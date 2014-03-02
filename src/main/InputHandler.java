@@ -11,7 +11,7 @@ import main.Keys.Key;
 public class InputHandler implements KeyListener {
 	
 	Map<Key, Integer> mappings = new HashMap<Key, Integer>();
-	private int tick = 0;
+	private boolean hasTapped = false;
 	
 	public InputHandler(Keys keys) {
 		initialize(keys.up, KeyEvent.VK_UP);
@@ -33,10 +33,7 @@ public class InputHandler implements KeyListener {
 			}
 		}
 		if (key != null) {
-			if (tick > 0)
-				key.isTapped = false;
-			else
-				key.isTapped = true;
+			key.isTapped = this.hasTapped;
 			key.nextState = value;
 		}
 	}
@@ -48,15 +45,13 @@ public class InputHandler implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		toggle(e, true);
-		tick++;
-		if (tick > 10)
-			tick = 10;
+		this.hasTapped = false;
 	}
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
 		toggle(e, false);
-		tick = 0;
+		this.hasTapped = true;
 	}
 	
 }

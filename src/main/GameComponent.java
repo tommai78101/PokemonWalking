@@ -12,14 +12,18 @@ import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import level.BaseWorld;
 import level.TestWorld;
 import screen.BaseScreen;
+import abstracts.Entity;
 import entity.TestEntity;
 
 public class GameComponent extends Canvas implements Runnable {
@@ -28,11 +32,11 @@ public class GameComponent extends Canvas implements Runnable {
 	public static String GAME_TITLE = "Hobby";
 	public static int GAME_WIDTH = 160;
 	public static int GAME_HEIGHT = 144;
+	public static int GAME_SCALE = 3;
 	
 	//-----------------------
 	private final BaseScreen screen;
 	
-	public int scale;
 	private boolean running;
 	private int fps;
 	
@@ -40,18 +44,16 @@ public class GameComponent extends Canvas implements Runnable {
 	private InputHandler inputHandler;
 	
 	//-----------------------
-	public TestWorld world;
-	public TestEntity player;
+	public BaseWorld world;
+	public Entity player;
 	
 	//-----------------------
 	
 	public GameComponent() {
-		scale = 3;
 		running = false;
 		
 		screen = new BaseScreen(GAME_WIDTH, GAME_HEIGHT);
 		screen.loadResources();
-		this.createWorld();
 	}
 	
 	public void init() {
@@ -64,15 +66,7 @@ public class GameComponent extends Canvas implements Runnable {
 		
 		//-------------------
 		//World loading
-		initializeWorld();
-	}
-	
-	public void createWorld() {
-		world = new TestWorld(30, 20);
-		//TODO: Create a method of loading the world.
-	}
-	
-	public void initializeWorld() {
+		world = new TestWorld(40, 20);
 		this.player = new TestEntity(keys);
 		this.world.addEntity(player);
 	}
@@ -80,6 +74,7 @@ public class GameComponent extends Canvas implements Runnable {
 	public void start() {
 		running = true;
 		Thread thread = new Thread(this);
+		thread.setName("Game Loop Thread");
 		thread.start();
 	}
 	
@@ -94,6 +89,8 @@ public class GameComponent extends Canvas implements Runnable {
 		double unprocessed = 0.0;
 		int frames = 0;
 		int tick = 0;
+		boolean shouldRender = false;
+		final double nsPerTick = 1000000000.0 / 60.0;
 		try {
 			init();
 		}
@@ -103,8 +100,11 @@ public class GameComponent extends Canvas implements Runnable {
 		}
 		
 		while (running) {
-			double nsPerTick = 1000000000.0 / 60.0;
-			boolean shouldRender = false;
+			shouldRender = false;
+			long now = System.nanoTime();
+			unprocessed += (now - lastTime) / nsPerTick;
+			lastTime = now;
+			
 			while (unprocessed >= 1) {
 				tick++;
 				unprocessed -= 1;
@@ -114,8 +114,8 @@ public class GameComponent extends Canvas implements Runnable {
 			int toTick = tick;
 			if (tick > 0 && tick < 3)
 				toTick = 1;
-			if (tick > 20)
-				toTick = 20;
+			if (tick > 7)
+				toTick = 7;
 			
 			for (int i = 0; i < toTick; i++) {
 				tick--;
@@ -123,34 +123,16 @@ public class GameComponent extends Canvas implements Runnable {
 				shouldRender = true;
 			}
 			
-			BufferStrategy bufferStrategy = this.getBufferStrategy();
-			if (bufferStrategy == null) {
-				this.createBufferStrategy(4);
-				continue;
-			}
-			
 			if (shouldRender) {
 				frames++;
-				Graphics g = bufferStrategy.getDrawGraphics();
-				render(g);
-				g.dispose();
+				render();
 			}
-			
-			long now = System.nanoTime();
-			unprocessed += (now - lastTime) / nsPerTick;
-			lastTime = now;
 			
 			try {
 				Thread.sleep(1);
 			}
 			catch (InterruptedException e) {
 				e.printStackTrace();
-			}
-			
-			if (shouldRender) {
-				if (bufferStrategy != null) {
-					bufferStrategy.show();
-				}
 			}
 			
 			if (System.currentTimeMillis() - lastTimer > 1000) {
@@ -166,24 +148,34 @@ public class GameComponent extends Canvas implements Runnable {
 	public synchronized void tick() {
 		keys.tick();
 		world.tick();
-		
 	}
 	
-	public synchronized void render(Graphics g) {
-		g.setColor(Color.LIGHT_GRAY);
-		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-		g.translate((((this.getWidth() - (GAME_WIDTH) * scale)) / 2) - this.player.xPosition * scale, ((this.getHeight() - (GAME_HEIGHT) * scale) / 2) - this.player.yPosition * scale);
-		g.clipRect(0, 0, GAME_WIDTH * scale, GAME_HEIGHT * scale);
-		screen.clear(0xffffff);
-		
-		if (world != null) {
-			int xScroll = (player.xPosition);
-			int yScroll = (player.yPosition);
-			world.render(screen, xScroll, yScroll);
+	public synchronized void render() {
+		BufferStrategy bufferStrategy = this.getBufferStrategy();
+		if (bufferStrategy == null) {
+			//Create new buffers before returning, if no buffers exist yet.
+			this.createBufferStrategy(2);
+			return;
 		}
 		
-		BufferedImage image = createCompatibleBufferedImage(screen.getBufferedImage());
-		g.drawImage(image, 0, 0, GAME_WIDTH * scale, GAME_HEIGHT * scale, null);
+		//Get graphics variable.
+		Graphics g = bufferStrategy.getDrawGraphics();
+		
+		//Background border
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(0, 0, this.getWidth(), this.getHeight());
+		screen.clear(0x44bb44);
+		
+		//World rendering.
+		if (world != null) {
+			int xScroll = player.getX() - screen.getWidth() / 2;
+			int yScroll = player.getY() - screen.getHeight() / 2;
+			world.render(screen, xScroll, yScroll);
+		}
+		BufferedImage image = this.createCompatibleBufferedImage(screen.getBufferedImage());
+		g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), null);
+		g.dispose();
+		bufferStrategy.show();
 	}
 	
 	public WindowListener getWindowListener() {
@@ -193,25 +185,6 @@ public class GameComponent extends Canvas implements Runnable {
 				GameComponent.this.stop();
 			}
 		};
-	}
-	
-	public static void main(String[] args) {
-		GameComponent game = new GameComponent();
-		JFrame frame = new JFrame(GAME_TITLE);
-		
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(game);
-		frame.setContentPane(panel);
-		frame.pack();
-		frame.setResizable(false);
-		Insets inset = frame.getInsets();
-		frame.setSize(new Dimension(inset.left + inset.right + GAME_WIDTH * game.scale, inset.top + inset.bottom + GAME_HEIGHT * game.scale));
-		frame.setLocationRelativeTo(null);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.addWindowListener(game.getWindowListener());
-		frame.setVisible(true);
-		
-		game.start();
 	}
 	
 	//-------------------------------
@@ -227,6 +200,40 @@ public class GameComponent extends Canvas implements Runnable {
 		graphics.dispose();
 		return newImage;
 	}
+	
+	private BufferedImage scaleBufferedImage(BufferedImage before) {
+		int w = before.getWidth();
+		int h = before.getHeight();
+		BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		AffineTransform at = new AffineTransform();
+		at.scale(GAME_SCALE, GAME_SCALE);
+		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
+		after = scaleOp.filter(before, after);
+		return after;
+	}
+	
 	//---------------------------------
 	//Other methods
+	
+	//---------------------------------
+	//Main execution method
+	
+	public static void main(String[] args) {
+		GameComponent game = new GameComponent();
+		JFrame frame = new JFrame(GAME_TITLE);
+		
+		JPanel panel = new JPanel(new BorderLayout());
+		panel.add(game);
+		frame.setContentPane(panel);
+		frame.pack();
+		frame.setResizable(false);
+		Insets inset = frame.getInsets();
+		frame.setSize(new Dimension(inset.left + inset.right + GAME_WIDTH * GAME_SCALE, inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE));
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(game.getWindowListener());
+		frame.setVisible(true);
+		
+		game.start();
+	}
 }

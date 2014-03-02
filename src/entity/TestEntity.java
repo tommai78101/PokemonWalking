@@ -5,12 +5,11 @@ import level.tile.Tile;
 import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
+import abstracts.Entity;
 
 public class TestEntity extends Entity {
 	
 	public Keys keys;
-	public int xPosition;
-	public int yPosition;
 	int facing = 0;
 	int turning = 0;
 	byte animationTick = 0;
@@ -31,8 +30,19 @@ public class TestEntity extends Entity {
 	}
 	
 	@Override
+	public int getX() {
+		return xPosition;
+	}
+	
+	@Override
+	public int getY() {
+		return yPosition;
+	}
+	
+	@Override
 	public void initialize(BaseWorld world) {
-		
+		this.xPosition = (world.getWidth() / 2) * Tile.WIDTH;
+		this.yPosition = (world.getHeight() / 2) * Tile.HEIGHT;
 	}
 	
 	@Override
@@ -104,10 +114,12 @@ public class TestEntity extends Entity {
 	public void render(BaseScreen screen) {
 		//Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
 		if (lockWalking) {
-			screen.blit(Art.player[turning][animationPointer], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
+			//screen.blit(Art.player[turning][animationPointer], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
+			screen.blit(Art.player[turning][animationPointer], xPosition - Tile.WIDTH, yPosition - Tile.HEIGHT / 2);
 		}
 		else
-			screen.blit(Art.player[facing][0], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
+			//screen.blit(Art.player[facing][0], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
+			screen.blit(Art.player[facing][0], xPosition - Tile.WIDTH, yPosition - Tile.HEIGHT / 2);
 		
 	}
 	

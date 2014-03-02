@@ -30,14 +30,15 @@ public class BaseScreen extends BaseBitmap {
 	}
 	
 	public void blit(BaseBitmap bitmap, int x, int y) {
-		this.blit(bitmap, x, y, bitmap.width, bitmap.height);
+		this.blit(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height);
 	}
 	
 	public void blit(BaseBitmap bitmap, int x, int y, int w, int h) {
-		//TODO: May need to change parameter types into abstracts/interfaces.
-		if (w == -1)
+		//This directly blits the bitmap to the X and Y coordinates within the screen area.
+		//The Rect adjusts the blitting area to within the screen area.
+		if (w <= -1)
 			w = bitmap.width;
-		if (h == -1)
+		if (h <= -1)
 			h = bitmap.height;
 		Rect blitArea = new Rect(x, y, w, h).adjust(this);
 		int blitWidth = blitArea.bottomRightCorner_X - blitArea.topLeftCorner_X;
@@ -84,5 +85,13 @@ public class BaseScreen extends BaseBitmap {
 		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
 		
 		return 0xFF000000 | red | green | blue;
+	}
+	
+	public int getXOffset() {
+		return xOffset;
+	}
+	
+	public int getYOffset() {
+		return yOffset;
 	}
 }
