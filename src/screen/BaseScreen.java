@@ -3,10 +3,14 @@ package screen;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
+import java.util.Random;
 
 import resources.Art;
 
 public class BaseScreen extends BaseBitmap {
+	
+	//TODO: Add more drawing functions that enable more controls when it comes to rendering assets.
+	
 	protected BufferedImage image;
 	protected int xOffset;
 	protected int yOffset;
@@ -63,6 +67,11 @@ public class BaseScreen extends BaseBitmap {
 	public void setOffset(int xOff, int yOff) {
 		this.xOffset = xOff;
 		this.yOffset = yOff;
+	}
+	
+	public void createStaticNoise(Random r) {
+		for (int p = 0; p < pixels.length; p++)
+			pixels[p] = r.nextInt();
 	}
 	
 	//-------------------------------------------

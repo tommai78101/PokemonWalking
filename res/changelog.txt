@@ -1,0 +1,21 @@
+Changelog (For backup reasons)
+
+----------
+
+1. Added a new test world.
+2. Implemented loading tiles based on pixel position in world file.
+
+
+Revision 4
+commit SHA-1: 29a57540d0dfbf3b0a036aebe6f5321449102eee 
+
+1. Consolidated all rendering stuffs into one method.
+2. Removed translate() and clipRect() for the reason of not 
+   to confuse myself anymore.
+3. Change the xScroll and yScroll variables to track down a
+   player's position from center of screen.
+4. Removed the conditions to decrease gridX0 and gridY0 in 
+   World rendering, as it have no effects.
+5. Modified the player entity blitting positions relative 
+   to the player's coordinates, and not relative to the 
+   screen and player's coordinates altogether.

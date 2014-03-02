@@ -69,4 +69,8 @@ public class BaseBitmap {
 	public int getHeight() {
 		return this.height;
 	}
+	
+	public int[] getPixels() {
+		return this.pixels;
+	}
 }
