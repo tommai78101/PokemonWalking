@@ -28,6 +28,9 @@ public class Game {
 	private int xScroll;
 	private int yScroll;
 	
+	private int xCamera;
+	private int yCamera;
+	
 	public Game(BaseScreen output, Keys input) {
 		this.screen = output;
 		this.inputs = input;
@@ -46,9 +49,12 @@ public class Game {
 		//screen.createStaticNoise(Randomize);
 		//TODO: Re-create the player's fixed position to camera's center, while everything else moves around.
 		for (World w : worlds)
-			if (w != null)
-				w.render(screen, xScroll - player.getX(), yScroll - player.getY());
-		player.render(screen, xScroll - Tile.WIDTH, yScroll - Tile.HEIGHT);
+			if (w != null) {
+				//w.render(screen, xScroll - player.getX(), yScroll - player.getY());
+				w.render(screen, player.getX(), player.getY());
+			}
+		//player.render(screen, xScroll - Tile.WIDTH, yScroll - Tile.HEIGHT);
+		player.render(screen, screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
 	}
 	
 	public void tick() {
@@ -71,5 +77,11 @@ public class Game {
 		//CamCenter: the coordinates of the center of camera.
 		this.xScroll = xCamCenter;
 		this.yScroll = yCamCenter;
+	}
+	
+	public void setCameraRelativeToArea(int areaXPos, int areaYPos) {
+		//cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
+		this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
+		this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
 	}
 }

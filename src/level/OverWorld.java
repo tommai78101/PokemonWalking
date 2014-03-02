@@ -94,10 +94,31 @@ public class OverWorld extends World {
 	}
 	
 	@Override
-	public void render(BaseScreen screen, int xPosition, int yPosition) {
-		screen.setOffset(xPosition - Tile.WIDTH, yPosition - Tile.HEIGHT);
+	public void render(BaseScreen screen, int xPlayerPos, int yPlayerPos) {
+		/*screen.setOffset(xPosition - Tile.WIDTH, yPosition - Tile.HEIGHT);
 		renderTiles(screen, xPosition - screen.getWidth(), yPosition - screen.getHeight(), xPosition + screen.getWidth(), yPosition + screen.getHeight());
+		screen.setOffset(0, 0);*/
+		
+		/*screen.setOffset(xPositionInArea * Tile.WIDTH, yPositionInArea * Tile.HEIGHT);
+		renderTiles(screen, activeArea, xPositionInArea, yPositionInArea);
+		screen.setOffset(0, 0);*/
+		
+		/*int xOffset = xPlayerPos + screen.getWidth() / 2;
+		int yOffset = yPlayerPos + screen.getHeight() / 2;
+		renderTiles(screen, activeArea, xPlayerPos, yPlayerPos, xOffset, yOffset);*/
+		
+		//OverWorld offsets are not set.
+		//Setting area offsets with player positions
+		//activeArea.setOffset(xPlayerPos, yPlayerPos);
+		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
+		activeArea.renderTiles(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
+		
+	}
+	
+	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {
+		area.setPosition(xPosition, yPosition);
+		area.renderTiles(screen, -xOff, -yOff);
 	}
 	
 	public Tile getTile(int x, int y) {

@@ -99,20 +99,19 @@ public class Area extends World {
 		
 	}
 	
-	public void renderTiles(BaseScreen screen, int xTgt, int yTgt) {
-		if (xTgt < 0 || xTgt >= this.width || yTgt < 0 || yTgt >= this.height)
-			return;
-		drawTiles(screen, xTgt, yTgt);
-	}
-	
-	private void drawTiles(BaseScreen screen, int x, int y) {
-		switch (pixels[y * this.width + x]) {
-			case 0xFF00FF00:
-				screen.blit(Art.testTile, (x - 1) * Tile.WIDTH, (y - 1) * Tile.HEIGHT);
-				break;
-			default:
-				screen.blit(Art.smallTree, (x - 1) * Tile.WIDTH, (y - 1) * Tile.HEIGHT);
-				break;
+	public void renderTiles(BaseScreen screen, int xOff, int yOff) {
+		//X and Y are now offsets.
+		for (int y = 0; y < this.height; y++) {
+			for (int x = 0; x < this.width; x++) {
+				switch (pixels[y * this.width + x]) {
+					case 0xFF00FF00:
+						screen.blit(Art.testTile, (x - 1) * Tile.WIDTH - xOff, (y - 1) * Tile.HEIGHT - yOff);
+						break;
+					default:
+						screen.blit(Art.smallTree, (x - 1) * Tile.WIDTH - xOff, (y - 1) * Tile.HEIGHT - yOff);
+						break;
+				}
+			}
 		}
 	}
 	

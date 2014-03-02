@@ -21,7 +21,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import screen.BaseScreen;
-import abstracts.Tile;
 
 public class MainComponent extends Canvas implements Runnable {
 	
@@ -165,7 +164,7 @@ public class MainComponent extends Canvas implements Runnable {
 		//Background border
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-		screen.clear(0x44bb44);
+		screen.clear(0xA4E767);
 		
 		//World rendering.
 		//if (world != null) {
@@ -174,8 +173,8 @@ public class MainComponent extends Canvas implements Runnable {
 		//world.render(screen, xScroll, yScroll);
 		//}
 		
-		game.setScrollOffset(GAME_WIDTH / 2, (GAME_HEIGHT + Tile.HEIGHT) / 2);
-		
+		//game.setScrollOffset(GAME_WIDTH / 2, (GAME_HEIGHT + Tile.HEIGHT) / 2);
+		game.setCameraRelativeToArea(GAME_WIDTH / 2, GAME_HEIGHT / 2);
 		game.render();
 		
 		BufferedImage image = this.createCompatibleBufferedImage(screen.getBufferedImage());

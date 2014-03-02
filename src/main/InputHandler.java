@@ -18,6 +18,11 @@ public class InputHandler implements KeyListener {
 		initialize(keys.down, KeyEvent.VK_DOWN);
 		initialize(keys.left, KeyEvent.VK_LEFT);
 		initialize(keys.right, KeyEvent.VK_RIGHT);
+		
+		initialize(keys.W, KeyEvent.VK_W);
+		initialize(keys.S, KeyEvent.VK_S);
+		initialize(keys.A, KeyEvent.VK_A);
+		initialize(keys.D, KeyEvent.VK_D);
 	}
 	
 	public void initialize(Key key, int defaultKeyCode) {
@@ -30,6 +35,7 @@ public class InputHandler implements KeyListener {
 		for (Key k : keySet) {
 			if (mappings.get(k) == event.getKeyCode()) {
 				key = k;
+				break;
 			}
 		}
 		if (key != null) {
@@ -40,18 +46,29 @@ public class InputHandler implements KeyListener {
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
+		
+		//No effect.
+		this.hasTapped = false;
+		toggle(e, true);
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent e) {
+		
+		//Switch these two lines below around for Gen. 1 walking and Gen. 2 walking.
+		
+		//hasTapped on top: Gen. 1 walking.
+		//hasTapped on bottom: Gen. 2 walking.
 		toggle(e, true);
 		this.hasTapped = false;
 	}
 	
 	@Override
 	public void keyReleased(KeyEvent e) {
-		toggle(e, false);
+		//No effect.
 		this.hasTapped = true;
+		toggle(e, false);
+		
 	}
 	
 }

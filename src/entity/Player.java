@@ -97,50 +97,66 @@ public class Player extends Entity implements Collidable, Interactable {
 	
 	public void walk() {
 		if (!lockWalking) {
-			if (keys.up.isTappedDown) {
-				facing = 2;
-				animationTick = 0;
-				animationPointer = 0;
+			if (keys.up.isTappedDown || keys.W.isTappedDown) {
+				if (facing != 2) {
+					facing = 2;
+					animationTick = 0;
+					animationPointer = 0;
+				}
+				else
+					yAccel--;
 			}
-			else if (keys.down.isTappedDown) {
-				facing = 0;
-				animationTick = 0;
-				animationPointer = 0;
+			else if (keys.down.isTappedDown || keys.S.isTappedDown) {
+				if (facing != 0) {
+					facing = 0;
+					animationTick = 0;
+					animationPointer = 0;
+				}
+				else
+					yAccel++;
 			}
-			else if (keys.left.isTappedDown) {
-				facing = 1;
-				animationTick = 0;
-				animationPointer = 0;
+			else if (keys.left.isTappedDown || keys.A.isTappedDown) {
+				if (facing != 1) {
+					facing = 1;
+					animationTick = 0;
+					animationPointer = 0;
+				}
+				else
+					xAccel--;
 			}
-			else if (keys.right.isTappedDown) {
-				facing = 3;
-				animationTick = 0;
-				animationPointer = 0;
+			else if (keys.right.isTappedDown || keys.D.isTappedDown) {
+				if (facing != 3) {
+					facing = 3;
+					animationTick = 0;
+					animationPointer = 0;
+				}
+				else
+					xAccel++;
 			}
 		}
 		if (!lockWalking) {
-			if (keys.up.isPressedDown) {
+			if (keys.up.isPressedDown || keys.W.isPressedDown) {
 				if (facing == 2)
 					yAccel--;
 				else
 					facing = 2;
 				lockWalking = true;
 			}
-			if (keys.down.isPressedDown) {
+			if (keys.down.isPressedDown || keys.S.isPressedDown) {
 				if (facing == 0)
 					yAccel++;
 				else
 					facing = 0;
 				lockWalking = true;
 			}
-			if (keys.left.isPressedDown) {
+			if (keys.left.isPressedDown || keys.A.isPressedDown) {
 				if (facing == 1)
 					xAccel--;
 				else
 					facing = 1;
 				lockWalking = true;
 			}
-			if (keys.right.isPressedDown) {
+			if (keys.right.isPressedDown || keys.D.isPressedDown) {
 				if (facing == 3)
 					xAccel++;
 				else
@@ -175,7 +191,8 @@ public class Player extends Entity implements Collidable, Interactable {
 			output.blit(Art.player[turning][animationPointer], x, y);
 		}
 		else {
-			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown)
+			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
 				output.blit(Art.player[facing][animationPointer], x, y);
 			else
 				output.blit(Art.player[facing][0], x, y);
@@ -258,7 +275,7 @@ public class Player extends Entity implements Collidable, Interactable {
 	private void controlTick() {
 		animationTick++;
 		if (isBlocked) {
-			if (animationTick >= 24) {
+			if (animationTick >= 20) {
 				animationTick = 0;
 			}
 		}
