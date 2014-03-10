@@ -6,9 +6,7 @@ import level.Area;
 import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
-import abstracts.BaseWorld;
-import abstracts.Entity;
-import abstracts.Tile;
+import abstracts.*;
 
 public class Player extends Entity implements Collidable, Interactable {
 	
@@ -26,15 +24,19 @@ public class Player extends Entity implements Collidable, Interactable {
 	
 	AnimationType animationType;
 	
+	
 	public Inventory inventory;
 	
 	//--------------------------------------------------------------------------
 	
 	BaseWorld world;
-	int facing = 0;
 	int turning = 0;
+	
+	//These are based on the art sprite in the resource folder. The numbers are used to get elements from a 2D array.
+	int facing = 0;
 	int lastFacing = -1;
 	
+
 	int testValue = 0;
 	
 	int xAccel;

@@ -1,21 +1,9 @@
 package main;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.*;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -91,7 +79,7 @@ public class MainComponent extends Canvas implements Runnable {
 		int frames = 0;
 		int tick = 0;
 		boolean shouldRender = false;
-		final double nsPerTick = 1000000000.0 / 60.0;
+		final double nsPerTick = 1000000000.0 / 30.0;
 		try {
 			init();
 		}
