@@ -5,11 +5,9 @@ import java.util.ArrayList;
 import screen.BaseBitmap;
 import screen.BaseScreen;
 import abstracts.Tile;
-import abstracts.World;
 import entity.Player;
 
-public class Area extends World {
-	
+public class Area {
 	private final int width;
 	private final int height;
 	private final int[] pixels;
@@ -18,6 +16,8 @@ public class Area extends World {
 	private int yPlayerPosition;
 	private Player player;
 	
+	private BaseBitmap bitmap;
+
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	
 	public Area(BaseBitmap bitmap) {
@@ -31,6 +31,8 @@ public class Area extends World {
 			for (int x = 0; x < this.width; x++) {
 				int pixel = this.pixels[y * this.width + x];
 				PixelData px = new PixelData(pixel, x, y);
+				
+				//Will probably work more on this in the future once I've moved on to WayPoints.
 				/*
 				  px.xPosition = x;
 				px.yPosition = y;
@@ -43,6 +45,7 @@ public class Area extends World {
 					px.setAsWarpZone(parentArea, targetArea);
 					px.canBeWalkedThrough = false;
 				}*/
+
 				areaData.get(y).add(px);
 			}
 		}
@@ -60,66 +63,67 @@ public class Area extends World {
 		return this.height;
 	}
 	
-	@Override
 	public void tick() {
-		xPlayerPosition = player.getXInArea();
-		yPlayerPosition = player.getYInArea();
-		if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
-			return;
-		PixelData data = null;
-		//Target pixel is now used to determine the pixel data the player is currently 
-		//facing (or what pixel is currently in front of the player?).
-		switch (player.getFacing()) {
-			case 0:
-				//Down
-				if (this.yPlayerPosition + 1 < this.height)
-					data = areaData.get(this.yPlayerPosition + 1).get(this.xPlayerPosition);
-				break;
-			case 1:
-				//Left
-				if (this.xPlayerPosition - 1 >= 0)
-					data = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition - 1);
-				break;
-			case 2:
-				//Up
-				if (this.yPlayerPosition - 1 >= 0)
-					data = areaData.get(this.yPlayerPosition - 1).get(this.xPlayerPosition);
-				break;
-			case 3:
-				//Right
-				if (this.xPlayerPosition + 1 < this.width)
-					data = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition + 1);
-				break;
-		}
-		if (data != null) {
-			if (player.isNotLockedWalking()) {
-				//System.out.println("Player is not facing an Obstacle.");
-				switch (data.getColor()) {
-					case 0xFFFF00FF:
-						player.blockPath(true);
-						break;
-					case 0xFF0000EE:
-						System.out.println("Facing warp zone.");
-						player.blockPath(false);
-						break;
-					default:
-						player.blockPath(false);
-						break;
+		//Since "setPlayer" method isn't always set, there should be checks everywhere to make sure "player" isn't null.
+		if (this.player != null) {
+			xPlayerPosition = player.getXInArea();
+			yPlayerPosition = player.getYInArea();
+			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
+				return;
+			PixelData data = null;
+			//Target pixel is now used to determine the pixel data the player is currently 
+			//facing (or what pixel is currently in front of the player?).
+			switch (player.getFacing()) {
+				case 0:
+					//Down
+					if (this.yPlayerPosition + 1 < this.height)
+						data = areaData.get(this.yPlayerPosition + 1).get(this.xPlayerPosition);
+					break;
+				case 1:
+					//Left
+					if (this.xPlayerPosition - 1 >= 0)
+						data = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition - 1);
+					break;
+				case 2:
+					//Up
+					if (this.yPlayerPosition - 1 >= 0)
+						data = areaData.get(this.yPlayerPosition - 1).get(this.xPlayerPosition);
+					break;
+				case 3:
+					//Right
+					if (this.xPlayerPosition + 1 < this.width)
+						data = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition + 1);
+					break;
+			}
+			if (data != null) {
+				if (player.isNotLockedWalking()) {
+					//System.out.println("Player is not facing an Obstacle.");
+					switch (data.getColor()) {
+						case 0xFFFF00FF:
+							player.blockPath(true);
+							break;
+						case 0xFF0000EE:
+							System.out.println("Facing warp zone.");
+							player.blockPath(false);
+							break;
+						default:
+							player.blockPath(false);
+							break;
+					}
 				}
 			}
+			
+			//Target pixel is used to determine what pixel the player is currently standing on
+			//(or what pixel the player is currently on top of).
+			data = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+			switch (data.getColor()) {
+				case 0xFF0000EE:
+					System.out.println("Is in warp zone.");
+					//TODO: Do something about this. Player supposed to be teleported to a new area at this point.
+				default:
+					break;
+			}
 		}
-		
-		//Target pixel is used to determine what pixel the player is currently standing on
-		//(or what pixel the player is currently on top of).
-		data = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-		switch (data.getColor()) {
-			case 0xFF0000EE:
-				System.out.println("Is in warp zone.");
-				//TODO: Do something about this. Player supposed to be teleported to a new area at this point.
-			default:
-				break;
-		}
-
 	}
 	
 	public void renderTiles(BaseScreen screen, int xOff, int yOff) {
@@ -130,6 +134,7 @@ public class Area extends World {
 		}
 	}
 	
+	//Getters/Setters
 	public int getPlayerX() {
 		return this.xPlayerPosition;
 	}
@@ -146,10 +151,10 @@ public class Area extends World {
 		this.yPlayerPosition = y;
 	}
 	
+
 	public void setDefaultPosition(Player player) {
 		//TODO: When the game starts from the very beginning, the player must always start from the very first way point.
 		player.setAreaPosition(1, 1);
 	}
 	
-
 }
