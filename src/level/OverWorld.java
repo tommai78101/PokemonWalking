@@ -25,8 +25,11 @@ public class OverWorld extends World {
 		//Player
 		this.player = player;
 		
+
 		//Going to set this area as test default only. This will need to change in the future.
 		this.currentArea = new Area(Art.testArea);
+		this.currentArea.setPlayer(player);
+		this.currentArea.setDefaultPosition();
 		//Needs a marker in the area that points to where the area connects together.
 		
 		
@@ -77,8 +80,8 @@ public class OverWorld extends World {
 	
 	@Override
 	public void tick() {
-		this.player.tick();
 		this.currentArea.tick();
+		this.player.tick();
 	}
 	
 	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {

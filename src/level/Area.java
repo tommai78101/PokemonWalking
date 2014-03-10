@@ -152,7 +152,7 @@ public class Area {
 	}
 	
 
-	public void setDefaultPosition(Player player) {
+	public void setDefaultPosition() {
 		//TODO: When the game starts from the very beginning, the player must always start from the very first way point.
 		player.setAreaPosition(1, 1);
 	}
