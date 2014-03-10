@@ -33,6 +33,7 @@ public class Player extends Entity implements Collidable, Interactable {
 	BaseWorld world;
 	int facing = 0;
 	int turning = 0;
+	int lastFacing = -1;
 	
 	int testValue = 0;
 	
@@ -42,11 +43,19 @@ public class Player extends Entity implements Collidable, Interactable {
 	boolean lockWalking;
 	boolean isBlocked;
 	
+	//--------------------------------------------------------------------------
+
 	public Player(Keys keys) {
 		this.keys = keys;
 	}
 	
-	public void setCenter(BaseScreen screen) {
+	public void setCenterCamPosition(BaseScreen screen) {
+		this.setRenderOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
+	}
+	
+	public void setRenderOffset(int x, int y) {
+		this.xOffset = x;
+		this.yOffset = y;
 	}
 	
 	public void bang() {
@@ -55,12 +64,12 @@ public class Player extends Entity implements Collidable, Interactable {
 	
 	public int getXInArea() {
 		//Returns area position X.
-		return xPosition / Tile.WIDTH + 1;
+		return xPosition / Tile.WIDTH;
 	}
 	
 	public int getYInArea() {
 		//Returns area position Y.
-		return yPosition / Tile.HEIGHT + 1;
+		return yPosition / Tile.HEIGHT;
 	}
 	
 	@Override
@@ -99,68 +108,81 @@ public class Player extends Entity implements Collidable, Interactable {
 		if (!lockWalking) {
 			if (keys.up.isTappedDown || keys.W.isTappedDown) {
 				if (facing != 2) {
+					lastFacing = facing;
 					facing = 2;
 					animationTick = 0;
 					animationPointer = 0;
 				}
-				else
+				else {
 					yAccel--;
+				}
 			}
 			else if (keys.down.isTappedDown || keys.S.isTappedDown) {
 				if (facing != 0) {
+					lastFacing = facing;
 					facing = 0;
 					animationTick = 0;
 					animationPointer = 0;
 				}
-				else
+				else {
 					yAccel++;
+				}
 			}
 			else if (keys.left.isTappedDown || keys.A.isTappedDown) {
 				if (facing != 1) {
+					lastFacing = facing;
 					facing = 1;
 					animationTick = 0;
 					animationPointer = 0;
 				}
-				else
+				else {
 					xAccel--;
+				}
 			}
 			else if (keys.right.isTappedDown || keys.D.isTappedDown) {
 				if (facing != 3) {
+					lastFacing = facing;
 					facing = 3;
 					animationTick = 0;
 					animationPointer = 0;
 				}
-				else
+				else {
 					xAccel++;
+				}
+
 			}
 		}
 		if (!lockWalking) {
 			if (keys.up.isPressedDown || keys.W.isPressedDown) {
 				if (facing == 2)
 					yAccel--;
-				else
+				else {
 					facing = 2;
+				}
 				lockWalking = true;
 			}
 			if (keys.down.isPressedDown || keys.S.isPressedDown) {
 				if (facing == 0)
 					yAccel++;
-				else
+				else {
 					facing = 0;
+				}
 				lockWalking = true;
 			}
 			if (keys.left.isPressedDown || keys.A.isPressedDown) {
 				if (facing == 1)
 					xAccel--;
-				else
+				else {
 					facing = 1;
+				}
 				lockWalking = true;
 			}
 			if (keys.right.isPressedDown || keys.D.isPressedDown) {
 				if (facing == 3)
 					xAccel++;
-				else
+				else {
 					facing = 3;
+				}
 				lockWalking = true;
 			}
 		}
@@ -187,15 +209,21 @@ public class Player extends Entity implements Collidable, Interactable {
 	}
 	
 	public void render(BaseScreen output, int x, int y) {
+		
+		//render(BaseScreen output, int x, int y)
+		//output: where to blit the bitmap
+		//x: Pixel X offset
+		//y: Pixel Y offset
+
 		if (lockWalking) {
-			output.blit(Art.player[turning][animationPointer], x, y);
+			output.blit(Art.player[turning][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else {
 			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
 					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
-				output.blit(Art.player[facing][animationPointer], x, y);
+				output.blit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 			else
-				output.blit(Art.player[facing][0], x, y);
+				output.blit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
 		}
 	}
 	
@@ -223,6 +251,10 @@ public class Player extends Entity implements Collidable, Interactable {
 		return facing;
 	}
 	
+	public int getLastFacing() {
+		return lastFacing;
+	}
+
 	@Override
 	public void interact(Interactable object) {
 	}
@@ -288,5 +320,14 @@ public class Player extends Entity implements Collidable, Interactable {
 			if (animationPointer > 3)
 				animationPointer = 0;
 		}
+	}
+	
+	public void setAreaPosition(int x, int y) {
+		this.setPosition(x * Tile.WIDTH, y * Tile.HEIGHT);
+	}
+	
+	public boolean hasChangedFacing() {
+		//True, if current facing has been changed.
+		return this.lastFacing != this.facing;
 	}
 }

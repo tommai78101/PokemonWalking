@@ -12,6 +12,11 @@ import entity.Data;
 import entity.Plot;
 
 public abstract class World {
+
+	
+	
+	
+	
 	protected BaseBitmap bitmap;
 	protected int xOffset;
 	protected int yOffset;

@@ -15,6 +15,7 @@ public class Art {
 	
 	//Area
 	public static BaseBitmap testArea;
+	public static BaseBitmap testArea2;
 	
 	//Others
 	public static BaseBitmap sprite;
@@ -27,5 +28,6 @@ public class Art {
 		testDownAnimation = screen.cut("/art/player/test_walk_down_animation.png", 16, 16, 0, 0);
 		
 		testArea = screen.load("/area/test/testArea.png");
+		testArea2 = screen.load("/area/test/testArea2.png");
 	}
 }

@@ -21,6 +21,7 @@ public class Game {
 	private final Keys inputs;
 	private final Gui guiInterface;
 	private final List<World> worlds;
+	private World overworld;
 	private final Player player;
 	private Plot storyPlot;
 	private Data data;
@@ -34,35 +35,47 @@ public class Game {
 	public Game(BaseScreen output, Keys input) {
 		this.screen = output;
 		this.inputs = input;
+
 		player = new Player(input);
+		player.setCenterCamPosition(output);
+
 		this.guiInterface = new Gui();
 		
 		worlds = new ArrayList<World>();
 		
-		OverWorld world = new OverWorld("Test");
+		OverWorld world = new OverWorld(player);
+		overworld = world;
 		world.initialize(player);
 		worlds.add(world);
 	}
 	
 	public void render() {
 		//TODO: Do rendering by calling "BaseScreen" variable and call one of many draw methods provided.
-		//screen.createStaticNoise(Randomize);
 		//TODO: Re-create the player's fixed position to camera's center, while everything else moves around.
+		//TODO: Overworld must be drawn while the player is moving around. Small areas can only be seen after the camera culls out the overworld.
+		/*
 		for (World w : worlds)
 			if (w != null) {
-				//w.render(screen, xScroll - player.getX(), yScroll - player.getY());
 				w.render(screen, player.getX(), player.getY());
 			}
-		//player.render(screen, xScroll - Tile.WIDTH, yScroll - Tile.HEIGHT);
-		player.render(screen, screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
+		*/
+		
+		overworld.render(screen, player.getX(), player.getY());
+		player.render(screen, 0, 0);
 	}
 	
 	public void tick() {
 		//TODO: This updates for all objects given.
+		/*
 		for (World w : worlds)
 			if (w != null)
 				w.tick();
+		*/
 		player.tick();
+		overworld.tick();
+		
+		checkPlayerWarpZone();
+
 	}
 	
 	public void save() {
@@ -83,5 +96,9 @@ public class Game {
 		//cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
 		this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
 		this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
+	}
+	
+	public void checkPlayerWarpZone() {
+		
 	}
 }

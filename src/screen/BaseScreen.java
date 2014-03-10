@@ -34,7 +34,8 @@ public class BaseScreen extends BaseBitmap {
 	}
 	
 	public void blit(BaseBitmap bitmap, int x, int y) {
-		this.blit(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height);
+		if (bitmap != null)
+			this.blit(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height);
 	}
 	
 	public void blit(BaseBitmap bitmap, int x, int y, int w, int h) {
