@@ -80,8 +80,9 @@ public class OverWorld extends World {
 	
 	@Override
 	public void tick() {
-		this.currentArea.tick();
 		this.player.tick();
+		this.currentArea.tick();
+
 	}
 	
 	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {

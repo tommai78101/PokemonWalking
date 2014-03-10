@@ -9,6 +9,10 @@ import screen.BaseScreen;
 import abstracts.*;
 
 public class Player extends Entity implements Collidable, Interactable {
+	private final int UP = 2;
+	private final int DOWN = 0;
+	private final int LEFT = 1;
+	private final int RIGHT = 3;
 	
 	public Keys keys;
 	
@@ -24,24 +28,21 @@ public class Player extends Entity implements Collidable, Interactable {
 	
 	AnimationType animationType;
 	
-	
 	public Inventory inventory;
 	
 	//--------------------------------------------------------------------------
 	
-	BaseWorld world;
-	int turning = 0;
-	
 	//These are based on the art sprite in the resource folder. The numbers are used to get elements from a 2D array.
 	int facing = 0;
-	int lastFacing = -1;
-	
-
-	int testValue = 0;
+	int lastFacing = 0;
+	int turning = 0;
 	
 	int xAccel;
 	int yAccel;
 	
+	int oldXPosition;
+	int oldYPosition;
+
 	boolean lockWalking;
 	boolean isBlocked;
 	
@@ -66,12 +67,36 @@ public class Player extends Entity implements Collidable, Interactable {
 	
 	public int getXInArea() {
 		//Returns area position X.
-		return xPosition / Tile.WIDTH;
+		//if (!this.lockWalking)
+		int result = (xPosition / Tile.WIDTH);
+		if (this.lockWalking)
+			switch (facing) {
+				case LEFT:
+					break;
+				case RIGHT:
+					result += 1;
+					break;
+			}
+		//System.out.println("" + result);
+
+		return result;
+		//return this.oldXPosition / Tile.WIDTH;
 	}
 	
 	public int getYInArea() {
 		//Returns area position Y.
-		return yPosition / Tile.HEIGHT;
+		//if (!this.lockWalking)
+		int result = (yPosition / Tile.HEIGHT);
+		if (this.lockWalking)
+			switch (facing) {
+				case UP:
+					break;
+				case DOWN:
+					result += 1;
+					break;
+			}
+		return result;
+		//return this.oldYPosition / Tile.HEIGHT;
 	}
 	
 	@Override
@@ -98,7 +123,7 @@ public class Player extends Entity implements Collidable, Interactable {
 	public void tick() {
 		
 		//Tile object = this.world.getTile(nextX, nextY);
-		//if (!facingObstacle(object)) {
+		//if (!facingObstacle(object)){ 
 		walk();
 		//}
 		//else {
@@ -106,89 +131,102 @@ public class Player extends Entity implements Collidable, Interactable {
 		//}
 	}
 	
-	public void walk() {
-		if (!lockWalking) {
-			if (keys.up.isTappedDown || keys.W.isTappedDown) {
-				if (facing != 2) {
-					lastFacing = facing;
-					facing = 2;
-					animationTick = 0;
-					animationPointer = 0;
-				}
-				else {
-					yAccel--;
-				}
+	public boolean tapped() {
+		if (keys.up.isTappedDown || keys.W.isTappedDown) {
+			if (facing != UP) {
+				lastFacing = facing;
+				facing = UP;
+				animationTick = 0;
+				animationPointer = 0;
 			}
-			else if (keys.down.isTappedDown || keys.S.isTappedDown) {
-				if (facing != 0) {
-					lastFacing = facing;
-					facing = 0;
-					animationTick = 0;
-					animationPointer = 0;
-				}
-				else {
-					yAccel++;
-				}
+			else {
+				yAccel--;
+				return true;
 			}
-			else if (keys.left.isTappedDown || keys.A.isTappedDown) {
-				if (facing != 1) {
-					lastFacing = facing;
-					facing = 1;
-					animationTick = 0;
-					animationPointer = 0;
-				}
-				else {
-					xAccel--;
-				}
+		}
+		else if (keys.down.isTappedDown || keys.S.isTappedDown) {
+			if (facing != DOWN) {
+				lastFacing = facing;
+				facing = DOWN;
+				animationTick = 0;
+				animationPointer = 0;
 			}
-			else if (keys.right.isTappedDown || keys.D.isTappedDown) {
-				if (facing != 3) {
-					lastFacing = facing;
-					facing = 3;
-					animationTick = 0;
-					animationPointer = 0;
-				}
-				else {
-					xAccel++;
-				}
+			else {
+				yAccel++;
+				return true;
+			}
+		}
+		else if (keys.left.isTappedDown || keys.A.isTappedDown) {
+			if (facing != LEFT) {
+				lastFacing = facing;
+				facing = LEFT;
+				animationTick = 0;
+				animationPointer = 0;
+			}
+			else {
+				xAccel--;
+				return true;
+			}
+		}
+		else if (keys.right.isTappedDown || keys.D.isTappedDown) {
+			if (facing != RIGHT) {
+				lastFacing = facing;
+				facing = RIGHT;
+				animationTick = 0;
+				animationPointer = 0;
+			}
+			else {
+				xAccel++;
+				return true;
+			}
 
-			}
 		}
-		if (!lockWalking) {
-			if (keys.up.isPressedDown || keys.W.isPressedDown) {
-				if (facing == 2)
-					yAccel--;
-				else {
-					facing = 2;
-				}
-				lockWalking = true;
+		return false;
+	}
+	
+	public void pressed() {
+		if (keys.up.isPressedDown || keys.W.isPressedDown) {
+			if (facing == UP)
+				yAccel--;
+			else {
+				facing = UP;
 			}
-			if (keys.down.isPressedDown || keys.S.isPressedDown) {
-				if (facing == 0)
-					yAccel++;
-				else {
-					facing = 0;
-				}
-				lockWalking = true;
-			}
-			if (keys.left.isPressedDown || keys.A.isPressedDown) {
-				if (facing == 1)
-					xAccel--;
-				else {
-					facing = 1;
-				}
-				lockWalking = true;
-			}
-			if (keys.right.isPressedDown || keys.D.isPressedDown) {
-				if (facing == 3)
-					xAccel++;
-				else {
-					facing = 3;
-				}
-				lockWalking = true;
-			}
+			lockWalking = true;
 		}
-		handleMovement();
+		if (keys.down.isPressedDown || keys.S.isPressedDown) {
+			if (facing == DOWN)
+				yAccel++;
+			else {
+				facing = DOWN;
+			}
+			lockWalking = true;
+		}
+		if (keys.left.isPressedDown || keys.A.isPressedDown) {
+			if (facing == LEFT)
+				xAccel--;
+			else {
+				facing = LEFT;
+			}
+			lockWalking = true;
+		}
+		if (keys.right.isPressedDown || keys.D.isPressedDown) {
+			if (facing == RIGHT)
+				xAccel++;
+			else {
+				facing = RIGHT;
+			}
+			lockWalking = true;
+		}
+	}
+	
+	public void walk() {
+		if (!this.lockWalking) {
+			//			if (!tapped())
+			//				pressed();
+			tapped();
+			pressed();
+		}
+		handleMovementCheck();
 		controlTick();
 	}
 	
@@ -217,12 +255,12 @@ public class Player extends Entity implements Collidable, Interactable {
 		//x: Pixel X offset
 		//y: Pixel Y offset
 
-		if (lockWalking) {
+		if (this.lockWalking) {
 			output.blit(Art.player[turning][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else {
 			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+				|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
 				output.blit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 			else
 				output.blit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
@@ -282,23 +320,42 @@ public class Player extends Entity implements Collidable, Interactable {
 	//-----------------------------------
 	//Private methods
 	
-	private void handleMovement() {
-		if (isBlocked) {
-			xAccel = 0;
-			yAccel = 0;
+	private void handleMovementCheck() {
+		if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
+			if (this.isBlocked) {
+				xAccel = 0;
+				yAccel = 0;
+				turning = facing;
+				this.lockWalking = false;
+				return;
+			}
 		}
-		if (lockWalking) {
+
+		if (this.lockWalking) {
+			if (xAccel > 1)
+				xAccel = 1;
+			else if (xAccel < -1)
+				xAccel = -1;
+			else if (yAccel > 1)
+				yAccel = 1;
+			else if (yAccel < -1)
+				yAccel = -1;
+			
 			xPosition += xAccel;
 			yPosition += yAccel;
+			checkFacing();
+			if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
+				xAccel = 0;
+				yAccel = 0;
+				this.lockWalking = false;
+				turning = facing;
+			}
 		}
-		if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
-			lockWalking = false;
-			xAccel = 0;
-			yAccel = 0;
-			turning = facing;
+
+		if (Math.abs(xPosition - oldXPosition) == Tile.WIDTH || Math.abs(yPosition - oldYPosition) == Tile.HEIGHT) {
+			oldXPosition = xPosition;
+			oldYPosition = yPosition;
 		}
-		else
-			lockWalking = true;
 	}
 	
 	private boolean facingObstacle(Tile object) {
@@ -306,6 +363,21 @@ public class Player extends Entity implements Collidable, Interactable {
 		return isBlocked;
 	}
 	
+	private void checkFacing() {
+		if (keys.up.isTappedDown || keys.up.isPressedDown || keys.W.isTappedDown || keys.W.isPressedDown) {
+			facing = UP;
+		}
+		else if (keys.down.isTappedDown || keys.down.isPressedDown || keys.S.isTappedDown || keys.S.isPressedDown) {
+			facing = DOWN;
+		}
+		else if (keys.left.isTappedDown || keys.left.isPressedDown || keys.A.isTappedDown || keys.A.isPressedDown) {
+			facing = LEFT;
+		}
+		else if (keys.right.isTappedDown || keys.right.isPressedDown || keys.D.isTappedDown || keys.D.isPressedDown) {
+			facing = RIGHT;
+		}
+	}
+
 	private void controlTick() {
 		animationTick++;
 		if (isBlocked) {

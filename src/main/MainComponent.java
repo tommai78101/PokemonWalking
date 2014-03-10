@@ -125,7 +125,7 @@ public class MainComponent extends Canvas implements Runnable {
 			if (System.currentTimeMillis() - lastTimer > 1000) {
 				lastTimer += 1000;
 				fps = frames;
-				System.out.println("FPS: " + Integer.toString(fps));
+				//System.out.println("FPS: " + Integer.toString(fps));
 				frames = 0;
 			}
 		}

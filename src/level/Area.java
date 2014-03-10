@@ -66,13 +66,17 @@ public class Area {
 	public void tick() {
 		//Since "setPlayer" method isn't always set, there should be checks everywhere to make sure "player" isn't null.
 		if (this.player != null) {
+			PixelData data = null;
+			
 			xPlayerPosition = player.getXInArea();
 			yPlayerPosition = player.getYInArea();
+			//System.out.println("X: " + xPlayerPosition + " Y: " + yPlayerPosition);
 			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 				return;
-			PixelData data = null;
+			
 			//Target pixel is now used to determine the pixel data the player is currently 
 			//facing (or what pixel is currently in front of the player?).
+			
 			switch (player.getFacing()) {
 				case 0:
 					//Down
@@ -96,23 +100,25 @@ public class Area {
 					break;
 			}
 			if (data != null) {
-				if (player.isNotLockedWalking()) {
-					//System.out.println("Player is not facing an Obstacle.");
-					switch (data.getColor()) {
-						case 0xFFFF00FF:
-							player.blockPath(true);
-							break;
-						case 0xFF0000EE:
-							System.out.println("Facing warp zone.");
-							player.blockPath(false);
-							break;
-						default:
-							player.blockPath(false);
-							break;
-					}
+				//if (player.isNotLockedWalking()) {
+				//System.out.println("Player is not facing an Obstacle.");
+				switch (data.getColor()) {
+					case 0xFFFF00FF:
+						player.blockPath(true);
+						break;
+					case 0xFF0000EE:
+						System.out.println("Facing warp zone.");
+						player.blockPath(false);
+						break;
+					case 0xFF00FF00:
+						player.blockPath(false);
+						break;
+					default:
+						player.blockPath(true);
+						break;
+				//}
 				}
 			}
-			
 			//Target pixel is used to determine what pixel the player is currently standing on
 			//(or what pixel the player is currently on top of).
 			data = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
@@ -151,7 +157,6 @@ public class Area {
 		this.yPlayerPosition = y;
 	}
 	
-
 	public void setDefaultPosition() {
 		//TODO: When the game starts from the very beginning, the player must always start from the very first way point.
 		player.setAreaPosition(1, 1);
