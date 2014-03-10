@@ -5,80 +5,86 @@ import java.util.List;
 
 import resources.Art;
 import screen.BaseScreen;
-import abstracts.Entity;
 import abstracts.Tile;
 import abstracts.World;
 import entity.Player;
 
 public class OverWorld extends World {
 	
+	private static final int MAX_AREAS = 2;
+
+	//Contains overworld specific areas.
 	public List<Area> areas = new ArrayList<Area>();
-	public Area activeArea;
-	public Player player;
 	
+	//Already have currentArea and player.
+
 	public OverWorld(Player player) {
-		this.player = player;
-		//TODO: Work more on this "activeArea" part.
-		//What it should do: activeArea points to the area the player is in (making the area active).
-		activeArea = new Area(Art.testArea);
-		Area secondary = new Area(Art.testArea2);
+		//Must initialize all overworld specific properties, such as specific areas, specific dialogues, etc. first.		
+		initialize();
 		
+		//Player
+		this.player = player;
+		
+		//Going to set this area as test default only. This will need to change in the future.
+		this.currentArea = new Area(Art.testArea);
 		//Needs a marker in the area that points to where the area connects together.
 		
-		areas.add(activeArea);
-		areas.add(secondary);
 		
-		initialize();
 	}
 	
 	public void initialize() {
-		//Primarily the default area the player is to be in.
-		activeArea.setPlayer(player);
-		activeArea.setDefaultPosition(player);
+		//There should be a maximum number of areas available for the OverWorld.
+		this.areas.add(new Area(Art.testArea));
+		this.areas.add(new Area(Art.testArea2));
 	}
 	
-	public void addEntity(Entity e) {
-		//e.initialize(this);
-		//this.tiles.add(e);
+	//Will add this in the future. Currently, the only entity is Player.
+	//	public void addEntity(Entity e) {
+	//		//e.initialize(this);
+	//		//this.tiles.add(e);
+	//	}
+	
+	//Worlds no longer need to calculate total width and height.
+	//	public int getTotalWidth() {
+	//		int result = 0;
+	//		for (Area a : areas) {
+	//			if (a != null)
+	//				result += a.getWidth();
+	//		}
+	//		return result;
+	//	}
+	//	
+	//	public int getTotalHeight() {
+	//		int result = 0;
+	//		for (Area a : areas) {
+	//			if (a != null)
+	//				result += a.getHeight();
+	//		}
+	//		return result;
+	//	}
+	
+	//Not sure if these width and height values are useful...
+	public int getCurrentAreaWidth() {
+		return this.currentArea.getWidth();
 	}
 	
-	public int getTotalWidth() {
-		int result = 0;
-		for (Area a : areas) {
-			if (a != null)
-				result += a.getWidth();
-		}
-		return result;
+	public int getCurrentAreaHeight() {
+		return this.currentArea.getHeight();
 	}
 	
-	public int getTotalHeight() {
-		int result = 0;
-		for (Area a : areas) {
-			if (a != null)
-				result += a.getHeight();
-		}
-		return result;
-	}
 	
-	public int getActiveAreaWidth() {
-		return activeArea.getWidth();
-	}
 	
-	public int getActiveAreaHeight() {
-		return activeArea.getHeight();
-	}
 	
 	@Override
 	public void tick() {
-		//TODO: Pick the active area from the ArrayList<Area>, and point it to this variable here.
-		//Then activate the tick().		
-		activeArea.tick();
+		this.player.tick();
+		this.currentArea.tick();
 	}
 	
 	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {
 		for (int y = y0; y < y1; y++) {
 			for (int x = x0; x < x1; x++) {
-				activeArea.renderTiles(screen, x, y);
+				this.currentArea.renderTiles(screen, x, y);
 			}
 		}
 	}
@@ -89,14 +95,15 @@ public class OverWorld extends World {
 		//Setting area offsets with player positions
 
 		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
-		activeArea.renderTiles(screen, xPlayerPos, yPlayerPos);
+		this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
 		
 	}
 	
 	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {
-		area.setPosition(xPosition, yPosition);
-		area.renderTiles(screen, -xOff, -yOff);
+		//Unsure at the moment.
+		//		area.setPosition(xPosition, yPosition);
+		//		area.renderTiles(screen, -xOff, -yOff);
 	}
 	
 	public Tile getTile(int x, int y) {
@@ -107,19 +114,5 @@ public class OverWorld extends World {
 	
 	public void addTile(Tile t) {
 		//this.tiles.add(t);
-	}
-	
-	@Override
-	public void transitionTo(World world) {
-		
-	}
-	
-	public void transitionTo(World world, Area area) {
-		
-	}
-
-	public void initialize(Player player) {
-		activeArea.setPlayer(player);
-		player.initialize(activeArea);
 	}
 }
