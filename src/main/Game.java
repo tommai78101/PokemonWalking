@@ -1,16 +1,12 @@
 package main;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import level.OverWorld;
 import screen.BaseScreen;
 import abstracts.Tile;
 import abstracts.World;
-import entity.Data;
-import entity.Player;
-import entity.Plot;
+import entity.*;
 
 public class Game {
 	//Handles different types of worlds for the game to use.
@@ -43,10 +39,8 @@ public class Game {
 		
 		worlds = new ArrayList<World>();
 		
-		OverWorld world = new OverWorld(player);
-		overworld = world;
-		world.initialize(player);
-		worlds.add(world);
+		this.overworld = new OverWorld(player);
+		worlds.add(this.overworld);
 	}
 	
 	public void render() {
