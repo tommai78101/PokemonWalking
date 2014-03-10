@@ -18,6 +18,7 @@ public abstract class World {
 	//Each warp point defines two areas.
 	//All warp points can point to a list of areas. 
 	//Question: Should this list of areas be global?
+	//Question: Should subclasses of World contain list of areas specific to those Worlds?
 	
 	//Player coordinates is relative to area position.
 	//Player needs a way to interact with World, to use warp points and do actions.
