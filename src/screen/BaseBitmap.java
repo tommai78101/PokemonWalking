@@ -24,7 +24,7 @@ public class BaseBitmap {
 	
 	public BaseBitmap load(String filename) {
 		try {
-			BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
+			BufferedImage image = ImageIO.read(this.getClass().getResource(filename));
 			return load(image);
 		}
 		catch (IOException e) {
