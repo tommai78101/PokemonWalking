@@ -2,6 +2,8 @@ package screen;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 
 import javax.imageio.ImageIO;
 
@@ -24,7 +26,15 @@ public class BaseBitmap {
 	
 	public BaseBitmap load(String filename) {
 		try {
-			BufferedImage image = ImageIO.read(this.getClass().getResource(filename));
+			//BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
+			
+			Enumeration<URL> urls = this.getClass().getClassLoader().getResources(filename);
+			for (URL url = null; urls.hasMoreElements();) {
+				url = urls.nextElement();
+				System.out.println(url.toString());
+			}
+
+			BufferedImage image = ImageIO.read(BaseBitmap.this.getClass().getClassLoader().getResource(filename));
 			return load(image);
 		}
 		catch (IOException e) {
@@ -44,7 +54,8 @@ public class BaseBitmap {
 	
 	public BaseBitmap[][] cut(String filename, int w, int h, int clipW, int clipH) {
 		try {
-			BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
+			//BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
+			BufferedImage image = ImageIO.read(BaseBitmap.this.getClass().getClassLoader().getResource(filename));
 			int xTiles = (image.getWidth() - clipW) / w;
 			int yTiles = (image.getHeight() - clipH) / h;
 			BaseBitmap[][] results = new BaseBitmap[xTiles][yTiles];
