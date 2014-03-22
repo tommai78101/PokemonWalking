@@ -66,72 +66,110 @@ public class Area {
 	public void tick() {
 		//Since "setPlayer" method isn't always set, there should be checks everywhere to make sure "player" isn't null.
 		if (this.player != null) {
-			PixelData data = null;
-			
-			xPlayerPosition = player.getXInArea();
-			yPlayerPosition = player.getYInArea();
-			//System.out.println("X: " + xPlayerPosition + " Y: " + yPlayerPosition);
-			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
-				return;
-			
-			//Target pixel is now used to determine the pixel data the player is currently 
-			//facing (or what pixel is currently in front of the player?).
-			
-			switch (player.getFacing()) {
-				case 0:
-					//Down
-					if (this.yPlayerPosition + 1 < this.height)
-						data = areaData.get(this.yPlayerPosition + 1).get(this.xPlayerPosition);
-					break;
-				case 1:
-					//Left
-					if (this.xPlayerPosition - 1 >= 0)
-						data = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition - 1);
-					break;
-				case 2:
-					//Up
-					if (this.yPlayerPosition - 1 >= 0)
-						data = areaData.get(this.yPlayerPosition - 1).get(this.xPlayerPosition);
-					break;
-				case 3:
-					//Right
-					if (this.xPlayerPosition + 1 < this.width)
-						data = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition + 1);
-					break;
-			}
-			if (data != null) {
-				//if (player.isNotLockedWalking()) {
-				//System.out.println("Player is not facing an Obstacle.");
-				switch (data.getColor()) {
-					case 0xFFFF00FF:
-						player.blockPath(true);
-						break;
-					case 0xFF0000EE:
-						System.out.println("Facing warp zone.");
-						player.blockPath(false);
-						break;
-					case 0xFF00FF00:
-						player.blockPath(false);
-						break;
-					default:
-						player.blockPath(true);
-						break;
-				//}
+			//PixelData data = null;
+			if (this.player.isNotLockedWalking()) {
+				xPlayerPosition = player.getXInArea();
+				yPlayerPosition = player.getYInArea();
+				//System.out.println("X: " + xPlayerPosition + " Y: " + yPlayerPosition);
+				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
+					return;
+				
+				//			//Target pixel is now used to determine the pixel data the player is currently 
+				//			//facing (or what pixel is currently in front of the player?).			
+				//			switch (player.getFacing()) {
+				//				case 0:
+				//					//Down
+				//					if (this.yPlayerPosition + 1 < this.height)
+				//						data = areaData.get(this.yPlayerPosition + 1).get(this.xPlayerPosition);
+				//					break;
+				//				case 1:
+				//					//Left
+				//					if (this.xPlayerPosition - 1 >= 0)
+				//						data = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition - 1);
+				//					break;
+				//				case 2:
+				//					//Up
+				//					if (this.yPlayerPosition - 1 >= 0)
+				//						data = areaData.get(this.yPlayerPosition - 1).get(this.xPlayerPosition);
+				//					break;
+				//				case 3:
+				//					//Right
+				//					if (this.xPlayerPosition + 1 < this.width)
+				//						data = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition + 1);
+				//					break;
+				//			}
+				//			if (data != null) {
+				//				//if (player.isNotLockedWalking()) {
+				//				//System.out.println("Player is not facing an Obstacle.");
+				//				switch (data.getColor()) {
+				//					case 0xFFFF00FF:
+				//						player.blockPath(true);
+				//						break;
+				//					case 0xFF0000EE:
+				//						System.out.println("Facing warp zone.");
+				//						player.blockPath(false);
+				//						break;
+				//					case 0xFF00FF00:
+				//						player.blockPath(false);
+				//						break;
+				//					default:
+				//						player.blockPath(true);
+				//						break;
+				//				//}
+				//				}
+				//			}
+				
+				//Another method of detecting obstacles: Find all currently blocking obstacles
+				//	of each direction at the same time.
+				
+				PixelData data_up = null;
+				PixelData data_down = null;
+				PixelData data_left = null;
+				PixelData data_right = null;
+
+				try {
+					data_up = areaData.get(this.yPlayerPosition - 1).get(this.xPlayerPosition);
+					data_down = areaData.get(this.yPlayerPosition + 1).get(this.xPlayerPosition);
+					data_left = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition - 1);
+					data_right = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition + 1);
+					
+					this.player.setAllBlockingDirections(checkData(data_up), checkData(data_down), checkData(data_left), checkData(data_right));
+					
+					//Target pixel is used to determine what pixel the player is currently standing on
+					//(or what pixel the player is currently on top of).
+					data_up = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+					switch (data_up.getColor()) {
+						case 0xFF0000EE:
+							System.out.println("Is in warp zone.");
+							//TODO: Do something about this. Player supposed to be teleported to a new area at this point.
+						default:
+							break;
+					}
 				}
-			}
-			//Target pixel is used to determine what pixel the player is currently standing on
-			//(or what pixel the player is currently on top of).
-			data = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-			switch (data.getColor()) {
-				case 0xFF0000EE:
-					System.out.println("Is in warp zone.");
-					//TODO: Do something about this. Player supposed to be teleported to a new area at this point.
-				default:
-					break;
+				catch (Exception e) {
+					//this.player.setAllBlockingDirections(false, false, false, false);
+					this.player.setAllBlockingDirections(checkData(data_up), checkData(data_down), checkData(data_left), checkData(data_right));
+				}
 			}
 		}
 	}
 	
+	public boolean checkData(PixelData data) {
+		if (data != null) {
+			switch (data.getColor()) {
+				case 0xFFFF00FF:
+					return true;
+				case 0xFF0000EE:
+					return false;
+				case 0xFF00FF00:
+					return false;
+				default:
+					return false;
+			}
+		}
+		return true;
+	}
+
 	public void renderTiles(BaseScreen screen, int xOff, int yOff) {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {

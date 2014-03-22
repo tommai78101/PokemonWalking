@@ -35,7 +35,7 @@ public class Player extends Entity implements Collidable, Interactable {
 	//These are based on the art sprite in the resource folder. The numbers are used to get elements from a 2D array.
 	int facing = 0;
 	int lastFacing = 0;
-	int turning = 0;
+	int walking = 0;
 	
 	int xAccel;
 	int yAccel;
@@ -46,6 +46,8 @@ public class Player extends Entity implements Collidable, Interactable {
 	boolean lockWalking;
 	boolean isBlocked;
 	
+	boolean[] facingsBlocked = new boolean[4];
+
 	//--------------------------------------------------------------------------
 
 	public Player(Keys keys) {
@@ -131,100 +133,79 @@ public class Player extends Entity implements Collidable, Interactable {
 		//}
 	}
 	
-	public boolean tapped() {
+	public void tapped() {
+		animationTick = 0;
+		animationPointer = 0;
 		if (keys.up.isTappedDown || keys.W.isTappedDown) {
 			if (facing != UP) {
-				lastFacing = facing;
 				facing = UP;
-				animationTick = 0;
-				animationPointer = 0;
-			}
-			else {
-				yAccel--;
-				return true;
 			}
 		}
 		else if (keys.down.isTappedDown || keys.S.isTappedDown) {
 			if (facing != DOWN) {
-				lastFacing = facing;
 				facing = DOWN;
-				animationTick = 0;
-				animationPointer = 0;
-			}
-			else {
-				yAccel++;
-				return true;
 			}
 		}
 		else if (keys.left.isTappedDown || keys.A.isTappedDown) {
 			if (facing != LEFT) {
-				lastFacing = facing;
 				facing = LEFT;
-				animationTick = 0;
-				animationPointer = 0;
-			}
-			else {
-				xAccel--;
-				return true;
 			}
 		}
 		else if (keys.right.isTappedDown || keys.D.isTappedDown) {
 			if (facing != RIGHT) {
-				lastFacing = facing;
 				facing = RIGHT;
-				animationTick = 0;
-				animationPointer = 0;
 			}
-			else {
-				xAccel++;
-				return true;
-			}
-
 		}
-		return false;
 	}
 	
 	public void pressed() {
+		xAccel = yAccel = 0;
 		if (keys.up.isPressedDown || keys.W.isPressedDown) {
-			if (facing == UP)
-				yAccel--;
-			else {
+			if (facing != UP) {
 				facing = UP;
 			}
-			lockWalking = true;
+			if (!this.facingsBlocked[UP]) {
+				this.lockWalking = true;
+				yAccel--;
+			}
 		}
-		if (keys.down.isPressedDown || keys.S.isPressedDown) {
-			if (facing == DOWN)
-				yAccel++;
-			else {
+		else if (keys.down.isPressedDown || keys.S.isPressedDown) {
+			if (facing != DOWN) {
 				facing = DOWN;
 			}
-			lockWalking = true;
+			if (!this.facingsBlocked[DOWN]) {
+				this.lockWalking = true;
+				yAccel++;
+			}
 		}
-		if (keys.left.isPressedDown || keys.A.isPressedDown) {
-			if (facing == LEFT)
-				xAccel--;
-			else {
+		else if (keys.left.isPressedDown || keys.A.isPressedDown) {
+			if (facing != LEFT) {
 				facing = LEFT;
 			}
-			lockWalking = true;
+			if (!this.facingsBlocked[LEFT]) {
+				this.lockWalking = true;
+				xAccel--;
+			}
 		}
-		if (keys.right.isPressedDown || keys.D.isPressedDown) {
-			if (facing == RIGHT)
-				xAccel++;
-			else {
+		else if (keys.right.isPressedDown || keys.D.isPressedDown) {
+			if (facing != RIGHT) {
 				facing = RIGHT;
 			}
-			lockWalking = true;
+			if (!this.facingsBlocked[RIGHT]) {
+				this.lockWalking = true;
+				xAccel++;
+			}
 		}
 	}
-	
+
 	public void walk() {
 		if (!this.lockWalking) {
-			//			if (!tapped())
-			//				pressed();
-			tapped();
-			pressed();
+			if (!this.isBlocked) {
+				if (keys.up.isTappedDown || keys.down.isTappedDown || keys.left.isTappedDown || keys.right.isTappedDown || keys.W.isTappedDown || keys.S.isTappedDown || keys.A.isTappedDown || keys.D.isTappedDown)
+					tapped();
+				else if (keys.up.isPressedDown || keys.down.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown || keys.W.isPressedDown || keys.S.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					pressed();
+			}
 		}
 		handleMovementCheck();
 		controlTick();
@@ -239,8 +220,8 @@ public class Player extends Entity implements Collidable, Interactable {
 	public void render(BaseScreen screen) {
 		/*//Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
 		if (lockWalking) {
-			//screen.blit(Art.player[turning][animationPointer], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
-			screen.blit(Art.player[turning][animationPointer], xPosition - Tile.WIDTH, yPosition - Tile.HEIGHT / 2);
+			//screen.blit(Art.player[walking][animationPointer], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
+			screen.blit(Art.player[walking][animationPointer], xPosition - Tile.WIDTH, yPosition - Tile.HEIGHT / 2);
 		}
 		else
 			//screen.blit(Art.player[facing][0], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
@@ -256,7 +237,7 @@ public class Player extends Entity implements Collidable, Interactable {
 		//y: Pixel Y offset
 
 		if (this.lockWalking) {
-			output.blit(Art.player[turning][animationPointer], this.xOffset + x, this.yOffset + y);
+			output.blit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else {
 			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
@@ -317,45 +298,118 @@ public class Player extends Entity implements Collidable, Interactable {
 		return !this.lockWalking;
 	}
 	
+	public void setAllBlockingDirections(boolean up, boolean down, boolean left, boolean right) {
+		this.facingsBlocked[UP] = up;
+		this.facingsBlocked[DOWN] = down;
+		this.facingsBlocked[LEFT] = left;
+		this.facingsBlocked[RIGHT] = right;
+	}
+
 	//-----------------------------------
 	//Private methods
 	
 	private void handleMovementCheck() {
-		if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
-			if (this.isBlocked) {
-				xAccel = 0;
-				yAccel = 0;
-				turning = facing;
-				this.lockWalking = false;
-				return;
-			}
-		}
-
+		//Check if player is currently locked to walking.
 		if (this.lockWalking) {
-			if (xAccel > 1)
-				xAccel = 1;
-			else if (xAccel < -1)
-				xAccel = -1;
-			else if (yAccel > 1)
-				yAccel = 1;
-			else if (yAccel < -1)
-				yAccel = -1;
+
+			//When being locked to walking, facing must stay constant.
+			if (this.walking != this.facing)
+				this.walking = this.facing;
+
+			//Makes sure the acceleration stays limited to 1 pixel/tick.
+			if (xAccel > 1) xAccel = 1;
+			if (xAccel < -1) xAccel = -1;
+			if (yAccel > 1) yAccel = 1;
+			if (yAccel < -1) yAccel = -1;
 			
 			xPosition += xAccel;
 			yPosition += yAccel;
-			checkFacing();
-			if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
-				xAccel = 0;
-				yAccel = 0;
+
+			//Needs to get out of being locked to walking.
+			//Note that we cannot compare using ||, what if the player is moving in one direction? What about the other axis?
+			if ((xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0)) {
 				this.lockWalking = false;
-				turning = facing;
 			}
 		}
+		else {
+			//Before we walk, check to see if the oldX and oldY are up-to-date with the latest X and Y.
+			if (this.oldXPosition != this.xPosition) this.oldXPosition = this.xPosition;
+			if (this.oldYPosition != this.yPosition) this.oldYPosition = this.yPosition;
+			
+			//Reset the acceleration values, since we're not really walking.
+			xAccel = 0;
+			yAccel = 0;
 
-		if (Math.abs(xPosition - oldXPosition) == Tile.WIDTH || Math.abs(yPosition - oldYPosition) == Tile.HEIGHT) {
-			oldXPosition = xPosition;
-			oldYPosition = yPosition;
+			//Check for inputs the player wants to face. Tapping in a direction turns the player around.
+			checkFacing();
+			checkFacingObstacles();
+			
+			//Now about to walk. First, check to see if there's an obstacle blocking the path.
+			if (this.isBlocked) {
+				this.lockWalking = false;
+			}
 		}
+		
+		//		if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
+		//			if (this.isBlocked) {
+		//				xAccel = 0;
+		//				yAccel = 0;
+		//				walking = facing;
+		//				this.lockWalking = false;
+		//				return;
+		//			}
+		//		}
+		//
+		//		if (this.lockWalking) {
+		//			if (xAccel > 1)
+		//				xAccel = 1;
+		//			else if (xAccel < -1)
+		//				xAccel = -1;
+		//			else if (yAccel > 1)
+		//				yAccel = 1;
+		//			else if (yAccel < -1)
+		//				yAccel = -1;
+		//			
+		//			xPosition += xAccel;
+		//			yPosition += yAccel;
+		//			checkFacing();
+		//			if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
+		//				xAccel = 0;
+		//				yAccel = 0;
+		//				this.lockWalking = false;
+		//				walking = facing;
+		//			}
+		//		}
+		//
+		//		if (Math.abs(xPosition - oldXPosition) == Tile.WIDTH || Math.abs(yPosition - oldYPosition) == Tile.HEIGHT) {
+		//			oldXPosition = xPosition;
+		//			oldYPosition = yPosition;
+		//		}
+	}
+	
+	private void checkFacingObstacles() {
+		this.isBlocked = false;
+		if (this.facing == UP) {
+			if (this.facingsBlocked[UP])
+				this.isBlocked = true;
+		}
+		else if (this.facing == DOWN) {
+			if (this.facingsBlocked[DOWN])
+				this.isBlocked = true;
+		}
+		else if (this.facing == LEFT) {
+			if (this.facingsBlocked[LEFT])
+				this.isBlocked = true;
+		}
+		else if (this.facing == RIGHT) {
+			if (this.facingsBlocked[RIGHT])
+				this.isBlocked = true;
+		}
+	}
+
+	private boolean checkObstacles() {
+		//Something something
+		return isBlocked;
 	}
 	
 	private boolean facingObstacle(Tile object) {
