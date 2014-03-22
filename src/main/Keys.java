@@ -7,8 +7,9 @@ public class Keys {
 	public class Key {
 		public final String name;
 		//Input handling variables.
-		public boolean isTapped;
-		public boolean nextState;
+		//		public boolean isTapped;
+		//		public boolean nextState;
+		public boolean keyStateDown;
 		
 		//Key related variables.
 		public boolean isTappedDown;
@@ -19,28 +20,28 @@ public class Keys {
 			Keys.this.all.add(this);
 		}
 		
-		public void tick(List<Key> all) {
-			if (isTapped) {
-				isTappedDown = nextState;
-				isPressedDown = false;
-			}
-			else {
-				isPressedDown = nextState;
-				isTappedDown = false;
-
-			}
-			for (int i = 0; i < all.size() - 1; i++) {
-				for (int j = i + 1; j < all.size(); j++) {
-					Key k = all.get(i);
-					if (k.isTappedDown || k.isPressedDown) {
-						Key l = all.get(j);
-						l.isTappedDown = false;
-						l.isPressedDown = false;
-						//l.nextState = false;
-					}
-				}
-			}
-		}
+		//		public void tick(List<Key> all) {
+		//			if (isTapped) {
+		//				isTappedDown = nextState;
+		//				isPressedDown = false;
+		//			}
+		//			else {
+		//				isPressedDown = nextState;
+		//				isTappedDown = false;
+		//
+		//			}
+		//			for (int i = 0; i < all.size() - 1; i++) {
+		//				for (int j = i + 1; j < all.size(); j++) {
+		//					Key k = all.get(i);
+		//					if (k.isTappedDown || k.isPressedDown) {
+		//						Key l = all.get(j);
+		//						l.isTappedDown = false;
+		//						l.isPressedDown = false;
+		//						//l.nextState = false;
+		//					}
+		//				}
+		//			}
+		//		}
 	}
 	
 	List<Key> all = new ArrayList<Key>();
@@ -54,9 +55,4 @@ public class Keys {
 	public Key S = new Key("S");
 	public Key A = new Key("A");
 	public Key D = new Key("D");
-	
-	public void tick() {
-		for (Key k : all)
-			k.tick(all);
-	}
 }
