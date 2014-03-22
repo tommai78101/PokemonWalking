@@ -6,10 +6,13 @@ import java.util.List;
 public class Keys {
 	public class Key {
 		public final String name;
+		//Input handling variables.
 		public boolean isTapped;
+		public boolean nextState;
+		
+		//Key related variables.
 		public boolean isTappedDown;
 		public boolean isPressedDown;
-		public boolean nextState;
 		
 		public Key(String name) {
 			this.name = name;
@@ -37,7 +40,6 @@ public class Keys {
 					}
 				}
 			}
-
 		}
 	}
 	
@@ -53,34 +55,7 @@ public class Keys {
 	public Key A = new Key("A");
 	public Key D = new Key("D");
 	
-	//	public Random r = new Random();
-	//	public int test = 30;
-
 	public void tick() {
-		//		if (test < 0) {
-		//			test = 40;
-		//			for (Key k : all)
-		//				k.tick();
-		//			switch (r.nextInt(4)) {
-		//				case 0:
-		//					down.isPressedDown = r.nextBoolean();
-		//					System.out.println("DOWN");
-		//					break;
-		//				case 1:
-		//					up.isPressedDown = r.nextBoolean();
-		//					System.out.println("UP");
-		//					break;
-		//				case 2:
-		//					right.isPressedDown = r.nextBoolean();
-		//					System.out.println("RIGHT");
-		//					break;
-		//				case 3:
-		//					left.isPressedDown = r.nextBoolean();
-		//					System.out.println("LEFT");
-		//					break;
-		//			}
-		//		}
-		//		test--;
 		for (Key k : all)
 			k.tick(all);
 	}
