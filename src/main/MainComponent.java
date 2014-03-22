@@ -24,7 +24,9 @@ public class MainComponent extends Canvas implements Runnable {
 	//-----------------------
 	
 	private final Keys keys = new Keys();
-	private InputHandler inputHandler;
+	//Wrong input handler. Requires a rewrite.
+	//private InputHandler inputHandler;
+	private NewInputHandler inputHandler;
 	
 	//-----------------------	
 	private boolean running;
@@ -44,7 +46,7 @@ public class MainComponent extends Canvas implements Runnable {
 		
 		//-------------------
 		//Input Handling
-		inputHandler = new InputHandler(keys);
+		inputHandler = new NewInputHandler(keys);
 		this.addKeyListener(inputHandler);
 		//this.player = new Player(keys);
 		
@@ -108,12 +110,13 @@ public class MainComponent extends Canvas implements Runnable {
 			for (int i = 0; i < toTick; i++) {
 				tick--;
 				tick();
+				render();
 				shouldRender = true;
 			}
 			
 			if (shouldRender) {
 				frames++;
-				render();
+				//render();
 			}
 			
 			try {
@@ -133,7 +136,7 @@ public class MainComponent extends Canvas implements Runnable {
 	}
 	
 	public synchronized void tick() {
-		keys.tick();
+		//keys.tick();
 		//world.tick();
 		game.tick();
 	}
@@ -167,6 +170,12 @@ public class MainComponent extends Canvas implements Runnable {
 		
 		BufferedImage image = this.createCompatibleBufferedImage(screen.getBufferedImage());
 		g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), null);
+		
+		//Key input debugging only.
+		g.setColor(Color.black);
+		g.setFont(new Font("Serif", Font.PLAIN, 14));
+		keys(g);
+
 		g.dispose();
 		bufferStrategy.show();
 	}
@@ -183,6 +192,28 @@ public class MainComponent extends Canvas implements Runnable {
 	//-------------------------------
 	//Private methods:
 	
+	private void keys(Graphics g) {
+		if (keys.up.isTappedDown)
+			g.drawString("up tapped", 10, 10);
+		else if (keys.up.isPressedDown)
+			g.drawString("up pressed", 10, 10);
+		
+		if (keys.left.isTappedDown)
+			g.drawString("left tapped", 10, 10);
+		else if (keys.left.isPressedDown)
+			g.drawString("left pressed", 10, 10);
+		
+		if (keys.down.isTappedDown)
+			g.drawString("down tapped", 10, 10);
+		else if (keys.down.isPressedDown)
+			g.drawString("down pressed", 10, 10);
+		
+		if (keys.right.isTappedDown)
+			g.drawString("right tapped", 10, 10);
+		else if (keys.right.isPressedDown)
+			g.drawString("right pressed", 10, 10);
+	}
+
 	private BufferedImage createCompatibleBufferedImage(BufferedImage image) {
 		GraphicsConfiguration gfx_config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		if (image.getColorModel().equals(gfx_config.getColorModel()))
