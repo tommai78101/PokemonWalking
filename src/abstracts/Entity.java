@@ -23,7 +23,7 @@ public abstract class Entity extends Tile implements Collidable, Interactable {
 	public boolean isRemoved;
 	protected byte typeId = 0;
 	
-	public abstract void initialize(BaseWorld world);
+	//public abstract void initialize(BaseWorld world);
 	
 	public abstract void tick();
 	

@@ -10,7 +10,7 @@ public class PixelData {
 	//This is also the ID number for the pixel.
 	private int color;
 	//If false, it's an obstacle.
-	public boolean canBeWalkedThrough;
+	private boolean canBeWalkedThrough;
 	public int xPosition;
 	public int yPosition;
 	//This represents the art resource this PixelData object is representing.
@@ -78,11 +78,10 @@ public class PixelData {
 			case 0xFF00FF00:
 				this.bitmap = Art.grass;
 				break;
-			//			case 0xFF0000EE:
-			//				this.bitmap = Art.forestEntrance;
-			//				break;
 			default:
+				//TODO: Change the default pixel data to something else more representative.
 				this.bitmap = Art.smallTree;
+				this.canBeWalkedThrough = false;
 				break;
 		}
 	}
@@ -98,6 +97,12 @@ public class PixelData {
 			this.isWarpZone = true;
 			this.canBeWalkedThrough = true;
 		}
+		else {
+			this.isWarpZone = false;
+			this.parentArea = 0;
+			this.targetArea = 0;
+		}
+
 	}
 
 	public int getColor() {
@@ -110,5 +115,9 @@ public class PixelData {
 	
 	public int getTargetAreaID() {
 		return targetArea;
+	}
+	
+	public boolean isWalkThroughable() {
+		return this.canBeWalkedThrough;
 	}
 }

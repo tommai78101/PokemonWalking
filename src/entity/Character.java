@@ -7,7 +7,6 @@ import interfaces.Moveable;
 import java.util.List;
 
 import screen.BaseScreen;
-import abstracts.BaseWorld;
 import abstracts.Entity;
 import abstracts.Tile;
 
@@ -28,12 +27,12 @@ public class Character extends Entity implements Collidable, Interactable, Movea
 	public void interact(Interactable object) {
 	}
 	
-	@Override
-	public void initialize(BaseWorld world) {
-		//TODO: Do something about the incorrect ID.
-		if (this.moveableId < 0 || this.interactableId < 0 || this.collidableId < 0)
-			return;
-	}
+	//	@Override
+	//	public void initialize(BaseWorld world) {
+	//		//TODO: Do something about the incorrect ID.
+	//		if (this.moveableId < 0 || this.interactableId < 0 || this.collidableId < 0)
+	//			return;
+	//	}
 	
 	@Override
 	public void tick() {

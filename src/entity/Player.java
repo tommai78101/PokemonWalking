@@ -5,9 +5,9 @@ import level.Area;
 import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
-import abstracts.BaseWorld;
 import abstracts.Entity;
 import abstracts.Tile;
+//import abstracts.BaseWorld;
 
 public class Player extends Entity {
 	private final int UP = 2;
@@ -482,10 +482,10 @@ public class Player extends Entity {
 		return this.yPosition;
 	}
 	
-	@Override
-	public void initialize(BaseWorld world) {
-
-	}
+	//	@Override
+	//	public void initialize(BaseWorld world) {
+	//
+	//	}
 	
 	@Override
 	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
