@@ -23,7 +23,7 @@ public class Art {
 	
 	public static void loadAllResources(BaseScreen screen) {
 		//Misc.
-		sprite = screen.load("art/test.png");
+		//sprite = screen.load("art/test.png");
 		
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
