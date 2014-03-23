@@ -1,14 +1,14 @@
 ![Imgur](http://i.imgur.com/AvrMq9d.png)
 
 # Pokémon Walking Algorithm (Working Title)
-==============
+===
 
 **Abstract:**
 Implements the walking algorithm used in classic Pokémon G/S/C games.
 
 **Note:** *It does not mimic the walking algorithm used in Pokémon R/B/Y games (1st generation games).*
 
-==============
+===
 **Description:**
 This is a project I am currently working on while I'm doing conscription service. The aim of this project is to port the walking algorithm used in the 2nd generation games of the official Pokémon game series. At the moment, I'm leaving out the 1st generation walking algorithm, as the 2nd generation games introduced "turning on the spot".
 
