@@ -67,9 +67,6 @@ public class Game {
 		*/
 		player.tick();
 		overworld.tick();
-		
-		checkPlayerWarpZone();
-
 	}
 	
 	public void save() {
@@ -90,9 +87,5 @@ public class Game {
 		//cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
 		this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
 		this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
-	}
-	
-	public void checkPlayerWarpZone() {
-		
 	}
 }
