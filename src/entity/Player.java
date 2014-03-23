@@ -44,7 +44,6 @@ public class Player extends Entity implements Collidable, Interactable {
 	int oldYPosition;
 
 	boolean lockWalking;
-	boolean isBlocked;
 	
 	boolean[] facingsBlocked = new boolean[4];
 
@@ -200,12 +199,38 @@ public class Player extends Entity implements Collidable, Interactable {
 
 	public void walk() {
 		if (!this.lockWalking) {
-			if (!this.isBlocked) {
-				if (keys.up.isTappedDown || keys.down.isTappedDown || keys.left.isTappedDown || keys.right.isTappedDown || keys.W.isTappedDown || keys.S.isTappedDown || keys.A.isTappedDown || keys.D.isTappedDown)
+			if (!this.facingsBlocked[UP]) {
+				if (keys.up.isTappedDown || keys.W.isTappedDown)
 					tapped();
-				else if (keys.up.isPressedDown || keys.down.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown || keys.W.isPressedDown || keys.S.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+				else if (keys.up.isPressedDown || keys.W.isPressedDown)
 					pressed();
 			}
+			if (!this.facingsBlocked[DOWN]) {
+				if (keys.down.isTappedDown || keys.S.isTappedDown)
+					tapped();
+				else if (keys.down.isPressedDown || keys.S.isPressedDown)
+					pressed();
+			}
+			if (!this.facingsBlocked[LEFT]) {
+				if (keys.left.isTappedDown || keys.A.isTappedDown)
+					tapped();
+				else if (keys.left.isPressedDown || keys.A.isPressedDown)
+					pressed();
+			}
+			if (!this.facingsBlocked[RIGHT]) {
+				if (keys.right.isTappedDown || keys.D.isTappedDown)
+					tapped();
+				else if (keys.right.isPressedDown || keys.D.isPressedDown)
+					pressed();
+			}
+			
+			//			
+			//			if (!this.isBlocked) {
+			//				if (keys.up.isTappedDown || keys.down.isTappedDown || keys.left.isTappedDown || keys.right.isTappedDown || keys.W.isTappedDown || keys.S.isTappedDown || keys.A.isTappedDown || keys.D.isTappedDown)
+			//					tapped();
+			//				else if (keys.up.isPressedDown || keys.down.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown || keys.W.isPressedDown || keys.S.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+			//					pressed();
+			//			}
 		}
 		handleMovementCheck();
 		controlTick();
@@ -248,26 +273,25 @@ public class Player extends Entity implements Collidable, Interactable {
 		}
 	}
 	
-	@Override
-	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
-		int a = this.xPosition + Tile.WIDTH;
-		int b = this.xPosition - Tile.WIDTH;
-		int c = this.yPosition + Tile.HEIGHT;
-		int d = this.yPosition - Tile.HEIGHT;
-		if (tile == null)
-			return;
-		isBlocked = false;
-		switch (tile.getType()) {
-			case Entity.PLAYER:
-			default:
-				break;
-			case Entity.TREE:
-				this.collide(tile);
-				isBlocked = true;
-				break;
-		}
-	}
-	
+	//	@Override
+	//	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
+	//		int a = this.xPosition + Tile.WIDTH;
+	//		int b = this.xPosition - Tile.WIDTH;
+	//		int c = this.yPosition + Tile.HEIGHT;
+	//		int d = this.yPosition - Tile.HEIGHT;
+	//		if (tile == null)
+	//			return;
+	//		switch (tile.getType()) {
+	//			case Entity.PLAYER:
+	//			default:
+	//				break;
+	//			case Entity.TREE:
+	//				this.collide(tile);
+	//				isBlocked = true;
+	//				break;
+	//		}
+	//	}
+
 	public int getFacing() {
 		return facing;
 	}
@@ -290,9 +314,9 @@ public class Player extends Entity implements Collidable, Interactable {
 		return this.collidableId;
 	}
 	
-	public void blockPath(boolean value) {
-		this.isBlocked = value;
-	}
+	//	public void blockPath(boolean value) {
+	//		this.isBlocked = value;
+	//	}
 	
 	public boolean isNotLockedWalking() {
 		return !this.lockWalking;
@@ -342,12 +366,16 @@ public class Player extends Entity implements Collidable, Interactable {
 
 			//Check for inputs the player wants to face. Tapping in a direction turns the player around.
 			checkFacing();
-			checkFacingObstacles();
+			//checkFacingObstacles();
 			
 			//Now about to walk. First, check to see if there's an obstacle blocking the path.
-			if (this.isBlocked) {
+			if (this.facingsBlocked[UP] || this.facingsBlocked[DOWN] || this.facingsBlocked[LEFT] || this.facingsBlocked[RIGHT]) {
 				this.lockWalking = false;
 			}
+			
+			//			if (this.isBlocked) {
+			//				this.lockWalking = false;
+			//			}
 		}
 		
 		//		if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
@@ -387,35 +415,36 @@ public class Player extends Entity implements Collidable, Interactable {
 		//		}
 	}
 	
-	private void checkFacingObstacles() {
-		this.isBlocked = false;
-		if (this.facing == UP) {
-			if (this.facingsBlocked[UP])
-				this.isBlocked = true;
-		}
-		else if (this.facing == DOWN) {
-			if (this.facingsBlocked[DOWN])
-				this.isBlocked = true;
-		}
-		else if (this.facing == LEFT) {
-			if (this.facingsBlocked[LEFT])
-				this.isBlocked = true;
-		}
-		else if (this.facing == RIGHT) {
-			if (this.facingsBlocked[RIGHT])
-				this.isBlocked = true;
-		}
-	}
+	//	
+	//	private void checkFacingObstacles() {
+	//		this.isBlocked = false;
+	//		if (this.facing == UP) {
+	//			if (this.facingsBlocked[UP])
+	//				this.isBlocked = true;
+	//		}
+	//		else if (this.facing == DOWN) {
+	//			if (this.facingsBlocked[DOWN])
+	//				this.isBlocked = true;
+	//		}
+	//		else if (this.facing == LEFT) {
+	//			if (this.facingsBlocked[LEFT])
+	//				this.isBlocked = true;
+	//		}
+	//		else if (this.facing == RIGHT) {
+	//			if (this.facingsBlocked[RIGHT])
+	//				this.isBlocked = true;
+	//		}
+	//	}
 
-	private boolean checkObstacles() {
-		//Something something
-		return isBlocked;
-	}
+	//	private boolean checkObstacles() {
+	//		//Something something
+	//		return isBlocked;
+	//	}
 	
-	private boolean facingObstacle(Tile object) {
-		this.handleCollision(object, 0, 0);
-		return isBlocked;
-	}
+	//	private boolean facingObstacle(Tile object) {
+	//		this.handleCollision(object, 0, 0);
+	//		return isBlocked;
+	//	}
 	
 	private void checkFacing() {
 		if (keys.up.isTappedDown || keys.up.isPressedDown || keys.W.isTappedDown || keys.W.isPressedDown) {
@@ -434,7 +463,23 @@ public class Player extends Entity implements Collidable, Interactable {
 
 	private void controlTick() {
 		animationTick++;
-		if (isBlocked) {
+		//if (this.isBlocked) {
+		if ((this.facing == UP && this.facingsBlocked[UP])) {
+			if (animationTick >= 20) {
+				animationTick = 0;
+			}
+		}
+		else if ((this.facing == DOWN && this.facingsBlocked[DOWN])) {
+			if (animationTick >= 20) {
+				animationTick = 0;
+			}
+		}
+		else if ((this.facing == LEFT && this.facingsBlocked[LEFT])) {
+			if (animationTick >= 20) {
+				animationTick = 0;
+			}
+		}
+		else if ((this.facing == RIGHT && this.facingsBlocked[RIGHT])) {
 			if (animationTick >= 20) {
 				animationTick = 0;
 			}
@@ -457,5 +502,9 @@ public class Player extends Entity implements Collidable, Interactable {
 	public boolean hasChangedFacing() {
 		//True, if current facing has been changed.
 		return this.lastFacing != this.facing;
+	}
+	
+	@Override
+	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
 	}
 }
