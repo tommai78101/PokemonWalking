@@ -6,7 +6,7 @@ import abstracts.Tile;
 public class Tree extends Tile {
 	
 	@Override
-	public void render(BaseScreen screen) {
+	public void render(BaseScreen screen, int x, int y) {
 		
 	}
 	

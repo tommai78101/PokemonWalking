@@ -45,9 +45,9 @@ public abstract class BaseWorld {
 	
 	public void render(BaseScreen screen) {
 		for (Tile t : this.tiles)
-			t.render(screen);
+			t.render(screen, 0, 0);
 		for (Entity e : this.entities)
-			e.render(screen);
+			e.render(screen, 0, 0);
 	}
 	
 	public Tile getTile(int xPosition, int yPosition) {
