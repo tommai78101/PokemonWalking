@@ -457,8 +457,11 @@ public class Player extends Entity {
 			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else if (this.lockJumping) {
+			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
+
 			//Walking animation while in the air.
 			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
+
 		}
 		else {
 			//Blocking animation. Possibly done to create a perfect loop.

@@ -22,6 +22,7 @@ public class Art {
 	
 	//Others
 	public static BaseBitmap sprite;
+	public static BaseBitmap shadow;
 	
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
@@ -35,6 +36,7 @@ public class Art {
 		//Player, NPCs
 		testDownAnimation = screen.cut("art/player/test_walk_down_animation.png", 16, 16, 0, 0);
 		player = screen.cut("art/player/player.png", 16, 16, 0, 0);
+		shadow = screen.load("art/player/shadow.png");
 		
 		//Areas
 		testArea = screen.load("area/test/testArea.png");
