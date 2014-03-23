@@ -20,17 +20,6 @@ public class PixelData {
 	//This can also be "isWayPoint".
 	private boolean isWarpZone;
 	
-	/*
-	 * Area Type:
-	 * 
-	 * 0x0 = Forest
-	 * 0x1 = City
-	 * 0x2 = Cave / Mountain
-	 * 0x3 = Water
-	 * 
-	 * */
-	private byte areaType;
-
 	private int targetArea;
 	private int parentArea;
 	

@@ -9,9 +9,6 @@ import abstracts.World;
 import entity.Player;
 
 public class OverWorld extends World {
-	
-	private static final int MAX_AREAS = 2;
-
 	//Contains overworld specific areas.
 	public List<Area> areas = new ArrayList<Area>();
 	
@@ -124,11 +121,11 @@ public class OverWorld extends World {
 			player.render(screen, 0, 0);
 	}
 	
-	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {
-		//Unsure at the moment.
-		//		area.setPosition(xPosition, yPosition);
-		//		area.renderTiles(screen, -xOff, -yOff);
-	}
+	//	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {
+	//		//Unsure at the moment.
+	//		//		area.setPosition(xPosition, yPosition);
+	//		//		area.renderTiles(screen, -xOff, -yOff);
+	//	}
 	
 	public Tile getTile(int x, int y) {
 		/*if (pixels[y * this.width + x] != 0xFF00FF00)

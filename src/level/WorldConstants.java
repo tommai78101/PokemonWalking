@@ -13,6 +13,9 @@ public class WorldConstants {
 	public static final int TEST_WORLD_1 = 0x01;
 	public static final int TEST_WORLD_2 = 0x02;
 	
+	//Unimportant at the moment.
+	//private static final int MAX_AREAS = 2;
+
 	public static Area convertToArea(int areaID) {
 		switch (areaID) {
 			case TEST_WORLD_1:

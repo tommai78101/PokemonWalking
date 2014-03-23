@@ -6,11 +6,8 @@ import java.util.Random;
 
 import level.OverWorld;
 import screen.BaseScreen;
-import abstracts.Tile;
 import abstracts.World;
-import entity.Data;
 import entity.Player;
-import entity.Plot;
 
 public class Game {
 	//Handles different types of worlds for the game to use.
@@ -18,28 +15,28 @@ public class Game {
 	//Each world stays loaded, while the pointer just "slides" across towards the next world it is transitioning to.
 	public static Random Randomize = new Random(System.currentTimeMillis());
 	private final BaseScreen screen;
-	private final Keys inputs;
-	private final Gui guiInterface;
+	//private final Keys inputs;
+	//private final Gui guiInterface;
 	private final List<World> worlds;
 	private World overworld;
 	private final Player player;
-	private Plot storyPlot;
-	private Data data;
+	//private Plot storyPlot;
+	//private Data data;
 	
-	private int xScroll;
-	private int yScroll;
+	//private int xScroll;
+	//private int yScroll;
 	
-	private int xCamera;
-	private int yCamera;
+	//private int xCamera;
+	//private int yCamera;
 	
 	public Game(BaseScreen output, Keys input) {
 		this.screen = output;
-		this.inputs = input;
+		//this.inputs = input;
 
 		player = new Player(input);
 		player.setCenterCamPosition(output);
 
-		this.guiInterface = new Gui();
+		//this.guiInterface = new Gui();
 		
 		worlds = new ArrayList<World>();
 		
@@ -82,13 +79,15 @@ public class Game {
 	
 	public void setScrollOffset(int xCamCenter, int yCamCenter) {
 		//CamCenter: the coordinates of the center of camera.
-		this.xScroll = xCamCenter;
-		this.yScroll = yCamCenter;
+		//this.xScroll = xCamCenter;
+		//this.yScroll = yCamCenter;
 	}
 	
 	public void setCameraRelativeToArea(int areaXPos, int areaYPos) {
+		//Not used at the moment.
+
 		//cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
-		this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
-		this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
+		//this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
+		//this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
 	}
 }

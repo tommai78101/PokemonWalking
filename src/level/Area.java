@@ -19,6 +19,18 @@ public class Area {
 	private boolean isInWarpZone;
 	private PixelData currentPixelData;
 	private final int areaID;
+	
+	/*
+	 * Area Type:
+	 * 
+	 * 0x0 = Forest
+	 * 0x1 = City
+	 * 0x2 = Cave / Mountain
+	 * 0x3 = Water
+	 * 
+	 * */
+	//Will implement Area Type sometime in the future.
+	//private int areaType;
 
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	

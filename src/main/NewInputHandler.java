@@ -20,10 +20,11 @@ public class NewInputHandler implements KeyListener {
 	 */
 	public Map<Key, Integer> mappings = new HashMap<Key, Integer>();
 	private ExecutorService threadPool = Executors.newCachedThreadPool();
-	private Keys keys;
+	
+	//private Keys keys;
 	
 	public NewInputHandler(Keys keys) {
-		this.keys = keys;
+		//this.keys = keys;
 		mappings.put(keys.up, KeyEvent.VK_UP);
 		mappings.put(keys.down, KeyEvent.VK_DOWN);
 		mappings.put(keys.left, KeyEvent.VK_LEFT);

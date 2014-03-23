@@ -1,9 +1,13 @@
 package main;
 
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.*;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -30,7 +34,7 @@ public class MainComponent extends Canvas implements Runnable {
 	
 	//-----------------------	
 	private boolean running;
-	private int fps;
+	//private int fps;
 	
 	//-----------------------
 	
@@ -73,9 +77,9 @@ public class MainComponent extends Canvas implements Runnable {
 	@Override
 	public void run() {
 		long lastTime = System.nanoTime();
-		long lastTimer = System.currentTimeMillis();
+		//long lastTimer = System.currentTimeMillis();
 		double unprocessed = 0.0;
-		int frames = 0;
+		//int frames = 0;
 		int tick = 0;
 		boolean shouldRender = false;
 		final double nsPerTick = 1000000000.0 / 30.0;
@@ -112,7 +116,7 @@ public class MainComponent extends Canvas implements Runnable {
 			}
 			
 			if (shouldRender) {
-				frames++;
+				//frames++;
 				//render();
 			}
 			
@@ -122,12 +126,12 @@ public class MainComponent extends Canvas implements Runnable {
 			catch (InterruptedException e) {
 			}
 			
-			if (System.currentTimeMillis() - lastTimer > 1000) {
-				lastTimer += 1000;
-				fps = frames;
-				//System.out.println("FPS: " + Integer.toString(fps));
-				frames = 0;
-			}
+			//			if (System.currentTimeMillis() - lastTimer > 1000) {
+			//				lastTimer += 1000;
+			//				//fps = frames;
+			//				//System.out.println("FPS: " + Integer.toString(fps));
+			//				//frames = 0;
+			//			}
 		}
 		//Game loop has exited, everything stops from here on out.
 	}

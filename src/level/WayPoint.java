@@ -2,13 +2,13 @@ package level;
 
 public class WayPoint {
 	
-	private int xPosition;
-	private int yPosition;
+	//private int xPosition;
+	//private int yPosition;
 	
 	private WayPoint target;
 	
-	private int pixelColor;
-	private int data;
+	//private int pixelColor;
+	//private int data;
 	
 	//A flag that determines if two areas are "linked" together nicely in the OverWorld.
 	private boolean isLinked;
@@ -26,12 +26,12 @@ public class WayPoint {
 		
 		//I like the color blue, therefore blue represents waypoint, and green/red both represents the data id for the waypoints.
 
-		this.xPosition = x;
-		this.yPosition = y;
-		this.pixelColor = color;
+		//this.xPosition = x;
+		//this.yPosition = y;
+		//this.pixelColor = color;
 		
 		//Leaving out the "blue" channel, we can see where this waypoint is leading to.
-		this.data = (color >> 8) & 0xFFFFFF;
+		//this.data = (color >> 8) & 0xFFFFFF;
 		
 		//We assume the flag isn't set, since the way point had just been set.
 		this.isLinked = false;
