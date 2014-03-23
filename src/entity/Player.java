@@ -212,29 +212,19 @@ public class Player extends Entity {
 	}
 	
 	@Override
-	public void render(BaseScreen screen) {
-		/*//Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
-		if (lockWalking) {
-			//screen.blit(Art.player[walking][animationPointer], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
-			screen.blit(Art.player[walking][animationPointer], xPosition - Tile.WIDTH, yPosition - Tile.HEIGHT / 2);
-		}
-		else
-			//screen.blit(Art.player[facing][0], (screen.getWidth() - Tile.WIDTH * 2) / 2 + xPosition, (screen.getHeight() - Tile.HEIGHT) / 2 + yPosition, Tile.WIDTH, Tile.HEIGHT);
-			screen.blit(Art.player[facing][0], xPosition - Tile.WIDTH, yPosition - Tile.HEIGHT / 2);*/
-		
-	}
-	
 	public void render(BaseScreen output, int x, int y) {
-		
+		//Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
 		//render(BaseScreen output, int x, int y)
 		//output: where to blit the bitmap
 		//x: Pixel X offset
 		//y: Pixel Y offset
 
 		if (this.lockWalking) {
+			//Walking animation
 			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else {
+			//Blocking animation. Possibly done to create a perfect loop.
 			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
 				|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
 				output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);

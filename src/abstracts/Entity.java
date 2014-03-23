@@ -28,7 +28,7 @@ public abstract class Entity extends Tile implements Collidable, Interactable {
 	public abstract void tick();
 	
 	@Override
-	public abstract void render(BaseScreen screen);
+	public abstract void render(BaseScreen screen, int x, int y);
 	
 	public int getX() {
 		return xPosition;

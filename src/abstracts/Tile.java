@@ -20,7 +20,7 @@ public abstract class Tile implements BoundingBoxCollidable {
 		return true;
 	}
 	
-	public void render(BaseScreen screen) {
+	public void render(BaseScreen screen, int x, int y) {
 		screen.blit(Art.grass, xPosition * Tile.WIDTH, yPosition * Tile.HEIGHT);
 	}
 	
