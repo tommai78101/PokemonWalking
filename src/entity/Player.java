@@ -1,14 +1,15 @@
 package entity;
 
-import interfaces.Collidable;
 import interfaces.Interactable;
 import level.Area;
 import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
-import abstracts.*;
+import abstracts.BaseWorld;
+import abstracts.Entity;
+import abstracts.Tile;
 
-public class Player extends Entity implements Collidable, Interactable {
+public class Player extends Entity {
 	private final int UP = 2;
 	private final int DOWN = 0;
 	private final int LEFT = 1;
@@ -22,11 +23,12 @@ public class Player extends Entity implements Collidable, Interactable {
 	int collidableId = 1;
 	int interactableId = 1;
 	
-	public enum AnimationType {
-		WALKING
-	};
-	
-	AnimationType animationType;
+	//Not yet used.
+	//	public enum AnimationType {
+	//		WALKING
+	//	};
+	//	
+	//	AnimationType animationType;
 	
 	public Inventory inventory;
 	
@@ -44,7 +46,6 @@ public class Player extends Entity implements Collidable, Interactable {
 	int oldYPosition;
 
 	boolean lockWalking;
-	
 	boolean[] facingsBlocked = new boolean[4];
 
 	//--------------------------------------------------------------------------
@@ -60,10 +61,6 @@ public class Player extends Entity implements Collidable, Interactable {
 	public void setRenderOffset(int x, int y) {
 		this.xOffset = x;
 		this.yOffset = y;
-	}
-	
-	public void bang() {
-		
 	}
 	
 	public int getXInArea() {
@@ -100,36 +97,9 @@ public class Player extends Entity implements Collidable, Interactable {
 		//return this.oldYPosition / Tile.HEIGHT;
 	}
 	
-	@Override
-	public int getX() {
-		return this.xPosition;
-	}
-	
-	@Override
-	public int getY() {
-		return this.yPosition;
-	}
-	
-	@Override
-	public void initialize(BaseWorld world) {
-		
-	}
-	
 	public void initialize(Area area) {
 		area.setPlayerX(this.getXInArea());
 		area.setPlayerY(this.getYInArea());
-	}
-	
-	@Override
-	public void tick() {
-		
-		//Tile object = this.world.getTile(nextX, nextY);
-		//if (!facingObstacle(object)){ 
-		walk();
-		//}
-		//else {
-		//	bang();
-		//}
 	}
 	
 	public void tapped() {
@@ -329,7 +299,16 @@ public class Player extends Entity implements Collidable, Interactable {
 		this.facingsBlocked[RIGHT] = right;
 	}
 
-	//-----------------------------------
+	public void setAreaPosition(int x, int y) {
+		this.setPosition(x * Tile.WIDTH, y * Tile.HEIGHT);
+	}
+	
+	public boolean hasChangedFacing() {
+		//True, if current facing has been changed.
+		return this.lastFacing != this.facing;
+	}
+
+	//-------------------------------------------------------------------------------------
 	//Private methods
 	
 	private void handleMovementCheck() {
@@ -495,16 +474,37 @@ public class Player extends Entity implements Collidable, Interactable {
 		}
 	}
 	
-	public void setAreaPosition(int x, int y) {
-		this.setPosition(x * Tile.WIDTH, y * Tile.HEIGHT);
+	//---------------------------------------------------------------------
+	//Override methods
+	
+	@Override
+	public int getX() {
+		return this.xPosition;
 	}
 	
-	public boolean hasChangedFacing() {
-		//True, if current facing has been changed.
-		return this.lastFacing != this.facing;
+	@Override
+	public int getY() {
+		return this.yPosition;
+	}
+	
+	@Override
+	public void initialize(BaseWorld world) {
+
 	}
 	
 	@Override
 	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
+	}
+	
+	@Override
+	public void tick() {
+		
+		//Tile object = this.world.getTile(nextX, nextY);
+		//if (!facingObstacle(object)){ 
+		walk();
+		//}
+		//else {
+		//	bang();
+		//}
 	}
 }
