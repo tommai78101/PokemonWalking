@@ -307,6 +307,11 @@ public class Player extends Entity {
 		//True, if current facing has been changed.
 		return this.lastFacing != this.facing;
 	}
+	
+	public void forceLockWalking() {
+		this.lockWalking = true;
+		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+	}
 
 	//-------------------------------------------------------------------------------------
 	//Private methods

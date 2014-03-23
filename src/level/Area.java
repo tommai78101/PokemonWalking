@@ -16,15 +16,17 @@ public class Area {
 	private int yPlayerPosition;
 	private Player player;
 	
-	private BaseBitmap bitmap;
+	private boolean isInWarpZone;
+	private PixelData currentPixelData;
+	private final int areaID;
 
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	
-	public Area(BaseBitmap bitmap) {
-		this.bitmap = bitmap;
+	public Area(BaseBitmap bitmap, final int areaID) {
 		this.width = bitmap.getWidth();
 		this.height = bitmap.getHeight();
 		this.pixels = bitmap.getPixels();
+		this.areaID = areaID;
 		
 		for (int y = 0; y < this.height; y++) {
 			areaData.add(new ArrayList<PixelData>());
@@ -134,22 +136,19 @@ public class Area {
 					data_right = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition + 1);
 					
 					this.player.setAllBlockingDirections(checkData(data_up), checkData(data_down), checkData(data_left), checkData(data_right));
-					
-					//Target pixel is used to determine what pixel the player is currently standing on
-					//(or what pixel the player is currently on top of).
-					data_up = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-					switch (data_up.getColor()) {
-						case 0xFF0000EE:
-							//R0 G0 B255
-							System.out.println("Is in warp zone.");
-							//TODO: Do something about this. Player supposed to be teleported to a new area at this point.
-						default:
-							break;
-					}
 				}
 				catch (Exception e) {
 					//this.player.setAllBlockingDirections(false, false, false, false);
 					this.player.setAllBlockingDirections(checkData(data_up), checkData(data_down), checkData(data_left), checkData(data_right));
+				}
+				
+				//Target pixel is used to determine what pixel the player is currently standing on
+				//(or what pixel the player is currently on top of).
+				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+				int pixel = this.currentPixelData.getColor();
+				int b = (pixel & 0xFF);
+				if (b == 0xEE) {
+					this.isInWarpZone = true;
 				}
 			}
 		}
@@ -201,4 +200,33 @@ public class Area {
 		player.setAreaPosition(1, 1);
 	}
 	
+	public void setDefaultPosition(PixelData data) {
+		PixelData targetData = null;
+		if (data.isWarpZoneEnabled()) {
+			//this.player.setPosition(data.xPosition * Tile.WIDTH, data.yPosition * Tile.HEIGHT);
+			for (ArrayList<PixelData> list : this.areaData) {
+				for (PixelData p : list) {
+					if ((p.getColor() & 0xFF) == 0xEE)
+						targetData = p;
+				}
+			}
+			//this.setPlayerX(targetData.xPosition);
+			//this.setPlayerY(targetData.yPosition);
+			this.player.setAreaPosition(targetData.xPosition, targetData.yPosition);
+		}
+	}
+
+	public boolean playerIsInWarpZone() {
+		return this.isInWarpZone;
+	}
+	
+	public PixelData getCurrentPixelData() {
+		//Return the pixel data the player is currently on top of.
+		return this.currentPixelData;
+	}
+	
+	public int getAreaID() {
+		return this.areaID;
+	}
+
 }
