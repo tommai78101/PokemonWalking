@@ -1,6 +1,6 @@
 ![Imgur](http://i.imgur.com/AvrMq9d.png)
 
-# Pokemon Walking Algorithm (Working Title)
+# Pokémon Walking Algorithm (Working Title)
 ==============
 
 **Abstract:**
