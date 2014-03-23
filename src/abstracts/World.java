@@ -1,9 +1,6 @@
 package abstracts;
 
-import java.util.List;
-
 import level.Area;
-import level.WayPoint;
 import screen.BaseScreen;
 import entity.Player;
 
@@ -29,7 +26,7 @@ public abstract class World {
 	protected Area currentArea;
 	
 	//Contains new objects, must add them.
-	protected List<WayPoint> warpPoints;
+	//protected List<WayPoint> warpPoints;
 	
 	
 	
