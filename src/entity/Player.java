@@ -8,8 +8,6 @@ import screen.BaseScreen;
 import abstracts.Entity;
 import abstracts.Tile;
 
-//import abstracts.BaseWorld;
-
 public class Player extends Entity {
 	public static final int UP = 2;
 	public static final int DOWN = 0;
@@ -71,7 +69,6 @@ public class Player extends Entity {
 	
 	public int getXInArea() {
 		//Returns area position X.
-		//if (!this.lockWalking)
 		int result = (xPosition / Tile.WIDTH);
 		if (this.lockWalking)
 			switch (facing) {
@@ -81,15 +78,11 @@ public class Player extends Entity {
 					result += 1;
 					break;
 			}
-		//System.out.println("" + result);
-
 		return result;
-		//return this.oldXPosition / Tile.WIDTH;
 	}
 	
 	public int getYInArea() {
 		//Returns area position Y.
-		//if (!this.lockWalking)
 		int result = (yPosition / Tile.HEIGHT);
 		if (this.lockWalking)
 			switch (facing) {
@@ -100,7 +93,6 @@ public class Player extends Entity {
 					break;
 			}
 		return result;
-		//return this.oldYPosition / Tile.HEIGHT;
 	}
 	
 	public void initialize(Area area) {
@@ -207,16 +199,7 @@ public class Player extends Entity {
 					return;
 				}
 			}
-			
-			//			
-			//			if (!this.isBlocked) {
-			//				if (keys.up.isTappedDown || keys.down.isTappedDown || keys.left.isTappedDown || keys.right.isTappedDown || keys.W.isTappedDown || keys.S.isTappedDown || keys.A.isTappedDown || keys.D.isTappedDown)
-			//					tapped();
-			//				else if (keys.up.isPressedDown || keys.down.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown || keys.W.isPressedDown || keys.S.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
-			//					pressed();
-			//			}
 		}
-
 	}
 	
 	public void collide(Tile tile) {
@@ -302,25 +285,6 @@ public class Player extends Entity {
 
 	}
 
-	//	@Override
-	//	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
-	//		int a = this.xPosition + Tile.WIDTH;
-	//		int b = this.xPosition - Tile.WIDTH;
-	//		int c = this.yPosition + Tile.HEIGHT;
-	//		int d = this.yPosition - Tile.HEIGHT;
-	//		if (tile == null)
-	//			return;
-	//		switch (tile.getType()) {
-	//			case Entity.PLAYER:
-	//			default:
-	//				break;
-	//			case Entity.TREE:
-	//				this.collide(tile);
-	//				isBlocked = true;
-	//				break;
-	//		}
-	//	}
-
 	public int getFacing() {
 		return facing;
 	}
@@ -329,10 +293,6 @@ public class Player extends Entity {
 		return lastFacing;
 	}
 
-	//	public void blockPath(boolean value) {
-	//		this.isBlocked = value;
-	//	}
-	
 	public boolean isLockedWalking() {
 		return this.lockWalking;
 	}
@@ -400,86 +360,14 @@ public class Player extends Entity {
 
 			//Check for inputs the player wants to face. Tapping in a direction turns the player around.
 			checkFacing();
-			//checkFacingObstacles();
 			
 			//Now about to walk. First, check to see if there's an obstacle blocking the path.
 			if (this.facingsBlocked[UP] || this.facingsBlocked[DOWN] || this.facingsBlocked[LEFT] || this.facingsBlocked[RIGHT]) {
 				this.lockWalking = false;
 			}
-			
-			//			if (this.isBlocked) {
-			//				this.lockWalking = false;
-			//			}
 		}
-		
-		//		if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
-		//			if (this.isBlocked) {
-		//				xAccel = 0;
-		//				yAccel = 0;
-		//				walking = facing;
-		//				this.lockWalking = false;
-		//				return;
-		//			}
-		//		}
-		//
-		//		if (this.lockWalking) {
-		//			if (xAccel > 1)
-		//				xAccel = 1;
-		//			else if (xAccel < -1)
-		//				xAccel = -1;
-		//			else if (yAccel > 1)
-		//				yAccel = 1;
-		//			else if (yAccel < -1)
-		//				yAccel = -1;
-		//			
-		//			xPosition += xAccel;
-		//			yPosition += yAccel;
-		//			checkFacing();
-		//			if (xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0) {
-		//				xAccel = 0;
-		//				yAccel = 0;
-		//				this.lockWalking = false;
-		//				walking = facing;
-		//			}
-		//		}
-		//
-		//		if (Math.abs(xPosition - oldXPosition) == Tile.WIDTH || Math.abs(yPosition - oldYPosition) == Tile.HEIGHT) {
-		//			oldXPosition = xPosition;
-		//			oldYPosition = yPosition;
-		//		}
 	}
-	
-	//	
-	//	private void checkFacingObstacles() {
-	//		this.isBlocked = false;
-	//		if (this.facing == UP) {
-	//			if (this.facingsBlocked[UP])
-	//				this.isBlocked = true;
-	//		}
-	//		else if (this.facing == DOWN) {
-	//			if (this.facingsBlocked[DOWN])
-	//				this.isBlocked = true;
-	//		}
-	//		else if (this.facing == LEFT) {
-	//			if (this.facingsBlocked[LEFT])
-	//				this.isBlocked = true;
-	//		}
-	//		else if (this.facing == RIGHT) {
-	//			if (this.facingsBlocked[RIGHT])
-	//				this.isBlocked = true;
-	//		}
-	//	}
 
-	//	private boolean checkObstacles() {
-	//		//Something something
-	//		return isBlocked;
-	//	}
-	
-	//	private boolean facingObstacle(Tile object) {
-	//		this.handleCollision(object, 0, 0);
-	//		return isBlocked;
-	//	}
-	
 	private void checkFacing() {
 		if (keys.up.isTappedDown || keys.up.isPressedDown || keys.W.isTappedDown || keys.W.isPressedDown) {
 			facing = UP;
@@ -497,7 +385,6 @@ public class Player extends Entity {
 
 	private void controlTick() {
 		animationTick++;
-		//if (this.isBlocked) {
 		if ((this.facing == UP && this.facingsBlocked[UP])) {
 			if (animationTick >= 10) {
 				animationTick = 0;
@@ -542,20 +429,12 @@ public class Player extends Entity {
 		return this.yPosition;
 	}
 	
-	//	@Override
-	//	public void initialize(BaseWorld world) {
-	//
-	//	}
-	
 	@Override
 	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
 	}
 	
 	@Override
 	public void tick() {
-		
-		//Tile object = this.world.getTile(nextX, nextY);
-		//if (!facingObstacle(object)){ 
 		if (!this.lockJumping) {
 			walk();
 			handleMovementCheck();
@@ -563,10 +442,6 @@ public class Player extends Entity {
 		}
 		else
 			jump();
-		//}
-		//else {
-		//	bang();
-		//}
 	}
 
 	@Override
