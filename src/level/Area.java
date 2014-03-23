@@ -140,6 +140,7 @@ public class Area {
 					data_up = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
 					switch (data_up.getColor()) {
 						case 0xFF0000EE:
+							//R0 G0 B255
 							System.out.println("Is in warp zone.");
 							//TODO: Do something about this. Player supposed to be teleported to a new area at this point.
 						default:
