@@ -325,8 +325,8 @@ public class Player extends Entity {
 			if (yAccel > 1) yAccel = 1;
 			if (yAccel < -1) yAccel = -1;
 			
-			xPosition += xAccel;
-			yPosition += yAccel;
+			xPosition += xAccel * 2;
+			yPosition += yAccel * 2;
 
 			//Needs to get out of being locked to walking.
 			//Note that we cannot compare using ||, what if the player is moving in one direction? What about the other axis?
@@ -444,27 +444,27 @@ public class Player extends Entity {
 		animationTick++;
 		//if (this.isBlocked) {
 		if ((this.facing == UP && this.facingsBlocked[UP])) {
-			if (animationTick >= 20) {
+			if (animationTick >= 10) {
 				animationTick = 0;
 			}
 		}
 		else if ((this.facing == DOWN && this.facingsBlocked[DOWN])) {
-			if (animationTick >= 20) {
+			if (animationTick >= 10) {
 				animationTick = 0;
 			}
 		}
 		else if ((this.facing == LEFT && this.facingsBlocked[LEFT])) {
-			if (animationTick >= 20) {
+			if (animationTick >= 10) {
 				animationTick = 0;
 			}
 		}
 		else if ((this.facing == RIGHT && this.facingsBlocked[RIGHT])) {
-			if (animationTick >= 20) {
+			if (animationTick >= 10) {
 				animationTick = 0;
 			}
 		}
 		else {
-			if (animationTick >= 8)
+			if (animationTick >= 4)
 				animationTick = 0;
 		}
 		if (animationTick == 0) {

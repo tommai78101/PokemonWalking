@@ -80,7 +80,7 @@ public class OverWorld extends World {
 	
 	@Override
 	public void tick() {
-		this.player.tick();
+		//this.player.tick();
 		this.currentArea.tick();
 
 	}
