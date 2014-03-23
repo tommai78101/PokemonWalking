@@ -26,8 +26,7 @@ public class BaseBitmap {
 	
 	public BaseBitmap load(String filename) {
 		try {
-			//BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
-			
+			//Prints out the bitmap filename. If there's something wrong, it won't print it out.
 			Enumeration<URL> urls = this.getClass().getClassLoader().getResources(filename);
 			for (URL url = null; urls.hasMoreElements();) {
 				url = urls.nextElement();
