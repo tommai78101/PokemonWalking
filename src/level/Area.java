@@ -81,7 +81,7 @@ public class Area {
 		//Since "setPlayer" method isn't always set, there should be checks everywhere to make sure "player" isn't null.
 		if (this.player != null) {
 			//PixelData data = null;
-			if (this.player.isNotLockedWalking()) {
+			if (!this.player.isLockedWalking()) {
 				xPlayerPosition = player.getXInArea();
 				yPlayerPosition = player.getYInArea();
 				//System.out.println("X: " + xPlayerPosition + " Y: " + yPlayerPosition);
@@ -156,16 +156,37 @@ public class Area {
 				//Target pixel is used to determine what pixel the player is currently standing on
 				//(or what pixel the player is currently on top of).
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-				int pixel = this.currentPixelData.getColor();
-				//Determines warp zone.
-				int red = (pixel & 0xFF0000) >> 16;
-				if (red == 0x7F) {
-					this.isInWarpZone = true;
-				}
+				checkData();
+			}
+			else if (!this.player.isLockedJumping()) {
+				xPlayerPosition = player.getXInArea();
+				yPlayerPosition = player.getYInArea();
+				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
+					return;
+				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+				checkData();
 			}
 		}
 	}
 	
+	public void checkData() {
+		int pixel = this.currentPixelData.getColor();
+		//Determines warp zone.
+		int red = (pixel & 0xFF0000) >> 16;
+		if (red == 0x7F) {
+			this.isInWarpZone = true;
+			return;
+		}
+		
+		int green = (pixel & 0xFF00) >> 8;
+		int blue = (pixel & 0xFF);
+		
+		//Determine ledges (horizontal) 
+		if (blue == 0xDD) {
+			this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
+		}
+	}
+
 	public boolean checkData(PixelData data, int xOffset, int yOffset) {
 		if (data != null) {
 			switch (data.getColor()) {

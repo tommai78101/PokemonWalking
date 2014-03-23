@@ -7,6 +7,7 @@ import resources.Art;
 import screen.BaseScreen;
 import abstracts.Entity;
 import abstracts.Tile;
+
 //import abstracts.BaseWorld;
 
 public class Player extends Entity {
@@ -46,7 +47,12 @@ public class Player extends Entity {
 	int oldYPosition;
 
 	boolean lockWalking;
+	boolean lockJumping;
 	boolean[] facingsBlocked = new boolean[4];
+	
+	//Temporary variables
+	boolean jumpHeightSignedFlag = false;
+	int varyingJumpHeight = 0;
 
 	//--------------------------------------------------------------------------
 
@@ -172,26 +178,34 @@ public class Player extends Entity {
 			if (!this.facingsBlocked[UP]) {
 				if (keys.up.isTappedDown || keys.W.isTappedDown)
 					tapped();
-				else if (keys.up.isPressedDown || keys.W.isPressedDown)
+				else if (keys.up.isPressedDown || keys.W.isPressedDown) {
 					pressed();
+					return;
+				}
 			}
 			if (!this.facingsBlocked[DOWN]) {
 				if (keys.down.isTappedDown || keys.S.isTappedDown)
 					tapped();
-				else if (keys.down.isPressedDown || keys.S.isPressedDown)
+				else if (keys.down.isPressedDown || keys.S.isPressedDown) {
 					pressed();
+					return;
+				}
 			}
 			if (!this.facingsBlocked[LEFT]) {
 				if (keys.left.isTappedDown || keys.A.isTappedDown)
 					tapped();
-				else if (keys.left.isPressedDown || keys.A.isPressedDown)
+				else if (keys.left.isPressedDown || keys.A.isPressedDown) {
 					pressed();
+					return;
+				}
 			}
 			if (!this.facingsBlocked[RIGHT]) {
 				if (keys.right.isTappedDown || keys.D.isTappedDown)
 					tapped();
-				else if (keys.right.isPressedDown || keys.D.isPressedDown)
+				else if (keys.right.isPressedDown || keys.D.isPressedDown) {
 					pressed();
+					return;
+				}
 			}
 			
 			//			
@@ -202,8 +216,7 @@ public class Player extends Entity {
 			//					pressed();
 			//			}
 		}
-		handleMovementCheck();
-		controlTick();
+
 	}
 	
 	public void collide(Tile tile) {
@@ -211,28 +224,84 @@ public class Player extends Entity {
 		yPosition += (-yAccel);
 	}
 	
-	@Override
-	public void render(BaseScreen output, int x, int y) {
-		//Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
-		//render(BaseScreen output, int x, int y)
-		//output: where to blit the bitmap
-		//x: Pixel X offset
-		//y: Pixel Y offset
+	public void jump() {
+		if (this.lockJumping) {
+			//When being locked to walking, facing must stay constant.
+			if (this.walking != this.facing)
+				this.walking = this.facing;
+			
+			//Also make sure it's currently not being blocked by anything (You're in the air)
+			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 
-		if (this.lockWalking) {
-			//Walking animation
-			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
-		}
-		else {
-			//Blocking animation. Possibly done to create a perfect loop.
-			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-				|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
-				output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+			//Makes sure the acceleration stays limited to 1 pixel/tick.
+			if (xAccel > 1) xAccel = 1;
+			if (xAccel < -1) xAccel = -1;
+			if (yAccel > 1) yAccel = 1;
+			if (yAccel < -1) yAccel = -1;
+			
+			xPosition += xAccel * 2;
+			yPosition += yAccel * 2;
+			
+			//Jumping stuffs go here.
+			if (!this.jumpHeightSignedFlag)
+				this.varyingJumpHeight++;
 			else
-				output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+				this.varyingJumpHeight--;
+			if (this.varyingJumpHeight >= 10.0)
+				this.jumpHeightSignedFlag = true;
+
+			//Needs to get out of being locked to walking/jumping.
+			//Note that we cannot compare using ||, what if the player is moving in one direction? What about the other axis?
+			if ((xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0)) {
+				//Resets every flag that locks the player.
+				this.lockWalking = false;
+				this.lockJumping = false;
+				if (this.jumpHeightSignedFlag) {
+					this.jumpHeightSignedFlag = false;
+					this.varyingJumpHeight = 0;
+				}
+			}
 		}
+		controlTick();
 	}
 	
+	public void setLockJumping(int red, int green, int blue, int canAllow_1, int canAllow_2) {
+		/*
+		 * Pixel color determines the current tile ID the player is on. It's separated into R, G, and B.
+		 * canAllow_1 and canAllow_2 determines the direction the player can go while the player is on the current pixel data.
+		 * 
+		 * canAllow_1 must be UP or LEFT.
+		 * canAllow_2 must be DOWN or RIGHT.
+		 *
+		 * Unfortunately, we have to do another check on the colors.
+		 */
+		
+		if (canAllow_1 == DOWN || canAllow_1 == RIGHT || canAllow_2 == UP || canAllow_2 == LEFT)
+			throw new IllegalArgumentException("canAllow_1 must be UP or LEFT. canAllow_2 must be DOWN or RIGHT");
+		
+		switch (blue) {
+			case 0xDD:
+				//Since this is a ledge (horizontal), green = orientation, red = ledge type.
+				switch (green) {
+					case 0x00:
+						//Horizontal
+						this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
+						this.facingsBlocked[UP] = false;
+						this.lockJumping = true;
+						break;
+					default:
+						this.lockJumping = false;
+						break;
+
+				}
+				break;
+			default:
+				this.lockJumping = false;
+				break;
+		}
+
+	}
+
 	//	@Override
 	//	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
 	//		int a = this.xPosition + Tile.WIDTH;
@@ -260,26 +329,12 @@ public class Player extends Entity {
 		return lastFacing;
 	}
 
-	@Override
-	public void interact(Interactable object) {
-	}
-	
-	@Override
-	public int getInteractableId() {
-		return this.interactableId;
-	}
-	
-	@Override
-	public int getCollidableId() {
-		return this.collidableId;
-	}
-	
 	//	public void blockPath(boolean value) {
 	//		this.isBlocked = value;
 	//	}
 	
-	public boolean isNotLockedWalking() {
-		return !this.lockWalking;
+	public boolean isLockedWalking() {
+		return this.lockWalking;
 	}
 	
 	public void setAllBlockingDirections(boolean up, boolean down, boolean left, boolean right) {
@@ -302,6 +357,10 @@ public class Player extends Entity {
 		this.lockWalking = true;
 		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 	}
+	
+	public boolean isLockedJumping() {
+		return this.lockJumping;
+	}
 
 	//-------------------------------------------------------------------------------------
 	//Private methods
@@ -323,9 +382,10 @@ public class Player extends Entity {
 			xPosition += xAccel * 2;
 			yPosition += yAccel * 2;
 
-			//Needs to get out of being locked to walking.
+			//Needs to get out of being locked to walking/jumping.
 			//Note that we cannot compare using ||, what if the player is moving in one direction? What about the other axis?
 			if ((xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0)) {
+				//Resets every flag that locks the player.
 				this.lockWalking = false;
 			}
 		}
@@ -496,10 +556,56 @@ public class Player extends Entity {
 		
 		//Tile object = this.world.getTile(nextX, nextY);
 		//if (!facingObstacle(object)){ 
-		walk();
+		if (!this.lockJumping) {
+			walk();
+			handleMovementCheck();
+			controlTick();
+		}
+		else
+			jump();
 		//}
 		//else {
 		//	bang();
 		//}
+	}
+
+	@Override
+	public void render(BaseScreen output, int x, int y) {
+		//Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
+		//render(BaseScreen output, int x, int y)
+		//output: where to blit the bitmap
+		//x: Pixel X offset
+		//y: Pixel Y offset
+		
+		if (this.lockWalking && !this.lockJumping) {
+			//Walking animation
+			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+		}
+		else if (this.lockJumping) {
+			//Walking animation while in the air.
+			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
+		}
+		else {
+			//Blocking animation. Possibly done to create a perfect loop.
+			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+				|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+				output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+			else
+				output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+		}
+	}
+	
+	@Override
+	public void interact(Interactable object) {
+	}
+	
+	@Override
+	public int getInteractableId() {
+		return this.interactableId;
+	}
+	
+	@Override
+	public int getCollidableId() {
+		return this.collidableId;
 	}
 }
