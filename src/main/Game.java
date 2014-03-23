@@ -1,12 +1,16 @@
 package main;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import level.OverWorld;
 import screen.BaseScreen;
 import abstracts.Tile;
 import abstracts.World;
-import entity.*;
+import entity.Data;
+import entity.Player;
+import entity.Plot;
 
 public class Game {
 	//Handles different types of worlds for the game to use.
@@ -55,7 +59,6 @@ public class Game {
 		*/
 		
 		overworld.render(screen, player.getX(), player.getY());
-		player.render(screen, 0, 0);
 	}
 	
 	public void tick() {
@@ -65,11 +68,8 @@ public class Game {
 			if (w != null)
 				w.tick();
 		*/
-		player.tick();
+		//player.tick();
 		overworld.tick();
-		
-		checkPlayerWarpZone();
-
 	}
 	
 	public void save() {
@@ -90,9 +90,5 @@ public class Game {
 		//cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
 		this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
 		this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
-	}
-	
-	public void checkPlayerWarpZone() {
-		
 	}
 }

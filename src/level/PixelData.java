@@ -19,21 +19,30 @@ public class PixelData {
 	
 	//This can also be "isWayPoint".
 	private boolean isWarpZone;
-	private Area targetArea;
-	private Area parentArea;
+	
+	/*
+	 * Area Type:
+	 * 
+	 * 0x0 = Forest
+	 * 0x1 = City
+	 * 0x2 = Cave / Mountain
+	 * 0x3 = Water
+	 * 
+	 * */
+	private byte areaType;
 
-	public PixelData() {
-		this.targetArea = this.parentArea = null;
-		this.isWarpZone = false;
-	}
+	private int targetArea;
+	private int parentArea;
 	
 	public PixelData(int pixel, int x, int y) {
 		this.xPosition = x;
 		this.yPosition = y;
 		this.color = pixel;
+		this.targetArea = 0x0;
+		this.parentArea = 0x0;
 		
-		int red = pixel & 0xFF0000;
-		int green = pixel & 0xFF00;
+		int red = (pixel & 0xFF0000) >> 16;
+		int green = (pixel & 0xFF00) >> 8;
 		int blue = pixel & 0xFF;
 		
 		setProperties(red, green, blue);
@@ -42,41 +51,47 @@ public class PixelData {
 
 	public void setAsWarpZone(int parentArea, int targetArea) {
 		//Enabled by default.
-		this.parentArea = WorldConstants.convertToArea(parentArea);
-		this.targetArea = WorldConstants.convertToArea(targetArea);
+		this.parentArea = parentArea;
+		this.targetArea = targetArea;
 		this.isWarpZone = true;
 	}
 	
 	public void disableWarpZone() {
-		if (this.parentArea != null && this.targetArea != null) {
+		if (this.parentArea != 0x0 && this.targetArea != 0x0) {
 			this.isWarpZone = false;
 		}
 	}
 	
 	public void enableWarpZone() {
-		if (this.parentArea != null && this.targetArea != null) {
+		if (this.parentArea != 0x0 && this.targetArea != 0x0) {
 			this.isWarpZone = true;
 		}
 	}
 	
 	public boolean isWarpZoneEnabled() {
-		if (this.parentArea != null && this.targetArea != null) {
+		if (this.parentArea != 0x0 && this.targetArea != 0x0) {
 			return this.isWarpZone;
 		}
 		return false;
 	}
 	
 	public void prepareBitmap(int color) {
-		
-		//this.color = color;
-		
-		if (this.isWarpZone)
+		if (this.isWarpZone) {
+			//Default implementation of the warp zone tile bitmap.
+			this.bitmap = null;
+			//If Area ID is 0 ~ 15, then it's a forest type area. 
+			if ((this.parentArea & 0xF) < 0x10)
+				this.bitmap = Art.forestEntrance;
 			return;
+		}
 
 		switch (color) {
 			case 0xFF00FF00:
-				this.bitmap = Art.testTile;
+				this.bitmap = Art.grass;
 				break;
+			//			case 0xFF0000EE:
+			//				this.bitmap = Art.forestEntrance;
+			//				break;
 			default:
 				this.bitmap = Art.smallTree;
 				break;
@@ -88,10 +103,11 @@ public class PixelData {
 			//Warp Zone
 			//r: Parent Area
 			//g: Target Area			
-			this.parentArea = WorldConstants.convertToArea(r);
-			this.targetArea = WorldConstants.convertToArea(g);
+
+			this.parentArea = r;
+			this.targetArea = g;
 			this.isWarpZone = true;
-			this.canBeWalkedThrough = false;
+			this.canBeWalkedThrough = true;
 		}
 	}
 
@@ -99,11 +115,11 @@ public class PixelData {
 		return color;
 	}
 	
-	public Area getParentArea() {
+	public int getParentAreaID() {
 		return parentArea;
 	}
 	
-	public Area getTargetArea() {
+	public int getTargetAreaID() {
 		return targetArea;
 	}
 }

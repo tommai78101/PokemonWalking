@@ -10,8 +10,9 @@ public class Art {
 	public static BaseBitmap[][] testDownAnimation;
 	
 	//Tiles
-	public static BaseBitmap testTile;
+	public static BaseBitmap grass;
 	public static BaseBitmap smallTree;
+	public static BaseBitmap forestEntrance;
 	
 	//Area
 	public static BaseBitmap testArea;
@@ -21,13 +22,22 @@ public class Art {
 	public static BaseBitmap sprite;
 	
 	public static void loadAllResources(BaseScreen screen) {
+		//Misc.
 		sprite = screen.load("art/test.png");
-		player = screen.cut("art/player/player.png", 16, 16, 0, 0);
-		testTile = screen.load("art/floor/testTile.png");
-		smallTree = screen.load("art/wall/treeSmall.png");
-		testDownAnimation = screen.cut("art/player/test_walk_down_animation.png", 16, 16, 0, 0);
 		
+		//Wall
+		smallTree = screen.load("art/wall/treeSmall.png");
+		
+		//Floor
+		grass = screen.load("art/floor/grass.png");
+		forestEntrance = screen.load("art/floor/forestEntrance.png");
+
+		//Player, NPCs
+		testDownAnimation = screen.cut("art/player/test_walk_down_animation.png", 16, 16, 0, 0);
+		player = screen.cut("art/player/player.png", 16, 16, 0, 0);
+		
+		//Areas
 		testArea = screen.load("area/test/testArea.png");
-		testArea2 = screen.load("area/test/testArea2.png");
+		testArea2 = screen.load("area/test/warp_area.png");
 	}
 }

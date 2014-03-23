@@ -15,6 +15,8 @@ public class BaseScreen extends BaseBitmap {
 	protected int xOffset;
 	protected int yOffset;
 	
+	private byte invertTick = 0x7;
+
 	public BaseScreen(int w, int h) {
 		super(w, h);
 		this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -75,6 +77,39 @@ public class BaseScreen extends BaseBitmap {
 			pixels[p] = r.nextInt();
 	}
 	
+	public int getXOffset() {
+		return xOffset;
+	}
+	
+	public int getYOffset() {
+		return yOffset;
+	}
+	
+	public boolean invert() {
+		if (this.invertTick < 0x2) {
+			for (int i = 0; i < this.pixels.length; i++)
+				this.pixels[i] = 0xFF000000 | (0xAAAAAA - (this.pixels[i] & 0xFFFFFF));
+			this.invertTick++;
+			return true;
+		}
+		else if (this.invertTick < 0x6) {
+			for (int i = 0; i < this.pixels.length; i++)
+				this.pixels[i] = 0xFFAAAAAA;
+			this.invertTick++;
+			return true;
+		}
+		this.invertTick = 0x7;
+		return false;
+	}
+	
+	public void setInvertTick(byte value) {
+		this.invertTick = value;
+	}
+	
+	public byte getInvertTick() {
+		return this.invertTick;
+	}
+
 	//-------------------------------------------
 	//Private methods
 	
@@ -95,13 +130,5 @@ public class BaseScreen extends BaseBitmap {
 		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
 		
 		return 0xFF000000 | red | green | blue;
-	}
-	
-	public int getXOffset() {
-		return xOffset;
-	}
-	
-	public int getYOffset() {
-		return yOffset;
 	}
 }

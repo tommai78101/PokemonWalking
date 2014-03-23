@@ -3,7 +3,6 @@ package level;
 import java.util.ArrayList;
 import java.util.List;
 
-import resources.Art;
 import screen.BaseScreen;
 import abstracts.Tile;
 import abstracts.World;
@@ -16,7 +15,8 @@ public class OverWorld extends World {
 	//Contains overworld specific areas.
 	public List<Area> areas = new ArrayList<Area>();
 	
-	//Already have currentArea and player.
+	//Overworld properties.
+	private boolean invertBitmapColors;
 
 	public OverWorld(Player player) {
 		//Must initialize all overworld specific properties, such as specific areas, specific dialogues, etc. first.		
@@ -27,7 +27,7 @@ public class OverWorld extends World {
 		
 
 		//Going to set this area as test default only. This will need to change in the future.
-		this.currentArea = new Area(Art.testArea);
+		this.currentArea = this.areas.get(0);
 		this.currentArea.setPlayer(player);
 		this.currentArea.setDefaultPosition();
 		//Needs a marker in the area that points to where the area connects together.
@@ -37,8 +37,11 @@ public class OverWorld extends World {
 	
 	public void initialize() {
 		//There should be a maximum number of areas available for the OverWorld.
-		this.areas.add(new Area(Art.testArea));
-		this.areas.add(new Area(Art.testArea2));
+		//All areas defined must be placed in WorldConstants.
+		this.areas = WorldConstants.getAllAreas();
+		
+		//Overworld properties
+		this.invertBitmapColors = false;
 	}
 	
 	//Will add this in the future. Currently, the only entity is Player.
@@ -80,9 +83,17 @@ public class OverWorld extends World {
 	
 	@Override
 	public void tick() {
-		this.player.tick();
+		if (!this.invertBitmapColors)
+			this.player.tick();
 		this.currentArea.tick();
-
+		if (this.currentArea.playerIsInWarpZone()) {
+			PixelData data = this.currentArea.getCurrentPixelData();
+			this.currentArea = WorldConstants.convertToArea(data.getTargetAreaID());
+			this.currentArea.setPlayer(player);
+			this.currentArea.setDefaultPosition(data);
+			this.invertBitmapColors = true;
+			this.player.forceLockWalking();
+		}
 	}
 	
 	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {
@@ -102,6 +113,15 @@ public class OverWorld extends World {
 		this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
 		
+		if (this.invertBitmapColors) {
+			if (screen.getInvertTick() == (byte) 0x7) {
+				screen.setInvertTick((byte) 0x0);
+			}
+			this.invertBitmapColors = screen.invert();
+		}
+		
+		if (screen.getInvertTick() < (byte) 0x4 || screen.getInvertTick() >= (byte) 0x7)
+			player.render(screen, 0, 0);
 	}
 	
 	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {

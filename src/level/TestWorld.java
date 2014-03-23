@@ -39,7 +39,7 @@ public class TestWorld extends BaseWorld {
 					continue;
 				}
 				
-				screen.blit(Art.testTile, x * Tile.WIDTH, y * Tile.HEIGHT - Tile.HEIGHT / 2);
+				screen.blit(Art.grass, x * Tile.WIDTH, y * Tile.HEIGHT - Tile.HEIGHT / 2);
 			}
 		}
 	}

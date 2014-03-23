@@ -44,13 +44,10 @@ public class MainComponent extends Canvas implements Runnable {
 	public void init() {
 		this.requestFocus();
 		
-		//-------------------
 		//Input Handling
 		inputHandler = new NewInputHandler(keys);
 		this.addKeyListener(inputHandler);
-		//this.player = new Player(keys);
 		
-		//-------------------
 		//Game loading
 		//We pass the BaseScreen variable as a parameter, acting as an output.
 		game = new Game(screen, keys);
@@ -172,9 +169,7 @@ public class MainComponent extends Canvas implements Runnable {
 		g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), null);
 		
 		//Key input debugging only.
-		g.setColor(Color.black);
-		g.setFont(new Font("Serif", Font.PLAIN, 14));
-		keys(g);
+		debugKeys(g);
 
 		g.dispose();
 		bufferStrategy.show();
@@ -192,7 +187,9 @@ public class MainComponent extends Canvas implements Runnable {
 	//-------------------------------
 	//Private methods:
 	
-	private void keys(Graphics g) {
+	private void debugKeys(Graphics g) {
+		g.setColor(Color.black);
+		g.setFont(new Font("Serif", Font.PLAIN, 14));
 		if (keys.up.isTappedDown)
 			g.drawString("up tapped", 10, 10);
 		else if (keys.up.isPressedDown)
