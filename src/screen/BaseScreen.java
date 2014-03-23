@@ -40,6 +40,11 @@ public class BaseScreen extends BaseBitmap {
 			this.blit(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height);
 	}
 	
+	public void npcBlit(BaseBitmap bitmap, int x, int y) {
+		if (bitmap != null)
+			this.blit(bitmap, x + this.xOffset, y + this.yOffset - 4, bitmap.width, bitmap.height);
+	}
+
 	public void blit(BaseBitmap bitmap, int x, int y, int w, int h) {
 		//This directly blits the bitmap to the X and Y coordinates within the screen area.
 		//The Rect adjusts the blitting area to within the screen area.

@@ -232,14 +232,14 @@ public class Player extends Entity {
 		//y: Pixel Y offset
 
 		if (this.lockWalking) {
-			output.blit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else {
 			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
 				|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
-				output.blit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+				output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 			else
-				output.blit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+				output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
 		}
 	}
 	
