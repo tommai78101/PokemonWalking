@@ -2,15 +2,27 @@ package level;
 
 import resources.Art;
 import screen.BaseBitmap;
+import entity.Player;
 
 public class PixelData {
 	//This class contains all of the area's pixel color, pixel's properties, pixel flags to check, etc.
 	//This object will be loaded along with other PixelData objects when loading an area.
 	
+	/*
+	 * Pixel data types: (Including alpha values)
+	 * 
+	 * 0xFF00FF00: Flat grass (Can be walked, no Pokémon)
+	 * 0xFF0000DD: Ledges Horizontal
+	 * 0xFF0000AA: Small tree
+	 * 
+	 * Anything else: Flat grass.
+	 * 
+	 */
+
 	//This is also the ID number for the pixel.
 	private int color;
 	//If false, it's an obstacle.
-	private boolean canBeWalkedThrough;
+	private boolean[] facingsBlocked = new boolean[4];
 	public int xPosition;
 	public int yPosition;
 	//This represents the art resource this PixelData object is representing.
@@ -30,11 +42,12 @@ public class PixelData {
 		this.targetArea = 0x0;
 		this.parentArea = 0x0;
 		
+		int alpha = (pixel & 0xFF000000) >> 24;
 		int red = (pixel & 0xFF0000) >> 16;
 		int green = (pixel & 0xFF00) >> 8;
 		int blue = pixel & 0xFF;
 		
-		setProperties(red, green, blue);
+		setProperties(alpha, red, green, blue);
 		prepareBitmap(pixel);
 	}
 
@@ -65,6 +78,7 @@ public class PixelData {
 	}
 	
 	public void prepareBitmap(int color) {
+		//This is the only way to separate warp zones from regular tiles.		
 		if (this.isWarpZone) {
 			//Default implementation of the warp zone tile bitmap.
 			this.bitmap = null;
@@ -74,35 +88,76 @@ public class PixelData {
 			return;
 		}
 
+		//Tiles only.
+		/*
+		 * Future references:
+		 * 
+		 *  0xFFRRGGBB
+		 *  
+		 *  F: Does nothing.
+		 *  R: stands for floor tiles, *WARP ZONES*, conveyor belts, rugs, doormats, terrain, etc.
+		 *  G: stands for player, npcs, interactables, signs, items, Pokémon, etc.
+		 *  B: stands for walls, obstacles, etc. 
+		 * 
+		 */
+
 		switch (color) {
-			case 0xFF00FF00:
+			case 0xFFFF0000:
 				this.bitmap = Art.grass;
+				break;
+			case 0xFF0000DD:
+				//Green values determine the orientation.
+				//Red values determine the type (Mountain rock climb trails, plain ledge, bicycle ledges etc.)
+				this.bitmap = Art.ledge_horizontal;
+				break;
+			case 0xFF0000AA:
+				this.bitmap = Art.smallTree;
 				break;
 			default:
 				//TODO: Change the default pixel data to something else more representative.
-				this.bitmap = Art.smallTree;
-				this.canBeWalkedThrough = false;
+				this.bitmap = Art.grass;
 				break;
 		}
 	}
 	
-	public void setProperties(int r, int g, int b) {
-		if (b == 0xEE) {
+	public void setProperties(int a, int r, int g, int b) {
+		//TODO: Refactor the code to make it more readable and more modular than if...elses.
+
+		this.parentArea = 0;
+		this.targetArea = 0;
+		this.isWarpZone = false;
+
+
+		if (r == 0x7F) {
 			//Warp Zone
 			//r: Parent Area
-			//g: Target Area			
+			//g: Target Area
+			
+			//TODO: Set orientations of the warp zone.
 
-			this.parentArea = r;
-			this.targetArea = g;
+			this.parentArea = g;
+			this.targetArea = b;
 			this.isWarpZone = true;
-			this.canBeWalkedThrough = true;
+			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+			return;
 		}
-		else {
-			this.isWarpZone = false;
-			this.parentArea = 0;
-			this.targetArea = 0;
+		if (b == 0xDD) {
+			//Ledges
+			if (g == 0x00) {
+				//Horizontal ledges - Jump from top
+				this.facingsBlocked[Player.UP] = false;
+				this.facingsBlocked[Player.DOWN] = true;
+				this.facingsBlocked[Player.LEFT] = false;
+				this.facingsBlocked[Player.RIGHT] = false;
+				return;
+			}
+			return;
 		}
-
+		if (b == 0xAA) {
+			//Trees
+			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+			return;
+		}
 	}
 
 	public int getColor() {
@@ -117,7 +172,7 @@ public class PixelData {
 		return targetArea;
 	}
 	
-	public boolean isWalkThroughable() {
-		return this.canBeWalkedThrough;
+	public boolean[] isWalkThroughable() {
+		return this.facingsBlocked;
 	}
 }

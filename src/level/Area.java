@@ -147,34 +147,39 @@ public class Area {
 					data_left = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition - 1);
 					data_right = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition + 1);
 					
-					this.player.setAllBlockingDirections(checkData(data_up), checkData(data_down), checkData(data_left), checkData(data_right));
+					this.player.setAllBlockingDirections(checkData(data_up, 0, -1), checkData(data_down, 0, 1), checkData(data_left, -1, 0), checkData(data_right, 1, 0));
 				}
 				catch (Exception e) {
-					//this.player.setAllBlockingDirections(false, false, false, false);
-					this.player.setAllBlockingDirections(checkData(data_up), checkData(data_down), checkData(data_left), checkData(data_right));
+					this.player.setAllBlockingDirections(checkData(data_up, 0, -1), checkData(data_down, 0, 1), checkData(data_left, -1, 0), checkData(data_right, 1, 0));
 				}
 				
 				//Target pixel is used to determine what pixel the player is currently standing on
 				//(or what pixel the player is currently on top of).
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
 				int pixel = this.currentPixelData.getColor();
-				int b = (pixel & 0xFF);
-				if (b == 0xEE) {
+				//Determines warp zone.
+				int red = (pixel & 0xFF0000) >> 16;
+				if (red == 0x7F) {
 					this.isInWarpZone = true;
 				}
 			}
 		}
 	}
 	
-	public boolean checkData(PixelData data) {
+	public boolean checkData(PixelData data, int xOffset, int yOffset) {
 		if (data != null) {
 			switch (data.getColor()) {
-				case 0xFFFF00FF:
+				case 0xFFFF0000: //Flat grass
+					return false;
+				case 0xFF0000DD: //Ledge - Horizontal 
+				{
+					int y = this.yPlayerPosition + yOffset;
+					if (this.yPlayerPosition < y)
+						return false;
 					return true;
-				case 0xFF0000EE:
-					return false;
-				case 0xFF00FF00:
-					return false;
+				}
+				case 0xFF0000AA: //Small tree
+					return true;
 				default:
 					return false;
 			}
@@ -216,10 +221,12 @@ public class Area {
 		PixelData targetData = null;
 		if (data.isWarpZoneEnabled()) {
 			//this.player.setPosition(data.xPosition * Tile.WIDTH, data.yPosition * Tile.HEIGHT);
-			for (ArrayList<PixelData> list : this.areaData) {
+			LOOP_BREAK_Area_setDefaultPosition_1: for (ArrayList<PixelData> list : this.areaData) {
 				for (PixelData p : list) {
-					if ((p.getColor() & 0xFF) == 0xEE)
+					if (((p.getColor() & 0xFF0000) >> 16) == 0x7F) {
 						targetData = p;
+						break LOOP_BREAK_Area_setDefaultPosition_1;
+					}
 				}
 			}
 			//this.setPlayerX(targetData.xPosition);
