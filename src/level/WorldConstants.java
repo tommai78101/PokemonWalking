@@ -14,12 +14,12 @@ public class WorldConstants {
 	public static final int TEST_WORLD_2 = 0x02;
 	public static final int TEST_WORLD_3 = 0x03;
 	
-	//Temporary double variable for all common usages.
-	public static double tempDouble = 0.0;
-	//Temporary integer variable for all common usages.
-	public static int tempInteger = 0;
-	//Temporary boolean variable for all common usages.
-	public static boolean tempBoolean = false;
+	//	//Temporary double variable for all common usages.
+	//	public static double tempDouble = 0.0;
+	//	//Temporary integer variable for all common usages.
+	//	public static int tempInteger = 0;
+	//	//Temporary boolean variable for all common usages.
+	//	public static boolean tempBoolean = false;
 
 	//Unimportant at the moment.
 	//private static final int MAX_AREAS = 3;
