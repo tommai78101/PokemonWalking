@@ -158,13 +158,23 @@ public class Area {
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
 				checkData();
 			}
-			else if (!this.player.isLockedJumping()) {
+			else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
+				//A
+				//This goes with B. (30 lines down below.)
+				//It may be possible the player is still in the air, and hasn't done checking if the current pixel
+				//data is a ledge or not. This continues the data checking. It's required.
 				xPlayerPosition = player.getXInArea();
 				yPlayerPosition = player.getYInArea();
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-				checkData();
+				int pixel = this.currentPixelData.getColor();
+				int red = (pixel & 0xFF0000) >> 16;
+				int green = (pixel & 0xFF00) >> 8;
+				int blue = (pixel & 0xFF);
+				if (blue == 0xDD) {
+					this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
+				}
 			}
 		}
 	}
@@ -178,6 +188,8 @@ public class Area {
 			return;
 		}
 		
+		//B
+		//This goes with A. (30 lines up above.)
 		int green = (pixel & 0xFF00) >> 8;
 		int blue = (pixel & 0xFF);
 		
