@@ -35,6 +35,8 @@ public class OverWorld extends World {
 	public void initialize() {
 		//There should be a maximum number of areas available for the OverWorld.
 		//All areas defined must be placed in WorldConstants.
+		
+		//TODO: Make it so that all areas are connected together.
 		this.areas = WorldConstants.getAllAreas();
 		
 		//Overworld properties
