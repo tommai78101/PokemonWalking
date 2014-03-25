@@ -1,0 +1,89 @@
+Pokémon Walking - Documentation
+
+Changelogs:
+v1: First draft - using GameFaqs format.
+
+-------------------------------
+
+Table of Contents
+
+To find the chapter you wanted to view, either scroll down
+below, or use the Find (CTRL+F) method to search for the
+tag the chapters are linked to.
+
+
+
+Abstract...............[PWD01]
+About the Project......[PWD02]
+Groups.................[PWD03]
+	PixelData..........[PWD03#01]
+	Areas..............[PWD03#02]
+	Tiles..............[PWD03#03]
+Player.................[PWD04]
+Controls...............[PWD05]
+Contributors...........[PWD06]
+Terms of License.......[PWD07]
+Credits................[PWD08]
+
+
+
+-------------------------------
+
+Abstract [PWD01]
+
+Port of Pokémon walking movements from old-generation 
+Pokémon games. Nothing else is going to be ported to
+this project, such as battling, and official Pokémon
+related activities the official released versions do
+provide us with.
+
+-------------------------------
+
+About the Project [PWD02]
+
+The project is a port of the walking algorithm used 
+in 2nd generation Pokémon games. There are no future
+plans to add the 1st generation walking algorithm into
+this project.
+
+The concept was visualized when at the time, Twitch
+Plays Pokémon was trending. Many players entering
+inputs here and there 
+
+
+-------------------------------
+
+Groups [PWD03]
+
+
+-  -  -  -  -  -  -  -  -  -  -
+
+	PixelData [PWD03#01]
+	
+-  -  -  -  -  -  -  -  -  -  -
+	
+	Areas [PWD03#02]
+	
+-  -  -  -  -  -  -  -  -  -  -
+
+	Tiles [PWD03#03]
+	
+-------------------------------
+
+Player [PWD04]
+
+-------------------------------
+
+Controls [PWD05]
+
+-------------------------------
+
+Contributors [PWD06]
+
+-------------------------------
+
+Terms of License [PWD07]
+
+-------------------------------
+
+Credits [PWD08]
