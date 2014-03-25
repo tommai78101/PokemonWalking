@@ -1,7 +1,8 @@
 Pokémon Walking - Documentation
 
 Changelogs:
-v1: First draft - using GameFaqs format.
+r2: Added the history.
+r1: First draft - using GameFaqs format.
 
 -------------------------------
 
@@ -15,6 +16,7 @@ tag the chapters are linked to.
 
 Abstract...............[PWD01]
 About the Project......[PWD02]
+	History............[PWD02#01]
 Groups.................[PWD03]
 	PixelData..........[PWD03#01]
 	Areas..............[PWD03#02]
@@ -46,19 +48,110 @@ in 2nd generation Pokémon games. There are no future
 plans to add the 1st generation walking algorithm into
 this project.
 
-The concept was visualized when at the time, Twitch
-Plays Pokémon was trending. Many players entering
-inputs here and there 
+All arts are entirely placeholder. Some of the artwork
+may be here to stay.
 
+-  -  -  -  -  -  -  -  -  -  -
+
+	History [PWD02#01]
+
+The concept was created out of spite. The developer,
+tom_mai78101, felt that there was no easy way of
+creating custom dialogues and characters to share to
+others for jokes and fun. He does not want to learn
+to hack Pokémon games just for such a simple task, 
+but the developer could not put down the idea.
+
+Frustrated, the developer created "Pokémon Dialogue
+Editor," which is this project's first tentative
+title.
+
+Then, bored and lacking a plan, the developer moved on
+to create "Pixavive Survival," a real-time 2D pixel
+strategy game. 
+
+Packed with new ideas and tricks, the developer went
+back to this project and decided to redo the drawing
+board, but came to a halt. Even with new ideas, the
+developer could not come up with something original
+that can be used in this project.
+
+Looking back to the past, the developer decided to do
+something more simple. Something that has to do with
+Pokémon, and it has to be easy to see. It turns out to
+be the game genre, role-playing game.
+
+Rewriting the game engine, the developer created a
+working application, where the player controls an
+object using arrow keys as input. The developer wanted
+to have a retro feel when the player is exploring what
+was then an empty, blank canvas. The first thing that
+sprung up was the walking algorithm Pokémon games used.
+
+The developer first created tiles and placeholder art
+used as obstacles. For the obstacles, the collision 
+detection and response came from "Pixavive Survival."
+Then comes the player, which was mostly copied from
+Pokémon character sprite designs. It's really hard to
+draw a human in a 16x16 square, especially when trying
+to make human body parts apparent and easy to tell.
+
+At first, the developer thought the Pokémon character
+that was created is going to be a placeholder art until
+the end of this project. Overtime, the developer started
+to like the character design, and decided to keep it in,
+and move on to working on the walking algorithm.
+
+Once the developer implemented the walking algorithm,
+it became apparent that the walking algorithm requires
+tons and tons of tweaking and fixing bugs. This has led
+to many full releases at an early stage of development.
+
+It was also during that time, the new and second 
+tentative title, "Pokémon Walking algorithm," stuck.
+
+The history of the early development can be read here 
+from the link given below, with each of the releases and
+their respective source codes being available for
+download:
+
+http://www.thehelper.net/threads/java-pok%C3%A9mon-walking-algorithm.159287/
+
+It was not until the developer sees having a GitHub repo
+is crucial, that moving the entire project to an online
+server becomes neccesary. At v5, the move was completed.
+
+At v6, it was finally ready for public release to a more
+larger group of people, namely game programmers.
+
+It was not until v7 did all the known issues have been
+fixed. Now, the developer is currently busy with the
+military service, and will update the project from time
+to time.
 
 -------------------------------
 
 Groups [PWD03]
 
+This section contains class objects that were deemed to
+have multiple properties. They are grouped together for
+easier maintaining and adding new features for future
+planning.
+
+Each section is separated into group labels, with their
+usages and functions all explained. Refer to this
+section when adding/modifying/removing functions and
+their data format, since this section will be modified
+accordingly.
+
+All of these groups have not been finalized so far. Do
+not assume their information to be permanent.
 
 -  -  -  -  -  -  -  -  -  -  -
 
 	PixelData [PWD03#01]
+	
+	
 	
 -  -  -  -  -  -  -  -  -  -  -
 	
