@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
 import main.Keys.Key;
 
 public class NewInputHandler implements KeyListener {
@@ -23,6 +22,15 @@ public class NewInputHandler implements KeyListener {
 	
 	//private Keys keys;
 	
+	/**
+	 * Initializes the control inputs.
+	 * 
+	 * This input handler use threads to monitor inputs that require tapping or pressing the keys.
+	 * 
+	 * @param Keys
+	 *            An object that holds key input properties. All properties are used throughout
+	 *            the life cycle of this application.
+	 * */
 	public NewInputHandler(Keys keys) {
 		//this.keys = keys;
 		mappings.put(keys.up, KeyEvent.VK_UP);
@@ -35,7 +43,7 @@ public class NewInputHandler implements KeyListener {
 		mappings.put(keys.A, KeyEvent.VK_A);
 		mappings.put(keys.D, KeyEvent.VK_D);
 	}
-
+	
 	@Override
 	public void keyPressed(KeyEvent event) {
 		for (Key v : mappings.keySet()) {

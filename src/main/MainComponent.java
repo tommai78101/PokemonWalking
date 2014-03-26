@@ -1,6 +1,15 @@
 package main;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -8,17 +17,15 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import screen.BaseScreen;
 
 public class MainComponent extends Canvas implements Runnable {
 	
 	private static final long serialVersionUID = 1L;
-	public static String GAME_TITLE = "Hobby";
 	public static int GAME_WIDTH = 160;
+	public static String GAME_TITLE = "Pokémon Walking Algorithm (Hobby) by tom_mai78101";
 	public static int GAME_HEIGHT = 144;
 	public static int GAME_SCALE = 3;
 	
@@ -34,18 +41,35 @@ public class MainComponent extends Canvas implements Runnable {
 	
 	//-----------------------	
 	private boolean running;
+	
 	//private int fps;
 	
 	//-----------------------
 	
+	/**
+	 * Constructor of MainComponent.
+	 * 
+	 * This is what the main() method executes in order to start
+	 * the game.
+	 * 
+	 * */
 	public MainComponent() {
 		running = false;
 		screen = new BaseScreen(GAME_WIDTH, GAME_HEIGHT);
 		screen.loadResources();
 	}
 	
-	//Place where I get assets from.
+	/**
+	 * Intializes the game and loads all required assets.
+	 * 
+	 * This method can only be run once throughout the entire application life cycle. Otherwise,
+	 * there will be errors and unexpected glitches.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void init() {
+		//init(): Place where I get assets from.
+		
 		this.requestFocus();
 		
 		//Input Handling
@@ -62,6 +86,14 @@ public class MainComponent extends Canvas implements Runnable {
 		//this.world.setEntityStartingPosition(this.player);
 	}
 	
+	/**
+	 * Starts the game execution.
+	 * 
+	 * After MainComponent object has been loaded, this method is used to initiate game initialization
+	 * and execution of the entire game.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void start() {
 		running = true;
 		Thread thread = new Thread(this);
@@ -69,6 +101,13 @@ public class MainComponent extends Canvas implements Runnable {
 		thread.start();
 	}
 	
+	/**
+	 * Stops the Game Thread.
+	 * 
+	 * This is used when the player presses the Close button.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void stop() {
 		running = false;
 		game.save();
@@ -81,7 +120,7 @@ public class MainComponent extends Canvas implements Runnable {
 		double unprocessed = 0.0;
 		//int frames = 0;
 		int tick = 0;
-		boolean shouldRender = false;
+		//boolean shouldRender = false;
 		final double nsPerTick = 1000000000.0 / 30.0;
 		try {
 			init();
@@ -91,7 +130,7 @@ public class MainComponent extends Canvas implements Runnable {
 			return;
 		}
 		while (running) {
-			shouldRender = false;
+			//shouldRender = false;
 			long now = System.nanoTime();
 			unprocessed += (now - lastTime) / nsPerTick;
 			lastTime = now;
@@ -112,13 +151,13 @@ public class MainComponent extends Canvas implements Runnable {
 				tick--;
 				tick();
 				render();
-				shouldRender = true;
+				//shouldRender = true;
 			}
 			
-			if (shouldRender) {
-				//frames++;
-				//render();
-			}
+			//			if (shouldRender) {
+			//				//frames++;
+			//				//render();
+			//			}
 			
 			try {
 				Thread.sleep(1);
@@ -136,12 +175,29 @@ public class MainComponent extends Canvas implements Runnable {
 		//Game loop has exited, everything stops from here on out.
 	}
 	
+	/**
+	 * Updates the game.
+	 * 
+	 * This method is synchronized for no reason other than to avoid the main thread from fighting from the Game Thread.
+	 * It is possible that this is unnecessary. Please provide any feedback about this.
+	 * 
+	 * @return Nothing.
+	 * */
 	public synchronized void tick() {
 		//keys.tick();
 		//world.tick();
 		game.tick();
 	}
 	
+	/**
+	 * Renders the game to the screen.
+	 * 
+	 * The game uses software renderer, since it is modifying the BufferedImage acting as a back buffer. This method
+	 * is synchronized for no reason other than to avoid the main thread from fighting from the Game Thread.
+	 * It is possible that this is unnecessary. Please provide any feedback about this.
+	 * 
+	 * @return Nothing.
+	 * */
 	public synchronized void render() {
 		BufferStrategy bufferStrategy = this.getBufferStrategy();
 		if (bufferStrategy == null) {
@@ -174,11 +230,19 @@ public class MainComponent extends Canvas implements Runnable {
 		
 		//Key input debugging only.
 		debugKeys(g);
-
+		
 		g.dispose();
 		bufferStrategy.show();
 	}
 	
+	/**
+	 * Stops the Game Thread when the Close button has been pressed.
+	 * 
+	 * This is added to ensure the Game Thread exits safely.
+	 * 
+	 * @see WindowListener
+	 * @see WindowAdapter
+	 * */
 	public WindowListener getWindowListener() {
 		return new WindowAdapter() {
 			@Override
@@ -191,6 +255,17 @@ public class MainComponent extends Canvas implements Runnable {
 	//-------------------------------
 	//Private methods:
 	
+	/**
+	 * Debugs all inputs received from the player, and shows the result at the top left corner of the screen.
+	 * 
+	 * This will be removed some time in the future.
+	 * 
+	 * @param Graphics
+	 *            The Graphics object that the BufferStrategy uses.
+	 * @return Nothing.
+	 * @see BufferStrategy
+	 * @see Graphics
+	 * */
 	private void debugKeys(Graphics g) {
 		g.setColor(Color.black);
 		g.setFont(new Font("Serif", Font.PLAIN, 14));
@@ -214,7 +289,17 @@ public class MainComponent extends Canvas implements Runnable {
 		else if (keys.right.isPressedDown)
 			g.drawString("right pressed", 10, 10);
 	}
-
+	
+	/**
+	 * Creates a BufferedImage that is compatible with the graphics card the player is currently using.
+	 * 
+	 * The developer is unsure of its benefits. Please provide feedback if you have any comments about this.
+	 * 
+	 * @param BufferedImage
+	 *            Takes a BufferedImage that is to make it compatible with the graphics card built in the computer the
+	 *            game is running on.
+	 * @return BufferedImage The BufferedImage used for the Graphics object to blit to the screen.
+	 * */
 	private BufferedImage createCompatibleBufferedImage(BufferedImage image) {
 		GraphicsConfiguration gfx_config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		if (image.getColorModel().equals(gfx_config.getColorModel()))
