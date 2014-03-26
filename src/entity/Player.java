@@ -43,7 +43,7 @@ public class Player extends Entity {
 	
 	int oldXPosition;
 	int oldYPosition;
-
+	
 	boolean lockWalking;
 	boolean lockJumping;
 	boolean[] facingsBlocked = new boolean[4];
@@ -51,13 +51,26 @@ public class Player extends Entity {
 	//Temporary variables
 	boolean jumpHeightSignedFlag = false;
 	int varyingJumpHeight = 0;
-
+	
 	//--------------------------------------------------------------------------
-
+	
+	/**
+	 * Constructs a Player object in the game. This must be loaded in ONCE.
+	 * 
+	 * @param Keys
+	 *            Takes in the Keys object the input handler is controlling. It must not take in an uncontrolled Keys object.
+	 * */
 	public Player(Keys keys) {
 		this.keys = keys;
 	}
 	
+	/**
+	 * Moves the Player object to the center of the screen.
+	 * 
+	 * @param BaseScreen
+	 *            Pans the screen immediately so that the Player object is in the center of the screen.
+	 * @return Nothing.
+	 * */
 	public void setCenterCamPosition(BaseScreen screen) {
 		this.setRenderOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
 	}
@@ -164,7 +177,7 @@ public class Player extends Entity {
 			}
 		}
 	}
-
+	
 	public void walk() {
 		if (!this.lockWalking) {
 			if (!this.facingsBlocked[UP]) {
@@ -215,12 +228,16 @@ public class Player extends Entity {
 			
 			//Also make sure it's currently not being blocked by anything (You're in the air)
 			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-
+			
 			//Makes sure the acceleration stays limited to 1 pixel/tick.
-			if (xAccel > 1) xAccel = 1;
-			if (xAccel < -1) xAccel = -1;
-			if (yAccel > 1) yAccel = 1;
-			if (yAccel < -1) yAccel = -1;
+			if (xAccel > 1)
+				xAccel = 1;
+			if (xAccel < -1)
+				xAccel = -1;
+			if (yAccel > 1)
+				yAccel = 1;
+			if (yAccel < -1)
+				yAccel = -1;
 			
 			xPosition += xAccel * 2;
 			yPosition += yAccel * 2;
@@ -232,7 +249,7 @@ public class Player extends Entity {
 				this.varyingJumpHeight--;
 			if (this.varyingJumpHeight >= 10.0)
 				this.jumpHeightSignedFlag = true;
-
+			
 			//Needs to get out of being locked to walking/jumping.
 			//Note that we cannot compare using ||, what if the player is moving in one direction? What about the other axis?
 			if ((xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0)) {
@@ -275,16 +292,16 @@ public class Player extends Entity {
 					default:
 						this.lockJumping = false;
 						break;
-
+				
 				}
 				break;
 			default:
 				this.lockJumping = false;
 				break;
 		}
-
+		
 	}
-
+	
 	public int getFacing() {
 		return facing;
 	}
@@ -292,7 +309,7 @@ public class Player extends Entity {
 	public int getLastFacing() {
 		return lastFacing;
 	}
-
+	
 	public boolean isLockedWalking() {
 		return this.lockWalking;
 	}
@@ -303,7 +320,7 @@ public class Player extends Entity {
 		this.facingsBlocked[LEFT] = left;
 		this.facingsBlocked[RIGHT] = right;
 	}
-
+	
 	public void setAreaPosition(int x, int y) {
 		this.setPosition(x * Tile.WIDTH, y * Tile.HEIGHT);
 	}
@@ -321,27 +338,31 @@ public class Player extends Entity {
 	public boolean isLockedJumping() {
 		return this.lockJumping;
 	}
-
+	
 	//-------------------------------------------------------------------------------------
 	//Private methods
 	
 	private void handleMovementCheck() {
 		//Check if player is currently locked to walking.
 		if (this.lockWalking) {
-
+			
 			//When being locked to walking, facing must stay constant.
 			if (this.walking != this.facing)
 				this.walking = this.facing;
-
+			
 			//Makes sure the acceleration stays limited to 1 pixel/tick.
-			if (xAccel > 1) xAccel = 1;
-			if (xAccel < -1) xAccel = -1;
-			if (yAccel > 1) yAccel = 1;
-			if (yAccel < -1) yAccel = -1;
+			if (xAccel > 1)
+				xAccel = 1;
+			if (xAccel < -1)
+				xAccel = -1;
+			if (yAccel > 1)
+				yAccel = 1;
+			if (yAccel < -1)
+				yAccel = -1;
 			
 			xPosition += xAccel * 2;
 			yPosition += yAccel * 2;
-
+			
 			//Needs to get out of being locked to walking/jumping.
 			//Note that we cannot compare using ||, what if the player is moving in one direction? What about the other axis?
 			if ((xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0)) {
@@ -351,13 +372,15 @@ public class Player extends Entity {
 		}
 		else {
 			//Before we walk, check to see if the oldX and oldY are up-to-date with the latest X and Y.
-			if (this.oldXPosition != this.xPosition) this.oldXPosition = this.xPosition;
-			if (this.oldYPosition != this.yPosition) this.oldYPosition = this.yPosition;
+			if (this.oldXPosition != this.xPosition)
+				this.oldXPosition = this.xPosition;
+			if (this.oldYPosition != this.yPosition)
+				this.oldYPosition = this.yPosition;
 			
 			//Reset the acceleration values, since we're not really walking.
 			xAccel = 0;
 			yAccel = 0;
-
+			
 			//Check for inputs the player wants to face. Tapping in a direction turns the player around.
 			checkFacing();
 			
@@ -367,7 +390,7 @@ public class Player extends Entity {
 			}
 		}
 	}
-
+	
 	private void checkFacing() {
 		if (keys.up.isTappedDown || keys.up.isPressedDown || keys.W.isTappedDown || keys.W.isPressedDown) {
 			facing = UP;
@@ -382,7 +405,7 @@ public class Player extends Entity {
 			facing = RIGHT;
 		}
 	}
-
+	
 	private void controlTick() {
 		animationTick++;
 		if ((this.facing == UP && this.facingsBlocked[UP])) {
@@ -443,7 +466,7 @@ public class Player extends Entity {
 		else
 			jump();
 	}
-
+	
 	@Override
 	public void render(BaseScreen output, int x, int y) {
 		//Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
@@ -458,15 +481,15 @@ public class Player extends Entity {
 		}
 		else if (this.lockJumping) {
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
-
+			
 			//Walking animation while in the air.
 			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
-
+			
 		}
 		else {
 			//Blocking animation. Possibly done to create a perfect loop.
 			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-				|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
 				output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 			else
 				output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);

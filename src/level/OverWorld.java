@@ -2,7 +2,6 @@ package level;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import screen.BaseScreen;
 import abstracts.Tile;
 import abstracts.World;
@@ -14,7 +13,15 @@ public class OverWorld extends World {
 	
 	//Overworld properties.
 	private boolean invertBitmapColors;
-
+	
+	/**
+	 * Initializes the overworld in the game.
+	 * 
+	 * All game entities are to be loaded through this method.
+	 * 
+	 * @param Player
+	 *            Takes a Player object. The overworld then loads all related properties in respect to the Player object.
+	 * */
 	public OverWorld(Player player) {
 		//Must initialize all overworld specific properties, such as specific areas, specific dialogues, etc. first.		
 		initialize();
@@ -22,13 +29,11 @@ public class OverWorld extends World {
 		//Player
 		this.player = player;
 		
-
 		//Going to set this area as test default only. This will need to change in the future.
 		this.currentArea = this.areas.get(0);
 		this.currentArea.setPlayer(player);
 		this.currentArea.setDebugDefaultPosition();
 		//Needs a marker in the area that points to where the area connects together.
-		
 		
 	}
 	
@@ -77,9 +82,6 @@ public class OverWorld extends World {
 		return this.currentArea.getHeight();
 	}
 	
-	
-	
-	
 	@Override
 	public void tick() {
 		if (!this.invertBitmapColors)
@@ -107,7 +109,7 @@ public class OverWorld extends World {
 	public void render(BaseScreen screen, int xPlayerPos, int yPlayerPos) {
 		//OverWorld offsets are not set.
 		//Setting area offsets with player positions
-
+		
 		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
 		this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
