@@ -26,7 +26,7 @@ public class OverWorld extends World {
 		//Going to set this area as test default only. This will need to change in the future.
 		this.currentArea = this.areas.get(0);
 		this.currentArea.setPlayer(player);
-		this.currentArea.setDefaultPosition();
+		this.currentArea.setDebugDefaultPosition();
 		//Needs a marker in the area that points to where the area connects together.
 		
 		
@@ -35,6 +35,8 @@ public class OverWorld extends World {
 	public void initialize() {
 		//There should be a maximum number of areas available for the OverWorld.
 		//All areas defined must be placed in WorldConstants.
+		
+		//TODO: Make it so that all areas are connected together.
 		this.areas = WorldConstants.getAllAreas();
 		
 		//Overworld properties

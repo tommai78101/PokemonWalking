@@ -1,7 +1,9 @@
 Pokémon Walking - Documentation
 
 Changelogs:
-v1: First draft - using GameFaqs format.
+r3: Finished the draft.
+r2: Added the history.
+r1: First draft - using GameFaqs format.
 
 -------------------------------
 
@@ -15,12 +17,14 @@ tag the chapters are linked to.
 
 Abstract...............[PWD01]
 About the Project......[PWD02]
-Groups.................[PWD03]
+	History............[PWD02#01]
+Metadata...............[PWD03]
 	PixelData..........[PWD03#01]
 	Areas..............[PWD03#02]
 	Tiles..............[PWD03#03]
 Player.................[PWD04]
 Controls...............[PWD05]
+	Walking Algorithm..[PWD05#01]
 Contributors...........[PWD06]
 Terms of License.......[PWD07]
 Credits................[PWD08]
@@ -46,44 +50,232 @@ in 2nd generation Pokémon games. There are no future
 plans to add the 1st generation walking algorithm into
 this project.
 
-The concept was visualized when at the time, Twitch
-Plays Pokémon was trending. Many players entering
-inputs here and there 
+All arts are entirely placeholder. Some of the artwork
+may be here to stay.
 
+-  -  -  -  -  -  -  -  -  -  -
+
+	History [PWD02#01]
+
+The concept was created out of spite. The developer,
+tom_mai78101, felt that there was no easy way of
+creating custom dialogues and characters to share to
+others for jokes and fun. He does not want to learn
+to hack Pokémon games just for such a simple task, 
+but the developer could not put down the idea.
+
+Frustrated, the developer created "Pokémon Dialogue
+Editor," which is this project's first tentative
+title.
+
+Then, bored and lacking a plan, the developer moved on
+to create "Pixavive Survival," a real-time 2D pixel
+strategy game. 
+
+Packed with new ideas and tricks, the developer went
+back to this project and decided to redo the drawing
+board, but came to a halt. Even with new ideas, the
+developer could not come up with something original
+that can be used in this project.
+
+Looking back to the past, the developer decided to do
+something more simple. Something that has to do with
+Pokémon, and it has to be easy to see. It turns out to
+be the game genre, role-playing game.
+
+Rewriting the game engine, the developer created a
+working application, where the player controls an
+object using arrow keys as input. The developer wanted
+to have a retro feel when the player is exploring what
+was then an empty, blank canvas. The first thing that
+sprung up was the walking algorithm Pokémon games used.
+
+The developer first created tiles and placeholder art
+used as obstacles. For the obstacles, the collision 
+detection and response came from "Pixavive Survival."
+Then comes the player, which was mostly copied from
+Pokémon character sprite designs. It's really hard to
+draw a human in a 16x16 square, especially when trying
+to make human body parts apparent and easy to tell.
+
+At first, the developer thought the Pokémon character
+that was created is going to be a placeholder art until
+the end of this project. Overtime, the developer started
+to like the character design, and decided to keep it in,
+and move on to working on the walking algorithm.
+
+Once the developer implemented the walking algorithm,
+it became apparent that the walking algorithm requires
+tons and tons of tweaking and fixing bugs. This has led
+to many full releases at an early stage of development.
+
+It was also during that time, the new and second 
+tentative title, "Pokémon Walking algorithm," stuck.
+
+The history of the early development can be read here 
+from the link given below, with each of the releases and
+their respective source codes being available for
+download:
+
+http://www.thehelper.net/threads/java-pok%C3%A9mon-walking-algorithm.159287/
+
+It was not until the developer sees having a GitHub repo
+is crucial, that moving the entire project to an online
+server becomes neccesary. At v5, the move was completed.
+
+At v6, it was finally ready for public release to a more
+larger group of people, namely game programmers.
+
+It was not until v7 did all the known issues have been
+fixed. Now, the developer is currently busy with the
+military service, and will update the project from time
+to time.
 
 -------------------------------
 
-Groups [PWD03]
+Metadata [PWD03]
 
+This section contains class objects that were deemed to
+have multiple properties. They are grouped together for
+easier maintaining and adding new features for future
+planning.
+
+Each section is separated into group labels, with their
+usages and functions all explained. Refer to this
+section when adding/modifying/removing functions and
+their data format, since this section will be modified
+accordingly.
+
+All of these groups have not been finalized so far. Do
+not assume their information to be permanent.
 
 -  -  -  -  -  -  -  -  -  -  -
 
 	PixelData [PWD03#01]
 	
+	Every areas are created using an image editor. Theoretically,
+	the preferred editor should either be GIMP or Paint.NET 
+	for their ability to draw transparent pixels, opacity, or 
+	pixels with alpha values not set to 0xFF.
+	
+	They are then saved as PNG image files. PNG file format is
+	preferred, for their transparency support.
+	
+	Once the areas are loaded into the game, the pixels in the
+	image files are then converted into PixelData objects.
+	
+	A single PixelData object contains the pixel color data. It
+	is split into 4 bytes, each representing the alpha value (A),
+	the red value (R), the green value (G), and the blue value
+	(B). Each of these bytes determine the many different
+	properties of their corresponding tiles that are to be used
+	in the game for both game data and rendering.
+	
+	All values used are in hexidecimal numbers.
+	
+	The data format is given below:	
+	AA RR GG BB
+	
+	The following shows the minimum and maximum range:
+	00 00 00 00
+	FF FF FF FF
+	
+	The following algorithms are used to obtain each values from
+	a given pixel:	
+	A = (pixel >> 24) & 0xFF
+	R = (pixel >> 16) & 0xFF
+	G = (pixel >> 8) & 0xFF
+	B = pixel & 0xFF
+	
+	The following list shows what each byte represents:
+	A: Tile ID
+	R: Extended Tile ID/Tile-specific data.
+	G: Tile-specific data.
+	B: Tile-specific data.
+	
+	Tile ID represents what the pixel data is in a given area.
+	There are 256 different types of Tile ID in total. Two 
+	Tile IDs must not interfere, or be related, with each other.
+	
+	Extended Tile ID can represent the specifications of a given
+	Tile ID. It helps to categorize different, but related tiles
+	together. There are 256 different extended Tile IDs in
+	total, thus allowing 1 Tile of 1 kind of Tile ID to have 256
+	related Tile IDs for the game to use. The theoretical
+	maximum total of Tiles, when combining Tile IDs and extended
+	Tile IDs, is 65536, or 256 x 256 different combinations.
+	
+	Tile-specific data are used by the game accordingly with the
+	corresponding Tile ID. This is entirely determined by the
+	Tile the game uses and the area the Tile is in.
+	
 -  -  -  -  -  -  -  -  -  -  -
 	
 	Areas [PWD03#02]
+	
+	Mentioned before, each area is created using an image editor
+	that can edit/modify alpha values. Preferrably, GIMP or
+	Paint.NET may be a good choice.
+	
+	Due to limitations set by PixelData, the maximum theoretical
+	size of an area is 256x256. This is determined by using
+	2 bytes from a PixelData, each byte representing width and
+	height respectively. This also means that the tile's 
+	position a PixelData represents in the game can span from 
+	(0, 0) to (255, 255) in a 256x256 area.
+	
+	The chosen 2 bytes are, again, determined by the tile the 
+	Tile ID represents, and the area the tile is in. This goes
+	with the "Tile-specific data" that is accordance with the
+	PixelData data format.
 	
 -  -  -  -  -  -  -  -  -  -  -
 
 	Tiles [PWD03#03]
 	
+	<To be continued...>
+	
 -------------------------------
 
 Player [PWD04]
+
+Currently, the Player is represented as "Joe," a 
+character that appeared in the 2nd generation 
+Pokémon games, Gold, Silver, and Crystal versions.
+
+The character design and artwork were done by hand,
+and they are merely placeholder art.
 
 -------------------------------
 
 Controls [PWD05]
 
+To move the player around, use either WASD keys or 
+the arrow keys. Tap any key to let the Player face 
+towards the direction the tapped key represents.
+
+-  -  -  -  -  -  -  -  -  -  -
+
+	Walking Algorithm [PWD05#01]
+	
+	<To be continued...>
+
 -------------------------------
 
 Contributors [PWD06]
+
+Developer - tom_mai78101
 
 -------------------------------
 
 Terms of License [PWD07]
 
+This entire project is Apache Licensed. For more
+information, please read the terms and regulations
+of the license file in the root of the project folder.
+
 -------------------------------
 
 Credits [PWD08]
+
+Author - tom_mai78101
