@@ -130,6 +130,7 @@ public class MainComponent extends Canvas implements Runnable {
 			return;
 		}
 		while (running) {
+			//For debugging, this is disabled.
 			//shouldRender = false;
 			long now = System.nanoTime();
 			unprocessed += (now - lastTime) / nsPerTick;
@@ -151,9 +152,11 @@ public class MainComponent extends Canvas implements Runnable {
 				tick--;
 				tick();
 				render();
+				//For debugging, this is disabled.
 				//shouldRender = true;
 			}
 			
+			//For debugging, this is disabled.
 			//			if (shouldRender) {
 			//				//frames++;
 			//				//render();
