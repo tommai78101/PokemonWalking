@@ -136,6 +136,9 @@ public class MainComponent extends Canvas implements Runnable {
 			unprocessed += (now - lastTime) / nsPerTick;
 			lastTime = now;
 			
+			if (unprocessed >= 40.0)
+				unprocessed = 40.0;
+			
 			while (unprocessed >= 1) {
 				tick++;
 				unprocessed -= 1;

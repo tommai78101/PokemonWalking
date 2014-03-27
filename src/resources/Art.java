@@ -13,7 +13,7 @@ public class Art {
 	public static BaseBitmap grass;
 	public static BaseBitmap smallTree;
 	public static BaseBitmap forestEntrance;
-	public static BaseBitmap ledge_horizontal;
+	public static BaseBitmap ledge_horizontal_bottom;
 	
 	//Area
 	public static BaseBitmap testArea;
@@ -27,12 +27,12 @@ public class Art {
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
-		ledge_horizontal = screen.load("art/wall/ledge_horizontal.png");
-
+		ledge_horizontal_bottom = screen.load("art/wall/ledge_horizontal_bottom.png"); //FIXME: Add bitmap.
+		
 		//Floor
 		grass = screen.load("art/floor/grass.png");
 		forestEntrance = screen.load("art/floor/forestEntrance.png");
-
+		
 		//Player, NPCs
 		testDownAnimation = screen.cut("art/player/test_walk_down_animation.png", 16, 16, 0, 0);
 		player = screen.cut("art/player/player.png", 16, 16, 0, 0);

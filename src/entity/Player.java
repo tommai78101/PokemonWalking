@@ -281,6 +281,12 @@ public class Player extends Entity {
 	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or Player.RIGHT.
 	 * <p>
 	 * 
+	 * @param red
+	 *            The red value of the pixel color.
+	 * @param green
+	 *            The green value of the pixel color.
+	 * @param blue
+	 *            The blue value of the pixel color.
 	 * @param from
 	 *            The player direction the tile allows the player to jump from. Player direction is determined from
 	 *            where the tile is located. The player direction must not be the same as the "to" parameter.
@@ -289,7 +295,7 @@ public class Player extends Entity {
 	 *            where the tile is located. The player direction must not be the same as the "from" parameter.
 	 * @return Nothing.
 	 * */
-	public void setLockJumping(int from, int to) {
+	public void setLockJumping(int red, int green, int blue, int from, int to) {
 		/*
 		 * Pixel color determines the current tile ID the player is on. It's separated into R, G, and B.
 		 * canAllow_1 and canAllow_2 determines the direction the player can go while the player is on the current pixel data.
@@ -324,10 +330,18 @@ public class Player extends Entity {
 		//		}
 		if (from == to)
 			throw new IllegalArgumentException("The parameters, from and to, must not be the same.");
-		
-		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
-		this.facingsBlocked[from] = false;
-		this.lockJumping = true;
+		switch (red) {
+			case 0x00: //Horizontal bottom
+				//this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
+				this.facingsBlocked[UP] = false;
+				this.lockJumping = true;
+				break;
+			default: //Any other tiles should not cause the player to jump.
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				this.lockJumping = false;
+				break;
+		}
 	}
 	
 	public int getFacing() {
