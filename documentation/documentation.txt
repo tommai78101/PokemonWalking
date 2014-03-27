@@ -381,6 +381,14 @@ not assume their information to be permanent.
 			different target areas and different player target X and Y
 			coordinates. The maximum amount of warp points for a single area is
 			256. The range of where the player is to spawn in the area is 0 ~ 255.
+			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		OverWorld Connection Point
+		
+		05 XX 00 00
+		
+		XX - Area to connect. (Target area)
 
 -------------------------------
 
