@@ -1,7 +1,6 @@
 package level;
 
 import java.util.ArrayList;
-
 import screen.BaseBitmap;
 import screen.BaseScreen;
 import abstracts.Tile;
@@ -31,7 +30,7 @@ public class Area {
 	 * */
 	//Will implement Area Type sometime in the future.
 	//private int areaType;
-
+	
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	
 	public Area(BaseBitmap bitmap, final int areaID) {
@@ -72,14 +71,14 @@ public class Area {
 				//System.out.println("X: " + xPlayerPosition + " Y: " + yPlayerPosition);
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
-
+				
 				//Another method of detecting obstacles: Find all currently blocking obstacles
 				//	of each direction at the same time.
 				PixelData data_up = null;
 				PixelData data_down = null;
 				PixelData data_left = null;
 				PixelData data_right = null;
-
+				
 				try {
 					data_up = areaData.get(this.yPlayerPosition - 1).get(this.xPlayerPosition);
 					data_down = areaData.get(this.yPlayerPosition + 1).get(this.xPlayerPosition);
@@ -108,9 +107,9 @@ public class Area {
 					return;
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
 				int pixel = this.currentPixelData.getColor();
-				int red = (pixel & 0xFF0000) >> 16;
-				int green = (pixel & 0xFF00) >> 8;
-				int blue = (pixel & 0xFF);
+				int red = (pixel >> 16) & 0xFF;
+				int green = (pixel >> 8) & 0xFF;
+				int blue = pixel & 0xFF;
 				if (blue == 0xDD) {
 					this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
 				}
@@ -119,9 +118,10 @@ public class Area {
 	}
 	
 	public void checkData() {
+		//TODO: Fix this checkup.
 		int pixel = this.currentPixelData.getColor();
 		//Determines warp zone.
-		int red = (pixel & 0xFF0000) >> 16;
+		int red = (pixel >> 16) & 0xFF;
 		if (red == 0x7F) {
 			this.isInWarpZone = true;
 			return;
@@ -129,36 +129,59 @@ public class Area {
 		
 		//B
 		//This goes with A. (30 lines up above.)
-		int green = (pixel & 0xFF00) >> 8;
-		int blue = (pixel & 0xFF);
+		int green = (pixel >> 8) & 0xFF;
+		int blue = pixel & 0xFF;
 		
 		//Determine ledges (horizontal) 
 		if (blue == 0xDD) {
-			this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
+			this.player.setLockJumping(Player.UP, Player.DOWN);
 		}
 	}
-
+	
+	/**
+	 * Checks the pixel data and sets properties according to the documentation provided.
+	 * 
+	 * @param data
+	 *            Checks the PixelData that was passed in.
+	 * @param xOffset
+	 *            Sets the offset of the PixelData it should check by the X axis.
+	 * @param yOffset
+	 *            Sets the offset of the PixelData it should check by the Y axis.
+	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through.
+	 * */
 	public boolean checkData(PixelData data, int xOffset, int yOffset) {
 		if (data != null) {
-			switch (data.getColor()) {
-				case 0xFFFF0000: //Flat grass
+			int color = data.getColor();
+			int alpha = (color >> 24) & 0xFF;
+			int red = (color >> 16) & 0xFF;
+			int green = (color >> 8) & 0xFF;
+			int blue = color & 0xFF;
+			switch (alpha) {
+				case 0x01: //Flat grass
 					return false;
-				case 0xFF0000DD: //Ledge - Horizontal 
+				case 0x02: //Ledge
 				{
-					int y = this.yPlayerPosition + yOffset;
-					if (this.yPlayerPosition < y)
-						return false;
-					return true;
+					switch (red) {
+						case 0x00: //Horizontal Bottom
+							this.player.setLockJumping(Player.UP, Player.DOWN);
+							int y = this.yPlayerPosition + yOffset;
+							if (this.yPlayerPosition < y)
+								return false;
+							return true;
+					}
 				}
-				case 0xFF0000AA: //Small tree
+				case 0x03: //Small tree
 					return true;
-				default:
+				case 0x04: //Warp point
+					this.isInWarpZone = true;
+					return false;
+				default: //Any other type of tiles.
 					return false;
 			}
 		}
 		return true;
 	}
-
+	
 	public void renderTiles(BaseScreen screen, int xOff, int yOff) {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
@@ -203,7 +226,7 @@ public class Area {
 			this.player.setAreaPosition(targetData.xPosition, targetData.yPosition);
 		}
 	}
-
+	
 	public boolean playerIsInWarpZone() {
 		return this.isInWarpZone;
 	}
@@ -216,5 +239,5 @@ public class Area {
 	public int getAreaID() {
 		return this.areaID;
 	}
-
+	
 }

@@ -265,41 +265,69 @@ public class Player extends Entity {
 		controlTick();
 	}
 	
-	public void setLockJumping(int red, int green, int blue, int canAllow_1, int canAllow_2) {
+	/**
+	 * Locks the player into a jumping state. In this state, the Player cannot listen to any key
+	 * inputs received during the jump.
+	 * <p>
+	 * 
+	 * Note: An example on how to determine player direction for the tile to allow and block:
+	 * <ul>
+	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the
+	 * parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means,
+	 * the tile above X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X
+	 * (the UP tile) to jump across to the tile below X, but not the other way around.
+	 * </ul>
+	 * 
+	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or Player.RIGHT.
+	 * <p>
+	 * 
+	 * @param from
+	 *            The player direction the tile allows the player to jump from. Player direction is determined from
+	 *            where the tile is located. The player direction must not be the same as the "to" parameter.
+	 * @param to
+	 *            The player direction the tile allows the player to jump to. Player direction is determined from
+	 *            where the tile is located. The player direction must not be the same as the "from" parameter.
+	 * @return Nothing.
+	 * */
+	public void setLockJumping(int from, int to) {
 		/*
 		 * Pixel color determines the current tile ID the player is on. It's separated into R, G, and B.
 		 * canAllow_1 and canAllow_2 determines the direction the player can go while the player is on the current pixel data.
-		 * 
-		 * canAllow_1 must be UP or LEFT.
-		 * canAllow_2 must be DOWN or RIGHT.
+		 *
+		 *
 		 *
 		 * Unfortunately, we have to do another check on the colors.
 		 */
 		
-		if (canAllow_1 == DOWN || canAllow_1 == RIGHT || canAllow_2 == UP || canAllow_2 == LEFT)
-			throw new IllegalArgumentException("canAllow_1 must be UP or LEFT. canAllow_2 must be DOWN or RIGHT");
+		//		if (canAllow_1 == DOWN || canAllow_1 == RIGHT || canAllow_2 == UP || canAllow_2 == LEFT)
+		//			throw new IllegalArgumentException("canAllow_1 must be UP or LEFT. canAllow_2 must be DOWN or RIGHT");
 		
-		switch (blue) {
-			case 0xDD:
-				//Since this is a ledge (horizontal), green = orientation, red = ledge type.
-				switch (green) {
-					case 0x00:
-						//Horizontal
-						this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
-						this.facingsBlocked[UP] = false;
-						this.lockJumping = true;
-						break;
-					default:
-						this.lockJumping = false;
-						break;
-				
-				}
-				break;
-			default:
-				this.lockJumping = false;
-				break;
-		}
+		//		switch (blue) {
+		//			case 0xDD:
+		//				//Since this is a ledge (horizontal), green = orientation, red = ledge type.
+		//				switch (green) {
+		//					case 0x00:
+		//						//Horizontal
+		//						this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
+		//						this.facingsBlocked[UP] = false;
+		//						this.lockJumping = true;
+		//						break;
+		//					default:
+		//						this.lockJumping = false;
+		//						break;
+		//				
+		//				}
+		//				break;
+		//			default:
+		//				this.lockJumping = false;
+		//				break;
+		//		}
+		if (from == to)
+			throw new IllegalArgumentException("The parameters, from and to, must not be the same.");
 		
+		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+		this.facingsBlocked[from] = false;
+		this.lockJumping = true;
 	}
 	
 	public int getFacing() {
