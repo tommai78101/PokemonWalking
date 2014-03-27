@@ -22,6 +22,10 @@ Metadata...............[PWD03]
 	PixelData..........[PWD03#01]
 	Areas..............[PWD03#02]
 	Tiles..............[PWD03#03]
+		Grass..........[PWD03#03@01]
+		Ledge..........[PWD03#03@02]
+		Tree...........[PWD03#03@03]
+		Warp Point.....[PWD03#03@04]
 Player.................[PWD04]
 Controls...............[PWD05]
 	Walking Algorithm..[PWD05#01]
@@ -233,8 +237,93 @@ not assume their information to be permanent.
 
 	Tiles [PWD03#03]
 	
-	<To be continued...>
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
+		Grass [PWD03#03@01]
+		
+		Tile ID:
+			A: 01 - Grass
+		Extended Tile ID:
+			R: 00 - Normal grasslands.
+		Tile Specific ID:
+			G: 00 - None specified.
+			B: 00 - None specified.
+		Full Data(s):
+			01 00 00 00
+		Description:
+			Walkable grass tiles, may represents unpaved roads or fields.
+			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Ledge [PWD03#03@02]
+		
+		Tile ID:
+			A: 02 - Ledge
+		Extended Tile ID:
+			R: 00 - Horizontal Bottom
+			R: 01 - Horizontal Top
+			R: 02 - Vertical Bottom
+			R: 03 - Vertical Top
+			R: 04 - Top Left corner
+			R: 05 - Top Right corner
+			R: 06 - Bottom Left corner
+			R: 07 - Bottom Right corner
+		Tile Specific ID:
+			G: 00 - None specified.
+			B: 00 - None specified.
+		Full Data(s):
+			02 00 00 00
+			02 01 00 00
+			02 02 00 00
+			02 03 00 00
+			02 04 00 00
+			02 05 00 00
+			02 06 00 00
+			02 07 00 00
+		Description:
+			Can be jumped across according to its height, which is determined
+			by direction from where the player starts jumping. Horizontal
+			ledge heights are determined by thickness of the ledge. If it's
+			thick, it means top is higher than bottom. If it's thin, it means
+			bottom is higher than top. Player can only jump from higher
+			ground to lower ground.
+			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Tree [PWD03#03@03]
+	
+		Tile ID:
+			A: 03 - Tree
+		Extended Tile ID:
+			R: 00 - Small tree
+		Tile Specific ID:
+			G: None specified.
+			B: None specified.
+		Full Data(s):
+			03 00 00 00
+		Description:
+			An obstacle that blocks the Player's path.
+			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Warp Point [PWD03#03@04]
+		
+		Tile ID:
+			A: 04 - Warp Point
+		Extended Tile ID:
+			R: XX - Target Area
+		Tile Specific ID:
+			G: WW - Player's X position in the target area
+			B: HH - Player's Y position in the target area
+		Full Data(s):
+			04 XX WW HH
+		Description:
+			When stepped on, it warps the player to the target area. The RGB
+			values are arbitrary, meaning that there is no defined constant for
+			different target areas and different player target X and Y
+			coordinates. The maximum amount of warp points for a single area is
+			256. The range of where the player is to spawn in the area is 0 ~ 255.
+
 -------------------------------
 
 Player [PWD04]
