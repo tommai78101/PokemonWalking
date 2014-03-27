@@ -19,20 +19,21 @@ tag the chapters are linked to.
 Abstract...............[PWD01]
 About the Project......[PWD02]
 	History............[PWD02#01]
-Metadata...............[PWD03]
-	PixelData..........[PWD03#01]
-	Areas..............[PWD03#02]
-	Tiles..............[PWD03#03]
-		Grass..........[PWD03#03@01]
-		Ledge..........[PWD03#03@02]
-		Tree...........[PWD03#03@03]
-		Warp Point.....[PWD03#03@04]
-Player.................[PWD04]
-Controls...............[PWD05]
-	Walking Algorithm..[PWD05#01]
-Contributors...........[PWD06]
-Terms of License.......[PWD07]
-Credits................[PWD08]
+How to Debug...........[PWD03]
+Metadata...............[PWD04]
+	PixelData..........[PWD04#01]
+	Areas..............[PWD04#02]
+	Tiles..............[PWD04#03]
+		Grass..........[PWD04#03@01]
+		Ledge..........[PWD04#03@02]
+		Tree...........[PWD04#03@03]
+		Warp Point.....[PWD04#03@04]
+Player.................[PWD05]
+Controls...............[PWD06]
+	Walking Algorithm..[PWD06#01]
+Contributors...........[PWD07]
+Terms of License.......[PWD08]
+Credits................[PWD09]
 
 
 
@@ -138,7 +139,62 @@ to time.
 
 -------------------------------
 
-Metadata [PWD03]
+How to Debug [PWD03]
+
+This section explains steps to debugging this project and
+provide educational instructions to help new developers 
+get to know the flow of this project.
+
+The developer assumes you have already installed Git of
+your choice (TortoiseGIT, Git, GitHub for Windows, etc.),
+and your preferred Java IDE. This project uses JRE7, so
+it is possible this project will be in need of an overhaul
+once Java 8 has been released.
+
+If you wish, you may skip certain sections and paragraphs
+below.
+
+To start, open your preferred IDE. In this case, the
+documentation will use Eclipse IDE Kepler for Java. Once
+the IDE has finished loading, open up your workspace
+directory in the file explorer of your operating system.
+
+Once in the directory, use "git clone" to obtain a copy
+of the repository. Once finished, in your IDE, import the
+cloned directory as an existing project.
+
+In Eclipse, there's a feature that allows you to stop at
+main() when you start running your application. Your
+preferred IDE may or may not include this feature, thus
+you may wish to look it up online to understand this
+feature.
+
+Now, in Eclipse, up at the top of the taskbar, click on
+the following:
+
+Run > Debug Configurations...
+
+You should be able to see your application name in the
+Java Application category in the left pane. In the right
+pane, you should be in the Main tab. Near the bottom of
+the Main tab, you should see a checkbox with "Stop at
+main" text next to it. Go ahead and tick the checkbox.
+
+Now, press "Debug" button.
+
+Once here, use F5 to step in, F6 to step over, F7 to 
+step out, F8 to continue, CTRL+SHIFT+B to set a breakpoint,
+and F11 to debug again without stopping at main.
+
+Recommended suggestion would be to use F5 or F6 repeatedly
+until you have reached the same method for the third time.
+
+This is to ensure that you have at least an understanding
+of behind the scenes, and knowing what does what. 
+
+-------------------------------
+
+Metadata [PWD04]
 
 This section contains class objects that were deemed to
 have multiple properties. They are grouped together for
@@ -156,7 +212,7 @@ not assume their information to be permanent.
 
 -  -  -  -  -  -  -  -  -  -  -
 
-	PixelData [PWD03#01]
+	PixelData [PWD04#01]
 	
 	Every areas are created using an image editor. Theoretically,
 	the preferred editor should either be GIMP or Paint.NET 
@@ -216,7 +272,7 @@ not assume their information to be permanent.
 	
 -  -  -  -  -  -  -  -  -  -  -
 	
-	Areas [PWD03#02]
+	Areas [PWD04#02]
 	
 	Mentioned before, each area is created using an image editor
 	that can edit/modify alpha values. Preferrably, GIMP or
@@ -236,11 +292,11 @@ not assume their information to be permanent.
 	
 -  -  -  -  -  -  -  -  -  -  -
 
-	Tiles [PWD03#03]
+	Tiles [PWD04#03]
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
-		Grass [PWD03#03@01]
+		Grass [PWD04#03@01]
 		
 		Tile ID:
 			A: 01 - Grass
@@ -256,7 +312,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Ledge [PWD03#03@02]
+		Ledge [PWD04#03@02]
 		
 		Tile ID:
 			A: 02 - Ledge
@@ -291,7 +347,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Tree [PWD03#03@03]
+		Tree [PWD04#03@03]
 	
 		Tile ID:
 			A: 03 - Tree
@@ -307,7 +363,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Warp Point [PWD03#03@04]
+		Warp Point [PWD04#03@04]
 		
 		Tile ID:
 			A: 04 - Warp Point
@@ -327,7 +383,7 @@ not assume their information to be permanent.
 
 -------------------------------
 
-Player [PWD04]
+Player [PWD05]
 
 Currently, the Player is represented as "Joe," a 
 character that appeared in the 2nd generation 
@@ -338,7 +394,7 @@ and they are merely placeholder art.
 
 -------------------------------
 
-Controls [PWD05]
+Controls [PWD06]
 
 To move the player around, use either WASD keys or 
 the arrow keys. Tap any key to let the Player face 
@@ -346,19 +402,19 @@ towards the direction the tapped key represents.
 
 -  -  -  -  -  -  -  -  -  -  -
 
-	Walking Algorithm [PWD05#01]
+	Walking Algorithm [PWD06#01]
 	
 	<To be continued...>
 
 -------------------------------
 
-Contributors [PWD06]
+Contributors [PWD07]
 
 Developer - tom_mai78101
 
 -------------------------------
 
-Terms of License [PWD07]
+Terms of License [PWD08]
 
 This entire project is Apache Licensed. For more
 information, please read the terms and regulations
@@ -366,6 +422,6 @@ of the license file in the root of the project folder.
 
 -------------------------------
 
-Credits [PWD08]
+Credits [PWD09]
 
 Author - tom_mai78101
