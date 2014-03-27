@@ -1,6 +1,7 @@
-Pokémon Walking - Documentation
+﻿Pokémon Walking - Documentation
 
 Changelogs:
+r4: Added new tiles to the Tiles section.
 r3: Finished the draft.
 r2: Added the history.
 r1: First draft - using GameFaqs format.
