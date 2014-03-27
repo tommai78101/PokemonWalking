@@ -22,7 +22,7 @@ It's still in very early stages of development. Possibly even earlier than "alph
 * Everything is done from scratch/by hand. Only the character design is mostly copied from the original Pokémon games.
 
 **Known Issues:**
-* Unreproducible bug where the player can easily walk inside of the tree. I'm unable to recreate the bug successfully, but I'm fully aware of it. Not game-breaking, though.
+* None at the moment. (v7 release)
 
 **Plans:**
 * Implement all walking situations from the original games. Walking, surfing, jumping over ledges, riding bicycle, etc. (Main goal)
