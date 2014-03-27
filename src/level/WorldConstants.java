@@ -2,7 +2,6 @@ package level;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import resources.Art;
 
 public class WorldConstants {
@@ -13,6 +12,8 @@ public class WorldConstants {
 	public static final int TEST_WORLD_1 = 0x01;
 	public static final int TEST_WORLD_2 = 0x02;
 	public static final int TEST_WORLD_3 = 0x03;
+	public static final int TEST_WORLD_4 = 0x04;
+	public static final int TEST_WORLD_4_MORE = 0x05;
 	
 	//	//Temporary double variable for all common usages.
 	//	public static double tempDouble = 0.0;
@@ -20,10 +21,10 @@ public class WorldConstants {
 	//	public static int tempInteger = 0;
 	//	//Temporary boolean variable for all common usages.
 	//	public static boolean tempBoolean = false;
-
+	
 	//Unimportant at the moment.
 	//private static final int MAX_AREAS = 3;
-
+	
 	public static Area convertToArea(int areaID) {
 		switch (areaID) {
 			case TEST_WORLD_1:
@@ -32,6 +33,10 @@ public class WorldConstants {
 				return new Area(Art.testArea2, TEST_WORLD_2);
 			case TEST_WORLD_3:
 				return new Area(Art.testArea3, TEST_WORLD_3);
+			case TEST_WORLD_4:
+				return new Area(Art.testArea4_first, TEST_WORLD_4);
+			case TEST_WORLD_4_MORE:
+				return new Area(Art.testArea4_second, TEST_WORLD_4_MORE);
 			default:
 				return null;
 		}
@@ -42,6 +47,8 @@ public class WorldConstants {
 		result.add(new Area(Art.testArea, TEST_WORLD_1));
 		result.add(new Area(Art.testArea2, TEST_WORLD_2));
 		result.add(new Area(Art.testArea3, TEST_WORLD_3));
+		result.add(new Area(Art.testArea4_first, TEST_WORLD_4));
+		result.add(new Area(Art.testArea4_second, TEST_WORLD_4_MORE));
 		return result;
 	}
 }

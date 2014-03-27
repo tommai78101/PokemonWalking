@@ -19,6 +19,8 @@ public class Art {
 	public static BaseBitmap testArea;
 	public static BaseBitmap testArea2;
 	public static BaseBitmap testArea3;
+	public static BaseBitmap testArea4_first;
+	public static BaseBitmap testArea4_second;
 	
 	//Others
 	public static BaseBitmap sprite;
@@ -27,7 +29,7 @@ public class Art {
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
-		ledge_horizontal_bottom = screen.load("art/wall/ledge_horizontal_bottom.png"); //FIXME: Add bitmap.
+		ledge_horizontal_bottom = screen.load("art/wall/ledge_horizontal_bottom.png"); //FIXME: Redo bitmap.
 		
 		//Floor
 		grass = screen.load("art/floor/grass.png");
@@ -42,5 +44,10 @@ public class Art {
 		testArea = screen.load("area/test/testArea.png");
 		testArea2 = screen.load("area/test/warp_area.png");
 		testArea3 = screen.load("area/test/testArea3.png");
+		
+		//Overworld areas
+		testArea4_first = screen.load("area/test/testArea4.png");
+		testArea4_second = screen.load("area/test/testArea4_second.png");
+		
 	}
 }
