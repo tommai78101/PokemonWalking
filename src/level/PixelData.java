@@ -121,7 +121,7 @@ public class PixelData {
 				//the warp point is in.
 				this.bitmap = Art.forestEntrance;
 				break;
-			case 0x05:
+			case 0x05: //Sector markers.
 				//TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
 				this.bitmap = Art.grass;
 				break;
