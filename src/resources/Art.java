@@ -13,7 +13,10 @@ public class Art {
 	public static BaseBitmap grass;
 	public static BaseBitmap smallTree;
 	public static BaseBitmap forestEntrance;
-	public static BaseBitmap ledge_horizontal_bottom;
+	public static BaseBitmap ledge_bottom;
+	public static BaseBitmap ledge_bottom_left;
+	public static BaseBitmap ledge_left;
+	public static BaseBitmap ledge_top_left;
 	
 	//Area
 	public static BaseBitmap testArea;
@@ -28,7 +31,10 @@ public class Art {
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
-		ledge_horizontal_bottom = screen.load("art/wall/ledge_horizontal_bottom.png"); //FIXME: Redo bitmap.
+		ledge_bottom = screen.load("art/wall/ledge_bottom.png");
+		ledge_bottom_left = screen.load("art/wall/ledge_bottom_left.png");
+		ledge_left = screen.load("art/wall/ledge_left.png");
+		ledge_top_left = screen.load("art/wall/ledge_top_left.png");
 		
 		//Floor
 		grass = screen.load("art/floor/grass.png");

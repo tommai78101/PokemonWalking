@@ -216,7 +216,7 @@ public class MainComponent extends Canvas implements Runnable {
 		Graphics g = bufferStrategy.getDrawGraphics();
 		
 		//Background border
-		g.setColor(Color.LIGHT_GRAY);
+		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		screen.clear(0xA4E767);
 		

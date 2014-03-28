@@ -108,7 +108,16 @@ public class PixelData {
 			{
 				switch (red) {
 					case 0x00: //Horizontal Bottom
-						this.bitmap = Art.ledge_horizontal_bottom;
+						this.bitmap = Art.ledge_bottom;
+						break;
+					case 0x01: //Bottom left
+						this.bitmap = Art.ledge_bottom_left;
+						break;
+					case 0x02: //Left
+						this.bitmap = Art.ledge_left;
+						break;
+					case 0x03: //Top Left
+						this.bitmap = Art.ledge_top_left;
 						break;
 				}
 				break;
@@ -170,11 +179,23 @@ public class PixelData {
 				break;
 			case 0x02: //Ledges
 				switch (red) {
-					case 0x00:
+					case 0x00: //Bottom
 						this.facingsBlocked[Player.UP] = false;
 						this.facingsBlocked[Player.DOWN] = true;
 						this.facingsBlocked[Player.LEFT] = false;
 						this.facingsBlocked[Player.RIGHT] = false;
+						break;
+					case 0x01: //Bottom left
+						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+						break;
+					case 0x02: //Left
+						this.facingsBlocked[Player.UP] = false;
+						this.facingsBlocked[Player.DOWN] = false;
+						this.facingsBlocked[Player.LEFT] = false;
+						this.facingsBlocked[Player.RIGHT] = true;
+						break;
+					case 0x03: //Top left
+						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 						break;
 				}
 				break;
