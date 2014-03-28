@@ -16,6 +16,7 @@ public class Area {
 	private Player player;
 	
 	private boolean isInWarpZone;
+	private boolean isInConnectionPoint;
 	private PixelData currentPixelData;
 	private final int areaID;
 	
@@ -38,6 +39,8 @@ public class Area {
 		this.height = bitmap.getHeight();
 		this.pixels = bitmap.getPixels();
 		this.areaID = areaID;
+		this.isInWarpZone = false;
+		this.isInConnectionPoint = false;
 		
 		for (int y = 0; y < this.height; y++) {
 			areaData.add(new ArrayList<PixelData>());
@@ -150,7 +153,17 @@ public class Area {
 					this.isInWarpZone = true;
 				}
 				break;
+			case 0x05: //Overworld connection point.
+				if (!this.player.isLockedWalking()) {
+					this.isInConnectionPoint = true;
+				}
+				break;
 			default:
+				//If no special tiles, then it will keep reseting the flags.
+				if (!this.player.isLockedWalking() || !this.player.isLockedJumping()) {
+					this.isInWarpZone = false;
+					this.isInConnectionPoint = false;
+				}
 				break;
 		}
 	}
@@ -293,4 +306,17 @@ public class Area {
 		return this.areaID;
 	}
 	
+	public boolean playerIsInConnectionPoint() {
+		return this.isInConnectionPoint;
+	}
+	
+	public boolean playerHasLeftConnectionPoint() {
+		if (this.isInConnectionPoint) {
+			if (this.player.isLockedWalking()) {
+				//Leaving
+				return true;
+			}
+		}
+		return false;
+	}
 }
