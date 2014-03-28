@@ -13,6 +13,7 @@ public class OverWorld extends World {
 	
 	//Overworld properties.
 	private boolean invertBitmapColors;
+	private int currentAreaSectorID;
 	
 	/**
 	 * Initializes the overworld in the game.
@@ -33,6 +34,7 @@ public class OverWorld extends World {
 		this.currentArea = this.areas.get(0);
 		this.currentArea.setPlayer(player);
 		this.currentArea.setDebugDefaultPosition();
+		this.currentAreaSectorID = 1;
 		//Needs a marker in the area that points to where the area connects together.
 		
 	}
@@ -87,6 +89,7 @@ public class OverWorld extends World {
 		if (!this.invertBitmapColors)
 			this.player.tick();
 		this.currentArea.tick();
+		
 		if (this.currentArea.playerIsInWarpZone()) {
 			PixelData data = this.currentArea.getCurrentPixelData();
 			this.currentArea = WorldConstants.convertToArea(data.getTargetAreaID());
@@ -94,6 +97,14 @@ public class OverWorld extends World {
 			this.currentArea.setDefaultPosition(data);
 			this.invertBitmapColors = true;
 			this.player.forceLockWalking();
+		}
+		if (!this.player.isLockedWalking()) {
+			if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
+				this.currentAreaSectorID = this.currentArea.getSectorID();
+				//This is where you get the latest sector id at.
+				System.out.println(currentArea.getSectorID());
+			}
+			
 		}
 	}
 	

@@ -19,6 +19,7 @@ public class Area {
 	private boolean isInConnectionPoint;
 	private PixelData currentPixelData;
 	private final int areaID;
+	private int sectorID;
 	
 	/*
 	 * Area Type:
@@ -120,6 +121,9 @@ public class Area {
 				//				}
 				this.checkCurrentPositionDataAndSetProperties();
 			}
+			else {
+				this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
+			}
 		}
 	}
 	
@@ -133,13 +137,13 @@ public class Area {
 		//TODO: Fix this checkup.
 		int pixel = this.getCurrentPixelData().getColor();
 		int alpha = (pixel >> 24) & 0xFF;
+		int red = (pixel >> 16) & 0xFF;
+		int green = (pixel >> 8) & 0xFF;
 		switch (alpha) {
 			case 0x02: //Ledges
 			{
-				int red = (pixel >> 16) & 0xFF;
 				switch (red) {
 					case 0x00: //Horizontal bottom
-						int green = (pixel >> 8) & 0xFF;
 						int blue = pixel & 0xFF;
 						this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
 						break;
@@ -154,8 +158,9 @@ public class Area {
 				}
 				break;
 			case 0x05: //Overworld connection point.
-				if (!this.player.isLockedWalking()) {
+				if (!this.player.isLockedWalking() && !this.isInWarpZone) {
 					this.isInConnectionPoint = true;
+					this.sectorID = green;
 				}
 				break;
 			default:
@@ -213,6 +218,8 @@ public class Area {
 				case 0x04: //Warp point
 					//this.isInWarpZone = true;
 					return false;
+				case 0x05: //Sector point.
+					return false;
 				default: //Any other type of tiles.
 					return false;
 			}
@@ -262,7 +269,7 @@ public class Area {
 	
 	public void setDebugDefaultPosition() {
 		//When the game starts from the very beginning, the player must always start from the very first way point.
-		player.setAreaPosition(1, 1);
+		player.setAreaPosition(5, 5);
 	}
 	
 	public void setDefaultPosition(PixelData data) {
@@ -318,5 +325,9 @@ public class Area {
 			}
 		}
 		return false;
+	}
+	
+	public int getSectorID() {
+		return this.sectorID;
 	}
 }
