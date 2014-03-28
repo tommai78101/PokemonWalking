@@ -205,6 +205,7 @@ public class Area {
 				case 0x02: //Ledge
 				{
 					switch (red) {
+					//TODO: Add the other ledges.
 						case 0x00: //Horizontal Bottom
 							int y = this.yPlayerPosition + yOffset;
 							if (this.yPlayerPosition < y)
