@@ -131,11 +131,6 @@ public class Area {
 		int pixel = this.getCurrentPixelData().getColor();
 		int alpha = (pixel >> 24) & 0xFF;
 		switch (alpha) {
-			case 0x04: //Determines warp zone.
-				if (!this.player.isLockedWalking()) {
-					this.isInWarpZone = true;
-				}
-				break;
 			case 0x02: //Ledges
 			{
 				int red = (pixel >> 16) & 0xFF;
@@ -150,6 +145,11 @@ public class Area {
 				}
 				break;
 			}
+			case 0x04: //Determines warp zone.
+				if (!this.player.isLockedWalking()) {
+					this.isInWarpZone = true;
+				}
+				break;
 			default:
 				break;
 		}
