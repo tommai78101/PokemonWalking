@@ -1,5 +1,7 @@
 ![Imgur](http://i.imgur.com/AvrMq9d.png)
 
+![Imgur](http://i.imgur.com/aFmmjPM.png)
+
 ### Pokémon Walking Algorithm (Working Title)
 ===
  
@@ -19,6 +21,8 @@ It's still in very early stages of development. Possibly even earlier than "alph
 **Features:**
 * Walking. (Main theme of the entire project.)
 * Area warping. (Beta stages)
+* Ledges to jump!
+* Overworld to explore!
 * Everything is done from scratch/by hand. Only the character design is mostly copied from the original Pokémon games.
 
 **Known Issues:**
