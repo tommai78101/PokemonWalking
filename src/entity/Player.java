@@ -331,11 +331,38 @@ public class Player extends Entity {
 		if (from == to)
 			throw new IllegalArgumentException("The parameters, from and to, must not be the same.");
 		switch (red) {
-			case 0x00: //Horizontal bottom
+			case 0x00: //Bottom
 				//this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
 				this.facingsBlocked[UP] = false;
 				this.lockJumping = true;
+				break;
+			case 0x01: //Bottom Left
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
+				break;
+			case 0x02: //Left
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[UP] = true;
+				this.facingsBlocked[RIGHT] = false;
+				this.lockJumping = true;
+				break;
+			case 0x03: //Top Left
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
+				break;
+			case 0x04: //Top
+				this.facingsBlocked[UP] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
+				this.facingsBlocked[DOWN] = false;
+				this.lockJumping = true;
+				break;
+			case 0x05: //Top Right
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
+				break;
+			case 0x06: //Right
+				this.facingsBlocked[DOWN] = this.facingsBlocked[UP] = this.facingsBlocked[RIGHT] = true;
+				this.facingsBlocked[LEFT] = false;
+				this.lockJumping = true;
+				break;
+			case 0x07: //Bottom Right
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
 				break;
 			default: //Any other tiles should not cause the player to jump.
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;

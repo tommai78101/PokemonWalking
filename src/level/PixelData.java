@@ -52,13 +52,6 @@ public class PixelData {
 		prepareBitmap(alpha, red, green, blue);
 	}
 	
-	//	public void setAsWarpZone(int targetArea,) {
-	//		//Enabled by default.
-	//		//this.parentArea = parentArea;
-	//		this.targetArea = targetArea;
-	//		this.isWarpZone = true;
-	//	}
-	
 	public void disableWarpZone() {
 		this.isWarpZone = false;
 	}
@@ -72,34 +65,6 @@ public class PixelData {
 	}
 	
 	public void prepareBitmap(int alpha, int red, int green, int blue) {
-		//This is the only way to separate warp zones from regular tiles.		
-		//		if (this.isWarpZone) {
-		//			//Default implementation of the warp zone tile bitmap.
-		//			this.bitmap = null;
-		//			//If Area ID is 0 ~ 15, then it's a forest type area. 
-		//			if ((this.parentArea & 0xF) < 0x10)
-		//				this.bitmap = Art.forestEntrance;
-		//			return;
-		//		}
-		
-		//Tiles only.
-		//Check the documentation for official implementation.
-		//		switch (color) {
-		//			case 0xFFFF0000:
-		//				this.bitmap = Art.grass;
-		//				break;
-		//			case 0xFF0000DD:
-		//				//Green values determine the orientation.
-		//				//Red values determine the type (Mountain rock climb trails, plain ledge, bicycle ledges etc.)
-		//				this.bitmap = Art.ledge_horizontal;
-		//				break;
-		//			case 0xFF0000AA:
-		//				this.bitmap = Art.smallTree;
-		//				break;
-		//			default:
-		//				this.bitmap = Art.grass;
-		//				break;
-		//		}
 		switch (alpha) {
 			case 0x01: //Flat grass
 				this.bitmap = Art.grass;
@@ -107,17 +72,31 @@ public class PixelData {
 			case 0x02: //Ledge
 			{
 				switch (red) {
-					case 0x00: //Horizontal Bottom
+					case 0x00: //Bottom
 						this.bitmap = Art.ledge_bottom;
 						break;
 					case 0x01: //Bottom left
 						this.bitmap = Art.ledge_bottom_left;
 						break;
-					case 0x02: //Left
-						this.bitmap = Art.ledge_left;
+					case 0x02: //Right
+						//DEBUG: Understand why the game thinks it's the other way around.
+						this.bitmap = Art.ledge_right;
 						break;
 					case 0x03: //Top Left
 						this.bitmap = Art.ledge_top_left;
+						break;
+					case 0x04: //Top
+						this.bitmap = Art.ledge_top;
+						break;
+					case 0x05: //Top Right
+						this.bitmap = Art.ledge_top_right;
+						break;
+					case 0x06: //Left
+						//DEBUG: Left and right ledges are reversed. Find out why.
+						this.bitmap = Art.ledge_left;
+						break;
+					case 0x07: //Bottom Right
+						this.bitmap = Art.ledge_bottom_right;
 						break;
 				}
 				break;
@@ -143,37 +122,6 @@ public class PixelData {
 		//TODO: Refactor the code to make it more readable and more modular than if...elses.
 		this.targetArea = 0;
 		this.isWarpZone = false;
-		
-		//		if (r == 0x7F) {
-		//			//Warp Zone
-		//			//r: Parent Area
-		//			//g: Target Area
-		//			
-		//			//TODO: Set orientations of the warp zone.
-		//			
-		//			this.parentArea = g;
-		//			this.targetArea = b;
-		//			this.isWarpZone = true;
-		//			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
-		//			return;
-		//		}
-		//		if (b == 0xDD) {
-		//			//Ledges
-		//			if (g == 0x00) {
-		//				//Horizontal ledges - Jump from top
-		//				this.facingsBlocked[Player.UP] = false;
-		//				this.facingsBlocked[Player.DOWN] = true;
-		//				this.facingsBlocked[Player.LEFT] = false;
-		//				this.facingsBlocked[Player.RIGHT] = false;
-		//				return;
-		//			}
-		//			return;
-		//		}
-		//		if (b == 0xAA) {
-		//			//Trees
-		//			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-		//			return;
-		//		}
 		switch (alpha) {
 			case 0x01: //Grass
 				break;
@@ -191,10 +139,28 @@ public class PixelData {
 					case 0x02: //Left
 						this.facingsBlocked[Player.UP] = false;
 						this.facingsBlocked[Player.DOWN] = false;
+						this.facingsBlocked[Player.LEFT] = true;
+						this.facingsBlocked[Player.RIGHT] = false;
+						break;
+					case 0x03: //Top left
+						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+						break;
+					case 0x04: //Top
+						this.facingsBlocked[Player.UP] = true;
+						this.facingsBlocked[Player.DOWN] = false;
+						this.facingsBlocked[Player.LEFT] = false;
+						this.facingsBlocked[Player.RIGHT] = false;
+						break;
+					case 0x05: //Top Right
+						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+						break;
+					case 0x06: //Right
+						this.facingsBlocked[Player.UP] = false;
+						this.facingsBlocked[Player.DOWN] = false;
 						this.facingsBlocked[Player.LEFT] = false;
 						this.facingsBlocked[Player.RIGHT] = true;
 						break;
-					case 0x03: //Top left
+					case 0x07: //Bottom Right
 						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 						break;
 				}

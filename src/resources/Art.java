@@ -17,12 +17,17 @@ public class Art {
 	public static BaseBitmap ledge_bottom_left;
 	public static BaseBitmap ledge_left;
 	public static BaseBitmap ledge_top_left;
+	public static BaseBitmap ledge_top;
+	public static BaseBitmap ledge_top_right;
+	public static BaseBitmap ledge_right;
+	public static BaseBitmap ledge_bottom_right;
 	
 	//Area
 	public static BaseBitmap testArea;
 	public static BaseBitmap testArea2;
 	public static BaseBitmap testArea3;
 	public static BaseBitmap testArea4;
+	public static BaseBitmap testArea_debug;
 	
 	//Others
 	public static BaseBitmap sprite;
@@ -31,10 +36,16 @@ public class Art {
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
+		
+		//Ledges
 		ledge_bottom = screen.load("art/wall/ledge_bottom.png");
 		ledge_bottom_left = screen.load("art/wall/ledge_bottom_left.png");
 		ledge_left = screen.load("art/wall/ledge_left.png");
 		ledge_top_left = screen.load("art/wall/ledge_top_left.png");
+		ledge_top = screen.load("art/wall/ledge_top.png");
+		ledge_top_right = screen.load("art/wall/ledge_top_right.png");
+		ledge_right = screen.load("art/wall/ledge_right.png");
+		ledge_bottom_right = screen.load("art/wall/ledge_bottom_right.png");
 		
 		//Floor
 		grass = screen.load("art/floor/grass.png");
@@ -50,5 +61,6 @@ public class Art {
 		testArea2 = screen.load("area/test/testArea2.png");
 		testArea3 = screen.load("area/test/testArea3.png");
 		testArea4 = screen.load("area/test/testArea4.png");
+		testArea_debug = screen.load("area/test/testArea_debug.png");
 	}
 }

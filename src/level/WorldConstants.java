@@ -13,6 +13,7 @@ public class WorldConstants {
 	public static final int TEST_WORLD_2 = 0x02;
 	public static final int TEST_WORLD_3 = 0x03;
 	public static final int TEST_WORLD_4 = 0x04;
+	public static final int DEBUG = 0x05;
 	
 	//	//Temporary double variable for all common usages.
 	//	public static double tempDouble = 0.0;
@@ -34,6 +35,8 @@ public class WorldConstants {
 				return new Area(Art.testArea3, TEST_WORLD_3);
 			case TEST_WORLD_4:
 				return new Area(Art.testArea4, TEST_WORLD_4);
+			case DEBUG:
+				return new Area(Art.testArea_debug, DEBUG);
 			default:
 				return null;
 		}
@@ -45,6 +48,7 @@ public class WorldConstants {
 		result.add(new Area(Art.testArea2, TEST_WORLD_2));
 		result.add(new Area(Art.testArea3, TEST_WORLD_3));
 		result.add(new Area(Art.testArea4, TEST_WORLD_4));
+		result.add(new Area(Art.testArea_debug, DEBUG));
 		return result;
 	}
 }

@@ -72,28 +72,13 @@ public class Area {
 			if (!this.player.isLockedWalking()) {
 				xPlayerPosition = player.getXInArea();
 				yPlayerPosition = player.getYInArea();
-				//System.out.println("X: " + xPlayerPosition + " Y: " + yPlayerPosition);
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
 				
-				//Another method of detecting obstacles: Find all currently blocking obstacles
-				//	of each direction at the same time.
-				//				PixelData data_up = null;
-				//				PixelData data_down = null;
-				//				PixelData data_left = null;
-				//				PixelData data_right = null;
-				
 				try {
-					//					data_up = areaData.get(this.yPlayerPosition - 1).get(this.xPlayerPosition);
-					//					data_down = areaData.get(this.yPlayerPosition + 1).get(this.xPlayerPosition);
-					//					data_left = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition - 1);
-					//					data_right = areaData.get(this.yPlayerPosition).get(this.xPlayerPosition + 1);
-					
-					//this.player.setAllBlockingDirections(checkData(data_up, 0, -1), checkData(data_down, 0, 1), checkData(data_left, -1, 0), checkData(data_right, 1, 0));
 					this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
 				}
 				catch (Exception e) {
-					//this.player.setAllBlockingDirections(checkData(data_up, 0, -1), checkData(data_down, 0, 1), checkData(data_left, -1, 0), checkData(data_right, 1, 0));
 					this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
 				}
 				
@@ -112,13 +97,6 @@ public class Area {
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-				//				int pixel = this.currentPixelData.getColor();
-				//				int red = (pixel >> 16) & 0xFF;
-				//				int green = (pixel >> 8) & 0xFF;
-				//				int blue = pixel & 0xFF;
-				//				if (blue == 0xDD) {
-				//					this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
-				//				}
 				this.checkCurrentPositionDataAndSetProperties();
 			}
 			else {
@@ -139,13 +117,31 @@ public class Area {
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
 		int green = (pixel >> 8) & 0xFF;
+		int blue = pixel & 0xFF;
 		switch (alpha) {
 			case 0x02: //Ledges
 			{
 				switch (red) {
-					case 0x00: //Horizontal bottom
-						int blue = pixel & 0xFF;
+					case 0x00: //Bottom
 						this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
+						break;
+					case 0x01: //Bottom Left
+						//this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
+						break;
+					case 0x02: //left
+						this.player.setLockJumping(red, green, blue, Player.RIGHT, Player.LEFT);
+						break;
+					case 0x03: //top left
+						break;
+					case 0x04: //top
+						this.player.setLockJumping(red, green, blue, Player.DOWN, Player.UP);
+						break;
+					case 0x05: //top right
+						break;
+					case 0x06: //right
+						this.player.setLockJumping(red, green, blue, Player.LEFT, Player.RIGHT);
+						break;
+					case 0x07: //bottom right
 						break;
 					default:
 						break;
@@ -206,10 +202,37 @@ public class Area {
 				{
 					switch (red) {
 					//TODO: Add the other ledges.
-						case 0x00: //Horizontal Bottom
+						case 0x00: { //Bottom
 							int y = this.yPlayerPosition + yOffset;
 							if (this.yPlayerPosition < y)
 								return false;
+							return true;
+						}
+						case 0x01: //Bottom Left
+							return true;
+						case 0x02: {//Left
+							int x = this.xPlayerPosition + xOffset;
+							if (this.xPlayerPosition < x)
+								return false;
+							return true;
+						}
+						case 0x03: //Top Left
+							return true;
+						case 0x04: {//Top
+							int y = this.yPlayerPosition + yOffset;
+							if (this.yPlayerPosition > y)
+								return false;
+							return true;
+						}
+						case 0x05: //Top Right
+							return true;
+						case 0x06: { //Right
+							int x = this.xPlayerPosition + xOffset;
+							if (this.xPlayerPosition > x)
+								return false;
+							return true;
+						}
+						case 0x07: //Bottom Right
 							return true;
 					}
 					break;
@@ -226,21 +249,6 @@ public class Area {
 			}
 		}
 		return true;
-		//			int red = (data.getColor() >> 16) & 0xFF;
-		//			if (red == 0x04) {
-		//				this.isInWarpZone = true;
-		//				return false;
-		//			}
-		//			
-		//			//B
-		//			//This goes with A. (30 lines up above.)
-		//			int green = (pixel >> 8) & 0xFF;
-		//			int blue = pixel & 0xFF;
-		//			
-		//			//Determine ledges (horizontal) 
-		//			if (blue == 0xDD) {
-		//				this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
-		//			}
 	}
 	
 	public void renderTiles(BaseScreen screen, int xOff, int yOff) {
@@ -274,19 +282,6 @@ public class Area {
 	}
 	
 	public void setDefaultPosition(PixelData data) {
-		//		PixelData targetData = null;
-		//		if (data.isWarpZoneEnabled()) {
-		//			LOOP_BREAK_Area_setDefaultPosition_1: for (ArrayList<PixelData> list : this.areaData) {
-		//				for (PixelData p : list) {
-		//					if (((p.getColor() & 0xFF0000) >> 16) == 0x7F) {
-		//						targetData = p;
-		//						break LOOP_BREAK_Area_setDefaultPosition_1;
-		//					}
-		//				}
-		//			}
-		//			this.player.setAreaPosition(targetData.xPosition, targetData.yPosition);
-		//		}
-		
 		int color = data.getColor();
 		int alpha = (color >> 24) & 0xFF;
 		switch (alpha) {
