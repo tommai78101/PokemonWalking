@@ -121,6 +121,10 @@ public class PixelData {
 				//the warp point is in.
 				this.bitmap = Art.forestEntrance;
 				break;
+			case 0x05:
+				//TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
+				this.bitmap = Art.grass;
+				break;
 			default: //Any other type of tiles.
 				break;
 		}
@@ -180,6 +184,11 @@ public class PixelData {
 			case 0x04: //Warp Point
 				this.targetArea = red;
 				this.isWarpZone = true;
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				break;
+			case 0x05:
+				this.targetArea = red;
+				this.isWarpZone = false;
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 		}
