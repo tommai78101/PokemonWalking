@@ -24,6 +24,7 @@ How to Debug...........[PWD03]
 Metadata...............[PWD04]
 	PixelData..........[PWD04#01]
 	Areas..............[PWD04#02]
+		Overworld......[PWD04#02@01]
 	Tiles..............[PWD04#03]
 		Grass..........[PWD04#03@01]
 		Ledge..........[PWD04#03@02]
@@ -291,6 +292,12 @@ not assume their information to be permanent.
 	with the "Tile-specific data" that is accordance with the
 	PixelData data format.
 	
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+
+	Overworld [PWD04#02@01]
+	
+	
+	
 -  -  -  -  -  -  -  -  -  -  -
 
 	Tiles [PWD04#03]
@@ -318,17 +325,17 @@ not assume their information to be permanent.
 		Tile ID:
 			A: 02 - Ledge
 		Extended Tile ID:
-			R: 00 - Horizontal Bottom
-			R: 01 - Horizontal Top
-			R: 02 - Vertical Bottom
-			R: 03 - Vertical Top
-			R: 04 - Top Left corner
-			R: 05 - Top Right corner
-			R: 06 - Bottom Left corner
-			R: 07 - Bottom Right corner
+			R: 00 - Bottom facing ledge
+			R: 01 - Bottom left corner ledge
+			R: 02 - Left facing ledge
+			R: 03 - Top left corner ledge
+			R: 04 - Top facing ledge
+			R: 05 - Top right corner ledge
+			R: 06 - Right facing ledge
+			R: 07 - Bottom right corner ledge
 		Tile Specific ID:
-			G: 00 - None specified.
-			B: 00 - None specified.
+			G: 00 - Area Type ID (Temporary)
+			B: 00 - Ledge Type ID (Temporary)
 		Full Data(s):
 			02 00 00 00
 			02 01 00 00
@@ -345,6 +352,10 @@ not assume their information to be permanent.
 			thick, it means top is higher than bottom. If it's thin, it means
 			bottom is higher than top. Player can only jump from higher
 			ground to lower ground.
+			
+			Higher ground is determined by the spacing of the ground. The side
+			where the ground is larger in area represents area of higher
+			ground.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -389,6 +400,21 @@ not assume their information to be permanent.
 		05 XX 00 00
 		
 		XX - Area to connect. (Target area)
+		
+		Temp: 
+		
+		top left corner - fake tile. contains data
+		top row - possible hidden tile row. contains all
+		connected areas.
+		
+		05 [area] [0x80-(x offset)] [0x80-(y offset)]
+		
+		Temptation to avoid: use top row for metadata.
+		
+		
+		
+		
+		
 
 -------------------------------
 
