@@ -17,24 +17,27 @@ tag the chapters are linked to.
 
 
 
-Abstract...............[PWD01]
-About the Project......[PWD02]
-	History............[PWD02#01]
-How to Debug...........[PWD03]
-Metadata...............[PWD04]
-	PixelData..........[PWD04#01]
-	Areas..............[PWD04#02]
-	Tiles..............[PWD04#03]
-		Grass..........[PWD04#03@01]
-		Ledge..........[PWD04#03@02]
-		Tree...........[PWD04#03@03]
-		Warp Point.....[PWD04#03@04]
-Player.................[PWD05]
-Controls...............[PWD06]
-	Walking Algorithm..[PWD06#01]
-Contributors...........[PWD07]
-Terms of License.......[PWD08]
-Credits................[PWD09]
+Abstract...........................[PWD01]
+About the Project..................[PWD02]
+	History........................[PWD02#01]
+How to Debug.......................[PWD03]
+Metadata...........................[PWD04]
+	PixelData......................[PWD04#01]
+	Areas..........................[PWD04#02]
+		Overworld..................[PWD04#02@01]
+		Sector.....................[PWD04#02@02]
+	Tiles..........................[PWD04#03]
+		Grass......................[PWD04#03@01]
+		Ledge......................[PWD04#03@02]
+		Tree.......................[PWD04#03@03]
+		Warp Point.................[PWD04#03@04]
+		Area Connection Point......[PWD04#03@05]
+Player.............................[PWD05]
+Controls...........................[PWD06]
+	Walking Algorithm..............[PWD06#01]
+Contributors.......................[PWD07]
+Terms of License...................[PWD08]
+Credits............................[PWD09]
 
 
 
@@ -291,9 +294,75 @@ not assume their information to be permanent.
 	with the "Tile-specific data" that is accordance with the
 	PixelData data format.
 	
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Overworld [PWD04#02@01]
+	
+		In order to create a convincing overworld environment, the
+		areas must be large and explorable. Near the borders of the
+		areas, there must be a thickness of at least 5 tiles to the
+		right, and 4 tiles to the left. To make it consistent, the
+		overworld can have 5 tiles surounding the parameter.
+		
+		The overworld consists of large areas, easily consisting of
+		many paths, varying terrain, and cities/towns. It is up to
+		the map maker to decide on the content of the areas.
+		
+		No two areas should overlap, even if it's one single tile
+		being overlapped. This is due to game design limitations, 
+		which cannot be	easily changed.
+		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Sector [PWD04#02@02]
+		
+		Each area consists of sectors, which tells the game to mark
+		a section of an area a specific area of interest. This area
+		of interest will be marked on a map of the overworld for
+		players to see and view where they are going.
+		
+		Each sector has a name. The name can be anything of interest
+		or depends on the size of the area of interest.
+		
+		When crossing a sector, the game updates the current
+		whereabouts to the player. In order to update the game, the
+		mark has to be set in the path of where the player must cross
+		in order to enter a new area of interest.
+	
 -  -  -  -  -  -  -  -  -  -  -
 
 	Tiles [PWD04#03]
+	
+	This section contains information of all available tiles used
+	in the game. You may need to look up related tiles in order to
+	find the tile you really wanted.
+	
+	Each tile consists of the following:
+	
+		Tile ID: 				The ID number and name of the tile.
+		Extended Tile ID: 		The ID number used in conjunction of the
+								Tile ID.
+		Tile Specific ID:		The ID number defined in relation to the
+								tile and that tile only.
+		Full Data(s): 			The full data value, listed in the order
+								of ARGB format. There can be more than
+								one specific full data, if there are a
+								certain number of different full datas,
+								it will all be listed. If there are
+								unknown number of different full datas,
+								it will be listed with variables in them.
+		Description:			Describes the properties of the tile, and
+								how to use them accordingly.
+								
+	The maximum amount of tiles available in the game is 256. With
+	extended tile IDs included, the maximum amount of tiles is
+	65536.
+	
+	If there exists a situation where a single tile cannot be represented
+	enough, then it will either be delegated into two or more different
+	tiles, or there will probably be a format update, which may break
+	backwards compatibility, and stop using an universal standard file 
+	format.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
@@ -318,17 +387,17 @@ not assume their information to be permanent.
 		Tile ID:
 			A: 02 - Ledge
 		Extended Tile ID:
-			R: 00 - Horizontal Bottom
-			R: 01 - Horizontal Top
-			R: 02 - Vertical Bottom
-			R: 03 - Vertical Top
-			R: 04 - Top Left corner
-			R: 05 - Top Right corner
-			R: 06 - Bottom Left corner
-			R: 07 - Bottom Right corner
+			R: 00 - Bottom facing ledge
+			R: 01 - Bottom left corner ledge
+			R: 02 - Left facing ledge
+			R: 03 - Top left corner ledge
+			R: 04 - Top facing ledge
+			R: 05 - Top right corner ledge
+			R: 06 - Right facing ledge
+			R: 07 - Bottom right corner ledge
 		Tile Specific ID:
-			G: 00 - None specified.
-			B: 00 - None specified.
+			G: 00 - Area Type ID (Temporary)
+			B: 00 - Ledge Type ID (Temporary)
 		Full Data(s):
 			02 00 00 00
 			02 01 00 00
@@ -346,6 +415,10 @@ not assume their information to be permanent.
 			bottom is higher than top. Player can only jump from higher
 			ground to lower ground.
 			
+			Higher ground is determined by the spacing of the ground. The side
+			where the ground is larger in area represents area of higher
+			ground.
+			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 		Tree [PWD04#03@03]
@@ -360,7 +433,8 @@ not assume their information to be permanent.
 		Full Data(s):
 			03 00 00 00
 		Description:
-			An obstacle that blocks the Player's path.
+			An obstacle that blocks the Player's path. Currently, has no purposes
+			in the game.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -384,12 +458,30 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		OverWorld Connection Point
+		Area Connection Point (ACP) [PWD04#03@05]
 		
-		05 XX 00 00
+		Tile ID:
+			A: 05 - Area Connection Point (ACP)
+		Extended Tile ID:
+			R: TT - Target Area ID
+		Tile Specific ID:
+			G: SS - Sector ID in Target Area
+			B: 00 - None specified.
+		Full Data(s):
+			05 TT SS 00
+		Description:
+			When stepped on, it tells the game the player has moved into a new
+			area. This new area is a separate image file loaded and initialized
+			from the very beginning. 
+			
+			The target area ID is obtained from the
+			pixel data and handled by the game in order to load the correct
+			area from a list of all areas pre-loaded.
+			
+			The sector ID is used to tell the game what the new sector the player
+			is in when entering a new area. This is required in order to identify
+			the current sector.
 		
-		XX - Area to connect. (Target area)
-
 -------------------------------
 
 Player [PWD05]
