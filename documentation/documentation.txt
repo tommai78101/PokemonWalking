@@ -17,25 +17,27 @@ tag the chapters are linked to.
 
 
 
-Abstract...............[PWD01]
-About the Project......[PWD02]
-	History............[PWD02#01]
-How to Debug...........[PWD03]
-Metadata...............[PWD04]
-	PixelData..........[PWD04#01]
-	Areas..............[PWD04#02]
-		Overworld......[PWD04#02@01]
-	Tiles..............[PWD04#03]
-		Grass..........[PWD04#03@01]
-		Ledge..........[PWD04#03@02]
-		Tree...........[PWD04#03@03]
-		Warp Point.....[PWD04#03@04]
-Player.................[PWD05]
-Controls...............[PWD06]
-	Walking Algorithm..[PWD06#01]
-Contributors...........[PWD07]
-Terms of License.......[PWD08]
-Credits................[PWD09]
+Abstract...........................[PWD01]
+About the Project..................[PWD02]
+	History........................[PWD02#01]
+How to Debug.......................[PWD03]
+Metadata...........................[PWD04]
+	PixelData......................[PWD04#01]
+	Areas..........................[PWD04#02]
+		Overworld..................[PWD04#02@01]
+		Sector.....................[PWD04#02@02]
+	Tiles..........................[PWD04#03]
+		Grass......................[PWD04#03@01]
+		Ledge......................[PWD04#03@02]
+		Tree.......................[PWD04#03@03]
+		Warp Point.................[PWD04#03@04]
+		Area Connection Point......[PWD04#03@05]
+Player.............................[PWD05]
+Controls...........................[PWD06]
+	Walking Algorithm..............[PWD06#01]
+Contributors.......................[PWD07]
+Terms of License...................[PWD08]
+Credits............................[PWD09]
 
 
 
@@ -292,11 +294,40 @@ not assume their information to be permanent.
 	with the "Tile-specific data" that is accordance with the
 	PixelData data format.
 	
-~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-	Overworld [PWD04#02@01]
+		Overworld [PWD04#02@01]
 	
-	
+		In order to create a convincing overworld environment, the
+		areas must be large and explorable. Near the borders of the
+		areas, there must be a thickness of at least 5 tiles to the
+		right, and 4 tiles to the left. To make it consistent, the
+		overworld can have 5 tiles surounding the parameter.
+		
+		The overworld consists of large areas, easily consisting of
+		many paths, varying terrain, and cities/towns. It is up to
+		the map maker to decide on the content of the areas.
+		
+		No two areas should overlap, even if it's one single tile
+		being overlapped. This is due to game design limitations, 
+		which cannot be	easily changed.
+		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Sector [PWD04#02@02]
+		
+		Each area consists of sectors, which tells the game to mark
+		a section of an area a specific area of interest. This area
+		of interest will be marked on a map of the overworld for
+		players to see and view where they are going.
+		
+		Each sector has a name. The name can be anything of interest
+		or depends on the size of the area of interest.
+		
+		When crossing a sector, the game updates the current
+		whereabouts to the player. In order to update the game, the
+		mark has to be set in the path of where the player must cross
+		in order to enter a new area of interest.
 	
 -  -  -  -  -  -  -  -  -  -  -
 
@@ -395,7 +426,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		OverWorld Connection Point
+		Area Connection Point (ACP) [PWD04#03@05]
 		
 		05 XX 00 00
 		
