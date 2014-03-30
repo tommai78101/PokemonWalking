@@ -34,7 +34,9 @@ public class OverWorld extends World {
 		this.currentArea = this.areas.get(0);
 		this.currentArea.setPlayer(player);
 		this.currentArea.setDebugDefaultPosition();
-		this.currentAreaSectorID = 1;
+		this.setCurrentAreaSector(-1);
+		//TODO: Add a method that executes according to the sector ID. Basically,
+		//it needs to tell the player that they entered a new sector.
 		//Needs a marker in the area that points to where the area connects together.
 		
 	}
@@ -102,7 +104,7 @@ public class OverWorld extends World {
 			if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
 				this.currentAreaSectorID = this.currentArea.getSectorID();
 				//This is where you get the latest sector id at.
-				System.out.println(currentArea.getSectorID());
+				System.out.println("Area: " + this.currentArea.getAreaID() + " Sector: " + currentArea.getSectorID());
 			}
 			
 		}
@@ -150,5 +152,12 @@ public class OverWorld extends World {
 	
 	public void addTile(Tile t) {
 		//this.tiles.add(t);
+	}
+	
+	//---------------------------------------------------------------------------------------
+	//Private methods
+	
+	private void setCurrentAreaSector(int i) {
+		this.currentAreaSectorID = i;
 	}
 }

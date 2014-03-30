@@ -31,8 +31,8 @@ public class PixelData {
 	
 	//This can also be "isWayPoint".
 	private boolean isWarpZone;
-	
 	private int targetArea;
+	private int targetSector;
 	
 	//private int parentArea;
 	
@@ -40,8 +40,8 @@ public class PixelData {
 		this.xPosition = x;
 		this.yPosition = y;
 		this.color = pixel;
-		this.targetArea = 0x0;
-		//this.parentArea = 0x0;
+		this.targetArea = -1;
+		this.targetSector = -1;
 		
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
@@ -109,7 +109,7 @@ public class PixelData {
 				//the warp point is in.
 				this.bitmap = Art.forestEntrance;
 				break;
-			case 0x05: //Sector markers.
+			case 0x05: //ACP (Refer to documentation.)
 				//TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
 				this.bitmap = Art.grass;
 				break;
@@ -173,8 +173,9 @@ public class PixelData {
 				this.isWarpZone = true;
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
-			case 0x05:
+			case 0x05: //ACP (Refer to documentation.)
 				this.targetArea = red;
+				this.targetSector = green;
 				this.isWarpZone = false;
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
@@ -195,5 +196,9 @@ public class PixelData {
 	
 	public boolean[] isWalkThroughable() {
 		return this.facingsBlocked;
+	}
+	
+	public int getTargetSectorID() {
+		return this.targetSector;
 	}
 }

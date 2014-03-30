@@ -153,10 +153,10 @@ public class Area {
 					this.isInWarpZone = true;
 				}
 				break;
-			case 0x05: //Overworld connection point.
+			case 0x05: //Area Connection Point.
 				if (!this.player.isLockedWalking() && !this.isInWarpZone) {
 					this.isInConnectionPoint = true;
-					this.sectorID = green;
+					this.sectorID = this.currentPixelData.getTargetSectorID();
 				}
 				break;
 			default:
@@ -193,8 +193,8 @@ public class Area {
 			int color = data.getColor();
 			int alpha = (color >> 24) & 0xFF;
 			int red = (color >> 16) & 0xFF;
-			int green = (color >> 8) & 0xFF;
-			int blue = color & 0xFF;
+			//int green = (color >> 8) & 0xFF;
+			//int blue = color & 0xFF;
 			switch (alpha) {
 				case 0x01: //Flat grass
 					return false;
@@ -242,7 +242,7 @@ public class Area {
 				case 0x04: //Warp point
 					//this.isInWarpZone = true;
 					return false;
-				case 0x05: //Sector point.
+				case 0x05: //Area Connection point.
 					return false;
 				default: //Any other type of tiles.
 					return false;
