@@ -1,4 +1,4 @@
-![Imgur](http://i.imgur.com/AvrMq9d.png)
+![Imgur](http://i.imgur.com/yn1E4Z5.png)
 
 ![Imgur](http://i.imgur.com/aFmmjPM.png)
 
@@ -20,13 +20,15 @@ It's still in very early stages of development. Possibly even earlier than "alph
 
 **Features:**
 * Walking. (Main theme of the entire project.)
-* Area warping. (Beta stages)
-* Ledges to jump!
-* Overworld to explore!
+* Area warping. (Complete.)
+* Ledges to jump! (Complete.)
+* Overworld to explore! (Beta)
+* Mountains! (Beta.)
+* Stairs! (Complete.)
 * Everything is done from scratch/by hand. Only the character design is mostly copied from the original Pokémon games.
 
 **Known Issues:**
-* None at the moment. (v7 release)
+* I'm not going to upload a playable release right now. Busy with military service at the moment.
 
 **Plans:**
 * Implement all walking situations from the original games. Walking, surfing, jumping over ledges, riding bicycle, etc. (Main goal)
