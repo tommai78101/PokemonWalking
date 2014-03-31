@@ -31,7 +31,7 @@ public class OverWorld extends World {
 		this.player = player;
 		
 		//Going to set this area as test default only. This will need to change in the future.
-		this.currentArea = this.areas.get(0);
+		this.currentArea = this.areas.get(4);
 		this.currentArea.setPlayer(player);
 		this.currentArea.setDebugDefaultPosition();
 		this.setCurrentAreaSector(-1);

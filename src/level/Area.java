@@ -234,6 +234,8 @@ public class Area {
 						}
 						case 0x07: //Bottom Right
 							return true;
+						default:
+							break;
 					}
 					break;
 				}

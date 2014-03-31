@@ -79,7 +79,7 @@ public class PixelData {
 						this.bitmap = Art.ledge_bottom_left;
 						break;
 					case 0x02: //Right
-						//DEBUG: Understand why the game thinks it's the other way around.
+								//DEBUG: Understand why the game thinks it's the other way around.
 						this.bitmap = Art.ledge_right;
 						break;
 					case 0x03: //Top Left
@@ -92,11 +92,36 @@ public class PixelData {
 						this.bitmap = Art.ledge_top_right;
 						break;
 					case 0x06: //Left
-						//DEBUG: Left and right ledges are reversed. Find out why.
+								//DEBUG: Left and right ledges are reversed. Find out why.
 						this.bitmap = Art.ledge_left;
 						break;
 					case 0x07: //Bottom Right
-						this.bitmap = Art.ledge_bottom_right;
+						this.bitmap = Art.ledge_bottom_left;
+						break;
+					//---------------------------------------------------------
+					case 0x08:
+						this.bitmap = Art.ledge_mt_bottom;
+						break;
+					case 0x09:
+						this.bitmap = Art.ledge_mt_bottom_left;
+						break;
+					case 0x0A:
+						this.bitmap = Art.ledge_mt_left;
+						break;
+					case 0x0B:
+						this.bitmap = Art.ledge_mt_top_left;
+						break;
+					case 0x0C:
+						this.bitmap = Art.ledge_mt_top;
+						break;
+					case 0x0D:
+						this.bitmap = Art.ledge_mt_top_right;
+						break;
+					case 0x0E:
+						this.bitmap = Art.ledge_mt_right;
+						break;
+					case 0x0F:
+						this.bitmap = Art.ledge_mt_bottom_right;
 						break;
 				}
 				break;
@@ -161,6 +186,18 @@ public class PixelData {
 						this.facingsBlocked[Player.RIGHT] = true;
 						break;
 					case 0x07: //Bottom Right
+						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+						break;
+					//------------------------------------------------------------
+					//Same order, but with mountain ledges.
+					case 0x08:
+					case 0x09:
+					case 0x0A:
+					case 0x0B:
+					case 0x0C:
+					case 0x0D:
+					case 0x0E:
+					case 0x0F:
 						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 						break;
 				}

@@ -21,6 +21,14 @@ public class Art {
 	public static BaseBitmap ledge_top_right;
 	public static BaseBitmap ledge_right;
 	public static BaseBitmap ledge_bottom_right;
+	public static BaseBitmap ledge_mt_bottom;
+	public static BaseBitmap ledge_mt_bottom_left;
+	public static BaseBitmap ledge_mt_left;
+	public static BaseBitmap ledge_mt_top_left;
+	public static BaseBitmap ledge_mt_top;
+	public static BaseBitmap ledge_mt_top_right;
+	public static BaseBitmap ledge_mt_right;
+	public static BaseBitmap ledge_mt_bottom_right;
 	
 	//Area
 	public static BaseBitmap testArea;
@@ -46,6 +54,14 @@ public class Art {
 		ledge_top_right = screen.load("art/wall/ledge_top_right.png");
 		ledge_right = screen.load("art/wall/ledge_right.png");
 		ledge_bottom_right = screen.load("art/wall/ledge_bottom_right.png");
+		ledge_mt_bottom = screen.load("art/wall/ledge_mt_bottom.png");
+		ledge_mt_bottom_left = screen.load("art/wall/ledge_mt_bottom_left.png");
+		ledge_mt_left = screen.load("art/wall/ledge_mt_left.png");
+		ledge_mt_top_left = screen.load("art/wall/ledge_mt_top_left.png");
+		ledge_mt_top = screen.load("art/wall/ledge_mt_top.png");
+		ledge_mt_top_right = screen.load("art/wall/ledge_mt_top_right.png");
+		ledge_mt_right = screen.load("art/wall/ledge_mt_right.png");
+		ledge_mt_bottom_right = screen.load("art/wall/ledge_mt_bottom_right.png");
 		
 		//Floor
 		grass = screen.load("art/floor/grass.png");
