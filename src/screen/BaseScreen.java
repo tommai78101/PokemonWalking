@@ -106,10 +106,10 @@ public class BaseScreen extends BaseBitmap {
 						this.pixels[tgt + xx] = biomeColor;
 						break;
 					case 0x32:
-						this.pixels[tgt + xx] = lighten(biomeColor, 0.2f);
+						this.pixels[tgt + xx] = lighten(biomeColor, 0.1f);
 						break;
 					case 0x64:
-						this.pixels[tgt + xx] = lighten(biomeColor, 0.4f);
+						this.pixels[tgt + xx] = lighten(biomeColor, 0.2f);
 						break;
 					default:
 						this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
