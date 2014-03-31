@@ -373,12 +373,15 @@ not assume their information to be permanent.
 		Extended Tile ID:
 			R: 00 - Normal grasslands.
 		Tile Specific ID:
-			G: 00 - None specified.
+			G: 00 - Area Type.
 			B: 00 - None specified.
 		Full Data(s):
 			01 00 00 00
 		Description:
 			Walkable grass tiles, may represents unpaved roads or fields.
+			
+			Extended Tile ID is used to determine grass biome type. Area
+			Type is used to determine grass biome color.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -395,19 +398,20 @@ not assume their information to be permanent.
 			R: 05 - Top right corner ledge
 			R: 06 - Right facing ledge
 			R: 07 - Bottom right corner ledge
+			R: 08 - Bottom facing double ledge
+			R: 09 - Bottom left corner double ledge
+			R: 0A - Left facing double ledge
+			R: 0B - Top left corner double ledge
+			R: 0C - Top facing double ledge
+			R: 0D - Top right corner double ledge
+			R: 0E - Right facing double ledge
+			R: 0F - Bottom right corner double ledge
 		Tile Specific ID:
 			G: 00 - Area Type ID (Temporary)
 			B: 00 - Ledge Type ID (Temporary)
 		Full Data(s):
-			02 00 00 00
-			02 01 00 00
-			02 02 00 00
-			02 03 00 00
-			02 04 00 00
-			02 05 00 00
-			02 06 00 00
-			02 07 00 00
-		Description:
+			02 RR 00 00
+		Description:		
 			Can be jumped across according to its height, which is determined
 			by direction from where the player starts jumping. Horizontal
 			ledge heights are determined by thickness of the ledge. If it's
@@ -418,6 +422,13 @@ not assume their information to be permanent.
 			Higher ground is determined by the spacing of the ground. The side
 			where the ground is larger in area represents area of higher
 			ground.
+			
+			RR stands for one of the 8 cardinal directions the ledges are
+			facing (N, S, E, W, NE, NW, SE, and SW).
+			
+			Ledge Type is used to categorize all kinds of ledges. There may be
+			natural ledges, ramps for puzzles and traps, bicycle poles to hop
+			around, etc. This may be temporary.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
