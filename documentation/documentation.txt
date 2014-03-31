@@ -32,6 +32,7 @@ Metadata...........................[PWD04]
 		Tree.......................[PWD04#03@03]
 		Warp Point.................[PWD04#03@04]
 		Area Connection Point......[PWD04#03@05]
+		Stairs.....................[PWD04#03@06]
 Player.............................[PWD05]
 Controls...........................[PWD06]
 	Walking Algorithm..............[PWD06#01]
@@ -366,22 +367,44 @@ not assume their information to be permanent.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
-		Grass [PWD04#03@01]
+		Path [PWD04#03@01]
 		
 		Tile ID:
-			A: 01 - Grass
+			A: 01 - Path
 		Extended Tile ID:
-			R: 00 - Normal grasslands.
+			R: 00 - Grass.
+			R: 01 - Mountain ground.
 		Tile Specific ID:
 			G: 00 - Area Type.
-			B: 00 - None specified.
+			B: 00 - Ground Height.
 		Full Data(s):
 			01 00 00 00
+			01 01 00 00
 		Description:
-			Walkable grass tiles, may represents unpaved roads or fields.
+			Walkable path tiles, may also represents unpaved roads or 
+			fields.
 			
-			Extended Tile ID is used to determine grass biome type. Area
-			Type is used to determine grass biome color.
+			Extended Tile ID is used to determine path biome type. Area
+			Type is used to determine path biome color.
+			
+			Area Type determines the data type of path, which is used
+			for other metadata uses. The full list of area types are
+			given below:
+			
+				Area Type:
+				   
+					0x00 = Forest          
+					0x01 = City            
+					0x02 = Mountain 
+					0x03 = Water
+					0x04 = Cavern
+					0x05 = Building
+			
+			More area types may be specified at a later time, or when it is
+			required to add a new area type.
+			
+			Ground height specifies the light level drawn onto the
+			screen.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -407,7 +430,7 @@ not assume their information to be permanent.
 			R: 0E - Right facing double ledge
 			R: 0F - Bottom right corner double ledge
 		Tile Specific ID:
-			G: 00 - Area Type ID (Temporary)
+			G: 00 - Ground Height (Temporary)
 			B: 00 - Ledge Type ID (Temporary)
 		Full Data(s):
 			02 RR 00 00
@@ -492,6 +515,32 @@ not assume their information to be permanent.
 			The sector ID is used to tell the game what the new sector the player
 			is in when entering a new area. This is required in order to identify
 			the current sector.
+			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Stairs [PWD04#03@06]
+		
+		Tile ID:
+			A: 06 - Stairs
+		Extended ID:
+			R: 00 - Single-story Bottom
+			R: 01 - Single-story Left
+			R: 02 - Single-story Top
+			R: 03 - Single-story Right
+			R: 04 - Double-story bottom
+			R: 05 - Double-story left
+			R: 06 - Double-story top
+			R: 07 - Double-story right
+		Tile Specific ID:
+			G: 00 - None specified.
+			B: 00 - None specified.
+		Full Data(s):
+			06 00 00 00
+			06 01 00 00
+			06 02 00 00
+			06 03 00 00
+		Description:
+			Lets the player move to a higher area in a small amount of time.
 		
 -------------------------------
 
