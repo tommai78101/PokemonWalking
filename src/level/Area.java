@@ -76,6 +76,7 @@ public class Area {
 					return;
 				
 				try {
+					//Up, Down, Left, Right
 					this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
 				}
 				catch (Exception e) {
@@ -129,7 +130,7 @@ public class Area {
 						//this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
 						break;
 					case 0x02: //left
-						this.player.setLockJumping(red, green, blue, Player.RIGHT, Player.LEFT);
+						this.player.setLockJumping(red, green, blue, Player.LEFT, Player.RIGHT);
 						break;
 					case 0x03: //top left
 						break;
@@ -139,7 +140,7 @@ public class Area {
 					case 0x05: //top right
 						break;
 					case 0x06: //right
-						this.player.setLockJumping(red, green, blue, Player.LEFT, Player.RIGHT);
+						this.player.setLockJumping(red, green, blue, Player.RIGHT, Player.LEFT);
 						break;
 					case 0x07: //bottom right
 						break;
@@ -201,7 +202,10 @@ public class Area {
 				case 0x02: //Ledge
 				{
 					switch (red) {
-					//TODO: Add the other ledges.
+					/*TODO: Incorporate pixel data facingsBlocked variable to this section.
+					 * Currently, the facingsBlocked[] variable for each pixel data isn't
+					 * used.
+					 */
 						case 0x00: { //Bottom
 							int y = this.yPlayerPosition + yOffset;
 							if (this.yPlayerPosition < y)
@@ -212,7 +216,7 @@ public class Area {
 							return true;
 						case 0x02: {//Left
 							int x = this.xPlayerPosition + xOffset;
-							if (this.xPlayerPosition < x)
+							if (this.xPlayerPosition > x)
 								return false;
 							return true;
 						}
@@ -228,7 +232,7 @@ public class Area {
 							return true;
 						case 0x06: { //Right
 							int x = this.xPlayerPosition + xOffset;
-							if (this.xPlayerPosition > x)
+							if (this.xPlayerPosition < x)
 								return false;
 							return true;
 						}

@@ -342,7 +342,7 @@ public class Player extends Entity {
 				break;
 			case 0x02: //Left
 				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[UP] = true;
-				this.facingsBlocked[RIGHT] = false;
+				this.facingsBlocked[LEFT] = false;
 				this.lockJumping = true;
 				break;
 			case 0x03: //Top Left
@@ -357,8 +357,8 @@ public class Player extends Entity {
 				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
 				break;
 			case 0x06: //Right
-				this.facingsBlocked[DOWN] = this.facingsBlocked[UP] = this.facingsBlocked[RIGHT] = true;
-				this.facingsBlocked[LEFT] = false;
+				this.facingsBlocked[DOWN] = this.facingsBlocked[UP] = this.facingsBlocked[LEFT] = true;
+				this.facingsBlocked[RIGHT] = false;
 				this.lockJumping = true;
 				break;
 			case 0x07: //Bottom Right

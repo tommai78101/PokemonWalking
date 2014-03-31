@@ -79,8 +79,7 @@ public class PixelData {
 						this.bitmap = Art.ledge_bottom_left;
 						break;
 					case 0x02: //Right
-								//DEBUG: Understand why the game thinks it's the other way around.
-						this.bitmap = Art.ledge_right;
+						this.bitmap = Art.ledge_left;
 						break;
 					case 0x03: //Top Left
 						this.bitmap = Art.ledge_top_left;
@@ -92,11 +91,10 @@ public class PixelData {
 						this.bitmap = Art.ledge_top_right;
 						break;
 					case 0x06: //Left
-								//DEBUG: Left and right ledges are reversed. Find out why.
-						this.bitmap = Art.ledge_left;
+						this.bitmap = Art.ledge_right;
 						break;
 					case 0x07: //Bottom Right
-						this.bitmap = Art.ledge_bottom_left;
+						this.bitmap = Art.ledge_bottom_right;
 						break;
 					//---------------------------------------------------------
 					case 0x08:
@@ -164,7 +162,7 @@ public class PixelData {
 					case 0x02: //Left
 						this.facingsBlocked[Player.UP] = false;
 						this.facingsBlocked[Player.DOWN] = false;
-						this.facingsBlocked[Player.LEFT] = true;
+						this.facingsBlocked[Player.LEFT] = false;
 						this.facingsBlocked[Player.RIGHT] = false;
 						break;
 					case 0x03: //Top left
@@ -183,7 +181,7 @@ public class PixelData {
 						this.facingsBlocked[Player.UP] = false;
 						this.facingsBlocked[Player.DOWN] = false;
 						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = true;
+						this.facingsBlocked[Player.RIGHT] = false;
 						break;
 					case 0x07: //Bottom Right
 						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
