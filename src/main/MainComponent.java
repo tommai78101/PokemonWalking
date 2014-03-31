@@ -218,7 +218,7 @@ public class MainComponent extends Canvas implements Runnable {
 		//Background border
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-		screen.clear(0xA4E767);
+		//screen.clear(0xA4E767);
 		
 		//World rendering.
 		//if (world != null) {
