@@ -11,6 +11,7 @@ public class Art {
 	
 	//Tiles
 	public static BaseBitmap grass;
+	public static BaseBitmap mt_ground;
 	public static BaseBitmap smallTree;
 	public static BaseBitmap forestEntrance;
 	public static BaseBitmap ledge_bottom;
@@ -29,6 +30,14 @@ public class Art {
 	public static BaseBitmap ledge_mt_top_right;
 	public static BaseBitmap ledge_mt_right;
 	public static BaseBitmap ledge_mt_bottom_right;
+	public static BaseBitmap stairs_left;
+	public static BaseBitmap stairs_top;
+	public static BaseBitmap stairs_right;
+	public static BaseBitmap stairs_bottom;
+	public static BaseBitmap stairs_mt_left;
+	public static BaseBitmap stairs_mt_top;
+	public static BaseBitmap stairs_mt_right;
+	public static BaseBitmap stairs_mt_bottom;
 	
 	//Area
 	public static BaseBitmap testArea;
@@ -62,9 +71,18 @@ public class Art {
 		ledge_mt_top_right = screen.load("art/wall/ledge_mt_top_right.png");
 		ledge_mt_right = screen.load("art/wall/ledge_mt_right.png");
 		ledge_mt_bottom_right = screen.load("art/wall/ledge_mt_bottom_right.png");
+		stairs_left = screen.load("art/floor/stairs_left.png");
+		stairs_top = screen.load("art/floor/stairs_top.png");
+		stairs_right = screen.load("art/floor/stairs_right.png");
+		stairs_bottom = screen.load("art/floor/stairs_bottom.png");
+		stairs_mt_left = screen.load("art/floor/stairs_mt_left.png");
+		stairs_mt_top = screen.load("art/floor/stairs_mt_top.png");
+		stairs_mt_right = screen.load("art/floor/stairs_mt_right.png");
+		stairs_mt_bottom = screen.load("art/floor/stairs_mt_bottom.png");
 		
 		//Floor
 		grass = screen.load("art/floor/grass.png");
+		mt_ground = screen.load("art/floor/mt_ground.png");
 		forestEntrance = screen.load("art/floor/forestEntrance.png");
 		
 		//Player, NPCs

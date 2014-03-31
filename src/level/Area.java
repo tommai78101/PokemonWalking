@@ -20,17 +20,7 @@ public class Area {
 	private PixelData currentPixelData;
 	private final int areaID;
 	private int sectorID;
-	
-	/*
-	 * Area Type:
-	 * 
-	 * 0x0 = Forest
-	 * 0x1 = City
-	 * 0x2 = Cave / Mountain
-	 * 0x3 = Water
-	 * 
-	 * */
-	//Will implement Area Type sometime in the future.
+	//TODO: Add area type.
 	//private int areaType;
 	
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
@@ -197,7 +187,7 @@ public class Area {
 			//int green = (color >> 8) & 0xFF;
 			//int blue = color & 0xFF;
 			switch (alpha) {
-				case 0x01: //Flat grass
+				case 0x01: //Paths
 					return false;
 				case 0x02: //Ledge
 				{

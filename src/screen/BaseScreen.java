@@ -101,6 +101,8 @@ public class BaseScreen extends BaseBitmap {
 			for (int xx = src; xx < src + blitWidth; xx++) {
 				int color = bitmap.pixels[xx];
 				int alpha = (color >> 24) & 0xFF;
+				//This alpha value determines the areas in the bitmap what to draw.
+				//Has nothing to do with pixel data properties.
 				switch (alpha) {
 					case 0x0:
 						this.pixels[tgt + xx] = biomeColor;
@@ -195,6 +197,11 @@ public class BaseScreen extends BaseBitmap {
 								break;
 							default:
 								break;
+						}
+						break;
+					case 0x01: //Mountain ground
+						for (int i = 0; i < blue; i++) {
+							color = lighten(color, 0.1f);
 						}
 						break;
 					default:

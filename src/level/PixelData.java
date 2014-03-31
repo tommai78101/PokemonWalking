@@ -33,6 +33,7 @@ public class PixelData {
 	private boolean isWarpZone;
 	private int targetArea;
 	private int targetSector;
+	private int groundHeight;
 	
 	//private int parentArea;
 	
@@ -42,6 +43,7 @@ public class PixelData {
 		this.color = pixel;
 		this.targetArea = -1;
 		this.targetSector = -1;
+		this.groundHeight = 0; //Default
 		
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
@@ -67,7 +69,14 @@ public class PixelData {
 	public void prepareBitmap(int alpha, int red, int green, int blue) {
 		switch (alpha) {
 			case 0x01: //Flat grass
-				this.bitmap = Art.grass;
+				switch (red) { //Terrain tile type
+					case 0x00: //Grass
+						this.bitmap = Art.grass;
+						break;
+					case 0x01: //Mountain ground
+						this.bitmap = Art.mt_ground;
+						break;
+				}
 				break;
 			case 0x02: //Ledge
 			{
@@ -136,6 +145,34 @@ public class PixelData {
 				//TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
 				this.bitmap = Art.grass;
 				break;
+			case 0x06:
+				switch (red) {
+					case 0x00:
+						this.bitmap = Art.stairs_bottom;
+						break;
+					case 0x01:
+						this.bitmap = Art.stairs_left;
+						break;
+					case 0x02:
+						this.bitmap = Art.stairs_top;
+						break;
+					case 0x03:
+						this.bitmap = Art.stairs_right;
+						break;
+					case 0x04:
+						this.bitmap = Art.stairs_mt_bottom;
+						break;
+					case 0x05:
+						this.bitmap = Art.stairs_mt_left;
+						break;
+					case 0x06:
+						this.bitmap = Art.stairs_mt_top;
+						break;
+					case 0x07:
+						this.bitmap = Art.stairs_mt_right;
+						break;
+				}
+				break;
 			default: //Any other type of tiles.
 				break;
 		}
@@ -145,8 +182,10 @@ public class PixelData {
 		//TODO: Refactor the code to make it more readable and more modular than if...elses.
 		this.targetArea = 0;
 		this.isWarpZone = false;
+		this.groundHeight = 0;
 		switch (alpha) {
 			case 0x01: //Grass
+				this.groundHeight = blue;
 				break;
 			case 0x02: //Ledges
 				switch (red) {
@@ -213,6 +252,8 @@ public class PixelData {
 				this.targetSector = green;
 				this.isWarpZone = false;
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				break;
+			case 0x06: //Stairs
 				break;
 		}
 	}
