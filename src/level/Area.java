@@ -256,7 +256,8 @@ public class Area {
 	public void renderTiles(BaseScreen screen, int xOff, int yOff) {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
-				screen.blit(this.areaData.get(y).get(x).bitmap, x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff);
+				PixelData data = this.areaData.get(y).get(x);
+				screen.blitBiome(data.bitmap, x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
 			}
 		}
 	}

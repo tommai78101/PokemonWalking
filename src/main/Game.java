@@ -74,7 +74,7 @@ public class Game {
 				w.render(screen, player.getX(), player.getY());
 			}
 		*/
-		
+		screen.clear(0xA4E767);
 		overworld.render(screen, player.getX(), player.getY());
 	}
 	

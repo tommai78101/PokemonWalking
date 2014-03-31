@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
-
+import level.PixelData;
 import resources.Art;
 
 public class BaseScreen extends BaseBitmap {
@@ -16,7 +16,7 @@ public class BaseScreen extends BaseBitmap {
 	protected int yOffset;
 	
 	private byte invertTick = 0x7;
-
+	
 	public BaseScreen(int w, int h) {
 		super(w, h);
 		this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
@@ -40,11 +40,16 @@ public class BaseScreen extends BaseBitmap {
 			this.blit(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height);
 	}
 	
+	public void blitBiome(BaseBitmap bitmap, int x, int y, PixelData data) {
+		if (bitmap != null)
+			this.blitBiome(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height, data);
+	}
+	
 	public void npcBlit(BaseBitmap bitmap, int x, int y) {
 		if (bitmap != null)
 			this.blit(bitmap, x + this.xOffset, y + this.yOffset - 4, bitmap.width, bitmap.height);
 	}
-
+	
 	public void blit(BaseBitmap bitmap, int x, int y, int w, int h) {
 		//This directly blits the bitmap to the X and Y coordinates within the screen area.
 		//The Rect adjusts the blitting area to within the screen area.
@@ -64,6 +69,40 @@ public class BaseScreen extends BaseBitmap {
 				int alpha = (color >> 24) & 0xFF;
 				if (alpha == 0xFF) {
 					this.pixels[tgt + xx] = color;
+				}
+				else {
+					this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
+				}
+			}
+		}
+	}
+	
+	public void blitBiome(BaseBitmap bitmap, int x, int y, int w, int h, PixelData data) {
+		//This directly blits the bitmap to the X and Y coordinates within the screen area.
+		//The Rect adjusts the blitting area to within the screen area.
+		if (w <= -1)
+			w = bitmap.width;
+		if (h <= -1)
+			h = bitmap.height;
+		Rect blitArea = new Rect(x, y, w, h).adjust(this);
+		int blitWidth = blitArea.bottomRightCorner_X - blitArea.topLeftCorner_X;
+		
+		int dataColor = data.getColor();
+		int tileID = (dataColor >> 24) & 0xFF;
+		int red = (dataColor >> 16) & 0xFF;
+		int green = (dataColor >> 8) & 0xFF;
+		int blue = dataColor & 0xFF;
+		int biomeColor = getBiomeBaseColor(tileID, red, green, blue);
+		
+		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
+			int tgt = yy * this.width + blitArea.topLeftCorner_X;
+			int src = (yy - y) * bitmap.width + (blitArea.topLeftCorner_X - x);
+			tgt -= src;
+			for (int xx = src; xx < src + blitWidth; xx++) {
+				int color = bitmap.pixels[xx];
+				int alpha = (color >> 24) & 0xFF;
+				if (alpha == 0x0) {
+					this.pixels[tgt + xx] = biomeColor;
 				}
 				else {
 					this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
@@ -114,7 +153,7 @@ public class BaseScreen extends BaseBitmap {
 	public byte getInvertTick() {
 		return this.invertTick;
 	}
-
+	
 	//-------------------------------------------
 	//Private methods
 	
@@ -135,5 +174,37 @@ public class BaseScreen extends BaseBitmap {
 		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
 		
 		return 0xFF000000 | red | green | blue;
+	}
+	
+	private int getBiomeBaseColor(int tileID, int red, int green, int blue) {
+		int color = 0xFFA4E767;
+		switch (tileID) {
+			case 0x01: //Grass
+				switch (red) {
+					case 0x00:
+						switch (green) {
+							case 0x00:
+								break;
+							default:
+								break;
+						}
+						break;
+					default:
+						break;
+				}
+				break;
+			case 0x02: //Ledges
+				switch (green) {
+					case 0x00:
+						break;
+					case 0x01:
+						color = 0xFFCCA333;
+						break;
+				}
+				break;
+			default:
+				break;
+		}
+		return color;
 	}
 }
