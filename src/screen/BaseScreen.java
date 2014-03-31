@@ -101,11 +101,19 @@ public class BaseScreen extends BaseBitmap {
 			for (int xx = src; xx < src + blitWidth; xx++) {
 				int color = bitmap.pixels[xx];
 				int alpha = (color >> 24) & 0xFF;
-				if (alpha == 0x0) {
-					this.pixels[tgt + xx] = biomeColor;
-				}
-				else {
-					this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
+				switch (alpha) {
+					case 0x0:
+						this.pixels[tgt + xx] = biomeColor;
+						break;
+					case 0x32:
+						this.pixels[tgt + xx] = lighten(biomeColor, 0.2f);
+						break;
+					case 0x64:
+						this.pixels[tgt + xx] = lighten(biomeColor, 0.4f);
+						break;
+					default:
+						this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
+						break;
 				}
 			}
 		}
@@ -198,7 +206,7 @@ public class BaseScreen extends BaseBitmap {
 					case 0x00:
 						break;
 					case 0x01:
-						color = 0xFFCCA333;
+						color = 0xFF7F411D;
 						break;
 				}
 				break;
@@ -206,5 +214,13 @@ public class BaseScreen extends BaseBitmap {
 				break;
 		}
 		return color;
+	}
+	
+	private int lighten(int color, float amount) {
+		int a = (color >> 24) & 0xFF;
+		int r = (color >> 16) & 0xFF;
+		int g = (color >> 8) & 0xFF;
+		int b = color & 0xFF;
+		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16 | ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
 	}
 }
