@@ -105,10 +105,10 @@ public class BaseScreen extends BaseBitmap {
 						this.pixels[tgt + xx] = biomeColor;
 						break;
 					case 0x32:
-						this.pixels[tgt + xx] = lighten(biomeColor, 0.1f);
+						this.pixels[tgt + xx] = 0xFF000000 | (biomeColor & 0x00FFFFFF);//lighten(biomeColor, 0.1f);
 						break;
 					case 0x64:
-						this.pixels[tgt + xx] = lighten(biomeColor, 0.2f);
+						this.pixels[tgt + xx] = 0xFF000000 | (biomeColor & 0x00FFFFFF);//lighten(biomeColor, 0.2f);
 						break;
 					default:
 						this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
@@ -210,7 +210,16 @@ public class BaseScreen extends BaseBitmap {
 					case 0x00:
 						break;
 					case 0x01:
-						color = 0xFF7F411D;
+						color = 0xFFD5B23B;
+						break;
+				}
+				break;
+			case 0x06: //Stairs
+				switch (green) {
+					case 0x00:
+						break;
+					case 0x01:
+						color = 0xFFD5B23B;
 						break;
 				}
 				break;
