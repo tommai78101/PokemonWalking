@@ -18,9 +18,6 @@ public class Player extends Entity {
 	byte animationTick = 0;
 	byte animationPointer = 0;
 	
-	int collidableId = 1;
-	int interactableId = 1;
-	
 	//Not yet used.
 	//	public enum AnimationType {
 	//		WALKING
