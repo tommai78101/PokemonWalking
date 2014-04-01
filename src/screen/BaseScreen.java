@@ -71,7 +71,8 @@ public class BaseScreen extends BaseBitmap {
 					this.pixels[tgt + xx] = color;
 				}
 				else {
-					this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
+					continue;
+					//this.pixels[tgt + xx] = 0x00FFFFFF;//blendPixels(this.pixels[tgt + xx], color);
 				}
 			}
 		}
