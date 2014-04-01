@@ -58,6 +58,7 @@ public class Art {
 	//Others
 	public static BaseBitmap sprite;
 	public static BaseBitmap shadow;
+	public static BaseBitmap error;
 	
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
@@ -114,5 +115,8 @@ public class Art {
 		testArea3 = screen.load("area/test/testArea3.png");
 		testArea4 = screen.load("area/test/testArea4.png");
 		testArea_debug = screen.load("area/test/testArea_debug.png");
+		
+		//Miscellaneous
+		error = screen.load("art/debug/no_png.png");
 	}
 }

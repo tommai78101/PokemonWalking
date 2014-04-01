@@ -67,6 +67,7 @@ public class PixelData {
 	}
 	
 	public void prepareBitmap(int alpha, int red, int green, int blue) {
+		this.bitmap = Art.error;
 		switch (alpha) {
 			case 0x01: //Flat grass
 				switch (red) { //Terrain tile type
@@ -75,6 +76,11 @@ public class PixelData {
 						break;
 					case 0x01: //Mountain ground
 						this.bitmap = Art.mt_ground;
+						break;
+					case 0x02:
+						this.bitmap = Art.path;
+						break;
+					default:
 						break;
 				}
 				break;
@@ -269,6 +275,9 @@ public class PixelData {
 					case 0x17:
 						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 						break;
+					default:
+						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+						break;
 				}
 				break;
 			case 0x03: //Trees
@@ -286,6 +295,9 @@ public class PixelData {
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 			case 0x06: //Stairs
+				break;
+			default:
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 		}
 	}
