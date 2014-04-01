@@ -1,6 +1,6 @@
-![Imgur](http://i.imgur.com/yn1E4Z5.png)
+![Imgur](http://i.imgur.com/Yv9F1P4.png)
 
-![Imgur](http://i.imgur.com/aFmmjPM.png)
+![Imgur](http://i.imgur.com/AvrMq9d.png)
 
 ### Pokémon Walking Algorithm (Working Title)
 ===
