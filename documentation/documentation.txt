@@ -554,7 +554,23 @@ not assume their information to be permanent.
 			
 			Area Type ID determines the base color of the biome the tile is
 			currently in.
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Water [PWD04#03@07]
 		
+		Tile ID:
+			A: 07 - Water
+		Extended Tile ID:
+			R: 00 - None specified.
+		Tile Specific ID:
+			G: 00 - None specified.
+			B: 00 - None specified.
+		Full Data(s):
+			07 00 00 00
+		Description:
+			Represents water.
+			
 -------------------------------
 
 Player [PWD05]
