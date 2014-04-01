@@ -1,11 +1,9 @@
 package abstracts;
 
-import interfaces.Collidable;
-import interfaces.Interactable;
 import screen.BaseBitmap;
 import screen.BaseScreen;
 
-public abstract class Entity extends Tile implements Collidable, Interactable {
+public abstract class Entity extends Tile {
 	
 	public int id;
 	
@@ -32,10 +30,6 @@ public abstract class Entity extends Tile implements Collidable, Interactable {
 	
 	public int getY() {
 		return yPosition;
-	}
-	
-	@Override
-	public void collide(Collidable object) {
 	}
 	
 	public void setPosition(int x, int y) {

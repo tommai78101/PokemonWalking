@@ -1,6 +1,5 @@
 package entity;
 
-import interfaces.Interactable;
 import level.Area;
 import main.Keys;
 import resources.Art;
@@ -556,19 +555,5 @@ public class Player extends Entity {
 			else
 				output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
 		}
-	}
-	
-	@Override
-	public void interact(Interactable object) {
-	}
-	
-	@Override
-	public int getInteractableId() {
-		return this.interactableId;
-	}
-	
-	@Override
-	public int getCollidableId() {
-		return this.collidableId;
 	}
 }
