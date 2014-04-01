@@ -519,10 +519,6 @@ public class Player extends Entity {
 	}
 	
 	@Override
-	public void handleCollision(Tile tile, int xAcceleration, int yAcceleration) {
-	}
-	
-	@Override
 	public void tick() {
 		if (!this.lockJumping) {
 			walk();
