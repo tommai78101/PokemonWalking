@@ -432,6 +432,14 @@ not assume their information to be permanent.
 			R: 0D - Top right corner double ledge
 			R: 0E - Right facing double ledge
 			R: 0F - Bottom right corner double ledge
+			R: 10 - Bottom facing inner ledge
+			R: 11 - Bottom left inner ledge
+			R: 12 - Left facing inner ledge
+			R: 13 - Top left inner ledge
+			R: 14 - Top facing inner ledge
+			R: 15 - Top right inner ledge
+			R: 16 - Right facing inner ledge
+			R: 17 - Bottom right inner ledge
 		Tile Specific ID:
 			G: 00 - Ground Height (Temporary)
 			B: 00 - Ledge Type ID (Temporary)
