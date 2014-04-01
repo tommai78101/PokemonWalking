@@ -441,7 +441,7 @@ not assume their information to be permanent.
 			R: 16 - Right facing inner ledge
 			R: 17 - Bottom right inner ledge
 		Tile Specific ID:
-			G: 00 - Ground Height (Temporary)
+			G: 00 - Area Type ID (Temporary)
 			B: 00 - Ledge Type ID (Temporary)
 		Full Data(s):
 			02 RR 00 00
@@ -453,9 +453,8 @@ not assume their information to be permanent.
 			bottom is higher than top. Player can only jump from higher
 			ground to lower ground.
 			
-			Higher ground is determined by the spacing of the ground. The side
-			where the ground is larger in area represents area of higher
-			ground.
+			Area Type ID determines the base color of the biome the tile is
+			currently in.
 			
 			RR stands for one of the 8 cardinal directions the ledges are
 			facing (N, S, E, W, NE, NW, SE, and SW).
@@ -543,7 +542,7 @@ not assume their information to be permanent.
 			R: 06 - Double-story top
 			R: 07 - Double-story right
 		Tile Specific ID:
-			G: 00 - None specified.
+			G: 00 - Area Type ID (Temporary)
 			B: 00 - None specified.
 		Full Data(s):
 			06 00 00 00
@@ -552,6 +551,9 @@ not assume their information to be permanent.
 			06 03 00 00
 		Description:
 			Lets the player move to a higher area in a small amount of time.
+			
+			Area Type ID determines the base color of the biome the tile is
+			currently in.
 		
 -------------------------------
 
