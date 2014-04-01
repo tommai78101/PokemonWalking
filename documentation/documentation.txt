@@ -1,6 +1,7 @@
 ﻿Pokémon Walking - Documentation
 
 Changelogs:
+r6: Added more tiles.
 r5: Added a beginner's section, "How to Debug."
 r4: Added new tiles to the Tiles section.
 r3: Finished the draft.
