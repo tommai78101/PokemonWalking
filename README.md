@@ -18,18 +18,25 @@ If all bodes well, it's possible that this will become a Java port of the Pokém
 
 It's still in very early stages of development. Possibly even earlier than "alpha".
 
+*Everything is done from scratch/by hand. Only the character design is mostly copied from the original Pokémon games.*
+
 **Features:**
 * Walking. (Main theme of the entire project.)
-* Area warping. (Beta stages)
-* Ledges to jump!
-* Overworld to explore!
-* Everything is done from scratch/by hand. Only the character design is mostly copied from the original Pokémon games.
+* Area warping. (Complete.)
+* Ledges to jump! (Complete.)
+* Overworld to explore! (Beta.)
+* Stairs! (Complete.)
+* Primitive Ground Height Lighting (Testing stages.)
+* Water! (Beta)
+* Bitmap animation! (Complete!)
 
 **Known Issues:**
-* None at the moment. (v7 release)
+* (NEW) There may be issues with the tiles-to-tiles interaction, causing unwanted bugs.
+* (NEW) There may be hidden issues I haven't seen/know of yet.
 
 **Plans:**
 * Implement all walking situations from the original games. Walking, surfing, jumping over ledges, riding bicycle, etc. (Main goal)
+* (NEW) Create a game completely different from Pokémon games. (Extended Plan, won't guarantee it.)
 
 **Wanna chat?**
 You may head over to The Helper Forums, or Java-Gaming.org to post your feedback. Much appreciated. 
