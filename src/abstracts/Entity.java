@@ -4,7 +4,6 @@ import interfaces.Collidable;
 import interfaces.Interactable;
 import screen.BaseBitmap;
 import screen.BaseScreen;
-import entity.Data;
 
 public abstract class Entity extends Tile implements Collidable, Interactable {
 	
@@ -15,8 +14,6 @@ public abstract class Entity extends Tile implements Collidable, Interactable {
 	
 	protected int xOffset;
 	protected int yOffset;
-	
-	protected Data data;
 	
 	protected BaseBitmap bitmap;
 	
@@ -41,7 +38,7 @@ public abstract class Entity extends Tile implements Collidable, Interactable {
 	@Override
 	public void collide(Collidable object) {
 	}
-
+	
 	public void setPosition(int x, int y) {
 		this.xPosition = x;
 		this.yPosition = y;

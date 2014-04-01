@@ -28,9 +28,6 @@ public class Player extends Entity {
 	//	};
 	//	
 	//	AnimationType animationType;
-	
-	public Inventory inventory;
-	
 	//--------------------------------------------------------------------------
 	
 	//These are based on the art sprite in the resource folder. The numbers are used to get elements from a 2D array.
