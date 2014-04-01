@@ -60,6 +60,9 @@ public class Art {
 	public static BaseBitmap shadow;
 	public static BaseBitmap error;
 	
+	//Animation
+	public static BaseBitmap[] water;
+	
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
@@ -118,5 +121,17 @@ public class Art {
 		
 		//Miscellaneous
 		error = screen.load("art/debug/no_png.png");
+		
+		//Animation
+		water = new BaseBitmap[16];
+		for (int i = 0; i < water.length; i++) {
+			//There are 16 frames for the water.
+			if (i < 10) {
+				water[i] = screen.load("art/animation/water/water000" + String.valueOf(i) + ".png");
+			}
+			else {
+				water[i] = screen.load("art/animation/water/water00" + String.valueOf(i) + ".png");
+			}
+		}
 	}
 }

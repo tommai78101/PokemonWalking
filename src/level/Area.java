@@ -248,6 +248,12 @@ public class Area {
 					return false;
 				case 0x05: //Area Connection point.
 					return false;
+				case 0x06:
+					return false;
+				case 0x07:
+					//TODO: Add something that detects a special boolean value
+					//in order to let the player move on water.
+					return true;
 				default: //Any other type of tiles.
 					return false;
 			}
@@ -259,7 +265,8 @@ public class Area {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
-				screen.blitBiome(data.bitmap, x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
+				screen.blitBiome(data.getBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
+				data.tick();
 			}
 		}
 	}

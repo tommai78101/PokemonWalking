@@ -27,7 +27,9 @@ public class PixelData {
 	public int yPosition;
 	//This represents the art resource this PixelData object is representing.
 	//This can also give flexibility when it comes to puzzle-themed areas.
-	public BaseBitmap bitmap;
+	//Now adding animations.
+	public BaseBitmap[] bitmap;
+	public int bitmapTick;
 	
 	//This can also be "isWayPoint".
 	private boolean isWarpZone;
@@ -44,6 +46,7 @@ public class PixelData {
 		this.targetArea = -1;
 		this.targetSector = -1;
 		this.groundHeight = 0; //Default
+		this.bitmapTick = 0;
 		
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
@@ -67,144 +70,158 @@ public class PixelData {
 	}
 	
 	public void prepareBitmap(int alpha, int red, int green, int blue) {
-		this.bitmap = Art.error;
 		switch (alpha) {
 			case 0x01: //Flat grass
+				this.bitmap = new BaseBitmap[1];
 				switch (red) { //Terrain tile type
 					case 0x00: //Grass
-						this.bitmap = Art.grass;
+						this.bitmap[0] = Art.grass;
 						break;
 					case 0x01: //Mountain ground
-						this.bitmap = Art.mt_ground;
+						this.bitmap[0] = Art.mt_ground;
 						break;
 					case 0x02:
-						this.bitmap = Art.path;
+						this.bitmap[0] = Art.path;
 						break;
 					default:
+						
 						break;
 				}
 				break;
 			case 0x02: //Ledge
 			{
+				this.bitmap = new BaseBitmap[1];
 				switch (red) {
 					case 0x00: //Bottom
-						this.bitmap = Art.ledge_bottom;
+						this.bitmap[0] = Art.ledge_bottom;
 						break;
 					case 0x01: //Bottom left
-						this.bitmap = Art.ledge_bottom_left;
+						this.bitmap[0] = Art.ledge_bottom_left;
 						break;
 					case 0x02: //Right
-						this.bitmap = Art.ledge_left;
+						this.bitmap[0] = Art.ledge_left;
 						break;
 					case 0x03: //Top Left
-						this.bitmap = Art.ledge_top_left;
+						this.bitmap[0] = Art.ledge_top_left;
 						break;
 					case 0x04: //Top
-						this.bitmap = Art.ledge_top;
+						this.bitmap[0] = Art.ledge_top;
 						break;
 					case 0x05: //Top Right
-						this.bitmap = Art.ledge_top_right;
+						this.bitmap[0] = Art.ledge_top_right;
 						break;
 					case 0x06: //Left
-						this.bitmap = Art.ledge_right;
+						this.bitmap[0] = Art.ledge_right;
 						break;
 					case 0x07: //Bottom Right
-						this.bitmap = Art.ledge_bottom_right;
+						this.bitmap[0] = Art.ledge_bottom_right;
 						break;
 					//---------------------------------------------------------
 					case 0x08:
-						this.bitmap = Art.ledge_mt_bottom;
+						this.bitmap[0] = Art.ledge_mt_bottom;
 						break;
 					case 0x09:
-						this.bitmap = Art.ledge_mt_bottom_left;
+						this.bitmap[0] = Art.ledge_mt_bottom_left;
 						break;
 					case 0x0A:
-						this.bitmap = Art.ledge_mt_left;
+						this.bitmap[0] = Art.ledge_mt_left;
 						break;
 					case 0x0B:
-						this.bitmap = Art.ledge_mt_top_left;
+						this.bitmap[0] = Art.ledge_mt_top_left;
 						break;
 					case 0x0C:
-						this.bitmap = Art.ledge_mt_top;
+						this.bitmap[0] = Art.ledge_mt_top;
 						break;
 					case 0x0D:
-						this.bitmap = Art.ledge_mt_top_right;
+						this.bitmap[0] = Art.ledge_mt_top_right;
 						break;
 					case 0x0E:
-						this.bitmap = Art.ledge_mt_right;
+						this.bitmap[0] = Art.ledge_mt_right;
 						break;
 					case 0x0F:
-						this.bitmap = Art.ledge_mt_bottom_right;
+						this.bitmap[0] = Art.ledge_mt_bottom_right;
 						break;
 					case 0x10:
-						this.bitmap = Art.ledge_inner_bottom;
+						this.bitmap[0] = Art.ledge_inner_bottom;
 						break;
 					case 0x11:
-						this.bitmap = Art.ledge_inner_bottom_left;
+						this.bitmap[0] = Art.ledge_inner_bottom_left;
 						break;
 					case 0x12:
-						this.bitmap = Art.ledge_inner_left;
+						this.bitmap[0] = Art.ledge_inner_left;
 						break;
 					case 0x13:
-						this.bitmap = Art.ledge_inner_top_left;
+						this.bitmap[0] = Art.ledge_inner_top_left;
 						break;
 					case 0x14:
-						this.bitmap = Art.ledge_inner_top;
+						this.bitmap[0] = Art.ledge_inner_top;
 						break;
 					case 0x15:
-						this.bitmap = Art.ledge_inner_top_right;
+						this.bitmap[0] = Art.ledge_inner_top_right;
 						break;
 					case 0x16:
-						this.bitmap = Art.ledge_inner_right;
+						this.bitmap[0] = Art.ledge_inner_right;
 						break;
 					case 0x17:
-						this.bitmap = Art.ledge_inner_bottom_right;
+						this.bitmap[0] = Art.ledge_inner_bottom_right;
 						break;
 				}
 				break;
 			}
 			case 0x03: //Small tree
-				this.bitmap = Art.smallTree;
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.smallTree;
 				break;
 			case 0x04: //Warp point
+				this.bitmap = new BaseBitmap[1];
 				//TODO: Implement an Area Type ID for warp points. Entrances must fit the theme of the biome 
 				//the warp point is in.
-				this.bitmap = Art.forestEntrance;
+				this.bitmap[0] = Art.forestEntrance;
 				break;
 			case 0x05: //ACP (Refer to documentation.)
+				this.bitmap = new BaseBitmap[1];
 				//TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
-				this.bitmap = Art.grass;
+				this.bitmap[0] = Art.grass;
 				break;
 			case 0x06:
+				this.bitmap = new BaseBitmap[1];
 				switch (red) {
 					case 0x00:
-						this.bitmap = Art.stairs_bottom;
+						this.bitmap[0] = Art.stairs_bottom;
 						break;
 					case 0x01:
-						this.bitmap = Art.stairs_left;
+						this.bitmap[0] = Art.stairs_left;
 						break;
 					case 0x02:
-						this.bitmap = Art.stairs_top;
+						this.bitmap[0] = Art.stairs_top;
 						break;
 					case 0x03:
-						this.bitmap = Art.stairs_right;
+						this.bitmap[0] = Art.stairs_right;
 						break;
 					case 0x04:
-						this.bitmap = Art.stairs_mt_bottom;
+						this.bitmap[0] = Art.stairs_mt_bottom;
 						break;
 					case 0x05:
-						this.bitmap = Art.stairs_mt_left;
+						this.bitmap[0] = Art.stairs_mt_left;
 						break;
 					case 0x06:
-						this.bitmap = Art.stairs_mt_top;
+						this.bitmap[0] = Art.stairs_mt_top;
 						break;
 					case 0x07:
-						this.bitmap = Art.stairs_mt_right;
+						this.bitmap[0] = Art.stairs_mt_right;
 						break;
 				}
 				break;
+			case 0x07:
+				//Always start with the first frame of any animation.
+				this.bitmap = Art.water;
+				break;
 			default: //Any other type of tiles.
 				break;
+		}
+		if (this.bitmap == null) {
+			this.bitmap = new BaseBitmap[1];
+			this.bitmap[0] = Art.error;
 		}
 	}
 	
@@ -296,6 +313,10 @@ public class PixelData {
 				break;
 			case 0x06: //Stairs
 				break;
+			case 0x07:
+				//TODO: Needs to do something with this. It must not block the player, however, without
+				//special boolean value, it will always block player from advancing.
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 			default:
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
@@ -320,5 +341,15 @@ public class PixelData {
 	
 	public int getTargetSectorID() {
 		return this.targetSector;
+	}
+	
+	public void tick() {
+		this.bitmapTick++;
+		if (this.bitmapTick >= this.bitmap.length)
+			this.bitmapTick = 0;
+	}
+	
+	public BaseBitmap getBitmap() {
+		return this.bitmap[this.bitmapTick];
 	}
 }

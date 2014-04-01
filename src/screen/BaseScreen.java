@@ -42,8 +42,9 @@ public class BaseScreen extends BaseBitmap {
 	}
 	
 	public void blitBiome(BaseBitmap bitmap, int x, int y, PixelData data) {
-		if (bitmap != null)
+		if (bitmap != null) {
 			this.blitBiome(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height, data);
+		}
 	}
 	
 	public void npcBlit(BaseBitmap bitmap, int x, int y) {
@@ -106,10 +107,10 @@ public class BaseScreen extends BaseBitmap {
 						this.pixels[tgt + xx] = biomeColor;
 						break;
 					case 0x32:
-						this.pixels[tgt + xx] = 0xFF000000 | (biomeColor & 0x00FFFFFF);//lighten(biomeColor, 0.1f);
+						this.pixels[tgt + xx] = lighten(biomeColor, 0.003f);
 						break;
 					case 0x64:
-						this.pixels[tgt + xx] = 0xFF000000 | (biomeColor & 0x00FFFFFF);//lighten(biomeColor, 0.2f);
+						this.pixels[tgt + xx] = lighten(biomeColor, 0.006f);
 						break;
 					default:
 						this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
