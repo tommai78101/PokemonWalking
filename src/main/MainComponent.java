@@ -169,6 +169,8 @@ public class MainComponent extends Canvas implements Runnable {
 				Thread.sleep(1);
 			}
 			catch (InterruptedException e) {
+				System.out.println("Something is wrong... No response.");
+				this.requestFocus();
 			}
 			
 			//			if (System.currentTimeMillis() - lastTimer > 1000) {

@@ -198,6 +198,8 @@ public class Area {
 					 */
 						case 0x00: { //Bottom
 							int y = this.yPlayerPosition + yOffset;
+							if (!this.checkIfValuesAreAllowed((this.getTileColor(0, 2) >> 24) & 0xFF, 0x02, 0x03))
+								return true;
 							if (this.yPlayerPosition < y)
 								return false;
 							return true;
@@ -206,6 +208,8 @@ public class Area {
 							return true;
 						case 0x02: {//Left
 							int x = this.xPlayerPosition + xOffset;
+							if (!this.checkIfValuesAreAllowed((this.getTileColor(-2, 0) >> 24) & 0xFF, 0x02, 0x03))
+								return true;
 							if (this.xPlayerPosition > x)
 								return false;
 							return true;
@@ -214,6 +218,8 @@ public class Area {
 							return true;
 						case 0x04: {//Top
 							int y = this.yPlayerPosition + yOffset;
+							if (!this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x02, 0x03))
+								return true;
 							if (this.yPlayerPosition > y)
 								return false;
 							return true;
@@ -222,6 +228,8 @@ public class Area {
 							return true;
 						case 0x06: { //Right
 							int x = this.xPlayerPosition + xOffset;
+							if (!this.checkIfValuesAreAllowed((this.getTileColor(2, 0) >> 24) & 0xFF, 0x02, 0x03))
+								return true;
 							if (this.xPlayerPosition < x)
 								return false;
 							return true;
@@ -322,5 +330,40 @@ public class Area {
 	
 	public int getSectorID() {
 		return this.sectorID;
+	}
+	
+	public int getSurroundingTileID(int xOffset, int yOffset) {
+		PixelData data;
+		try {
+			data = this.areaData.get(yPlayerPosition + yOffset).get(xPlayerPosition + xOffset);
+		}
+		catch (Exception e) {
+			return -1;
+		}
+		if (data != null) { return (data.getColor() >> 24) & 0xFF; }
+		return -1;
+	}
+	
+	public boolean checkIfValuesAreAllowed(int IDToCompare, int... multipleTileIDs) {
+		boolean result = true;
+		for (int a : multipleTileIDs) {
+			if (IDToCompare == a) {
+				result = false;
+				break;
+			}
+		}
+		return result;
+	}
+	
+	public int getTileColor(int xOffset, int yOffset) {
+		PixelData data;
+		try {
+			data = this.areaData.get(yPlayerPosition + yOffset).get(xPlayerPosition + xOffset);
+		}
+		catch (Exception e) {
+			return 0;
+		}
+		if (data != null) { return (data.getColor()); }
+		return 0;
 	}
 }
