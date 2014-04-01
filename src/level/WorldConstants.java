@@ -9,21 +9,16 @@ public class WorldConstants {
 		//Add/delete a map area, update everything shown below.
 	}
 	
+	//Area IDs
 	public static final int TEST_WORLD_1 = 0x01;
 	public static final int TEST_WORLD_2 = 0x02;
 	public static final int TEST_WORLD_3 = 0x03;
 	public static final int TEST_WORLD_4 = 0x04;
 	public static final int DEBUG = 0x05;
 	
-	//	//Temporary double variable for all common usages.
-	//	public static double tempDouble = 0.0;
-	//	//Temporary integer variable for all common usages.
-	//	public static int tempInteger = 0;
-	//	//Temporary boolean variable for all common usages.
-	//	public static boolean tempBoolean = false;
-	
-	//Unimportant at the moment.
-	//private static final int MAX_AREAS = 3;
+	//Biome Colors
+	public static final int GRASS_GREEN = 0xFFA4E767;
+	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
 	
 	public static Area convertToArea(int areaID) {
 		switch (areaID) {

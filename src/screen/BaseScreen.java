@@ -5,6 +5,7 @@ import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
 import level.PixelData;
+import level.WorldConstants;
 import resources.Art;
 
 public class BaseScreen extends BaseBitmap {
@@ -184,7 +185,7 @@ public class BaseScreen extends BaseBitmap {
 	}
 	
 	private int getBiomeBaseColor(int tileID, int red, int green, int blue) {
-		int color = 0xFFA4E767;
+		int color = WorldConstants.GRASS_GREEN;
 		switch (tileID) {
 			case 0x01: //Grass
 				switch (red) {
@@ -210,7 +211,7 @@ public class BaseScreen extends BaseBitmap {
 					case 0x00:
 						break;
 					case 0x01:
-						color = 0xFFD5B23B;
+						color = WorldConstants.MOUNTAIN_BROWN;
 						break;
 				}
 				break;
@@ -219,7 +220,7 @@ public class BaseScreen extends BaseBitmap {
 					case 0x00:
 						break;
 					case 0x01:
-						color = 0xFFD5B23B;
+						color = WorldConstants.MOUNTAIN_BROWN;
 						break;
 				}
 				break;
