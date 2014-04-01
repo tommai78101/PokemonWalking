@@ -17,6 +17,7 @@ public class Area {
 	
 	private boolean isInWarpZone;
 	private boolean isInConnectionPoint;
+	private boolean isInWater;
 	private PixelData currentPixelData;
 	private final int areaID;
 	private int sectorID;
@@ -32,6 +33,7 @@ public class Area {
 		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInConnectionPoint = false;
+		this.isInWater = false;
 		
 		for (int y = 0; y < this.height; y++) {
 			areaData.add(new ArrayList<PixelData>());
@@ -235,7 +237,8 @@ public class Area {
 							return true;
 						}
 						case 0x07: //Bottom Right
-							return true;
+							//TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!
+							return false;
 						default:
 							break;
 					}
@@ -253,7 +256,7 @@ public class Area {
 				case 0x07:
 					//TODO: Add something that detects a special boolean value
 					//in order to let the player move on water.
-					return true;
+					return false;
 				default: //Any other type of tiles.
 					return false;
 			}

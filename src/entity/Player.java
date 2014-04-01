@@ -39,9 +39,9 @@ public class Player extends Entity {
 	
 	boolean lockWalking;
 	boolean lockJumping;
+	boolean lockSurfing;
 	boolean[] facingsBlocked = new boolean[4];
 	
-	//Temporary variables
 	boolean jumpHeightSignedFlag = false;
 	int varyingJumpHeight = 0;
 	
@@ -401,12 +401,21 @@ public class Player extends Entity {
 		return this.lockJumping;
 	}
 	
+	public boolean isLockedSurfing() {
+		return this.lockSurfing;
+	}
+	
+	public void forceLockSurfing() {
+		this.lockSurfing = true;
+		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+	}
+	
 	//-------------------------------------------------------------------------------------
 	//Private methods
 	
 	private void handleMovementCheck() {
 		//Check if player is currently locked to walking.
-		if (this.lockWalking) {
+		if (this.lockWalking || this.lockSurfing) {
 			
 			//When being locked to walking, facing must stay constant.
 			if (this.walking != this.facing)
