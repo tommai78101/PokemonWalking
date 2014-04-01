@@ -130,6 +130,30 @@ public class PixelData {
 					case 0x0F:
 						this.bitmap = Art.ledge_mt_bottom_right;
 						break;
+					case 0x10:
+						this.bitmap = Art.ledge_inner_bottom;
+						break;
+					case 0x11:
+						this.bitmap = Art.ledge_inner_bottom_left;
+						break;
+					case 0x12:
+						this.bitmap = Art.ledge_inner_left;
+						break;
+					case 0x13:
+						this.bitmap = Art.ledge_inner_top_left;
+						break;
+					case 0x14:
+						this.bitmap = Art.ledge_inner_top;
+						break;
+					case 0x15:
+						this.bitmap = Art.ledge_inner_top_right;
+						break;
+					case 0x16:
+						this.bitmap = Art.ledge_inner_right;
+						break;
+					case 0x17:
+						this.bitmap = Art.ledge_inner_bottom_right;
+						break;
 				}
 				break;
 			}
@@ -235,6 +259,14 @@ public class PixelData {
 					case 0x0D:
 					case 0x0E:
 					case 0x0F:
+					case 0x10:
+					case 0x11:
+					case 0x12:
+					case 0x13:
+					case 0x14:
+					case 0x15:
+					case 0x16:
+					case 0x17:
 						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 						break;
 				}
