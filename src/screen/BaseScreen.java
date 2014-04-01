@@ -70,10 +70,6 @@ public class BaseScreen extends BaseBitmap {
 				if (alpha == 0xFF) {
 					this.pixels[tgt + xx] = color;
 				}
-				else {
-					continue;
-					//this.pixels[tgt + xx] = 0x00FFFFFF;//blendPixels(this.pixels[tgt + xx], color);
-				}
 			}
 		}
 	}
