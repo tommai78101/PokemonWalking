@@ -375,12 +375,14 @@ not assume their information to be permanent.
 		Extended Tile ID:
 			R: 00 - Grass.
 			R: 01 - Mountain ground.
+			R: 02 - Path.
 		Tile Specific ID:
 			G: 00 - Area Type.
-			B: 00 - Ground Height.
+			B: HH - Ground Height.
 		Full Data(s):
-			01 00 00 00
-			01 01 00 00
+			01 00 00 HH
+			01 01 00 HH
+			01 02 00 HH
 		Description:
 			Walkable path tiles, may also represents unpaved roads or 
 			fields.
