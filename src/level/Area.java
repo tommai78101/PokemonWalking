@@ -275,7 +275,7 @@ public class Area {
 	
 	public void setDebugDefaultPosition() {
 		//When the game starts from the very beginning, the player must always start from the very first way point.
-		player.setAreaPosition(5, 5);
+		player.setAreaPosition(0, 0);
 	}
 	
 	public void setDefaultPosition(PixelData data) {
