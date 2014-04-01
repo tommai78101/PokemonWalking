@@ -227,4 +227,12 @@ public class BaseScreen extends BaseBitmap {
 		int b = color & 0xFF;
 		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16 | ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
 	}
+	
+	private int darken(int color, float amount) {
+		int a = (color >> 24) & 0xFF;
+		int r = (color >> 16) & 0xFF;
+		int g = (color >> 8) & 0xFF;
+		int b = color & 0xFF;
+		return 0xFF000000 | ((int) Math.min(255, r - 255 * amount) & 0xFF) << 16 | ((int) Math.min(255, g - 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b - 255 * amount) & 0xFF;
+	}
 }
