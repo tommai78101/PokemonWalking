@@ -14,6 +14,7 @@ public class Art {
 	public static BaseBitmap mt_ground;
 	public static BaseBitmap smallTree;
 	public static BaseBitmap forestEntrance;
+	public static BaseBitmap path;
 	public static BaseBitmap ledge_bottom;
 	public static BaseBitmap ledge_bottom_left;
 	public static BaseBitmap ledge_left;
@@ -100,6 +101,7 @@ public class Art {
 		grass = screen.load("art/floor/grass.png");
 		mt_ground = screen.load("art/floor/mt_ground.png");
 		forestEntrance = screen.load("art/floor/forestEntrance.png");
+		path = screen.load("art/floor/path.png");
 		
 		//Player, NPCs
 		testDownAnimation = screen.cut("art/player/test_walk_down_animation.png", 16, 16, 0, 0);
