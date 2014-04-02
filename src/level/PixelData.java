@@ -216,12 +216,16 @@ public class PixelData {
 			//Always start with the first frame of any animation.
 			{
 				switch (red) {
-					case 0x00:
+					case 0x00: //Left Border
 						break;
-					case 0x01:
+					case 0x01: //Top Left Border
+						break;
+					case 0x02: //Top Border
 						this.bitmap = Art.water_top;
 						break;
-					case 0x02:
+					case 0x03:	//Top Right Border
+						break;
+					case 0x04: //Right Border
 						break;
 					default:
 						this.bitmap = Art.water;
