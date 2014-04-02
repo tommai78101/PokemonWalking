@@ -63,6 +63,7 @@ public class Art {
 	
 	//Animation
 	public static BaseBitmap[] water;
+	public static BaseBitmap[] water_top;
 	
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
@@ -125,15 +126,22 @@ public class Art {
 		error = screen.load("art/debug/no_png.png");
 		
 		//Animation
-		water = new BaseBitmap[16];
-		for (int i = 0; i < water.length; i++) {
+		//water = new BaseBitmap[16];
+		water = loadAnimation(screen, 16, "art/animation/water/water00");
+		water_top = loadAnimation(screen, 16, "art/animation/water/water_top00");
+	}
+	
+	private static BaseBitmap[] loadAnimation(BaseScreen screen, int frames, String filename) {
+		BaseBitmap[] result = new BaseBitmap[frames];
+		for (int i = 0; i < frames; i++) {
 			//There are 16 frames for the water.
 			if (i < 10) {
-				water[i] = screen.load("art/animation/water/water000" + String.valueOf(i) + ".png");
+				result[i] = screen.load(filename + "0" + String.valueOf(i) + ".png");
 			}
 			else {
-				water[i] = screen.load("art/animation/water/water00" + String.valueOf(i) + ".png");
+				result[i] = screen.load(filename + String.valueOf(i) + ".png");
 			}
 		}
+		return result;
 	}
 }

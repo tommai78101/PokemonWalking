@@ -213,9 +213,25 @@ public class PixelData {
 				}
 				break;
 			case 0x07:
-				//Always start with the first frame of any animation.
-				this.bitmap = Art.water;
+			//Always start with the first frame of any animation.
+			{
+				switch (red) {
+					case 0x00:
+						break;
+					case 0x01:
+						this.bitmap = Art.water_top;
+						break;
+					case 0x02:
+						break;
+					default:
+						this.bitmap = Art.water;
+						break;
+				}
+				if (this.bitmap == null) {
+					this.bitmap = Art.water;
+				}
 				break;
+			}
 			default: //Any other type of tiles.
 				break;
 		}
