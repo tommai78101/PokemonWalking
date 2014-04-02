@@ -1,5 +1,10 @@
 package resources;
 
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.IOException;
 import screen.BaseBitmap;
 import screen.BaseScreen;
 
@@ -69,6 +74,9 @@ public class Art {
 	public static BaseBitmap[] water_top_right;
 	public static BaseBitmap[] water_right;
 	
+	//Font
+	public static Font font;
+	
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
@@ -128,6 +136,7 @@ public class Art {
 		
 		//Miscellaneous
 		error = screen.load("art/debug/no_png.png");
+		font = loadFont("font/font.ttf");
 		
 		//Animation
 		//water = new BaseBitmap[16];
@@ -149,6 +158,24 @@ public class Art {
 			else {
 				result[i] = screen.load(filename + String.valueOf(i) + ".png");
 			}
+		}
+		return result;
+	}
+	
+	private static Font loadFont(String filename) {
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		Font result = null;
+		try {
+			result = Font.createFont(Font.TRUETYPE_FONT, new File(filename));
+		}
+		catch (FontFormatException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (result != null) {
+			ge.registerFont(result);
 		}
 		return result;
 	}
