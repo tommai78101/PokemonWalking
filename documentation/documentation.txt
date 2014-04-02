@@ -562,12 +562,16 @@ not assume their information to be permanent.
 		Tile ID:
 			A: 07 - Water
 		Extended Tile ID:
-			R: 00 - None specified.
+			R: 00 - Left Water Border.
+			R: 01 - Top Water Border.
+			R: 02 - Right Water Border.
 		Tile Specific ID:
 			G: 00 - None specified.
 			B: 00 - None specified.
 		Full Data(s):
 			07 00 00 00
+			07 01 00 00
+			07 02 00 00
 		Description:
 			Represents water.
 			
