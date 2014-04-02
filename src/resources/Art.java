@@ -7,6 +7,7 @@ public class Art {
 	
 	//Entities
 	public static BaseBitmap[][] player;
+	public static BaseBitmap[][] player_surf;
 	public static BaseBitmap[][] testDownAnimation;
 	
 	//Tiles
@@ -111,6 +112,7 @@ public class Art {
 		testDownAnimation = screen.cut("art/player/test_walk_down_animation.png", 16, 16, 0, 0);
 		player = screen.cut("art/player/player.png", 16, 16, 0, 0);
 		shadow = screen.load("art/player/shadow.png");
+		player_surf = screen.cut("art/player/player_surf.png", 16, 16, 0, 0);
 		
 		//Areas
 		testArea = screen.load("area/test/testArea.png");

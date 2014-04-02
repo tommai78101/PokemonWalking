@@ -17,7 +17,6 @@ public class Area {
 	
 	private boolean isInWarpZone;
 	private boolean isInConnectionPoint;
-	private boolean isInWater;
 	private PixelData currentPixelData;
 	private final int areaID;
 	private int sectorID;
@@ -33,7 +32,6 @@ public class Area {
 		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInConnectionPoint = false;
-		this.isInWater = false;
 		
 		for (int y = 0; y < this.height; y++) {
 			areaData.add(new ArrayList<PixelData>());
@@ -152,12 +150,18 @@ public class Area {
 					this.sectorID = this.currentPixelData.getTargetSectorID();
 				}
 				break;
+			case 0x07:
+				if (!this.player.isInWater())
+					this.player.goesInWater();
+				break;
 			default:
 				//If no special tiles, then it will keep reseting the flags.
 				if (!this.player.isLockedWalking() || !this.player.isLockedJumping()) {
 					this.isInWarpZone = false;
 					this.isInConnectionPoint = false;
 				}
+				if (this.player.isInWater())
+					this.player.leavesWater();
 				break;
 		}
 	}

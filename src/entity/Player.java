@@ -39,8 +39,8 @@ public class Player extends Entity {
 	
 	boolean lockWalking;
 	boolean lockJumping;
-	boolean lockSurfing;
 	boolean[] facingsBlocked = new boolean[4];
+	boolean isInWater;
 	
 	boolean jumpHeightSignedFlag = false;
 	int varyingJumpHeight = 0;
@@ -401,13 +401,16 @@ public class Player extends Entity {
 		return this.lockJumping;
 	}
 	
-	public boolean isLockedSurfing() {
-		return this.lockSurfing;
+	public boolean isInWater() {
+		return this.isInWater;
 	}
 	
-	public void forceLockSurfing() {
-		this.lockSurfing = true;
-		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+	public void goesInWater() {
+		this.isInWater = true;
+	}
+	
+	public void leavesWater() {
+		this.isInWater = false;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -415,7 +418,7 @@ public class Player extends Entity {
 	
 	private void handleMovementCheck() {
 		//Check if player is currently locked to walking.
-		if (this.lockWalking || this.lockSurfing) {
+		if (this.lockWalking) {
 			
 			//When being locked to walking, facing must stay constant.
 			if (this.walking != this.facing)
@@ -544,22 +547,33 @@ public class Player extends Entity {
 		
 		if (this.lockWalking && !this.lockJumping) {
 			//Walking animation
-			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+			if (!this.isInWater)
+				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+			else
+				output.npcBlit(Art.player_surf[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else if (this.lockJumping) {
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
-			
-			//Walking animation while in the air.
+			//Walking animation while in the air. Shouldn't jump when in water.
 			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 			
 		}
 		else {
 			//Blocking animation. Possibly done to create a perfect loop.
-			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
-				output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
-			else
-				output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+			if (!this.isInWater) {
+				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+				else
+					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+			}
+			else {
+				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+				else
+					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
+			}
 		}
 	}
 }
