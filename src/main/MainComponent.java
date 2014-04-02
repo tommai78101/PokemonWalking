@@ -141,7 +141,7 @@ public class MainComponent extends Canvas implements Runnable {
 			if (unprocessed < 0.0 || unprocessed == Double.NaN)
 				unprocessed = 0.0;
 			
-			while (unprocessed >= 1) {
+			while (unprocessed >= 1.0) {
 				tick++;
 				unprocessed -= 1;
 			}
