@@ -216,24 +216,24 @@ public class PixelData {
 			//Always start with the first frame of any animation.
 			{
 				switch (red) {
-					case 0x00: //Left Border
-						break;
-					case 0x01: //Top Left Border
-						this.bitmap = Art.water_top_left;
-						break;
-					case 0x02: //Top Border
-						this.bitmap = Art.water_top;
-						break;
-					case 0x03:	//Top Right Border
-						break;
-					case 0x04: //Right Border
-						break;
-					default:
+					case 0x00: //Pure water, no border.
 						this.bitmap = Art.water;
 						break;
-				}
-				if (this.bitmap == null) {
-					this.bitmap = Art.water;
+					case 0x01: //Left Border
+						this.bitmap = Art.water_left;
+						break;
+					case 0x02: //Top Left Border
+						this.bitmap = Art.water_top_left;
+						break;
+					case 0x03: //Top Border
+						this.bitmap = Art.water_top;
+						break;
+					case 0x04:	//Top Right Border
+						this.bitmap = Art.water_top_right;
+						break;
+					case 0x05: //Right Border
+						this.bitmap = Art.water_right;
+						break;
 				}
 				break;
 			}
