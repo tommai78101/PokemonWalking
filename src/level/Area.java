@@ -125,7 +125,8 @@ public class Area {
 					case 0x03: //top left
 						break;
 					case 0x04: //top
-						this.player.setLockJumping(red, green, blue, Player.DOWN, Player.UP);
+						if (!this.checkIfValuesAreAllowed(this.getSurroundingTileID(0, -1), 0x01))
+							this.player.setLockJumping(red, green, blue, Player.DOWN, Player.UP);
 						break;
 					case 0x05: //top right
 						break;
@@ -224,10 +225,10 @@ public class Area {
 							return true;
 						case 0x04: {//Top
 							int y = this.yPlayerPosition + yOffset;
+							if (this.yPlayerPosition >= y)
+								return false;
 							if (!this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x02, 0x03))
 								return true;
-							if (this.yPlayerPosition > y)
-								return false;
 							return true;
 						}
 						case 0x05: //Top Right
