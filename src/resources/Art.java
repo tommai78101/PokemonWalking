@@ -64,6 +64,7 @@ public class Art {
 	//Animation
 	public static BaseBitmap[] water;
 	public static BaseBitmap[] water_top;
+	public static BaseBitmap[] water_top_left;
 	
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
@@ -129,6 +130,7 @@ public class Art {
 		//water = new BaseBitmap[16];
 		water = loadAnimation(screen, 16, "art/animation/water/water00");
 		water_top = loadAnimation(screen, 16, "art/animation/water/water_top00");
+		water_top_left = loadAnimation(screen, 16, "art/animation/water/water_top_left00");
 	}
 	
 	private static BaseBitmap[] loadAnimation(BaseScreen screen, int frames, String filename) {

@@ -219,6 +219,7 @@ public class PixelData {
 					case 0x00: //Left Border
 						break;
 					case 0x01: //Top Left Border
+						this.bitmap = Art.water_top_left;
 						break;
 					case 0x02: //Top Border
 						this.bitmap = Art.water_top;
