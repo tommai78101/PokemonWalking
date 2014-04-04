@@ -183,7 +183,7 @@ public class Art {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Font result = null;
 		try {
-			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
+			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream()).deriveFont(Font.PLAIN, 24f);
 		}
 		catch (FontFormatException e) {
 			e.printStackTrace();

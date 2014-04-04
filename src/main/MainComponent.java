@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
@@ -21,7 +20,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import resources.Art;
 import screen.BaseScreen;
-import screen.Dialogue;
 
 public class MainComponent extends Canvas implements Runnable {
 	
@@ -30,6 +28,8 @@ public class MainComponent extends Canvas implements Runnable {
 	public static String GAME_TITLE = "Pokémon Walking Algorithm (Hobby) by tom_mai78101";
 	public static int GAME_HEIGHT = 144;
 	public static int GAME_SCALE = 3;
+	public static int COMPONENT_WIDTH;
+	public static int COMPONENT_HEIGHT;
 	
 	//-----------------------
 	private final BaseScreen screen;
@@ -73,6 +73,8 @@ public class MainComponent extends Canvas implements Runnable {
 		//init(): Place where I get assets from.
 		
 		this.requestFocus();
+		MainComponent.COMPONENT_HEIGHT = this.getHeight();
+		MainComponent.COMPONENT_WIDTH = this.getWidth();
 		
 		//Input Handling
 		inputHandler = new NewInputHandler(keys);
@@ -235,10 +237,7 @@ public class MainComponent extends Canvas implements Runnable {
 		
 		//game.setScrollOffset(GAME_WIDTH / 2, (GAME_HEIGHT + Tile.HEIGHT) / 2);
 		game.setCameraRelativeToArea(GAME_WIDTH / 2, GAME_HEIGHT / 2);
-		game.render();
-		
-		BufferedImage image = this.createCompatibleBufferedImage(screen.getBufferedImage());
-		g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), null);
+		game.render(g);
 		
 		//Key input debugging only.
 		debugKeys(g, 0, 30);
@@ -280,10 +279,7 @@ public class MainComponent extends Canvas implements Runnable {
 	 * */
 	private void debugKeys(Graphics g, int x, int y) {
 		g.setColor(Color.black);
-		//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
-		//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
-		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
-		g.drawString("POKéMON", Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+		g.setFont(Art.font);
 		if (keys.up.isTappedDown)
 			g.drawString("up tapped", x, y);
 		else if (keys.up.isPressedDown)
@@ -315,7 +311,7 @@ public class MainComponent extends Canvas implements Runnable {
 	 *            game is running on.
 	 * @return BufferedImage The BufferedImage used for the Graphics object to blit to the screen.
 	 * */
-	private BufferedImage createCompatibleBufferedImage(BufferedImage image) {
+	public static final BufferedImage createCompatibleBufferedImage(BufferedImage image) {
 		GraphicsConfiguration gfx_config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 		if (image.getColorModel().equals(gfx_config.getColorModel()))
 			return image;

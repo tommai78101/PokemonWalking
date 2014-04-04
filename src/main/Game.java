@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -62,7 +63,7 @@ public class Game {
 	 * 
 	 * @return Nothing.
 	 * */
-	public void render() {
+	public void render(Graphics graphics) {
 		//TODO: Do rendering by calling "BaseScreen" variable and call one of many draw methods provided.
 		//TODO: Re-create the player's fixed position to camera's center, while everything else moves around.
 		//TODO: Overworld must be drawn while the player is moving around. Small areas can only be seen after the camera culls out the overworld.
@@ -75,6 +76,8 @@ public class Game {
 		screen.clear(0xA4E767);
 		overworld.render(screen, player.getX(), player.getY());
 		dialogue.render(screen);
+		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+		dialogue.renderText(graphics);
 	}
 	
 	/**

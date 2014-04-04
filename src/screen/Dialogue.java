@@ -1,5 +1,8 @@
 package screen;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
 import main.MainComponent;
 import resources.Art;
 
@@ -32,6 +35,18 @@ public class Dialogue {
 	
 	public void render(BaseScreen output) {
 		output.blit(bitmap_base, Dialogue.getDialogueX(), Dialogue.getDialogueY());
+	}
+	
+	public void renderText(Graphics g) {
+		drawText(g);
+	}
+	
+	private void drawText(Graphics g) {
+		g.setColor(Color.black);
+		//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
+		//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
+		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
+		g.drawString("POKéMON", Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 	}
 	
 	public static final int getDialogueX() {
