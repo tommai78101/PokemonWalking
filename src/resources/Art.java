@@ -3,8 +3,9 @@ package resources;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
-import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 import screen.BaseBitmap;
 import screen.BaseScreen;
 
@@ -162,11 +163,24 @@ public class Art {
 		return result;
 	}
 	
-	private static Font loadFont(String filename) {
+	public static Font loadFont(String filename) {
+		Enumeration<URL> urls = null;
+		URL url = null;
+		try {
+			urls = Art.class.getClassLoader().getResources(filename);
+		}
+		catch (IOException e2) {
+			e2.printStackTrace();
+		}
+		for (; urls.hasMoreElements();) {
+			url = urls.nextElement();
+			System.out.println(url.toString());
+		}
+		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Font result = null;
 		try {
-			result = Font.createFont(Font.TRUETYPE_FONT, new File(filename));
+			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
 		}
 		catch (FontFormatException e) {
 			e.printStackTrace();
@@ -178,5 +192,9 @@ public class Art {
 			ge.registerFont(result);
 		}
 		return result;
+	}
+	
+	public static Font setFontProperties(Font font, int style, int size) {
+		return font.deriveFont(style, 40f);
 	}
 }

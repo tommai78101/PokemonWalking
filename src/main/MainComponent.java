@@ -19,6 +19,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import resources.Art;
 import screen.BaseScreen;
 
 public class MainComponent extends Canvas implements Runnable {
@@ -239,7 +240,7 @@ public class MainComponent extends Canvas implements Runnable {
 		g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), null);
 		
 		//Key input debugging only.
-		debugKeys(g);
+		debugKeys(g, 0, 30);
 		
 		g.dispose();
 		bufferStrategy.show();
@@ -276,28 +277,28 @@ public class MainComponent extends Canvas implements Runnable {
 	 * @see BufferStrategy
 	 * @see Graphics
 	 * */
-	private void debugKeys(Graphics g) {
+	private void debugKeys(Graphics g, int x, int y) {
 		g.setColor(Color.black);
-		g.setFont(new Font("Serif", Font.PLAIN, 14));
+		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
 		if (keys.up.isTappedDown)
-			g.drawString("up tapped", 10, 10);
+			g.drawString("up tapped", x, y);
 		else if (keys.up.isPressedDown)
-			g.drawString("up pressed", 10, 10);
+			g.drawString("up pressed", x, y);
 		
 		if (keys.left.isTappedDown)
-			g.drawString("left tapped", 10, 10);
+			g.drawString("left tapped", x, y);
 		else if (keys.left.isPressedDown)
-			g.drawString("left pressed", 10, 10);
+			g.drawString("left pressed", x, y);
 		
 		if (keys.down.isTappedDown)
-			g.drawString("down tapped", 10, 10);
+			g.drawString("down tapped", x, y);
 		else if (keys.down.isPressedDown)
-			g.drawString("down pressed", 10, 10);
+			g.drawString("down pressed", x, y);
 		
 		if (keys.right.isTappedDown)
-			g.drawString("right tapped", 10, 10);
+			g.drawString("right tapped", x, y);
 		else if (keys.right.isPressedDown)
-			g.drawString("right pressed", 10, 10);
+			g.drawString("right pressed", x, y);
 	}
 	
 	/**
