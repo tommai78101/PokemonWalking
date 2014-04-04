@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import resources.Art;
 import screen.BaseScreen;
+import screen.Dialogue;
 
 public class MainComponent extends Canvas implements Runnable {
 	
@@ -280,8 +281,9 @@ public class MainComponent extends Canvas implements Runnable {
 	private void debugKeys(Graphics g, int x, int y) {
 		g.setColor(Color.black);
 		//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
+		//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
 		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
-		g.drawString("POKéMON", 200, y + 100);
+		g.drawString("POKéMON", Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 		if (keys.up.isTappedDown)
 			g.drawString("up tapped", x, y);
 		else if (keys.up.isPressedDown)

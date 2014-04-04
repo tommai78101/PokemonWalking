@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import level.OverWorld;
 import screen.BaseScreen;
+import screen.Dialogue;
 import abstracts.World;
 import entity.Player;
 
@@ -19,6 +20,8 @@ public class Game {
 	private final List<World> worlds;
 	private World overworld;
 	private final Player player;
+	
+	private Dialogue dialogue;
 	
 	//private Plot storyPlot;
 	//private Data data;
@@ -44,15 +47,10 @@ public class Game {
 	 * */
 	public Game(BaseScreen output, Keys input) {
 		this.screen = output;
-		//this.inputs = input;
-		
+		this.dialogue = new Dialogue();
 		player = new Player(input);
 		player.setCenterCamPosition(output);
-		
-		//this.guiInterface = new Gui();
-		
 		worlds = new ArrayList<World>();
-		
 		this.overworld = new OverWorld(player);
 		worlds.add(this.overworld);
 	}
@@ -76,6 +74,7 @@ public class Game {
 		*/
 		screen.clear(0xA4E767);
 		overworld.render(screen, player.getX(), player.getY());
+		dialogue.render(screen);
 	}
 	
 	/**
@@ -94,6 +93,7 @@ public class Game {
 		*/
 		//player.tick();
 		overworld.tick();
+		dialogue.tick();
 	}
 	
 	/**

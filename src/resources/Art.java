@@ -66,7 +66,8 @@ public class Art {
 	public static BaseBitmap sprite;
 	public static BaseBitmap shadow;
 	public static BaseBitmap error;
-	
+	public static BaseBitmap dialogue_base;
+	public static BaseBitmap dialogue_next;
 	//Animation
 	public static BaseBitmap[] water;
 	public static BaseBitmap[] water_top;
@@ -138,6 +139,8 @@ public class Art {
 		//Miscellaneous
 		error = screen.load("art/debug/no_png.png");
 		font = loadFont("font/font.ttf");
+		dialogue_base = screen.load("art/dialog/dialogue.png");
+		dialogue_next = screen.load("art/dialog/dialogue_next.png");
 		
 		//Animation
 		//water = new BaseBitmap[16];
