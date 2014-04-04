@@ -52,7 +52,7 @@ public class Dialogue {
 		
 	}
 	
-	public void renderText(Graphics g) {
+	public void renderTextGraphics(Graphics g) {
 		g.setColor(Color.black);
 		//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
 		//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
