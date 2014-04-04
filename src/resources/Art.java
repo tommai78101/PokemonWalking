@@ -193,8 +193,4 @@ public class Art {
 		}
 		return result;
 	}
-	
-	public static Font setFontProperties(Font font, int style, int size) {
-		return font.deriveFont(style, 40f);
-	}
 }
