@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import main.MainComponent;
 import resources.Art;
+import abstracts.Tile;
 
 public class Dialogue {
 	//According to the width and height of the dialog shown in the original games.
@@ -21,29 +22,37 @@ public class Dialogue {
 	//Font size
 	public static final int FONT_SIZE = 24;
 	
-	private BaseBitmap bitmap_base;
-	private BaseBitmap bitmap_next;
-	
 	public Dialogue() {
-		this.bitmap_base = Art.dialogue_base;
-		this.bitmap_next = Art.dialogue_next;
 	}
 	
 	public void tick() {
 		
 	}
 	
-	public void render(BaseScreen output) {
-		//TODO: Make dialog box flexible to use. There is no way that there is just one kind of
-		//dialog box used throughout the game.
-		output.blit(bitmap_base, Dialogue.getDialogueX(), Dialogue.getDialogueY());
+	public void render(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
+		}
+		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
+		
+		for (int j = 0; j < centerHeight - 1; j++) {
+			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			for (int i = 0; i < centerWidth - 1; i++) {
+				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			}
+			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+		}
+		
+		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
+		}
+		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+		
 	}
 	
 	public void renderText(Graphics g) {
-		drawText(g);
-	}
-	
-	private void drawText(Graphics g) {
 		g.setColor(Color.black);
 		//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
 		//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.

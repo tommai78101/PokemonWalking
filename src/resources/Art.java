@@ -66,8 +66,19 @@ public class Art {
 	public static BaseBitmap sprite;
 	public static BaseBitmap shadow;
 	public static BaseBitmap error;
-	public static BaseBitmap dialogue_base;
+	
+	//Dialog
 	public static BaseBitmap dialogue_next;
+	public static BaseBitmap dialogue_bottom;
+	public static BaseBitmap dialogue_bottom_left;
+	public static BaseBitmap dialogue_left;
+	public static BaseBitmap dialogue_top_left;
+	public static BaseBitmap dialogue_top;
+	public static BaseBitmap dialogue_top_right;
+	public static BaseBitmap dialogue_right;
+	public static BaseBitmap dialogue_bottom_right;
+	public static BaseBitmap dialogue_background;
+	
 	//Animation
 	public static BaseBitmap[] water;
 	public static BaseBitmap[] water_top;
@@ -139,8 +150,18 @@ public class Art {
 		//Miscellaneous
 		error = screen.load("art/debug/no_png.png");
 		font = loadFont("font/font.ttf");
-		dialogue_base = screen.load("art/dialog/dialogue.png");
+		
+		//Dialogue
 		dialogue_next = screen.load("art/dialog/dialogue_next.png");
+		dialogue_bottom = screen.load("art/dialog/dialogue_bottom.png");
+		dialogue_bottom_left = screen.load("art/dialog/dialogue_bottom_left.png");
+		dialogue_left = screen.load("art/dialog/dialogue_left.png");
+		dialogue_top_left = screen.load("art/dialog/dialogue_top_left.png");
+		dialogue_top = screen.load("art/dialog/dialogue_top.png");
+		dialogue_top_right = screen.load("art/dialog/dialogue_top_right.png");
+		dialogue_right = screen.load("art/dialog/dialogue_right.png");
+		dialogue_bottom_right = screen.load("art/dialog/dialogue_bottom_right.png");
+		dialogue_background = screen.load("art/dialog/dialogue_bg.png");
 		
 		//Animation
 		//water = new BaseBitmap[16];

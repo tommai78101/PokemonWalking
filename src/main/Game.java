@@ -75,7 +75,9 @@ public class Game {
 		*/
 		screen.clear(0xA4E767);
 		overworld.render(screen, player.getX(), player.getY());
-		dialogue.render(screen);
+		//dialogue.render(screen);
+		dialogue.render(screen, 0, 6, 9, 2);
+		dialogue.render(screen, 6, 0, 3, 8);
 		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		dialogue.renderText(graphics);
 	}
