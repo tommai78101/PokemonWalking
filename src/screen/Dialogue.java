@@ -34,6 +34,8 @@ public class Dialogue {
 	}
 	
 	public void render(BaseScreen output) {
+		//TODO: Make dialog box flexible to use. There is no way that there is just one kind of
+		//dialog box used throughout the game.
 		output.blit(bitmap_base, Dialogue.getDialogueX(), Dialogue.getDialogueY());
 	}
 	
