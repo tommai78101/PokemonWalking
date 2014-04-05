@@ -417,4 +417,8 @@ public class PixelData {
 	public BaseBitmap getBitmap() {
 		return this.bitmap[this.bitmapTick];
 	}
+	
+	public int getGroundHeight() {
+		return this.groundHeight;
+	}
 }
