@@ -3,6 +3,7 @@ package resources;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -211,6 +212,26 @@ public class Art {
 		}
 		catch (IOException e) {
 			e.printStackTrace();
+		}
+		catch (NullPointerException e) {
+			try {
+				result = Font.createFont(Font.TRUETYPE_FONT, Art.class.getResourceAsStream(filename)).deriveFont(Font.PLAIN, 24f);
+			}
+			catch (FontFormatException e1) {
+				e1.printStackTrace();
+			}
+			catch (IOException e1) {
+				e1.printStackTrace();
+				try {
+					result = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/font.ttf")).deriveFont(Font.PLAIN, 24f);
+				}
+				catch (FontFormatException e2) {
+					e2.printStackTrace();
+				}
+				catch (IOException e2) {
+					e2.printStackTrace();
+				}
+			}
 		}
 		if (result != null) {
 			ge.registerFont(result);
