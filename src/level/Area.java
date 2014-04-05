@@ -55,6 +55,11 @@ public class Area {
 		return this.height;
 	}
 	
+	/**
+	 * Updates the area.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void tick() {
 		//Since "setPlayer" method isn't always set, there should be checks everywhere to make sure "player" isn't null.
 		if (this.player != null) {
@@ -125,6 +130,7 @@ public class Area {
 					case 0x03: //top left
 						break;
 					case 0x04: //top
+						//if (this.checkIfValuesAreAllowed(this.getSurroundingTileID(0, -1), 0x01))
 						this.player.setLockJumping(red, green, blue, Player.DOWN, Player.UP);
 						break;
 					case 0x05: //top right
@@ -150,12 +156,18 @@ public class Area {
 					this.sectorID = this.currentPixelData.getTargetSectorID();
 				}
 				break;
+			case 0x07:
+				if (!this.player.isInWater())
+					this.player.goesInWater();
+				break;
 			default:
 				//If no special tiles, then it will keep reseting the flags.
 				if (!this.player.isLockedWalking() || !this.player.isLockedJumping()) {
 					this.isInWarpZone = false;
 					this.isInConnectionPoint = false;
 				}
+				if (this.player.isInWater())
+					this.player.leavesWater();
 				break;
 		}
 	}
@@ -198,7 +210,7 @@ public class Area {
 					 */
 						case 0x00: { //Bottom
 							int y = this.yPlayerPosition + yOffset;
-							if (!this.checkIfValuesAreAllowed((this.getTileColor(0, 2) >> 24) & 0xFF, 0x02, 0x03))
+							if (this.checkIfValuesAreAllowed((this.getTileColor(0, 2) >> 24) & 0xFF, 0x02, 0x03))
 								return true;
 							if (this.yPlayerPosition < y)
 								return false;
@@ -208,7 +220,7 @@ public class Area {
 							return true;
 						case 0x02: {//Left
 							int x = this.xPlayerPosition + xOffset;
-							if (!this.checkIfValuesAreAllowed((this.getTileColor(-2, 0) >> 24) & 0xFF, 0x02, 0x03))
+							if (this.checkIfValuesAreAllowed((this.getTileColor(-2, 0) >> 24) & 0xFF, 0x02, 0x03))
 								return true;
 							if (this.xPlayerPosition > x)
 								return false;
@@ -218,7 +230,7 @@ public class Area {
 							return true;
 						case 0x04: {//Top
 							int y = this.yPlayerPosition + yOffset;
-							if (!this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x02, 0x03))
+							if (this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x02, 0x03))
 								return true;
 							if (this.yPlayerPosition > y)
 								return false;
@@ -228,14 +240,15 @@ public class Area {
 							return true;
 						case 0x06: { //Right
 							int x = this.xPlayerPosition + xOffset;
-							if (!this.checkIfValuesAreAllowed((this.getTileColor(2, 0) >> 24) & 0xFF, 0x02, 0x03))
+							if (this.checkIfValuesAreAllowed((this.getTileColor(2, 0) >> 24) & 0xFF, 0x02, 0x03))
 								return true;
 							if (this.xPlayerPosition < x)
 								return false;
 							return true;
 						}
 						case 0x07: //Bottom Right
-							return true;
+							//TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!
+							return false;
 						default:
 							break;
 					}
@@ -253,7 +266,7 @@ public class Area {
 				case 0x07:
 					//TODO: Add something that detects a special boolean value
 					//in order to let the player move on water.
-					return true;
+					return false;
 				default: //Any other type of tiles.
 					return false;
 			}
@@ -261,6 +274,23 @@ public class Area {
 		return true;
 	}
 	
+	/**
+	 * Renders the bitmap tiles based on the given pixel data.
+	 * 
+	 * <p>
+	 * Note that this is where the bitmap animation works by updating the bitmap after it has been rendered to the screen.
+	 * 
+	 * @param screen
+	 *            The screen display where the bitmaps are to output to.
+	 * @param xOff
+	 *            The X offset based on the player's X position in absolute world coordinates. The
+	 *            absolute world coordinates mean the precise X position on the Canvas.
+	 * @param yOff
+	 *            The Y offset based on the player's Y position in absolute world coordinates. The
+	 *            absolute world coordinates mean the precise Y position on the Canvas.
+	 * @return Nothing.
+	 * 
+	 * */
 	public void renderTiles(BaseScreen screen, int xOff, int yOff) {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
@@ -293,6 +323,14 @@ public class Area {
 		player.setAreaPosition(0, 0);
 	}
 	
+	/**
+	 * Sets the player's position according to the given warp point pixel data.
+	 * 
+	 * It's mostly used in conjunction with initializing the area with the player position set.
+	 * 
+	 * @param data
+	 *            The pixel data used to set the default player's position.
+	 * */
 	public void setDefaultPosition(PixelData data) {
 		int color = data.getColor();
 		int alpha = (color >> 24) & 0xFF;
@@ -339,6 +377,15 @@ public class Area {
 		return this.sectorID;
 	}
 	
+	/**
+	 * Obtains the tile ID of the tile being offset by the player's position.
+	 * 
+	 * @param xOffset
+	 *            The X value offset from the player's X position.
+	 * @param yOffset
+	 *            The Y value offset from the player's Y position.
+	 * @return The tile ID of the tile chosen.
+	 * */
 	public int getSurroundingTileID(int xOffset, int yOffset) {
 		PixelData data;
 		try {
@@ -351,11 +398,28 @@ public class Area {
 		return -1;
 	}
 	
-	public boolean checkIfValuesAreAllowed(int IDToCompare, int... multipleTileIDs) {
-		boolean result = true;
+	/**
+	 * Compares target tile ID with other multiple tile IDs to see if they are one of many
+	 * tiles that the player is allowed to walk on, or when the conditions are right for
+	 * the player to move on the tile.
+	 * 
+	 * @param targetIDToCompare
+	 *            The target tile ID used to test and see if it's allowable
+	 *            for the player to move/walk on. Use getSurroundingTileID() to fetch the target tile
+	 *            ID.
+	 * @param multipleTileIDs
+	 *            The many tile IDs that are to be compared to the target tile ID
+	 *            to see if the target tile ID is one of the allowed tile IDs. You may use as many tile
+	 *            IDs for comparison as you wished.
+	 * @return True, if the target tile ID is one of the many tile IDs that's allowable. False,
+	 *         if none of the tile IDs match the target tile ID.
+	 * 
+	 * */
+	public boolean checkIfValuesAreAllowed(int targetIDToCompare, int... multipleTileIDs) {
+		boolean result = false;
 		for (int a : multipleTileIDs) {
-			if (IDToCompare == a) {
-				result = false;
+			if (targetIDToCompare == a) {
+				result = true;
 				break;
 			}
 		}

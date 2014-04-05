@@ -1,5 +1,12 @@
 package resources;
 
+import java.awt.Font;
+import java.awt.FontFormatException;
+import java.awt.GraphicsEnvironment;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 import screen.BaseBitmap;
 import screen.BaseScreen;
 
@@ -7,6 +14,7 @@ public class Art {
 	
 	//Entities
 	public static BaseBitmap[][] player;
+	public static BaseBitmap[][] player_surf;
 	public static BaseBitmap[][] testDownAnimation;
 	
 	//Tiles
@@ -60,8 +68,28 @@ public class Art {
 	public static BaseBitmap shadow;
 	public static BaseBitmap error;
 	
+	//Dialog
+	public static BaseBitmap dialogue_next;
+	public static BaseBitmap dialogue_bottom;
+	public static BaseBitmap dialogue_bottom_left;
+	public static BaseBitmap dialogue_left;
+	public static BaseBitmap dialogue_top_left;
+	public static BaseBitmap dialogue_top;
+	public static BaseBitmap dialogue_top_right;
+	public static BaseBitmap dialogue_right;
+	public static BaseBitmap dialogue_bottom_right;
+	public static BaseBitmap dialogue_background;
+	
 	//Animation
 	public static BaseBitmap[] water;
+	public static BaseBitmap[] water_top;
+	public static BaseBitmap[] water_top_left;
+	public static BaseBitmap[] water_left;
+	public static BaseBitmap[] water_top_right;
+	public static BaseBitmap[] water_right;
+	
+	//Font
+	public static Font font;
 	
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
@@ -111,6 +139,7 @@ public class Art {
 		testDownAnimation = screen.cut("art/player/test_walk_down_animation.png", 16, 16, 0, 0);
 		player = screen.cut("art/player/player.png", 16, 16, 0, 0);
 		shadow = screen.load("art/player/shadow.png");
+		player_surf = screen.cut("art/player/player_surf.png", 16, 16, 0, 0);
 		
 		//Areas
 		testArea = screen.load("area/test/testArea.png");
@@ -121,17 +150,92 @@ public class Art {
 		
 		//Miscellaneous
 		error = screen.load("art/debug/no_png.png");
+		font = loadFont("font/font.ttf");
+		
+		//Dialogue
+		dialogue_next = screen.load("art/dialog/dialogue_next.png");
+		dialogue_bottom = screen.load("art/dialog/dialogue_bottom.png");
+		dialogue_bottom_left = screen.load("art/dialog/dialogue_bottom_left.png");
+		dialogue_left = screen.load("art/dialog/dialogue_left.png");
+		dialogue_top_left = screen.load("art/dialog/dialogue_top_left.png");
+		dialogue_top = screen.load("art/dialog/dialogue_top.png");
+		dialogue_top_right = screen.load("art/dialog/dialogue_top_right.png");
+		dialogue_right = screen.load("art/dialog/dialogue_right.png");
+		dialogue_bottom_right = screen.load("art/dialog/dialogue_bottom_right.png");
+		dialogue_background = screen.load("art/dialog/dialogue_bg.png");
 		
 		//Animation
-		water = new BaseBitmap[16];
-		for (int i = 0; i < water.length; i++) {
+		//water = new BaseBitmap[16];
+		water = loadAnimation(screen, 16, "art/animation/water/water00");
+		water_top = loadAnimation(screen, 16, "art/animation/water/water_top00");
+		water_top_left = loadAnimation(screen, 16, "art/animation/water/water_top_left00");
+		water_left = loadAnimation(screen, 16, "art/animation/water/water_left00");
+		water_top_right = loadAnimation(screen, 16, "art/animation/water/water_top_right00");
+		water_right = loadAnimation(screen, 16, "art/animation/water/water_right00");
+	}
+	
+	private static BaseBitmap[] loadAnimation(BaseScreen screen, int frames, String filename) {
+		BaseBitmap[] result = new BaseBitmap[frames];
+		for (int i = 0; i < frames; i++) {
 			//There are 16 frames for the water.
 			if (i < 10) {
-				water[i] = screen.load("art/animation/water/water000" + String.valueOf(i) + ".png");
+				result[i] = screen.load(filename + "0" + String.valueOf(i) + ".png");
 			}
 			else {
-				water[i] = screen.load("art/animation/water/water00" + String.valueOf(i) + ".png");
+				result[i] = screen.load(filename + String.valueOf(i) + ".png");
 			}
 		}
+		return result;
+	}
+	
+	public static Font loadFont(String filename) {
+		Enumeration<URL> urls = null;
+		URL url = null;
+		try {
+			urls = Art.class.getClassLoader().getResources(filename);
+		}
+		catch (IOException e2) {
+			e2.printStackTrace();
+		}
+		for (; urls.hasMoreElements();) {
+			url = urls.nextElement();
+			System.out.println(url.toString());
+		}
+		
+		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		Font result = null;
+		try {
+			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream()).deriveFont(Font.PLAIN, 24f);
+		}
+		catch (FontFormatException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch (NullPointerException e) {
+			try {
+				result = Font.createFont(Font.TRUETYPE_FONT, Art.class.getResourceAsStream(filename)).deriveFont(Font.PLAIN, 24f);
+			}
+			catch (FontFormatException e1) {
+				e1.printStackTrace();
+			}
+			catch (IOException e1) {
+				e1.printStackTrace();
+				try {
+					result = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/font.ttf")).deriveFont(Font.PLAIN, 24f);
+				}
+				catch (FontFormatException e2) {
+					e2.printStackTrace();
+				}
+				catch (IOException e2) {
+					e2.printStackTrace();
+				}
+			}
+		}
+		if (result != null) {
+			ge.registerFont(result);
+		}
+		return result;
 	}
 }

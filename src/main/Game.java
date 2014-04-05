@@ -1,10 +1,12 @@
 package main;
 
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import level.OverWorld;
 import screen.BaseScreen;
+import screen.Dialogue;
 import abstracts.World;
 import entity.Player;
 
@@ -19,6 +21,8 @@ public class Game {
 	private final List<World> worlds;
 	private World overworld;
 	private final Player player;
+	
+	private Dialogue dialogue;
 	
 	//private Plot storyPlot;
 	//private Data data;
@@ -42,18 +46,13 @@ public class Game {
 	 * @see BaseScreen
 	 * @see NewInputHandler
 	 * */
-	public Game(BaseScreen output, Keys input) {
-		this.screen = output;
-		//this.inputs = input;
-		
+	public Game(MainComponent main, Keys input) {
+		this.screen = main.getBaseScreen();
+		this.dialogue = new Dialogue(input);
 		player = new Player(input);
-		player.setCenterCamPosition(output);
-		
-		//this.guiInterface = new Gui();
-		
+		player.setCenterCamPosition(this.screen);
 		worlds = new ArrayList<World>();
-		
-		this.overworld = new OverWorld(player);
+		this.overworld = new OverWorld(player, this.dialogue);
 		worlds.add(this.overworld);
 	}
 	
@@ -64,7 +63,7 @@ public class Game {
 	 * 
 	 * @return Nothing.
 	 * */
-	public void render() {
+	public void render(Graphics graphics) {
 		//TODO: Do rendering by calling "BaseScreen" variable and call one of many draw methods provided.
 		//TODO: Re-create the player's fixed position to camera's center, while everything else moves around.
 		//TODO: Overworld must be drawn while the player is moving around. Small areas can only be seen after the camera culls out the overworld.
@@ -76,6 +75,11 @@ public class Game {
 		*/
 		screen.clear(0xA4E767);
 		overworld.render(screen, player.getX(), player.getY());
+		//dialogue.displayText("Hello World.", screen, Dial)
+		//dialogue.render(screen, 6, 0, 3, 8);
+		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+		//FIXME: Need to do something about the font having to be rendered by graphics and not screen.
+		dialogue.renderTextGraphics(graphics);
 	}
 	
 	/**
@@ -94,6 +98,7 @@ public class Game {
 		*/
 		//player.tick();
 		overworld.tick();
+		dialogue.tick();
 	}
 	
 	/**

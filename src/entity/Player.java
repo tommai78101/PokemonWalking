@@ -40,8 +40,8 @@ public class Player extends Entity {
 	boolean lockWalking;
 	boolean lockJumping;
 	boolean[] facingsBlocked = new boolean[4];
+	boolean isInWater;
 	
-	//Temporary variables
 	boolean jumpHeightSignedFlag = false;
 	int varyingJumpHeight = 0;
 	
@@ -106,7 +106,7 @@ public class Player extends Entity {
 		area.setPlayerY(this.getYInArea());
 	}
 	
-	public void tapped() {
+	private void tapped() {
 		animationTick = 0;
 		animationPointer = 0;
 		if (keys.up.isTappedDown || keys.W.isTappedDown) {
@@ -131,7 +131,7 @@ public class Player extends Entity {
 		}
 	}
 	
-	public void pressed() {
+	private void pressed() {
 		xAccel = yAccel = 0;
 		if (keys.up.isPressedDown || keys.W.isPressedDown) {
 			if (facing != UP) {
@@ -171,7 +171,7 @@ public class Player extends Entity {
 		}
 	}
 	
-	public void walk() {
+	private void walk() {
 		if (!this.lockWalking) {
 			if (!this.facingsBlocked[UP]) {
 				if (keys.up.isTappedDown || keys.W.isTappedDown)
@@ -213,7 +213,7 @@ public class Player extends Entity {
 		yPosition += (-yAccel);
 	}
 	
-	public void jump() {
+	private void jump() {
 		if (this.lockJumping) {
 			//When being locked to walking, facing must stay constant.
 			if (this.walking != this.facing)
@@ -364,18 +364,51 @@ public class Player extends Entity {
 		}
 	}
 	
+	/**
+	 * Gets a value that determines the direction the player is currently facing towards.
+	 * 
+	 * @return An integer of one of the followings: Player.UP, Player.DOWN, Player.LEFT, Player.RIGHT.
+	 * */
 	public int getFacing() {
 		return facing;
 	}
 	
+	/**
+	 * Gets a value that determines the direction the player had last been facing towards at.
+	 * 
+	 * @return An integer of one of the followings: Player.UP, Player.DOWN, Player.LEFT, Player.RIGHT.
+	 * */
 	public int getLastFacing() {
 		return lastFacing;
 	}
 	
+	/**
+	 * Checks to see if the player is currently locked to walking.
+	 * 
+	 * @return True, if the player is walking right now. False, otherwise.
+	 * */
 	public boolean isLockedWalking() {
 		return this.lockWalking;
 	}
 	
+	/**
+	 * Sets where each of the four directions are blocked by obstacles in front of the player. The
+	 * obstacles are in front of the player, when the player is facing towards them. That is the time
+	 * to check and see if the obstacle is blocking the player or not.
+	 * 
+	 * @param up
+	 *            If an obstacle is in front of the player when the player is facing towards NORTH, or UP,
+	 *            then up is true. False, otherwise.
+	 * @param down
+	 *            If an obstacle is below of the player when the player is facing towards SOUTH, or DOWN,
+	 *            then down is true. False, otherwise.
+	 * @param left
+	 *            If an obstacle is to the left of the player when the player is facing towards WEST, or LEFT,
+	 *            then left is true. False, otherwise.
+	 * @param right
+	 *            If an obstacle is to the right of the player when the player is facing towards EAST, or RIGHT,
+	 *            then right is true. False, otherwise.
+	 * */
 	public void setAllBlockingDirections(boolean up, boolean down, boolean left, boolean right) {
 		this.facingsBlocked[UP] = up;
 		this.facingsBlocked[DOWN] = down;
@@ -392,6 +425,13 @@ public class Player extends Entity {
 		return this.lastFacing != this.facing;
 	}
 	
+	/**
+	 * Forces the player to continue to walk for more than 1 tile.
+	 * 
+	 * Used when the player has entered an entrance.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void forceLockWalking() {
 		this.lockWalking = true;
 		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
@@ -401,9 +441,30 @@ public class Player extends Entity {
 		return this.lockJumping;
 	}
 	
+	public boolean isInWater() {
+		return this.isInWater;
+	}
+	
+	public void goesInWater() {
+		this.isInWater = true;
+	}
+	
+	public void leavesWater() {
+		this.isInWater = false;
+	}
+	
 	//-------------------------------------------------------------------------------------
 	//Private methods
 	
+	/**
+	 * Makes adjustments to the player's position when the player is walking.
+	 * 
+	 * <p>
+	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player
+	 * wanted to walk.
+	 * 
+	 * @return Nothing.
+	 * */
 	private void handleMovementCheck() {
 		//Check if player is currently locked to walking.
 		if (this.lockWalking) {
@@ -535,22 +596,33 @@ public class Player extends Entity {
 		
 		if (this.lockWalking && !this.lockJumping) {
 			//Walking animation
-			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+			if (!this.isInWater)
+				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+			else
+				output.npcBlit(Art.player_surf[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else if (this.lockJumping) {
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
-			
-			//Walking animation while in the air.
+			//Walking animation while in the air. Shouldn't jump when in water.
 			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 			
 		}
 		else {
 			//Blocking animation. Possibly done to create a perfect loop.
-			if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
-				output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
-			else
-				output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+			if (!this.isInWater) {
+				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+				else
+					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+			}
+			else {
+				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+				else
+					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
+			}
 		}
 	}
 }
