@@ -32,14 +32,6 @@ public class Dialogue {
 	//Styles
 	public static final int DIALOGUE_STYLE_SPEECH = 0xF1;
 	
-	private int stringPointer;
-	private byte tickSpeed;
-	private byte arrowTickSpeed;
-	private String dialogueText;
-	private boolean showDialog;
-	private boolean next;
-	private boolean nextTick;
-	
 	//TODO: Optimize this, to make way for other types of dialogues to use.
 	private String[] tokens;
 	private int tokenPointer;
@@ -50,6 +42,13 @@ public class Dialogue {
 	private boolean firstLineFull;
 	private boolean secondLineFull;
 	private Map<Integer, Boolean> dialogs;
+	private boolean next;
+	private boolean nextTick;
+	private int stringPointer;
+	private byte tickSpeed;
+	private byte arrowTickSpeed;
+	private String dialogueText;
+	private boolean showDialog;
 	
 	private Keys input;
 	
@@ -115,7 +114,7 @@ public class Dialogue {
 		}
 	}
 	
-	public void render(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+	public void renderDialog(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
 		if (this.showDialog) {
 			output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
 			for (int i = 0; i < centerWidth - 1; i++) {
@@ -143,12 +142,22 @@ public class Dialogue {
 		}
 	}
 	
+	/**
+	 * Displays a dialog box showing the text message that was passed in as a parameter. This method
+	 * can lock player's inputs while the dialog is displayed onto the screen.
+	 * 
+	 * @param text
+	 *            Pass a String string to make it display the message to the player.
+	 * @param dialogID
+	 *            This is currently unimplemented.
+	 * @return Nothing.
+	 * */
 	public void displayDialog(String text, int dialogID) {
 		if (this.dialogs.containsKey(dialogID)) {
 			//TODO: DO SOMETHING WHEN dialogs HAVE BEEN REACHED ALREADY.
 			if (this.dialogs.get(dialogID).booleanValue()) { return; }
 		}
-		if (text != null && !text.isEmpty()) {
+		if (text != null && !text.isEmpty() && !this.showDialog) {
 			this.showDialog = true;
 			this.dialogueText = text;
 			this.tokens = this.dialogueText.split(" ");
@@ -161,18 +170,43 @@ public class Dialogue {
 		}
 	}
 	
+	/**
+	 * Hides the dialog by making it disappear from the screen.
+	 * 
+	 * This method is used to hide the dialog box and allow back the player's inputs.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void hideDialog() {
 		this.showDialog = false;
 		this.dialogueText = null;
 		NewInputHandler.unlockInputs();
 	}
 	
+	//
 	public void setCheckpoint(int dialogID, boolean value) {
 		if (this.dialogs.containsKey(dialogID)) {
 			this.dialogs.put(dialogID, value);
 		}
 	}
 	
+	/**
+	 * Tells the Graphics object to draw text onto the screen.
+	 * 
+	 * <p>
+	 * There are many complicated situations where texts can overflow around the dialog boxes, causing it to show up glitchy. Using lots of
+	 * conditional checkings, I was able to confine the glitchiness down to a minimum.
+	 * 
+	 * <p>
+	 * In order to use this, this method must be placed somewhere where there is an easy way to pass the Graphics object to this. The Graphics object
+	 * is obtained by using getDrawGraphics() from the BufferStrategy, which is created from the Canvas AWT component.
+	 * 
+	 * @param graphics
+	 *            The Graphics object used for drawing texts using custom
+	 *            fonts.
+	 * @return Nothing.
+	 * 
+	 * */
 	public void renderTextGraphics(Graphics g) {
 		if (this.dialogueText != null && !this.dialogueText.isEmpty()) {
 			//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
@@ -221,7 +255,6 @@ public class Dialogue {
 				}
 				else {
 					this.firstLineFull = true;
-					//this.secondLinePointer = this.firstLinePointer;
 				}
 				if (this.firstLineFull) {
 					if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
@@ -239,7 +272,7 @@ public class Dialogue {
 					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 					if (!this.secondLineFull) {
 						if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
-							g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+							g.drawString(this.dialogueText.substring(this.beginningPointer + this.secondLinePointer, this.beginningPointer + this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 						}
 					}
 					else {
