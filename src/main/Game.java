@@ -52,7 +52,7 @@ public class Game {
 		player = new Player(input);
 		player.setCenterCamPosition(this.screen);
 		worlds = new ArrayList<World>();
-		this.overworld = new OverWorld(player);
+		this.overworld = new OverWorld(player, this.dialogue);
 		worlds.add(this.overworld);
 	}
 	
@@ -76,8 +76,6 @@ public class Game {
 		screen.clear(0xA4E767);
 		overworld.render(screen, player.getX(), player.getY());
 		//dialogue.displayText("Hello World.", screen, Dial)
-		dialogue.render(screen, 0, 6, 9, 2);
-		dialogue.displayDialog();
 		//dialogue.render(screen, 6, 0, 3, 8);
 		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		//FIXME: Need to do something about the font having to be rendered by graphics and not screen.

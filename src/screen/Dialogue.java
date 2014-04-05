@@ -3,8 +3,11 @@ package screen;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.util.HashMap;
+import java.util.Map;
 import main.Keys;
 import main.MainComponent;
+import main.NewInputHandler;
 import resources.Art;
 import abstracts.Tile;
 
@@ -38,10 +41,13 @@ public class Dialogue {
 	
 	private String[] tokens;
 	private int tokenPointer;
+	private int beginningPointer;
 	private int firstLinePointer;
 	private int secondLinePointer;
+	private int totalStringPointer;
 	private boolean firstLineFull;
 	private boolean secondLineFull;
+	private Map<Integer, Boolean> dialogs;
 	
 	private Keys input;
 	
@@ -52,26 +58,49 @@ public class Dialogue {
 		
 		this.stringPointer = 0;
 		this.tickSpeed = 0;
-		this.dialogueText = "POKéMON WORLD IS HAPPENING TOMORROW.";
+		this.dialogueText = null;
 		this.showDialog = false;
 		this.next = false;
 		this.nextTick = false;
 		//this.dialogueList = new ArrayList<String>();
 		
-		this.tokens = this.dialogueText.split(" ");
+		//this.tokens = this.dialogueText.split(" ");
 		this.tokenPointer = 0;
+		this.beginningPointer = 0;
 		this.firstLinePointer = 0;
 		this.secondLinePointer = 0;
+		this.totalStringPointer = 0;
+		this.dialogs = new HashMap<Integer, Boolean>();
 	}
 	
 	public void tick() {
 		if (this.showDialog) {
+			if (!NewInputHandler.inputsAreLocked())
+				NewInputHandler.lockInputs();
 			this.tickSpeed--;
 			if (this.tickSpeed < 0) {
-				if (this.stringPointer < this.dialogueText.length() && !this.next)
+				if (this.totalStringPointer < this.dialogueText.length() && !this.next) {
 					this.stringPointer++;
+					this.totalStringPointer++;
+				}
 				this.tickSpeed = 0x4;
 				this.nextTick = !this.nextTick;
+			}
+			if (this.next) {
+				if (input.Z.isPressedDown || input.Z.isTappedDown) {
+					if (this.totalStringPointer < this.dialogueText.length()) {
+						this.firstLineFull = false;
+						this.secondLineFull = false;
+						this.firstLinePointer = 0;
+						this.beginningPointer = this.secondLinePointer;
+						this.secondLinePointer = 0;
+						this.stringPointer = 0;
+						this.next = false;
+					}
+					else {
+						this.hideDialog();
+					}
+				}
 			}
 		}
 	}
@@ -104,34 +133,67 @@ public class Dialogue {
 		}
 	}
 	
-	public void displayDialog() {
-		this.showDialog = true;
+	public void displayDialog(String text, int dialogID) {
+		if (this.dialogs.containsKey(dialogID)) {
+			//TODO: DO SOMETHING WHEN dialogs HAVE BEEN REACHED ALREADY.
+			if (this.dialogs.get(dialogID).booleanValue()) { return; }
+		}
+		if (text != null && !text.isEmpty()) {
+			this.showDialog = true;
+			this.dialogueText = text;
+			this.tokens = this.dialogueText.split(" ");
+			this.tokenPointer = 0;
+			this.beginningPointer = 0;
+			this.firstLinePointer = 0;
+			this.secondLinePointer = 0;
+			this.totalStringPointer = 0;
+			this.dialogs.put(dialogID, false);
+		}
 	}
 	
 	public void hideDialog() {
 		this.showDialog = false;
-		this.stringPointer = 0;
-		this.tickSpeed = 0;
-		this.tokenPointer = 0;
+		this.dialogueText = null;
+		NewInputHandler.unlockInputs();
+	}
+	
+	public void setCheckpoint(int dialogID, boolean value) {
+		if (this.dialogs.containsKey(dialogID)) {
+			this.dialogs.put(dialogID, value);
+		}
 	}
 	
 	public void renderTextGraphics(Graphics g) {
-		g.setColor(Color.black);
-		//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
-		//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
-		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
-		
 		if (this.dialogueText != null && !this.dialogueText.isEmpty()) {
-			if (this.stringPointer <= this.dialogueText.length()) {
-				String text = this.tokens[this.tokenPointer];
+			//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
+			//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
+			g.setColor(Color.black);
+			g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
+			if (this.totalStringPointer <= this.dialogueText.length()) {
+				//Handles one word sentences only.
+				if (this.stringPointer > this.dialogueText.length()) {
+					this.stringPointer = this.dialogueText.length();
+					this.next = true;
+					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+					return;
+				}
 				
+				//Handles more than one word.
+				String text = this.tokens[this.tokenPointer];
 				if (this.firstLinePointer + text.length() < MAX_STRING_LENGTH) {
 					if (this.stringPointer > text.length()) {
+						
 						this.firstLinePointer += this.stringPointer;
 						this.secondLinePointer = this.firstLinePointer;
-						this.stringPointer = 0;
-						if (this.tokenPointer < this.tokens.length - 1)
+						if (this.tokenPointer < this.tokens.length - 1) {
 							this.tokenPointer++;
+							this.stringPointer = 0;
+						}
+						//Short sentences.
+						if (this.totalStringPointer >= this.dialogueText.length() - 1) {
+							g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+							return;
+						}
 					}
 				}
 				else {
@@ -141,9 +203,10 @@ public class Dialogue {
 					if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
 						if (this.stringPointer > text.length()) {
 							this.secondLinePointer += this.stringPointer;
-							this.stringPointer = 0;
-							if (this.tokenPointer < this.tokens.length - 1)
+							if (this.tokenPointer < this.tokens.length - 1) {
 								this.tokenPointer++;
+								this.stringPointer = 0;
+							}
 						}
 					}
 					else {
@@ -151,10 +214,10 @@ public class Dialogue {
 					}
 				}
 				if (!this.firstLineFull) {
-					g.drawString(this.dialogueText.substring(0, this.firstLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 				}
 				else {
-					g.drawString(this.dialogueText.substring(0, this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 					if (!this.secondLineFull) {
 						if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
 							g.drawString(this.dialogueText.substring(this.firstLinePointer, this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
@@ -165,7 +228,9 @@ public class Dialogue {
 						this.next = true;
 					}
 				}
-				
+				if (this.totalStringPointer >= this.dialogueText.length()) {
+					this.next = true;
+				}
 			}
 		}
 	}
@@ -188,5 +253,9 @@ public class Dialogue {
 	
 	public static final int getDialogueTextSecondLineStartingY() {
 		return (Dialogue.getDialogueY() * MainComponent.GAME_SCALE) + Dialogue.SECOND_LINE_SPACING_HEIGHT * MainComponent.GAME_SCALE + Dialogue.FONT_SIZE;
+	}
+	
+	public boolean isDisplayingDialogue() {
+		return this.showDialog;
 	}
 }

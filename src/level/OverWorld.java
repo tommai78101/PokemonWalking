@@ -3,6 +3,7 @@ package level;
 import java.util.ArrayList;
 import java.util.List;
 import screen.BaseScreen;
+import screen.Dialogue;
 import abstracts.Tile;
 import abstracts.World;
 import entity.Player;
@@ -14,6 +15,7 @@ public class OverWorld extends World {
 	//Overworld properties.
 	private boolean invertBitmapColors;
 	private int currentAreaSectorID;
+	private Dialogue dialogue;
 	
 	/**
 	 * Initializes the overworld in the game.
@@ -23,7 +25,7 @@ public class OverWorld extends World {
 	 * @param Player
 	 *            Takes a Player object. The overworld then loads all related properties in respect to the Player object.
 	 * */
-	public OverWorld(Player player) {
+	public OverWorld(Player player, Dialogue dialogue) {
 		//Must initialize all overworld specific properties, such as specific areas, specific dialogues, etc. first.		
 		initialize();
 		
@@ -39,6 +41,8 @@ public class OverWorld extends World {
 		//it needs to tell the player that they entered a new sector.
 		//Needs a marker in the area that points to where the area connects together.
 		
+		//Dialogue
+		this.dialogue = dialogue;
 	}
 	
 	public void initialize() {
@@ -108,6 +112,10 @@ public class OverWorld extends World {
 			}
 			
 		}
+		dialogue.displayDialog("Testing...", 1);
+		if (dialogue.isDisplayingDialogue()) {
+			dialogue.setCheckpoint(1, true);
+		}
 	}
 	
 	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {
@@ -136,6 +144,8 @@ public class OverWorld extends World {
 		
 		if (screen.getInvertTick() < (byte) 0x4 || screen.getInvertTick() >= (byte) 0x7)
 			player.render(screen, 0, 0);
+		
+		dialogue.render(screen, 0, 6, 9, 2);
 	}
 	
 	//	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {
