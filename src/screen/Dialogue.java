@@ -29,16 +29,18 @@ public class Dialogue {
 	//Dialogue max string length per line.
 	public static final int MAX_STRING_LENGTH = 18;
 	
-	//Dialogue defaults;
-	public static final int DIALOGUE_SPEECH = 0xF1;
+	//Styles
+	public static final int DIALOGUE_STYLE_SPEECH = 0xF1;
 	
 	private int stringPointer;
-	private int tickSpeed;
+	private byte tickSpeed;
+	private byte arrowTickSpeed;
 	private String dialogueText;
 	private boolean showDialog;
 	private boolean next;
 	private boolean nextTick;
 	
+	//TODO: Optimize this, to make way for other types of dialogues to use.
 	private String[] tokens;
 	private int tokenPointer;
 	private int beginningPointer;
@@ -58,6 +60,7 @@ public class Dialogue {
 		
 		this.stringPointer = 0;
 		this.tickSpeed = 0;
+		this.arrowTickSpeed = 0;
 		this.dialogueText = null;
 		this.showDialog = false;
 		this.next = false;
@@ -83,11 +86,18 @@ public class Dialogue {
 					this.stringPointer++;
 					this.totalStringPointer++;
 				}
-				this.tickSpeed = 0x4;
+				this.tickSpeed = 0x2;
+			}
+			this.arrowTickSpeed--;
+			if (this.arrowTickSpeed < 0) {
 				this.nextTick = !this.nextTick;
+				this.arrowTickSpeed = 0x6;
 			}
 			if (this.next) {
-				if (input.Z.isPressedDown || input.Z.isTappedDown) {
+				if (input.Z.isPressedDown || input.Z.isTappedDown
+						|| input.X.isTappedDown || input.X.isPressedDown
+						|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+						|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
 					if (this.totalStringPointer < this.dialogueText.length()) {
 						this.firstLineFull = false;
 						this.secondLineFull = false;
