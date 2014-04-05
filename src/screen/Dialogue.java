@@ -102,7 +102,7 @@ public class Dialogue {
 						this.firstLineFull = false;
 						this.secondLineFull = false;
 						this.firstLinePointer = 0;
-						this.beginningPointer = this.secondLinePointer;
+						this.beginningPointer += this.secondLinePointer;
 						this.secondLinePointer = 0;
 						this.stringPointer = 0;
 						this.next = false;
@@ -188,11 +188,24 @@ public class Dialogue {
 					return;
 				}
 				
+				if (this.totalStringPointer == this.dialogueText.length()) {
+					this.next = true;
+					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+					g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.dialogueText.length()), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+					return;
+				}
+				
+				if (this.firstLineFull && this.secondLineFull) {
+					this.next = true;
+					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+					g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+					return;
+				}
+				
 				//Handles more than one word.
 				String text = this.tokens[this.tokenPointer];
-				if (this.firstLinePointer + text.length() < MAX_STRING_LENGTH) {
+				if (this.firstLinePointer + text.length() <= MAX_STRING_LENGTH) {
 					if (this.stringPointer > text.length()) {
-						
 						this.firstLinePointer += this.stringPointer;
 						this.secondLinePointer = this.firstLinePointer;
 						if (this.tokenPointer < this.tokens.length - 1) {
@@ -208,6 +221,7 @@ public class Dialogue {
 				}
 				else {
 					this.firstLineFull = true;
+					//this.secondLinePointer = this.firstLinePointer;
 				}
 				if (this.firstLineFull) {
 					if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
@@ -222,25 +236,26 @@ public class Dialogue {
 					else {
 						this.secondLineFull = true;
 					}
-				}
-				if (!this.firstLineFull) {
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-				}
-				else {
 					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 					if (!this.secondLineFull) {
 						if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
-							g.drawString(this.dialogueText.substring(this.firstLinePointer, this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+							g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 						}
 					}
 					else {
-						g.drawString(this.dialogueText.substring(this.firstLinePointer, this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 						this.next = true;
 					}
 				}
-				if (this.totalStringPointer >= this.dialogueText.length()) {
-					this.next = true;
+				else {
+					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 				}
+			}
+			else {
+				this.next = true;
+				g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+				g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+				return;
 			}
 		}
 	}
