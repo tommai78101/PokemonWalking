@@ -82,7 +82,7 @@ public class MainComponent extends Canvas implements Runnable {
 		
 		//Game loading
 		//We pass the BaseScreen variable as a parameter, acting as an output.
-		game = new Game(screen, keys);
+		game = new Game(this, keys);
 		game.load();
 		//world = new TestWorld(Art.testArea);
 		
@@ -332,6 +332,10 @@ public class MainComponent extends Canvas implements Runnable {
 		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
 		after = scaleOp.filter(before, after);
 		return after;
+	}
+	
+	public BaseScreen getBaseScreen() {
+		return this.screen;
 	}
 	
 	//---------------------------------

@@ -46,11 +46,11 @@ public class Game {
 	 * @see BaseScreen
 	 * @see NewInputHandler
 	 * */
-	public Game(BaseScreen output, Keys input) {
-		this.screen = output;
-		this.dialogue = new Dialogue();
+	public Game(MainComponent main, Keys input) {
+		this.screen = main.getBaseScreen();
+		this.dialogue = new Dialogue(input);
 		player = new Player(input);
-		player.setCenterCamPosition(output);
+		player.setCenterCamPosition(this.screen);
 		worlds = new ArrayList<World>();
 		this.overworld = new OverWorld(player);
 		worlds.add(this.overworld);
@@ -75,8 +75,10 @@ public class Game {
 		*/
 		screen.clear(0xA4E767);
 		overworld.render(screen, player.getX(), player.getY());
+		//dialogue.displayText("Hello World.", screen, Dial)
 		dialogue.render(screen, 0, 6, 9, 2);
-		dialogue.render(screen, 6, 0, 3, 8);
+		dialogue.displayDialog();
+		//dialogue.render(screen, 6, 0, 3, 8);
 		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		//FIXME: Need to do something about the font having to be rendered by graphics and not screen.
 		dialogue.renderTextGraphics(graphics);
