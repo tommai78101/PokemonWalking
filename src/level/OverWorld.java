@@ -112,7 +112,7 @@ public class OverWorld extends World {
 			}
 			
 		}
-		dialogue.displayDialog("Testing...", 1);
+		dialogue.displayDialog("Hello World.", 1);
 		if (dialogue.isDisplayingDialogue()) {
 			dialogue.setCheckpoint(1, true);
 		}
