@@ -112,9 +112,10 @@ public class OverWorld extends World {
 			}
 			
 		}
-		dialogue.displayDialog("Hello World. Press Z, X, /, or . to continue. For the next release, I'll be cleaning up the codes. No more features until then.", 1);
+		//dialogue.displayDialog("Hello World. Press Z, X, /, or . to continue. For the next release, I'll be cleaning up the codes. No more features until then.", 1);
+		dialogue.displayDialog("HAPPENING TOMORROW!!", 2);
 		if (dialogue.isDisplayingDialogue()) {
-			dialogue.setCheckpoint(1, true);
+			dialogue.setCheckpoint(2, true);
 		}
 	}
 	
@@ -145,7 +146,7 @@ public class OverWorld extends World {
 		if (screen.getInvertTick() < (byte) 0x4 || screen.getInvertTick() >= (byte) 0x7)
 			player.render(screen, 0, 0);
 		
-		dialogue.render(screen, 0, 6, 9, 2);
+		dialogue.renderDialog(screen, 0, 6, 9, 2);
 	}
 	
 	//	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {
