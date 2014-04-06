@@ -579,6 +579,32 @@ not assume their information to be permanent.
 		Description:
 			Represents water.
 			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Dialogue ID stuffs:
+		* Needs an action in order to initiate a trigger.
+		* Cannot use Tiles to mark dialogue triggers.
+		* Needs to separate what is dialogue and what is an object/obstacle/entity.
+		* Needs to rewrite some portions of the code.
+		
+		New Proposal:
+		* Delegate some Pixel Data stuffs into Triggers.
+		* New area, new sector  ---> Triggers.
+		* Pixel Data should be reserved for map related tiles.
+		* Pixel Data should allow items to be placed. When picked ---> Triggers.
+		* Triggers can allow certain areas to be restricted. Only allow players
+			when the conditions are met.
+		* Triggers can activate plot related events, such as NPCs rushing towards
+			player and speak using dialogues.  ----->  Triggers are an expansion
+			of Pixel Data.
+		* Battle sequences can be triggered by checking for "trigger battle"
+			conditions.
+		* Items can be given by using triggers.
+		* Items can be taken away by using triggers.
+		
+		
+		Conclusion: Triggers are a necessity.	
+			
 -------------------------------
 
 Player [PWD05]
