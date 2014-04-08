@@ -2,6 +2,7 @@ package level;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import screen.BaseScreen;
 import screen.Dialogue;
 import abstracts.Tile;
@@ -132,6 +133,10 @@ public class OverWorld extends World {
 		//OverWorld offsets are not set.
 		//Setting area offsets with player positions
 		
+		if (dialogue.isDisplayingDialogue()) {
+			screen.enableRenderHalf();
+		}
+
 		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
 		this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
@@ -146,7 +151,9 @@ public class OverWorld extends World {
 		if (screen.getInvertTick() < (byte) 0x4 || screen.getInvertTick() >= (byte) 0x7)
 			player.render(screen, 0, 0);
 		
+		screen.disableRenderHalf();
 		dialogue.renderDialog(screen, 0, 6, 9, 2);
+
 	}
 	
 	//	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {

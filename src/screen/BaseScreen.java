@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
+
 import level.PixelData;
 import level.WorldConstants;
 import resources.Art;
@@ -15,8 +16,9 @@ public class BaseScreen extends BaseBitmap {
 	protected BufferedImage image;
 	protected int xOffset;
 	protected int yOffset;
-	
+
 	private byte invertTick = 0x7;
+	private boolean cutScreen;
 	
 	public BaseScreen(int w, int h) {
 		super(w, h);
@@ -63,6 +65,12 @@ public class BaseScreen extends BaseBitmap {
 		int blitWidth = blitArea.bottomRightCorner_X - blitArea.topLeftCorner_X;
 		
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
+			
+			//Place the cut height here.
+			if (cutScreen) {
+				if (yy > Dialogue.getDialogueY())
+					break;
+			}
 			int tgt = yy * this.width + blitArea.topLeftCorner_X;
 			int src = (yy - y) * bitmap.width + (blitArea.topLeftCorner_X - x);
 			tgt -= src;
@@ -94,6 +102,12 @@ public class BaseScreen extends BaseBitmap {
 		int biomeColor = getBiomeBaseColor(tileID, red, green, blue);
 		
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
+			
+			//Place the cut height here.
+			if (cutScreen) {
+				if (yy > Dialogue.getDialogueY())
+					break;
+			}
 			int tgt = yy * this.width + blitArea.topLeftCorner_X;
 			int src = (yy - y) * bitmap.width + (blitArea.topLeftCorner_X - x);
 			tgt -= src;
@@ -163,6 +177,18 @@ public class BaseScreen extends BaseBitmap {
 		return this.invertTick;
 	}
 	
+	public void enableRenderHalf() {
+		this.cutScreen = true;
+	}
+	
+	public void disableRenderHalf() {
+		this.cutScreen = false;
+	}
+	
+	public boolean isRenderingHalf() {
+		return this.cutScreen;
+	}
+
 	//-------------------------------------------
 	//Private methods
 	
