@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.util.HashMap;
 import java.util.Map;
+
 import main.Keys;
 import main.MainComponent;
 import main.NewInputHandler;
@@ -223,16 +224,17 @@ public class Dialogue {
 				}
 				
 				if (this.totalStringPointer == this.dialogueText.length()) {
+					if (this.totalStringPointer <= MAX_STRING_LENGTH) {
+						g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+					}
+					else {
+						g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+						if (this.beginningPointer + this.secondLinePointer < MAX_STRING_LENGTH * 2)
+							g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+						else
+							g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+					}
 					this.next = true;
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.dialogueText.length()), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-					return;
-				}
-				
-				if (this.firstLineFull && this.secondLineFull) {
-					this.next = true;
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 					return;
 				}
 				
@@ -257,6 +259,7 @@ public class Dialogue {
 					this.firstLineFull = true;
 				}
 				if (this.firstLineFull) {
+					//First line is full
 					if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
 						if (this.stringPointer > text.length()) {
 							this.secondLinePointer += this.stringPointer;
@@ -272,7 +275,7 @@ public class Dialogue {
 					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 					if (!this.secondLineFull) {
 						if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
-							g.drawString(this.dialogueText.substring(this.beginningPointer + this.secondLinePointer, this.beginningPointer + this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+							g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 						}
 					}
 					else {
@@ -281,14 +284,9 @@ public class Dialogue {
 					}
 				}
 				else {
+					//First line isn't full
 					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 				}
-			}
-			else {
-				this.next = true;
-				g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-				g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-				return;
 			}
 		}
 	}
