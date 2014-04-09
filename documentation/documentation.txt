@@ -587,6 +587,27 @@ not assume their information to be permanent.
 		* Needs to separate what is dialogue and what is an object/obstacle/entity.
 		* Needs to rewrite some portions of the code.
 		
+		Dialogue Plans:
+		
+		* Create a rendering box using BufferedImage and Graphics. Use BufferedImage
+			own getDrawGraphics() to obtain the Graphics object.
+		* Obtain Graphics2D from Graphics. Use that to draw custom fonts.
+		* When drawing the image, the image must be at the location where both
+			the dialog box and the text are to be drawn at.
+		* When drawing the text, the text must complete two lines, before allowing
+			the player to click "Next". After that, the text must scroll upwards
+			to allow the next line to appear in the dialog box.
+		* Can use punctuation symbols to act like delimiters.These delimiters can be
+			used to tell the game when the dialogue should scroll up, or change next
+			paragraphs.
+		* A person of multiple paragraphs need some data format to store/access
+			them. 
+		* Create the ability to increase/decrease the text speed. tickCount is necessary.
+		* (Optional) Create the ability to change text border designs.
+		
+		
+		
+		
 		New Proposal:
 		* Delegate some Pixel Data stuffs into Triggers.
 		* New area, new sector  ---> Triggers.
