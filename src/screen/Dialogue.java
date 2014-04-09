@@ -260,9 +260,13 @@ public class Dialogue {
 				if (this.firstLineFull) {
 					//First line is full
 
-					if ((this.secondLinePointer - MAX_STRING_LENGTH - 1) + text.length() <= MAX_STRING_LENGTH) {
+					if (text.length() <= MAX_STRING_LENGTH) {
 						if (this.stringPointer > text.length()) {
 							this.secondLinePointer += this.stringPointer;
+							if ((this.secondLinePointer - 2) == MAX_STRING_LENGTH * 2) {
+								//Subtract 2 space characters from the (first + second lines) character total.
+								this.secondLineFull = true;
+							}
 							if (this.tokenPointer < this.tokens.length - 1) {
 								this.tokenPointer++;
 								this.stringPointer = 0;
