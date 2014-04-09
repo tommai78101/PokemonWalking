@@ -114,7 +114,7 @@ public class OverWorld extends World {
 			
 		}
 		//dialogue.displayDialog("Hello World. Press Z, X, /, or . to continue. For the next release, I'll be cleaning up the codes. No more features until then.", 1);
-		dialogue.displayDialog("abcdefghijklmnopqr abcdefghijk mnop rt jklmnopqr test end.", 2);
+		dialogue.displayDialog("abcdefghijklmnopqr abcdefghijknoqr rt jklmnopqr test end.", 2);
 		if (dialogue.isDisplayingDialogue()) {
 			dialogue.setCheckpoint(2, true);
 		}
