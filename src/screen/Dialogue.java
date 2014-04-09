@@ -3,6 +3,7 @@ package screen;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,7 +77,7 @@ public class Dialogue {
 		this.dialogs = new HashMap<Integer, Boolean>();
 	}
 	
-	public void tick() {
+	public void tick_old() {
 		if (this.showDialog) {
 			if (!NewInputHandler.inputsAreLocked())
 				NewInputHandler.lockInputs();
@@ -163,7 +164,7 @@ public class Dialogue {
 		if (text != null && !text.isEmpty() && !this.showDialog) {
 			this.showDialog = true;
 			this.dialogueText = text;
-			this.tokens = this.dialogueText.split(" ");
+			this.tokens = this.dialogueText.split("\\s");
 			this.tokenPointer = 0;
 			this.beginningPointer = 0;
 			this.firstLinePointer = 0;
@@ -260,11 +261,9 @@ public class Dialogue {
 				if (this.firstLineFull) {
 					//First line is full
 					int textCompare = 0;
-					if (beginningPointer > (MAX_STRING_LENGTH+1) * 2)
+					if (beginningPointer > (MAX_STRING_LENGTH + 1) * 2)
 						textCompare = (((beginningPointer % (MAX_STRING_LENGTH + 1)) + secondLinePointer - 1) % MAX_STRING_LENGTH) + text.length();
-					else
-						textCompare = (((secondLinePointer % MAX_STRING_LENGTH)) - 1) + text.length();
-					if (textCompare <= MAX_STRING_LENGTH) {
+					if ((this.totalStringPointer > (MAX_STRING_LENGTH * 2) + 1) ? (textCompare <= MAX_STRING_LENGTH) : (text.length() <= MAX_STRING_LENGTH)) {
 						if (this.stringPointer > text.length()) {
 							this.secondLinePointer += this.stringPointer;
 							if (this.secondLinePointer >= MAX_STRING_LENGTH * 2) {
@@ -299,6 +298,73 @@ public class Dialogue {
 		}
 	}
 	
+	public void renderText(Graphics g) {
+		g.setColor(Color.black);
+		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
+		try {
+			g.drawString(this.tokens[this.tokenPointer], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+			g.drawString(this.tokens[this.tokenPointer + 1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+		}
+		catch (Exception e) {
+		}
+		this.next = true;
+	}
+	
+	public void tick() {
+		if (!NewInputHandler.inputsAreLocked())
+			NewInputHandler.lockInputs();
+		if (this.next) {
+			if (input.Z.isPressedDown || input.Z.isTappedDown
+				|| input.X.isTappedDown || input.X.isPressedDown
+				|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+				|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+				if (this.tokenPointer > this.tokens.length || this.tokenPointer + 1 > this.tokens.length)
+					this.hideDialog();
+				else {
+					this.tokenPointer += 2;
+				}
+			}
+		}
+	}
+
+	public void createText(String str) {
+		this.tokens = toLines(str);
+		if (this.dialogs.isEmpty())
+			this.dialogs.put(2, false);
+		if (!this.getDialogueCheckpoint(2))
+			this.showDialog = true;
+	}
+	
+	private String[] toLines(String all) {
+		ArrayList<String> lines = new ArrayList<>();
+		String[] words = all.split("\\s");
+		String line = "";
+		int length = 0;
+		for (String w : words) {
+			//			if (w.length() >= MAX_STRING_LENGTH) {
+			//				line += w;
+			//				length += w.length();
+			//				lines.add(line);
+			//			}
+			//			else 
+			if (length + w.length() + 1 > MAX_STRING_LENGTH) {
+				if (line.isEmpty())
+					line += w;
+				lines.add(line);
+				line = "";
+				length = 0;
+			}
+			if (length > 0) {
+				line += " ";
+				length += 1;
+			}
+			line += w;
+			length += w.length();
+		}
+		if (line.length() > 0) lines.add(line);
+		return lines.toArray(new String[lines.size()]);
+	}
+
 	public static final int getDialogueX() {
 		return 0;
 	}

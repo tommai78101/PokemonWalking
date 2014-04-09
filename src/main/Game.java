@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 import level.OverWorld;
 import screen.BaseScreen;
 import screen.Dialogue;
@@ -79,7 +80,8 @@ public class Game {
 		//dialogue.render(screen, 6, 0, 3, 8);
 		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		//FIXME: Need to do something about the font having to be rendered by graphics and not screen.
-		dialogue.renderTextGraphics(graphics);
+		//dialogue.renderTextGraphics(graphics);
+		dialogue.renderText(graphics);
 	}
 	
 	/**
