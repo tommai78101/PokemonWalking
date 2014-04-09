@@ -95,9 +95,9 @@ public class Dialogue {
 			}
 			if (this.next) {
 				if (input.Z.isPressedDown || input.Z.isTappedDown
-						|| input.X.isTappedDown || input.X.isPressedDown
-						|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
-						|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+					|| input.X.isTappedDown || input.X.isPressedDown
+					|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+					|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
 					if (this.totalStringPointer < this.dialogueText.length()) {
 						this.firstLineFull = false;
 						this.secondLineFull = false;
@@ -156,7 +156,9 @@ public class Dialogue {
 	public void displayDialog(String text, int dialogID) {
 		if (this.dialogs.containsKey(dialogID)) {
 			//TODO: DO SOMETHING WHEN dialogs HAVE BEEN REACHED ALREADY.
-			if (this.dialogs.get(dialogID).booleanValue()) { return; }
+			if (this.dialogs.get(dialogID).booleanValue()) {
+				return;
+			}
 		}
 		if (text != null && !text.isEmpty() && !this.showDialog) {
 			this.showDialog = true;
@@ -195,12 +197,10 @@ public class Dialogue {
 	 * Tells the Graphics object to draw text onto the screen.
 	 * 
 	 * <p>
-	 * There are many complicated situations where texts can overflow around the dialog boxes, causing it to show up glitchy. Using lots of
-	 * conditional checkings, I was able to confine the glitchiness down to a minimum.
+	 * There are many complicated situations where texts can overflow around the dialog boxes, causing it to show up glitchy. Using lots of conditional checkings, I was able to confine the glitchiness down to a minimum.
 	 * 
 	 * <p>
-	 * In order to use this, this method must be placed somewhere where there is an easy way to pass the Graphics object to this. The Graphics object
-	 * is obtained by using getDrawGraphics() from the BufferStrategy, which is created from the Canvas AWT component.
+	 * In order to use this, this method must be placed somewhere where there is an easy way to pass the Graphics object to this. The Graphics object is obtained by using getDrawGraphics() from the BufferStrategy, which is created from the Canvas AWT component.
 	 * 
 	 * @param graphics
 	 *            The Graphics object used for drawing texts using custom
@@ -215,24 +215,21 @@ public class Dialogue {
 			g.setColor(Color.black);
 			g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
 			if (this.totalStringPointer <= this.dialogueText.length()) {
-				//Handles one word sentences only.
-				if (this.stringPointer > this.dialogueText.length()) {
-					this.stringPointer = this.dialogueText.length();
-					this.next = true;
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					return;
-				}
+				//				//Handles one word sentences only.
+				//				if (this.stringPointer > this.dialogueText.length()) {
+				//					this.stringPointer = this.dialogueText.length();
+				//					this.next = true;
+				//					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+				//					return;
+				//				}
 				
 				if (this.totalStringPointer == this.dialogueText.length()) {
-					if (this.totalStringPointer <= MAX_STRING_LENGTH) {
-						g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+					if ((this.totalStringPointer - this.beginningPointer) <= MAX_STRING_LENGTH) {
+						g.drawString(this.dialogueText.substring(this.beginningPointer, this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 					}
 					else {
 						g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-						if (this.beginningPointer + this.secondLinePointer < MAX_STRING_LENGTH * 2)
-							g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-						else
-							g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 					}
 					this.next = true;
 					return;
@@ -260,7 +257,8 @@ public class Dialogue {
 				}
 				if (this.firstLineFull) {
 					//First line is full
-					if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
+
+					if (this.secondLinePointer + text.length() <= MAX_STRING_LENGTH * 2) {
 						if (this.stringPointer > text.length()) {
 							this.secondLinePointer += this.stringPointer;
 							if (this.tokenPointer < this.tokens.length - 1) {
@@ -271,6 +269,7 @@ public class Dialogue {
 					}
 					else {
 						this.secondLineFull = true;
+						this.secondLinePointer += this.stringPointer;
 					}
 					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 					if (!this.secondLineFull) {
@@ -313,5 +312,9 @@ public class Dialogue {
 	
 	public boolean isDisplayingDialogue() {
 		return this.showDialog;
+	}
+	
+	public boolean getDialogueCheckpoint(int key) {
+		return this.dialogs.get(key);
 	}
 }
