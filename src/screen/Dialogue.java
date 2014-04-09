@@ -259,9 +259,9 @@ public class Dialogue {
 				}
 				if (this.firstLineFull) {
 					//First line is full
-					int textCompare = beginningPointer;
-					if (beginningPointer > MAX_STRING_LENGTH * 2)
-						textCompare = (((beginningPointer % MAX_STRING_LENGTH) - 2) + secondLinePointer - 1) + text.length();
+					int textCompare = 0;
+					if (beginningPointer > (MAX_STRING_LENGTH+1) * 2)
+						textCompare = (((beginningPointer % (MAX_STRING_LENGTH + 1)) + secondLinePointer - 1) % MAX_STRING_LENGTH) + text.length();
 					else
 						textCompare = (((secondLinePointer % MAX_STRING_LENGTH)) - 1) + text.length();
 					if (textCompare <= MAX_STRING_LENGTH) {
