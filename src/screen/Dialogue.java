@@ -95,7 +95,6 @@ public class Dialogue {
 	 * */
 	public void hideDialog() {
 		this.showDialog = false;
-		//		this.dialogueText = null;
 		this.tokenPointer = 0;
 		this.setDialogCheckpoint();
 		NewInputHandler.unlockInputs();
@@ -110,7 +109,6 @@ public class Dialogue {
 		}
 		catch (Exception e) {
 			//Ignore. Silently catch the any sorts of exception, and just let the game flow on.
-			//this.setDialogCheckpoint();
 		}
 	}
 	

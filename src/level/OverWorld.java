@@ -118,7 +118,7 @@ public class OverWorld extends World {
 		//	dialogue.setCheckpoint(2, true);
 		//}
 		if (!dialogue.isDialogCheckpointSet(1))
-			dialogue.createText("This is a test. Something more than just a test.", 1);
+			dialogue.createText("HELOW WORLAKD", 1);
 		
 	}
 	
