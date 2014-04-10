@@ -36,84 +36,62 @@ public class Dialogue {
 	//TODO: Optimize this, to make way for other types of dialogues to use.
 	private String[] tokens;
 	private int tokenPointer;
-	private int beginningPointer;
-	private int firstLinePointer;
-	private int secondLinePointer;
-	private int totalStringPointer;
-	private boolean firstLineFull;
-	private boolean secondLineFull;
 	private Map<Integer, Boolean> dialogs;
 	private boolean next;
 	private boolean nextTick;
-	private int stringPointer;
-	private byte tickSpeed;
 	private byte arrowTickSpeed;
-	private String dialogueText;
 	private boolean showDialog;
 	
 	private Keys input;
 	
-	//public ArrayList<String> dialogueList;
-	
 	public Dialogue(Keys input) {
 		this.input = input;
-		
-		this.stringPointer = 0;
-		this.tickSpeed = 0;
 		this.arrowTickSpeed = 0;
-		this.dialogueText = null;
 		this.showDialog = false;
 		this.next = false;
 		this.nextTick = false;
-		//this.dialogueList = new ArrayList<String>();
-		
-		//this.tokens = this.dialogueText.split(" ");
 		this.tokenPointer = 0;
-		this.beginningPointer = 0;
-		this.firstLinePointer = 0;
-		this.secondLinePointer = 0;
-		this.totalStringPointer = 0;
 		this.dialogs = new HashMap<Integer, Boolean>();
 	}
 	
-	public void tick_old() {
-		if (this.showDialog) {
-			if (!NewInputHandler.inputsAreLocked())
-				NewInputHandler.lockInputs();
-			this.tickSpeed--;
-			if (this.tickSpeed < 0) {
-				if (this.totalStringPointer < this.dialogueText.length() && !this.next) {
-					this.stringPointer++;
-					this.totalStringPointer++;
-				}
-				this.tickSpeed = 0x2;
-			}
-			this.arrowTickSpeed--;
-			if (this.arrowTickSpeed < 0) {
-				this.nextTick = !this.nextTick;
-				this.arrowTickSpeed = 0x6;
-			}
-			if (this.next) {
-				if (input.Z.isPressedDown || input.Z.isTappedDown
-						|| input.X.isTappedDown || input.X.isPressedDown
-						|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
-						|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
-					if (this.totalStringPointer < this.dialogueText.length()) {
-						this.firstLineFull = false;
-						this.secondLineFull = false;
-						this.firstLinePointer = 0;
-						this.beginningPointer += this.secondLinePointer;
-						this.secondLinePointer = 0;
-						this.stringPointer = 0;
-						this.next = false;
-					}
-					else {
-						this.hideDialog();
-					}
-				}
-			}
-		}
-	}
+	//	public void tick_old() {
+	//		if (this.showDialog) {
+	//			if (!NewInputHandler.inputsAreLocked())
+	//				NewInputHandler.lockInputs();
+	//			this.tickSpeed--;
+	//			if (this.tickSpeed < 0) {
+	//				if (this.totalStringPointer < this.dialogueText.length() && !this.next) {
+	//					this.stringPointer++;
+	//					this.totalStringPointer++;
+	//				}
+	//				this.tickSpeed = 0x2;
+	//			}
+	//			this.arrowTickSpeed--;
+	//			if (this.arrowTickSpeed < 0) {
+	//				this.nextTick = !this.nextTick;
+	//				this.arrowTickSpeed = 0x6;
+	//			}
+	//			if (this.next) {
+	//				if (input.Z.isPressedDown || input.Z.isTappedDown
+	//						|| input.X.isTappedDown || input.X.isPressedDown
+	//						|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+	//						|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+	//					if (this.totalStringPointer < this.dialogueText.length()) {
+	//						this.firstLineFull = false;
+	//						this.secondLineFull = false;
+	//						this.firstLinePointer = 0;
+	//						this.beginningPointer += this.secondLinePointer;
+	//						this.secondLinePointer = 0;
+	//						this.stringPointer = 0;
+	//						this.next = false;
+	//					}
+	//					else {
+	//						this.hideDialog();
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
 	
 	public void renderDialog(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
 		if (this.showDialog) {
@@ -137,39 +115,40 @@ public class Dialogue {
 			}
 			output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 			
+			//The boolean "next" is for dialogues that are complete, and the "nextTick" is for displaying the arrow.
 			if (this.next && this.nextTick) {
 				output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
 			}
 		}
 	}
 	
-	/**
-	 * Displays a dialog box showing the text message that was passed in as a parameter. This method
-	 * can lock player's inputs while the dialog is displayed onto the screen.
-	 * 
-	 * @param text
-	 *            Pass a String string to make it display the message to the player.
-	 * @param dialogID
-	 *            This is currently unimplemented.
-	 * @return Nothing.
-	 * */
-	public void displayDialog(String text, int dialogID) {
-		if (this.dialogs.containsKey(dialogID)) {
-			//TODO: DO SOMETHING WHEN dialogs HAVE BEEN REACHED ALREADY.
-			if (this.dialogs.get(dialogID).booleanValue()) { return; }
-		}
-		if (text != null && !text.isEmpty() && !this.showDialog) {
-			this.showDialog = true;
-			this.dialogueText = text;
-			this.tokens = this.dialogueText.split("\\s");
-			this.tokenPointer = 0;
-			this.beginningPointer = 0;
-			this.firstLinePointer = 0;
-			this.secondLinePointer = 0;
-			this.totalStringPointer = 0;
-			this.dialogs.put(dialogID, false);
-		}
-	}
+	//	/**
+	//	 * Displays a dialog box showing the text message that was passed in as a parameter. This method
+	//	 * can lock player's inputs while the dialog is displayed onto the screen.
+	//	 * 
+	//	 * @param text
+	//	 *            Pass a String string to make it display the message to the player.
+	//	 * @param dialogID
+	//	 *            This is currently unimplemented.
+	//	 * @return Nothing.
+	//	 * */
+	//	public void displayDialog(String text, int dialogID) {
+	//		if (this.dialogs.containsKey(dialogID)) {
+	//			//TODO: DO SOMETHING WHEN dialogs HAVE BEEN REACHED ALREADY.
+	//			if (this.dialogs.get(dialogID).booleanValue()) { return; }
+	//		}
+	//		if (text != null && !text.isEmpty() && !this.showDialog) {
+	//			this.showDialog = true;
+	//			this.dialogueText = text;
+	//			this.tokens = this.dialogueText.split("\\s");
+	//			this.tokenPointer = 0;
+	//			this.beginningPointer = 0;
+	//			this.firstLinePointer = 0;
+	//			this.secondLinePointer = 0;
+	//			this.totalStringPointer = 0;
+	//			this.dialogs.put(dialogID, false);
+	//		}
+	//	}
 	
 	/**
 	 * Hides the dialog by making it disappear from the screen.
@@ -180,117 +159,117 @@ public class Dialogue {
 	 * */
 	public void hideDialog() {
 		this.showDialog = false;
-		this.dialogueText = null;
+		//		this.dialogueText = null;
 		this.tokenPointer = 0;
 		this.setDialogCheckpoint();
 		NewInputHandler.unlockInputs();
 	}
 	
-	/**
-	 * Tells the Graphics object to draw text onto the screen.
-	 * 
-	 * <p>
-	 * There are many complicated situations where texts can overflow around the dialog boxes, causing it to show up glitchy. Using lots of
-	 * conditional checkings, I was able to confine the glitchiness down to a minimum.
-	 * 
-	 * <p>
-	 * In order to use this, this method must be placed somewhere where there is an easy way to pass the Graphics object to this. The Graphics object
-	 * is obtained by using getDrawGraphics() from the BufferStrategy, which is created from the Canvas AWT component.
-	 * 
-	 * @param graphics
-	 *            The Graphics object used for drawing texts using custom
-	 *            fonts.
-	 * @return Nothing.
-	 * 
-	 * */
-	public void renderTextGraphics(Graphics g) {
-		if (this.dialogueText != null && !this.dialogueText.isEmpty()) {
-			//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
-			//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
-			g.setColor(Color.black);
-			g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
-			if (this.totalStringPointer <= this.dialogueText.length()) {
-				//				//Handles one word sentences only.
-				//				if (this.stringPointer > this.dialogueText.length()) {
-				//					this.stringPointer = this.dialogueText.length();
-				//					this.next = true;
-				//					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-				//					return;
-				//				}
-				
-				if (this.totalStringPointer == this.dialogueText.length()) {
-					if ((this.totalStringPointer - this.beginningPointer) <= MAX_STRING_LENGTH) {
-						g.drawString(this.dialogueText.substring(this.beginningPointer, this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					}
-					else {
-						g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-					}
-					this.next = true;
-					return;
-				}
-				
-				//Handles more than one word.
-				String text = this.tokens[this.tokenPointer];
-				if (this.firstLinePointer + text.length() <= MAX_STRING_LENGTH) {
-					if (this.stringPointer > text.length()) {
-						this.firstLinePointer += this.stringPointer;
-						if (this.tokenPointer < this.tokens.length - 1) {
-							this.tokenPointer++;
-							this.stringPointer = 0;
-						}
-						//Short sentences.
-						if (this.totalStringPointer >= this.dialogueText.length() - 1) {
-							g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-							return;
-						}
-					}
-				}
-				else {
-					if (!this.firstLineFull) {
-						this.firstLineFull = true;
-						this.secondLinePointer = this.firstLinePointer + this.stringPointer;
-					}
-				}
-				if (this.firstLineFull) {
-					//First line is full
-					int textCompare = 0;
-					if (beginningPointer > (MAX_STRING_LENGTH + 1) * 2)
-						textCompare = (((beginningPointer % (MAX_STRING_LENGTH + 1)) + secondLinePointer - 1) % MAX_STRING_LENGTH) + text.length();
-					if ((this.totalStringPointer > (MAX_STRING_LENGTH * 2) + 1) ? (textCompare <= MAX_STRING_LENGTH) : (text.length() <= MAX_STRING_LENGTH)) {
-						if (this.stringPointer > text.length()) {
-							this.secondLinePointer += this.stringPointer;
-							if (this.secondLinePointer >= MAX_STRING_LENGTH * 2) {
-								//Subtract 2 space characters from the (first + second lines) character total.
-								this.secondLineFull = true;
-							}
-							if (this.tokenPointer < this.tokens.length - 1) {
-								this.tokenPointer++;
-								this.stringPointer = 0;
-							}
-						}
-					}
-					else {
-						this.secondLineFull = true;
-						if (this.stringPointer > 0)
-							this.secondLinePointer += this.stringPointer;
-					}
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					if (!this.secondLineFull) {
-						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-					}
-					else {
-						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-						this.next = true;
-					}
-				}
-				else {
-					//First line isn't full
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-				}
-			}
-		}
-	}
+	//	/**
+	//	 * Tells the Graphics object to draw text onto the screen.
+	//	 * 
+	//	 * <p>
+	//	 * There are many complicated situations where texts can overflow around the dialog boxes, causing it to show up glitchy. Using lots of
+	//	 * conditional checkings, I was able to confine the glitchiness down to a minimum.
+	//	 * 
+	//	 * <p>
+	//	 * In order to use this, this method must be placed somewhere where there is an easy way to pass the Graphics object to this. The Graphics object
+	//	 * is obtained by using getDrawGraphics() from the BufferStrategy, which is created from the Canvas AWT component.
+	//	 * 
+	//	 * @param graphics
+	//	 *            The Graphics object used for drawing texts using custom
+	//	 *            fonts.
+	//	 * @return Nothing.
+	//	 * 
+	//	 * */
+	//	public void renderTextGraphics(Graphics g) {
+	//		if (this.dialogueText != null && !this.dialogueText.isEmpty()) {
+	//			//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
+	//			//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
+	//			g.setColor(Color.black);
+	//			g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
+	//			if (this.totalStringPointer <= this.dialogueText.length()) {
+	//				//				//Handles one word sentences only.
+	//				//				if (this.stringPointer > this.dialogueText.length()) {
+	//				//					this.stringPointer = this.dialogueText.length();
+	//				//					this.next = true;
+	//				//					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+	//				//					return;
+	//				//				}
+	//				
+	//				if (this.totalStringPointer == this.dialogueText.length()) {
+	//					if ((this.totalStringPointer - this.beginningPointer) <= MAX_STRING_LENGTH) {
+	//						g.drawString(this.dialogueText.substring(this.beginningPointer, this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+	//					}
+	//					else {
+	//						g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+	//						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.totalStringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+	//					}
+	//					this.next = true;
+	//					return;
+	//				}
+	//				
+	//				//Handles more than one word.
+	//				String text = this.tokens[this.tokenPointer];
+	//				if (this.firstLinePointer + text.length() <= MAX_STRING_LENGTH) {
+	//					if (this.stringPointer > text.length()) {
+	//						this.firstLinePointer += this.stringPointer;
+	//						if (this.tokenPointer < this.tokens.length - 1) {
+	//							this.tokenPointer++;
+	//							this.stringPointer = 0;
+	//						}
+	//						//Short sentences.
+	//						if (this.totalStringPointer >= this.dialogueText.length() - 1) {
+	//							g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+	//							return;
+	//						}
+	//					}
+	//				}
+	//				else {
+	//					if (!this.firstLineFull) {
+	//						this.firstLineFull = true;
+	//						this.secondLinePointer = this.firstLinePointer + this.stringPointer;
+	//					}
+	//				}
+	//				if (this.firstLineFull) {
+	//					//First line is full
+	//					int textCompare = 0;
+	//					if (beginningPointer > (MAX_STRING_LENGTH + 1) * 2)
+	//						textCompare = (((beginningPointer % (MAX_STRING_LENGTH + 1)) + secondLinePointer - 1) % MAX_STRING_LENGTH) + text.length();
+	//					if ((this.totalStringPointer > (MAX_STRING_LENGTH * 2) + 1) ? (textCompare <= MAX_STRING_LENGTH) : (text.length() <= MAX_STRING_LENGTH)) {
+	//						if (this.stringPointer > text.length()) {
+	//							this.secondLinePointer += this.stringPointer;
+	//							if (this.secondLinePointer >= MAX_STRING_LENGTH * 2) {
+	//								//Subtract 2 space characters from the (first + second lines) character total.
+	//								this.secondLineFull = true;
+	//							}
+	//							if (this.tokenPointer < this.tokens.length - 1) {
+	//								this.tokenPointer++;
+	//								this.stringPointer = 0;
+	//							}
+	//						}
+	//					}
+	//					else {
+	//						this.secondLineFull = true;
+	//						if (this.stringPointer > 0)
+	//							this.secondLinePointer += this.stringPointer;
+	//					}
+	//					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+	//					if (!this.secondLineFull) {
+	//						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+	//					}
+	//					else {
+	//						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+	//						this.next = true;
+	//					}
+	//				}
+	//				else {
+	//					//First line isn't full
+	//					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+	//				}
+	//			}
+	//		}
+	//	}
 	
 	private int firstLineIterator;
 	private int secondLineIterator;
@@ -310,8 +289,6 @@ public class Dialogue {
 	}
 	
 	public void tick() {
-		if (!NewInputHandler.inputsAreLocked())
-			NewInputHandler.lockInputs();
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown
 					|| input.X.isTappedDown || input.X.isPressedDown
@@ -345,6 +322,8 @@ public class Dialogue {
 			}
 		}
 		if (this.showDialog) {
+			if (!NewInputHandler.inputsAreLocked())
+				NewInputHandler.lockInputs();
 			boolean result1 = false, result2 = false;
 			try {
 				if (this.firstLineIterator < this.tokens[this.tokenPointer].length())
@@ -373,6 +352,8 @@ public class Dialogue {
 		}
 		else {
 			this.firstLineIterator = this.secondLineIterator = 0;
+			if (NewInputHandler.inputsAreLocked())
+				NewInputHandler.unlockInputs();
 		}
 	}
 	
