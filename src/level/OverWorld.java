@@ -2,7 +2,6 @@ package level;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import screen.BaseScreen;
 import screen.Dialogue;
 import abstracts.Tile;
@@ -118,10 +117,9 @@ public class OverWorld extends World {
 		//if (dialogue.isDisplayingDialogue()) {
 		//	dialogue.setCheckpoint(2, true);
 		//}
-		dialogue.createText("abcdefghijklmnopqr abcdefghijklmnopqr abcdefghijklmnopqr abcdefghijklmnopqr abcdefghijklmnopqr abcdefghijklmnopqr");
-		if (dialogue.isDisplayingDialogue()) {
-			dialogue.setCheckpoint(2, true);
-		}
+		if (!dialogue.isDialogCheckpointSet(1))
+			dialogue.createText("This is a test. Something more than just a test.", 1);
+		
 	}
 	
 	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {
@@ -140,7 +138,7 @@ public class OverWorld extends World {
 		if (dialogue.isDisplayingDialogue()) {
 			screen.enableRenderHalf();
 		}
-
+		
 		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
 		this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
@@ -157,7 +155,7 @@ public class OverWorld extends World {
 		
 		screen.disableRenderHalf();
 		dialogue.renderDialog(screen, 0, 6, 9, 2);
-
+		
 	}
 	
 	//	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {

@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
 import main.Keys;
 import main.MainComponent;
 import main.NewInputHandler;
@@ -96,9 +95,9 @@ public class Dialogue {
 			}
 			if (this.next) {
 				if (input.Z.isPressedDown || input.Z.isTappedDown
-					|| input.X.isTappedDown || input.X.isPressedDown
-					|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
-					|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+						|| input.X.isTappedDown || input.X.isPressedDown
+						|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+						|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
 					if (this.totalStringPointer < this.dialogueText.length()) {
 						this.firstLineFull = false;
 						this.secondLineFull = false;
@@ -157,9 +156,7 @@ public class Dialogue {
 	public void displayDialog(String text, int dialogID) {
 		if (this.dialogs.containsKey(dialogID)) {
 			//TODO: DO SOMETHING WHEN dialogs HAVE BEEN REACHED ALREADY.
-			if (this.dialogs.get(dialogID).booleanValue()) {
-				return;
-			}
+			if (this.dialogs.get(dialogID).booleanValue()) { return; }
 		}
 		if (text != null && !text.isEmpty() && !this.showDialog) {
 			this.showDialog = true;
@@ -184,24 +181,21 @@ public class Dialogue {
 	public void hideDialog() {
 		this.showDialog = false;
 		this.dialogueText = null;
+		this.tokenPointer = 0;
+		this.setDialogCheckpoint();
 		NewInputHandler.unlockInputs();
-	}
-	
-	//
-	public void setCheckpoint(int dialogID, boolean value) {
-		if (this.dialogs.containsKey(dialogID)) {
-			this.dialogs.put(dialogID, value);
-		}
 	}
 	
 	/**
 	 * Tells the Graphics object to draw text onto the screen.
 	 * 
 	 * <p>
-	 * There are many complicated situations where texts can overflow around the dialog boxes, causing it to show up glitchy. Using lots of conditional checkings, I was able to confine the glitchiness down to a minimum.
+	 * There are many complicated situations where texts can overflow around the dialog boxes, causing it to show up glitchy. Using lots of
+	 * conditional checkings, I was able to confine the glitchiness down to a minimum.
 	 * 
 	 * <p>
-	 * In order to use this, this method must be placed somewhere where there is an easy way to pass the Graphics object to this. The Graphics object is obtained by using getDrawGraphics() from the BufferStrategy, which is created from the Canvas AWT component.
+	 * In order to use this, this method must be placed somewhere where there is an easy way to pass the Graphics object to this. The Graphics object
+	 * is obtained by using getDrawGraphics() from the BufferStrategy, which is created from the Canvas AWT component.
 	 * 
 	 * @param graphics
 	 *            The Graphics object used for drawing texts using custom
@@ -298,16 +292,21 @@ public class Dialogue {
 		}
 	}
 	
+	private int firstLineIterator;
+	private int secondLineIterator;
+	private int dialogKeyID;
+	
 	public void renderText(Graphics g) {
 		g.setColor(Color.black);
 		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
 		try {
-			g.drawString(this.tokens[this.tokenPointer], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-			g.drawString(this.tokens[this.tokenPointer + 1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+			g.drawString(this.tokens[this.tokenPointer].substring(0, this.firstLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+			g.drawString(this.tokens[this.tokenPointer + 1].substring(0, secondLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 		}
 		catch (Exception e) {
+			//Ignore. Silently catch the any sorts of exception, and just let the game flow on.
+			//this.setDialogCheckpoint();
 		}
-		this.next = true;
 	}
 	
 	public void tick() {
@@ -315,24 +314,77 @@ public class Dialogue {
 			NewInputHandler.lockInputs();
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown
-				|| input.X.isTappedDown || input.X.isPressedDown
-				|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
-				|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
-				if (this.tokenPointer > this.tokens.length || this.tokenPointer + 1 > this.tokens.length)
+					|| input.X.isTappedDown || input.X.isPressedDown
+					|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+					|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+				this.next = false;
+				boolean result1 = false, result2 = false;
+				try {
+					this.tokens[this.tokenPointer].length();
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					result1 = true;
+				}
+				try {
+					this.tokens[this.tokenPointer + 1].length();
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
+					result2 = true;
+				}
+				if (result1 || result2)
 					this.hideDialog();
 				else {
 					this.tokenPointer += 2;
+					this.firstLineIterator = this.secondLineIterator = 0;
 				}
 			}
+			this.arrowTickSpeed--;
+			if (this.arrowTickSpeed < 0) {
+				this.nextTick = !this.nextTick;
+				this.arrowTickSpeed = 0x6;
+			}
+		}
+		if (this.showDialog) {
+			boolean result1 = false, result2 = false;
+			try {
+				if (this.firstLineIterator < this.tokens[this.tokenPointer].length())
+					this.firstLineIterator++;
+				else {
+					this.tokens[this.tokenPointer + 1].length();
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException e) {
+				result1 = true;
+			}
+			try {
+				if (this.secondLineIterator >= this.tokens[this.tokenPointer + 1].length()) {
+					this.next = true;
+				}
+				else {
+					if (this.secondLineIterator < this.tokens[this.tokenPointer + 1].length() && this.firstLineIterator >= this.tokens[this.tokenPointer].length())
+						this.secondLineIterator++;
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException e) {
+				result2 = true;
+			}
+			if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length)
+				this.next = true;
+		}
+		else {
+			this.firstLineIterator = this.secondLineIterator = 0;
 		}
 	}
-
-	public void createText(String str) {
+	
+	public void createText(String str, int key) {
 		this.tokens = toLines(str);
-		if (this.dialogs.isEmpty())
-			this.dialogs.put(2, false);
-		if (!this.getDialogueCheckpoint(2))
-			this.showDialog = true;
+		if (!this.dialogs.isEmpty()) {
+			if (!this.getDialogueCheckpoint(this.dialogKeyID))
+				this.showDialog = true;
+		}
+		else {
+			this.setDialogKeyID(key);
+		}
 	}
 	
 	private String[] toLines(String all) {
@@ -341,15 +393,13 @@ public class Dialogue {
 		String line = "";
 		int length = 0;
 		for (String w : words) {
-			//			if (w.length() >= MAX_STRING_LENGTH) {
-			//				line += w;
-			//				length += w.length();
-			//				lines.add(line);
-			//			}
-			//			else 
 			if (length + w.length() + 1 > MAX_STRING_LENGTH) {
-				if (line.isEmpty())
+				if (w.length() >= MAX_STRING_LENGTH) {
 					line += w;
+					lines.add(line);
+					line = "";
+					continue;
+				}
 				lines.add(line);
 				line = "";
 				length = 0;
@@ -361,10 +411,28 @@ public class Dialogue {
 			line += w;
 			length += w.length();
 		}
-		if (line.length() > 0) lines.add(line);
+		if (line.length() > 0)
+			lines.add(line);
 		return lines.toArray(new String[lines.size()]);
 	}
-
+	
+	public void setDialogKeyID(int value) {
+		this.dialogKeyID = value;
+		this.dialogs.put(value, false);
+	}
+	
+	public void setDialogCheckpoint() {
+		this.dialogs.put(this.dialogKeyID, true);
+	}
+	
+	public boolean isDialogCheckpointSet(int key) {
+		if (this.dialogs.isEmpty())
+			return false;
+		return this.dialogs.get(key);
+	}
+	
+	//-------------------------  STATIC FINAL METHODS ONLY -------------------------------
+	
 	public static final int getDialogueX() {
 		return 0;
 	}
