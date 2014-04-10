@@ -34,6 +34,7 @@ Metadata...........................[PWD04]
 		Warp Point.................[PWD04#03@04]
 		Area Connection Point......[PWD04#03@05]
 		Stairs.....................[PWD04#03@06]
+		Sign.......................[PWD04#03@07]
 Player.............................[PWD05]
 Controls...........................[PWD06]
 	Walking Algorithm..............[PWD06#01]
@@ -625,6 +626,24 @@ not assume their information to be permanent.
 		
 		
 		Conclusion: Triggers are a necessity.	
+		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~		
+		
+		Sign [PWD04#03@07]
+		
+		Tile ID:
+			A: 08 - Sign
+		Extended Tile ID:
+			R: 00 - None specified
+		Tile Specific ID:
+			G: 00 - None specified.
+			B: 00 - None specified.
+		Full Data(s):
+			08 00 00 00
+		Description:
+			Sign post. Players can interact with sign posts by pressing the action
+			key, "Z" or "/". This will show up a dialogue of the text written on
+			the sign.
 			
 -------------------------------
 
