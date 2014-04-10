@@ -72,6 +72,7 @@ public class Area {
 				
 				try {
 					//Up, Down, Left, Right
+					//TODO: Fix player facing. Interactions need player facing. Else, it's wonky.
 					this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
 				}
 				catch (Exception e) {
@@ -263,10 +264,13 @@ public class Area {
 					return false;
 				case 0x06:
 					return false;
-				case 0x07:
+				case 0x07: //Water
 					//TODO: Add something that detects a special boolean value
 					//in order to let the player move on water.
 					return false;
+				case 0x08: //Sign
+					this.player.interact(data.getColor());
+					return true;
 				default: //Any other type of tiles.
 					return false;
 			}

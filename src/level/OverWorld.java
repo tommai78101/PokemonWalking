@@ -26,8 +26,12 @@ public class OverWorld extends World {
 	 *            Takes a Player object. The overworld then loads all related properties in respect to the Player object.
 	 * */
 	public OverWorld(Player player, Dialogue dialogue) {
-		//Must initialize all overworld specific properties, such as specific areas, specific dialogues, etc. first.		
-		initialize();
+		//There should be a maximum number of areas available for the OverWorld.
+		//All areas defined must be placed in WorldConstants.
+		this.areas = WorldConstants.getAllAreas();
+		
+		//Overworld properties
+		this.invertBitmapColors = false;
 		
 		//Player
 		this.player = player;
@@ -43,17 +47,6 @@ public class OverWorld extends World {
 		
 		//Dialogue
 		this.dialogue = dialogue;
-	}
-	
-	public void initialize() {
-		//There should be a maximum number of areas available for the OverWorld.
-		//All areas defined must be placed in WorldConstants.
-		
-		//TODO: Make it so that all areas are connected together.
-		this.areas = WorldConstants.getAllAreas();
-		
-		//Overworld properties
-		this.invertBitmapColors = false;
 	}
 	
 	//Will add this in the future. Currently, the only entity is Player.
@@ -118,7 +111,16 @@ public class OverWorld extends World {
 		//	dialogue.setCheckpoint(2, true);
 		//}
 		//if (!dialogue.isDialogCheckpointSet(1))
-		dialogue.createText(1);
+		
+		//TODO: Fix the awkward interaction caused by so many states not working properly.
+		if (dialogue.isDoneDisplayingDialogue()) {
+			this.player.stopInteraction();
+			dialogue.reset();
+		}
+		else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
+			if (!dialogue.isDisplayingDialogue())
+				dialogue.createText(this.player.getInteractionID());
+		}
 		
 	}
 	

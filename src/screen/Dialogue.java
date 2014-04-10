@@ -50,6 +50,7 @@ public class Dialogue {
 	
 	private ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("res/dialogue/dialogue.txt");
 	private DialogueText currentDialogue;
+	private boolean doneDisplayingDialogue;
 	
 	private Keys input;
 	
@@ -118,9 +119,10 @@ public class Dialogue {
 		this.showDialog = false;
 		this.tokenPointer = 0;
 		//this.setDialogCheckpoint();
-		this.currentDialogue.checkpoint = true;
+		//this.currentDialogue.checkpoint = true; 
+		//TODO: Checkpoints are for specific game goals that players had reached.
+		this.doneDisplayingDialogue = true;
 		this.currentDialogue = null;
-		NewInputHandler.unlockInputs();
 	}
 	
 	/**
@@ -196,8 +198,6 @@ public class Dialogue {
 			}
 		}
 		if (this.showDialog) {
-			if (!NewInputHandler.inputsAreLocked())
-				NewInputHandler.lockInputs();
 			boolean result1 = false, result2 = false;
 			try {
 				if (this.firstLineIterator < this.tokens[this.tokenPointer].length())
@@ -250,7 +250,7 @@ public class Dialogue {
 	 *            Dialogue ID, used to differentiate dialogues from others.
 	 * @return Nothing.
 	 * */
-	public void createText(int key) {
+	public void createText(int interactionID) {
 		//		this.tokens = toLines(str);
 		//		if (!this.dialogs.isEmpty()) {
 		//			if (!this.getDialogueCheckpoint(this.dialogKeyID))
@@ -260,27 +260,41 @@ public class Dialogue {
 		//			this.setDialogKeyID(key);
 		//			this.showDialog = true;
 		//		}
+		//		
+		//		if (this.dialogues.isEmpty()) {
+		//			this.dialogues = Dialogue.loadDialogues("res/dialogue/dialogue.txt");
+		//		}
 		
-		if (this.dialogues.isEmpty())
-			return;
-		DialogueText temp = null;
-		for (int i = 0; i < this.dialogues.size(); i++) {
-			try {
-				temp = this.dialogues.get(i);
-				if (currentDialogue == null)
-					currentDialogue = temp;
-				else if (currentDialogue != null && temp.dialogueID != currentDialogue.dialogueID)
-					currentDialogue = temp;
-				if (!currentDialogue.checkpoint) {
-					this.tokens = toLines(currentDialogue.dialogueMessage);
-					this.showDialog = true;
-					break;
-				}
-				else
-					continue;
-			}
-			catch (Exception e) {
-				continue;
+		//TODO: Player interacting with anything, will trigger dialogue, according to
+		//pixel data the player is interacting with.
+		//		DialogueText temp = null;
+		//		for (int i = 0; i < this.dialogues.size(); i++) {
+		//			try {
+		//				temp = this.dialogues.get(i);
+		//				if (currentDialogue == null)
+		//					currentDialogue = temp;
+		//				else if (currentDialogue != null && temp.dialogueID != currentDialogue.dialogueID)
+		//					currentDialogue = temp;
+		//				if (!currentDialogue.checkpoint) {
+		//					this.tokens = toLines(currentDialogue.dialogueMessage);
+		//					this.showDialog = true;
+		//					break;
+		//				}
+		//				else
+		//					continue;
+		//			}
+		//			catch (Exception e) {
+		//				continue;
+		//			}
+		//		}
+		
+		for (DialogueText dt : this.dialogues) {
+			if (dt.dialogueID == interactionID) {
+				this.currentDialogue = dt;
+				this.tokens = toLines(dt.dialogueMessage);
+				this.showDialog = true;
+				this.doneDisplayingDialogue = false;
+				break;
 			}
 		}
 	}
@@ -314,9 +328,9 @@ public class Dialogue {
 	 * @see #setDialogKeyID(int)
 	 * 
 	 * */
-	public void setDialogCheckpoint() {
-		//this.dialogs.put(this.dialogKeyID, true);
-	}
+	//	public void setDialogCheckpoint() {
+	//		//this.dialogs.put(this.dialogKeyID, true);
+	//	}
 	
 	/**
 	 * Checks to see if the dialogue checkpoint has been set.
@@ -336,9 +350,18 @@ public class Dialogue {
 		return this.showDialog;
 	}
 	
+	public boolean isDoneDisplayingDialogue() {
+		return this.doneDisplayingDialogue;
+	}
+	
 	//	public boolean getDialogueCheckpoint(int key) {
 	//		return this.dialogs.get(key);
 	//	}
+	
+	public void reset() {
+		this.showDialog = false;
+		this.doneDisplayingDialogue = false;
+	}
 	
 	//-------------------------  STATIC FINAL METHODS ONLY -------------------------------
 	
@@ -367,10 +390,9 @@ public class Dialogue {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(filename));
 			String line = null;
-			DialogueText text = null;
+			DialogueText text = new DialogueText();
 			String[] tokens;
 			while ((line = reader.readLine()) != null) {
-				text = new DialogueText();
 				text.checkpoint = false;
 				if (line.startsWith("#")) {
 					//Dialogue ID
@@ -381,12 +403,11 @@ public class Dialogue {
 					tokens = line.split("@");
 					text.dialogueMessage = tokens[1];
 				}
-				else {
+				if (text.dialogueID != 0 && text.dialogueMessage != null) {
 					result.add(text);
+					text = new DialogueText();
 				}
 			}
-			if (line == null)
-				result.add(text);
 			return result;
 		}
 		catch (FileNotFoundException e) {

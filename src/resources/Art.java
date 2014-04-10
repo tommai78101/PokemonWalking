@@ -55,6 +55,7 @@ public class Art {
 	public static BaseBitmap stairs_mt_top;
 	public static BaseBitmap stairs_mt_right;
 	public static BaseBitmap stairs_mt_bottom;
+	public static BaseBitmap sign;
 	
 	//Area
 	public static BaseBitmap testArea;
@@ -94,6 +95,7 @@ public class Art {
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
+		sign = screen.load("art/wall/sign.png");
 		
 		//Ledges
 		ledge_bottom = screen.load("art/wall/ledge_bottom.png");

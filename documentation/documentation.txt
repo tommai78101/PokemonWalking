@@ -629,21 +629,23 @@ not assume their information to be permanent.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~		
 		
-		Sign [PWD04#03@07]
+		Sign [PWD04#03@08]
 		
 		Tile ID:
 			A: 08 - Sign
 		Extended Tile ID:
 			R: 00 - None specified
 		Tile Specific ID:
-			G: 00 - None specified.
-			B: 00 - None specified.
+			G: 00 - Dialogue ID.
+			B: 00 - Dialogue ID.
 		Full Data(s):
-			08 00 00 00
+			08 00 0000
 		Description:
 			Sign post. Players can interact with sign posts by pressing the action
 			key, "Z" or "/". This will show up a dialogue of the text written on
 			the sign.
+			
+			WARNING: Dialogue ID must not equal to 0, or 0x0000. This is reserved.
 			
 -------------------------------
 

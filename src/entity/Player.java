@@ -2,6 +2,7 @@ package entity;
 
 import level.Area;
 import main.Keys;
+import main.NewInputHandler;
 import resources.Art;
 import screen.BaseScreen;
 import abstracts.Entity;
@@ -41,6 +42,9 @@ public class Player extends Entity {
 	boolean lockJumping;
 	boolean[] facingsBlocked = new boolean[4];
 	boolean isInWater;
+	
+	int interactionID;
+	boolean enableInteraction;
 	
 	boolean jumpHeightSignedFlag = false;
 	int varyingJumpHeight = 0;
@@ -451,6 +455,35 @@ public class Player extends Entity {
 	
 	public void leavesWater() {
 		this.isInWater = false;
+	}
+	
+	public void interact(int dataColor) {
+		if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
+			this.enableInteraction = false;
+			return;
+		}
+		if (this.keys.Z.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isTappedDown || this.keys.SLASH.isPressedDown) {
+			if (!this.enableInteraction) {
+				this.interactionID = dataColor & 0xFFFF;
+				this.enableInteraction = true;
+				if (!NewInputHandler.inputsAreLocked())
+					NewInputHandler.lockInputs();
+			}
+		}
+	}
+	
+	public void stopInteraction() {
+		this.enableInteraction = false;
+		this.interactionID = 0;
+		NewInputHandler.unlockInputs();
+	}
+	
+	public int getInteractionID() {
+		return this.interactionID;
+	}
+	
+	public boolean isInteracting() {
+		return this.enableInteraction;
 	}
 	
 	//-------------------------------------------------------------------------------------
