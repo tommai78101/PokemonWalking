@@ -3,9 +3,12 @@ package screen;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import level.DialogueText;
 import main.Keys;
 import main.MainComponent;
 import main.NewInputHandler;
@@ -36,7 +39,7 @@ public class Dialogue {
 	//TODO: Optimize this, to make way for other types of dialogues to use.
 	private String[] tokens;
 	private int tokenPointer;
-	private Map<Integer, Boolean> dialogs;
+	//private Map<Integer, Boolean> dialogs;
 	private boolean next;
 	private boolean nextTick;
 	private byte arrowTickSpeed;
@@ -44,6 +47,9 @@ public class Dialogue {
 	private int firstLineIterator;
 	private int secondLineIterator;
 	private int dialogKeyID;
+	
+	private ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("res/dialogue/dialogue.txt");
+	private DialogueText currentDialogue;
 	
 	private Keys input;
 	
@@ -54,7 +60,7 @@ public class Dialogue {
 		this.next = false;
 		this.nextTick = false;
 		this.tokenPointer = 0;
-		this.dialogs = new HashMap<Integer, Boolean>();
+		//this.dialogs = new HashMap<Integer, Boolean>();
 	}
 	
 	/**
@@ -111,7 +117,9 @@ public class Dialogue {
 	public void hideDialog() {
 		this.showDialog = false;
 		this.tokenPointer = 0;
-		this.setDialogCheckpoint();
+		//this.setDialogCheckpoint();
+		this.currentDialogue.checkpoint = true;
+		this.currentDialogue = null;
 		NewInputHandler.unlockInputs();
 	}
 	
@@ -242,15 +250,38 @@ public class Dialogue {
 	 *            Dialogue ID, used to differentiate dialogues from others.
 	 * @return Nothing.
 	 * */
-	public void createText(String str, int key) {
-		this.tokens = toLines(str);
-		if (!this.dialogs.isEmpty()) {
-			if (!this.getDialogueCheckpoint(this.dialogKeyID))
-				this.showDialog = true;
-		}
-		else {
-			this.setDialogKeyID(key);
-			this.showDialog = true;
+	public void createText(int key) {
+		//		this.tokens = toLines(str);
+		//		if (!this.dialogs.isEmpty()) {
+		//			if (!this.getDialogueCheckpoint(this.dialogKeyID))
+		//				this.showDialog = true;
+		//		}
+		//		else {
+		//			this.setDialogKeyID(key);
+		//			this.showDialog = true;
+		//		}
+		
+		if (this.dialogues.isEmpty())
+			return;
+		DialogueText temp = null;
+		for (int i = 0; i < this.dialogues.size(); i++) {
+			try {
+				temp = this.dialogues.get(i);
+				if (currentDialogue == null)
+					currentDialogue = temp;
+				else if (currentDialogue != null && temp.dialogueID != currentDialogue.dialogueID)
+					currentDialogue = temp;
+				if (!currentDialogue.checkpoint) {
+					this.tokens = toLines(currentDialogue.dialogueMessage);
+					this.showDialog = true;
+					break;
+				}
+				else
+					continue;
+			}
+			catch (Exception e) {
+				continue;
+			}
 		}
 	}
 	
@@ -267,7 +298,7 @@ public class Dialogue {
 	 * */
 	public void setDialogKeyID(int value) {
 		this.dialogKeyID = value;
-		this.dialogs.put(value, false);
+		//this.dialogs.put(value, false);
 	}
 	
 	/**
@@ -284,7 +315,7 @@ public class Dialogue {
 	 * 
 	 * */
 	public void setDialogCheckpoint() {
-		this.dialogs.put(this.dialogKeyID, true);
+		//this.dialogs.put(this.dialogKeyID, true);
 	}
 	
 	/**
@@ -295,11 +326,19 @@ public class Dialogue {
 	 * @return True, if the dialogue of the dialogue ID given has been set. False, if there are no
 	 *         checkpoints set, or if the dialogue of the dialogue ID given has not been set.
 	 * */
-	public boolean isDialogCheckpointSet(int key) {
-		if (this.dialogs.isEmpty())
-			return false;
-		return this.dialogs.get(key);
+	//	public boolean isDialogCheckpointSet(int key) {
+	//		if (this.dialogs.isEmpty())
+	//			return false;
+	//		return this.dialogs.get(key);
+	//	}
+	
+	public boolean isDisplayingDialogue() {
+		return this.showDialog;
 	}
+	
+	//	public boolean getDialogueCheckpoint(int key) {
+	//		return this.dialogs.get(key);
+	//	}
 	
 	//-------------------------  STATIC FINAL METHODS ONLY -------------------------------
 	
@@ -323,12 +362,40 @@ public class Dialogue {
 		return (Dialogue.getDialogueY() * MainComponent.GAME_SCALE) + Dialogue.SECOND_LINE_SPACING_HEIGHT * MainComponent.GAME_SCALE + Dialogue.FONT_SIZE;
 	}
 	
-	public boolean isDisplayingDialogue() {
-		return this.showDialog;
-	}
-	
-	public boolean getDialogueCheckpoint(int key) {
-		return this.dialogs.get(key);
+	public static ArrayList<DialogueText> loadDialogues(String filename) {
+		ArrayList<DialogueText> result = new ArrayList<DialogueText>();
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			String line = null;
+			DialogueText text = null;
+			String[] tokens;
+			while ((line = reader.readLine()) != null) {
+				text = new DialogueText();
+				text.checkpoint = false;
+				if (line.startsWith("#")) {
+					//Dialogue ID
+					tokens = line.split("#");
+					text.dialogueID = Integer.valueOf(tokens[1]);
+				}
+				else if (line.startsWith("@")) {
+					tokens = line.split("@");
+					text.dialogueMessage = tokens[1];
+				}
+				else {
+					result.add(text);
+				}
+			}
+			if (line == null)
+				result.add(text);
+			return result;
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	//----------------------- PRIVATE METHODS ONLY ------------------------------------------

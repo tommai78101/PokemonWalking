@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
-
 import level.PixelData;
 import level.WorldConstants;
 import resources.Art;
@@ -16,7 +15,7 @@ public class BaseScreen extends BaseBitmap {
 	protected BufferedImage image;
 	protected int xOffset;
 	protected int yOffset;
-
+	
 	private byte invertTick = 0x7;
 	private boolean cutScreen;
 	
@@ -28,6 +27,7 @@ public class BaseScreen extends BaseBitmap {
 	
 	public void loadResources() {
 		Art.loadAllResources(this);
+		//Dialogue.loadDialogues("res/dialogue/dialogue.txt");
 	}
 	
 	public BufferedImage getBufferedImage() {
@@ -188,7 +188,7 @@ public class BaseScreen extends BaseBitmap {
 	public boolean isRenderingHalf() {
 		return this.cutScreen;
 	}
-
+	
 	//-------------------------------------------
 	//Private methods
 	
