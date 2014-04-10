@@ -57,6 +57,21 @@ public class Dialogue {
 		this.dialogs = new HashMap<Integer, Boolean>();
 	}
 	
+	/**
+	 * Renders the dialogue box.
+	 * 
+	 * @param output
+	 *            A BaseScreen object that the rendered tiles be blit to.
+	 * @param x
+	 *            The dialogue box's X coordinate.
+	 * @param y
+	 *            The dialogue box's Y coordinate.
+	 * @param centerWidth
+	 *            The dialogue box's width.
+	 * @param centerHeight
+	 *            The dialogue box's height.
+	 * @return Nothing.
+	 * */
 	public void renderDialog(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
 		if (this.showDialog) {
 			output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
@@ -100,6 +115,19 @@ public class Dialogue {
 		NewInputHandler.unlockInputs();
 	}
 	
+	/**
+	 * Renders the text onto the screen.
+	 * 
+	 * <p>
+	 * This method must be called after the Graphics object has been obtained from BufferStrategy.
+	 * 
+	 * <p>
+	 * There is a slight exception handling abuse. That is done to make sure all dialogue lines have been drawn.
+	 * 
+	 * @param g
+	 *            The Graphics object obtained from the BufferStrategy.
+	 * @return Nothing.
+	 * */
 	public void renderText(Graphics g) {
 		g.setColor(Color.black);
 		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
@@ -112,6 +140,15 @@ public class Dialogue {
 		}
 	}
 	
+	/**
+	 * Updates the dialogues on a per-tick basis.
+	 * 
+	 * <p>
+	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when
+	 * displaying dialogues. More information can be found by reading the comments in this method code.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void tick() {
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown
@@ -124,12 +161,17 @@ public class Dialogue {
 					this.tokens[this.tokenPointer].length();
 				}
 				catch (ArrayIndexOutOfBoundsException e) {
+					//If (N+1)th line doesn't exist, then the dialogue has already
+					//been completed.
 					result1 = true;
 				}
 				try {
 					this.tokens[this.tokenPointer + 1].length();
 				}
 				catch (ArrayIndexOutOfBoundsException e) {
+					//If (N+1)th line doesn't exist, then this doesn't exist.
+					//However, if (N+1)th do exist, there's a chance that this line may
+					//not exist. We check just to make sure.
 					result2 = true;
 				}
 				if (result1 || result2)
@@ -153,6 +195,10 @@ public class Dialogue {
 				if (this.firstLineIterator < this.tokens[this.tokenPointer].length())
 					this.firstLineIterator++;
 				else {
+					//This is done to check to see if there exist a (N+1)th line in the entire dialogue.
+					//If it didn't exist, set result1 to true, so that the game knows the first
+					//line is finished.
+					//Abusing the exception handling.
 					this.tokens[this.tokenPointer + 1].length();
 				}
 			}
@@ -169,6 +215,9 @@ public class Dialogue {
 				}
 			}
 			catch (ArrayIndexOutOfBoundsException e) {
+				//Since there can only be cases where (N+2)th line exists but not (N+2)th line,
+				//and cases where the (N+2)th line has finished.
+				//Therefore, it returns true in both cases.
 				result2 = true;
 			}
 			if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length)
@@ -181,6 +230,18 @@ public class Dialogue {
 		}
 	}
 	
+	/**
+	 * Creates a set of lines for use with the dialogues from a given dialogue message.
+	 * 
+	 * <p>
+	 * Messages must be full dialogues.
+	 * 
+	 * @param str
+	 *            Dialogue message to be used for dialogues in the game.
+	 * @param key
+	 *            Dialogue ID, used to differentiate dialogues from others.
+	 * @return Nothing.
+	 * */
 	public void createText(String str, int key) {
 		this.tokens = toLines(str);
 		if (!this.dialogs.isEmpty()) {
@@ -189,18 +250,51 @@ public class Dialogue {
 		}
 		else {
 			this.setDialogKeyID(key);
+			this.showDialog = true;
 		}
 	}
 	
+	/**
+	 * Prepares the dialogue checkpoint of the dialogue ID given.
+	 * 
+	 * <p>
+	 * This is usually paired with {@link #setDialogCheckpoint()}.
+	 * 
+	 * @param value
+	 *            The dialogue ID of the current dialogue.
+	 * @return Nothing.
+	 * @see #setDialogCheckpoint()
+	 * */
 	public void setDialogKeyID(int value) {
 		this.dialogKeyID = value;
 		this.dialogs.put(value, false);
 	}
 	
+	/**
+	 * Sets the dialogue checkpoint to true.
+	 * 
+	 * <p>
+	 * This must be used when the current dialogue has completed, or when a checkpoint in the game has been set.
+	 * 
+	 * <p>
+	 * This must be used after when {@link #setDialogKeyID(int)} has been called.
+	 * 
+	 * @return Nothing.
+	 * @see #setDialogKeyID(int)
+	 * 
+	 * */
 	public void setDialogCheckpoint() {
 		this.dialogs.put(this.dialogKeyID, true);
 	}
 	
+	/**
+	 * Checks to see if the dialogue checkpoint has been set.
+	 * 
+	 * @param key
+	 *            The dialogue ID used to identify the dialogue needed to check.
+	 * @return True, if the dialogue of the dialogue ID given has been set. False, if there are no
+	 *         checkpoints set, or if the dialogue of the dialogue ID given has not been set.
+	 * */
 	public boolean isDialogCheckpointSet(int key) {
 		if (this.dialogs.isEmpty())
 			return false;
