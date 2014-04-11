@@ -3,11 +3,14 @@ package screen;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import level.DialogueText;
 import main.Keys;
 import main.MainComponent;
-import main.NewInputHandler;
 import resources.Art;
 import abstracts.Tile;
 
@@ -32,90 +35,48 @@ public class Dialogue {
 	//Styles
 	public static final int DIALOGUE_STYLE_SPEECH = 0xF1;
 	
-	private int stringPointer;
-	private byte tickSpeed;
-	private byte arrowTickSpeed;
-	private String dialogueText;
-	private boolean showDialog;
-	private boolean next;
-	private boolean nextTick;
-	
 	//TODO: Optimize this, to make way for other types of dialogues to use.
 	private String[] tokens;
 	private int tokenPointer;
-	private int beginningPointer;
-	private int firstLinePointer;
-	private int secondLinePointer;
-	private int totalStringPointer;
-	private boolean firstLineFull;
-	private boolean secondLineFull;
-	private Map<Integer, Boolean> dialogs;
+	//private Map<Integer, Boolean> dialogs;
+	private boolean next;
+	private boolean nextTick;
+	private byte arrowTickSpeed;
+	private byte repeatDialogueTick;
+	private boolean showDialog;
+	private int firstLineIterator;
+	private int secondLineIterator;
+	private ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("dialogue/dialogue.txt");
+	private boolean doneDisplayingDialogue;
 	
 	private Keys input;
 	
-	//public ArrayList<String> dialogueList;
-	
 	public Dialogue(Keys input) {
 		this.input = input;
-		
-		this.stringPointer = 0;
-		this.tickSpeed = 0;
 		this.arrowTickSpeed = 0;
-		this.dialogueText = null;
 		this.showDialog = false;
 		this.next = false;
 		this.nextTick = false;
-		//this.dialogueList = new ArrayList<String>();
-		
-		//this.tokens = this.dialogueText.split(" ");
 		this.tokenPointer = 0;
-		this.beginningPointer = 0;
-		this.firstLinePointer = 0;
-		this.secondLinePointer = 0;
-		this.totalStringPointer = 0;
-		this.dialogs = new HashMap<Integer, Boolean>();
+		//this.dialogs = new HashMap<Integer, Boolean>();
 	}
 	
-	public void tick() {
-		if (this.showDialog) {
-			if (!NewInputHandler.inputsAreLocked())
-				NewInputHandler.lockInputs();
-			this.tickSpeed--;
-			if (this.tickSpeed < 0) {
-				if (this.totalStringPointer < this.dialogueText.length() && !this.next) {
-					this.stringPointer++;
-					this.totalStringPointer++;
-				}
-				this.tickSpeed = 0x2;
-			}
-			this.arrowTickSpeed--;
-			if (this.arrowTickSpeed < 0) {
-				this.nextTick = !this.nextTick;
-				this.arrowTickSpeed = 0x6;
-			}
-			if (this.next) {
-				if (input.Z.isPressedDown || input.Z.isTappedDown
-						|| input.X.isTappedDown || input.X.isPressedDown
-						|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
-						|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
-					if (this.totalStringPointer < this.dialogueText.length()) {
-						this.firstLineFull = false;
-						this.secondLineFull = false;
-						this.firstLinePointer = 0;
-						this.beginningPointer += this.secondLinePointer;
-						this.secondLinePointer = 0;
-						this.stringPointer = 0;
-						this.next = false;
-					}
-					else {
-						this.hideDialog();
-					}
-				}
-			}
-		}
-	}
-	
-	public void render(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+	/**
+	 * Renders the dialogue box.
+	 * 
+	 * @param output
+	 *            A BaseScreen object that the rendered tiles be blit to.
+	 * @param x
+	 *            The dialogue box's X coordinate.
+	 * @param y
+	 *            The dialogue box's Y coordinate.
+	 * @param centerWidth
+	 *            The dialogue box's width.
+	 * @param centerHeight
+	 *            The dialogue box's height.
+	 * @return Nothing.
+	 * */
+	public void renderDialog(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
 		if (this.showDialog) {
 			output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
 			for (int i = 0; i < centerWidth - 1; i++) {
@@ -137,128 +98,253 @@ public class Dialogue {
 			}
 			output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 			
+			//The boolean "next" is for dialogues that are complete, and the "nextTick" is for displaying the arrow.
 			if (this.next && this.nextTick) {
 				output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
 			}
 		}
 	}
 	
-	public void displayDialog(String text, int dialogID) {
-		if (this.dialogs.containsKey(dialogID)) {
-			//TODO: DO SOMETHING WHEN dialogs HAVE BEEN REACHED ALREADY.
-			if (this.dialogs.get(dialogID).booleanValue()) { return; }
-		}
-		if (text != null && !text.isEmpty()) {
-			this.showDialog = true;
-			this.dialogueText = text;
-			this.tokens = this.dialogueText.split(" ");
-			this.tokenPointer = 0;
-			this.beginningPointer = 0;
-			this.firstLinePointer = 0;
-			this.secondLinePointer = 0;
-			this.totalStringPointer = 0;
-			this.dialogs.put(dialogID, false);
-		}
-	}
-	
+	/**
+	 * Hides the dialog by making it disappear from the screen.
+	 * 
+	 * This method is used to hide the dialog box and allow back the player's inputs.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void hideDialog() {
 		this.showDialog = false;
-		this.dialogueText = null;
-		NewInputHandler.unlockInputs();
+		this.tokenPointer = 0;
+		//this.setDialogCheckpoint();
+		//this.currentDialogue.checkpoint = true; 
+		//TODO: Checkpoints are for specific game goals that players had reached.
+		this.doneDisplayingDialogue = true;
+		this.repeatDialogueTick = 0xF;
 	}
 	
-	public void setCheckpoint(int dialogID, boolean value) {
-		if (this.dialogs.containsKey(dialogID)) {
-			this.dialogs.put(dialogID, value);
+	/**
+	 * Renders the text onto the screen.
+	 * 
+	 * <p>
+	 * This method must be called after the Graphics object has been obtained from BufferStrategy.
+	 * 
+	 * <p>
+	 * There is a slight exception handling abuse. That is done to make sure all dialogue lines have been drawn.
+	 * 
+	 * @param g
+	 *            The Graphics object obtained from the BufferStrategy.
+	 * @return Nothing.
+	 * */
+	public void renderText(Graphics g) {
+		g.setColor(Color.black);
+		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
+		try {
+			g.drawString(this.tokens[this.tokenPointer].substring(0, this.firstLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+			g.drawString(this.tokens[this.tokenPointer + 1].substring(0, secondLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+		}
+		catch (Exception e) {
+			//Ignore. Silently catch the any sorts of exception, and just let the game flow on.
 		}
 	}
 	
-	public void renderTextGraphics(Graphics g) {
-		if (this.dialogueText != null && !this.dialogueText.isEmpty()) {
-			//The game uses 8f FONT when shown on the screen. It is scaled by GAME_SCALE.
-			//Text are drawn with positive X = RIGHT, positive Y = UP. Not the other way around.
-			g.setColor(Color.black);
-			g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
-			if (this.totalStringPointer <= this.dialogueText.length()) {
-				//Handles one word sentences only.
-				if (this.stringPointer > this.dialogueText.length()) {
-					this.stringPointer = this.dialogueText.length();
-					this.next = true;
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					return;
+	/**
+	 * Updates the dialogues on a per-tick basis.
+	 * 
+	 * <p>
+	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when
+	 * displaying dialogues. More information can be found by reading the comments in this method code.
+	 * 
+	 * @return Nothing.
+	 * */
+	public void tick() {
+		if (this.next) {
+			if (input.Z.isPressedDown || input.Z.isTappedDown
+					|| input.X.isTappedDown || input.X.isPressedDown
+					|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+					|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+				this.next = false;
+				boolean result1 = false, result2 = false;
+				try {
+					this.tokens[this.tokenPointer].length();
 				}
-				
-				if (this.totalStringPointer == this.dialogueText.length()) {
-					this.next = true;
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.dialogueText.length()), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-					return;
+				catch (ArrayIndexOutOfBoundsException e) {
+					//If (N+1)th line doesn't exist, then the dialogue has already
+					//been completed.
+					result1 = true;
 				}
-				
-				if (this.firstLineFull && this.secondLineFull) {
-					this.next = true;
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-					return;
+				try {
+					this.tokens[this.tokenPointer + 1].length();
 				}
-				
-				//Handles more than one word.
-				String text = this.tokens[this.tokenPointer];
-				if (this.firstLinePointer + text.length() <= MAX_STRING_LENGTH) {
-					if (this.stringPointer > text.length()) {
-						this.firstLinePointer += this.stringPointer;
-						this.secondLinePointer = this.firstLinePointer;
-						if (this.tokenPointer < this.tokens.length - 1) {
-							this.tokenPointer++;
-							this.stringPointer = 0;
-						}
-						//Short sentences.
-						if (this.totalStringPointer >= this.dialogueText.length() - 1) {
-							g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-							return;
-						}
-					}
+				catch (ArrayIndexOutOfBoundsException e) {
+					//If (N+1)th line doesn't exist, then this doesn't exist.
+					//However, if (N+1)th do exist, there's a chance that this line may
+					//not exist. We check just to make sure.
+					result2 = true;
 				}
+				if (result1 || result2)
+					this.hideDialog();
 				else {
-					this.firstLineFull = true;
-					//this.secondLinePointer = this.firstLinePointer;
-				}
-				if (this.firstLineFull) {
-					if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
-						if (this.stringPointer > text.length()) {
-							this.secondLinePointer += this.stringPointer;
-							if (this.tokenPointer < this.tokens.length - 1) {
-								this.tokenPointer++;
-								this.stringPointer = 0;
-							}
-						}
-					}
-					else {
-						this.secondLineFull = true;
-					}
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-					if (!this.secondLineFull) {
-						if (this.secondLinePointer + text.length() < MAX_STRING_LENGTH * 2) {
-							g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-						}
-					}
-					else {
-						g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-						this.next = true;
-					}
-				}
-				else {
-					g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer + this.stringPointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+					this.tokenPointer += 2;
+					this.firstLineIterator = this.secondLineIterator = 0;
 				}
 			}
-			else {
+			this.arrowTickSpeed--;
+			if (this.arrowTickSpeed < 0) {
+				this.nextTick = !this.nextTick;
+				this.arrowTickSpeed = 0x6;
+			}
+		}
+		if (this.showDialog) {
+			boolean result1 = false, result2 = false;
+			try {
+				if (this.firstLineIterator < this.tokens[this.tokenPointer].length())
+					this.firstLineIterator++;
+				else {
+					//This is done to check to see if there exist a (N+1)th line in the entire dialogue.
+					//If it didn't exist, set result1 to true, so that the game knows the first
+					//line is finished.
+					//Abusing the exception handling.
+					this.tokens[this.tokenPointer + 1].length();
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException e) {
+				result1 = true;
+			}
+			try {
+				if (this.secondLineIterator >= this.tokens[this.tokenPointer + 1].length()) {
+					this.next = true;
+				}
+				else {
+					if (this.secondLineIterator < this.tokens[this.tokenPointer + 1].length() && this.firstLineIterator >= this.tokens[this.tokenPointer].length())
+						this.secondLineIterator++;
+				}
+			}
+			catch (ArrayIndexOutOfBoundsException e) {
+				//Since there can only be cases where (N+2)th line exists but not (N+2)th line,
+				//and cases where the (N+2)th line has finished.
+				//Therefore, it returns true in both cases.
+				result2 = true;
+			}
+			if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length)
 				this.next = true;
-				g.drawString(this.dialogueText.substring(this.beginningPointer, this.beginningPointer + this.firstLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-				g.drawString(this.dialogueText.substring(this.beginningPointer + this.firstLinePointer, this.beginningPointer + this.secondLinePointer), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-				return;
+		}
+		else {
+			this.firstLineIterator = this.secondLineIterator = 0;
+		}
+		if (this.repeatDialogueTick > 0)
+			this.repeatDialogueTick--;
+	}
+	
+	/**
+	 * Creates a set of lines for use with the dialogues from a given dialogue message.
+	 * 
+	 * <p>
+	 * Messages must be full dialogues.
+	 * 
+	 * @param str
+	 *            Dialogue message to be used for dialogues in the game.
+	 * @param key
+	 *            Dialogue ID, used to differentiate dialogues from others.
+	 * @return Nothing.
+	 * */
+	public void createText(int interactionID) {
+		//		this.tokens = toLines(str);
+		//		if (!this.dialogs.isEmpty()) {
+		//			if (!this.getDialogueCheckpoint(this.dialogKeyID))
+		//				this.showDialog = true;
+		//		}
+		//		else {
+		//			this.setDialogKeyID(key);
+		//			this.showDialog = true;
+		//		}
+		//		
+		//		if (this.dialogues.isEmpty()) {
+		//			this.dialogues = Dialogue.loadDialogues("res/dialogue/dialogue.txt");
+		//		}
+		
+		//TODO: Player interacting with anything, will trigger dialogue, according to
+		//pixel data the player is interacting with.
+		//		DialogueText temp = null;
+		//		for (int i = 0; i < this.dialogues.size(); i++) {
+		//			try {
+		//				temp = this.dialogues.get(i);
+		//				if (currentDialogue == null)
+		//					currentDialogue = temp;
+		//				else if (currentDialogue != null && temp.dialogueID != currentDialogue.dialogueID)
+		//					currentDialogue = temp;
+		//				if (!currentDialogue.checkpoint) {
+		//					this.tokens = toLines(currentDialogue.dialogueMessage);
+		//					this.showDialog = true;
+		//					break;
+		//				}
+		//				else
+		//					continue;
+		//			}
+		//			catch (Exception e) {
+		//				continue;
+		//			}
+		//		}
+		
+		for (DialogueText dt : this.dialogues) {
+			if (dt.dialogueID == interactionID) {
+				this.tokens = toLines(dt.dialogueMessage);
+				this.showDialog = true;
+				this.doneDisplayingDialogue = false;
+				break;
 			}
 		}
 	}
+	
+	/**
+	 * Sets the dialogue checkpoint to true.
+	 * 
+	 * <p>
+	 * This must be used when the current dialogue has completed, or when a checkpoint in the game has been set.
+	 * 
+	 * <p>
+	 * This must be used after when {@link #setDialogKeyID(int)} has been called.
+	 * 
+	 * @return Nothing.
+	 * @see #setDialogKeyID(int)
+	 * 
+	 * */
+	//	public void setDialogCheckpoint() {
+	//		//this.dialogs.put(this.dialogKeyID, true);
+	//	}
+	
+	/**
+	 * Checks to see if the dialogue checkpoint has been set.
+	 * 
+	 * @param key
+	 *            The dialogue ID used to identify the dialogue needed to check.
+	 * @return True, if the dialogue of the dialogue ID given has been set. False, if there are no
+	 *         checkpoints set, or if the dialogue of the dialogue ID given has not been set.
+	 * */
+	//	public boolean isDialogCheckpointSet(int key) {
+	//		if (this.dialogs.isEmpty())
+	//			return false;
+	//		return this.dialogs.get(key);
+	//	}
+	
+	public boolean isDisplayingDialogue() {
+		return this.showDialog;
+	}
+	
+	public boolean isDoneDisplayingDialogue() {
+		return this.doneDisplayingDialogue;
+	}
+	
+	//	public boolean getDialogueCheckpoint(int key) {
+	//		return this.dialogs.get(key);
+	//	}
+	
+	public void reset() {
+		this.showDialog = false;
+		if (this.repeatDialogueTick <= 0)
+			this.doneDisplayingDialogue = false;
+	}
+	
+	//-------------------------  STATIC FINAL METHODS ONLY -------------------------------
 	
 	public static final int getDialogueX() {
 		return 0;
@@ -280,7 +366,68 @@ public class Dialogue {
 		return (Dialogue.getDialogueY() * MainComponent.GAME_SCALE) + Dialogue.SECOND_LINE_SPACING_HEIGHT * MainComponent.GAME_SCALE + Dialogue.FONT_SIZE;
 	}
 	
-	public boolean isDisplayingDialogue() {
-		return this.showDialog;
+	public static ArrayList<DialogueText> loadDialogues(String filename) {
+		ArrayList<DialogueText> result = new ArrayList<DialogueText>();
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(Dialogue.class.getClassLoader().getResourceAsStream(filename)));
+			String line = null;
+			DialogueText text = new DialogueText();
+			String[] tokens;
+			while ((line = reader.readLine()) != null) {
+				text.checkpoint = false;
+				if (line.startsWith("#")) {
+					//Dialogue ID
+					tokens = line.split("#");
+					text.dialogueID = Integer.valueOf(tokens[1]);
+				}
+				else if (line.startsWith("@")) {
+					tokens = line.split("@");
+					text.dialogueMessage = tokens[1];
+				}
+				else if (line.isEmpty() || line.trim().equals("")) {
+					result.add(text);
+					text = new DialogueText();
+				}
+			}
+			return result;
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	//----------------------- PRIVATE METHODS ONLY ------------------------------------------
+	
+	private String[] toLines(String all) {
+		ArrayList<String> lines = new ArrayList<>();
+		String[] words = all.split("\\s");
+		String line = "";
+		int length = 0;
+		for (String w : words) {
+			if (length + w.length() + 1 > MAX_STRING_LENGTH) {
+				if (w.length() >= MAX_STRING_LENGTH) {
+					line += w;
+					lines.add(line);
+					line = "";
+					continue;
+				}
+				lines.add(line);
+				line = "";
+				length = 0;
+			}
+			if (length > 0) {
+				line += " ";
+				length += 1;
+			}
+			line += w;
+			length += w.length();
+		}
+		if (line.length() > 0)
+			lines.add(line);
+		return lines.toArray(new String[lines.size()]);
 	}
 }

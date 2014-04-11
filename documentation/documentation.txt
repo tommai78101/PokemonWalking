@@ -34,6 +34,7 @@ Metadata...........................[PWD04]
 		Warp Point.................[PWD04#03@04]
 		Area Connection Point......[PWD04#03@05]
 		Stairs.....................[PWD04#03@06]
+		Sign.......................[PWD04#03@07]
 Player.............................[PWD05]
 Controls...........................[PWD06]
 	Walking Algorithm..............[PWD06#01]
@@ -578,6 +579,73 @@ not assume their information to be permanent.
 			07 04 00 00
 		Description:
 			Represents water.
+			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Dialogue ID stuffs:
+		* Needs an action in order to initiate a trigger.
+		* Cannot use Tiles to mark dialogue triggers.
+		* Needs to separate what is dialogue and what is an object/obstacle/entity.
+		* Needs to rewrite some portions of the code.
+		
+		Dialogue Plans:
+		
+		* Create a rendering box using BufferedImage and Graphics. Use BufferedImage
+			own getDrawGraphics() to obtain the Graphics object.
+		* Obtain Graphics2D from Graphics. Use that to draw custom fonts.
+		* When drawing the image, the image must be at the location where both
+			the dialog box and the text are to be drawn at.
+		* When drawing the text, the text must complete two lines, before allowing
+			the player to click "Next". After that, the text must scroll upwards
+			to allow the next line to appear in the dialog box.
+		* Can use punctuation symbols to act like delimiters.These delimiters can be
+			used to tell the game when the dialogue should scroll up, or change next
+			paragraphs.
+		* A person of multiple paragraphs need some data format to store/access
+			them. 
+		* Create the ability to increase/decrease the text speed. tickCount is necessary.
+		* (Optional) Create the ability to change text border designs.
+		
+		
+		
+		
+		New Proposal:
+		* Delegate some Pixel Data stuffs into Triggers.
+		* New area, new sector  ---> Triggers.
+		* Pixel Data should be reserved for map related tiles.
+		* Pixel Data should allow items to be placed. When picked ---> Triggers.
+		* Triggers can allow certain areas to be restricted. Only allow players
+			when the conditions are met.
+		* Triggers can activate plot related events, such as NPCs rushing towards
+			player and speak using dialogues.  ----->  Triggers are an expansion
+			of Pixel Data.
+		* Battle sequences can be triggered by checking for "trigger battle"
+			conditions.
+		* Items can be given by using triggers.
+		* Items can be taken away by using triggers.
+		
+		
+		Conclusion: Triggers are a necessity.	
+		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~		
+		
+		Sign [PWD04#03@08]
+		
+		Tile ID:
+			A: 08 - Sign
+		Extended Tile ID:
+			R: 00 - None specified
+		Tile Specific ID:
+			G: 00 - Dialogue ID.
+			B: 00 - Dialogue ID.
+		Full Data(s):
+			08 00 0000
+		Description:
+			Sign post. Players can interact with sign posts by pressing the action
+			key, "Z" or "/". This will show up a dialogue of the text written on
+			the sign.
+			
+			WARNING: Dialogue ID must not equal to 0, or 0x0000. This is reserved.
 			
 -------------------------------
 

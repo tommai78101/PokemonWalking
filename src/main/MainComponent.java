@@ -18,7 +18,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import resources.Art;
 import screen.BaseScreen;
 
 public class MainComponent extends Canvas implements Runnable {
@@ -240,7 +239,7 @@ public class MainComponent extends Canvas implements Runnable {
 		game.render(g);
 		
 		//Key input debugging only.
-		debugKeys(g, 0, 30);
+		//debugKeys(g, 0, 30);
 		
 		g.dispose();
 		bufferStrategy.show();
@@ -277,29 +276,29 @@ public class MainComponent extends Canvas implements Runnable {
 	 * @see BufferStrategy
 	 * @see Graphics
 	 * */
-	private void debugKeys(Graphics g, int x, int y) {
-		g.setColor(Color.black);
-		g.setFont(Art.font);
-		if (keys.up.isTappedDown)
-			g.drawString("up tapped", x, y);
-		else if (keys.up.isPressedDown)
-			g.drawString("up pressed", x, y);
-		
-		if (keys.left.isTappedDown)
-			g.drawString("left tapped", x, y);
-		else if (keys.left.isPressedDown)
-			g.drawString("left pressed", x, y);
-		
-		if (keys.down.isTappedDown)
-			g.drawString("down tapped", x, y);
-		else if (keys.down.isPressedDown)
-			g.drawString("down pressed", x, y);
-		
-		if (keys.right.isTappedDown)
-			g.drawString("right tapped", x, y);
-		else if (keys.right.isPressedDown)
-			g.drawString("right pressed", x, y);
-	}
+	//	private void debugKeys(Graphics g, int x, int y) {
+	//		g.setColor(Color.black);
+	//		g.setFont(Art.font);
+	//		if (keys.up.isTappedDown)
+	//			g.drawString("up tapped", x, y);
+	//		else if (keys.up.isPressedDown)
+	//			g.drawString("up pressed", x, y);
+	//		
+	//		if (keys.left.isTappedDown)
+	//			g.drawString("left tapped", x, y);
+	//		else if (keys.left.isPressedDown)
+	//			g.drawString("left pressed", x, y);
+	//		
+	//		if (keys.down.isTappedDown)
+	//			g.drawString("down tapped", x, y);
+	//		else if (keys.down.isPressedDown)
+	//			g.drawString("down pressed", x, y);
+	//		
+	//		if (keys.right.isTappedDown)
+	//			g.drawString("right tapped", x, y);
+	//		else if (keys.right.isPressedDown)
+	//			g.drawString("right pressed", x, y);
+	//	}
 	
 	/**
 	 * Creates a BufferedImage that is compatible with the graphics card the player is currently using.

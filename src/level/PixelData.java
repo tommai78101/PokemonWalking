@@ -263,6 +263,10 @@ public class PixelData {
 				}
 				break;
 			}
+			case 0x08:
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.sign;
+				break;
 			default: //Any other type of tiles.
 				break;
 		}
@@ -378,10 +382,13 @@ public class PixelData {
 				break;
 			case 0x06: //Stairs
 				break;
-			case 0x07:
+			case 0x07: //Water
 				//TODO: Needs to do something with this. It must not block the player, however, without
 				//special boolean value, it will always block player from advancing.
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+			case 0x08: //Sign
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				break;
 			default:
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;

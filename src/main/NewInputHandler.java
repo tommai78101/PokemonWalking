@@ -55,7 +55,8 @@ public class NewInputHandler implements KeyListener {
 	public void keyPressed(KeyEvent event) {
 		int code = event.getKeyCode();
 		if (inputLock) {
-			if (code != KeyEvent.VK_Z && code != KeyEvent.VK_X && code != KeyEvent.VK_SLASH && code != KeyEvent.VK_PERIOD) { return; }
+			if (code != KeyEvent.VK_Z && code != KeyEvent.VK_X && code != KeyEvent.VK_SLASH && code != KeyEvent.VK_PERIOD)
+				return;
 		}
 		for (Key v : mappings.keySet()) {
 			if (mappings.get(v) == code) {

@@ -26,8 +26,12 @@ public class OverWorld extends World {
 	 *            Takes a Player object. The overworld then loads all related properties in respect to the Player object.
 	 * */
 	public OverWorld(Player player, Dialogue dialogue) {
-		//Must initialize all overworld specific properties, such as specific areas, specific dialogues, etc. first.		
-		initialize();
+		//There should be a maximum number of areas available for the OverWorld.
+		//All areas defined must be placed in WorldConstants.
+		this.areas = WorldConstants.getAllAreas();
+		
+		//Overworld properties
+		this.invertBitmapColors = false;
 		
 		//Player
 		this.player = player;
@@ -43,17 +47,6 @@ public class OverWorld extends World {
 		
 		//Dialogue
 		this.dialogue = dialogue;
-	}
-	
-	public void initialize() {
-		//There should be a maximum number of areas available for the OverWorld.
-		//All areas defined must be placed in WorldConstants.
-		
-		//TODO: Make it so that all areas are connected together.
-		this.areas = WorldConstants.getAllAreas();
-		
-		//Overworld properties
-		this.invertBitmapColors = false;
 	}
 	
 	//Will add this in the future. Currently, the only entity is Player.
@@ -112,10 +105,24 @@ public class OverWorld extends World {
 			}
 			
 		}
-		dialogue.displayDialog("Hello World. Press Z, X, /, or . to continue. For the next release, I'll be cleaning up the codes. No more features until then.", 1);
-		if (dialogue.isDisplayingDialogue()) {
-			dialogue.setCheckpoint(1, true);
+		//dialogue.displayDialog("Hello World. Press Z, X, /, or . to continue. For the next release, I'll be cleaning up the codes. No more features until then.", 1);
+		//dialogue.displayDialog("Hello World. I'm coming for you. Yeah!", 2);
+		//if (dialogue.isDisplayingDialogue()) {
+		//	dialogue.setCheckpoint(2, true);
+		//}
+		//if (!dialogue.isDialogCheckpointSet(1))
+		
+		//TODO: Fix the awkward interaction caused by so many states not working properly.
+		if (dialogue.isDoneDisplayingDialogue()) {
+			dialogue.reset();
+			this.player.stopInteraction();
 		}
+		else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
+			if (!dialogue.isDisplayingDialogue()) {
+				dialogue.createText(this.player.getInteractionID());
+			}
+		}
+		
 	}
 	
 	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {
@@ -131,6 +138,10 @@ public class OverWorld extends World {
 		//OverWorld offsets are not set.
 		//Setting area offsets with player positions
 		
+		if (dialogue.isDisplayingDialogue()) {
+			screen.enableRenderHalf();
+		}
+		
 		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
 		this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
@@ -145,7 +156,9 @@ public class OverWorld extends World {
 		if (screen.getInvertTick() < (byte) 0x4 || screen.getInvertTick() >= (byte) 0x7)
 			player.render(screen, 0, 0);
 		
-		dialogue.render(screen, 0, 6, 9, 2);
+		screen.disableRenderHalf();
+		dialogue.renderDialog(screen, 0, 6, 9, 2);
+		
 	}
 	
 	//	private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {

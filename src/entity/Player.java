@@ -2,6 +2,7 @@ package entity;
 
 import level.Area;
 import main.Keys;
+import main.NewInputHandler;
 import resources.Art;
 import screen.BaseScreen;
 import abstracts.Entity;
@@ -18,14 +19,6 @@ public class Player extends Entity {
 	byte animationTick = 0;
 	byte animationPointer = 0;
 	
-	//Not yet used.
-	//	public enum AnimationType {
-	//		WALKING
-	//	};
-	//	
-	//	AnimationType animationType;
-	//--------------------------------------------------------------------------
-	
 	//These are based on the art sprite in the resource folder. The numbers are used to get elements from a 2D array.
 	int facing = 0;
 	int lastFacing = 0;
@@ -41,6 +34,9 @@ public class Player extends Entity {
 	boolean lockJumping;
 	boolean[] facingsBlocked = new boolean[4];
 	boolean isInWater;
+	
+	int interactionID;
+	boolean enableInteraction;
 	
 	boolean jumpHeightSignedFlag = false;
 	int varyingJumpHeight = 0;
@@ -453,6 +449,47 @@ public class Player extends Entity {
 		this.isInWater = false;
 	}
 	
+	public void interact(int dataColor) {
+		int alpha = (dataColor >> 24) & 0xFF;
+		switch (alpha) {
+			case 0x08: {
+				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
+					this.enableInteraction = false;
+					NewInputHandler.unlockInputs();
+				}
+				if (this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) {
+					this.enableInteraction = true;
+				}
+				if (this.enableInteraction) {
+					this.interactionID = dataColor & 0xFFFF;
+				}
+				break;
+			}
+			default:
+				stopInteraction();
+				break;
+		}
+	}
+	
+	public void stopInteraction() {
+		this.enableInteraction = false;
+		this.interactionID = 0;
+		NewInputHandler.unlockInputs();
+	}
+	
+	public int getInteractionID() {
+		return this.interactionID;
+	}
+	
+	public boolean isInteracting() {
+		return this.enableInteraction;
+	}
+	
+	public void stopAnimation() {
+		this.animationTick = 0;
+		this.animationPointer = 0;
+	}
+	
 	//-------------------------------------------------------------------------------------
 	//Private methods
 	
@@ -578,9 +615,14 @@ public class Player extends Entity {
 	@Override
 	public void tick() {
 		if (!this.lockJumping) {
-			walk();
-			handleMovementCheck();
-			controlTick();
+			if (!this.enableInteraction) {
+				walk();
+				handleMovementCheck();
+				controlTick();
+			}
+			else {
+				stopAnimation();
+			}
 		}
 		else
 			jump();
