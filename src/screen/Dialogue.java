@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import level.DialogueText;
 import main.Keys;
 import main.MainComponent;
-import main.NewInputHandler;
 import resources.Art;
 import abstracts.Tile;
 
@@ -43,6 +42,7 @@ public class Dialogue {
 	private boolean next;
 	private boolean nextTick;
 	private byte arrowTickSpeed;
+	private byte repeatDialogueTick;
 	private boolean showDialog;
 	private int firstLineIterator;
 	private int secondLineIterator;
@@ -123,6 +123,7 @@ public class Dialogue {
 		//TODO: Checkpoints are for specific game goals that players had reached.
 		this.doneDisplayingDialogue = true;
 		this.currentDialogue = null;
+		this.repeatDialogueTick = 0xF;
 	}
 	
 	/**
@@ -233,9 +234,9 @@ public class Dialogue {
 		}
 		else {
 			this.firstLineIterator = this.secondLineIterator = 0;
-			if (NewInputHandler.inputsAreLocked())
-				NewInputHandler.unlockInputs();
 		}
+		if (this.repeatDialogueTick > 0)
+			this.repeatDialogueTick--;
 	}
 	
 	/**
@@ -360,7 +361,8 @@ public class Dialogue {
 	
 	public void reset() {
 		this.showDialog = false;
-		this.doneDisplayingDialogue = false;
+		if (this.repeatDialogueTick <= 0)
+			this.doneDisplayingDialogue = false;
 	}
 	
 	//-------------------------  STATIC FINAL METHODS ONLY -------------------------------

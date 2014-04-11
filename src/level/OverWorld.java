@@ -114,12 +114,14 @@ public class OverWorld extends World {
 		
 		//TODO: Fix the awkward interaction caused by so many states not working properly.
 		if (dialogue.isDoneDisplayingDialogue()) {
-			this.player.stopInteraction();
 			dialogue.reset();
+			this.player.stopInteraction();
 		}
 		else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
-			if (!dialogue.isDisplayingDialogue())
+			if (!dialogue.isDisplayingDialogue()) {
+				this.player.startInteraction();
 				dialogue.createText(this.player.getInteractionID());
+			}
 		}
 		
 	}

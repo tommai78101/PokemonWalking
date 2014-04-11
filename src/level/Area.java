@@ -70,13 +70,31 @@ public class Area {
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
 				
-				try {
-					//Up, Down, Left, Right
-					//TODO: Fix player facing. Interactions need player facing. Else, it's wonky.
-					this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
-				}
-				catch (Exception e) {
-					this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
+				//try {
+				//Up, Down, Left, Right
+				//TODO: Fix player facing. Interactions need player facing. Else, it's wonky.
+				
+				//Not sure why there has to be two instances of the same method call.
+				this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
+				//}
+				//catch (Exception e) {
+				//	this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
+				//}
+				if (this.player.isInteracting()) {
+					switch (this.player.getFacing()) {
+						case Player.UP:
+							this.player.interact(areaData.get(this.yPlayerPosition - 1).get(xPlayerPosition).getColor());
+							break;
+						case Player.DOWN:
+							this.player.interact(areaData.get(this.yPlayerPosition + 1).get(xPlayerPosition).getColor());
+							break;
+						case Player.LEFT:
+							this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition - 1).getColor());
+							break;
+						case Player.RIGHT:
+							this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition + 1).getColor());
+							break;
+					}
 				}
 				
 				//Target pixel is used to determine what pixel the player is currently standing on

@@ -460,16 +460,15 @@ public class Player extends Entity {
 	public void interact(int dataColor) {
 		if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 			this.enableInteraction = false;
-			return;
 		}
-		if (this.keys.Z.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isTappedDown || this.keys.SLASH.isPressedDown) {
-			if (!this.enableInteraction) {
-				this.interactionID = dataColor & 0xFFFF;
-				this.enableInteraction = true;
-				if (!NewInputHandler.inputsAreLocked())
-					NewInputHandler.lockInputs();
-			}
+		if (this.enableInteraction) {
+			this.interactionID = dataColor & 0xFFFF;
 		}
+	}
+	
+	public void startInteraction() {
+		if (!NewInputHandler.inputsAreLocked())
+			NewInputHandler.lockInputs();
 	}
 	
 	public void stopInteraction() {
@@ -611,9 +610,15 @@ public class Player extends Entity {
 	@Override
 	public void tick() {
 		if (!this.lockJumping) {
-			walk();
-			handleMovementCheck();
-			controlTick();
+			if (this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) {
+				this.enableInteraction = true;
+			}
+			else {
+				this.enableInteraction = false;
+				walk();
+				handleMovementCheck();
+				controlTick();
+			}
 		}
 		else
 			jump();
