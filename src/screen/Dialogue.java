@@ -405,7 +405,7 @@ public class Dialogue {
 					tokens = line.split("@");
 					text.dialogueMessage = tokens[1];
 				}
-				if (text.dialogueID != 0 && text.dialogueMessage != null) {
+				else if (line.isEmpty() || line.trim().equals("")) {
 					result.add(text);
 					text = new DialogueText();
 				}
