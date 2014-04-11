@@ -647,6 +647,29 @@ not assume their information to be permanent.
 			
 			WARNING: Dialogue ID must not equal to 0, or 0x0000. This is reserved.
 			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		House
+		
+		* Create tiles that are related to building structures.
+		* Each building structures are dependent on one another.
+		* Warp point must have a door.
+		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		NPCs
+		
+		* Don't know how they are to be placed on a map.
+		* Don't know how to control them via AI.
+		* Need to have its own animation.
+		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Items
+		
+		*Objects the player is able to interact with.
+		* Requires player inventory and inventory management system.
+			
 -------------------------------
 
 Player [PWD05]
