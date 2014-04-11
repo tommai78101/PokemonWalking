@@ -80,21 +80,27 @@ public class Area {
 				//catch (Exception e) {
 				//	this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
 				//}
-				if (this.player.isInteracting()) {
-					switch (this.player.getFacing()) {
-						case Player.UP:
-							this.player.interact(areaData.get(this.yPlayerPosition - 1).get(xPlayerPosition).getColor());
-							break;
-						case Player.DOWN:
-							this.player.interact(areaData.get(this.yPlayerPosition + 1).get(xPlayerPosition).getColor());
-							break;
-						case Player.LEFT:
-							this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition - 1).getColor());
-							break;
-						case Player.RIGHT:
-							this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition + 1).getColor());
-							break;
+				try {
+					if (this.player.isInteracting()) {
+						switch (this.player.getFacing()) {
+							case Player.UP:
+								this.player.interact(areaData.get(this.yPlayerPosition - 1).get(xPlayerPosition).getColor());
+								break;
+							case Player.DOWN:
+								this.player.interact(areaData.get(this.yPlayerPosition + 1).get(xPlayerPosition).getColor());
+								break;
+							case Player.LEFT:
+								this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition - 1).getColor());
+								break;
+							case Player.RIGHT:
+								this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition + 1).getColor());
+								break;
+						}
 					}
+				}
+				catch (Exception e)
+				{
+					this.player.stopInteraction();
 				}
 				
 				//Target pixel is used to determine what pixel the player is currently standing on

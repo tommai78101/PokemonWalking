@@ -119,7 +119,6 @@ public class OverWorld extends World {
 		}
 		else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
 			if (!dialogue.isDisplayingDialogue()) {
-				this.player.startInteraction();
 				dialogue.createText(this.player.getInteractionID());
 			}
 		}

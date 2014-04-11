@@ -19,14 +19,6 @@ public class Player extends Entity {
 	byte animationTick = 0;
 	byte animationPointer = 0;
 	
-	//Not yet used.
-	//	public enum AnimationType {
-	//		WALKING
-	//	};
-	//	
-	//	AnimationType animationType;
-	//--------------------------------------------------------------------------
-	
 	//These are based on the art sprite in the resource folder. The numbers are used to get elements from a 2D array.
 	int facing = 0;
 	int lastFacing = 0;
@@ -458,17 +450,25 @@ public class Player extends Entity {
 	}
 	
 	public void interact(int dataColor) {
-		if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
-			this.enableInteraction = false;
+		int alpha = (dataColor >> 24) & 0xFF;
+		switch (alpha) {
+			case 0x08: {
+				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
+					this.enableInteraction = false;
+					NewInputHandler.unlockInputs();
+				}
+				if (this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) {
+					this.enableInteraction = true;
+				}
+				if (this.enableInteraction) {
+					this.interactionID = dataColor & 0xFFFF;
+				}
+				break;
+			}
+			default:
+				stopInteraction();
+				break;
 		}
-		if (this.enableInteraction) {
-			this.interactionID = dataColor & 0xFFFF;
-		}
-	}
-	
-	public void startInteraction() {
-		if (!NewInputHandler.inputsAreLocked())
-			NewInputHandler.lockInputs();
 	}
 	
 	public void stopInteraction() {
@@ -483,6 +483,11 @@ public class Player extends Entity {
 	
 	public boolean isInteracting() {
 		return this.enableInteraction;
+	}
+	
+	public void stopAnimation() {
+		this.animationTick = 0;
+		this.animationPointer = 0;
 	}
 	
 	//-------------------------------------------------------------------------------------
@@ -610,14 +615,13 @@ public class Player extends Entity {
 	@Override
 	public void tick() {
 		if (!this.lockJumping) {
-			if (this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) {
-				this.enableInteraction = true;
-			}
-			else {
-				this.enableInteraction = false;
+			if (!this.enableInteraction) {
 				walk();
 				handleMovementCheck();
 				controlTick();
+			}
+			else {
+				stopAnimation();
 			}
 		}
 		else

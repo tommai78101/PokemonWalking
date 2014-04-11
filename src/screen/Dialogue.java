@@ -5,8 +5,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import level.DialogueText;
 import main.Keys;
@@ -46,10 +46,7 @@ public class Dialogue {
 	private boolean showDialog;
 	private int firstLineIterator;
 	private int secondLineIterator;
-	private int dialogKeyID;
-	
-	private ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("res/dialogue/dialogue.txt");
-	private DialogueText currentDialogue;
+	private ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("dialogue/dialogue.txt");
 	private boolean doneDisplayingDialogue;
 	
 	private Keys input;
@@ -122,7 +119,6 @@ public class Dialogue {
 		//this.currentDialogue.checkpoint = true; 
 		//TODO: Checkpoints are for specific game goals that players had reached.
 		this.doneDisplayingDialogue = true;
-		this.currentDialogue = null;
 		this.repeatDialogueTick = 0xF;
 	}
 	
@@ -291,29 +287,12 @@ public class Dialogue {
 		
 		for (DialogueText dt : this.dialogues) {
 			if (dt.dialogueID == interactionID) {
-				this.currentDialogue = dt;
 				this.tokens = toLines(dt.dialogueMessage);
 				this.showDialog = true;
 				this.doneDisplayingDialogue = false;
 				break;
 			}
 		}
-	}
-	
-	/**
-	 * Prepares the dialogue checkpoint of the dialogue ID given.
-	 * 
-	 * <p>
-	 * This is usually paired with {@link #setDialogCheckpoint()}.
-	 * 
-	 * @param value
-	 *            The dialogue ID of the current dialogue.
-	 * @return Nothing.
-	 * @see #setDialogCheckpoint()
-	 * */
-	public void setDialogKeyID(int value) {
-		this.dialogKeyID = value;
-		//this.dialogs.put(value, false);
 	}
 	
 	/**
@@ -390,7 +369,7 @@ public class Dialogue {
 	public static ArrayList<DialogueText> loadDialogues(String filename) {
 		ArrayList<DialogueText> result = new ArrayList<DialogueText>();
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(Dialogue.class.getClassLoader().getResourceAsStream(filename)));
 			String line = null;
 			DialogueText text = new DialogueText();
 			String[] tokens;
