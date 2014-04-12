@@ -379,12 +379,12 @@ not assume their information to be permanent.
 			R: 01 - Mountain ground.
 			R: 02 - Path.
 		Tile Specific ID:
-			G: 00 - Area Type.
+			G: TT - Area Type.
 			B: HH - Ground Height.
 		Full Data(s):
-			01 00 00 HH
-			01 01 00 HH
-			01 02 00 HH
+			01 00 TT HH
+			01 01 TT HH
+			01 02 TT HH
 		Description:
 			Walkable path tiles, may also represents unpaved roads or 
 			fields.
@@ -426,6 +426,7 @@ not assume their information to be permanent.
 			R: 05 - Top right corner ledge
 			R: 06 - Right facing ledge
 			R: 07 - Bottom right corner ledge
+			
 			R: 08 - Bottom facing double ledge
 			R: 09 - Bottom left corner double ledge
 			R: 0A - Left facing double ledge
@@ -434,6 +435,7 @@ not assume their information to be permanent.
 			R: 0D - Top right corner double ledge
 			R: 0E - Right facing double ledge
 			R: 0F - Bottom right corner double ledge
+			
 			R: 10 - Bottom facing inner ledge
 			R: 11 - Bottom left inner ledge
 			R: 12 - Left facing inner ledge
@@ -443,10 +445,10 @@ not assume their information to be permanent.
 			R: 16 - Right facing inner ledge
 			R: 17 - Bottom right inner ledge
 		Tile Specific ID:
-			G: 00 - Area Type ID (Temporary)
+			G: TT - Area Type ID (Temporary)
 			B: 00 - Ledge Type ID (Temporary)
 		Full Data(s):
-			02 RR 00 00
+			02 RR TT 00
 		Description:		
 			Can be jumped across according to its height, which is determined
 			by direction from where the player starts jumping. Horizontal
