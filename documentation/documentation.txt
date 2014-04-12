@@ -1,6 +1,7 @@
 ﻿Pokémon Walking - Documentation
 
 Changelogs:
+r7: Changing some of the info below.
 r6: Added more tiles.
 r5: Added a beginner's section, "How to Debug."
 r4: Added new tiles to the Tiles section.
@@ -28,7 +29,7 @@ Metadata...........................[PWD04]
 		Overworld..................[PWD04#02@01]
 		Sector.....................[PWD04#02@02]
 	Tiles..........................[PWD04#03]
-		Grass......................[PWD04#03@01]
+		Path.......................[PWD04#03@01]
 		Ledge......................[PWD04#03@02]
 		Tree.......................[PWD04#03@03]
 		Warp Point.................[PWD04#03@04]
