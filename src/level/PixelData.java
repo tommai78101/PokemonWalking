@@ -97,7 +97,7 @@ public class PixelData {
 	 * */
 	public void prepareBitmap(int alpha, int red, int green, int blue) {
 		switch (alpha) {
-			case 0x01: //Flat grass
+			case 0x01: //Path
 				this.bitmap = new BaseBitmap[1];
 				switch (red) { //Terrain tile type
 					case 0x00: //Grass
@@ -106,11 +106,10 @@ public class PixelData {
 					case 0x01: //Mountain ground
 						this.bitmap[0] = Art.mt_ground;
 						break;
-					case 0x02:
+					case 0x02: //Road / Path
 						this.bitmap[0] = Art.path;
 						break;
 					default:
-						
 						break;
 				}
 				break;

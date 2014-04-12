@@ -1,6 +1,7 @@
 package level;
 
 import java.util.ArrayList;
+
 import screen.BaseBitmap;
 import screen.BaseScreen;
 import abstracts.Tile;
@@ -155,8 +156,8 @@ public class Area {
 					case 0x03: //top left
 						break;
 					case 0x04: //top
-						//if (this.checkIfValuesAreAllowed(this.getSurroundingTileID(0, -1), 0x01))
-						this.player.setLockJumping(red, green, blue, Player.DOWN, Player.UP);
+						if (this.checkIfValuesAreAllowed(this.getSurroundingTileID(0, -1), 0x01))
+							this.player.setLockJumping(red, green, blue, Player.DOWN, Player.UP);
 						break;
 					case 0x05: //top right
 						break;
@@ -255,10 +256,16 @@ public class Area {
 							return true;
 						case 0x04: {//Top
 							int y = this.yPlayerPosition + yOffset;
-							if (this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x02, 0x03))
-								return true;
 							if (this.yPlayerPosition > y)
 								return false;
+							if (this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x02))
+								return true;
+							if (this.checkIfValuesAreAllowed((this.getTileColor(-1, 0) >> 16) & 0xFF, 0x04))
+								return false;
+							if (this.checkIfValuesAreAllowed((this.getTileColor(1, 0) >> 16) & 0xFF, 0x04))
+								return false;
+							if (this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x03))
+								return true;
 							return true;
 						}
 						case 0x05: //Top Right
@@ -274,6 +281,17 @@ public class Area {
 						case 0x07: //Bottom Right
 							//TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!
 							return false;
+							
+							//-------------------------      MOUNTAIN LEDGES ------------------------
+						case 0x0C:
+							int y = this.yPlayerPosition + yOffset;
+							if (this.yPlayerPosition > y)
+								return false;
+							if (this.checkIfValuesAreAllowed((this.getTileColor(-1, 0) >> 16) & 0xFF, 0x0C))
+								return false;
+							if (this.checkIfValuesAreAllowed((this.getTileColor(1, 0) >> 16) & 0xFF, 0x0C))
+								return false;
+							return true;
 						default:
 							break;
 					}
