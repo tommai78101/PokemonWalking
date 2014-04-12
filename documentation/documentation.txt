@@ -35,7 +35,9 @@ Metadata...........................[PWD04]
 		Warp Point.................[PWD04#03@04]
 		Area Connection Point......[PWD04#03@05]
 		Stairs.....................[PWD04#03@06]
-		Sign.......................[PWD04#03@07]
+		Water......................[PWD04#03@07]
+		Sign.......................[PWD04#03@08]
+		House......................[PWD04#03@09]
 Player.............................[PWD05]
 Controls...........................[PWD06]
 	Walking Algorithm..............[PWD06#01]
@@ -652,11 +654,27 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		House
+		House [PWD04#03@09]
 		
-		* Create tiles that are related to building structures.
-		* Each building structures are dependent on one another.
-		* Warp point must have a door.
+		Tile ID:
+			A: 09 - House
+		Extended Tile ID:
+			R: HH - House-related Tiles
+		Tile Specific ID:
+			G: 00 - None specified.
+			B: 00 - None specified.
+		Full Data(s):
+			09 HH 00 00
+		Description:
+			Represents buildings in the game. A single tile only represents a 
+			portion of the building.
+			
+			Doors are warp points in disguise. It will warp the player to specific
+			areas that are not part of the overworld.
+			
+			Roofs are colored in gray, which is used for manipulating colors in the
+			game. Colors are to be determined by the game, not by the map makers.
+			
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
