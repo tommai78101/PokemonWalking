@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
+
 import level.PixelData;
 import level.WorldConstants;
 import resources.Art;
@@ -100,6 +101,7 @@ public class BaseScreen extends BaseBitmap {
 		int green = (dataColor >> 8) & 0xFF;
 		int blue = dataColor & 0xFF;
 		int biomeColor = getBiomeBaseColor(tileID, red, green, blue);
+		int tick = 0;
 		
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
 			
@@ -116,9 +118,19 @@ public class BaseScreen extends BaseBitmap {
 				int alpha = (color >> 24) & 0xFF;
 				//This alpha value determines the areas in the bitmap what to draw.
 				//Has nothing to do with pixel data properties.
+				
 				switch (alpha) {
 					case 0x0:
-						this.pixels[tgt + xx] = biomeColor;
+						//Biome Color with a bit of speckled light/dark patches.
+						if ((tick++ % 17 < 7) && (tick++ % 21 < 2))
+							this.pixels[tgt + xx] = lighten(biomeColor, 0.07f);
+						else if ((tick++ % 23 < 4) && (tick++ % 19 < 3))
+							this.pixels[tgt + xx] = darken(biomeColor, 0.07f);
+						else
+							this.pixels[tgt + xx] = biomeColor;
+						tick++;
+						if (tick > w * w)
+							tick = 0;
 						break;
 					case 0x32:
 						this.pixels[tgt + xx] = lighten(biomeColor, 0.003f);
@@ -128,7 +140,8 @@ public class BaseScreen extends BaseBitmap {
 						break;
 					default:
 						this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
-						break;
+						continue;
+						//break;
 				}
 			}
 		}

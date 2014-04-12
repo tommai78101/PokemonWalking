@@ -341,6 +341,7 @@ public class Area {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
+				screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
 				screen.blitBiome(data.getBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
 				data.tick();
 			}

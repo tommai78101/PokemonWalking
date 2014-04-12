@@ -29,7 +29,9 @@ public class PixelData {
 	//This can also give flexibility when it comes to puzzle-themed areas.
 	//Now adding animations.
 	public BaseBitmap[] bitmap;
+	public BaseBitmap[] biomeBitmap;
 	public int bitmapTick;
+	public int biomeBitmapTick;
 	
 	//This can also be "isWayPoint".
 	private boolean isWarpZone;
@@ -47,6 +49,7 @@ public class PixelData {
 		this.targetSector = -1;
 		this.groundHeight = 0; //Default
 		this.bitmapTick = 0;
+		this.biomeBitmapTick = 0;
 		
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
@@ -99,7 +102,7 @@ public class PixelData {
 		switch (alpha) {
 			case 0x01: //Path
 				this.bitmap = new BaseBitmap[1];
-				switch (red) { //Terrain tile type
+				switch (red) { //Tile Type
 					case 0x00: //Grass
 						this.bitmap[0] = Art.grass;
 						break;
@@ -108,6 +111,17 @@ public class PixelData {
 						break;
 					case 0x02: //Road / Path
 						this.bitmap[0] = Art.path;
+						break;
+					default:
+						break;
+				}
+				this.biomeBitmap = new BaseBitmap[1];
+				switch (green) { //Area Type
+					case 0x00:
+						this.biomeBitmap[0] = Art.grass; //Forest
+						break;
+					case 0x02:
+						this.biomeBitmap[0] = Art.mt_ground; //Mountain
 						break;
 					default:
 						break;
@@ -273,6 +287,10 @@ public class PixelData {
 			this.bitmap = new BaseBitmap[1];
 			this.bitmap[0] = Art.error;
 		}
+		if (this.biomeBitmap == null) {
+			this.biomeBitmap = new BaseBitmap[1];
+			this.biomeBitmap[0] = Art.grass; //By default, biome bitmap should be grass.
+		}
 	}
 	
 	/**
@@ -418,6 +436,9 @@ public class PixelData {
 		this.bitmapTick++;
 		if (this.bitmapTick >= this.bitmap.length)
 			this.bitmapTick = 0;
+		this.biomeBitmapTick++;
+		if (this.biomeBitmapTick >= this.biomeBitmap.length)
+			this.biomeBitmapTick = 0;
 	}
 	
 	public BaseBitmap getBitmap() {
@@ -426,5 +447,9 @@ public class PixelData {
 	
 	public int getGroundHeight() {
 		return this.groundHeight;
+	}
+	
+	public BaseBitmap getBiomeBitmap() {
+		return this.biomeBitmap[this.biomeBitmapTick];
 	}
 }
