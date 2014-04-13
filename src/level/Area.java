@@ -172,6 +172,7 @@ public class Area {
 				break;
 			}
 			case 0x04: //Determines warp zone.
+			case 0x0A: //House Doors are a type of warp zones.
 				if (!this.player.isLockedWalking()) {
 					this.isInWarpZone = true;
 				}
@@ -182,7 +183,7 @@ public class Area {
 					this.sectorID = this.currentPixelData.getTargetSectorID();
 				}
 				break;
-			case 0x07:
+			case 0x07: //Water tiles. Checks to see if player is in the water.
 				if (!this.player.isInWater())
 					this.player.goesInWater();
 				break;
@@ -192,6 +193,7 @@ public class Area {
 					this.isInWarpZone = false;
 					this.isInConnectionPoint = false;
 				}
+				//This is to check to see if player has left the water.
 				if (this.player.isInWater())
 					this.player.leavesWater();
 				break;
@@ -201,6 +203,9 @@ public class Area {
 	/**
 	 * Checks the pixel data and sets properties according to the documentation provided. The tile the pixel data is representing determines
 	 * whether it should allow or block the player from walking towards it.
+	 * 
+	 * <p>
+	 * In other words, this is the method call that works out the collision detection/response in the game.
 	 * 
 	 * @param xOffset
 	 *            Sets the offset of the PixelData it should check by the X axis.
@@ -313,7 +318,13 @@ public class Area {
 				case 0x08: //Sign
 					this.player.interact(data.getColor());
 					return true;
-				default: //Any other type of tiles.
+				case 0x09:
+					if (red == 0x00) //Door should be walkable, all other house tiles should not.
+						return false;
+					return true;
+				case 0x0A: //House Door
+					return false;
+				default: //Any other type of tiles should be walkable, for no apparent reasons.
 					return false;
 			}
 		}

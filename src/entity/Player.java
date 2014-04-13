@@ -437,18 +437,35 @@ public class Player extends Entity {
 		return this.lockJumping;
 	}
 	
+	/**
+	 * Returns the player's state (Surfing or Walking).
+	 * 
+	 * @return True, if player is surfing. False, if player is walking on land.
+	 * */
 	public boolean isInWater() {
 		return this.isInWater;
 	}
 	
+	/**
+	 * Changes the player's state to Surfing.
+	 * */
 	public void goesInWater() {
 		this.isInWater = true;
 	}
 	
+	/**
+	 * Changes the player's state to Walking.
+	 * */
 	public void leavesWater() {
 		this.isInWater = false;
 	}
 	
+	/**
+	 * Lets the player interact with the data tile ID.
+	 * 
+	 * @param dataColor
+	 *            The tile ID's full data (the color of the tile).
+	 * */
 	public void interact(int dataColor) {
 		int alpha = (dataColor >> 24) & 0xFF;
 		switch (alpha) {

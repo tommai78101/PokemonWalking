@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+
 import screen.BaseBitmap;
 import screen.BaseScreen;
 
@@ -23,6 +24,7 @@ public class Art {
 	public static BaseBitmap smallTree;
 	public static BaseBitmap forestEntrance;
 	public static BaseBitmap path;
+	//----------------------------------------------------------
 	public static BaseBitmap ledge_bottom;
 	public static BaseBitmap ledge_bottom_left;
 	public static BaseBitmap ledge_left;
@@ -31,6 +33,7 @@ public class Art {
 	public static BaseBitmap ledge_top_right;
 	public static BaseBitmap ledge_right;
 	public static BaseBitmap ledge_bottom_right;
+	//----------------------------------------------------------
 	public static BaseBitmap ledge_mt_bottom;
 	public static BaseBitmap ledge_mt_bottom_left;
 	public static BaseBitmap ledge_mt_left;
@@ -39,6 +42,7 @@ public class Art {
 	public static BaseBitmap ledge_mt_top_right;
 	public static BaseBitmap ledge_mt_right;
 	public static BaseBitmap ledge_mt_bottom_right;
+	//----------------------------------------------------------
 	public static BaseBitmap ledge_inner_bottom;
 	public static BaseBitmap ledge_inner_bottom_left;
 	public static BaseBitmap ledge_inner_left;
@@ -47,6 +51,7 @@ public class Art {
 	public static BaseBitmap ledge_inner_top_right;
 	public static BaseBitmap ledge_inner_right;
 	public static BaseBitmap ledge_inner_bottom_right;
+	//----------------------------------------------------------
 	public static BaseBitmap stairs_left;
 	public static BaseBitmap stairs_top;
 	public static BaseBitmap stairs_right;
@@ -55,7 +60,18 @@ public class Art {
 	public static BaseBitmap stairs_mt_top;
 	public static BaseBitmap stairs_mt_right;
 	public static BaseBitmap stairs_mt_bottom;
+	//----------------------------------------------------------
 	public static BaseBitmap sign;
+	//----------------------------------------------------------
+	public static BaseBitmap house_door;
+	public static BaseBitmap house_bottom;
+	public static BaseBitmap house_bottom_left;
+	public static BaseBitmap house_left;
+	public static BaseBitmap house_bottom_right;
+	public static BaseBitmap house_roof_left;
+	public static BaseBitmap house_roof_middle;
+	public static BaseBitmap house_roof_right;
+	//----------------------------------------------------------
 	
 	//Area
 	public static BaseBitmap testArea;
@@ -174,6 +190,16 @@ public class Art {
 		water_left = loadAnimation(screen, 16, "art/animation/water/water_left00");
 		water_top_right = loadAnimation(screen, 16, "art/animation/water/water_top_right00");
 		water_right = loadAnimation(screen, 16, "art/animation/water/water_right00");
+		
+		//House
+		house_door = screen.load("art/house/house_door.png");
+		house_bottom = screen.load("art/house/house_bottom.png");
+		house_bottom_left = screen.load("art/house/house_bottom_left.png");
+		//house_left = screen.load("art/house/house_left.png");
+		house_bottom_right = screen.load("art/house/house_bottom_right.png");
+		house_roof_left = Art.changeColors(screen.load("art/house/house_roof_left.png"), 0x676767, 0xF7F7F7);
+		house_roof_middle = Art.changeColors(screen.load("art/house/house_roof_middle.png"), 0x676767, 0xF7F7F7);
+		house_roof_right = Art.changeColors(screen.load("art/house/house_roof_right.png"), 0x676767, 0xF7F7F7);
 	}
 	
 	private static BaseBitmap[] loadAnimation(BaseScreen screen, int frames, String filename) {
@@ -239,5 +265,43 @@ public class Art {
 			ge.registerFont(result);
 		}
 		return result;
+	}
+	
+	public static BaseBitmap changeColors(BaseBitmap bitmap, int color, int alphaColor) {
+		int[] pixels = bitmap.getPixels();
+		for (int i = 0; i < pixels.length; i++) {
+			int alpha = (pixels[i] >> 24) & 0xFF;
+			int gray = pixels[i] & 0xFFFFFF;
+			//May be possible this will expand in the future.
+			switch (alpha) {
+				case 0x00:
+					pixels[i] = 0xFF000000 | alphaColor;
+					break;
+				default:
+					pixels[i] = blendPixels(gray, color);
+					break;
+			}
+		}
+		return bitmap;
+	}
+	
+	public static int blendPixels(int bgColor, int blendColor) {
+		int alphaBlend = (blendColor >> 24) & 0xFF;
+		int alphaBackground = 256 - alphaBlend;
+		
+		int bgRed = (bgColor >> 16) & 0xFF;
+		int bgGreen = (bgColor >>8) & 0xFF;
+		int bgBlue = bgColor & 0xFF;
+		
+		int blendRed = (blendColor >> 16) & 0xFF;
+		int blendGreen = (blendColor >> 8) & 0xFF;
+		int blendBlue = blendColor & 0xFF;
+		
+		int red = ((blendRed * alphaBlend + bgRed * alphaBackground) >> 8) & 0xFF0000;
+		int green = ((blendGreen * alphaBlend + bgGreen * alphaBackground) >> 8) & 0xFF00;
+		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
+		
+
+		return 0xFF000000 | red | green | blue;
 	}
 }

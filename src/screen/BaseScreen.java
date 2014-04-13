@@ -139,7 +139,7 @@ public class BaseScreen extends BaseBitmap {
 						this.pixels[tgt + xx] = lighten(biomeColor, 0.006f);
 						break;
 					default:
-						this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
+						this.pixels[tgt + xx] = color;
 						continue;
 						//break;
 				}
@@ -205,25 +205,6 @@ public class BaseScreen extends BaseBitmap {
 	//-------------------------------------------
 	//Private methods
 	
-	private int blendPixels(int bgColor, int blendColor) {
-		int alphaBlend = (blendColor >> 24) & 0xFF;
-		int alphaBackground = 256 - alphaBlend;
-		
-		int bgRed = bgColor & 0xFF0000;
-		int bgGreen = bgColor & 0xFF00;
-		int bgBlue = bgColor & 0xFF;
-		
-		int blendRed = blendColor & 0xFF0000;
-		int blendGreen = blendColor & 0xFF00;
-		int blendBlue = blendColor & 0xFF;
-		
-		int red = ((blendRed * alphaBlend + bgRed * alphaBackground) >> 8) & 0xFF0000;
-		int green = ((blendGreen * alphaBlend + bgGreen * alphaBackground) >> 8) & 0xFF00;
-		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
-		
-		return 0xFF000000 | red | green | blue;
-	}
-	
 	private int getBiomeBaseColor(int tileID, int red, int green, int blue) {
 		int color = WorldConstants.GRASS_GREEN;
 		switch (tileID) {
@@ -278,9 +259,7 @@ public class BaseScreen extends BaseBitmap {
 		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16 | ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
 	}
 	
-	@SuppressWarnings("unused")
 	private int darken(int color, float amount) {
-		int a = (color >> 24) & 0xFF;
 		int r = (color >> 16) & 0xFF;
 		int g = (color >> 8) & 0xFF;
 		int b = color & 0xFF;

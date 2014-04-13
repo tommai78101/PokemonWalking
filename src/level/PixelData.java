@@ -2,7 +2,6 @@ package level;
 
 import resources.Art;
 import screen.BaseBitmap;
-import entity.Player;
 
 public class PixelData {
 	//This class contains all of the area's pixel color, pixel's properties, pixel flags to check, etc.
@@ -76,17 +75,14 @@ public class PixelData {
 	 * Sets the bitmap tile the pixel data is representing.
 	 * 
 	 * <p>
-	 * When setting the bitmap, first it must set the bitmap to something other than null. Since the bitmap variable holds an array, it takes in at
-	 * least 1 bitmap pre-loaded by the Art class. Then, once the bitmap is set, it must break all the way outside of the nested switch conditions,
-	 * otherwise, setting bitmaps will overwrite correct data with incorrect data.
+	 * When setting the bitmap, first it must set the bitmap to something other than null. Since the bitmap variable holds an array, it takes in at least 1 bitmap pre-loaded by the Art class. Then, once the bitmap is set, it must break all the way outside of the nested switch conditions, otherwise,
+	 * setting bitmaps will overwrite correct data with incorrect data.
 	 * 
 	 * <p>
-	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error bitmap, which when loaded into the game, the game will not crash, and
-	 * the developers/players can tell where the bitmap loading has gone wrong.
+	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error bitmap, which when loaded into the game, the game will not crash, and the developers/players can tell where the bitmap loading has gone wrong.
 	 * 
 	 * <p>
-	 * If the bitmap is an animated bitmap, the Art class will load the animated bitmap into an array. The next step would be to just pass the array
-	 * to this bitmap.
+	 * If the bitmap is an animated bitmap, the Art class will load the animated bitmap into an array. The next step would be to just pass the array to this bitmap.
 	 * 
 	 * @param alpha
 	 *            The alpha value of the pixel data's color.
@@ -211,10 +207,8 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.smallTree;
 				break;
-			case 0x04: //Warp point
+			case 0x04: //Warp point (Refer to documentation for flaws.)
 				this.bitmap = new BaseBitmap[1];
-				//TODO: Implement an Area Type ID for warp points. Entrances must fit the theme of the biome 
-				//the warp point is in.
 				this.bitmap[0] = Art.forestEntrance;
 				break;
 			case 0x05: //ACP (Refer to documentation.)
@@ -280,6 +274,36 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.sign;
 				break;
+			case 0x09: //House
+				this.bitmap = new BaseBitmap[1];
+				switch (red) { //House related tiles. Way too many to list them orderly.
+					case 0x00: //Door
+						this.bitmap[0] = Art.house_door;
+						break;
+					case 0x01: //Bottom building
+						this.bitmap[0] = Art.house_bottom;
+						break;
+					case 0x02: //Bottom left building
+						this.bitmap[0] = Art.house_bottom_left;
+						break;
+					case 0x03: //Bottom right building
+						this.bitmap[0] = Art.house_bottom_right;
+						break;
+					case 0x04: //Roof left
+						this.bitmap[0] = Art.house_roof_left;
+						break;
+					case 0x05: //Roof middle
+						this.bitmap[0] = Art.house_roof_middle;
+						break;
+					case 0x06: //Roof right
+						this.bitmap[0] = Art.house_roof_right;
+						break;
+				}
+				break;
+			case 0x0A: //House Door
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.house_door;
+				break;
 			default: //Any other type of tiles.
 				break;
 		}
@@ -298,7 +322,10 @@ public class PixelData {
 	 * area's information on what the player should do and don't.
 	 * 
 	 * <p>
-	 * Some of the features are currently unused.
+	 * Some of the features are currently unused. Especially collision detection.
+	 * 
+	 * <p>
+	 * Only the ones that set target areas, warp zone areas, etc. are the ones being used.
 	 * 
 	 * @param alpha
 	 *            The alpha value of the pixel data's color.
@@ -321,90 +348,97 @@ public class PixelData {
 				this.groundHeight = blue;
 				break;
 			case 0x02: //Ledges
-				switch (red) {
-					case 0x00: //Bottom
-						this.facingsBlocked[Player.UP] = false;
-						this.facingsBlocked[Player.DOWN] = true;
-						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = false;
-						break;
-					case 0x01: //Bottom left
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					case 0x02: //Left
-						this.facingsBlocked[Player.UP] = false;
-						this.facingsBlocked[Player.DOWN] = false;
-						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = false;
-						break;
-					case 0x03: //Top left
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					case 0x04: //Top
-						this.facingsBlocked[Player.UP] = true;
-						this.facingsBlocked[Player.DOWN] = false;
-						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = false;
-						break;
-					case 0x05: //Top Right
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					case 0x06: //Right
-						this.facingsBlocked[Player.UP] = false;
-						this.facingsBlocked[Player.DOWN] = false;
-						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = false;
-						break;
-					case 0x07: //Bottom Right
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					//------------------------------------------------------------
-					//Same order, but with mountain ledges.
-					case 0x08:
-					case 0x09:
-					case 0x0A:
-					case 0x0B:
-					case 0x0C:
-					case 0x0D:
-					case 0x0E:
-					case 0x0F:
-					case 0x10:
-					case 0x11:
-					case 0x12:
-					case 0x13:
-					case 0x14:
-					case 0x15:
-					case 0x16:
-					case 0x17:
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					default:
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-				}
+				//				switch (red) {
+				//					case 0x00: //Bottom
+				//						this.facingsBlocked[Player.UP] = false;
+				//						this.facingsBlocked[Player.DOWN] = true;
+				//						this.facingsBlocked[Player.LEFT] = false;
+				//						this.facingsBlocked[Player.RIGHT] = false;
+				//						break;
+				//					case 0x01: //Bottom left
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					case 0x02: //Left
+				//						this.facingsBlocked[Player.UP] = false;
+				//						this.facingsBlocked[Player.DOWN] = false;
+				//						this.facingsBlocked[Player.LEFT] = false;
+				//						this.facingsBlocked[Player.RIGHT] = false;
+				//						break;
+				//					case 0x03: //Top left
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					case 0x04: //Top
+				//						this.facingsBlocked[Player.UP] = true;
+				//						this.facingsBlocked[Player.DOWN] = false;
+				//						this.facingsBlocked[Player.LEFT] = false;
+				//						this.facingsBlocked[Player.RIGHT] = false;
+				//						break;
+				//					case 0x05: //Top Right
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					case 0x06: //Right
+				//						this.facingsBlocked[Player.UP] = false;
+				//						this.facingsBlocked[Player.DOWN] = false;
+				//						this.facingsBlocked[Player.LEFT] = false;
+				//						this.facingsBlocked[Player.RIGHT] = false;
+				//						break;
+				//					case 0x07: //Bottom Right
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					//------------------------------------------------------------
+				//					//Same order, but with mountain ledges.
+				//					case 0x08:
+				//					case 0x09:
+				//					case 0x0A:
+				//					case 0x0B:
+				//					case 0x0C:
+				//					case 0x0D:
+				//					case 0x0E:
+				//					case 0x0F:
+				//					case 0x10:
+				//					case 0x11:
+				//					case 0x12:
+				//					case 0x13:
+				//					case 0x14:
+				//					case 0x15:
+				//					case 0x16:
+				//					case 0x17:
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					default:
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//				}
 				break;
 			case 0x03: //Trees
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x04: //Warp Point
 				this.targetArea = red;
 				this.isWarpZone = true;
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 			case 0x05: //ACP (Refer to documentation.)
 				this.targetArea = red;
 				this.targetSector = green;
 				this.isWarpZone = false;
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 			case 0x06: //Stairs
 				break;
 			case 0x07: //Water
 				//TODO: Needs to do something with this. It must not block the player, however, without
 				//special boolean value, it will always block player from advancing.
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 			case 0x08: //Sign
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				break;
+			case 0x09: //House
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				break;
+			case 0x0A: //House Door
+				this.targetArea = red;
+				this.isWarpZone = true;
 				break;
 			default:
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
