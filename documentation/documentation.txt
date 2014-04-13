@@ -38,6 +38,7 @@ Metadata...........................[PWD04]
 		Water......................[PWD04#03@07]
 		Sign.......................[PWD04#03@08]
 		House......................[PWD04#03@09]
+		House Door.................[PWD04#03@10]
 Player.............................[PWD05]
 Controls...........................[PWD06]
 	Walking Algorithm..............[PWD06#01]
@@ -506,6 +507,9 @@ not assume their information to be permanent.
 			coordinates. The maximum amount of warp points for a single area is
 			256. The range of where the player is to spawn in the area is 0 ~ 255.
 			
+			Due to limitations of game data format, all warp points of different
+			bitmaps will have its own data tile ID.
+			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 		Area Connection Point (ACP) [PWD04#03@05]
@@ -669,13 +673,32 @@ not assume their information to be permanent.
 			Represents buildings in the game. A single tile only represents a 
 			portion of the building.
 			
-			Doors are warp points in disguise. It will warp the player to specific
-			areas that are not part of the overworld.
-			
 			Roofs are colored in gray, which is used for manipulating colors in the
 			game. Colors are to be determined by the game, not by the map makers.
 			
+			Doors are not related to Houses, even though they are entrances to
+			houses. This is due to limitations of the game data format.
 		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		House Door [PWD04#03@10]
+		
+		Tile ID:
+			A: 0A - Door
+		Extended Tile ID:
+			R: TT - Target Area
+		Tile Specific ID:
+			G: XX - X position of Target Area
+			B: YY - Y position of Target Area
+		Full Data(s):
+			0A TT XX YY
+		Description:
+			Another type of warp point. For more information, see Warp Points. 
+			[PWD04#03@04].	
+			
+			Door warp points will tell the game that the player is indoors, and
+			is no longer outside in the overworld.
+
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 		NPCs
