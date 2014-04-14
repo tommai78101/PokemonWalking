@@ -665,7 +665,7 @@ not assume their information to be permanent.
 		Extended Tile ID:
 			R: HH - House-related Tiles
 		Tile Specific ID:
-			G: 00 - None specified.
+			G: 00 - Area/Sector ID.
 			B: 00 - None specified.
 		Full Data(s):
 			09 HH 00 00
@@ -675,6 +675,7 @@ not assume their information to be permanent.
 			
 			Roofs are colored in gray, which is used for manipulating colors in the
 			game. Colors are to be determined by the game, not by the map makers.
+			The roof colors are determined by the area/sector ID.
 			
 			Doors are not related to Houses, even though they are entrances to
 			houses. This is due to limitations of the game data format.
