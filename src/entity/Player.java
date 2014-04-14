@@ -412,6 +412,18 @@ public class Player extends Entity {
 		this.facingsBlocked[RIGHT] = right;
 	}
 	
+	/**
+	 * Sets the player's current area position to the corresponding X and Y coordinates given.
+	 * 
+	 * <p>
+	 * It uses the 2D Cartesian coordinates used in bitmaps. Positive X: Right. Positive Y: Down.
+	 * 
+	 * @param x
+	 *            The X coordinate the player is to be positioned at.
+	 * @param y
+	 *            The Y coordinate the player is to be positioned at.
+	 * @return Nothing.
+	 * */
 	public void setAreaPosition(int x, int y) {
 		this.setPosition(x * Tile.WIDTH, y * Tile.HEIGHT);
 	}
