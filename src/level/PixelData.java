@@ -290,13 +290,14 @@ public class PixelData {
 						this.bitmap[0] = Art.house_bottom_right;
 						break;
 					case 0x04: //Roof left
-						this.bitmap[0] = Art.house_roof_left;
+						this.bitmap[0] = Art.changeColors(Art.house_roof_left, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
+						//this.bitmap[0] = Art.house_roof_left;
 						break;
 					case 0x05: //Roof middle
-						this.bitmap[0] = Art.house_roof_middle;
+						this.bitmap[0] = Art.changeColors(Art.house_roof_middle, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
 						break;
 					case 0x06: //Roof right
-						this.bitmap[0] = Art.house_roof_right;
+						this.bitmap[0] = Art.changeColors(Art.house_roof_right, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
 						break;
 				}
 				break;

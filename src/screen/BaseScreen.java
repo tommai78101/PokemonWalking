@@ -140,8 +140,7 @@ public class BaseScreen extends BaseBitmap {
 						break;
 					default:
 						this.pixels[tgt + xx] = color;
-						continue;
-						//break;
+						break;
 				}
 			}
 		}

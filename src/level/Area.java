@@ -394,6 +394,7 @@ public class Area {
 		int alpha = (color >> 24) & 0xFF;
 		switch (alpha) {
 			case 0x04: //Warp point
+			case 0x0A: //Door
 			{
 				int green = (color >> 8) & 0xFF;
 				int blue = color & 0xFF;

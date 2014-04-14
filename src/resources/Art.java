@@ -197,9 +197,10 @@ public class Art {
 		house_bottom_left = screen.load("art/house/house_bottom_left.png");
 		//house_left = screen.load("art/house/house_left.png");
 		house_bottom_right = screen.load("art/house/house_bottom_right.png");
-		house_roof_left = Art.changeColors(screen.load("art/house/house_roof_left.png"), 0x676767, 0xF7F7F7);
-		house_roof_middle = Art.changeColors(screen.load("art/house/house_roof_middle.png"), 0x676767, 0xF7F7F7);
-		house_roof_right = Art.changeColors(screen.load("art/house/house_roof_right.png"), 0x676767, 0xF7F7F7);
+		house_roof_left = screen.load("art/house/house_roof_left.png");
+		//house_roof_left = Art.changeColors(screen.load("art/house/house_roof_left.png"), 0x676767, 0xF7F7F7);
+		house_roof_middle = screen.load("art/house/house_roof_middle.png");
+		house_roof_right = screen.load("art/house/house_roof_right.png");
 	}
 	
 	private static BaseBitmap[] loadAnimation(BaseScreen screen, int frames, String filename) {
@@ -268,21 +269,23 @@ public class Art {
 	}
 	
 	public static BaseBitmap changeColors(BaseBitmap bitmap, int color, int alphaColor) {
+		BaseBitmap result = new BaseBitmap(bitmap.getWidth(), bitmap.getHeight());
 		int[] pixels = bitmap.getPixels();
+		int[] resultPixels = result.getPixels();
 		for (int i = 0; i < pixels.length; i++) {
 			int alpha = (pixels[i] >> 24) & 0xFF;
 			int gray = pixels[i] & 0xFFFFFF;
 			//May be possible this will expand in the future.
 			switch (alpha) {
-				case 0x00:
-					pixels[i] = 0xFF000000 | alphaColor;
+				case 0x01:
+					resultPixels[i] = 0xFF000000 | (((alphaColor * color) >> 7) & 0xFFFFFF);
 					break;
 				default:
-					pixels[i] = blendPixels(gray, color);
+					resultPixels[i] = 0xFF000000 | ((((color * gray) << 8) + (color + gray) >> 8) & 0xFFFFFF);
 					break;
 			}
 		}
-		return bitmap;
+		return result;
 	}
 	
 	public static int blendPixels(int bgColor, int blendColor) {
@@ -297,8 +300,8 @@ public class Art {
 		int blendGreen = (blendColor >> 8) & 0xFF;
 		int blendBlue = blendColor & 0xFF;
 		
-		int red = ((blendRed * alphaBlend + bgRed * alphaBackground) >> 8) & 0xFF0000;
-		int green = ((blendGreen * alphaBlend + bgGreen * alphaBackground) >> 8) & 0xFF00;
+		int red = ((blendRed * alphaBlend + bgRed * alphaBackground) >> 8) & 0xFF;
+		int green = ((blendGreen * alphaBlend + bgGreen * alphaBackground) >> 8) & 0xFF;
 		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
 		
 

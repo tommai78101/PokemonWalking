@@ -21,7 +21,9 @@ public class BaseBitmap {
 	public BaseBitmap(int w, int h, int[] p) {
 		this.width = w;
 		this.height = h;
-		this.pixels = p;
+		this.pixels = new int[w * h];
+		for (int i = 0; i < p.length; i++)
+			this.pixels[i] = p[i];
 	}
 	
 	public BaseBitmap load(String filename) {
