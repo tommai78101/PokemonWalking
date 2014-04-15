@@ -8,18 +8,19 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 
 public class FileControl extends JPanel implements ActionListener {
-	private static final String ID_TAG = "id";
-	private static final int NUM_BUTTONS = 3;
+	private static final long serialVersionUID = 1L;
 	
+	private String[] tags = new String[]{"New", "Save", "Open"};
+	private LevelEditor editor;
 	HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
 	
-	public FileControl() {
+	public FileControl(LevelEditor editor) {
 		super();
+		this.editor = editor;
+		this.setLayout(new GridLayout(1, tags.length));
 		
-		this.setLayout(new GridLayout(1, NUM_BUTTONS));
-		
-		for (int i = 0; i < NUM_BUTTONS; i++) {
-			JButton button = new JButton("Test " + Integer.toString(i));
+		for (int i = 0; i < tags.length; i++) {
+			JButton button = new JButton(tags[i]);
 			button.addActionListener(this);
 			String actionCommand = Integer.toString(i);
 			button.setActionCommand(actionCommand);
@@ -31,14 +32,21 @@ public class FileControl extends JPanel implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		String command = ((JButton) event.getSource()).getActionCommand();
+		JButton button = (JButton) event.getSource();
+		String command = button.getActionCommand();
 		try {
 			int value = Integer.valueOf(command);
 			switch (value) {
-				case 0:
-				case 1:
-				case 2:
-					System.out.println("Test " + Integer.toString(value) + " has been pressed.");
+				case 0: //New
+				{
+					editor.drawingBoardPanel.newImage();
+					break;
+				}
+				case 1: //Save
+					System.out.println("Save");
+					break;
+				case 2: //Open
+					System.out.println("Open");
 					break;
 			}
 		}
