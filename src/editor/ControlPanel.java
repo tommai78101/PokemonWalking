@@ -5,7 +5,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Iterator;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -18,7 +17,7 @@ import abstracts.Tile;
 public class ControlPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7481148146432931992L;
 	
-	private HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
+	public HashMap<Integer, Data> buttonCache = new HashMap<Integer, Data>();
 	private String iconName;
 	private LevelEditor editor;
 	private Data selectedData;
@@ -57,8 +56,12 @@ public class ControlPanel extends JPanel implements ActionListener {
 			button.setActionCommand(actionCommand);
 			button.setName(s.filepath);
 			button.addActionListener(this);
-			buttonCache.put(actionCommand, button);
 			iconsPanel.add(button);
+			s.image = test.getImage();
+			s.button = button;
+			if (s != null) {
+				buttonCache.put(s.editorID, s);
+			}
 		}
 		
 		JScrollPane scrollPanel = new JScrollPane(iconsPanel) {
@@ -96,13 +99,16 @@ public class ControlPanel extends JPanel implements ActionListener {
 		else
 			this.iconName = (imageName.substring(0, imageName.length() - 4));
 		
-		int id = Integer.valueOf(event.getActionCommand());
-		for (Iterator<Data> it = editor.getResourceFilePaths().iterator(); it.hasNext();) {
-			Data d = it.next();
-			if (d.editorID == id) {
-				this.selectedData = d;
-				break;
-			}
+		//		for (Iterator<Data> it = editor.getResourceFilePaths().iterator(); it.hasNext();) {
+		//			Data d = it.next();
+		//			if (d.editorID == id) {
+		//				this.selectedData = d;
+		//				break;
+		//			}
+		//		}
+		Data d = this.buttonCache.get(Integer.valueOf(event.getActionCommand()));
+		if (d != null) {
+			this.selectedData = d;
 		}
 		editor.validate();
 	}

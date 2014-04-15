@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -21,18 +22,21 @@ public class DrawingBoard extends Canvas implements Runnable {
 	
 	private BufferedImage image;
 	private int[] tiles;
-	private int sizeW, sizeH;
-	private int dx, dy;
+	private int[] pixels;
+	private int bitmapWidth, bitmapHeight;
+	private int offsetX, offsetY;
+	private int mouseOnTileX, mouseOnTileY;
 	
 	public DrawingBoard(final LevelEditor editor) {
 		super();
 		this.editor = editor;
-		dx = dy = 0;
+		offsetX = offsetY = 0;
 	}
 	
 	@Override
 	public void run() {
 		while (editor.running) {
+			tick();
 			render();
 			try {
 				Thread.sleep(1);
@@ -64,13 +68,19 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		tiles = new int[w * h];
 		image = new BufferedImage(w * Tile.WIDTH, h * Tile.HEIGHT, BufferedImage.TYPE_INT_ARGB);
-		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-		for (int i = 0; i < pixels.length; i++)
-			pixels[i] = -1;
-		dx = dy = 0;
+		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		for (int j = 0; j < image.getHeight(); j++) {
+			for (int i = 0; i < image.getWidth(); i++) {
+				if (i % Tile.WIDTH == 0 || j % Tile.HEIGHT == 0)
+					pixels[j * image.getWidth() + i] = 0;
+				else
+					pixels[j * image.getWidth() + i] = -1;
+			}
+		}
+		offsetX = offsetY = 0;
 		editor.input.dx = editor.input.dy = 0;
-		sizeW = w;
-		sizeH = h;
+		bitmapWidth = w;
+		bitmapHeight = h;
 	}
 	
 	public void newImage() {
@@ -79,10 +89,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 			public void run() {
 				JTextField widthField = new JTextField("10");
 				JTextField heightField = new JTextField("10");
-				JPanel panel = new JPanel(new GridLayout(1, 1));
-				panel.add(new JLabel("Width: "));
+				JPanel panel = new JPanel(new GridLayout(1, 2));
+				panel.add(new JLabel("  Width:"));
 				panel.add(widthField);
-				panel.add(new JLabel("Height: "));
+				panel.add(new JLabel("  Height:"));
 				panel.add(heightField);
 				int result = JOptionPane.showConfirmDialog(null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				if (result == JOptionPane.OK_OPTION) {
@@ -99,10 +109,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 			bs = this.getBufferStrategy();
 		}
 		
-		if (editor.input.isDragging()) {
-			dx = editor.input.dx;
-			dy = editor.input.dy;
-		}
 		//		else if (editor.input.isDrawing()) {
 		//			int px = editor.input.mouseX % (dx - image.getWidth());
 		//			int py = editor.input.mouseY / (dx - image.getHeight());
@@ -110,19 +116,66 @@ public class DrawingBoard extends Canvas implements Runnable {
 		//			for (; it.hasNext();) {
 		//				Data d = it.next();
 		//				if (d.editorID == editor.controlPanel.getSelectedData().editorID) {
-		//					tiles[py * sizeW + px] = 0xFF00000;//d.editorID;
+		//					tiles[py * bitmapWidth + px] = 0xFF00000;//d.editorID;
 		//				}
 		//			}
 		//		}
+		
+		if (tiles != null) {
+			for (int j = 0; j < tiles.length; j++) {
+				if (bitmapWidth == 0)
+					break;
+				int w = j % bitmapWidth;
+				int h = j / bitmapWidth;
+				
+				//				for (Iterator<Data> it = editor.getResourceFilePaths().iterator(); it.hasNext();) {
+				//					Data temp = it.next();
+				//					if (temp.editorID == tiles[j]) {
+				//						d = temp;
+				//						break;
+				//					}
+				//				}
+				Data d = editor.controlPanel.buttonCache.get(tiles[j]);
+				if (d == null)
+					break;
+				if (d.image == null)
+					break;
+				Image img = d.image;
+				BufferedImage bimg;
+				if (img instanceof BufferedImage)
+					bimg = (BufferedImage) img;
+				else {
+					bimg = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+					Graphics g = bimg.getGraphics();
+					g.drawImage(img, 0, 0, null);
+					g.dispose();
+				}
+				//				int[] px = bimg.getRGB(0, 0, img.getWidth(null), img.getHeight(null), null, 0, img.getWidth(null));
+				//				for (int yy = h * Tile.HEIGHT; yy < (h + 1) * Tile.HEIGHT; yy++) {
+				//					for (int xx = w * Tile.WIDTH; xx < (w + 1) * Tile.WIDTH; xx++) {
+				//						try {
+				//							this.pixels[yy * (bitmapWidth * Tile.WIDTH) + xx] = px[yy * Tile.WIDTH + xx];
+				//						}
+				//						catch (Exception e)
+				//						{
+				//						}
+				//					}
+				//				}
+				
+				Graphics g = this.image.getGraphics();
+				g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+				g.dispose();
+			}
+		}
 		
 		Graphics g = bs.getDrawGraphics();
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		
-		g.translate(-dx, -dy);
+		g.translate(-offsetX, -offsetY);
 		
-		g.setColor(Color.LIGHT_GRAY);
-		g.fillRect(0, 0, this.getWidth(), this.getHeight());
+		//		g.setColor(Color.LIGHT_GRAY);
+		//		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		
 		if (image != null) {
 			//g.drawImage(image, (this.getWidth() - image.getWidth()) / 2, (this.getHeight() - image.getHeight()) / 2, null);
@@ -133,7 +186,42 @@ public class DrawingBoard extends Canvas implements Runnable {
 		bs.show();
 	}
 	
+	public void tick() {
+		if (editor.input.isDragging()) {
+			offsetX = editor.input.dx;
+			offsetY = editor.input.dy;
+		}
+		
+		if (editor.input.isDrawing()) {
+			
+			//TODO: Needs to check if user is actually drawing or not in the Canvas.
+			//Canvas detection is required.
+			this.mouseOnTileX = offsetX + editor.input.mouseX;
+			if (this.mouseOnTileX < 0)
+				this.mouseOnTileX = 0;
+			if (this.mouseOnTileX > bitmapWidth)
+				this.mouseOnTileX = bitmapWidth;
+			this.mouseOnTileY = offsetY + editor.input.mouseY;
+			if (this.mouseOnTileY < 0)
+				this.mouseOnTileY = 0;
+			if (this.mouseOnTileY > bitmapHeight)
+				this.mouseOnTileY = bitmapHeight;
+			
+			Data d = editor.controlPanel.getSelectedData();
+			if (d != null)
+				tiles[this.getMouseTileY() * bitmapWidth + this.getMouseTileX()] = d.editorID;
+		}
+	}
+	
 	public void start() {
 		new Thread(this).start();
+	}
+	
+	public int getMouseTileX() {
+		return this.mouseOnTileX / Tile.WIDTH;
+	}
+	
+	public int getMouseTileY() {
+		return this.mouseOnTileY / Tile.HEIGHT;
 	}
 }

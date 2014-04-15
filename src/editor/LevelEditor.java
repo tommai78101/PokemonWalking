@@ -49,6 +49,7 @@ public class LevelEditor extends JFrame {
 			}
 		});
 		
+		this.id = 0;
 		final File folder = new File("res");
 		getAllFiles(folder);
 		
@@ -121,7 +122,6 @@ public class LevelEditor extends JFrame {
 	//	}
 	
 	public void getAllFiles(final File folder) {
-		int id = 0;
 		for (final File entry : folder.listFiles()) {
 			if (entry.isDirectory()) {
 				if (!(entry.getName().equals("animation") || entry.getName().equals("player") || entry.getName().equals("area")))
@@ -131,10 +131,10 @@ public class LevelEditor extends JFrame {
 				String path = entry.getPath();
 				if (path.endsWith(".png")) {
 					Data d = new Data();
+					d.editorID = this.id;
 					d.filepath = path;
-					d.editorID = id;
-					id++;
 					filepaths.add(d);
+					this.id++;
 				}
 			}
 		}

@@ -17,7 +17,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	
 	public EditorInput(LevelEditor editor) {
 		this.editor = editor;
-		
+		//TODO: Dispatch event to Canvas other than Control Panel. Events must be separated from each other.
 	}
 	
 	public boolean isDragging() {
