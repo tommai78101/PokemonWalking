@@ -115,6 +115,6 @@ public class EditorConstants {
 		else if (compare.equals("house_door.png"))
 			return 0x0A000000;
 		else
-			return 0;
+			return 99;
 	}
 }

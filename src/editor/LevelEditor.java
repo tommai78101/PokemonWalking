@@ -20,6 +20,7 @@ public class LevelEditor extends JFrame {
 	public ControlPanel controlPanel;
 	public FileControl fileControlPanel;
 	public DrawingBoard drawingBoardPanel;
+	public TilePropertiesPanel propertiesPanel;
 	public StatusPanel statusPanel;
 	
 	public String message;
