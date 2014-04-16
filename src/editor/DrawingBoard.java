@@ -163,6 +163,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 				//				}
 				
 				Graphics g = this.image.getGraphics();
+				g.setColor(Color.white);
+				g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 				g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
 				g.dispose();
 			}
@@ -193,23 +195,20 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		
 		if (editor.input.isDrawing()) {
-			
-			//TODO: Needs to check if user is actually drawing or not in the Canvas.
-			//Canvas detection is required.
 			this.mouseOnTileX = offsetX + editor.input.mouseX;
 			if (this.mouseOnTileX < 0)
-				this.mouseOnTileX = 0;
-			if (this.mouseOnTileX > bitmapWidth)
-				this.mouseOnTileX = bitmapWidth;
+				return;
+			if (this.mouseOnTileX >= bitmapWidth * Tile.WIDTH)
+				return;
 			this.mouseOnTileY = offsetY + editor.input.mouseY;
 			if (this.mouseOnTileY < 0)
-				this.mouseOnTileY = 0;
-			if (this.mouseOnTileY > bitmapHeight)
-				this.mouseOnTileY = bitmapHeight;
-			
+				return;
+			if (this.mouseOnTileY >= bitmapHeight * Tile.HEIGHT)
+				return;
 			Data d = editor.controlPanel.getSelectedData();
 			if (d != null)
 				tiles[this.getMouseTileY() * bitmapWidth + this.getMouseTileX()] = d.editorID;
+			editor.input.forceCancelDrawing();
 		}
 	}
 	
@@ -223,5 +222,14 @@ public class DrawingBoard extends Canvas implements Runnable {
 	
 	public int getMouseTileY() {
 		return this.mouseOnTileY / Tile.HEIGHT;
+	}
+	
+	public BufferedImage getMapImage() {
+		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
+		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
+		for (int i = 0; i < tiles.length; i++) {
+			pixels[i] = tiles[i];
+		}
+		return buffer;
 	}
 }

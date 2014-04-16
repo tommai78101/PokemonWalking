@@ -26,8 +26,6 @@ public class LevelEditor extends JFrame {
 	public boolean running;
 	public EditorInput input;
 	
-	private int id;
-	
 	public LevelEditor(String name) {
 		super(name);
 		running = true;
@@ -49,7 +47,6 @@ public class LevelEditor extends JFrame {
 			}
 		});
 		
-		this.id = 0;
 		final File folder = new File("res");
 		getAllFiles(folder);
 		
@@ -59,19 +56,19 @@ public class LevelEditor extends JFrame {
 				if (input == null) {
 					input = new EditorInput(editor.LevelEditor.this);
 					addMouseListener(input);
-					addMouseMotionListener(input);
+					//addMouseMotionListener(input);
 				}
 				if (fileControlPanel == null) {
 					fileControlPanel = new FileControl(editor.LevelEditor.this);
 					fileControlPanel.addMouseListener(input);
-					fileControlPanel.addMouseMotionListener(input);
+					//fileControlPanel.addMouseMotionListener(input);
 					add(fileControlPanel, BorderLayout.NORTH);
 					validate();
 				}
 				if (controlPanel == null) {
 					controlPanel = new ControlPanel(editor.LevelEditor.this);
 					controlPanel.addMouseListener(input);
-					controlPanel.addMouseMotionListener(input);
+					//controlPanel.addMouseMotionListener(input);
 					add(controlPanel, BorderLayout.WEST);
 					validate();
 				}
@@ -86,7 +83,7 @@ public class LevelEditor extends JFrame {
 				if (statusPanel == null) {
 					statusPanel = new StatusPanel();
 					statusPanel.addMouseListener(input);
-					statusPanel.addMouseMotionListener(input);
+					//statusPanel.addMouseMotionListener(input);
 					add(statusPanel, BorderLayout.SOUTH);
 				}
 			}
@@ -131,10 +128,9 @@ public class LevelEditor extends JFrame {
 				String path = entry.getPath();
 				if (path.endsWith(".png")) {
 					Data d = new Data();
-					d.editorID = this.id;
+					d.editorID = EditorConstants.getEditorIDFromPath(path);
 					d.filepath = path;
 					filepaths.add(d);
-					this.id++;
 				}
 			}
 		}

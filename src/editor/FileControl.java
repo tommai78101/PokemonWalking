@@ -3,8 +3,13 @@ package editor;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
 public class FileControl extends JPanel implements ActionListener {
@@ -43,7 +48,20 @@ public class FileControl extends JPanel implements ActionListener {
 					break;
 				}
 				case 1: //Save
-					System.out.println("Save");
+					JFileChooser chooser = new JFileChooser();
+					chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+					chooser.setVisible(true);
+					int result = chooser.showSaveDialog(null);
+					if (result == JFileChooser.APPROVE_OPTION) {
+						try {
+							BufferedImage img = editor.drawingBoardPanel.getMapImage();
+							File file = chooser.getSelectedFile();
+							ImageIO.write(img, "png", new File(file.getAbsolutePath() + "\\" + file.getName() + ".png"));
+						}
+						catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
 					break;
 				case 2: //Open
 					System.out.println("Open");

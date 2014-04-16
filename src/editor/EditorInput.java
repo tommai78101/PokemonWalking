@@ -66,6 +66,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		mouseX = event.getX();
 		mouseY = event.getY();
 		editor.validate();
+		drawing = false;
 	}
 	
 	@Override
@@ -73,6 +74,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		mouseX = event.getX();
 		mouseY = event.getY();
 		editor.validate();
+		drawing = false;
 	}
 	
 	@Override
@@ -93,8 +95,13 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		dx = oldX - event.getX();
 		dy = oldY - event.getY();
 		
-		editor.validate();
 		drawing = false;
 		panning = false;
+		editor.validate();
+		
+	}
+	
+	public void forceCancelDrawing() {
+		drawing = false;
 	}
 }
