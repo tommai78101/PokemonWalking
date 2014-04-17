@@ -664,7 +664,13 @@ not assume their information to be permanent.
 		Tile ID:
 			A: 09 - House
 		Extended Tile ID:
-			R: HH - House-related Tiles
+			R: HH - House-related Tiles:
+				00 - Bottom
+				01 - Bottom Left
+				02 - Bottom Right
+				03 - Single Roof Left
+				04 - Single Roof Middle
+				05 - Single Roof Right
 		Tile Specific ID:
 			G: 00 - Area/Sector ID.
 			B: 00 - None specified.
