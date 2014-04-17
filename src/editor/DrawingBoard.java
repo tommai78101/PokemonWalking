@@ -178,6 +178,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 				g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 				g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
 				g.dispose();
+				
 			}
 		}
 		
@@ -275,8 +276,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
 		for (int i = 0; i < tiles.length; i++) {
-			Data data = EditorConstants.getInstance().getTileMap().get(tiles[i]);
-			pixels[i] = (data.alpha << 24) | (data.red << 16) | (data.green << 8) | data.blue;
+			pixels[i] = tiles[i];
 		}
 		return buffer;
 	}

@@ -90,53 +90,6 @@ public class LevelEditor extends JFrame {
 		});
 	}
 	
-	//	public void tick() {
-	//		
-	//	}
-	
-	//	public void render() {
-	//		BufferStrategy bs = this.getBufferStrategy();
-	//		if (bs == null) {
-	//			this.createBufferStrategy(3);
-	//			bs = this.getBufferStrategy();
-	//		}
-	//		
-	////		for (int i = 0; i < pixels.length; i++) {
-	////			pixels[i] = 0x44FF13AA;
-	////		}
-	//		
-	////		this.controlPanel.render(pixels);
-	////		block.render(pixels);
-	//		
-	//		Graphics g = bs.getDrawGraphics();
-	////		g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), null);
-	//		g.dispose();
-	//		bs.show();
-	//	}
-	
-	//	public static void stop() {
-	//		running = false;
-	//	}
-	
-	//	public void getAllFiles(final File folder) {
-	//		//		for (final File entry : folder.listFiles()) {
-	//		//			if (entry.isDirectory()) {
-	//		//				if (!(entry.getName().equals("animation") || entry.getName().equals("player") || entry.getName().equals("area")))
-	//		//					getAllFiles(entry);
-	//		//			}
-	//		//			else {
-	//		//				String path = entry.getPath();
-	//		//				if (path.endsWith(".png")) {
-	//		//					Data d = new Data();
-	//		//					d.editorID = EditorConstants.getEditorIDFromPath(path);
-	//		//					d.filepath = path;
-	//		//					filepaths.add(d);
-	//		//				}
-	//		//			}
-	//		//		}
-	//		//EditorConstants.getInstance();
-	//	}
-	
 	@Override
 	public void validate() {
 		super.validate();
