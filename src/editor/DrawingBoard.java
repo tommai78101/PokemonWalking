@@ -21,8 +21,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private LevelEditor editor;
 	
 	private BufferedImage image;
-	private int[] tiles;
-	private int[] pixels;
+	private String[] tiles;
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
@@ -39,7 +38,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			tick();
 			render();
 			try {
-				Thread.sleep(1);
+				Thread.sleep(3);
 			}
 			catch (InterruptedException e) {
 			}
@@ -66,9 +65,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 			image.flush();
 			image = null;
 		}
-		tiles = new int[w * h];
+		tiles = new String[w * h];
+		for (int i = 0; i < tiles.length; i++)
+			tiles[i] = EditorConstants.DEFAULT_TILE;
 		image = new BufferedImage(w * Tile.WIDTH, h * Tile.HEIGHT, BufferedImage.TYPE_INT_ARGB);
-		pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 		for (int j = 0; j < image.getHeight(); j++) {
 			for (int i = 0; i < image.getWidth(); i++) {
 				if (i % Tile.WIDTH == 0 || j % Tile.HEIGHT == 0)
@@ -123,23 +124,19 @@ public class DrawingBoard extends Canvas implements Runnable {
 		
 		if (tiles != null) {
 			for (int j = 0; j < tiles.length; j++) {
-				if (bitmapWidth == 0)
+				if (bitmapWidth <= 0)
+					break;
+				if (bitmapHeight <= 0)
 					break;
 				int w = j % bitmapWidth;
 				int h = j / bitmapWidth;
 				
-				//				for (Iterator<Data> it = editor.getResourceFilePaths().iterator(); it.hasNext();) {
-				//					Data temp = it.next();
-				//					if (temp.editorID == tiles[j]) {
-				//						d = temp;
-				//						break;
-				//					}
-				//				}
-				Data d = editor.controlPanel.buttonCache.get(tiles[j]);
+				Data d = EditorConstants.getInstance().getTileMap().get(tiles[j]);
 				if (d == null)
 					break;
 				if (d.image == null)
 					break;
+				
 				Image img = d.image;
 				BufferedImage bimg;
 				if (img instanceof BufferedImage)
@@ -150,17 +147,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 					g.drawImage(img, 0, 0, null);
 					g.dispose();
 				}
-				//				int[] px = bimg.getRGB(0, 0, img.getWidth(null), img.getHeight(null), null, 0, img.getWidth(null));
-				//				for (int yy = h * Tile.HEIGHT; yy < (h + 1) * Tile.HEIGHT; yy++) {
-				//					for (int xx = w * Tile.WIDTH; xx < (w + 1) * Tile.WIDTH; xx++) {
-				//						try {
-				//							this.pixels[yy * (bitmapWidth * Tile.WIDTH) + xx] = px[yy * Tile.WIDTH + xx];
-				//						}
-				//						catch (Exception e)
-				//						{
-				//						}
-				//					}
-				//				}
 				
 				Graphics g = this.image.getGraphics();
 				g.setColor(Color.white);
@@ -176,14 +162,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 		
 		g.translate(-offsetX, -offsetY);
 		
-		//		g.setColor(Color.LIGHT_GRAY);
-		//		g.fillRect(0, 0, this.getWidth(), this.getHeight());
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		
 		if (image != null) {
-			//g.drawImage(image, (this.getWidth() - image.getWidth()) / 2, (this.getHeight() - image.getHeight()) / 2, null);
 			g.drawImage(image, 0, 0, null);
 		}
-		
 		g.dispose();
 		bs.show();
 	}
@@ -207,8 +191,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 				return;
 			Data d = editor.controlPanel.getSelectedData();
 			if (d != null)
-				tiles[this.getMouseTileY() * bitmapWidth + this.getMouseTileX()] = d.editorID;
+				tiles[this.getMouseTileY() * bitmapWidth + this.getMouseTileX()] = d.name;
 			editor.input.forceCancelDrawing();
+			editor.validate();
 		}
 	}
 	
@@ -228,7 +213,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
 		for (int i = 0; i < tiles.length; i++) {
-			pixels[i] = tiles[i];
+			Data data = EditorConstants.getInstance().getTileMap().get(tiles[i]);
+			pixels[i] = (data.alpha << 24) | (data.red << 16) | (data.green << 8) | data.blue;
 		}
 		return buffer;
 	}

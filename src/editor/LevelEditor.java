@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
 import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -48,8 +47,8 @@ public class LevelEditor extends JFrame {
 			}
 		});
 		
-		final File folder = new File("res");
-		getAllFiles(folder);
+		//		final File folder = new File("res");
+		//		getAllFiles(folder);
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
@@ -119,23 +118,24 @@ public class LevelEditor extends JFrame {
 	//		running = false;
 	//	}
 	
-	public void getAllFiles(final File folder) {
-		for (final File entry : folder.listFiles()) {
-			if (entry.isDirectory()) {
-				if (!(entry.getName().equals("animation") || entry.getName().equals("player") || entry.getName().equals("area")))
-					getAllFiles(entry);
-			}
-			else {
-				String path = entry.getPath();
-				if (path.endsWith(".png")) {
-					Data d = new Data();
-					d.editorID = EditorConstants.getEditorIDFromPath(path);
-					d.filepath = path;
-					filepaths.add(d);
-				}
-			}
-		}
-	}
+	//	public void getAllFiles(final File folder) {
+	//		//		for (final File entry : folder.listFiles()) {
+	//		//			if (entry.isDirectory()) {
+	//		//				if (!(entry.getName().equals("animation") || entry.getName().equals("player") || entry.getName().equals("area")))
+	//		//					getAllFiles(entry);
+	//		//			}
+	//		//			else {
+	//		//				String path = entry.getPath();
+	//		//				if (path.endsWith(".png")) {
+	//		//					Data d = new Data();
+	//		//					d.editorID = EditorConstants.getEditorIDFromPath(path);
+	//		//					d.filepath = path;
+	//		//					filepaths.add(d);
+	//		//				}
+	//		//			}
+	//		//		}
+	//		//EditorConstants.getInstance();
+	//	}
 	
 	@Override
 	public void validate() {
