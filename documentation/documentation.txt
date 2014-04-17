@@ -489,7 +489,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Warp Point [PWD04#03@04]
+		ForestEntrance [PWD04#03@04]
 		
 		Tile ID:
 			A: 04 - Warp Point
@@ -520,7 +520,13 @@ not assume their information to be permanent.
 			R: TT - Target Area ID
 		Tile Specific ID:
 			G: SS - Sector ID in Target Area
-			B: 00 - None specified.
+			B: AA - Area Type ID
+				00 = Forest (Green Forest Entrance) 
+				01 = City (Path [Road])
+				02 = Mountain (Path [Dirt])
+				03 = Water (Water [No Borders])
+				04 = Cavern (Path [Dirt])
+				05 = Building (Door / Carpet)
 		Full Data(s):
 			05 TT SS 00
 		Description:
