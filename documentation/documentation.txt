@@ -585,7 +585,7 @@ not assume their information to be permanent.
 			R: 04 - Top Right Border
 			R: 05 - Right Border
 		Tile Specific ID:
-			G: 00 - None specified.
+			G: 00 - Area Type ID.
 			B: 00 - None specified.
 		Full Data(s):
 			07 00 00 00
