@@ -281,25 +281,22 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				switch (red) { //House related tiles. Way too many to list them orderly.
 					case 0x00: //Door
-						this.bitmap[0] = Art.house_door;
-						break;
-					case 0x01: //Bottom building
 						this.bitmap[0] = Art.house_bottom;
 						break;
-					case 0x02: //Bottom left building
+					case 0x01: //Bottom building
 						this.bitmap[0] = Art.house_bottom_left;
 						break;
-					case 0x03: //Bottom right building
+					case 0x02: //Bottom left building
 						this.bitmap[0] = Art.house_bottom_right;
 						break;
-					case 0x04: //Roof left
+					case 0x03: //Roof left
 						this.bitmap[0] = Art.changeColors(Art.house_roof_left, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
 						//this.bitmap[0] = Art.house_roof_left;
 						break;
-					case 0x05: //Roof middle
+					case 0x04: //Roof middle
 						this.bitmap[0] = Art.changeColors(Art.house_roof_middle, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
 						break;
-					case 0x06: //Roof right
+					case 0x05: //Roof right
 						this.bitmap[0] = Art.changeColors(Art.house_roof_right, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
 						break;
 				}
