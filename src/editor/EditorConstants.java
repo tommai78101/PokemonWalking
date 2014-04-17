@@ -1,5 +1,6 @@
 package editor;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.io.BufferedReader;
@@ -20,27 +21,58 @@ public class EditorConstants {
 	
 	//TODO: Add additional pixel data properties that can be edited/modified for the area.
 	
-	private final HashMap<String, Data> tileMap;
+	private final HashMap<Integer, Data> tileMap;
 	private static final EditorConstants instance = new EditorConstants();
 	
-	public static final String DEFAULT_TILE = "Empty";
+	public static final Color GRASS_GREEN = new Color(164, 231, 103);
+	public static final Color ROAD_WHITE = new Color(255, 244, 201);
+	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
+	public static final Color WATER_BLUE = new Color(0, 65, 255);
 	
 	private EditorConstants() {
 		int id = 1;
-		tileMap = new HashMap<String, Data>();
+		tileMap = new HashMap<Integer, Data>();
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
 			String line;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("#"))
+				Data data = new Data();
+				if (line.contains("*")) {
+					data.areaTypeIncluded = true;
+					Data.DataType type = Data.DataType.BLUE;
+					short i = 0;
+					byte count = 0x00;
+					while (line.charAt(i) != '*') {
+						if (line.charAt(i) == '%') {
+							count++;
+							if (count == 2)
+								type = Data.DataType.ALPHA;
+							else if (count == 3)
+								type = Data.DataType.RED;
+							else if (count == 4)
+								type = Data.DataType.GREEN;
+							else if (count == 5)
+								type = Data.DataType.BLUE;
+							else if (count >= 7)
+								type = Data.DataType.BLUE;
+						}
+						i++;
+					}
+					data.areaTypeIDType = type;
+					line = line.replace('*', '@');
+				}
+				if (line.startsWith("#")) {
+					data = null;
 					continue;
-				else if (line.startsWith("-"))
+				}
+				else if (line.startsWith("-")) {
 					//TODO: Modify GUI to categorize tiles into groups.
+					data = null;
 					continue;
+				}
 				else if (line.startsWith("%")) {
 					String trim = line.trim().replaceAll("\\s+", "").replaceAll("@", "00");
 					String[] tokens = trim.split("%");
-					Data data = new Data();
 					data.name = tokens[1].replace('_', ' ');
 					data.alpha = (byte) (Integer.parseInt(tokens[2], 16) & 0xFF);
 					data.red = (byte) (Integer.parseInt(tokens[3], 16) & 0xFF);;
@@ -71,8 +103,28 @@ public class EditorConstants {
 					data.button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
-					tileMap.put(tokens[1], data);
+					if (data.areaTypeIncluded) {
+						for (byte i = 0; i < 0x06; i++) {
+							switch (data.areaTypeIDType) {
+								case ALPHA:
+									tileMap.put((i << 24) | (data.red << 16) | (data.green << 8) | data.blue, data);
+									break;
+								case RED:
+									tileMap.put((data.alpha << 24) | (i << 16) | (data.green << 8) | data.blue, data);
+									break;
+								case GREEN:
+									tileMap.put((data.alpha << 24) | (data.red << 16) | (i << 8) | data.blue, data);
+									break;
+								case BLUE:
+									tileMap.put((data.alpha << 24) | (data.red << 16) | (data.green << 8) | i, data);
+									break;
+							}
+						}
+					}
+					else
+						tileMap.put((data.alpha << 24) | (data.red << 16) | (data.green << 8) | data.blue, data);
 					id++;
+					data = null;
 				}
 			}
 		}
@@ -200,17 +252,17 @@ public class EditorConstants {
 	//			return 99;
 	//	}
 	
-	public HashMap<String, Data> getTileMap() {
+	public HashMap<Integer, Data> getTileMap() {
 		return this.tileMap;
 	}
 	
-	public List<Map.Entry<String, Data>> getSortedTileMap() {
+	public List<Map.Entry<Integer, Data>> getSortedTileMap() {
 		final int size = this.tileMap.size();
-		final List<Map.Entry<String, Data>> list = new ArrayList<Map.Entry<String, Data>>(size);
+		final List<Map.Entry<Integer, Data>> list = new ArrayList<Map.Entry<Integer, Data>>(size);
 		list.addAll(this.tileMap.entrySet());
-		final Comparator<Map.Entry<String, Data>> c = new Comparator<Map.Entry<String, Data>>() {
+		final Comparator<Map.Entry<Integer, Data>> c = new Comparator<Map.Entry<Integer, Data>>() {
 			@Override
-			public int compare(Map.Entry<String, Data> d1, Map.Entry<String, Data> d2) {
+			public int compare(Map.Entry<Integer, Data> d1, Map.Entry<Integer, Data> d2) {
 				Data e1 = d1.getValue();
 				Data e2 = d2.getValue();
 				if (e1.editorID < e2.editorID)

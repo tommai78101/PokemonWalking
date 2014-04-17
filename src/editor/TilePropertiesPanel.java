@@ -187,32 +187,52 @@ public class TilePropertiesPanel extends JPanel {
 		this.add(tileBBIDField);
 	}
 	
-	public int getTileIDValue() {
-		return Integer.valueOf(tileIDField.getText());
+	public byte getAlpha() {
+		try {
+			return (byte) (Integer.valueOf(tileIDField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 	
 	public String getTileIDString() {
 		return tileIDField.getText();
 	}
 	
-	public int getExtendedTileIDValue() {
-		return Integer.valueOf(extTileIDField.getText());
+	public byte getRed() {
+		try {
+			return (byte) (Integer.valueOf(extTileIDField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 	
 	public String getExtendedTileIDString() {
 		return extTileIDField.getText();
 	}
 	
-	public int getTileIDGValue() {
-		return Integer.valueOf(tileGGIDField.getText());
+	public byte getGreen() {
+		try {
+			return (byte) (Integer.valueOf(tileGGIDField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 	
 	public String getTileIDGString() {
 		return tileGGIDField.getText();
 	}
 	
-	public int getTileIDBValue() {
-		return Integer.valueOf(tileBBIDField.getText());
+	public byte getBlue() {
+		try {
+			return (byte) (Integer.valueOf(tileBBIDField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 	
 	public String getTileIDBString() {

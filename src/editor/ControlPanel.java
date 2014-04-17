@@ -31,71 +31,11 @@ public class ControlPanel extends JPanel implements ActionListener {
 		
 		JPanel iconsPanel = new JPanel();
 		iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.Y_AXIS));
-		//		for (Data s : editor.getResourceFilePaths()) {
-		//			ImageIcon test = new ImageIcon(s.filepath);
-		//			JButton button = new JButton(test) {
-		//				private static final long serialVersionUID = 1L;
-		//				
-		//				@Override
-		//				public Dimension getMinimumSize() {
-		//					return new Dimension(Tile.WIDTH, Tile.HEIGHT);
-		//				}
-		//				
-		//				@Override
-		//				public Dimension getSize() {
-		//					return new Dimension(Tile.WIDTH, Tile.HEIGHT);
-		//				}
-		//				
-		//				@Override
-		//				public Dimension getPreferredSize() {
-		//					return new Dimension(Tile.WIDTH, Tile.HEIGHT);
-		//				}
-		//			};
-		//			button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-		//			button.setMargin(new Insets(0, 0, 0, 0));
-		//			button.setBorder(null);
-		//			String actionCommand = Integer.toString(s.editorID);
-		//			button.setActionCommand(actionCommand);
-		//			button.setName(s.filepath);
-		//			button.addActionListener(this);
-		//			iconsPanel.add(button);
-		//			s.image = test.getImage();
-		//			s.button = button;
-		//			if (s != null) {
-		//				buttonCache.put(s.editorID, s);
-		//			}
-		//		}
-		//		
-		
 		EditorConstants constants = EditorConstants.getInstance();
-		for (Iterator<Map.Entry<String, Data>> it = constants.getSortedTileMap().iterator(); it.hasNext();) {
-			Map.Entry<String, Data> entry = it.next();
+		for (Iterator<Map.Entry<Integer, Data>> it = constants.getSortedTileMap().iterator(); it.hasNext();) {
+			Map.Entry<Integer, Data> entry = it.next();
 			Data d = entry.getValue();
-			//ImageIcon icon = new ImageIcon(d.filepath);
-			//			JButton button = new JButton(icon) {
-			//				private static final long serialVersionUID = 1L;
-			//				
-			//				@Override
-			//				public Dimension getMinimumSize() {
-			//					return new Dimension(Tile.WIDTH, Tile.HEIGHT);
-			//				}
-			//				
-			//				@Override
-			//				public Dimension getSize() {
-			//					return new Dimension(Tile.WIDTH, Tile.HEIGHT);
-			//				}
-			//				
-			//				@Override
-			//				public Dimension getPreferredSize() {
-			//					return new Dimension(Tile.WIDTH, Tile.HEIGHT);
-			//				}
-			//			};
-			//			button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
-			//			button.setMargin(new Insets(0, 0, 0, 0));
-			//			button.setBorder(null);
-			//			button.setActionCommand(d.name);
-			//			button.addActionListener(this);
-			d.button.setActionCommand(d.name);
+			d.button.setActionCommand(Integer.toString((d.alpha << 24) | (d.red << 16) | (d.green << 8) | (d.blue)));
 			d.button.addActionListener(this);
 			iconsPanel.add(d.button);
 		}
@@ -135,10 +75,11 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		JButton button = (JButton) event.getSource();
-		this.iconName = button.getActionCommand();
-		Data d = EditorConstants.getInstance().getTileMap().get(this.iconName);
+		int color = Integer.parseInt(button.getActionCommand());
+		Data d = EditorConstants.getInstance().getTileMap().get(color);
 		if (d != null) {
 			this.selectedData = d;
+			this.iconName = d.name;
 			this.propertiesPanel.tileIDField.setText(Byte.toString(d.alpha));
 			this.propertiesPanel.extTileIDField.setText(Byte.toString(d.red));
 			this.propertiesPanel.tileGGIDField.setText(Byte.toString(d.green));
@@ -153,5 +94,9 @@ public class ControlPanel extends JPanel implements ActionListener {
 	
 	public Data getSelectedData() {
 		return this.selectedData;
+	}
+	
+	public TilePropertiesPanel getPropertiesPanel() {
+		return this.propertiesPanel;
 	}
 }
