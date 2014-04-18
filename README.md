@@ -30,6 +30,8 @@ It's still in very early stages of development. Possibly even earlier than "alph
 * Primitive Ground Height Lighting (Testing stages.)
 * Water! (Beta)
 * Bitmap animation! (Complete!)
+* Dialogues. (Beta)
+* Entity interaction. (Alpha)
 * Level Editor (Main features complete! Bare functionalities only!)
 
 **Known Issues:**
