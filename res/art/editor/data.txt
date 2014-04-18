@@ -38,12 +38,12 @@
 -
 % ForestEntrance % 04 % @ % @ % @ % res/art/floor/forestEntrance.png
 -
-% AreaZone % 05 % @ % @ % 00 % res/art/floor/forestEntrance.png  * %
-% AreaZone % 05 % @ % @ % 01 % res/art/floor/path.png            * %
-% AreaZone % 05 % @ % @ % 02 % res/art/floor/mt_ground.png       * %
-% AreaZone % 05 % @ % @ % 03 % res/art/editor/water.gif          * %
-% AreaZone % 05 % @ % @ % 04 % res/art/floor/mt_ground.png       * %
-% AreaZone % 05 % @ % @ % 05 % res/art/house/house_door.png      * %
+% AreaZone % 05 % @ % @ % 00 % res/art/floor/forestEntrance.png % * %
+% AreaZone % 05 % @ % @ % 01 % res/art/floor/path.png           % * %
+% AreaZone % 05 % @ % @ % 02 % res/art/floor/mt_ground.png      % * %
+% AreaZone % 05 % @ % @ % 03 % res/art/editor/water.gif         % * %
+% AreaZone % 05 % @ % @ % 04 % res/art/floor/mt_ground.png      % * %
+% AreaZone % 05 % @ % @ % 05 % res/art/house/house_door.png     % * %
 -
 % Stairs % 06 % 00 % * % @ % res/art/floor/stairs_bottom.png
 % Stairs % 06 % 01 % * % @ % res/art/floor/stairs_left.png
