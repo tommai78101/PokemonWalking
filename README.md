@@ -41,6 +41,6 @@ It's still in very early stages of development. Possibly even earlier than "alph
 * Create a game completely different from Pokémon games. (Extended Plan, won't guarantee it.)
 
 **Wanna chat?**
-You may head over to The Helper Forums, or Java-Gaming.org to post your feedback. Much appreciated. 
- http://www.thehelper.net/threads/java-pok%C3%A9mon-walking-algorithm.159287/  
- http://www.java-gaming.org/topics/pok-mon-walking/32546/view.html
+You may head over to The Helper Forums, or Java-Gaming.org to post your feedback. Much appreciated.     
+http://www.thehelper.net/threads/java-pok%C3%A9mon-walking-algorithm.159287/        
+http://www.java-gaming.org/topics/pok-mon-walking/32546/view.html           
