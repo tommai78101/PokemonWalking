@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -80,8 +81,8 @@ public class EditorConstants {
 					data.blue = (char) (Integer.parseInt(tokens[5], 16) & 0xFF);
 					data.filepath = tokens[6];
 					data.editorID = id;
-					ImageIcon icon = new ImageIcon(tokens[6]);
-					data.image = icon.getImage();
+					data.image = ImageIO.read(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
+					ImageIcon icon = new ImageIcon(data.image);
 					data.button = new JButton(icon) {
 						private static final long serialVersionUID = 1L;
 						
