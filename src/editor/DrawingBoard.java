@@ -22,6 +22,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 	
 	private BufferedImage image;
 	private int[] tiles;
+	private int[] tilesEditorID;
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
@@ -81,8 +82,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 			image = null;
 		}
 		tiles = new int[w * h];
-		for (int i = 0; i < tiles.length; i++)
+		tilesEditorID = new int[w * h];
+		for (int i = 0; i < tiles.length; i++) {
 			tiles[i] = 0;
+			tilesEditorID[i] = 0;
+		}
 		image = new BufferedImage(w * Tile.WIDTH, h * Tile.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 		for (int j = 0; j < image.getHeight(); j++) {
@@ -124,8 +128,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.createBufferStrategy(3);
 			bs = this.getBufferStrategy();
 		}
-		if (tiles != null) {
-			for (int j = 0; j < tiles.length; j++) {
+		if (tilesEditorID != null) {
+			for (int j = 0; j < tilesEditorID.length; j++) {
 				if (bitmapWidth <= 0)
 					break;
 				if (bitmapHeight <= 0)
@@ -133,13 +137,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 				int w = j % bitmapWidth;
 				int h = j / bitmapWidth;
 				
-				Data data = EditorConstants.getInstance().getTileMap().get(tiles[j]);
-				//Data data = editor.controlPanel.getSelectedData();
+				Data data = EditorConstants.getInstance().getTileMap().get(tilesEditorID[j]);
 				if (data == null) {
 					break;
 				}
 				if (data.image == null) {
 					tiles[j] = 0;
+					tilesEditorID[j] = 0;
 					continue;
 				}
 				
@@ -160,7 +164,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					switch (data.areaTypeIDType) {
 						case ALPHA:
 						default:
-							g.setColor(Color.white);
+							this.setBiomeTile((tiles[j] >> 24) & 0xFF, g);
 							break;
 						case RED:
 							this.setBiomeTile((tiles[j] >> 16) & 0xFF, g);
@@ -240,20 +244,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 			Data d = editor.controlPanel.getSelectedData();
 			if (d != null) {
 				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
-				//				if (!d.areaTypeIncluded) {
-				tiles[this.getMouseTileY() * bitmapWidth + this.getMouseTileX()] = (
+				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+				tiles[i] = (
 						panel.getAlpha() << 24) |
 						(panel.getRed() << 16) |
 						(panel.getGreen() << 8) |
 						panel.getBlue();
-				//				}
-				//				else {
-				//					int color = (d.areaTypeIDType == Data.DataType.ALPHA ? (d.alpha << 24) : (panel.getAlpha() << 24));
-				//					color = color | (d.areaTypeIDType == Data.DataType.RED ? (d.red << 16) : (panel.getRed() << 16));
-				//					color = color | (d.areaTypeIDType == Data.DataType.GREEN ? (d.green << 8) : (panel.getGreen() << 8));
-				//					color = color | (d.areaTypeIDType == Data.DataType.BLUE ? d.blue : panel.getBlue());
-				//					tiles[this.getMouseTileY() * bitmapWidth + this.getMouseTileX()] = color;
-				//				}
+				tilesEditorID[i] = d.editorID;
 			}
 			editor.input.forceCancelDrawing();
 			editor.validate();

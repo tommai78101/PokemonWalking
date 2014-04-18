@@ -187,9 +187,9 @@ public class TilePropertiesPanel extends JPanel {
 		this.add(tileBBIDField);
 	}
 	
-	public byte getAlpha() {
+	public char getAlpha() {
 		try {
-			return (byte) (Integer.valueOf(tileIDField.getText()) & 0xFF);
+			return (char) (Integer.valueOf(tileIDField.getText()) & 0xFF);
 		}
 		catch (NumberFormatException e) {
 			return 0;
@@ -200,9 +200,9 @@ public class TilePropertiesPanel extends JPanel {
 		return tileIDField.getText();
 	}
 	
-	public byte getRed() {
+	public char getRed() {
 		try {
-			return (byte) (Integer.valueOf(extTileIDField.getText()) & 0xFF);
+			return (char) (Integer.valueOf(extTileIDField.getText()) & 0xFF);
 		}
 		catch (NumberFormatException e) {
 			return 0;
@@ -213,9 +213,9 @@ public class TilePropertiesPanel extends JPanel {
 		return extTileIDField.getText();
 	}
 	
-	public byte getGreen() {
+	public char getGreen() {
 		try {
-			return (byte) (Integer.valueOf(tileGGIDField.getText()) & 0xFF);
+			return (char) (Integer.valueOf(tileGGIDField.getText()) & 0xFF);
 		}
 		catch (NumberFormatException e) {
 			return 0;
@@ -226,9 +226,9 @@ public class TilePropertiesPanel extends JPanel {
 		return tileGGIDField.getText();
 	}
 	
-	public byte getBlue() {
+	public char getBlue() {
 		try {
-			return (byte) (Integer.valueOf(tileBBIDField.getText()) & 0xFF);
+			return (char) (Integer.valueOf(tileBBIDField.getText()) & 0xFF);
 		}
 		catch (NumberFormatException e) {
 			return 0;

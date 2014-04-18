@@ -35,7 +35,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 		for (Iterator<Map.Entry<Integer, Data>> it = constants.getSortedTileMap().iterator(); it.hasNext();) {
 			Map.Entry<Integer, Data> entry = it.next();
 			Data d = entry.getValue();
-			d.button.setActionCommand(Integer.toString((d.alpha << 24) | (d.red << 16) | (d.green << 8) | (d.blue)));
+			d.button.setActionCommand(Integer.toString(d.editorID));
 			d.button.addActionListener(this);
 			iconsPanel.add(d.button);
 		}
@@ -75,15 +75,15 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		JButton button = (JButton) event.getSource();
-		int color = Integer.parseInt(button.getActionCommand());
-		Data d = EditorConstants.getInstance().getTileMap().get(color);
+		int id = Integer.parseInt(button.getActionCommand());
+		Data d = EditorConstants.getInstance().getTileMap().get(id);
 		if (d != null) {
 			this.selectedData = d;
 			this.iconName = d.name;
-			this.propertiesPanel.tileIDField.setText(Byte.toString(d.alpha));
-			this.propertiesPanel.extTileIDField.setText(Byte.toString(d.red));
-			this.propertiesPanel.tileGGIDField.setText(Byte.toString(d.green));
-			this.propertiesPanel.tileBBIDField.setText(Byte.toString(d.blue));
+			this.propertiesPanel.tileIDField.setText(Integer.toString(d.alpha));
+			this.propertiesPanel.extTileIDField.setText(Integer.toString(d.red));
+			this.propertiesPanel.tileGGIDField.setText(Integer.toString(d.green));
+			this.propertiesPanel.tileBBIDField.setText(Integer.toString(d.blue));
 		}
 		editor.validate();
 	}

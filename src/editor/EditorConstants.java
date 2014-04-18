@@ -30,7 +30,7 @@ public class EditorConstants {
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
 	
 	private EditorConstants() {
-		int id = 1;
+		int id = 0;
 		tileMap = new HashMap<Integer, Data>();
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
@@ -74,10 +74,10 @@ public class EditorConstants {
 					String trim = line.trim().replaceAll("\\s+", "").replaceAll("@", "00");
 					String[] tokens = trim.split("%");
 					data.name = tokens[1].replace('_', ' ');
-					data.alpha = (byte) (Integer.parseInt(tokens[2], 16) & 0xFF);
-					data.red = (byte) (Integer.parseInt(tokens[3], 16) & 0xFF);;
-					data.green = (byte) (Integer.parseInt(tokens[4], 16) & 0xFF);
-					data.blue = (byte) (Integer.parseInt(tokens[5], 16) & 0xFF);
+					data.alpha = (char) (Integer.parseInt(tokens[2], 16) & 0xFF);
+					data.red = (char) (Integer.parseInt(tokens[3], 16) & 0xFF);;
+					data.green = (char) (Integer.parseInt(tokens[4], 16) & 0xFF);
+					data.blue = (char) (Integer.parseInt(tokens[5], 16) & 0xFF);
 					data.filepath = tokens[6];
 					data.editorID = id;
 					ImageIcon icon = new ImageIcon(tokens[6]);
@@ -104,25 +104,13 @@ public class EditorConstants {
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
 					if (data.areaTypeIncluded) {
-						for (byte i = 0; i < 0x06; i++) {
-							switch (data.areaTypeIDType) {
-								case ALPHA:
-									tileMap.put((i << 24) | (data.red << 16) | (data.green << 8) | data.blue, data);
-									break;
-								case RED:
-									tileMap.put((data.alpha << 24) | (i << 16) | (data.green << 8) | data.blue, data);
-									break;
-								case GREEN:
-									tileMap.put((data.alpha << 24) | (data.red << 16) | (i << 8) | data.blue, data);
-									break;
-								case BLUE:
-									tileMap.put((data.alpha << 24) | (data.red << 16) | (data.green << 8) | i, data);
-									break;
-							}
+						for (char i = 0; i < 0x06; i++) {
+							data.areaType = i;
+							tileMap.put(data.editorID, data);
 						}
 					}
 					else
-						tileMap.put((data.alpha << 24) | (data.red << 16) | (data.green << 8) | data.blue, data);
+						tileMap.put(data.editorID, data);
 					id++;
 					data = null;
 				}
