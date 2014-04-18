@@ -64,7 +64,20 @@ public class FileControl extends JPanel implements ActionListener {
 					}
 					break;
 				case 2: //Open
-					System.out.println("Open");
+					JFileChooser opener = new JFileChooser();
+					opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+					opener.setVisible(true);
+					int answer = opener.showOpenDialog(null);
+					if (answer == JFileChooser.APPROVE_OPTION) {
+						try {
+							File f = opener.getSelectedFile();
+							BufferedImage image = ImageIO.read(f);
+							editor.drawingBoardPanel.openMapImage(image);
+						}
+						catch (IOException e1) {
+							e1.printStackTrace();
+						}
+					}
 					break;
 			}
 		}

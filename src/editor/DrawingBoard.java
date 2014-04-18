@@ -10,6 +10,8 @@ import java.awt.Image;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -276,5 +278,22 @@ public class DrawingBoard extends Canvas implements Runnable {
 			pixels[i] = tiles[i];
 		}
 		return buffer;
+	}
+	
+	public void openMapImage(BufferedImage image) {
+		this.setImageSize(image.getWidth(), image.getHeight());
+		int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+		List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getSortedTileMap();
+		for (int i = 0; i < tiles.length; i++) {
+			tiles[i] = srcTiles[i];
+			DATA_COLOR_LOOP: for (Map.Entry<Integer, Data> entry : list) {
+				Data d = entry.getValue();
+				int color = (d.alpha << 24) | (d.red << 16) | (d.green << 8) | d.blue;
+				if (tiles[i] == color) {
+					tilesEditorID[i] = d.editorID;
+					break DATA_COLOR_LOOP;
+				}
+			}
+		}
 	}
 }
