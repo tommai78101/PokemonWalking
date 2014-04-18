@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
+
 import level.PixelData;
 import level.WorldConstants;
 import resources.Art;
@@ -100,6 +101,7 @@ public class BaseScreen extends BaseBitmap {
 		int green = (dataColor >> 8) & 0xFF;
 		int blue = dataColor & 0xFF;
 		int biomeColor = getBiomeBaseColor(tileID, red, green, blue);
+		int tick = 0;
 		
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
 			
@@ -116,9 +118,19 @@ public class BaseScreen extends BaseBitmap {
 				int alpha = (color >> 24) & 0xFF;
 				//This alpha value determines the areas in the bitmap what to draw.
 				//Has nothing to do with pixel data properties.
+				
 				switch (alpha) {
 					case 0x0:
-						this.pixels[tgt + xx] = biomeColor;
+						//Biome Color with a bit of speckled light/dark patches.
+						if ((tick++ % 17 < 7) && (tick++ % 21 < 2))
+							this.pixels[tgt + xx] = lighten(biomeColor, 0.07f);
+						else if ((tick++ % 23 < 4) && (tick++ % 19 < 3))
+							this.pixels[tgt + xx] = darken(biomeColor, 0.07f);
+						else
+							this.pixels[tgt + xx] = biomeColor;
+						tick++;
+						if (tick > w * w)
+							tick = 0;
 						break;
 					case 0x32:
 						this.pixels[tgt + xx] = lighten(biomeColor, 0.003f);
@@ -127,7 +139,7 @@ public class BaseScreen extends BaseBitmap {
 						this.pixels[tgt + xx] = lighten(biomeColor, 0.006f);
 						break;
 					default:
-						this.pixels[tgt + xx] = blendPixels(this.pixels[tgt + xx], color);
+						this.pixels[tgt + xx] = color;
 						break;
 				}
 			}
@@ -192,25 +204,6 @@ public class BaseScreen extends BaseBitmap {
 	//-------------------------------------------
 	//Private methods
 	
-	private int blendPixels(int bgColor, int blendColor) {
-		int alphaBlend = (blendColor >> 24) & 0xFF;
-		int alphaBackground = 256 - alphaBlend;
-		
-		int bgRed = bgColor & 0xFF0000;
-		int bgGreen = bgColor & 0xFF00;
-		int bgBlue = bgColor & 0xFF;
-		
-		int blendRed = blendColor & 0xFF0000;
-		int blendGreen = blendColor & 0xFF00;
-		int blendBlue = blendColor & 0xFF;
-		
-		int red = ((blendRed * alphaBlend + bgRed * alphaBackground) >> 8) & 0xFF0000;
-		int green = ((blendGreen * alphaBlend + bgGreen * alphaBackground) >> 8) & 0xFF00;
-		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
-		
-		return 0xFF000000 | red | green | blue;
-	}
-	
 	private int getBiomeBaseColor(int tileID, int red, int green, int blue) {
 		int color = WorldConstants.GRASS_GREEN;
 		switch (tileID) {
@@ -265,9 +258,7 @@ public class BaseScreen extends BaseBitmap {
 		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16 | ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
 	}
 	
-	@SuppressWarnings("unused")
 	private int darken(int color, float amount) {
-		int a = (color >> 24) & 0xFF;
 		int r = (color >> 16) & 0xFF;
 		int g = (color >> 8) & 0xFF;
 		int b = color & 0xFF;

@@ -1,6 +1,7 @@
 ﻿Pokémon Walking - Documentation
 
 Changelogs:
+r7: Changing some of the info below.
 r6: Added more tiles.
 r5: Added a beginner's section, "How to Debug."
 r4: Added new tiles to the Tiles section.
@@ -28,13 +29,16 @@ Metadata...........................[PWD04]
 		Overworld..................[PWD04#02@01]
 		Sector.....................[PWD04#02@02]
 	Tiles..........................[PWD04#03]
-		Grass......................[PWD04#03@01]
+		Path.......................[PWD04#03@01]
 		Ledge......................[PWD04#03@02]
 		Tree.......................[PWD04#03@03]
 		Warp Point.................[PWD04#03@04]
 		Area Connection Point......[PWD04#03@05]
 		Stairs.....................[PWD04#03@06]
-		Sign.......................[PWD04#03@07]
+		Water......................[PWD04#03@07]
+		Sign.......................[PWD04#03@08]
+		House......................[PWD04#03@09]
+		House Door.................[PWD04#03@10]
 Player.............................[PWD05]
 Controls...........................[PWD06]
 	Walking Algorithm..............[PWD06#01]
@@ -378,12 +382,12 @@ not assume their information to be permanent.
 			R: 01 - Mountain ground.
 			R: 02 - Path.
 		Tile Specific ID:
-			G: 00 - Area Type.
+			G: TT - Area Type.
 			B: HH - Ground Height.
 		Full Data(s):
-			01 00 00 HH
-			01 01 00 HH
-			01 02 00 HH
+			01 00 TT HH
+			01 01 TT HH
+			01 02 TT HH
 		Description:
 			Walkable path tiles, may also represents unpaved roads or 
 			fields.
@@ -425,6 +429,7 @@ not assume their information to be permanent.
 			R: 05 - Top right corner ledge
 			R: 06 - Right facing ledge
 			R: 07 - Bottom right corner ledge
+			
 			R: 08 - Bottom facing double ledge
 			R: 09 - Bottom left corner double ledge
 			R: 0A - Left facing double ledge
@@ -433,6 +438,7 @@ not assume their information to be permanent.
 			R: 0D - Top right corner double ledge
 			R: 0E - Right facing double ledge
 			R: 0F - Bottom right corner double ledge
+			
 			R: 10 - Bottom facing inner ledge
 			R: 11 - Bottom left inner ledge
 			R: 12 - Left facing inner ledge
@@ -442,10 +448,10 @@ not assume their information to be permanent.
 			R: 16 - Right facing inner ledge
 			R: 17 - Bottom right inner ledge
 		Tile Specific ID:
-			G: 00 - Area Type ID (Temporary)
+			G: TT - Area Type ID (Temporary)
 			B: 00 - Ledge Type ID (Temporary)
 		Full Data(s):
-			02 RR 00 00
+			02 RR TT 00
 		Description:		
 			Can be jumped across according to its height, which is determined
 			by direction from where the player starts jumping. Horizontal
@@ -483,7 +489,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Warp Point [PWD04#03@04]
+		ForestEntrance [PWD04#03@04]
 		
 		Tile ID:
 			A: 04 - Warp Point
@@ -501,6 +507,9 @@ not assume their information to be permanent.
 			coordinates. The maximum amount of warp points for a single area is
 			256. The range of where the player is to spawn in the area is 0 ~ 255.
 			
+			Due to limitations of game data format, all warp points of different
+			bitmaps will have its own data tile ID.
+			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 		Area Connection Point (ACP) [PWD04#03@05]
@@ -511,7 +520,13 @@ not assume their information to be permanent.
 			R: TT - Target Area ID
 		Tile Specific ID:
 			G: SS - Sector ID in Target Area
-			B: 00 - None specified.
+			B: AA - Area Type ID
+				00 = Forest (Green Forest Entrance) 
+				01 = City (Path [Road])
+				02 = Mountain (Path [Dirt])
+				03 = Water (Water [No Borders])
+				04 = Cavern (Path [Dirt])
+				05 = Building (Door / Carpet)
 		Full Data(s):
 			05 TT SS 00
 		Description:
@@ -563,13 +578,14 @@ not assume their information to be permanent.
 		Tile ID:
 			A: 07 - Water
 		Extended Tile ID:
-			R: 00 - Left Border
-			R: 01 - Top Left Border
-			R: 02 - Top Border
-			R: 03 - Top Right Border
-			R: 04 - Right Border
+			R: 00 - No Border
+			R: 01 - Left Border
+			R: 02 - Top Left Border
+			R: 03 - Top Border
+			R: 04 - Top Right Border
+			R: 05 - Right Border
 		Tile Specific ID:
-			G: 00 - None specified.
+			G: 00 - Area Type ID.
 			B: 00 - None specified.
 		Full Data(s):
 			07 00 00 00
@@ -646,6 +662,71 @@ not assume their information to be permanent.
 			the sign.
 			
 			WARNING: Dialogue ID must not equal to 0, or 0x0000. This is reserved.
+			
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		House [PWD04#03@09]
+		
+		Tile ID:
+			A: 09 - House
+		Extended Tile ID:
+			R: HH - House-related Tiles:
+				00 - Bottom
+				01 - Bottom Left
+				02 - Bottom Right
+				03 - Single Roof Left
+				04 - Single Roof Middle
+				05 - Single Roof Right
+		Tile Specific ID:
+			G: 00 - Area/Sector ID.
+			B: 00 - None specified.
+		Full Data(s):
+			09 HH 00 00
+		Description:
+			Represents buildings in the game. A single tile only represents a 
+			portion of the building.
+			
+			Roofs are colored in gray, which is used for manipulating colors in the
+			game. Colors are to be determined by the game, not by the map makers.
+			The roof colors are determined by the area/sector ID.
+			
+			Doors are not related to Houses, even though they are entrances to
+			houses. This is due to limitations of the game data format.
+		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		House Door [PWD04#03@10]
+		
+		Tile ID:
+			A: 0A - Door
+		Extended Tile ID:
+			R: TT - Target Area
+		Tile Specific ID:
+			G: XX - X position of Target Area
+			B: YY - Y position of Target Area
+		Full Data(s):
+			0A TT XX YY
+		Description:
+			Another type of warp point. For more information, see Warp Points. 
+			[PWD04#03@04].	
+			
+			Door warp points will tell the game that the player is indoors, and
+			is no longer outside in the overworld.
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		NPCs
+		
+		* Don't know how they are to be placed on a map.
+		* Don't know how to control them via AI.
+		* Need to have its own animation.
+		
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Items
+		
+		*Objects the player is able to interact with.
+		* Requires player inventory and inventory management system.
 			
 -------------------------------
 

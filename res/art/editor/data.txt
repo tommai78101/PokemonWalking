@@ -1,0 +1,73 @@
+# Editor related data management file
+#
+# Specs:
+# #: This is a comment. It will be ignored.
+# %: Delimiter.
+# @: Values must be entered manually. Default is 0.
+# -: New Section.
+# _: Space character placeholder.
+# *: Includes area type.
+# Here's how it is written:
+#		% Tile Name % Alpha % Red % Green % Blue % Filepath
+
+% Empty % 00 % 00 % 00 %00 % res/art/debug/no_png.png
+-
+% Path_[Grass] % 01 % 00 % * % @ % res/art/floor/grass.png 
+% Path_[Dirt] % 01 % 01 % * % @ % res/art/floor/mt_ground.png
+% Path_[Road] % 01 % 02 % * % @ % res/art/floor/path.png
+-
+% Ledge % 02 % 00 % * % @ % res/art/wall/ledge_bottom.png
+% Ledge % 02 % 01 % * % @ % res/art/wall/ledge_bottom_left.png
+% Ledge % 02 % 02 % * % @ % res/art/wall/ledge_left.png
+% Ledge % 02 % 03 % * % @ % res/art/wall/ledge_top_left.png
+% Ledge % 02 % 04 % * % @ % res/art/wall/ledge_top.png
+% Ledge % 02 % 05 % * % @ % res/art/wall/ledge_top_right.png
+% Ledge % 02 % 06 % * % @ % res/art/wall/ledge_right.png
+% Ledge % 02 % 07 % * % @ % res/art/wall/ledge_bottom_right.png
+-
+% Ledge_[Mountain] % 02 % 08 % * % @ % res/art/wall/ledge_mt_bottom.png
+% Ledge_[Mountain] % 02 % 09 % * % @ % res/art/wall/ledge_mt_bottom_left.png
+% Ledge_[Mountain] % 02 % 0A % * % @ % res/art/wall/ledge_mt_left.png
+% Ledge_[Mountain] % 02 % 0B % * % @ % res/art/wall/ledge_mt_top_left.png
+% Ledge_[Mountain] % 02 % 0C % * % @ % res/art/wall/ledge_mt_top.png
+% Ledge_[Mountain] % 02 % 0D % * % @ % res/art/wall/ledge_mt_top_right.png
+% Ledge_[Mountain] % 02 % 0E % * % @ % res/art/wall/ledge_mt_right.png
+% Ledge_[Mountain] % 02 % 0F % * % @ % res/art/wall/ledge_mt_bottom_right.png
+-
+% Tree_[Small] % 03 % 00 % 00 % 00 % res/art/wall/treeSmall.png
+-
+% ForestEntrance % 04 % @ % @ % @ % res/art/floor/forestEntrance.png
+-
+% AreaZone % 05 % @ % @ % 00 % res/art/floor/forestEntrance.png  * %
+% AreaZone % 05 % @ % @ % 01 % res/art/floor/path.png            * %
+% AreaZone % 05 % @ % @ % 02 % res/art/floor/mt_ground.png       * %
+% AreaZone % 05 % @ % @ % 03 % res/art/editor/water.gif          * %
+% AreaZone % 05 % @ % @ % 04 % res/art/floor/mt_ground.png       * %
+% AreaZone % 05 % @ % @ % 05 % res/art/house/house_door.png      * %
+-
+% Stairs % 06 % 00 % * % @ % res/art/floor/stairs_bottom.png
+% Stairs % 06 % 01 % * % @ % res/art/floor/stairs_left.png
+% Stairs % 06 % 02 % * % @ % res/art/floor/stairs_top.png
+% Stairs % 06 % 03 % * % @ % res/art/floor/stairs_right.png
+% Stairs_[Double] % 06 % 04 % * % @ % res/art/floor/stairs_mt_bottom.png
+% Stairs_[Double] % 06 % 05 % * % @ % res/art/floor/stairs_mt_left.png
+% Stairs_[Double] % 06 % 06 % * % @ % res/art/floor/stairs_mt_top.png
+% Stairs_[Double] % 06 % 07 % * % @ % res/art/floor/stairs_mt_right.png
+-
+% Water % 07 % 00 % * % @ % res/art/editor/water.gif
+% Water % 07 % 01 % * % @ % res/art/editor/water_left.gif
+% Water % 07 % 02 % * % @ % res/art/editor/water_top_left.gif
+% Water % 07 % 03 % * % @ % res/art/editor/water_top.gif
+% Water % 07 % 04 % * % @ % res/art/editor/water_top_right.gif
+% Water % 07 % 05 % * % @ % res/art/editor/water_right.gif
+-
+% Sign % 08 % @ % @ % @ % res/art/wall/sign.png
+-
+% House % 09 % 00 % @ % @ % res/art/house/house_bottom.png
+% House % 09 % 01 % @ % @ % res/art/house/house_bottom_left.png
+% House % 09 % 02 % @ % @ % res/art/house/house_bottom_right.png
+% House % 09 % 03 % @ % @ % res/art/house/house_roof_left.png
+% House % 09 % 04 % @ % @ % res/art/house/house_roof_middle.png
+% House % 09 % 05 % @ % @ % res/art/house/house_roof_right.png
+-
+% Door % 0A % @ % @ % @ % res/art/house/house_door.png

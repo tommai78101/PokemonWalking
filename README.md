@@ -1,12 +1,13 @@
+![Imgur](http://i.imgur.com/032wf8V.png)
+
 ![Imgur](http://i.imgur.com/Yv9F1P4.png)
 
-![Imgur](http://i.imgur.com/yn1E4Z5.png)
-
-### Pokémon Walking Algorithm (Working Title)
+### Pokémon Walking Algorithm (Working Title) 
 ===
  
 **Abstract:**
-Implements the walking algorithm used in classic Pokémon G/S/C games.
+Implements the walking algorithm used in classic Pokémon G/S/C games. 
+**(NEW:)** Also includes a level editor to create your own game areas.
 
 **Note:** *It does not mimic the walking algorithm used in Pokémon R/B/Y games (1st generation games).*
 
@@ -29,14 +30,15 @@ It's still in very early stages of development. Possibly even earlier than "alph
 * Primitive Ground Height Lighting (Testing stages.)
 * Water! (Beta)
 * Bitmap animation! (Complete!)
+* Level Editor (Main features complete! Bare functionalities only!)
 
 **Known Issues:**
-* (NEW) There may be issues with the tiles-to-tiles interaction, causing unwanted bugs.
-* (NEW) There may be hidden issues I haven't seen/know of yet.
+* There may be issues with the tiles-to-tiles interaction, causing unwanted bugs.
+* There may be hidden issues I haven't seen/know of yet.
 
 **Plans:**
 * Implement all walking situations from the original games. Walking, surfing, jumping over ledges, riding bicycle, etc. (Main goal)
-* (NEW) Create a game completely different from Pokémon games. (Extended Plan, won't guarantee it.)
+* Create a game completely different from Pokémon games. (Extended Plan, won't guarantee it.)
 
 **Wanna chat?**
 You may head over to The Helper Forums, or Java-Gaming.org to post your feedback. Much appreciated. 

@@ -2,7 +2,6 @@ package level;
 
 import resources.Art;
 import screen.BaseBitmap;
-import entity.Player;
 
 public class PixelData {
 	//This class contains all of the area's pixel color, pixel's properties, pixel flags to check, etc.
@@ -29,7 +28,9 @@ public class PixelData {
 	//This can also give flexibility when it comes to puzzle-themed areas.
 	//Now adding animations.
 	public BaseBitmap[] bitmap;
+	public BaseBitmap[] biomeBitmap;
 	public int bitmapTick;
+	public int biomeBitmapTick;
 	
 	//This can also be "isWayPoint".
 	private boolean isWarpZone;
@@ -47,6 +48,7 @@ public class PixelData {
 		this.targetSector = -1;
 		this.groundHeight = 0; //Default
 		this.bitmapTick = 0;
+		this.biomeBitmapTick = 0;
 		
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
@@ -97,20 +99,30 @@ public class PixelData {
 	 * */
 	public void prepareBitmap(int alpha, int red, int green, int blue) {
 		switch (alpha) {
-			case 0x01: //Flat grass
+			case 0x01: //Path
 				this.bitmap = new BaseBitmap[1];
-				switch (red) { //Terrain tile type
+				switch (red) { //Tile Type
 					case 0x00: //Grass
 						this.bitmap[0] = Art.grass;
 						break;
 					case 0x01: //Mountain ground
 						this.bitmap[0] = Art.mt_ground;
 						break;
-					case 0x02:
+					case 0x02: //Road / Path
 						this.bitmap[0] = Art.path;
 						break;
 					default:
-						
+						break;
+				}
+				this.biomeBitmap = new BaseBitmap[1];
+				switch (green) { //Area Type
+					case 0x00:
+						this.biomeBitmap[0] = Art.grass; //Forest
+						break;
+					case 0x02:
+						this.biomeBitmap[0] = Art.mt_ground; //Mountain
+						break;
+					default:
 						break;
 				}
 				break;
@@ -198,10 +210,8 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.smallTree;
 				break;
-			case 0x04: //Warp point
+			case 0x04: //Warp point (Refer to documentation for flaws.)
 				this.bitmap = new BaseBitmap[1];
-				//TODO: Implement an Area Type ID for warp points. Entrances must fit the theme of the biome 
-				//the warp point is in.
 				this.bitmap[0] = Art.forestEntrance;
 				break;
 			case 0x05: //ACP (Refer to documentation.)
@@ -209,7 +219,7 @@ public class PixelData {
 				//TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
 				this.bitmap[0] = Art.grass;
 				break;
-			case 0x06:
+			case 0x06: //Stairs
 				this.bitmap = new BaseBitmap[1];
 				switch (red) {
 					case 0x00:
@@ -238,8 +248,8 @@ public class PixelData {
 						break;
 				}
 				break;
-			case 0x07:
-			//Always start with the first frame of any animation.
+			case 0x07: //Water
+				//Always start with the first frame of any animation.
 			{
 				switch (red) {
 					case 0x00: //Pure water, no border.
@@ -263,9 +273,37 @@ public class PixelData {
 				}
 				break;
 			}
-			case 0x08:
+			case 0x08: //Sign
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.sign;
+				break;
+			case 0x09: //House
+				this.bitmap = new BaseBitmap[1];
+				switch (red) { //House related tiles. Way too many to list them orderly.
+					case 0x00: //Door
+						this.bitmap[0] = Art.house_bottom;
+						break;
+					case 0x01: //Bottom building
+						this.bitmap[0] = Art.house_bottom_left;
+						break;
+					case 0x02: //Bottom left building
+						this.bitmap[0] = Art.house_bottom_right;
+						break;
+					case 0x03: //Roof left
+						this.bitmap[0] = Art.changeColors(Art.house_roof_left, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
+						//this.bitmap[0] = Art.house_roof_left;
+						break;
+					case 0x04: //Roof middle
+						this.bitmap[0] = Art.changeColors(Art.house_roof_middle, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
+						break;
+					case 0x05: //Roof right
+						this.bitmap[0] = Art.changeColors(Art.house_roof_right, WorldConstants.convertToMainAreaColor(green), WorldConstants.convertToSecondaryAreaColor(green));
+						break;
+				}
+				break;
+			case 0x0A: //House Door
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.house_door;
 				break;
 			default: //Any other type of tiles.
 				break;
@@ -274,6 +312,10 @@ public class PixelData {
 			this.bitmap = new BaseBitmap[1];
 			this.bitmap[0] = Art.error;
 		}
+		if (this.biomeBitmap == null) {
+			this.biomeBitmap = new BaseBitmap[1];
+			this.biomeBitmap[0] = Art.grass; //By default, biome bitmap should be grass.
+		}
 	}
 	
 	/**
@@ -281,7 +323,10 @@ public class PixelData {
 	 * area's information on what the player should do and don't.
 	 * 
 	 * <p>
-	 * Some of the features are currently unused.
+	 * Some of the features are currently unused. Especially collision detection.
+	 * 
+	 * <p>
+	 * Only the ones that set target areas, warp zone areas, etc. are the ones being used.
 	 * 
 	 * @param alpha
 	 *            The alpha value of the pixel data's color.
@@ -304,90 +349,97 @@ public class PixelData {
 				this.groundHeight = blue;
 				break;
 			case 0x02: //Ledges
-				switch (red) {
-					case 0x00: //Bottom
-						this.facingsBlocked[Player.UP] = false;
-						this.facingsBlocked[Player.DOWN] = true;
-						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = false;
-						break;
-					case 0x01: //Bottom left
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					case 0x02: //Left
-						this.facingsBlocked[Player.UP] = false;
-						this.facingsBlocked[Player.DOWN] = false;
-						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = false;
-						break;
-					case 0x03: //Top left
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					case 0x04: //Top
-						this.facingsBlocked[Player.UP] = true;
-						this.facingsBlocked[Player.DOWN] = false;
-						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = false;
-						break;
-					case 0x05: //Top Right
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					case 0x06: //Right
-						this.facingsBlocked[Player.UP] = false;
-						this.facingsBlocked[Player.DOWN] = false;
-						this.facingsBlocked[Player.LEFT] = false;
-						this.facingsBlocked[Player.RIGHT] = false;
-						break;
-					case 0x07: //Bottom Right
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					//------------------------------------------------------------
-					//Same order, but with mountain ledges.
-					case 0x08:
-					case 0x09:
-					case 0x0A:
-					case 0x0B:
-					case 0x0C:
-					case 0x0D:
-					case 0x0E:
-					case 0x0F:
-					case 0x10:
-					case 0x11:
-					case 0x12:
-					case 0x13:
-					case 0x14:
-					case 0x15:
-					case 0x16:
-					case 0x17:
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-					default:
-						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-						break;
-				}
+				//				switch (red) {
+				//					case 0x00: //Bottom
+				//						this.facingsBlocked[Player.UP] = false;
+				//						this.facingsBlocked[Player.DOWN] = true;
+				//						this.facingsBlocked[Player.LEFT] = false;
+				//						this.facingsBlocked[Player.RIGHT] = false;
+				//						break;
+				//					case 0x01: //Bottom left
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					case 0x02: //Left
+				//						this.facingsBlocked[Player.UP] = false;
+				//						this.facingsBlocked[Player.DOWN] = false;
+				//						this.facingsBlocked[Player.LEFT] = false;
+				//						this.facingsBlocked[Player.RIGHT] = false;
+				//						break;
+				//					case 0x03: //Top left
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					case 0x04: //Top
+				//						this.facingsBlocked[Player.UP] = true;
+				//						this.facingsBlocked[Player.DOWN] = false;
+				//						this.facingsBlocked[Player.LEFT] = false;
+				//						this.facingsBlocked[Player.RIGHT] = false;
+				//						break;
+				//					case 0x05: //Top Right
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					case 0x06: //Right
+				//						this.facingsBlocked[Player.UP] = false;
+				//						this.facingsBlocked[Player.DOWN] = false;
+				//						this.facingsBlocked[Player.LEFT] = false;
+				//						this.facingsBlocked[Player.RIGHT] = false;
+				//						break;
+				//					case 0x07: //Bottom Right
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					//------------------------------------------------------------
+				//					//Same order, but with mountain ledges.
+				//					case 0x08:
+				//					case 0x09:
+				//					case 0x0A:
+				//					case 0x0B:
+				//					case 0x0C:
+				//					case 0x0D:
+				//					case 0x0E:
+				//					case 0x0F:
+				//					case 0x10:
+				//					case 0x11:
+				//					case 0x12:
+				//					case 0x13:
+				//					case 0x14:
+				//					case 0x15:
+				//					case 0x16:
+				//					case 0x17:
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//					default:
+				//						this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//						break;
+				//				}
 				break;
 			case 0x03: //Trees
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x04: //Warp Point
 				this.targetArea = red;
 				this.isWarpZone = true;
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 			case 0x05: //ACP (Refer to documentation.)
 				this.targetArea = red;
 				this.targetSector = green;
 				this.isWarpZone = false;
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 			case 0x06: //Stairs
 				break;
 			case 0x07: //Water
 				//TODO: Needs to do something with this. It must not block the player, however, without
 				//special boolean value, it will always block player from advancing.
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 			case 0x08: //Sign
-				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				break;
+			case 0x09: //House
+				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				break;
+			case 0x0A: //House Door
+				this.targetArea = red;
+				this.isWarpZone = true;
 				break;
 			default:
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
@@ -419,6 +471,9 @@ public class PixelData {
 		this.bitmapTick++;
 		if (this.bitmapTick >= this.bitmap.length)
 			this.bitmapTick = 0;
+		this.biomeBitmapTick++;
+		if (this.biomeBitmapTick >= this.biomeBitmap.length)
+			this.biomeBitmapTick = 0;
 	}
 	
 	public BaseBitmap getBitmap() {
@@ -427,5 +482,9 @@ public class PixelData {
 	
 	public int getGroundHeight() {
 		return this.groundHeight;
+	}
+	
+	public BaseBitmap getBiomeBitmap() {
+		return this.biomeBitmap[this.biomeBitmapTick];
 	}
 }
