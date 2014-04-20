@@ -442,6 +442,29 @@ public class Player extends Entity {
 	}
 	
 	/**
+	 * Returns the player's state (Riding or Not Riding Bicycle).
+	 * 
+	 * @return True, if player is riding. False, if player is not.
+	 * */
+	public boolean isRidingBicycle() {
+		return this.isOnBicycle;
+	}
+	
+	/**
+	 * Changes the player's state to Riding.
+	 * */
+	public void startsRidingBicycle() {
+		this.isOnBicycle = true;
+	}
+	
+	/**
+	 * Changes the player's state to Walking.
+	 * */
+	public void getsOffBicycle() {
+		this.isOnBicycle = false;
+	}
+
+	/**
 	 * Lets the player interact with the data tile ID.
 	 * 
 	 * @param dataColor
