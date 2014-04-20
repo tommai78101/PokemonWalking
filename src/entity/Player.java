@@ -430,6 +430,7 @@ public class Player extends Entity {
 	 * */
 	public void goesInWater() {
 		this.isInWater = true;
+		this.isOnBicycle = false;
 	}
 	
 	/**
@@ -437,6 +438,7 @@ public class Player extends Entity {
 	 * */
 	public void leavesWater() {
 		this.isInWater = false;
+		this.isOnBicycle = false;
 	}
 	
 	/**
@@ -616,7 +618,6 @@ public class Player extends Entity {
 	@Override
 	public void tick() {
 		//TODO: Find some way of allowing players to ride bicycle.
-		//this.isOnBicycle = true;
 		if (!this.lockJumping) {
 			if (!this.enableInteraction) {
 				walk();
@@ -657,7 +658,10 @@ public class Player extends Entity {
 		else if (this.lockJumping) {
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
 			//Walking animation while in the air. Shouldn't jump when in water.
-			output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
+			if (this.isOnBicycle)
+				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
+			else
+				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 			
 		}
 		else {
