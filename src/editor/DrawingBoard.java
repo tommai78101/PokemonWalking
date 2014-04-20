@@ -12,10 +12,12 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
 import abstracts.Tile;
 
 public class DrawingBoard extends Canvas implements Runnable {
@@ -248,10 +250,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 				tiles[i] = (
-						panel.getAlpha() << 24) |
-						(panel.getRed() << 16) |
-						(panel.getGreen() << 8) |
-						panel.getBlue();
+					panel.getAlpha() << 24) |
+					(panel.getRed() << 16) |
+					(panel.getGreen() << 8) |
+					panel.getBlue();
 				tilesEditorID[i] = d.editorID;
 			}
 			editor.input.forceCancelDrawing();
@@ -284,14 +286,45 @@ public class DrawingBoard extends Canvas implements Runnable {
 		this.setImageSize(image.getWidth(), image.getHeight());
 		int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
 		List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getSortedTileMap();
-		for (int i = 0; i < tiles.length; i++) {
+		TILE_LOOP: for (int i = 0; i < tiles.length; i++) {
 			tiles[i] = srcTiles[i];
 			DATA_COLOR_LOOP: for (Map.Entry<Integer, Data> entry : list) {
 				Data d = entry.getValue();
-				int color = (d.alpha << 24) | (d.red << 16) | (d.green << 8) | d.blue;
-				if (tiles[i] == color) {
-					tilesEditorID[i] = d.editorID;
-					break DATA_COLOR_LOOP;
+				int alpha = ((srcTiles[i] >> 24) & 0xFF);
+				if (alpha == d.alpha) {
+					switch (alpha) {
+						case 0x01: //Path
+						case 0x02: //Ledges
+						case 0x06: //Stairs
+						case 0x07: //Water
+						case 0x09: //House
+							//Extended Tile IDs are used to differenate tiles.
+							int red = ((srcTiles[i] >> 16) & 0xFF);
+							if (red == d.red) {
+								tilesEditorID[i] = d.editorID;
+								continue TILE_LOOP;
+							}
+							else
+								continue DATA_COLOR_LOOP;
+						case 0x05: //Area Zone
+							//Extended Tile IDs are used to differenate tiles.
+							int blue = srcTiles[i] & 0xFF;
+							if (blue == d.blue) {
+								tilesEditorID[i] = d.editorID;
+								continue TILE_LOOP;
+							}
+							else
+								continue DATA_COLOR_LOOP;
+						default:
+							//Alpha value is only used.
+							tilesEditorID[i] = d.editorID;
+							continue TILE_LOOP;
+					}
+
+				}
+				else {
+					tilesEditorID[i] = 0;
+					continue TILE_LOOP;
 				}
 			}
 		}

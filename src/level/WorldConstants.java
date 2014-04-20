@@ -22,10 +22,7 @@ public class WorldConstants {
 	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
 	
 	//Building Roof Colors / Main Area Color Theme
-	public static final int AREA_1_COLOR = 0xFF676767;
-	
-	//Building Roof Alpha Colors / Secondary Area Color Theme
-	public static final int AREA_1_ALPHA_COLOR = 0xFFF7F7F7;
+	public static final int AREA_1_COLOR = 0xFFA495B0;
 
 	/**
 	 * Returns the area matching the given area ID value.
@@ -67,32 +64,16 @@ public class WorldConstants {
 	}
 	
 	/**
-	 * Returns the primary area color theme of the given area ID.
+	 * Returns the area color theme of the given area ID.
 	 * 
 	 * @param areaID
 	 *            The area ID value.
 	 * @return The primary area color of full opacity.
 	 * */
-	public static int convertToMainAreaColor(int areaID) {
+	public static int convertToAreaColor(int areaID) {
 		switch (areaID) {
 			case TEST_WORLD_1:
 				return AREA_1_COLOR;
-			default:
-				return 0;
-		}
-	}
-	
-	/**
-	 * Returns the secondary area color theme of the given area ID.
-	 * 
-	 * @param areaID
-	 *            The area ID value.
-	 * @return The secondary area color of full opacity.
-	 * */
-	public static int convertToSecondaryAreaColor(int areaID) {
-		switch (areaID) {
-			case TEST_WORLD_1:
-				return AREA_1_ALPHA_COLOR;
 			default:
 				return 0;
 		}

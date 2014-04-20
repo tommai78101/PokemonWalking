@@ -276,14 +276,13 @@ public class Art {
 		int[] resultPixels = result.getPixels();
 		for (int i = 0; i < pixels.length; i++) {
 			int alpha = (pixels[i] >> 24) & 0xFF;
-			int gray = pixels[i] & 0xFFFFFF;
 			//May be possible this will expand in the future.
 			switch (alpha) {
 				case 0x01:
-					resultPixels[i] = 0xFF000000 | (((alphaColor * color) >> 7) & 0xFFFFFF);
+					resultPixels[i] = BaseScreen.lighten(color, 0.2f);
 					break;
 				default:
-					resultPixels[i] = 0xFF000000 | ((((color * gray) << 8) + (color + gray) >> 8) & 0xFFFFFF);
+					resultPixels[i] = 0xFF000000 | BaseScreen.darken(color, 0.1f);
 					break;
 			}
 		}

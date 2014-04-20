@@ -125,7 +125,7 @@ public class BaseScreen extends BaseBitmap {
 						if ((tick++ % 17 < 7) && (tick++ % 21 < 2))
 							this.pixels[tgt + xx] = lighten(biomeColor, 0.07f);
 						else if ((tick++ % 23 < 4) && (tick++ % 19 < 3))
-							this.pixels[tgt + xx] = darken(biomeColor, 0.07f);
+							this.pixels[tgt + xx] = BaseScreen.darken(biomeColor, 0.07f);
 						else
 							this.pixels[tgt + xx] = biomeColor;
 						tick++;
@@ -250,7 +250,7 @@ public class BaseScreen extends BaseBitmap {
 		return color;
 	}
 	
-	private int lighten(int color, float amount) {
+	public static int lighten(int color, float amount) {
 		//int a = (color >> 24) & 0xFF;
 		int r = (color >> 16) & 0xFF;
 		int g = (color >> 8) & 0xFF;
@@ -258,7 +258,7 @@ public class BaseScreen extends BaseBitmap {
 		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16 | ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
 	}
 	
-	private int darken(int color, float amount) {
+	public static int darken(int color, float amount) {
 		int r = (color >> 16) & 0xFF;
 		int g = (color >> 8) & 0xFF;
 		int b = color & 0xFF;
