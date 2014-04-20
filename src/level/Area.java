@@ -318,9 +318,7 @@ public class Area {
 				case 0x08: //Sign
 					this.player.interact(data.getColor());
 					return true;
-				case 0x09:
-					if (red == 0x00) //Door should be walkable, all other house tiles should not.
-						return false;
+				case 0x09: //House
 					return true;
 				case 0x0A: //House Door
 					return false;
