@@ -615,7 +615,8 @@ public class Player extends Entity {
 	
 	@Override
 	public void tick() {
-		this.isOnBicycle = true;
+		//TODO: Find some way of allowing players to ride bicycle.
+		//this.isOnBicycle = true;
 		if (!this.lockJumping) {
 			if (!this.enableInteraction) {
 				walk();
@@ -630,14 +631,20 @@ public class Player extends Entity {
 			jump();
 	}
 	
+	/**
+	 * Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
+	 * 
+	 * @param output
+	 *            Where the bitmap is to be blitted.
+	 * @param x
+	 *            Pixel X offset.
+	 * @param y
+	 *            Pixel Y offset.
+	 * @return Nothing.
+	 * 
+	 * */
 	@Override
 	public void render(BaseScreen output, int x, int y) {
-		//Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
-		//render(BaseScreen output, int x, int y)
-		//output: where to blit the bitmap
-		//x: Pixel X offset
-		//y: Pixel Y offset
-		
 		if (this.lockWalking && !this.lockJumping) {
 			//Walking animation
 			if (this.isInWater)
