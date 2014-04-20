@@ -34,6 +34,7 @@ public class Player extends Entity {
 	boolean lockJumping;
 	boolean[] facingsBlocked = new boolean[4];
 	boolean isInWater;
+	boolean isOnBicycle;
 	
 	int interactionID;
 	boolean enableInteraction;
@@ -261,10 +262,8 @@ public class Player extends Entity {
 	 * 
 	 * Note: An example on how to determine player direction for the tile to allow and block:
 	 * <ul>
-	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the
-	 * parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means,
-	 * the tile above X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X
-	 * (the UP tile) to jump across to the tile below X, but not the other way around.
+	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means, the tile above
+	 * X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X (the UP tile) to jump across to the tile below X, but not the other way around.
 	 * </ul>
 	 * 
 	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or Player.RIGHT.
@@ -285,38 +284,6 @@ public class Player extends Entity {
 	 * @return Nothing.
 	 * */
 	public void setLockJumping(int red, int green, int blue, int from, int to) {
-		/*
-		 * Pixel color determines the current tile ID the player is on. It's separated into R, G, and B.
-		 * canAllow_1 and canAllow_2 determines the direction the player can go while the player is on the current pixel data.
-		 *
-		 *
-		 *
-		 * Unfortunately, we have to do another check on the colors.
-		 */
-		
-		//		if (canAllow_1 == DOWN || canAllow_1 == RIGHT || canAllow_2 == UP || canAllow_2 == LEFT)
-		//			throw new IllegalArgumentException("canAllow_1 must be UP or LEFT. canAllow_2 must be DOWN or RIGHT");
-		
-		//		switch (blue) {
-		//			case 0xDD:
-		//				//Since this is a ledge (horizontal), green = orientation, red = ledge type.
-		//				switch (green) {
-		//					case 0x00:
-		//						//Horizontal
-		//						this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
-		//						this.facingsBlocked[UP] = false;
-		//						this.lockJumping = true;
-		//						break;
-		//					default:
-		//						this.lockJumping = false;
-		//						break;
-		//				
-		//				}
-		//				break;
-		//			default:
-		//				this.lockJumping = false;
-		//				break;
-		//		}
 		if (from == to)
 			throw new IllegalArgumentException("The parameters, from and to, must not be the same.");
 		switch (red) {
@@ -526,8 +493,7 @@ public class Player extends Entity {
 	 * Makes adjustments to the player's position when the player is walking.
 	 * 
 	 * <p>
-	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player
-	 * wanted to walk.
+	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player wanted to walk.
 	 * 
 	 * @return Nothing.
 	 * */
@@ -549,8 +515,14 @@ public class Player extends Entity {
 			if (yAccel < -1)
 				yAccel = -1;
 			
-			xPosition += xAccel * 2;
-			yPosition += yAccel * 2;
+			if (!this.isOnBicycle) {
+				xPosition += xAccel * 2;
+				yPosition += yAccel * 2;
+			}
+			else {
+				xPosition += xAccel * 4;
+				yPosition += yAccel * 4;
+			}
 			
 			//Needs to get out of being locked to walking/jumping.
 			//Note that we cannot compare using ||, what if the player is moving in one direction? What about the other axis?
@@ -643,6 +615,7 @@ public class Player extends Entity {
 	
 	@Override
 	public void tick() {
+		this.isOnBicycle = true;
 		if (!this.lockJumping) {
 			if (!this.enableInteraction) {
 				walk();
@@ -667,10 +640,12 @@ public class Player extends Entity {
 		
 		if (this.lockWalking && !this.lockJumping) {
 			//Walking animation
-			if (!this.isInWater)
-				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
-			else
+			if (this.isInWater)
 				output.npcBlit(Art.player_surf[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+			else if (this.isOnBicycle)
+				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+			else
+				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else if (this.lockJumping) {
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
@@ -680,19 +655,26 @@ public class Player extends Entity {
 		}
 		else {
 			//Blocking animation. Possibly done to create a perfect loop.
-			if (!this.isInWater) {
+			if (!this.isInWater && !this.isOnBicycle) {
 				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
 					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
 			}
-			else {
+			else if (this.isInWater && !this.isOnBicycle) {
 				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
 					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
+			}
+			else if (!this.isInWater && this.isOnBicycle) {
+				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+					output.npcBlit(Art.player_bicycle[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+				else
+					output.npcBlit(Art.player_bicycle[facing][0], this.xOffset + x, this.yOffset + y);
 			}
 		}
 	}
