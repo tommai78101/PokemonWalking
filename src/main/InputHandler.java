@@ -7,23 +7,12 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import main.Keys;
 import main.Keys.Key;
 
 public class InputHandler implements KeyListener {
-	
-	/*
-	 * Requirements:
-	 * 
-	 *  1. Needs to detect "tap" and "press".
-	 *  
-	 * 
-	 */
 	public Map<Key, Integer> mappings = new HashMap<Key, Integer>();
 	private ExecutorService threadPool = Executors.newCachedThreadPool();
 	private static boolean inputLock;
-	
-	//private Keys keys;
 	
 	/**
 	 * Initializes the control inputs.
@@ -35,7 +24,6 @@ public class InputHandler implements KeyListener {
 	 *            the life cycle of this application.
 	 * */
 	public InputHandler(Keys keys) {
-		//this.keys = keys;
 		mappings.put(keys.up, KeyEvent.VK_UP);
 		mappings.put(keys.down, KeyEvent.VK_DOWN);
 		mappings.put(keys.left, KeyEvent.VK_LEFT);
