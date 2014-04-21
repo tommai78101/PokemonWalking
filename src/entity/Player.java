@@ -697,22 +697,25 @@ public class Player extends Entity {
 		else {
 			//Blocking animation. Possibly done to create a perfect loop.
 			if (!this.isInWater && !this.isOnBicycle) {
-				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+				//Walking
+				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
 			}
 			else if (this.isInWater && !this.isOnBicycle) {
-				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+				//Surfing
+				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
 			}
 			else if (!this.isInWater && this.isOnBicycle) {
-				if (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown)
+				//Riding
+				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player_bicycle[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_bicycle[facing][0], this.xOffset + x, this.yOffset + y);

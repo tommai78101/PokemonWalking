@@ -182,6 +182,8 @@ public class Dialogue {
 			this.isMenuActivated = !this.isMenuActivated;
 			this.input.START.lastKeyState = true;
 		}
+		if ((this.input.X.keyStateDown || this.input.PERIOD.keyStateDown) && this.isMenuActivated)
+			this.isMenuActivated = false;
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown
 				|| input.X.isTappedDown || input.X.isPressedDown
