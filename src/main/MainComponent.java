@@ -1,14 +1,6 @@
 package main;
 
-import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -16,8 +8,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
 import screen.BaseScreen;
 
 public class MainComponent extends Canvas implements Runnable {
@@ -38,7 +32,7 @@ public class MainComponent extends Canvas implements Runnable {
 	private final Keys keys = new Keys();
 	//Wrong input handler. Requires a rewrite.
 	//private InputHandler inputHandler;
-	private NewInputHandler inputHandler;
+	private InputHandler inputHandler;
 	
 	//-----------------------	
 	private boolean running;
@@ -76,7 +70,7 @@ public class MainComponent extends Canvas implements Runnable {
 		MainComponent.COMPONENT_WIDTH = this.getWidth();
 		
 		//Input Handling
-		inputHandler = new NewInputHandler(keys);
+		inputHandler = new InputHandler(keys);
 		this.addKeyListener(inputHandler);
 		
 		//Game loading

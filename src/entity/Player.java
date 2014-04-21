@@ -1,8 +1,8 @@
 package entity;
 
 import level.Area;
+import main.InputHandler;
 import main.Keys;
-import main.NewInputHandler;
 import resources.Art;
 import screen.BaseScreen;
 import abstracts.Entity;
@@ -476,7 +476,7 @@ public class Player extends Entity {
 			case 0x08: {
 				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 					this.enableInteraction = false;
-					NewInputHandler.unlockInputs();
+					InputHandler.unlockInputs();
 				}
 				if (this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) {
 					this.enableInteraction = true;
@@ -495,7 +495,7 @@ public class Player extends Entity {
 	public void stopInteraction() {
 		this.enableInteraction = false;
 		this.interactionID = 0;
-		NewInputHandler.unlockInputs();
+		InputHandler.unlockInputs();
 	}
 	
 	public int getInteractionID() {
