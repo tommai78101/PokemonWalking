@@ -35,4 +35,6 @@ public class Keys {
 	public Key D = new Key("D");
 	public Key SLASH = new Key("/");
 	public Key PERIOD = new Key(".");
+	
+	public Key START = new Key("ENTER");
 }

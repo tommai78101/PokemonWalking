@@ -6,9 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import main.Keys;
 import main.Keys.Key;
 
-public class NewInputHandler implements KeyListener {
+public class InputHandler implements KeyListener {
 	
 	/*
 	 * Requirements:
@@ -32,7 +34,7 @@ public class NewInputHandler implements KeyListener {
 	 *            An object that holds key input properties. All properties are used throughout
 	 *            the life cycle of this application.
 	 * */
-	public NewInputHandler(Keys keys) {
+	public InputHandler(Keys keys) {
 		//this.keys = keys;
 		mappings.put(keys.up, KeyEvent.VK_UP);
 		mappings.put(keys.down, KeyEvent.VK_DOWN);
@@ -48,6 +50,8 @@ public class NewInputHandler implements KeyListener {
 		mappings.put(keys.SLASH, KeyEvent.VK_SLASH);
 		mappings.put(keys.PERIOD, KeyEvent.VK_PERIOD);
 		
+		mappings.put(keys.START, KeyEvent.VK_ENTER);
+
 		inputLock = false;
 	}
 	
