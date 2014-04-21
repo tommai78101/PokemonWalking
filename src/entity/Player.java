@@ -1,7 +1,6 @@
 package entity;
 
 import level.Area;
-import main.InputHandler;
 import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
@@ -36,6 +35,8 @@ public class Player extends Entity {
 	boolean isInWater;
 	boolean isOnBicycle;
 	
+	private static boolean movementLock;
+
 	int interactionID;
 	boolean enableInteraction;
 	
@@ -476,7 +477,7 @@ public class Player extends Entity {
 			case 0x08: {
 				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 					this.enableInteraction = false;
-					InputHandler.unlockInputs();
+					Player.unlockMovements();
 				}
 				if (this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) {
 					this.enableInteraction = true;
@@ -495,7 +496,7 @@ public class Player extends Entity {
 	public void stopInteraction() {
 		this.enableInteraction = false;
 		this.interactionID = 0;
-		InputHandler.unlockInputs();
+		Player.unlockMovements();
 	}
 	
 	public int getInteractionID() {
@@ -527,9 +528,10 @@ public class Player extends Entity {
 		if (this.lockWalking) {
 			
 			//When being locked to walking, facing must stay constant.
+			
 			if (this.walking != this.facing)
 				this.walking = this.facing;
-			
+
 			//Makes sure the acceleration stays limited to 1 pixel/tick.
 			if (xAccel > 1)
 				xAccel = 1;
@@ -568,7 +570,8 @@ public class Player extends Entity {
 			yAccel = 0;
 			
 			//Check for inputs the player wants to face. Tapping in a direction turns the player around.
-			checkFacing();
+			if (!movementLock)
+				checkFacing();
 			
 			//Now about to walk. First, check to see if there's an obstacle blocking the path.
 			if (this.facingsBlocked[UP] || this.facingsBlocked[DOWN] || this.facingsBlocked[LEFT] || this.facingsBlocked[RIGHT]) {
@@ -593,35 +596,37 @@ public class Player extends Entity {
 	}
 	
 	private void controlTick() {
-		animationTick++;
-		if ((this.facing == UP && this.facingsBlocked[UP])) {
-			if (animationTick >= 10) {
-				animationTick = 0;
+		if (!movementLock) {
+			animationTick++;
+			if ((this.facing == UP && this.facingsBlocked[UP])) {
+				if (animationTick >= 10) {
+					animationTick = 0;
+				}
 			}
-		}
-		else if ((this.facing == DOWN && this.facingsBlocked[DOWN])) {
-			if (animationTick >= 10) {
-				animationTick = 0;
+			else if ((this.facing == DOWN && this.facingsBlocked[DOWN])) {
+				if (animationTick >= 10) {
+					animationTick = 0;
+				}
 			}
-		}
-		else if ((this.facing == LEFT && this.facingsBlocked[LEFT])) {
-			if (animationTick >= 10) {
-				animationTick = 0;
+			else if ((this.facing == LEFT && this.facingsBlocked[LEFT])) {
+				if (animationTick >= 10) {
+					animationTick = 0;
+				}
 			}
-		}
-		else if ((this.facing == RIGHT && this.facingsBlocked[RIGHT])) {
-			if (animationTick >= 10) {
-				animationTick = 0;
+			else if ((this.facing == RIGHT && this.facingsBlocked[RIGHT])) {
+				if (animationTick >= 10) {
+					animationTick = 0;
+				}
 			}
-		}
-		else {
-			if (animationTick >= 4)
-				animationTick = 0;
-		}
-		if (animationTick == 0) {
-			animationPointer++;
-			if (animationPointer > 3)
-				animationPointer = 0;
+			else {
+				if (animationTick >= 4)
+					animationTick = 0;
+			}
+			if (animationTick == 0) {
+				animationPointer++;
+				if (animationPointer > 3)
+					animationPointer = 0;
+			}
 		}
 	}
 	
@@ -641,18 +646,20 @@ public class Player extends Entity {
 	@Override
 	public void tick() {
 		//TODO: Find some way of allowing players to ride bicycle.
-		if (!this.lockJumping) {
-			if (!this.enableInteraction) {
-				walk();
-				handleMovementCheck();
-				controlTick();
+		if (!Player.movementLock) {
+			if (!this.lockJumping) {
+				if (!this.enableInteraction) {
+					walk();
+					handleMovementCheck();
+					controlTick();
+				}
+				else {
+					stopAnimation();
+				}
 			}
-			else {
-				stopAnimation();
-			}
+			else
+				jump();
 		}
-		else
-			jump();
 	}
 	
 	/**
@@ -711,5 +718,17 @@ public class Player extends Entity {
 					output.npcBlit(Art.player_bicycle[facing][0], this.xOffset + x, this.yOffset + y);
 			}
 		}
+	}
+	
+	public static void unlockMovements() {
+		movementLock = false;
+	}
+	
+	public static void lockMovements() {
+		movementLock = true;
+	}
+	
+	public static boolean isMovementsLocked() {
+		return movementLock;
 	}
 }

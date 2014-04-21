@@ -13,6 +13,7 @@ public class Keys {
 		//Key related variables.
 		public boolean isTappedDown;
 		public boolean isPressedDown;
+		public boolean lastKeyState;
 		
 		public Key(String name) {
 			this.name = name;

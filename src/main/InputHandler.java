@@ -12,7 +12,6 @@ import main.Keys.Key;
 public class InputHandler implements KeyListener {
 	public Map<Key, Integer> mappings = new HashMap<Key, Integer>();
 	private ExecutorService threadPool = Executors.newCachedThreadPool();
-	private static boolean inputLock;
 	
 	/**
 	 * Initializes the control inputs.
@@ -39,21 +38,16 @@ public class InputHandler implements KeyListener {
 		mappings.put(keys.PERIOD, KeyEvent.VK_PERIOD);
 		
 		mappings.put(keys.START, KeyEvent.VK_ENTER);
-
-		inputLock = false;
 	}
 	
 	@Override
 	public void keyPressed(KeyEvent event) {
 		int code = event.getKeyCode();
-		if (inputLock) {
-			if (code != KeyEvent.VK_Z && code != KeyEvent.VK_X && code != KeyEvent.VK_SLASH && code != KeyEvent.VK_PERIOD)
-				return;
-		}
 		for (Key v : mappings.keySet()) {
 			if (mappings.get(v) == code) {
 				if (!v.keyStateDown) {
 					final Key key = v;
+					key.lastKeyState = key.keyStateDown;
 					key.isTappedDown = true;
 					key.isPressedDown = false;
 					key.keyStateDown = true;
@@ -83,6 +77,7 @@ public class InputHandler implements KeyListener {
 	public void keyReleased(KeyEvent event) {
 		for (Key k : mappings.keySet()) {
 			if (mappings.get(k) == event.getKeyCode()) {
+				k.lastKeyState = k.keyStateDown;
 				k.isPressedDown = false;
 				k.isTappedDown = false;
 				k.keyStateDown = false;
@@ -95,17 +90,4 @@ public class InputHandler implements KeyListener {
 	public void keyTyped(KeyEvent arg0) {
 		//Ignore. Used for sending Unicode character mapped as a system input.
 	}
-	
-	public static void lockInputs() {
-		inputLock = true;
-	}
-	
-	public static void unlockInputs() {
-		inputLock = false;
-	}
-	
-	public static boolean inputsAreLocked() {
-		return inputLock;
-	}
-	
 }

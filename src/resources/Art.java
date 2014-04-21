@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
+import main.MainComponent;
 import screen.BaseBitmap;
 import screen.BaseScreen;
 
@@ -97,6 +98,7 @@ public class Art {
 	public static BaseBitmap dialogue_right;
 	public static BaseBitmap dialogue_bottom_right;
 	public static BaseBitmap dialogue_background;
+	public static BaseBitmap dialogue_pointer;
 	
 	//Animation
 	public static BaseBitmap[] water;
@@ -183,6 +185,7 @@ public class Art {
 		dialogue_right = screen.load("art/dialog/dialogue_right.png");
 		dialogue_bottom_right = screen.load("art/dialog/dialogue_bottom_right.png");
 		dialogue_background = screen.load("art/dialog/dialogue_bg.png");
+		dialogue_pointer = screen.load("art/dialog/dialogue_pointer.png");
 		
 		//Animation
 		//water = new BaseBitmap[16];
@@ -236,7 +239,7 @@ public class Art {
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Font result = null;
 		try {
-			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream()).deriveFont(Font.PLAIN, 24f);
+			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
 		}
 		catch (FontFormatException e) {
 			e.printStackTrace();
@@ -246,7 +249,7 @@ public class Art {
 		}
 		catch (NullPointerException e) {
 			try {
-				result = Font.createFont(Font.TRUETYPE_FONT, Art.class.getResourceAsStream(filename)).deriveFont(Font.PLAIN, 24f);
+				result = Font.createFont(Font.TRUETYPE_FONT, Art.class.getResourceAsStream(filename));
 			}
 			catch (FontFormatException e1) {
 				e1.printStackTrace();
@@ -254,7 +257,7 @@ public class Art {
 			catch (IOException e1) {
 				e1.printStackTrace();
 				try {
-					result = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/font.ttf")).deriveFont(Font.PLAIN, 24f);
+					result = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/font.ttf"));
 				}
 				catch (FontFormatException e2) {
 					e2.printStackTrace();
@@ -267,7 +270,7 @@ public class Art {
 		if (result != null) {
 			ge.registerFont(result);
 		}
-		return result;
+		return result.deriveFont(Font.PLAIN, 8f * MainComponent.GAME_SCALE);
 	}
 	
 	public static BaseBitmap changeColors(BaseBitmap bitmap, int color, int alphaColor) {

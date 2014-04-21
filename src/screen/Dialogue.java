@@ -1,18 +1,19 @@
 package screen;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+
 import level.DialogueText;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import abstracts.Tile;
+import entity.Player;
 
 public class Dialogue {
 	//According to the width and height of the dialog shown in the original games.
@@ -31,6 +32,7 @@ public class Dialogue {
 	
 	//Dialogue max string length per line.
 	public static final int MAX_STRING_LENGTH = 18;
+	public static final int HALF_STRING_LENGTH = 9;
 	
 	//Styles
 	public static final int DIALOGUE_STYLE_SPEECH = 0xF1;
@@ -51,6 +53,12 @@ public class Dialogue {
 	
 	private Keys input;
 	
+	//---------------------------------------
+	private boolean isMenuActivated;
+	private ArrayList<String> tempMenuItems = new ArrayList<String>();
+	private int menuPointerPosition = 0;
+
+
 	public Dialogue(Keys input) {
 		this.input = input;
 		this.arrowTickSpeed = 0;
@@ -58,7 +66,14 @@ public class Dialogue {
 		this.next = false;
 		this.nextTick = false;
 		this.tokenPointer = 0;
-		//this.dialogs = new HashMap<Integer, Boolean>();
+		this.isMenuActivated = false;
+		
+		tempMenuItems.add("POKéDEX");
+		tempMenuItems.add("ITEMS");
+		tempMenuItems.add("WHATEVER");
+		tempMenuItems.add("SAVE");
+		tempMenuItems.add("OPTION");
+		tempMenuItems.add("QUIT");
 	}
 	
 	/**
@@ -77,31 +92,29 @@ public class Dialogue {
 	 * @return Nothing.
 	 * */
 	public void renderDialog(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
-		if (this.showDialog) {
-			output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
+		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
+		}
+		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
+		
+		for (int j = 0; j < centerHeight - 1; j++) {
+			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
 			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
+				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
 			}
-			output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-			
-			for (int j = 0; j < centerHeight - 1; j++) {
-				output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-				for (int i = 0; i < centerWidth - 1; i++) {
-					output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-				}
-				output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			}
-			
-			output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
-			}
-			output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-			
-			//The boolean "next" is for dialogues that are complete, and the "nextTick" is for displaying the arrow.
-			if (this.next && this.nextTick) {
-				output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
-			}
+			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+		}
+		
+		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
+		}
+		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+		
+		//The boolean "next" is for dialogues that are complete, and the "nextTick" is for displaying the arrow.
+		if (this.next && this.nextTick) {
+			output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
 		}
 	}
 	
@@ -114,6 +127,7 @@ public class Dialogue {
 	 * */
 	public void hideDialog() {
 		this.showDialog = false;
+		this.next = false;
 		this.tokenPointer = 0;
 		//this.setDialogCheckpoint();
 		//this.currentDialogue.checkpoint = true; 
@@ -137,7 +151,7 @@ public class Dialogue {
 	 * */
 	public void renderText(Graphics g) {
 		g.setColor(Color.black);
-		g.setFont(Art.font.deriveFont(Font.PLAIN, 24f));
+		g.setFont(Art.font);
 		try {
 			g.drawString(this.tokens[this.tokenPointer].substring(0, this.firstLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 			g.drawString(this.tokens[this.tokenPointer + 1].substring(0, secondLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
@@ -145,23 +159,34 @@ public class Dialogue {
 		catch (Exception e) {
 			//Ignore. Silently catch the any sorts of exception, and just let the game flow on.
 		}
+		if (this.isMenuActivated) {
+			for (int i = 0; i < tempMenuItems.size(); i++) {
+				//TODO: We need to have an arrow pointing at the menu items.
+				//We can't do anything about it. Scaling problems.
+				g.drawString(tempMenuItems.get(i), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
+			}
+		}
 	}
 	
 	/**
 	 * Updates the dialogues on a per-tick basis.
 	 * 
 	 * <p>
-	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when
-	 * displaying dialogues. More information can be found by reading the comments in this method code.
+	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when displaying dialogues. More information can be found by reading the comments in this method code.
 	 * 
 	 * @return Nothing.
 	 * */
 	public void tick() {
+		
+		if (!this.input.START.lastKeyState && this.input.START.keyStateDown) {
+			this.isMenuActivated = !this.isMenuActivated;
+			this.input.START.lastKeyState = true;
+		}
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown
-					|| input.X.isTappedDown || input.X.isPressedDown
-					|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
-					|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+				|| input.X.isTappedDown || input.X.isPressedDown
+				|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+				|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
 				this.next = false;
 				boolean result1 = false, result2 = false;
 				try {
@@ -195,46 +220,95 @@ public class Dialogue {
 			}
 		}
 		if (this.showDialog) {
-			boolean result1 = false, result2 = false;
-			try {
-				if (this.firstLineIterator < this.tokens[this.tokenPointer].length())
-					this.firstLineIterator++;
-				else {
-					//This is done to check to see if there exist a (N+1)th line in the entire dialogue.
-					//If it didn't exist, set result1 to true, so that the game knows the first
-					//line is finished.
-					//Abusing the exception handling.
-					this.tokens[this.tokenPointer + 1].length();
-				}
-			}
-			catch (ArrayIndexOutOfBoundsException e) {
-				result1 = true;
-			}
-			try {
-				if (this.secondLineIterator >= this.tokens[this.tokenPointer + 1].length()) {
-					this.next = true;
-				}
-				else {
-					if (this.secondLineIterator < this.tokens[this.tokenPointer + 1].length() && this.firstLineIterator >= this.tokens[this.tokenPointer].length())
-						this.secondLineIterator++;
-				}
-			}
-			catch (ArrayIndexOutOfBoundsException e) {
-				//Since there can only be cases where (N+2)th line exists but not (N+2)th line,
-				//and cases where the (N+2)th line has finished.
-				//Therefore, it returns true in both cases.
-				result2 = true;
-			}
-			if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length)
-				this.next = true;
+			speechDialogueHandling();
+		}
+		else if (this.isMenuActivated) {
+			menuDialogueText();
+			menuDialogueHandling();
 		}
 		else {
 			this.firstLineIterator = this.secondLineIterator = 0;
+			this.menuPointerPosition = 0;
+			if (Player.isMovementsLocked())
+				Player.unlockMovements();
 		}
 		if (this.repeatDialogueTick > 0)
 			this.repeatDialogueTick--;
 	}
 	
+	//FIXME:
+	private void menuDialogueText() {
+		String menuLine = "What will you do?";
+		this.tokens = this.toLines(menuLine, HALF_STRING_LENGTH);
+		this.tokenPointer = 0;
+		this.firstLineIterator = (menuLine.length() >= HALF_STRING_LENGTH ? HALF_STRING_LENGTH : menuLine.length());
+		if (menuLine.length() - HALF_STRING_LENGTH >= HALF_STRING_LENGTH) {
+			this.secondLineIterator = HALF_STRING_LENGTH;
+			this.next = true;
+		}
+		else {
+			if (menuLine.length() >= HALF_STRING_LENGTH)
+				this.secondLineIterator = menuLine.substring(this.firstLineIterator, menuLine.length() - 1).length();
+			else
+				this.secondLineIterator = HALF_STRING_LENGTH;
+		}
+		this.doneDisplayingDialogue = false;
+	}
+	
+	private void menuDialogueHandling() {
+		//TODO: Work on the input locking mechanism.
+		if (!Player.isMovementsLocked())
+			Player.lockMovements();
+		if (!this.input.down.lastKeyState && this.input.down.keyStateDown) {
+			this.menuPointerPosition++;
+			if (this.menuPointerPosition > this.tempMenuItems.size() - 1)
+				this.menuPointerPosition = 0;
+			this.input.down.lastKeyState = true;
+		}
+		else if (!this.input.up.lastKeyState && this.input.up.keyStateDown) {
+			this.menuPointerPosition--;
+			if (this.menuPointerPosition < 0)
+				this.menuPointerPosition = this.tempMenuItems.size() - 1;
+			this.input.up.lastKeyState = true;
+		}
+
+	}
+
+	private void speechDialogueHandling() {
+		boolean result1 = false, result2 = false;
+		try {
+			if (this.firstLineIterator < this.tokens[this.tokenPointer].length())
+				this.firstLineIterator++;
+			else {
+				//This is done to check to see if there exist a (N+1)th line in the entire dialogue.
+				//If it didn't exist, set result1 to true, so that the game knows the first
+				//line is finished.
+				//Abusing the exception handling.
+				this.tokens[this.tokenPointer + 1].length();
+			}
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			result1 = true;
+		}
+		try {
+			if (this.secondLineIterator >= this.tokens[this.tokenPointer + 1].length()) {
+				this.next = true;
+			}
+			else {
+				if (this.secondLineIterator < this.tokens[this.tokenPointer + 1].length() && this.firstLineIterator >= this.tokens[this.tokenPointer].length())
+					this.secondLineIterator++;
+			}
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
+			//Since there can only be cases where (N+2)th line exists but not (N+2)th line,
+			//and cases where the (N+2)th line has finished.
+			//Therefore, it returns true in both cases.
+			result2 = true;
+		}
+		if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length)
+			this.next = true;
+	}
+
 	/**
 	 * Creates a set of lines for use with the dialogues from a given dialogue message.
 	 * 
@@ -248,46 +322,9 @@ public class Dialogue {
 	 * @return Nothing.
 	 * */
 	public void createText(int interactionID) {
-		//		this.tokens = toLines(str);
-		//		if (!this.dialogs.isEmpty()) {
-		//			if (!this.getDialogueCheckpoint(this.dialogKeyID))
-		//				this.showDialog = true;
-		//		}
-		//		else {
-		//			this.setDialogKeyID(key);
-		//			this.showDialog = true;
-		//		}
-		//		
-		//		if (this.dialogues.isEmpty()) {
-		//			this.dialogues = Dialogue.loadDialogues("res/dialogue/dialogue.txt");
-		//		}
-		
-		//TODO: Player interacting with anything, will trigger dialogue, according to
-		//pixel data the player is interacting with.
-		//		DialogueText temp = null;
-		//		for (int i = 0; i < this.dialogues.size(); i++) {
-		//			try {
-		//				temp = this.dialogues.get(i);
-		//				if (currentDialogue == null)
-		//					currentDialogue = temp;
-		//				else if (currentDialogue != null && temp.dialogueID != currentDialogue.dialogueID)
-		//					currentDialogue = temp;
-		//				if (!currentDialogue.checkpoint) {
-		//					this.tokens = toLines(currentDialogue.dialogueMessage);
-		//					this.showDialog = true;
-		//					break;
-		//				}
-		//				else
-		//					continue;
-		//			}
-		//			catch (Exception e) {
-		//				continue;
-		//			}
-		//		}
-		
 		for (DialogueText dt : this.dialogues) {
 			if (dt.dialogueID == interactionID) {
-				this.tokens = toLines(dt.dialogueMessage);
+				this.tokens = toLines(dt.dialogueMessage, MAX_STRING_LENGTH);
 				this.showDialog = true;
 				this.doneDisplayingDialogue = false;
 				break;
@@ -326,6 +363,28 @@ public class Dialogue {
 	//		return this.dialogs.get(key);
 	//	}
 	
+	public void render(BaseScreen screen, int offsetX, int offsetY, Graphics g) {
+		if (this.isDisplayingDialogue()) {
+			screen.disableRenderHalf();
+			this.renderDialog(screen, 0, 6, 9, 2);
+		}
+		else if (this.isMenuActivated) {
+			this.renderDialog(screen, 0, 6, 9, 2);
+			this.renderDialog(screen, 5, 0, 4, tempMenuItems.size()); //TODO: This needs to use a array list size as height.
+			//Scaling problems again.
+			screen.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuPointerPosition * Tile.HEIGHT);
+		}
+		g.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+		if (this.isDisplayingDialogue() || this.isMenuActivated) {
+			this.renderText(g);
+		}
+	}
+
+	/**
+	 * Checks to see if the dialogue is allowed to be shown.
+	 * 
+	 * @return True, if the dialogue is allowed to be shown. False, if the dialogue is not allowed to be shown.
+	 * */
 	public boolean isDisplayingDialogue() {
 		return this.showDialog;
 	}
@@ -334,9 +393,9 @@ public class Dialogue {
 		return this.doneDisplayingDialogue;
 	}
 	
-	//	public boolean getDialogueCheckpoint(int key) {
-	//		return this.dialogs.get(key);
-	//	}
+	public boolean isMenuActivated() {
+		return this.isMenuActivated;
+	}
 	
 	public void reset() {
 		this.showDialog = false;
@@ -402,14 +461,14 @@ public class Dialogue {
 	
 	//----------------------- PRIVATE METHODS ONLY ------------------------------------------
 	
-	private String[] toLines(String all) {
+	private String[] toLines(String all, final int regex) {
 		ArrayList<String> lines = new ArrayList<>();
 		String[] words = all.split("\\s");
 		String line = "";
 		int length = 0;
 		for (String w : words) {
-			if (length + w.length() + 1 > MAX_STRING_LENGTH) {
-				if (w.length() >= MAX_STRING_LENGTH) {
+			if (length + w.length() + 1 > regex) {
+				if (w.length() >= regex) {
 					line += w;
 					lines.add(line);
 					line = "";

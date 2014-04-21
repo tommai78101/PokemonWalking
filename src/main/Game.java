@@ -25,14 +25,6 @@ public class Game {
 	
 	private Dialogue dialogue;
 	
-	//private Plot storyPlot;
-	//private Data data;
-	
-	//private int xScroll;
-	//private int yScroll;
-	
-	//private int xCamera;
-	//private int yCamera;
 	
 	/**
 	 * Creates the core component of the game.
@@ -49,12 +41,12 @@ public class Game {
 	 * */
 	public Game(MainComponent main, Keys input) {
 		this.screen = main.getBaseScreen();
+		this.player = new Player(input);
+		this.player.setCenterCamPosition(this.screen);
 		this.dialogue = new Dialogue(input);
-		player = new Player(input);
-		player.setCenterCamPosition(this.screen);
-		worlds = new ArrayList<World>();
 		this.overworld = new OverWorld(player, this.dialogue);
-		worlds.add(this.overworld);
+		this.worlds = new ArrayList<World>();
+		this.worlds.add(this.overworld);
 	}
 	
 	/**
@@ -78,10 +70,10 @@ public class Game {
 		overworld.render(screen, player.getX(), player.getY());
 		//dialogue.displayText("Hello World.", screen, Dial)
 		//dialogue.render(screen, 6, 0, 3, 8);
-		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		//FIXME: Need to do something about the font having to be rendered by graphics and not screen.
 		//dialogue.renderTextGraphics(graphics);
-		dialogue.renderText(graphics);
+		//dialogue.renderText(graphics);
+		dialogue.render(screen, player.getX(), player.getY(), graphics);
 	}
 	
 	/**

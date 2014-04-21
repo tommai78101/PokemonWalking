@@ -189,14 +189,29 @@ public class BaseScreen extends BaseBitmap {
 		return this.invertTick;
 	}
 	
+	/**
+	 * Allows the screen to be displayed with half of the screen gone.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void enableRenderHalf() {
 		this.cutScreen = true;
 	}
 	
+	/**
+	 * Allows the screen to be displayed in its entirely.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void disableRenderHalf() {
 		this.cutScreen = false;
 	}
 	
+	/**
+	 * Checks to see if the screen is displayed entirely or not.
+	 * 
+	 * @return True, if the screen is displayed with a portion not rendered. False, if the screen is rendered in its entirely.
+	 * */
 	public boolean isRenderingHalf() {
 		return this.cutScreen;
 	}
