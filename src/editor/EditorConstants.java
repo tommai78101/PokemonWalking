@@ -12,10 +12,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+
 import abstracts.Tile;
 
 public class EditorConstants {
@@ -75,10 +77,10 @@ public class EditorConstants {
 					String trim = line.trim().replaceAll("\\s+", "").replaceAll("@", "00");
 					String[] tokens = trim.split("%");
 					data.name = tokens[1].replace('_', ' ');
-					data.alpha = (char) (Integer.parseInt(tokens[2], 16) & 0xFF);
-					data.red = (char) (Integer.parseInt(tokens[3], 16) & 0xFF);;
-					data.green = (char) (Integer.parseInt(tokens[4], 16) & 0xFF);
-					data.blue = (char) (Integer.parseInt(tokens[5], 16) & 0xFF);
+					data.alpha = Integer.valueOf(tokens[2], 16);
+					data.red = Integer.valueOf(tokens[3], 16);
+					data.green = Integer.valueOf(tokens[4], 16);
+					data.blue = Integer.valueOf(tokens[5], 16);
 					data.filepath = tokens[6];
 					data.editorID = id;
 					data.image = ImageIO.read(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));

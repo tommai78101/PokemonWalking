@@ -285,48 +285,64 @@ public class DrawingBoard extends Canvas implements Runnable {
 	public void openMapImage(BufferedImage image) {
 		this.setImageSize(image.getWidth(), image.getHeight());
 		int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+		for (int i = 0; i < srcTiles.length; i++)
+			tiles[i] = srcTiles[i];
 		List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getSortedTileMap();
 		TILE_LOOP: for (int i = 0; i < tiles.length; i++) {
-			tiles[i] = srcTiles[i];
-			DATA_COLOR_LOOP: for (Map.Entry<Integer, Data> entry : list) {
+			int alpha = ((srcTiles[i] >> 24) & 0xFF);
+			DATA_COLOR_LOOP: for (int j = 0; j < list.size(); j++) {
+				Map.Entry<Integer, Data> entry = list.get(j);
 				Data d = entry.getValue();
-				int alpha = ((srcTiles[i] >> 24) & 0xFF);
-				if (alpha == d.alpha) {
-					switch (alpha) {
-						case 0x01: //Path
-						case 0x02: //Ledges
-						case 0x06: //Stairs
-						case 0x07: //Water
-						case 0x09: //House
-							//Extended Tile IDs are used to differenate tiles.
+				switch (alpha) {
+					case 0x01: //Path
+					case 0x02: //Ledges
+					case 0x06: //Stairs
+					case 0x07: //Water
+					case 0x09: //House
+						//Extended Tile IDs are used to differenate tiles.
+						if (alpha == Integer.valueOf(d.alpha)) {
 							int red = ((srcTiles[i] >> 16) & 0xFF);
-							if (red == d.red) {
+							if (red == Integer.valueOf(d.red)) {
 								tilesEditorID[i] = d.editorID;
-								continue TILE_LOOP;
+								break;
 							}
-							else
-								continue DATA_COLOR_LOOP;
-						case 0x05: //Area Zone
-							//Extended Tile IDs are used to differenate tiles.
+						}
+						continue;
+					case 0x05: //Area Zone
+						//Extended Tile IDs are used to differenate tiles.
+						if (alpha == Integer.valueOf(d.alpha)) {
 							int blue = srcTiles[i] & 0xFF;
 							if (blue == d.blue) {
 								tilesEditorID[i] = d.editorID;
-								continue TILE_LOOP;
+								break;
 							}
-							else
-								continue DATA_COLOR_LOOP;
-						default:
-							//Alpha value is only used.
+						}
+						continue;
+					default:
+						//Alpha value is only used.
+						if (alpha == Integer.valueOf(d.alpha))
 							tilesEditorID[i] = d.editorID;
-							continue TILE_LOOP;
-					}
-
-				}
-				else {
-					tilesEditorID[i] = 0;
-					continue TILE_LOOP;
+						break;
 				}
 			}
+			
+			//		for (int i = 0; i< srcTiles.length; i++){
+			//			tiles[i] = srcTiles[i];
+			//			int alpha = (srcTiles[i] >> 24)&0xFF;
+			//			int red = (srcTiles[i]>>16)&0xFF;
+			//			int blue = srcTiles[i]&0xFF;
+			//			for (int j=0; j <list.size(); j++){
+			//				Map.Entry<Integer, Data> entry = list.get(j);
+			//				Data data = entry.getValue();
+			//				if (alpha == Integer.valueOf(data.alpha)) {
+			//					if (red == Integer.valueOf(data.red) || blue == Integer.valueOf(data.blue)){
+			//						//Target Area
+			//						tilesEditorID[i] = data.editorID;
+			//						break;
+			//					}
+			//				}
+			//			}
+			//		}
 		}
 	}
 }

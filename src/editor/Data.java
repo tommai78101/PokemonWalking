@@ -1,6 +1,7 @@
 package editor;
 
 import java.awt.Image;
+
 import javax.swing.JButton;
 
 public class Data {
@@ -11,7 +12,7 @@ public class Data {
 	public String name;
 	public String filepath;
 	public int editorID;
-	public char alpha, red, green, blue;
+	public int alpha, red, green, blue;
 	public Image image;
 	public JButton button;
 	public boolean areaTypeIncluded;
