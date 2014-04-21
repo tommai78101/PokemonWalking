@@ -3,6 +3,7 @@ package main;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import level.OverWorld;
@@ -25,7 +26,6 @@ public class Game {
 	
 	private Dialogue dialogue;
 	
-	
 	/**
 	 * Creates the core component of the game.
 	 * 
@@ -43,7 +43,7 @@ public class Game {
 		this.screen = main.getBaseScreen();
 		this.player = new Player(input);
 		this.player.setCenterCamPosition(this.screen);
-		this.dialogue = new Dialogue(input);
+		this.dialogue = new Dialogue(input, this);
 		this.overworld = new OverWorld(player, this.dialogue);
 		this.worlds = new ArrayList<World>();
 		this.worlds.add(this.overworld);
@@ -127,5 +127,21 @@ public class Game {
 		//cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
 		//this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
 		//this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
+	}
+	
+	public void prepareAction(Map.Entry<String, String> entry) {
+		String key = entry.getKey();
+		
+		//TODO: Add actual game menu actions the player can do.
+		if (key.equals("BICYCLE")) {
+			if (!this.player.isRidingBicycle()) {
+				this.player.startsRidingBicycle();
+				entry.setValue("Get off bicycle.");
+			}
+			else {
+				this.player.getsOffBicycle();
+				entry.setValue("Use your bicycle.");
+			}
+		}
 	}
 }

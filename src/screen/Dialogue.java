@@ -6,9 +6,12 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Map;
 
 import level.DialogueText;
+import main.Game;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
@@ -52,15 +55,17 @@ public class Dialogue {
 	private boolean doneDisplayingDialogue;
 	
 	private Keys input;
+	private Game game;
 	
 	//---------------------------------------
 	private boolean isMenuActivated;
-	private ArrayList<String> tempMenuItems = new ArrayList<String>();
+	//private ArrayList<String> tempMenuItems = new ArrayList<String>();
+	private ArrayList<Map.Entry<String, String>> menuItems = new ArrayList<Map.Entry<String, String>>();
 	private int menuPointerPosition = 0;
 
-
-	public Dialogue(Keys input) {
+	public Dialogue(Keys input, Game game) {
 		this.input = input;
+		this.game = game;
 		this.arrowTickSpeed = 0;
 		this.showDialog = false;
 		this.next = false;
@@ -68,12 +73,9 @@ public class Dialogue {
 		this.tokenPointer = 0;
 		this.isMenuActivated = false;
 		
-		tempMenuItems.add("POKéDEX");
-		tempMenuItems.add("ITEMS");
-		tempMenuItems.add("WHATEVER");
-		tempMenuItems.add("SAVE");
-		tempMenuItems.add("OPTION");
-		tempMenuItems.add("QUIT");
+		//tempMenuItems.add("BICYCLE");
+		menuItems.add(new AbstractMap.SimpleEntry<String, String>("BICYCLE", "Use your bicycle."));
+		menuItems.add(new AbstractMap.SimpleEntry<String, String>("TEMP", "Do nothing."));
 	}
 	
 	/**
@@ -158,12 +160,20 @@ public class Dialogue {
 		}
 		catch (Exception e) {
 			//Ignore. Silently catch the any sorts of exception, and just let the game flow on.
+			int length = this.tokens[this.tokenPointer].length();
+			if (this.firstLineIterator > length)
+				this.firstLineIterator = length;
+			length = this.tokens[this.tokenPointer + 1].length();
+			if (this.secondLineIterator > length)
+				this.secondLineIterator = length;
 		}
+
 		if (this.isMenuActivated) {
-			for (int i = 0; i < tempMenuItems.size(); i++) {
+			for (int i = 0; i < menuItems.size(); i++) {
 				//TODO: We need to have an arrow pointing at the menu items.
 				//We can't do anything about it. Scaling problems.
-				g.drawString(tempMenuItems.get(i), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
+				g.drawString(menuItems.get(i).getKey(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
+
 			}
 		}
 	}
@@ -240,40 +250,57 @@ public class Dialogue {
 	
 	//FIXME:
 	private void menuDialogueText() {
-		String menuLine = "What will you do?";
+		String menuLine = menuItems.get(menuPointerPosition).getValue();
 		this.tokens = this.toLines(menuLine, HALF_STRING_LENGTH);
 		this.tokenPointer = 0;
-		this.firstLineIterator = (menuLine.length() >= HALF_STRING_LENGTH ? HALF_STRING_LENGTH : menuLine.length());
-		if (menuLine.length() - HALF_STRING_LENGTH >= HALF_STRING_LENGTH) {
+		try {
+		this.firstLineIterator = this.tokens[this.tokenPointer].length();
+		}
+		catch (Exception e) {
+			this.doneDisplayingDialogue = true;
+			return;
+		}
+		if (this.tokens.length > 2) {
 			this.secondLineIterator = HALF_STRING_LENGTH;
 			this.next = true;
 		}
 		else {
-			if (menuLine.length() >= HALF_STRING_LENGTH)
-				this.secondLineIterator = menuLine.substring(this.firstLineIterator, menuLine.length() - 1).length();
-			else
-				this.secondLineIterator = HALF_STRING_LENGTH;
+			try {
+				this.secondLineIterator = this.tokens[this.tokenPointer + 1].length();
+			}
+			catch (Exception e) {
+				this.secondLineIterator = 0;
+			}
 		}
 		this.doneDisplayingDialogue = false;
 	}
 	
 	private void menuDialogueHandling() {
-		//TODO: Work on the input locking mechanism.
+		//Player input mechanism
 		if (!Player.isMovementsLocked())
 			Player.lockMovements();
 		if (!this.input.down.lastKeyState && this.input.down.keyStateDown) {
 			this.menuPointerPosition++;
-			if (this.menuPointerPosition > this.tempMenuItems.size() - 1)
+			if (this.menuPointerPosition > this.menuItems.size() - 1)
 				this.menuPointerPosition = 0;
 			this.input.down.lastKeyState = true;
 		}
 		else if (!this.input.up.lastKeyState && this.input.up.keyStateDown) {
 			this.menuPointerPosition--;
 			if (this.menuPointerPosition < 0)
-				this.menuPointerPosition = this.tempMenuItems.size() - 1;
+				this.menuPointerPosition = this.menuItems.size() - 1;
 			this.input.up.lastKeyState = true;
 		}
-
+		
+		//Menu input mechanism
+		if ((this.input.Z.keyStateDown || this.input.SLASH.keyStateDown) && (!this.input.Z.lastKeyState || !this.input.SLASH.lastKeyState)) {
+			Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
+			game.prepareAction(entry);
+			this.input.Z.lastKeyState = true;
+			this.input.SLASH.lastKeyState = true;
+			this.doneDisplayingDialogue = true;
+			this.isMenuActivated = false;
+		}
 	}
 
 	private void speechDialogueHandling() {
@@ -371,8 +398,8 @@ public class Dialogue {
 			this.renderDialog(screen, 0, 6, 9, 2);
 		}
 		else if (this.isMenuActivated) {
-			this.renderDialog(screen, 0, 6, 9, 2);
-			this.renderDialog(screen, 5, 0, 4, tempMenuItems.size()); //TODO: This needs to use a array list size as height.
+			this.renderDialog(screen, 0, 6, 4, 2);
+			this.renderDialog(screen, 5, 0, 4, menuItems.size()); //TODO: This needs to use a array list size as height.
 			//Scaling problems again.
 			screen.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuPointerPosition * Tile.HEIGHT);
 		}
