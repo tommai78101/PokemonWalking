@@ -129,19 +129,18 @@ public class Game {
 		//this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
 	}
 	
-	public void prepareAction(Map.Entry<String, String> entry) {
-		String key = entry.getKey();
-		
+	public void sendAction(Map.Entry<String, String> entry) {
 		//TODO: Add actual game menu actions the player can do.
+		String key = entry.getKey();
 		if (key.equals("BICYCLE")) {
-			if (!this.player.isRidingBicycle()) {
+			if (!this.player.isRidingBicycle())
 				this.player.startsRidingBicycle();
-				entry.setValue("Get off bicycle.");
-			}
-			else {
+			else
 				this.player.getsOffBicycle();
-				entry.setValue("Use your bicycle.");
-			}
 		}
+	}
+	
+	public Player getPlayer() {
+		return this.player;
 	}
 }

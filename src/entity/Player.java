@@ -39,6 +39,9 @@ public class Player extends Entity {
 
 	int interactionID;
 	boolean enableInteraction;
+	//This variable is set to true no matter what in the Player class if the player tries to do action that's not allowed. 
+	//It must be turned off (set to False) somewhere else in other classes. By design!
+	public boolean warningsTriggered;
 	
 	boolean jumpHeightSignedFlag = false;
 	int varyingJumpHeight = 0;
@@ -455,7 +458,10 @@ public class Player extends Entity {
 	 * Changes the player's state to Riding.
 	 * */
 	public void startsRidingBicycle() {
-		this.isOnBicycle = true;
+		if (!this.isInWater)
+			this.isOnBicycle = true;
+		else
+			this.warningsTriggered = true;
 	}
 	
 	/**

@@ -160,12 +160,6 @@ public class Dialogue {
 		}
 		catch (Exception e) {
 			//Ignore. Silently catch the any sorts of exception, and just let the game flow on.
-			int length = this.tokens[this.tokenPointer].length();
-			if (this.firstLineIterator > length)
-				this.firstLineIterator = length;
-			length = this.tokens[this.tokenPointer + 1].length();
-			if (this.secondLineIterator > length)
-				this.secondLineIterator = length;
 		}
 
 		if (this.isMenuActivated) {
@@ -235,8 +229,13 @@ public class Dialogue {
 			speechDialogueHandling();
 		}
 		else if (this.isMenuActivated) {
+			prepareDialogueText();
 			menuDialogueText();
 			menuDialogueHandling();
+		}
+		else if (this.game.getPlayer().warningsTriggered) {
+			warningText();
+			this.game.getPlayer().warningsTriggered = false;
 		}
 		else {
 			this.firstLineIterator = this.secondLineIterator = 0;
@@ -248,13 +247,25 @@ public class Dialogue {
 			this.repeatDialogueTick--;
 	}
 	
-	//FIXME:
+	private void prepareDialogueText() {
+		Player player = this.game.getPlayer();
+		Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
+		if (entry.getKey().equals("BICYCLE")) {
+			if (player.isRidingBicycle()) {
+				entry.setValue("Get off bicycle.");
+			}
+			else {
+				entry.setValue("Use your bicycle.");
+			}
+		}
+	}
+	
 	private void menuDialogueText() {
 		String menuLine = menuItems.get(menuPointerPosition).getValue();
 		this.tokens = this.toLines(menuLine, HALF_STRING_LENGTH);
 		this.tokenPointer = 0;
 		try {
-		this.firstLineIterator = this.tokens[this.tokenPointer].length();
+			this.firstLineIterator = this.tokens[this.tokenPointer].length();
 		}
 		catch (Exception e) {
 			this.doneDisplayingDialogue = true;
@@ -295,12 +306,19 @@ public class Dialogue {
 		//Menu input mechanism
 		if ((this.input.Z.keyStateDown || this.input.SLASH.keyStateDown) && (!this.input.Z.lastKeyState || !this.input.SLASH.lastKeyState)) {
 			Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
-			game.prepareAction(entry);
+			game.sendAction(entry);
 			this.input.Z.lastKeyState = true;
 			this.input.SLASH.lastKeyState = true;
 			this.doneDisplayingDialogue = true;
 			this.isMenuActivated = false;
 		}
+	}
+	
+	private void warningText() {
+		this.tokens = this.toLines("There's a time and place for everything, but not now.", MAX_STRING_LENGTH);
+		this.showDialog = true;
+		this.doneDisplayingDialogue = false;
+		this.firstLineIterator = this.secondLineIterator = 0;
 	}
 
 	private void speechDialogueHandling() {
