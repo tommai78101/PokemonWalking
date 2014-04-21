@@ -62,7 +62,7 @@ public class Dialogue {
 	//private ArrayList<String> tempMenuItems = new ArrayList<String>();
 	private ArrayList<Map.Entry<String, String>> menuItems = new ArrayList<Map.Entry<String, String>>();
 	private int menuPointerPosition = 0;
-
+	
 	public Dialogue(Keys input, Game game) {
 		this.input = input;
 		this.game = game;
@@ -161,13 +161,13 @@ public class Dialogue {
 		catch (Exception e) {
 			//Ignore. Silently catch the any sorts of exception, and just let the game flow on.
 		}
-
+		
 		if (this.isMenuActivated) {
 			for (int i = 0; i < menuItems.size(); i++) {
 				//TODO: We need to have an arrow pointing at the menu items.
 				//We can't do anything about it. Scaling problems.
 				g.drawString(menuItems.get(i).getKey(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
-
+				
 			}
 		}
 	}
@@ -183,7 +183,7 @@ public class Dialogue {
 	public void tick() {
 		
 		if (!this.input.START.lastKeyState && this.input.START.keyStateDown) {
-			this.isMenuActivated = !this.isMenuActivated;
+			isMenuActivated = !isMenuActivated;
 			this.input.START.lastKeyState = true;
 		}
 		if ((this.input.X.keyStateDown || this.input.PERIOD.keyStateDown) && this.isMenuActivated)
@@ -240,8 +240,6 @@ public class Dialogue {
 		else {
 			this.firstLineIterator = this.secondLineIterator = 0;
 			this.menuPointerPosition = 0;
-			if (Player.isMovementsLocked())
-				Player.unlockMovements();
 		}
 		if (this.repeatDialogueTick > 0)
 			this.repeatDialogueTick--;
@@ -320,7 +318,7 @@ public class Dialogue {
 		this.doneDisplayingDialogue = false;
 		this.firstLineIterator = this.secondLineIterator = 0;
 	}
-
+	
 	private void speechDialogueHandling() {
 		boolean result1 = false, result2 = false;
 		try {
@@ -355,7 +353,7 @@ public class Dialogue {
 		if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length)
 			this.next = true;
 	}
-
+	
 	/**
 	 * Creates a set of lines for use with the dialogues from a given dialogue message.
 	 * 
@@ -426,7 +424,7 @@ public class Dialogue {
 			this.renderText(g);
 		}
 	}
-
+	
 	/**
 	 * Checks to see if the dialogue is allowed to be shown.
 	 * 

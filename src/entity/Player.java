@@ -174,7 +174,7 @@ public class Player extends Entity {
 	
 	private void walk() {
 		if (!this.lockWalking) {
-			if (!this.facingsBlocked[UP]) {
+			if (!this.facingsBlocked[UP] && !movementLock) {
 				if (keys.up.isTappedDown || keys.W.isTappedDown)
 					tapped();
 				else if (keys.up.isPressedDown || keys.W.isPressedDown) {
@@ -182,7 +182,7 @@ public class Player extends Entity {
 					return;
 				}
 			}
-			if (!this.facingsBlocked[DOWN]) {
+			if (!this.facingsBlocked[DOWN] && !movementLock) {
 				if (keys.down.isTappedDown || keys.S.isTappedDown)
 					tapped();
 				else if (keys.down.isPressedDown || keys.S.isPressedDown) {
@@ -190,7 +190,7 @@ public class Player extends Entity {
 					return;
 				}
 			}
-			if (!this.facingsBlocked[LEFT]) {
+			if (!this.facingsBlocked[LEFT] && !movementLock) {
 				if (keys.left.isTappedDown || keys.A.isTappedDown)
 					tapped();
 				else if (keys.left.isPressedDown || keys.A.isPressedDown) {
@@ -198,7 +198,7 @@ public class Player extends Entity {
 					return;
 				}
 			}
-			if (!this.facingsBlocked[RIGHT]) {
+			if (!this.facingsBlocked[RIGHT] && !movementLock) {
 				if (keys.right.isTappedDown || keys.D.isTappedDown)
 					tapped();
 				else if (keys.right.isPressedDown || keys.D.isPressedDown) {
@@ -458,8 +458,26 @@ public class Player extends Entity {
 	 * Changes the player's state to Riding.
 	 * */
 	public void startsRidingBicycle() {
-		if (!this.isInWater)
-			this.isOnBicycle = true;
+		if (!this.isInWater) {
+			Player.lockMovements();
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(250);
+					}
+					catch (InterruptedException e) {
+					}
+					isOnBicycle = true;
+					try {
+						Thread.sleep(250);
+					}
+					catch (InterruptedException e) {
+					}
+					Player.unlockMovements();
+				}
+			}).start();
+		}
 		else
 			this.warningsTriggered = true;
 	}
@@ -468,7 +486,24 @@ public class Player extends Entity {
 	 * Changes the player's state to Walking.
 	 * */
 	public void getsOffBicycle() {
-		this.isOnBicycle = false;
+		Player.lockMovements();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(250);
+				}
+				catch (InterruptedException e) {
+				}
+				isOnBicycle = false;
+				try {
+					Thread.sleep(250);
+				}
+				catch (InterruptedException e) {
+				}
+				Player.unlockMovements();
+			}
+		}).start();
 	}
 
 	/**
@@ -483,10 +518,15 @@ public class Player extends Entity {
 			case 0x08: {
 				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 					this.enableInteraction = false;
-					Player.unlockMovements();
+					if (Player.isMovementsLocked())
+						Player.unlockMovements();
 				}
-				if (this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) {
-					this.enableInteraction = true;
+				if ((this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+					if (!movementLock) {
+						this.enableInteraction = true;
+						this.keys.Z.lastKeyState = true;
+						this.keys.SLASH.lastKeyState = true;
+					}
 				}
 				if (this.enableInteraction) {
 					this.interactionID = dataColor & 0xFFFF;
@@ -502,7 +542,7 @@ public class Player extends Entity {
 	public void stopInteraction() {
 		this.enableInteraction = false;
 		this.interactionID = 0;
-		Player.unlockMovements();
+		//Player.unlockMovements();
 	}
 	
 	public int getInteractionID() {
@@ -548,7 +588,7 @@ public class Player extends Entity {
 			if (yAccel < -1)
 				yAccel = -1;
 			
-			if (!this.isOnBicycle) {
+			if (!this.isOnBicycle && !movementLock) {
 				xPosition += xAccel * 2;
 				yPosition += yAccel * 2;
 			}
@@ -652,20 +692,18 @@ public class Player extends Entity {
 	@Override
 	public void tick() {
 		//TODO: Find some way of allowing players to ride bicycle.
-		if (!Player.movementLock) {
-			if (!this.lockJumping) {
-				if (!this.enableInteraction) {
-					walk();
-					handleMovementCheck();
-					controlTick();
-				}
-				else {
-					stopAnimation();
-				}
+		if (!this.lockJumping) {
+			if (!this.enableInteraction) {
+				walk();
+				handleMovementCheck();
+				controlTick();
 			}
-			else
-				jump();
+			else {
+				stopAnimation();
+			}
 		}
+		else
+			jump();
 	}
 	
 	/**
