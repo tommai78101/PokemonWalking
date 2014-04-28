@@ -503,9 +503,7 @@ public class Dialogue {
 		return null;
 	}
 	
-	//----------------------- PRIVATE METHODS ONLY ------------------------------------------
-	
-	private String[] toLines(String all, final int regex) {
+	public static String[] toLines(String all, final int regex) {
 		ArrayList<String> lines = new ArrayList<>();
 		String[] words = all.split("\\s");
 		String line = "";
