@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
-
+import dialogue.Dialogue;
 import level.PixelData;
 import level.WorldConstants;
 import resources.Art;

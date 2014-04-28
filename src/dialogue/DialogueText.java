@@ -1,4 +1,4 @@
-package level;
+package dialogue;
 
 public class DialogueText {
 	public int dialogueID;

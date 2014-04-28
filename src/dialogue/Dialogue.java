@@ -1,4 +1,4 @@
-package screen;
+package dialogue;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -9,12 +9,11 @@ import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
-
-import level.DialogueText;
 import main.Game;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
+import screen.BaseScreen;
 import abstracts.Tile;
 import entity.Player;
 
@@ -59,7 +58,6 @@ public class Dialogue {
 	
 	//---------------------------------------
 	private boolean isMenuActivated;
-	//private ArrayList<String> tempMenuItems = new ArrayList<String>();
 	private ArrayList<Map.Entry<String, String>> menuItems = new ArrayList<Map.Entry<String, String>>();
 	private int menuPointerPosition = 0;
 	
@@ -176,7 +174,8 @@ public class Dialogue {
 	 * Updates the dialogues on a per-tick basis.
 	 * 
 	 * <p>
-	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when displaying dialogues. More information can be found by reading the comments in this method code.
+	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when
+	 * displaying dialogues. More information can be found by reading the comments in this method code.
 	 * 
 	 * @return Nothing.
 	 * */
@@ -190,9 +189,9 @@ public class Dialogue {
 			this.isMenuActivated = false;
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown
-				|| input.X.isTappedDown || input.X.isPressedDown
-				|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
-				|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+					|| input.X.isTappedDown || input.X.isPressedDown
+					|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+					|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
 				this.next = false;
 				boolean result1 = false, result2 = false;
 				try {

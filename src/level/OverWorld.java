@@ -2,9 +2,8 @@ package level;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import dialogue.Dialogue;
 import screen.BaseScreen;
-import screen.Dialogue;
 import abstracts.Tile;
 import abstracts.World;
 import entity.Player;

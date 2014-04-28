@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
+import dialogue.Dialogue;
 import level.OverWorld;
 import screen.BaseScreen;
-import screen.Dialogue;
 import abstracts.World;
 import entity.Player;
 
