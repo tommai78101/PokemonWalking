@@ -1,6 +1,14 @@
 package main;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -8,10 +16,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-
 import screen.BaseScreen;
 
 public class MainComponent extends Canvas implements Runnable {
@@ -351,7 +357,7 @@ public class MainComponent extends Canvas implements Runnable {
 		frame.setSize(new Dimension(inset.left + inset.right + GAME_WIDTH * GAME_SCALE, inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE));
 		frame.setLocationRelativeTo(null);
 		//DEBUG: 
-		//frame.setAlwaysOnTop(true);
+		frame.setAlwaysOnTop(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addWindowListener(game.getWindowListener());
 		frame.setVisible(true);

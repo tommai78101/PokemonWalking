@@ -181,12 +181,12 @@ public class Dialogue {
 	 * */
 	public void tick() {
 		
-		if (!this.input.START.lastKeyState && this.input.START.keyStateDown) {
-			isMenuActivated = !isMenuActivated;
-			this.input.START.lastKeyState = true;
-		}
-		if ((this.input.X.keyStateDown || this.input.PERIOD.keyStateDown) && this.isMenuActivated)
-			this.isMenuActivated = false;
+		//		if (!this.input.START.lastKeyState && this.input.START.keyStateDown) {
+		//			isMenuActivated = !isMenuActivated;
+		//			this.input.START.lastKeyState = true;
+		//		}
+		//		if ((this.input.X.keyStateDown || this.input.PERIOD.keyStateDown) && this.isMenuActivated)
+		//			this.isMenuActivated = false;
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown
 					|| input.X.isTappedDown || input.X.isPressedDown
@@ -227,11 +227,11 @@ public class Dialogue {
 		if (this.showDialog) {
 			speechDialogueHandling();
 		}
-		else if (this.isMenuActivated) {
-			prepareDialogueText();
-			menuDialogueText();
-			menuDialogueHandling();
-		}
+		//		else if (this.isMenuActivated) {
+		//			prepareDialogueText();
+		//			menuDialogueText();
+		//			menuDialogueHandling();
+		//		}
 		else if (this.game.getPlayer().warningsTriggered) {
 			warningText();
 			this.game.getPlayer().warningsTriggered = false;

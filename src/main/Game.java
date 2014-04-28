@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import dialogue.Dialogue;
 import level.OverWorld;
 import screen.BaseScreen;
 import abstracts.World;
+import dialogue.Dialogue;
+import dialogue.StartMenu;
 import entity.Player;
 
 public class Game {
@@ -20,6 +21,7 @@ public class Game {
 	//private final Keys inputs;
 	//private final Gui guiInterface;
 	private final List<World> worlds;
+	private StartMenu startMenu;
 	private World overworld;
 	private final Player player;
 	
@@ -46,6 +48,7 @@ public class Game {
 		this.overworld = new OverWorld(player, this.dialogue);
 		this.worlds = new ArrayList<World>();
 		this.worlds.add(this.overworld);
+		this.startMenu = new StartMenu(this).initialize();
 	}
 	
 	/**
@@ -73,6 +76,7 @@ public class Game {
 		//dialogue.renderTextGraphics(graphics);
 		//dialogue.renderText(graphics);
 		dialogue.render(screen, player.getX(), player.getY(), graphics);
+		startMenu.render(screen, graphics);
 	}
 	
 	/**
@@ -92,6 +96,7 @@ public class Game {
 		//player.tick();
 		overworld.tick();
 		dialogue.tick();
+		startMenu.tick();
 	}
 	
 	/**

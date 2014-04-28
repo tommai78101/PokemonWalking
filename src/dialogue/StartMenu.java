@@ -1,5 +1,6 @@
 package dialogue;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -7,14 +8,16 @@ import java.util.Map;
 import main.Game;
 import main.Keys;
 import main.MainComponent;
+import resources.Art;
+import screen.BaseScreen;
 import abstracts.Tile;
 import entity.Player;
 
 public class StartMenu {
 	//Description area
 	private static final int DESCRIPTION_STARTING_X = Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE;
-	private static final int DESCRIPTION_FIRST_LINE_Y = 120 * MainComponent.GAME_SCALE;
-	private static final int DESCRIPTION_SECOND_LINE_Y = 136 * MainComponent.GAME_SCALE;
+	private static final int DESCRIPTION_FIRST_LINE_Y = (Tile.HEIGHT * 7) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
+	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 8) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
 	
 	//String constants
 	private static final String ITEM_BICYCLE = "BICYCLE";
@@ -35,6 +38,16 @@ public class StartMenu {
 		this.actionEvent = null;
 	}
 	
+	public StartMenu initialize() {
+		MenuItem bicycle = new MenuItem(ITEM_BICYCLE, "Use the bicycle", "Get off bicycle");
+		MenuItem temp = new MenuItem("TEMP", "Nothing.", "Nothing");
+		MenuItem exit = new MenuItem("EXIT", "Close this menu", "Close this menu");
+		this.addMenuItem(bicycle);
+		this.addMenuItem(temp);
+		this.addMenuItem(exit);
+		return this;
+	}
+	
 	public void addMenuItem(MenuItem menuItem) {
 		this.items.add(new AbstractMap.SimpleEntry<Integer, MenuItem>(items.size(), menuItem));
 	}
@@ -51,24 +64,6 @@ public class StartMenu {
 		}
 	}
 	
-	public void renderMenuText(Graphics g) {
-		if (this.activation) {
-			for (int i = 0; i < this.items.size(); i++) {
-				//TODO: We need to have an arrow pointing at the menu items.
-				g.drawString(this.items.get(i).getValue().getDescription(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
-			}
-		}
-	}
-	
-	public void renderMenuDescriptionText(Graphics g) {
-		try {
-			g.drawString(tokens[0], StartMenu.DESCRIPTION_STARTING_X, StartMenu.DESCRIPTION_FIRST_LINE_Y);
-			g.drawString(tokens[1], StartMenu.DESCRIPTION_STARTING_X, StartMenu.DESCRIPTION_SECOND_LINE_Y);
-		}
-		catch (Exception e) {
-		}
-	}
-	
 	public void tick() {
 		if (!this.keys.START.lastKeyState && this.keys.START.keyStateDown) {
 			activation = !activation;
@@ -79,6 +74,19 @@ public class StartMenu {
 		if (this.activation) {
 			prepareMenuText();
 			handleMenuSelection();
+		}
+		else if (Player.isMovementsLocked())
+			Player.unlockMovements();
+	}
+	
+	public void render(BaseScreen output, Graphics graphics) {
+		if (this.activation) {
+			this.renderBox(output, 5, 0, 4, items.size());
+			this.renderDescriptionBox(output, 0, 7, 5, 3);
+			output.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuCursorPosition * Tile.HEIGHT);
+			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+			this.renderMenuText(graphics);
+			this.renderMenuDescriptionText(graphics);
 		}
 	}
 	
@@ -101,8 +109,8 @@ public class StartMenu {
 				item.toggleDescription(false);
 			else
 				item.toggleDescription(true);
-			this.tokens = Dialogue.toLines(item.getDescription(), Dialogue.HALF_STRING_LENGTH);
 		}
+		this.tokens = Dialogue.toLines(item.getDescription(), Dialogue.HALF_STRING_LENGTH);
 	}
 	
 	private void handleMenuSelection() {
@@ -130,4 +138,55 @@ public class StartMenu {
 		}
 	}
 	
+	private void renderBox(BaseScreen output, int x, int y, int middleWidth, int middleHeight) {
+		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
+		for (int i = 0; i < middleWidth - 1; i++) {
+			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
+		}
+		output.blit(Art.dialogue_top_right, (x + middleWidth) * Tile.WIDTH, y * Tile.HEIGHT);
+		
+		for (int j = 0; j < middleHeight - 1; j++) {
+			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			for (int i = 0; i < middleWidth - 1; i++) {
+				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			}
+			output.blit(Art.dialogue_right, (x + middleWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+		}
+		
+		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + middleHeight) * Tile.HEIGHT));
+		for (int i = 0; i < middleWidth - 1; i++) {
+			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + middleHeight) * Tile.HEIGHT));
+		}
+		output.blit(Art.dialogue_bottom_right, (x + middleWidth) * Tile.WIDTH, ((y + middleHeight) * Tile.HEIGHT));
+	}
+	
+	private void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), ((y - 1) * Tile.HEIGHT + 8) + j * Tile.HEIGHT);
+			}
+		}
+	}
+	
+	private void renderMenuText(Graphics g) {
+		g.setFont(Art.font);
+		g.setColor(Color.black);
+		if (this.activation) {
+			for (int i = 0; i < this.items.size(); i++) {
+				//TODO: We need to have an arrow pointing at the menu items.
+				g.drawString(this.items.get(i).getValue().getName(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
+			}
+		}
+	}
+	
+	private void renderMenuDescriptionText(Graphics g) {
+		g.setFont(Art.font);
+		g.setColor(Color.black);
+		try {
+			g.drawString(tokens[0], 0, StartMenu.DESCRIPTION_FIRST_LINE_Y);
+			g.drawString(tokens[1], 0, StartMenu.DESCRIPTION_SECOND_LINE_Y);
+		}
+		catch (Exception e) {
+		}
+	}
 }
