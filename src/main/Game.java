@@ -77,7 +77,10 @@ public class Game {
 		//dialogue.renderTextGraphics(graphics);
 		//dialogue.renderText(graphics);
 		dialogue.render(screen, player.getX(), player.getY(), graphics);
-		startMenu.render(screen, graphics);
+		if (startMenu.isActivated())
+			startMenu.render(screen, graphics);
+		else
+			graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 	}
 	
 	/**
@@ -154,11 +157,17 @@ public class Game {
 	//----------------------------------------------       PRIVATE METHODS      -------------------------------------------------
 	
 	private void handleActionEvent(Map.Entry<Integer, MenuItem> entry) {
-		if (entry.getValue().getName().equals(StartMenu.ITEM_NAME_BICYCLE)) {
+		String str = entry.getValue().getName();
+		if (str.equals(StartMenu.ITEM_NAME_BICYCLE)) {
 			if (!this.player.isRidingBicycle())
 				this.player.startsRidingBicycle();
 			else
 				this.player.getsOffBicycle();
+		}
+		else if (str.equals(StartMenu.ITEM_NAME_EXIT)) {
+			this.startMenu.clearActionEvent();
+			this.startMenu.closeMenu();
+			return;
 		}
 		this.startMenu.clearActionEvent();
 		this.startMenu.closeMenu();

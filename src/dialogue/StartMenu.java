@@ -21,6 +21,7 @@ public class StartMenu {
 	
 	//String constants
 	public static final String ITEM_NAME_BICYCLE = "BICYCLE";
+	public static final String ITEM_NAME_EXIT = "EXIT";
 	
 	private boolean activation;
 	private ArrayList<Map.Entry<Integer, MenuItem>> items = new ArrayList<Map.Entry<Integer, MenuItem>>();
@@ -41,7 +42,7 @@ public class StartMenu {
 	public StartMenu initialize() {
 		MenuItem bicycle = new MenuItem(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle");
 		MenuItem temp = new MenuItem("TEMP", "Nothing.", "Nothing");
-		MenuItem exit = new MenuItem("EXIT", "Close this menu", "Close this menu");
+		MenuItem exit = new MenuItem(ITEM_NAME_EXIT, "Close this menu", "Close this menu");
 		this.addMenuItem(bicycle);
 		this.addMenuItem(temp);
 		this.addMenuItem(exit);
@@ -92,9 +93,6 @@ public class StartMenu {
 			this.renderMenuText(graphics);
 			this.renderMenuDescriptionText(graphics);
 		}
-		else {
-			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-		}
 	}
 	
 	public Map.Entry<Integer, MenuItem> getActionEvent() {
@@ -111,6 +109,10 @@ public class StartMenu {
 	
 	public void closeMenu() {
 		this.activation = false;
+	}
+	
+	public boolean isActivated() {
+		return this.activation;
 	}
 	
 	//-------------------------  PRIVATE METHODS  -----------------------------------
