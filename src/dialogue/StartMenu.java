@@ -70,8 +70,10 @@ public class StartMenu {
 			if (!Player.isMovementsLocked())
 				Player.lockMovements();
 			final Player player = this.game.getPlayer();
-			if (!player.isLockedWalking() && !player.isLockedJumping())
+			if (!player.isLockedWalking() && !player.isLockedJumping()) {
 				activation = !activation;
+				this.menuCursorPosition = 0;
+			}
 			this.keys.START.lastKeyState = true;
 		}
 		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && this.activation)
@@ -109,6 +111,7 @@ public class StartMenu {
 	
 	public void closeMenu() {
 		this.activation = false;
+		this.menuCursorPosition = 0;
 	}
 	
 	public boolean isActivated() {
