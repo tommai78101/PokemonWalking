@@ -67,8 +67,15 @@ public class Art {
 	public static BaseBitmap house_door;
 	public static BaseBitmap house_bottom;
 	public static BaseBitmap house_bottom_left;
-	public static BaseBitmap house_left;
 	public static BaseBitmap house_bottom_right;
+	public static BaseBitmap house_left;
+	public static BaseBitmap house_left_windows_right;
+	public static BaseBitmap house_center;
+	public static BaseBitmap house_center_windows_center;
+	public static BaseBitmap house_center_windows_left;
+	public static BaseBitmap house_center_windows_right;
+	public static BaseBitmap house_right;
+	public static BaseBitmap house_right_windows_left;
 	public static BaseBitmap house_roof_left;
 	public static BaseBitmap house_roof_middle;
 	public static BaseBitmap house_roof_right;
@@ -202,10 +209,16 @@ public class Art {
 		house_door = screen.load("art/house/house_door.png");
 		house_bottom = screen.load("art/house/house_bottom.png");
 		house_bottom_left = screen.load("art/house/house_bottom_left.png");
-		//house_left = screen.load("art/house/house_left.png");
+		house_left = screen.load("art/house/house_left.png");
+		house_left_windows_right = screen.load("art/house/house_left_windows_right.png");
+		house_right = screen.load("art/house/house_right.png");
+		house_right_windows_left = screen.load("art/house/house_right_windows_left.png");
+		house_center = screen.load("art/house/house_center.png");
+		house_center_windows_center = screen.load("art/house/house_center_windows_center.png");
+		house_center_windows_left = screen.load("art/house/house_center_windows_left.png");
+		house_center_windows_right = screen.load("art/house/house_center_windows_right.png");
 		house_bottom_right = screen.load("art/house/house_bottom_right.png");
 		house_roof_left = screen.load("art/house/house_roof_left.png");
-		//house_roof_left = Art.changeColors(screen.load("art/house/house_roof_left.png"), 0x676767, 0xF7F7F7);
 		house_roof_middle = screen.load("art/house/house_roof_middle.png");
 		house_roof_right = screen.load("art/house/house_roof_right.png");
 		
