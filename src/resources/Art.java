@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
-
 import main.MainComponent;
 import screen.BaseBitmap;
 import screen.BaseScreen;
@@ -111,6 +110,9 @@ public class Art {
 	//Font
 	public static Font font;
 	
+	//Inventory
+	public static BaseBitmap inventory_gui;
+	
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
@@ -206,6 +208,9 @@ public class Art {
 		//house_roof_left = Art.changeColors(screen.load("art/house/house_roof_left.png"), 0x676767, 0xF7F7F7);
 		house_roof_middle = screen.load("art/house/house_roof_middle.png");
 		house_roof_right = screen.load("art/house/house_roof_right.png");
+		
+		//Inventory
+		inventory_gui = screen.load("art/inventory/inventory_gui.png");
 	}
 	
 	private static BaseBitmap[] loadAnimation(BaseScreen screen, int frames, String filename) {
@@ -297,7 +302,7 @@ public class Art {
 		int alphaBackground = 256 - alphaBlend;
 		
 		int bgRed = (bgColor >> 16) & 0xFF;
-		int bgGreen = (bgColor >>8) & 0xFF;
+		int bgGreen = (bgColor >> 8) & 0xFF;
 		int bgBlue = bgColor & 0xFF;
 		
 		int blendRed = (blendColor >> 16) & 0xFF;
@@ -308,7 +313,6 @@ public class Art {
 		int green = ((blendGreen * alphaBlend + bgGreen * alphaBackground) >> 8) & 0xFF;
 		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
 		
-
 		return 0xFF000000 | red | green | blue;
 	}
 }
