@@ -20,7 +20,7 @@ public class StartMenu {
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 8) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
 	
 	//String constants
-	private static final String ITEM_BICYCLE = "BICYCLE";
+	public static final String ITEM_NAME_BICYCLE = "BICYCLE";
 	
 	private boolean activation;
 	private ArrayList<Map.Entry<Integer, MenuItem>> items = new ArrayList<Map.Entry<Integer, MenuItem>>();
@@ -39,7 +39,7 @@ public class StartMenu {
 	}
 	
 	public StartMenu initialize() {
-		MenuItem bicycle = new MenuItem(ITEM_BICYCLE, "Use the bicycle", "Get off bicycle");
+		MenuItem bicycle = new MenuItem(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle");
 		MenuItem temp = new MenuItem("TEMP", "Nothing.", "Nothing");
 		MenuItem exit = new MenuItem("EXIT", "Close this menu", "Close this menu");
 		this.addMenuItem(bicycle);
@@ -66,7 +66,11 @@ public class StartMenu {
 	
 	public void tick() {
 		if (!this.keys.START.lastKeyState && this.keys.START.keyStateDown) {
-			activation = !activation;
+			if (!Player.isMovementsLocked())
+				Player.lockMovements();
+			final Player player = this.game.getPlayer();
+			if (!player.isLockedWalking() && !player.isLockedJumping())
+				activation = !activation;
 			this.keys.START.lastKeyState = true;
 		}
 		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && this.activation)
@@ -88,6 +92,9 @@ public class StartMenu {
 			this.renderMenuText(graphics);
 			this.renderMenuDescriptionText(graphics);
 		}
+		else {
+			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+		}
 	}
 	
 	public Map.Entry<Integer, MenuItem> getActionEvent() {
@@ -98,12 +105,20 @@ public class StartMenu {
 		return (this.actionEvent != null);
 	}
 	
+	public void clearActionEvent() {
+		this.actionEvent = null;
+	}
+	
+	public void closeMenu() {
+		this.activation = false;
+	}
+	
 	//-------------------------  PRIVATE METHODS  -----------------------------------
 	private void prepareMenuText() {
 		Map.Entry<Integer, MenuItem> entry = this.items.get(this.menuCursorPosition);
 		MenuItem item = entry.getValue();
 		//TODO: Make this modular.
-		if (item.getName().equals(StartMenu.ITEM_BICYCLE)) {
+		if (item.getName().equals(StartMenu.ITEM_NAME_BICYCLE)) {
 			Player player = this.game.getPlayer();
 			if (player.isRidingBicycle())
 				item.toggleDescription(false);
@@ -131,9 +146,9 @@ public class StartMenu {
 		
 		//Menu input mechanism
 		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-			this.actionEvent = items.get(menuCursorPosition);
 			this.keys.Z.lastKeyState = true;
 			this.keys.SLASH.lastKeyState = true;
+			this.actionEvent = items.get(menuCursorPosition);
 			this.activation = true;
 		}
 	}

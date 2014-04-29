@@ -15,7 +15,6 @@ import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
 import abstracts.Tile;
-import entity.Player;
 
 public class Dialogue {
 	//According to the width and height of the dialog shown in the original games.
@@ -244,72 +243,72 @@ public class Dialogue {
 			this.repeatDialogueTick--;
 	}
 	
-	private void prepareDialogueText() {
-		Player player = this.game.getPlayer();
-		Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
-		if (entry.getKey().equals("BICYCLE")) {
-			if (player.isRidingBicycle()) {
-				entry.setValue("Get off bicycle.");
-			}
-			else {
-				entry.setValue("Use your bicycle.");
-			}
-		}
-	}
+	//	private void prepareDialogueText() {
+	//		Player player = this.game.getPlayer();
+	//		Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
+	//		if (entry.getKey().equals("BICYCLE")) {
+	//			if (player.isRidingBicycle()) {
+	//				entry.setValue("Get off bicycle.");
+	//			}
+	//			else {
+	//				entry.setValue("Use your bicycle.");
+	//			}
+	//		}
+	//	}
 	
-	private void menuDialogueText() {
-		String menuLine = menuItems.get(menuPointerPosition).getValue();
-		this.tokens = this.toLines(menuLine, HALF_STRING_LENGTH);
-		this.tokenPointer = 0;
-		try {
-			this.firstLineIterator = this.tokens[this.tokenPointer].length();
-		}
-		catch (Exception e) {
-			this.doneDisplayingDialogue = true;
-			return;
-		}
-		if (this.tokens.length > 2) {
-			this.secondLineIterator = HALF_STRING_LENGTH;
-			this.next = true;
-		}
-		else {
-			try {
-				this.secondLineIterator = this.tokens[this.tokenPointer + 1].length();
-			}
-			catch (Exception e) {
-				this.secondLineIterator = 0;
-			}
-		}
-		this.doneDisplayingDialogue = false;
-	}
+	//	private void menuDialogueText() {
+	//		String menuLine = menuItems.get(menuPointerPosition).getValue();
+	//		this.tokens = this.toLines(menuLine, HALF_STRING_LENGTH);
+	//		this.tokenPointer = 0;
+	//		try {
+	//			this.firstLineIterator = this.tokens[this.tokenPointer].length();
+	//		}
+	//		catch (Exception e) {
+	//			this.doneDisplayingDialogue = true;
+	//			return;
+	//		}
+	//		if (this.tokens.length > 2) {
+	//			this.secondLineIterator = HALF_STRING_LENGTH;
+	//			this.next = true;
+	//		}
+	//		else {
+	//			try {
+	//				this.secondLineIterator = this.tokens[this.tokenPointer + 1].length();
+	//			}
+	//			catch (Exception e) {
+	//				this.secondLineIterator = 0;
+	//			}
+	//		}
+	//		this.doneDisplayingDialogue = false;
+	//	}
 	
-	private void menuDialogueHandling() {
-		//Player input mechanism
-		if (!Player.isMovementsLocked())
-			Player.lockMovements();
-		if (!this.input.down.lastKeyState && this.input.down.keyStateDown) {
-			this.menuPointerPosition++;
-			if (this.menuPointerPosition > this.menuItems.size() - 1)
-				this.menuPointerPosition = 0;
-			this.input.down.lastKeyState = true;
-		}
-		else if (!this.input.up.lastKeyState && this.input.up.keyStateDown) {
-			this.menuPointerPosition--;
-			if (this.menuPointerPosition < 0)
-				this.menuPointerPosition = this.menuItems.size() - 1;
-			this.input.up.lastKeyState = true;
-		}
-		
-		//Menu input mechanism
-		if ((this.input.Z.keyStateDown || this.input.SLASH.keyStateDown) && (!this.input.Z.lastKeyState || !this.input.SLASH.lastKeyState)) {
-			Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
-			game.sendAction(entry);
-			this.input.Z.lastKeyState = true;
-			this.input.SLASH.lastKeyState = true;
-			this.doneDisplayingDialogue = true;
-			this.isMenuActivated = false;
-		}
-	}
+	//	private void menuDialogueHandling() {
+	//		//Player input mechanism
+	//		if (!Player.isMovementsLocked())
+	//			Player.lockMovements();
+	//		if (!this.input.down.lastKeyState && this.input.down.keyStateDown) {
+	//			this.menuPointerPosition++;
+	//			if (this.menuPointerPosition > this.menuItems.size() - 1)
+	//				this.menuPointerPosition = 0;
+	//			this.input.down.lastKeyState = true;
+	//		}
+	//		else if (!this.input.up.lastKeyState && this.input.up.keyStateDown) {
+	//			this.menuPointerPosition--;
+	//			if (this.menuPointerPosition < 0)
+	//				this.menuPointerPosition = this.menuItems.size() - 1;
+	//			this.input.up.lastKeyState = true;
+	//		}
+	//		
+	//		//Menu input mechanism
+	//		if ((this.input.Z.keyStateDown || this.input.SLASH.keyStateDown) && (!this.input.Z.lastKeyState || !this.input.SLASH.lastKeyState)) {
+	//			Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
+	//			game.sendAction(entry);
+	//			this.input.Z.lastKeyState = true;
+	//			this.input.SLASH.lastKeyState = true;
+	//			this.doneDisplayingDialogue = true;
+	//			this.isMenuActivated = false;
+	//		}
+	//	}
 	
 	private void warningText() {
 		this.tokens = this.toLines("There's a time and place for everything, but not now.", MAX_STRING_LENGTH);
@@ -418,8 +417,8 @@ public class Dialogue {
 			//Scaling problems again.
 			screen.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuPointerPosition * Tile.HEIGHT);
 		}
-		g.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		if (this.isDisplayingDialogue() || this.isMenuActivated) {
+			g.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 			this.renderText(g);
 		}
 	}

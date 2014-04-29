@@ -9,6 +9,7 @@ import level.OverWorld;
 import screen.BaseScreen;
 import abstracts.World;
 import dialogue.Dialogue;
+import dialogue.MenuItem;
 import dialogue.StartMenu;
 import entity.Player;
 
@@ -97,6 +98,8 @@ public class Game {
 		overworld.tick();
 		dialogue.tick();
 		startMenu.tick();
+		if (startMenu.isActionEventAvailable())
+			handleActionEvent(startMenu.getActionEvent());
 	}
 	
 	/**
@@ -133,18 +136,31 @@ public class Game {
 		//this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
 	}
 	
-	public void sendAction(Map.Entry<String, String> entry) {
-		//TODO: Add actual game menu actions the player can do.
-		String key = entry.getKey();
-		if (key.equals("BICYCLE")) {
+	//	public void sendAction(Map.Entry<String, String> entry) {
+	//		//TODO: Add actual game menu actions the player can do.
+	//		String key = entry.getKey();
+	//		if (key.equals("BICYCLE")) {
+	//			if (!this.player.isRidingBicycle())
+	//				this.player.startsRidingBicycle();
+	//			else
+	//				this.player.getsOffBicycle();
+	//		}
+	//	}
+	
+	public Player getPlayer() {
+		return this.player;
+	}
+	
+	//----------------------------------------------       PRIVATE METHODS      -------------------------------------------------
+	
+	private void handleActionEvent(Map.Entry<Integer, MenuItem> entry) {
+		if (entry.getValue().getName().equals(StartMenu.ITEM_NAME_BICYCLE)) {
 			if (!this.player.isRidingBicycle())
 				this.player.startsRidingBicycle();
 			else
 				this.player.getsOffBicycle();
 		}
-	}
-	
-	public Player getPlayer() {
-		return this.player;
+		this.startMenu.clearActionEvent();
+		this.startMenu.closeMenu();
 	}
 }

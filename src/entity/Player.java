@@ -36,7 +36,7 @@ public class Player extends Entity {
 	boolean isOnBicycle;
 	
 	private static boolean movementLock;
-
+	
 	int interactionID;
 	boolean enableInteraction;
 	//This variable is set to true no matter what in the Player class if the player tries to do action that's not allowed. 
@@ -266,8 +266,10 @@ public class Player extends Entity {
 	 * 
 	 * Note: An example on how to determine player direction for the tile to allow and block:
 	 * <ul>
-	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means, the tile above
-	 * X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X (the UP tile) to jump across to the tile below X, but not the other way around.
+	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the
+	 * parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means,
+	 * the tile above X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X
+	 * (the UP tile) to jump across to the tile below X, but not the other way around.
 	 * </ul>
 	 * 
 	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or Player.RIGHT.
@@ -505,7 +507,7 @@ public class Player extends Entity {
 			}
 		}).start();
 	}
-
+	
 	/**
 	 * Lets the player interact with the data tile ID.
 	 * 
@@ -565,7 +567,8 @@ public class Player extends Entity {
 	 * Makes adjustments to the player's position when the player is walking.
 	 * 
 	 * <p>
-	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player wanted to walk.
+	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player
+	 * wanted to walk.
 	 * 
 	 * @return Nothing.
 	 * */
@@ -577,7 +580,7 @@ public class Player extends Entity {
 			
 			if (this.walking != this.facing)
 				this.walking = this.facing;
-
+			
 			//Makes sure the acceleration stays limited to 1 pixel/tick.
 			if (xAccel > 1)
 				xAccel = 1;
@@ -691,7 +694,6 @@ public class Player extends Entity {
 	
 	@Override
 	public void tick() {
-		//TODO: Find some way of allowing players to ride bicycle.
 		if (!this.lockJumping) {
 			if (!this.enableInteraction) {
 				walk();
@@ -743,7 +745,7 @@ public class Player extends Entity {
 			if (!this.isInWater && !this.isOnBicycle) {
 				//Walking
 				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
+						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
@@ -751,7 +753,7 @@ public class Player extends Entity {
 			else if (this.isInWater && !this.isOnBicycle) {
 				//Surfing
 				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
+						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
@@ -759,7 +761,7 @@ public class Player extends Entity {
 			else if (!this.isInWater && this.isOnBicycle) {
 				//Riding
 				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
+						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player_bicycle[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_bicycle[facing][0], this.xOffset + x, this.yOffset + y);
