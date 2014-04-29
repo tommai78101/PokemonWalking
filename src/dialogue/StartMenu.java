@@ -15,7 +15,6 @@ import entity.Player;
 
 public class StartMenu {
 	//Description area
-	private static final int DESCRIPTION_STARTING_X = Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE;
 	private static final int DESCRIPTION_FIRST_LINE_Y = (Tile.HEIGHT * 7) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 8) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
 	
