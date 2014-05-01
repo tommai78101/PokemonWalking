@@ -1,3 +1,9 @@
+/**
+ * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * */
+
 package resources;
 
 import java.awt.Font;
@@ -7,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+
 import main.MainComponent;
 import screen.BaseBitmap;
 import screen.BaseScreen;

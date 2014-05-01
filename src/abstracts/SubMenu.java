@@ -1,5 +1,11 @@
 package abstracts;
 
+/**
+ * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * */
+
 import java.awt.Graphics;
 
 import main.Keys;

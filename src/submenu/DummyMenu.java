@@ -1,6 +1,13 @@
+/**
+ * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * */
+
 package submenu;
 
 import java.awt.Graphics;
+
 import main.Keys;
 import screen.BaseScreen;
 import abstracts.SubMenu;
