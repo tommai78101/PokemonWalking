@@ -110,10 +110,10 @@ public class Game {
 					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				}
 				else {
+					screen.clear(0xA4E767);
+					overworld.render(screen, player.getX(), player.getY());
+					//dialogue.render(screen, player.getX(), player.getY(), graphics);
 					if (startMenu.isActivated()) {
-						screen.clear(0xA4E767);
-						overworld.render(screen, player.getX(), player.getY());
-						dialogue.render(screen, player.getX(), player.getY(), graphics);
 						startMenu.render(screen, graphics);
 					}
 					else {
@@ -162,8 +162,9 @@ public class Game {
 				break;
 			}
 			case PAUSED: {
-				if (!startMenu.isActivated())
+				if (!startMenu.isActivated()) {
 					startMenu.openMenu();
+				}
 				startMenu.tick();
 				checkUnpausing();
 				if (startMenu.isActionEventAvailable())
@@ -261,6 +262,9 @@ public class Game {
 		if (!keys.START.lastKeyState && keys.START.keyStateDown) {
 			switch (this.state) {
 				case GAME:
+					if (this.player.isLockedWalking() || this.player.isLockedJumping()) {
+						break;
+					}
 					this.state = State.PAUSED;
 					if (!Player.isMovementsLocked())
 						Player.lockMovements();
