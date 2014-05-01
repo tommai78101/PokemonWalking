@@ -5,11 +5,15 @@ import java.awt.Graphics;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
+
 import main.Game;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
+import submenu.DummyMenu;
+import submenu.Inventory;
+import abstracts.SubMenu;
 import abstracts.Tile;
 import entity.Player;
 
@@ -20,15 +24,16 @@ public class StartMenu {
 	
 	//String constants
 	public static final String ITEM_NAME_BICYCLE = "BICYCLE";
+	public static final String ITEM_NAME_INVENTORY = "INVENTORY";
 	public static final String ITEM_NAME_EXIT = "EXIT";
 	
 	private boolean activation;
-	private ArrayList<Map.Entry<Integer, MenuItem>> items = new ArrayList<Map.Entry<Integer, MenuItem>>();
+	private ArrayList<Map.Entry<Integer, SubMenu>> items = new ArrayList<Map.Entry<Integer, SubMenu>>();
 	private int menuCursorPosition;
 	private Keys keys;
 	private Game game;
 	private String[] tokens;
-	private Map.Entry<Integer, MenuItem> actionEvent;
+	private Map.Entry<Integer, SubMenu> actionEvent;
 	
 	public StartMenu(Game game) {
 		this.activation = false;
@@ -39,22 +44,22 @@ public class StartMenu {
 	}
 	
 	public StartMenu initialize() {
-		MenuItem bicycle = new MenuItem(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle");
-		MenuItem temp = new MenuItem("TEMP", "Nothing.", "Nothing");
-		MenuItem exit = new MenuItem(ITEM_NAME_EXIT, "Close this menu", "Close this menu");
+		SubMenu bicycle = new DummyMenu(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle");
+		SubMenu inventory = new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.").initialize(keys);
+		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu");
 		this.addMenuItem(bicycle);
-		this.addMenuItem(temp);
+		this.addMenuItem(inventory);
 		this.addMenuItem(exit);
 		return this;
 	}
 	
-	public void addMenuItem(MenuItem menuItem) {
-		this.items.add(new AbstractMap.SimpleEntry<Integer, MenuItem>(items.size(), menuItem));
+	public void addMenuItem(SubMenu SubMenu) {
+		this.items.add(new AbstractMap.SimpleEntry<Integer, SubMenu>(items.size(), SubMenu));
 	}
 	
 	public void removeMenuItem(int position) {
 		for (int i = 0; i < items.size(); i++) {
-			Map.Entry<Integer, MenuItem> entry = items.get(i);
+			Map.Entry<Integer, SubMenu> entry = items.get(i);
 			if (entry.getKey().intValue() == position) {
 				items.remove(i);
 				if (this.menuCursorPosition > 0)
@@ -65,16 +70,16 @@ public class StartMenu {
 	}
 	
 	public void tick() {
-		if (!this.keys.START.lastKeyState && this.keys.START.keyStateDown) {
-			if (!Player.isMovementsLocked())
-				Player.lockMovements();
-			final Player player = this.game.getPlayer();
-			if (!player.isLockedWalking() && !player.isLockedJumping()) {
-				activation = !activation;
-				this.menuCursorPosition = 0;
-			}
-			this.keys.START.lastKeyState = true;
-		}
+		//		if (!this.keys.START.lastKeyState && this.keys.START.keyStateDown) {
+		//			if (!Player.isMovementsLocked())
+		//				Player.lockMovements();
+		//			final Player player = this.game.getPlayer();
+		//			if (!player.isLockedWalking() && !player.isLockedJumping()) {
+		//				activation = !activation;
+		//				this.menuCursorPosition = 0;
+		//			}
+		//			this.keys.START.lastKeyState = true;
+		//		}
 		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && this.activation)
 			this.activation = false;
 		if (this.activation) {
@@ -96,7 +101,7 @@ public class StartMenu {
 		}
 	}
 	
-	public Map.Entry<Integer, MenuItem> getActionEvent() {
+	public Map.Entry<Integer, SubMenu> getActionEvent() {
 		return this.actionEvent;
 	}
 	
@@ -111,16 +116,27 @@ public class StartMenu {
 	public void closeMenu() {
 		this.activation = false;
 		this.menuCursorPosition = 0;
+		if (Player.isMovementsLocked())
+			Player.unlockMovements();
 	}
 	
+	public void openMenu() {
+		this.activation = true;
+		this.menuCursorPosition = 0;
+	}
+
 	public boolean isActivated() {
 		return this.activation;
 	}
 	
+	public SubMenu getSubMenu() {
+		return this.items.get(this.menuCursorPosition).getValue();
+	}
+
 	//-------------------------  PRIVATE METHODS  -----------------------------------
 	private void prepareMenuText() {
-		Map.Entry<Integer, MenuItem> entry = this.items.get(this.menuCursorPosition);
-		MenuItem item = entry.getValue();
+		Map.Entry<Integer, SubMenu> entry = this.items.get(this.menuCursorPosition);
+		SubMenu item = entry.getValue();
 		//TODO: Make this modular.
 		if (item.getName().equals(StartMenu.ITEM_NAME_BICYCLE)) {
 			Player player = this.game.getPlayer();

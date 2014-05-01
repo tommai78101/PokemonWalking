@@ -1,14 +1,13 @@
 package abstracts;
 
 import java.awt.Graphics;
+
 import main.Keys;
-import screen.BaseBitmap;
 import screen.BaseScreen;
 
 public abstract class SubMenu {
 	
 	protected boolean subMenuActivation;
-	protected BaseBitmap bgImage;
 	
 	private String name;
 	private String enabledDescription;
@@ -19,7 +18,6 @@ public abstract class SubMenu {
 		this.name = name;
 		this.enabledDescription = enabled;
 		this.disabledDescription = disabled;
-		this.bgImage = null;
 		this.subMenuActivation = false;
 	}
 	

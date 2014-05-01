@@ -4,10 +4,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
-import dialogue.Dialogue;
+
 import level.PixelData;
 import level.WorldConstants;
 import resources.Art;
+import dialogue.Dialogue;
 
 public class BaseScreen extends BaseBitmap {
 	
@@ -17,7 +18,7 @@ public class BaseScreen extends BaseBitmap {
 	protected int xOffset;
 	protected int yOffset;
 	
-	private byte invertTick = 0x7;
+	private byte tick = 0x7;
 	private boolean cutScreen;
 	
 	public BaseScreen(int w, int h) {
@@ -165,28 +166,28 @@ public class BaseScreen extends BaseBitmap {
 	}
 	
 	public boolean invert() {
-		if (this.invertTick < 0x2) {
+		if (this.tick < 0x2) {
 			for (int i = 0; i < this.pixels.length; i++)
 				this.pixels[i] = 0xFF000000 | (0xAAAAAA - (this.pixels[i] & 0xFFFFFF));
-			this.invertTick++;
+			this.tick++;
 			return true;
 		}
-		else if (this.invertTick < 0x6) {
+		else if (this.tick < 0x6) {
 			for (int i = 0; i < this.pixels.length; i++)
 				this.pixels[i] = 0xFFAAAAAA;
-			this.invertTick++;
+			this.tick++;
 			return true;
 		}
-		this.invertTick = 0x7;
+		this.tick = 0x7;
 		return false;
 	}
 	
 	public void setInvertTick(byte value) {
-		this.invertTick = value;
+		this.tick = value;
 	}
 	
 	public byte getInvertTick() {
-		return this.invertTick;
+		return this.tick;
 	}
 	
 	/**
