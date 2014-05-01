@@ -65,7 +65,11 @@ public class Game {
 	/**
 	 * Handles rendered objects.
 	 * 
-	 * All render() methods must be placed in here, in order to correctly render to the screen.
+	 * <p>
+	 * All render() methods must be placed in here to render to the screen.
+	 * 
+	 * <p>
+	 * Methods placed in here are to be separated by game states, and depending on the game states, they are to be called when necessary.
 	 * 
 	 * @return Nothing.
 	 * */
