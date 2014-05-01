@@ -83,8 +83,10 @@ public class Game {
 				//FIXME: Need to do something about the font having to be rendered by graphics and not screen.
 				//dialogue.renderTextGraphics(graphics);
 				//dialogue.renderText(graphics);
-				dialogue.render(screen, player.getX(), player.getY(), graphics);
-				graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+				if (dialogue.isDisplayingDialogue())
+					dialogue.render(screen, player.getX(), player.getY(), graphics);
+				else
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				break;
 			}
 			case INVENTORY: {

@@ -92,7 +92,7 @@ public class StartMenu {
 	
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.activation) {
-			this.renderBox(output, 5, 0, 4, items.size());
+			Dialogue.renderBox(output, 5, 0, 4, items.size());
 			this.renderDescriptionBox(output, 0, 7, 5, 3);
 			output.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuCursorPosition * Tile.HEIGHT);
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
@@ -171,28 +171,6 @@ public class StartMenu {
 			this.actionEvent = items.get(menuCursorPosition);
 			this.activation = true;
 		}
-	}
-	
-	private void renderBox(BaseScreen output, int x, int y, int middleWidth, int middleHeight) {
-		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
-		for (int i = 0; i < middleWidth - 1; i++) {
-			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
-		}
-		output.blit(Art.dialogue_top_right, (x + middleWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-		
-		for (int j = 0; j < middleHeight - 1; j++) {
-			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			for (int i = 0; i < middleWidth - 1; i++) {
-				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			}
-			output.blit(Art.dialogue_right, (x + middleWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-		}
-		
-		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + middleHeight) * Tile.HEIGHT));
-		for (int i = 0; i < middleWidth - 1; i++) {
-			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + middleHeight) * Tile.HEIGHT));
-		}
-		output.blit(Art.dialogue_bottom_right, (x + middleWidth) * Tile.WIDTH, ((y + middleHeight) * Tile.HEIGHT));
 	}
 	
 	private void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {

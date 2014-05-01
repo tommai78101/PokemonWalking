@@ -8,6 +8,7 @@ import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
 import abstracts.SubMenu;
+import dialogue.Dialogue;
 
 public class Inventory extends SubMenu {
 	
@@ -23,7 +24,7 @@ public class Inventory extends SubMenu {
 		g.setColor(Color.black);
 		
 		try {
-			g.drawString("Test", 0, 0);
+			g.drawString("", Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 		}
 		catch (Exception e) {
 		}

@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
+
 import main.Game;
 import main.Keys;
 import main.MainComponent;
@@ -91,26 +92,7 @@ public class Dialogue {
 	 * @return Nothing.
 	 * */
 	public void renderDialog(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
-		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
-		}
-		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-		
-		for (int j = 0; j < centerHeight - 1; j++) {
-			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			}
-			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-		}
-		
-		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
-		}
-		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-		
+		Dialogue.renderBox(output, x, y, centerWidth, centerHeight);
 		//The boolean "next" is for dialogues that are complete, and the "nextTick" is for displaying the arrow.
 		if (this.next && this.nextTick) {
 			output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
@@ -173,8 +155,7 @@ public class Dialogue {
 	 * Updates the dialogues on a per-tick basis.
 	 * 
 	 * <p>
-	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when
-	 * displaying dialogues. More information can be found by reading the comments in this method code.
+	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when displaying dialogues. More information can be found by reading the comments in this method code.
 	 * 
 	 * @return Nothing.
 	 * */
@@ -188,9 +169,9 @@ public class Dialogue {
 		//			this.isMenuActivated = false;
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown
-					|| input.X.isTappedDown || input.X.isPressedDown
-					|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
-					|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
+				|| input.X.isTappedDown || input.X.isPressedDown
+				|| input.SLASH.isTappedDown || input.SLASH.isPressedDown
+				|| input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
 				this.next = false;
 				boolean result1 = false, result2 = false;
 				try {
@@ -407,20 +388,16 @@ public class Dialogue {
 	//	}
 	
 	public void render(BaseScreen screen, int offsetX, int offsetY, Graphics g) {
-		if (this.isDisplayingDialogue()) {
-			screen.disableRenderHalf();
-			this.renderDialog(screen, 0, 6, 9, 2);
-		}
-		else if (this.isMenuActivated) {
-			this.renderDialog(screen, 0, 6, 4, 2);
-			this.renderDialog(screen, 5, 0, 4, menuItems.size()); //TODO: This needs to use a array list size as height.
-			//Scaling problems again.
-			screen.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuPointerPosition * Tile.HEIGHT);
-		}
-		if (this.isDisplayingDialogue() || this.isMenuActivated) {
-			g.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			this.renderText(g);
-		}
+		screen.disableRenderHalf();
+		this.renderDialog(screen, 0, 6, 9, 2);
+		g.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+		this.renderText(g);
+		//		else if (this.isMenuActivated) {
+		//			this.renderDialog(screen, 0, 6, 4, 2);
+		//			this.renderDialog(screen, 5, 0, 4, menuItems.size()); //TODO: This needs to use a array list size as height.
+		//			//Scaling problems again.
+		//			screen.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuPointerPosition * Tile.HEIGHT);
+		//		}
 	}
 	
 	/**
@@ -529,5 +506,27 @@ public class Dialogue {
 		if (line.length() > 0)
 			lines.add(line);
 		return lines.toArray(new String[lines.size()]);
+	}
+	
+	public static void renderBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
+		}
+		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
+		
+		for (int j = 0; j < centerHeight - 1; j++) {
+			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			for (int i = 0; i < centerWidth - 1; i++) {
+				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			}
+			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+		}
+		
+		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
+		}
+		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 	}
 }
