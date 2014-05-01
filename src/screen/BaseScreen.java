@@ -182,11 +182,34 @@ public class BaseScreen extends BaseBitmap {
 		return false;
 	}
 	
-	public void setInvertTick(byte value) {
+	public boolean flashing() {
+		if (this.tick < 0x2) {
+			for (int i = 0; i < this.pixels.length; i++)
+				this.pixels[i] = 0xFFAAAAAA;
+			this.tick++;
+			return true;
+		}
+		else if (this.tick < 0x4) {
+			for (int i = 0; i < this.pixels.length; i++)
+				this.pixels[i] = 0xFFF7F7F7;
+			this.tick++;
+			return true;
+		}
+		else if (this.tick < 0x6) {
+			for (int i = 0; i < this.pixels.length; i++)
+				this.pixels[i] = 0xFFAAAAAA;
+			this.tick++;
+			return true;
+		}
+		this.tick = 0x7;
+		return false;
+	}
+	
+	public void setRenderingEffectTick(byte value) {
 		this.tick = value;
 	}
 	
-	public byte getInvertTick() {
+	public byte getRenderingEffectTick() {
 		return this.tick;
 	}
 	

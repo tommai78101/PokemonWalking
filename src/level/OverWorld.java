@@ -2,10 +2,11 @@ package level;
 
 import java.util.ArrayList;
 import java.util.List;
-import dialogue.Dialogue;
+
 import screen.BaseScreen;
 import abstracts.Tile;
 import abstracts.World;
+import dialogue.Dialogue;
 import entity.Player;
 
 public class OverWorld extends World {
@@ -143,13 +144,13 @@ public class OverWorld extends World {
 		screen.setOffset(0, 0);
 		
 		if (this.invertBitmapColors) {
-			if (screen.getInvertTick() == (byte) 0x7) {
-				screen.setInvertTick((byte) 0x0);
+			if (screen.getRenderingEffectTick() == (byte) 0x7) {
+				screen.setRenderingEffectTick((byte) 0x0);
 			}
 			this.invertBitmapColors = screen.invert();
 		}
 		
-		if (screen.getInvertTick() < (byte) 0x4 || screen.getInvertTick() >= (byte) 0x7)
+		if (screen.getRenderingEffectTick() < (byte) 0x4 || screen.getRenderingEffectTick() >= (byte) 0x7)
 			player.render(screen, 0, 0);
 	}
 	

@@ -88,23 +88,34 @@ public class Game {
 				break;
 			}
 			case INVENTORY: {
-				screen.clear(0xF7F7F7);
-				if (this.subMenu != null)
-					this.subMenu.render(screen, graphics);
+				if (screen.getRenderingEffectTick() < (byte) 0x7) {
+					screen.flashing();
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+				}
+				else {
+					if (this.subMenu != null)
+						this.subMenu.render(screen, graphics);
+				}
 				break;
 			}
 			case PAUSED: {
-				if (startMenu.isActivated()) {
-					screen.clear(0xA4E767);
-					overworld.render(screen, player.getX(), player.getY());
-					dialogue.render(screen, player.getX(), player.getY(), graphics);
-					startMenu.render(screen, graphics);
+				if (screen.getRenderingEffectTick() < (byte) 0x7) {
+					screen.flashing();
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				}
 				else {
-					screen.clear(0xA4E767);
-					overworld.render(screen, player.getX(), player.getY());
-					dialogue.render(screen, player.getX(), player.getY(), graphics);
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					if (startMenu.isActivated()) {
+						screen.clear(0xA4E767);
+						overworld.render(screen, player.getX(), player.getY());
+						dialogue.render(screen, player.getX(), player.getY(), graphics);
+						startMenu.render(screen, graphics);
+					}
+					else {
+						screen.clear(0xA4E767);
+						overworld.render(screen, player.getX(), player.getY());
+						dialogue.render(screen, player.getX(), player.getY(), graphics);
+						graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					}
 				}
 				break;
 			}
@@ -140,6 +151,7 @@ public class Game {
 					break;
 				if (!this.subMenu.isActivated()) {
 					this.state = State.PAUSED;
+					screen.setRenderingEffectTick((byte) 0x0);
 				}
 				break;
 			}
@@ -225,6 +237,7 @@ public class Game {
 			this.subMenu = entry.getValue();
 			if (!this.subMenu.isActivated())
 				this.subMenu.enableSubMenu();
+			screen.setRenderingEffectTick((byte) 0x0);
 		}
 		else if (str.equals(StartMenu.ITEM_NAME_EXIT)) {
 			if (this.state != State.GAME)
@@ -232,8 +245,6 @@ public class Game {
 			if (this.subMenu != null)
 				this.subMenu.disableSubMenu();
 			this.subMenu = null;
-			//			if (Player.isMovementsLocked())
-			//				Player.unlockMovements();
 		}
 		this.startMenu.clearActionEvent();
 		this.startMenu.closeMenu();
