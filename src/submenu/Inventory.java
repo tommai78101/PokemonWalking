@@ -14,6 +14,7 @@ import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
 import abstracts.SubMenu;
+import abstracts.Tile;
 import dialogue.Dialogue;
 
 public class Inventory extends SubMenu {
@@ -30,7 +31,7 @@ public class Inventory extends SubMenu {
 		g.setColor(Color.black);
 		
 		try {
-			g.drawString("", Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+			g.drawString("Test", Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 		}
 		catch (Exception e) {
 		}
@@ -57,9 +58,21 @@ public class Inventory extends SubMenu {
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.subMenuActivation) {
 			output.blit(Art.inventory_gui, 0, 0);
+			Dialogue.renderBox(output, 0, 6, 9, 2);
+			renderListBox(output, 3, 1, 7, 5);
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 			renderText(graphics);
+
 		}
 	}
 	
+	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), (y * Tile.HEIGHT - 8) + (j * Tile.HEIGHT));
+			}
+		}
+		for (int k = 0; k < width; k++)
+			output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (k * Tile.WIDTH), (height * Tile.HEIGHT));
+	}
 }

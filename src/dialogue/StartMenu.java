@@ -99,7 +99,7 @@ public class StartMenu {
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.activation) {
 			Dialogue.renderBox(output, 5, 0, 4, items.size());
-			this.renderDescriptionBox(output, 0, 7, 5, 3);
+			StartMenu.renderDescriptionBox(output, 0, 7, 5, 3);
 			output.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuCursorPosition * Tile.HEIGHT);
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 			this.renderMenuText(graphics);
@@ -179,14 +179,6 @@ public class StartMenu {
 		}
 	}
 	
-	private void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
-				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), ((y - 1) * Tile.HEIGHT + 8) + j * Tile.HEIGHT);
-			}
-		}
-	}
-	
 	private void renderMenuText(Graphics g) {
 		g.setFont(Art.font);
 		g.setColor(Color.black);
@@ -206,6 +198,16 @@ public class StartMenu {
 			g.drawString(tokens[1], 0, StartMenu.DESCRIPTION_SECOND_LINE_Y);
 		}
 		catch (Exception e) {
+		}
+	}
+	
+	//-------------------------      STATIC METHODS   --------------------------------------
+	
+	public static void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), ((y - 1) * Tile.HEIGHT + 8) + j * Tile.HEIGHT);
+			}
 		}
 	}
 }
