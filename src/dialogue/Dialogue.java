@@ -65,7 +65,6 @@ public class Dialogue {
 	//---------------------------------------
 	private boolean isMenuActivated;
 	private ArrayList<Map.Entry<String, String>> menuItems = new ArrayList<Map.Entry<String, String>>();
-	private int menuPointerPosition = 0;
 	
 	public Dialogue(Keys input, Game game) {
 		this.input = input;
@@ -224,7 +223,6 @@ public class Dialogue {
 		}
 		else {
 			this.firstLineIterator = this.secondLineIterator = 0;
-			this.menuPointerPosition = 0;
 		}
 		if (this.repeatDialogueTick > 0)
 			this.repeatDialogueTick--;
@@ -298,7 +296,7 @@ public class Dialogue {
 	//	}
 	
 	private void warningText() {
-		this.tokens = this.toLines("There's a time and place for everything, but not now.", MAX_STRING_LENGTH);
+		this.tokens = Dialogue.toLines("There's a time and place for everything, but not now.", MAX_STRING_LENGTH);
 		this.showDialog = true;
 		this.doneDisplayingDialogue = false;
 		this.firstLineIterator = this.secondLineIterator = 0;

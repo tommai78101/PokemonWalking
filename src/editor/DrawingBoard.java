@@ -294,9 +294,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 		for (int i = 0; i < srcTiles.length; i++)
 			tiles[i] = srcTiles[i];
 		List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getSortedTileMap();
-		TILE_LOOP: for (int i = 0; i < tiles.length; i++) {
+		for (int i = 0; i < tiles.length; i++) {
 			int alpha = ((srcTiles[i] >> 24) & 0xFF);
-			DATA_COLOR_LOOP: for (int j = 0; j < list.size(); j++) {
+			for (int j = 0; j < list.size(); j++) {
 				Map.Entry<Integer, Data> entry = list.get(j);
 				Data d = entry.getValue();
 				switch (alpha) {
