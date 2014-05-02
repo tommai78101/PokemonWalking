@@ -127,6 +127,9 @@ public class Art {
 	//Inventory
 	public static BaseBitmap inventory_gui;
 	
+	//Object
+	public static BaseBitmap item;
+
 	public static void loadAllResources(BaseScreen screen) {
 		//Wall
 		smallTree = screen.load("art/wall/treeSmall.png");
@@ -231,6 +234,9 @@ public class Art {
 		
 		//Inventory
 		inventory_gui = screen.load("art/inventory/inventory_gui.png");
+		
+		//Object
+		item = screen.load("art/object/item.png");
 	}
 	
 	private static BaseBitmap[] loadAnimation(BaseScreen screen, int frames, String filename) {
