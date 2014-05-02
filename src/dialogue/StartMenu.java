@@ -40,6 +40,7 @@ public class StartMenu {
 	private Game game;
 	private String[] tokens;
 	private Map.Entry<Integer, SubMenu> actionEvent;
+	private Inventory inventory;
 	
 	public StartMenu(Game game) {
 		this.activation = false;
@@ -51,7 +52,7 @@ public class StartMenu {
 	
 	public StartMenu initialize() {
 		SubMenu bicycle = new DummyMenu(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle");
-		SubMenu inventory = new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.").initialize(keys);
+		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.").initialize(keys);
 		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu");
 		this.addMenuItem(bicycle);
 		this.addMenuItem(inventory);
@@ -137,6 +138,10 @@ public class StartMenu {
 	
 	public SubMenu getSubMenu() {
 		return this.items.get(this.menuCursorPosition).getValue();
+	}
+	
+	public Inventory getInventory() {
+		return this.inventory;
 	}
 
 	//-------------------------  PRIVATE METHODS  -----------------------------------

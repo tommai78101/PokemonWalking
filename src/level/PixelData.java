@@ -311,6 +311,10 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.house_door;
 				break;
+			case 0x0B: //Item
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.item;
+				break;
 			default: //Any other type of tiles.
 				break;
 		}
@@ -418,7 +422,7 @@ public class PixelData {
 				//				}
 				break;
 			case 0x03: //Trees
-				//				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x04: //Warp Point
 				this.targetArea = red;
@@ -446,6 +450,8 @@ public class PixelData {
 			case 0x0A: //House Door
 				this.targetArea = red;
 				this.isWarpZone = true;
+				break;
+			case 0x0B: //Item
 				break;
 			default:
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;

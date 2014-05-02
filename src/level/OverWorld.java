@@ -125,9 +125,43 @@ public class OverWorld extends World {
 			this.player.stopInteraction();
 		}
 		else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
-			if (!dialogue.isDisplayingDialogue()) {
-				dialogue.createText(this.player.getInteractionID());
+			int alpha = (player.getInteractionID() >> 24) & 0xFF;
+			switch (alpha) {
+				case 0x08: {//Sign
+					if (!dialogue.isDisplayingDialogue()) {
+						dialogue.createText(alpha, this.player.getInteractionID() & 0xFFFF);
+					}
+					break;
+				}
+				case 0x0B: {//Item
+					int red_itemType = (player.getInteractionID() >> 16) & 0xFF;
+					if (!dialogue.isDisplayingDialogue()) {
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								PixelData data = currentArea.getCurrentPixelData();
+								switch (player.getFacing()) {
+									case Player.UP:
+										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() - 1);
+										break;
+									case Player.DOWN:
+										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() + 1);
+										break;
+									case Player.LEFT:
+										currentArea.setPixelData(data, player.getXInArea() - 1, player.getYInArea());
+										break;
+									case Player.RIGHT:
+										currentArea.setPixelData(data, player.getXInArea() + 1, player.getYInArea());
+										break;
+								}
+							}
+						}).start();
+						dialogue.createText(alpha, red_itemType);
+					}
+					break;
+				}
 			}
+
 		}
 		
 	}

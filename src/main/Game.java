@@ -229,6 +229,10 @@ public class Game {
 		return this.player;
 	}
 	
+	public StartMenu getStartMenu() {
+		return this.startMenu;
+	}
+
 	//----------------------------------------------       PRIVATE METHODS      -------------------------------------------------
 	
 	private void handleActionEvent(Map.Entry<Integer, SubMenu> entry) {

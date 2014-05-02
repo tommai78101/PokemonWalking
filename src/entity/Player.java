@@ -523,36 +523,58 @@ public class Player extends Entity {
 	public void interact(int dataColor) {
 		int alpha = (dataColor >> 24) & 0xFF;
 		switch (alpha) {
-			case 0x08: {
+			case 0x08: {//Sign
 				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 					this.enableInteraction = false;
 					if (Player.isMovementsLocked())
 						Player.unlockMovements();
 				}
 				if ((this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+					this.keys.Z.lastKeyState = true;
+					this.keys.SLASH.lastKeyState = true;
 					if (!movementLock) {
-						this.enableInteraction = true;
-						this.keys.Z.lastKeyState = true;
-						this.keys.SLASH.lastKeyState = true;
+						if (this.interactionID != 0) {
+							this.enableInteraction = false;
+							return;
+						}
+						if (!this.enableInteraction)
+							this.enableInteraction = true;
 					}
 				}
 				if (this.enableInteraction) {
-					this.interactionID = dataColor & 0xFFFF;
+					this.interactionID = dataColor;
+				}
+				break;
+			}
+			case 0x0B: {//Item
+				if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)){
+					this.keys.Z.lastKeyState = true;
+					this.keys.SLASH.lastKeyState = true;
+					this.enableInteraction = true;
+					if (!Player.isMovementsLocked())
+						Player.lockMovements();
+					this.interactionID = dataColor;
 				}
 				break;
 			}
 			default:
-				stopInteraction();
+				//stopInteraction();
 				break;
 		}
 	}
 	
 	public void stopInteraction() {
 		this.enableInteraction = false;
-		this.interactionID = 0;
 		//Player.unlockMovements();
 	}
 	
+	public void startInteraction() {
+		if (this.enableInteraction)
+			return;
+		this.enableInteraction = true;
+		this.interactionID = 0;
+	}
+
 	public int getInteractionID() {
 		return this.interactionID;
 	}
@@ -566,6 +588,29 @@ public class Player extends Entity {
 		this.animationPointer = 0;
 	}
 	
+	public boolean isFacingAt(int x, int y) {
+		int xTgt = 0, yTgt = 0;
+		switch (this.facing) {
+			case Player.UP:
+				xTgt = this.getXInArea();
+				yTgt = this.getYInArea() - 1;
+				break;
+			case Player.DOWN:
+				xTgt = this.getXInArea();
+				yTgt = this.getYInArea() + 1;
+				break;
+			case Player.LEFT:
+				xTgt = this.getXInArea() - 1;
+				yTgt = this.getYInArea();
+				break;
+			case Player.RIGHT:
+				xTgt = this.getXInArea() + 1;
+				yTgt = this.getYInArea();
+				break;
+		}
+		return ((x == xTgt) && (y == yTgt));
+	}
+
 	//-------------------------------------------------------------------------------------
 	//Private methods
 	

@@ -6,6 +6,8 @@
 
 package dialogue;
 
+import item.DummyItem;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.io.BufferedReader;
@@ -21,6 +23,7 @@ import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
+import submenu.Inventory;
 import abstracts.Tile;
 
 public class Dialogue {
@@ -58,6 +61,7 @@ public class Dialogue {
 	private int secondLineIterator;
 	private ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("dialogue/dialogue.txt");
 	private boolean doneDisplayingDialogue;
+	private boolean itemPickedDialogue;
 	
 	private Keys input;
 	private Game game;
@@ -112,14 +116,17 @@ public class Dialogue {
 	 * @return Nothing.
 	 * */
 	public void hideDialog() {
-		this.showDialog = false;
-		this.next = false;
-		this.tokenPointer = 0;
-		//this.setDialogCheckpoint();
-		//this.currentDialogue.checkpoint = true; 
-		//TODO: Checkpoints are for specific game goals that players had reached.
-		this.doneDisplayingDialogue = true;
-		this.repeatDialogueTick = 0xF;
+		if (this.doneDisplayingDialogue) {
+			this.doneDisplayingDialogue = false;
+			this.showDialog = false;
+			this.next = false;
+			this.tokenPointer = 0;
+			this.game.getPlayer().stopInteraction();
+			//this.setDialogCheckpoint();
+			//this.currentDialogue.checkpoint = true; 
+			//TODO: Checkpoints are for specific game goals that players had reached.
+			this.repeatDialogueTick = 0xF;
+		}
 	}
 	
 	/**
@@ -146,14 +153,14 @@ public class Dialogue {
 			//Ignore. Silently catch the any sorts of exception, and just let the game flow on.
 		}
 		
-		if (this.isMenuActivated) {
-			for (int i = 0; i < menuItems.size(); i++) {
-				//TODO: We need to have an arrow pointing at the menu items.
-				//We can't do anything about it. Scaling problems.
-				g.drawString(menuItems.get(i).getKey(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
-				
-			}
-		}
+		//		if (this.isMenuActivated) {
+		//			for (int i = 0; i < menuItems.size(); i++) {
+		//				//TODO: We need to have an arrow pointing at the menu items.
+		//				//We can't do anything about it. Scaling problems.
+		//				g.drawString(menuItems.get(i).getKey(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
+		//				
+		//			}
+		//		}
 	}
 	
 	/**
@@ -196,8 +203,27 @@ public class Dialogue {
 					//not exist. We check just to make sure.
 					result2 = true;
 				}
-				if (result1 || result2)
-					this.hideDialog();
+				if (result1 || result2) {
+					if (!this.itemPickedDialogue) {
+						this.doneDisplayingDialogue = true;
+						this.hideDialog();
+					}
+					else {
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								try {
+									Thread.sleep(1000);
+								}
+								catch (InterruptedException e) {
+								}
+								Dialogue.this.doneDisplayingDialogue = true;
+								Dialogue.this.itemPickedDialogue = false;
+								Dialogue.this.hideDialog();
+							}
+						}).start();
+					}
+				}
 				else {
 					this.tokenPointer += 2;
 					this.firstLineIterator = this.secondLineIterator = 0;
@@ -349,15 +375,34 @@ public class Dialogue {
 	 *            Dialogue ID, used to differentiate dialogues from others.
 	 * @return Nothing.
 	 * */
-	public void createText(int interactionID) {
-		for (DialogueText dt : this.dialogues) {
-			if (dt.dialogueID == interactionID) {
-				this.tokens = toLines(dt.dialogueMessage, MAX_STRING_LENGTH);
+	public void createText(int key, int interactionID) {
+		switch (key) {
+			case 0x08: {//Sign
+				for (DialogueText dt : this.dialogues) {
+					if (dt.dialogueID == interactionID) {
+						this.tokens = toLines(dt.dialogueMessage, MAX_STRING_LENGTH);
+						this.showDialog = true;
+						this.doneDisplayingDialogue = false;
+						this.itemPickedDialogue = false;
+						break;
+					}
+				}
+				break;
+			}
+			case 0x0B: { //Item
+				Inventory inventory = this.game.getStartMenu().getInventory();
+				DummyItem dummy = new DummyItem("TEST", "This item is a test item.");
+				inventory.addItem(dummy);
+				this.tokens = toLines("Picked up " + dummy.getName() + "!", MAX_STRING_LENGTH);
 				this.showDialog = true;
 				this.doneDisplayingDialogue = false;
+				this.itemPickedDialogue = true;
+				this.next = false;
+				this.nextTick = false;
 				break;
 			}
 		}
+		
 	}
 	
 	/**

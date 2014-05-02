@@ -322,12 +322,31 @@ public class Area {
 					//in order to let the player move on water.
 					return false;
 				case 0x08: //Sign
-					this.player.interact(data.getColor());
+					if (this.player.isInteracting())
+						return true;
+					if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
+						if ((player.keys.Z.keyStateDown || player.keys.SLASH.keyStateDown) && (!player.keys.Z.lastKeyState || !player.keys.SLASH.lastKeyState)) {
+							this.player.startInteraction();
+							player.keys.Z.lastKeyState = true;
+							player.keys.SLASH.lastKeyState = true;
+						}
+					}
 					return true;
 				case 0x09: //House
 					return true;
 				case 0x0A: //House Door
 					return false;
+				case 0x0B: //Item
+					if (this.player.isInteracting())
+						return true;
+					if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
+						if ((player.keys.Z.keyStateDown || player.keys.SLASH.keyStateDown) && (!player.keys.Z.lastKeyState || !player.keys.SLASH.lastKeyState)) {
+							this.player.startInteraction();
+							player.keys.Z.lastKeyState = true;
+							player.keys.SLASH.lastKeyState = true;
+						}
+					}
+					return true; //Cannot go through items on the ground.
 				default: //Any other type of tiles should be walkable, for no apparent reasons.
 					return false;
 			}
@@ -503,5 +522,9 @@ public class Area {
 	
 	public void setPixelData(PixelData data, int xPosition, int yPosition) {
 		this.areaData.get(yPosition).set(xPosition, data);
+	}
+	
+	public PixelData getPixelData(int x, int y) {
+		return this.areaData.get(y).get(x);
 	}
 }
