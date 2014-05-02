@@ -8,11 +8,14 @@ package submenu;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
+import abstracts.Item;
 import abstracts.SubMenu;
 import abstracts.Tile;
 import dialogue.Dialogue;
@@ -20,10 +23,14 @@ import dialogue.Dialogue;
 public class Inventory extends SubMenu {
 	
 	private Keys keys;
+	private List<Item> items;
+	private int itemCursor;
 
 	//TODO: Continue to work on this.
 	public Inventory(String name, String enabled, String disabled) {
 		super(name, enabled, disabled);
+		this.itemCursor = 0;
+		this.items = new ArrayList<Item>();
 	}
 	
 	private void renderText(Graphics g) {
@@ -31,7 +38,13 @@ public class Inventory extends SubMenu {
 		g.setColor(Color.black);
 		
 		try {
-			g.drawString("Test", Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+			
+			for (int i = 0; i < items.size(); i++)
+				g.drawString(items.get(i).getName(), 3 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE, items.size() * Tile.HEIGHT);
+			
+			String[] tokens = Dialogue.toLines(items.get(itemCursor).getDescription(), Dialogue.MAX_STRING_LENGTH);
+			g.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+			g.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 		}
 		catch (Exception e) {
 		}
@@ -62,10 +75,19 @@ public class Inventory extends SubMenu {
 			renderListBox(output, 3, 1, 7, 5);
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 			renderText(graphics);
-
 		}
 	}
 	
+	public void addItem(Item item) {
+		this.items.add(item);
+	}
+	
+	public void tossItem() {
+		this.items.remove(itemCursor);
+	}
+	
+	//------------------------------------        PRIVATE METHODS        -----------------------------------------
+
 	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {

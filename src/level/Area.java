@@ -500,4 +500,8 @@ public class Area {
 		if (data != null) { return (data.getColor()); }
 		return 0;
 	}
+	
+	public void setPixelData(PixelData data, int xPosition, int yPosition) {
+		this.areaData.get(yPosition).set(xPosition, data);
+	}
 }
