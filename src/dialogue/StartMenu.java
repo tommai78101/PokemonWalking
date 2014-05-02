@@ -51,9 +51,9 @@ public class StartMenu {
 	}
 	
 	public StartMenu initialize() {
-		SubMenu bicycle = new DummyMenu(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle");
-		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.").initialize(keys);
-		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu");
+		SubMenu bicycle = new DummyMenu(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle", this.game);
+		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game).initialize(keys);
+		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu", this.game);
 		this.addMenuItem(bicycle);
 		this.addMenuItem(inventory);
 		this.addMenuItem(exit);
@@ -122,7 +122,6 @@ public class StartMenu {
 	
 	public void closeMenu() {
 		this.activation = false;
-		this.menuCursorPosition = 0;
 		if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}

@@ -391,7 +391,7 @@ public class Dialogue {
 			}
 			case 0x0B: { //Item
 				Inventory inventory = this.game.getStartMenu().getInventory();
-				DummyItem dummy = new DummyItem("TEST", "This item is a test item.");
+				DummyItem dummy = new DummyItem(this.game, "TEST", "This item is a test item.");
 				inventory.addItem(dummy);
 				this.tokens = toLines("Picked up " + dummy.getName() + "!", MAX_STRING_LENGTH);
 				this.showDialog = true;

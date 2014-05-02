@@ -8,6 +8,7 @@ package abstracts;
 
 import java.awt.Graphics;
 
+import main.Game;
 import main.Keys;
 import screen.BaseScreen;
 
@@ -18,12 +19,14 @@ public abstract class SubMenu {
 	private String name;
 	private String enabledDescription;
 	private String disabledDescription;
+	protected Game game;
 	private boolean enabled;
 	
-	public SubMenu(String name, String enabled, String disabled) {
+	public SubMenu(String name, String enabled, String disabled, Game game) {
 		this.name = name;
 		this.enabledDescription = enabled;
 		this.disabledDescription = disabled;
+		this.game = game;
 		this.subMenuActivation = false;
 	}
 	

@@ -1,6 +1,7 @@
 package abstracts;
 
 import level.Area;
+import main.Game;
 import resources.Art;
 import screen.BaseScreen;
 import entity.Player;
@@ -10,11 +11,13 @@ public abstract class Item {
 	
 	protected String name;
 	protected String description;
+	protected Game game;
 	protected boolean picked;
 	
-	public Item(String name, String description) {
+	public Item(Game game, String name, String description) {
 		setName(name);
 		setDescription(description);
+		this.game = game;
 		this.picked = false;
 	}
 
@@ -52,4 +55,6 @@ public abstract class Item {
 		this.picked = false;
 		//TODO: Add function that allows the item to be placed at.
 	}
+	
+	public abstract void doAction();
 }

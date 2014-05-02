@@ -1,8 +1,10 @@
+/abstracts
+/dialogue
+/editor
 /entity
+/item
 /level
 /main
 /resources
 /screen
-/abstracts
-/editor
-/item
+/submenu

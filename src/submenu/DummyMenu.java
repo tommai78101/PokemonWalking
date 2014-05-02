@@ -8,14 +8,15 @@ package submenu;
 
 import java.awt.Graphics;
 
+import main.Game;
 import main.Keys;
 import screen.BaseScreen;
 import abstracts.SubMenu;
 
 public class DummyMenu extends SubMenu {
 	
-	public DummyMenu(String name, String enabled, String disabled) {
-		super(name, enabled, disabled);
+	public DummyMenu(String name, String enabled, String disabled, Game game) {
+		super(name, enabled, disabled, game);
 	}
 	
 	@Override

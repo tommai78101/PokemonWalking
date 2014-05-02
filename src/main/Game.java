@@ -36,7 +36,7 @@ public class Game {
 	
 	private Dialogue dialogue;
 	
-	private enum State {
+	public enum State {
 		GAME, PAUSED, INVENTORY
 	};
 	
@@ -105,8 +105,10 @@ public class Game {
 					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				}
 				else {
-					if (this.subMenu != null)
+					if (this.subMenu != null) {
 						this.subMenu.render(screen, graphics);
+
+					}
 				}
 				break;
 			}
@@ -123,9 +125,7 @@ public class Game {
 						startMenu.render(screen, graphics);
 					}
 					else {
-						screen.clear(0xA4E767);
-						overworld.render(screen, player.getX(), player.getY());
-						dialogue.render(screen, player.getX(), player.getY(), graphics);
+						//dialogue.render(screen, player.getX(), player.getY(), graphics);
 						graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					}
 				}
@@ -157,8 +157,9 @@ public class Game {
 				break;
 			}
 			case INVENTORY: {
-				if (this.subMenu != null)
+				if (this.subMenu != null) {
 					this.subMenu.tick();
+				}
 				else
 					break;
 				if (!this.subMenu.isActivated()) {
@@ -168,10 +169,10 @@ public class Game {
 				break;
 			}
 			case PAUSED: {
-				if (!startMenu.isActivated()) {
+				if (startMenu.isActivated())
+					startMenu.tick();
+				else
 					startMenu.openMenu();
-				}
-				startMenu.tick();
 				checkUnpausing();
 				if (startMenu.isActionEventAvailable())
 					handleActionEvent(startMenu.getActionEvent());
@@ -232,6 +233,10 @@ public class Game {
 	public StartMenu getStartMenu() {
 		return this.startMenu;
 	}
+	
+	public void setState(State state) {
+		this.state = state;
+	}
 
 	//----------------------------------------------       PRIVATE METHODS      -------------------------------------------------
 	
@@ -276,6 +281,8 @@ public class Game {
 						break;
 					}
 					this.state = State.PAUSED;
+					if (!this.startMenu.isActivated())
+						this.startMenu.openMenu();
 					if (!Player.isMovementsLocked())
 						Player.lockMovements();
 					break;
@@ -288,17 +295,18 @@ public class Game {
 	
 	private void checkUnpausing() {
 		Keys keys = this.player.keys;
-		if ((!keys.START.lastKeyState && keys.START.keyStateDown) || ((keys.X.keyStateDown || keys.PERIOD.keyStateDown) && (!keys.X.lastKeyState || !keys.PERIOD.lastKeyState))) {
-			switch (this.state) {
-				case PAUSED:
+		switch (this.state) {
+			case PAUSED:
+				if ((!keys.START.lastKeyState && keys.START.keyStateDown) || ((keys.X.keyStateDown || keys.PERIOD.keyStateDown) && (!keys.X.lastKeyState || !keys.PERIOD.lastKeyState))) {
 					this.state = State.GAME;
 					if (Player.isMovementsLocked())
 						Player.unlockMovements();
-					break;
-				default:
-					break;
-			}
-			keys.START.lastKeyState = true;
+					keys.START.lastKeyState = true;
+				}
+				break;
+			default:
+				break;
 		}
+
 	}
 }
