@@ -69,6 +69,7 @@ public class Dialogue {
 	//---------------------------------------
 	private boolean isMenuActivated;
 	private ArrayList<Map.Entry<String, String>> menuItems = new ArrayList<Map.Entry<String, String>>();
+	private Thread itemDialogueThread;
 	
 	public Dialogue(Keys input, Game game) {
 		this.input = input;
@@ -80,9 +81,10 @@ public class Dialogue {
 		this.tokenPointer = 0;
 		this.isMenuActivated = false;
 		
-		//tempMenuItems.add("BICYCLE");
 		menuItems.add(new AbstractMap.SimpleEntry<String, String>("BICYCLE", "Use your bicycle."));
 		menuItems.add(new AbstractMap.SimpleEntry<String, String>("TEMP", "Do nothing."));
+		
+		this.itemDialogueThread = null;
 	}
 	
 	/**
@@ -345,19 +347,28 @@ public class Dialogue {
 		if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length && !this.itemPickedDialogue)
 			this.next = true;
 		if (this.itemPickedDialogue) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(2000);
+			if (this.itemDialogueThread != null && this.itemDialogueThread.getState() == Thread.State.TERMINATED) {
+				this.itemDialogueThread = null;
+				Dialogue.this.doneDisplayingDialogue = true;
+				Dialogue.this.itemPickedDialogue = false;
+				Dialogue.this.hideDialog();
+				return;
+			}
+			if (this.itemDialogueThread == null) {
+				this.itemDialogueThread = new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(2000);
+						}
+						catch (InterruptedException e) {
+						}
 					}
-					catch (InterruptedException e) {
-					}
-					Dialogue.this.doneDisplayingDialogue = true;
-					Dialogue.this.itemPickedDialogue = false;
-					Dialogue.this.hideDialog();
-				}
-			}).start();
+				});
+				this.itemDialogueThread.setName("Item Dialogue Checking Thread");
+			}
+			if (this.itemDialogueThread.getState() == Thread.State.NEW)
+				this.itemDialogueThread.start();
 		}
 	}
 	
