@@ -237,6 +237,10 @@ public class Game {
 	public void setState(State state) {
 		this.state = state;
 	}
+	
+	public BaseScreen getBaseScreen() {
+		return this.screen;
+	}
 
 	//----------------------------------------------       PRIVATE METHODS      -------------------------------------------------
 	

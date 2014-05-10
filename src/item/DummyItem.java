@@ -11,7 +11,8 @@ public class DummyItem extends Item {
 	
 	@Override
 	public void doAction() {
-		game.setState(State.GAME);
-		game.getStartMenu().closeMenu();
+		game.getBaseScreen().setRenderingEffectTick((byte) 0x0);
+		game.setState(State.PAUSED);
+		game.getStartMenu().openMenu();
 	}
 }

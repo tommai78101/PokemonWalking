@@ -336,7 +336,7 @@ public class MainComponent extends Canvas implements Runnable {
 	public BaseScreen getBaseScreen() {
 		return this.screen;
 	}
-	
+
 	//---------------------------------
 	//Other methods
 	
