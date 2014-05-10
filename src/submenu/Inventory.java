@@ -10,8 +10,10 @@ import item.DummyItem;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import main.Game;
 import main.Keys;
@@ -26,7 +28,7 @@ import dialogue.Dialogue;
 public class Inventory extends SubMenu {
 	
 	private Keys keys;
-	private List<Item> items;
+	private List<Map.Entry<Item, Integer>> items;
 	private int itemCursor;
 	private int arrowPosition;
 	private int itemListSpan = 0;
@@ -35,26 +37,33 @@ public class Inventory extends SubMenu {
 	public Inventory(String name, String enabled, String disabled, Game game) {
 		super(name, enabled, disabled, game);
 		this.itemCursor = 0;
-		this.items = new ArrayList<Item>();
-		this.items.add(new DummyItem(game, "RETURN", "Exit the inventory."));
+		this.items = new ArrayList<Map.Entry<Item, Integer>>();
+		this.items.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, "RETURN", "Exit the inventory."), Integer.MAX_VALUE));
 		this.arrowPosition = 0;
 	}
 	
 	private void renderText(Graphics g) {
 		g.setFont(Art.font);
 		g.setColor(Color.black);
-		
+
 		try {
 			for (int i = 0; i < 5; i++) {
 				if (i > items.size())
 					break;
-				g.drawString(items.get(itemListSpan + i).getName(), 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (Tile.HEIGHT + 5) + ((i) * Tile.HEIGHT * MainComponent.GAME_SCALE));
+				Map.Entry<Item, Integer> entry = items.get(itemListSpan + i);
+				g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
+				int value = entry.getValue().intValue();
+				if (value != Integer.MAX_VALUE) {
+					String string = "*" + Integer.toString(value);
+					g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (Tile.HEIGHT + 5) + ((i) * Tile.HEIGHT * MainComponent.GAME_SCALE));
+				}
 			}
 		}
 		catch (Exception e) {
 		}
 		try {
-			String[] tokens = Dialogue.toLines(items.get(itemCursor).getDescription(), Dialogue.MAX_STRING_LENGTH);
+			Map.Entry<Item, Integer> entry = items.get(itemCursor);
+			String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
 			g.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 			g.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
 		}
@@ -99,8 +108,8 @@ public class Inventory extends SubMenu {
 		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 			this.keys.Z.lastKeyState = true;
 			this.keys.SLASH.lastKeyState = true;
-			this.items.get(itemCursor).doAction();
-			//this.subMenuActivation = false;
+			Map.Entry<Item, Integer> entry = items.get(itemCursor);
+			entry.getKey().doAction();
 		}
 
 		if (itemCursor >= (itemListSpan + 5)) {
@@ -117,18 +126,32 @@ public class Inventory extends SubMenu {
 			output.blit(Art.inventory_gui, 0, 0);
 			Dialogue.renderBox(output, 0, 6, 9, 2);
 			renderListBox(output, 3, 1, 7, 5);
-			output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (5 + (arrowPosition * 5)));
+			output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 			renderText(graphics);
 		}
 	}
 	
 	public void addItem(Item item) {
-		this.items.add(items.size() - 1, item);
+		boolean heldItemExists = false;
+		for (int i = 0; i < items.size(); i++) {
+			Map.Entry<Item, Integer> entry = items.get(i);
+			if (entry.getKey().equals(item)) {
+				entry.setValue(entry.getValue().intValue() + 1);
+				heldItemExists = true;
+				break;
+			}
+		}
+		if (!heldItemExists)
+			this.items.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 	}
 	
 	public void tossItem() {
-		this.items.remove(itemCursor);
+		Map.Entry<Item, Integer> entry = items.get(itemCursor);
+		if (entry.getValue() - 1 <= 0)
+			this.items.remove(itemCursor);
+		else
+			entry.setValue(entry.getValue().intValue() - 1);
 	}
 	
 	public void resetCursor() {

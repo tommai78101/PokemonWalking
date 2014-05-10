@@ -56,5 +56,31 @@ public abstract class Item {
 		//TODO: Add function that allows the item to be placed at.
 	}
 	
+	@Override
+	public boolean equals(Object object) {
+		try {
+			if (object == null)
+				return false;
+			if (this.getClass() != object.getClass())
+				return false;
+			final Item item = (Item) object;
+			if ((this.name == null) ? (item.getName() != null) : !this.name.equals(item.getName()))
+				return false;
+			//		if ((this.description == null) ? (item.getDescription() != null) : !this.description.equals(item.getDescription()))
+			//			return false;
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 3;
+		hash = 53 * hash + ((this.name != null) ? this.name.hashCode() : 0);
+		return hash;
+	}
+
 	public abstract void doAction();
 }
