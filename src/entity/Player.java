@@ -272,10 +272,8 @@ public class Player extends Entity {
 	 * 
 	 * Note: An example on how to determine player direction for the tile to allow and block:
 	 * <ul>
-	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the
-	 * parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means,
-	 * the tile above X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X
-	 * (the UP tile) to jump across to the tile below X, but not the other way around.
+	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means, the tile above
+	 * X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X (the UP tile) to jump across to the tile below X, but not the other way around.
 	 * </ul>
 	 * 
 	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or Player.RIGHT.
@@ -528,33 +526,40 @@ public class Player extends Entity {
 					this.enableInteraction = false;
 					if (Player.isMovementsLocked())
 						Player.unlockMovements();
+					break;
 				}
-				if ((this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-					this.keys.Z.lastKeyState = true;
-					this.keys.SLASH.lastKeyState = true;
-					if (!movementLock) {
-						if (this.interactionID != 0) {
-							this.enableInteraction = false;
-							return;
-						}
-						if (!this.enableInteraction)
-							this.enableInteraction = true;
+				//				if ((this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+				//					this.keys.Z.lastKeyState = true;
+				//					this.keys.SLASH.lastKeyState = true;
+				if (!movementLock) {
+					if (this.interactionID != 0) {
+						this.enableInteraction = false;
+						return;
 					}
+					if (!this.enableInteraction)
+						this.enableInteraction = true;
 				}
+				//				}
 				if (this.enableInteraction) {
 					this.interactionID = dataColor;
 				}
 				break;
 			}
 			case 0x0B: {//Item
-				if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)){
-					this.keys.Z.lastKeyState = true;
-					this.keys.SLASH.lastKeyState = true;
-					this.enableInteraction = true;
-					if (!Player.isMovementsLocked())
-						Player.lockMovements();
-					this.interactionID = dataColor;
+				//				if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)){
+				//					this.keys.Z.lastKeyState = true;
+				//					this.keys.SLASH.lastKeyState = true;
+				if (!movementLock) {
+					if (this.interactionID != 0) {
+						this.enableInteraction = false;
+						return;
+					}
+					if (!this.enableInteraction)
+						this.enableInteraction = true;
+					//					}
 				}
+				if (this.enableInteraction)
+					this.interactionID = dataColor;
 				break;
 			}
 			default:
@@ -618,8 +623,7 @@ public class Player extends Entity {
 	 * Makes adjustments to the player's position when the player is walking.
 	 * 
 	 * <p>
-	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player
-	 * wanted to walk.
+	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player wanted to walk.
 	 * 
 	 * @return Nothing.
 	 * */
@@ -796,7 +800,7 @@ public class Player extends Entity {
 			if (!this.isInWater && !this.isOnBicycle) {
 				//Walking
 				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
@@ -804,7 +808,7 @@ public class Player extends Entity {
 			else if (this.isInWater && !this.isOnBicycle) {
 				//Surfing
 				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
@@ -812,7 +816,7 @@ public class Player extends Entity {
 			else if (!this.isInWater && this.isOnBicycle) {
 				//Riding
 				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown
-						|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
+					|| keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player_bicycle[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_bicycle[facing][0], this.xOffset + x, this.yOffset + y);

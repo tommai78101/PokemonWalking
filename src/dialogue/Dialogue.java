@@ -204,25 +204,8 @@ public class Dialogue {
 					result2 = true;
 				}
 				if (result1 || result2) {
-					if (!this.itemPickedDialogue) {
-						this.doneDisplayingDialogue = true;
-						this.hideDialog();
-					}
-					else {
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								try {
-									Thread.sleep(1000);
-								}
-								catch (InterruptedException e) {
-								}
-								Dialogue.this.doneDisplayingDialogue = true;
-								Dialogue.this.itemPickedDialogue = false;
-								Dialogue.this.hideDialog();
-							}
-						}).start();
-					}
+					this.doneDisplayingDialogue = true;
+					this.hideDialog();
 				}
 				else {
 					this.tokenPointer += 2;
@@ -359,8 +342,23 @@ public class Dialogue {
 			//Therefore, it returns true in both cases.
 			result2 = true;
 		}
-		if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length)
+		if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length && !this.itemPickedDialogue)
 			this.next = true;
+		if (this.itemPickedDialogue) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(2000);
+					}
+					catch (InterruptedException e) {
+					}
+					Dialogue.this.doneDisplayingDialogue = true;
+					Dialogue.this.itemPickedDialogue = false;
+					Dialogue.this.hideDialog();
+				}
+			}).start();
+		}
 	}
 	
 	/**
