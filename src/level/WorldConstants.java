@@ -37,21 +37,35 @@ public class WorldConstants {
 	 *            The area ID value.
 	 * @return The Area object with the matching area ID value. If no matching value exists, it returns null.
 	 * */
-	public static Area convertToArea(int areaID) {
+	public static Area convertToArea(List<Area> areas, int areaID) {
+		for (int i = 0; i < areas.size(); i++) {
+			Area area = areas.get(i);
+			if (area.getAreaID() == areaID)
+				return area;
+		}
+		Area area = null;
 		switch (areaID) {
 			case TEST_WORLD_1:
-				return new Area(Art.testArea, TEST_WORLD_1);
+				area = new Area(Art.testArea, TEST_WORLD_1);
+				break;
 			case TEST_WORLD_2:
-				return new Area(Art.testArea2, TEST_WORLD_2);
+				area = new Area(Art.testArea2, TEST_WORLD_2);
+				break;
 			case TEST_WORLD_3:
-				return new Area(Art.testArea3, TEST_WORLD_3);
+				area = new Area(Art.testArea3, TEST_WORLD_3);
+				break;
 			case TEST_WORLD_4:
-				return new Area(Art.testArea4, TEST_WORLD_4);
+				area = new Area(Art.testArea4, TEST_WORLD_4);
+				break;
 			case DEBUG:
-				return new Area(Art.testArea_debug, DEBUG);
+				area = new Area(Art.testArea_debug, DEBUG);
+				break;
 			default:
-				return null;
+				area = null;
+				break;
 		}
+		areas.add(area);
+		return area;
 	}
 	
 	/**

@@ -98,7 +98,7 @@ public class OverWorld extends World {
 		
 		if (this.currentArea.playerIsInWarpZone()) {
 			PixelData data = this.currentArea.getCurrentPixelData();
-			this.currentArea = WorldConstants.convertToArea(data.getTargetAreaID());
+			this.currentArea = WorldConstants.convertToArea(areas, data.getTargetAreaID());
 			this.currentArea.setPlayer(player);
 			this.currentArea.setDefaultPosition(data);
 			this.invertBitmapColors = true;
