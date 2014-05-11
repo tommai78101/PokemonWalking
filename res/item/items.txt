@@ -1,7 +1,14 @@
+// %: Item Type (for the game to recognize).
+// #: Item Name.
+// @: Item Description.
+// ^: Item specified category (One of Potions, KeyItems, Pokéballs, or TM/HM)
+
 %DUMMY
 #RETURN
 @Return to menu.
+^ALL
 
 %DUMMY
 #TEST
-@This is a test menu.
+@Test item. Returns to menu.
+^POKEBALLS

@@ -2,11 +2,12 @@ package item;
 
 import main.Game;
 import main.Game.State;
+import submenu.Inventory;
 import abstracts.Item;
 
 public class DummyItem extends Item {
-	public DummyItem(Game game, String name, String description) {
-		super(game, name, description);
+	public DummyItem(Game game, String name, String description, Inventory.Category category) {
+		super(game, name, description, category);
 	}
 
 	@Override

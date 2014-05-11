@@ -10,6 +10,8 @@ import level.Area;
 import main.Game;
 import resources.Art;
 import screen.BaseScreen;
+import submenu.Inventory;
+import submenu.Inventory.Category;
 import entity.Player;
 
 public abstract class Item {
@@ -17,11 +19,13 @@ public abstract class Item {
 	protected String name;
 	protected String description;
 	protected Game game;
+	protected Inventory.Category category;
 	protected boolean picked;
 
-	public Item(Game game, String name, String description) {
+	public Item(Game game, String name, String description, Inventory.Category category) {
 		setName(name);
 		setDescription(description);
+		setCategory(category);
 		this.game = game;
 		this.picked = false;
 	}
@@ -32,6 +36,10 @@ public abstract class Item {
 
 	public void setDescription(String value) {
 		this.description = value;
+	}
+	
+	public void setCategory(Inventory.Category category){
+		this.category = category;
 	}
 
 	public void renderTiles(BaseScreen output, int xOffset, int yOffset) {
@@ -46,6 +54,10 @@ public abstract class Item {
 
 	public String getDescription() {
 		return description;
+	}
+	
+	public Category getCategory(){
+		return this.category;
 	}
 
 	public void pick() {
@@ -102,6 +114,19 @@ public abstract class Item {
 					itemText.itemName = line.split("#")[1];
 				} else if (line.startsWith("@")) {
 					itemText.description = line.split("@")[1];
+				} else if (line.startsWith("^")) {
+					String value = line.split("\\^")[1];
+					if (value.equals("POTIONS")){
+						itemText.category = Category.POTIONS;
+					} else if (value.equals("KEYITEMS")){
+						itemText.category = Category.KEYITEMS;
+					} else if (value.equals("POKEBALLS")){
+						itemText.category = Category.POKEBALLS;
+					} else if (value.equals("TM_HM")){
+						itemText.category = Category.TM_HM;	
+					} else if (value.equals("ALL")){
+						itemText.skipCheckCategory = true;
+					}
 				}
 				if (itemText.isComplete()) {
 					itemText.id = id;

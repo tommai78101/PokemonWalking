@@ -76,10 +76,10 @@ public class Inventory extends SubMenu {
 		this.pokeballs = new ArrayList<Map.Entry<Item, Integer>>();
 		this.TMs_HMs = new ArrayList<Map.Entry<Item, Integer>>();
 		ItemText itemText = WorldConstants.items.get(WorldConstants.ITEM_RETURN);
-		this.potions.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
-		this.keyItems.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
-		this.pokeballs.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
-		this.TMs_HMs.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
+		this.potions.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description, itemText.category), Integer.MAX_VALUE));
+		this.keyItems.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description, itemText.category), Integer.MAX_VALUE));
+		this.pokeballs.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description, itemText.category), Integer.MAX_VALUE));
+		this.TMs_HMs.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description, itemText.category), Integer.MAX_VALUE));
 		this.arrowPosition = 0;
 		this.category = Category.POTIONS;
 	}
@@ -111,21 +111,24 @@ public class Inventory extends SubMenu {
 					Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
 					g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
 					int value = entry.getValue().intValue();
-					if (value != Integer.MAX_VALUE) {
+					if (value != Integer.MAX_VALUE && this.category != Category.KEYITEMS) {
 						String string = "*" + Integer.toString(value);
 						g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
 					}
 				}
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 			}
 			try {
 				Map.Entry<Item, Integer> entry = list.get(itemCursor);
 				String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
 				g.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 				g.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-			} catch (Exception e) {
 			}
-		} else
+			catch (Exception e) {
+			}
+		}
+		else
 			tick++;
 
 	}
@@ -201,7 +204,8 @@ public class Inventory extends SubMenu {
 
 		if (itemCursor >= (itemListSpan + 5)) {
 			itemListSpan++;
-		} else if (itemCursor < itemListSpan) {
+		}
+		else if (itemCursor < itemListSpan) {
 			itemListSpan--;
 		}
 	}
@@ -238,10 +242,25 @@ public class Inventory extends SubMenu {
 	}
 
 	public void addItem(Item item) {
-		//FIXME: Make new items have their own categories, so that they can be placed in correct lists.
 		boolean heldItemExists = false;
-		for (int i = 0; i < potions.size(); i++) {
-			Map.Entry<Item, Integer> entry = potions.get(i);
+		List<Map.Entry<Item, Integer>> list = null;
+		switch (item.getCategory()) {
+		case POTIONS:
+		default:
+			list = potions;
+			break;
+		case KEYITEMS:
+			list = keyItems;
+			break;
+		case POKEBALLS:
+			list = pokeballs;
+			break;
+		case TM_HM:
+			list = TMs_HMs;
+			break;
+		}
+		for (int i = 0; i < list.size(); i++) {
+			Map.Entry<Item, Integer> entry = list.get(i);
 			if (entry.getKey().equals(item)) {
 				entry.setValue(entry.getValue().intValue() + 1);
 				heldItemExists = true;
@@ -249,14 +268,29 @@ public class Inventory extends SubMenu {
 			}
 		}
 		if (!heldItemExists)
-			this.potions.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
+			list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 	}
 
 	public void tossItem() {
-		//FIXME: Make tossed items be removed from their respective item lists, and don't affect other lists.
-		Map.Entry<Item, Integer> entry = potions.get(itemCursor);
+		List<Map.Entry<Item, Integer>> list = null;
+		switch (this.category) {
+		case POTIONS:
+		default:
+			list = potions;
+			break;
+		case KEYITEMS:
+			list = keyItems;
+			break;
+		case POKEBALLS:
+			list = pokeballs;
+			break;
+		case TM_HM:
+			list = TMs_HMs;
+			break;
+		}
+		Map.Entry<Item, Integer> entry = list.get(itemCursor);
 		if (entry.getValue() - 1 <= 0)
-			this.potions.remove(itemCursor);
+			list.remove(itemCursor);
 		else
 			entry.setValue(entry.getValue().intValue() - 1);
 	}

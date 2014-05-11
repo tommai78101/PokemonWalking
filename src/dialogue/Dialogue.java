@@ -152,7 +152,8 @@ public class Dialogue {
 		try {
 			g.drawString(this.tokens[this.tokenPointer].substring(0, this.firstLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 			g.drawString(this.tokens[this.tokenPointer + 1].substring(0, secondLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// Ignore. Silently catch the any sorts of exception, and just let the game flow on.
 		}
 
@@ -188,14 +189,16 @@ public class Dialogue {
 				boolean result1 = false, result2 = false;
 				try {
 					this.tokens[this.tokenPointer].length();
-				} catch (ArrayIndexOutOfBoundsException e) {
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
 					// If (N+1)th line doesn't exist, then the dialogue has already
 					// been completed.
 					result1 = true;
 				}
 				try {
 					this.tokens[this.tokenPointer + 1].length();
-				} catch (ArrayIndexOutOfBoundsException e) {
+				}
+				catch (ArrayIndexOutOfBoundsException e) {
 					// If (N+1)th line doesn't exist, then this doesn't exist.
 					// However, if (N+1)th do exist, there's a chance that this line may
 					// not exist. We check just to make sure.
@@ -204,7 +207,8 @@ public class Dialogue {
 				if (result1 || result2) {
 					this.doneDisplayingDialogue = true;
 					this.hideDialog();
-				} else {
+				}
+				else {
 					this.tokenPointer += 2;
 					this.firstLineIterator = this.secondLineIterator = 0;
 				}
@@ -226,7 +230,8 @@ public class Dialogue {
 		else if (this.game.getPlayer().warningsTriggered) {
 			warningText();
 			this.game.getPlayer().warningsTriggered = false;
-		} else {
+		}
+		else {
 			this.firstLineIterator = this.secondLineIterator = 0;
 		}
 		if (this.repeatDialogueTick > 0)
@@ -319,17 +324,20 @@ public class Dialogue {
 				// Abusing the exception handling.
 				this.tokens[this.tokenPointer + 1].length();
 			}
-		} catch (ArrayIndexOutOfBoundsException e) {
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
 			result1 = true;
 		}
 		try {
 			if (this.secondLineIterator >= this.tokens[this.tokenPointer + 1].length()) {
 				this.next = true;
-			} else {
+			}
+			else {
 				if (this.secondLineIterator < this.tokens[this.tokenPointer + 1].length() && this.firstLineIterator >= this.tokens[this.tokenPointer].length())
 					this.secondLineIterator++;
 			}
-		} catch (ArrayIndexOutOfBoundsException e) {
+		}
+		catch (ArrayIndexOutOfBoundsException e) {
 			// Since there can only be cases where (N+2)th line exists but not (N+2)th line,
 			// and cases where the (N+2)th line has finished.
 			// Therefore, it returns true in both cases.
@@ -351,7 +359,8 @@ public class Dialogue {
 					public void run() {
 						try {
 							Thread.sleep(2000);
-						} catch (InterruptedException e) {
+						}
+						catch (InterruptedException e) {
 						}
 					}
 				});
@@ -394,7 +403,7 @@ public class Dialogue {
 			Item dummy = null;
 			switch (itemText.type) {
 			case DUMMY:
-				dummy = new DummyItem(this.game, itemText.itemName, itemText.description);
+				dummy = new DummyItem(this.game, itemText.itemName, itemText.description, itemText.category);
 				break;
 			default:
 				dummy = null;
@@ -516,18 +525,22 @@ public class Dialogue {
 					// Dialogue ID
 					tokens = line.split("#");
 					text.dialogueID = Integer.valueOf(tokens[1]);
-				} else if (line.startsWith("@")) {
+				}
+				else if (line.startsWith("@")) {
 					tokens = line.split("@");
 					text.dialogueMessage = tokens[1];
-				} else if (line.isEmpty() || line.trim().equals("")) {
+				}
+				else if (line.isEmpty() || line.trim().equals("")) {
 					result.add(text);
 					text = new DialogueText();
 				}
 			}
 			return result;
-		} catch (FileNotFoundException e) {
+		}
+		catch (FileNotFoundException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
