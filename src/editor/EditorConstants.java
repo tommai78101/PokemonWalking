@@ -7,6 +7,7 @@
 package editor;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.io.BufferedReader;
@@ -107,7 +108,7 @@ public class EditorConstants {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
 						}
 					};
-					data.button.setAlignmentX(JComponent.CENTER_ALIGNMENT);
+					data.button.setAlignmentX(Component.CENTER_ALIGNMENT);
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
 					if (data.areaTypeIncluded) {
