@@ -6,10 +6,16 @@
 
 package level;
 
+import item.ItemText;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import resources.Art;
+import abstracts.Item;
+import dialogue.Dialogue;
+import dialogue.DialogueText;
 
 public class WorldConstants {
 	private WorldConstants() {
@@ -23,12 +29,22 @@ public class WorldConstants {
 	public static final int TEST_WORLD_4 = 0x04;
 	public static final int DEBUG = 0x05;
 
+	// Item IDs
+	public static final int ITEM_RETURN = 0;
+	public static final int ITEM_TEST = 1;
+
 	// Biome Colors
 	public static final int GRASS_GREEN = 0xFFA4E767;
 	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
 
 	// Building Roof Colors / Main Area Color Theme
 	public static final int AREA_1_COLOR = 0xFFA495B0;
+
+	// Dialogues
+	public static ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("dialogue/dialogue.txt");
+
+	// Items
+	public static HashMap<Integer, ItemText> items = Item.loadItemResources("item/items.txt");
 
 	/**
 	 * Returns the area matching the given area ID value.

@@ -1,5 +1,11 @@
 package abstracts;
 
+import item.ItemText;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+
 import level.Area;
 import main.Game;
 import resources.Art;
@@ -81,4 +87,32 @@ public abstract class Item {
 	}
 
 	public abstract void doAction();
+
+	public static HashMap<Integer, ItemText> loadItemResources(String filename) {
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
+			String line;
+			ItemText itemText = new ItemText();
+			HashMap<Integer, ItemText> result = new HashMap<Integer, ItemText>();
+			int id = 0;
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("%")) {
+					itemText.type = ItemText.Type.getType(line.split("%")[1]);
+				} else if (line.startsWith("#")) {
+					itemText.itemName = line.split("#")[1];
+				} else if (line.startsWith("@")) {
+					itemText.description = line.split("@")[1];
+				}
+				if (itemText.isComplete()) {
+					itemText.id = id;
+					result.put(id, itemText);
+					itemText = new ItemText();
+					id++;
+				}
+			}
+			return result;
+		} catch (Exception e) {
+			return null;
+		}
+	}
 }

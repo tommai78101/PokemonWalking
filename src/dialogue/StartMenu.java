@@ -30,7 +30,7 @@ public class StartMenu {
 
 	// String constants
 	public static final String ITEM_NAME_BICYCLE = "BICYCLE";
-	public static final String ITEM_NAME_INVENTORY = "INVENTORY";
+	public static final String ITEM_NAME_INVENTORY = "PACK";
 	public static final String ITEM_NAME_EXIT = "EXIT";
 
 	private boolean activation;

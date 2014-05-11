@@ -7,6 +7,7 @@
 package submenu;
 
 import item.DummyItem;
+import item.ItemText;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import level.WorldConstants;
 import main.Game;
 import main.Keys;
 import main.MainComponent;
@@ -38,7 +40,8 @@ public class Inventory extends SubMenu {
 		super(name, enabled, disabled, game);
 		this.itemCursor = 0;
 		this.items = new ArrayList<Map.Entry<Item, Integer>>();
-		this.items.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, "RETURN", "Exit the inventory."), Integer.MAX_VALUE));
+		ItemText itemText = WorldConstants.items.get(WorldConstants.ITEM_RETURN);
+		this.items.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
 		this.arrowPosition = 0;
 	}
 
@@ -55,7 +58,7 @@ public class Inventory extends SubMenu {
 				int value = entry.getValue().intValue();
 				if (value != Integer.MAX_VALUE) {
 					String string = "*" + Integer.toString(value);
-					g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (Tile.HEIGHT + 5) + ((i) * Tile.HEIGHT * MainComponent.GAME_SCALE));
+					g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
 				}
 			}
 		} catch (Exception e) {

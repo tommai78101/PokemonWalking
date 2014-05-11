@@ -7,6 +7,7 @@
 package dialogue;
 
 import item.DummyItem;
+import item.ItemText;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -18,12 +19,14 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
 
+import level.WorldConstants;
 import main.Game;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
 import submenu.Inventory;
+import abstracts.Item;
 import abstracts.Tile;
 
 public class Dialogue {
@@ -59,7 +62,6 @@ public class Dialogue {
 	private boolean showDialog;
 	private int firstLineIterator;
 	private int secondLineIterator;
-	private ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("dialogue/dialogue.txt");
 	private boolean doneDisplayingDialogue;
 	private boolean itemPickedDialogue;
 
@@ -375,7 +377,7 @@ public class Dialogue {
 	public void createText(int key, int interactionID) {
 		switch (key) {
 		case 0x08: {// Sign
-			for (DialogueText dt : this.dialogues) {
+			for (DialogueText dt : WorldConstants.dialogues) {
 				if (dt.dialogueID == interactionID) {
 					this.tokens = toLines(dt.dialogueMessage, MAX_STRING_LENGTH);
 					this.showDialog = true;
@@ -388,14 +390,25 @@ public class Dialogue {
 		}
 		case 0x0B: { // Item
 			Inventory inventory = this.game.getStartMenu().getInventory();
-			DummyItem dummy = new DummyItem(this.game, "TEST", "This item is a test item.");
-			inventory.addItem(dummy);
-			this.tokens = toLines("Picked up " + dummy.getName() + "!", MAX_STRING_LENGTH);
-			this.showDialog = true;
-			this.doneDisplayingDialogue = false;
-			this.itemPickedDialogue = true;
-			this.next = false;
-			this.nextTick = false;
+			ItemText itemText = WorldConstants.items.get(interactionID);
+			Item dummy = null;
+			switch (itemText.type) {
+			case DUMMY:
+				dummy = new DummyItem(this.game, itemText.itemName, itemText.description);
+				break;
+			default:
+				dummy = null;
+				break;
+			}
+			if (dummy != null) {
+				inventory.addItem(dummy);
+				this.tokens = toLines("Picked up " + dummy.getName() + "!", MAX_STRING_LENGTH);
+				this.showDialog = true;
+				this.doneDisplayingDialogue = false;
+				this.itemPickedDialogue = true;
+				this.next = false;
+				this.nextTick = false;
+			}
 			break;
 		}
 		}

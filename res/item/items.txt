@@ -1,0 +1,7 @@
+%DUMMY
+#RETURN
+@Return to menu.
+
+%DUMMY
+#TEST
+@This is a test menu.
