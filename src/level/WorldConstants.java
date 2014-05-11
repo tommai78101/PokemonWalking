@@ -13,21 +13,21 @@ import resources.Art;
 
 public class WorldConstants {
 	private WorldConstants() {
-		//Add/delete a map area, update everything shown below.
+		// Add/delete a map area, update everything shown below.
 	}
-	
-	//Area IDs
+
+	// Area IDs
 	public static final int TEST_WORLD_1 = 0x01;
 	public static final int TEST_WORLD_2 = 0x02;
 	public static final int TEST_WORLD_3 = 0x03;
 	public static final int TEST_WORLD_4 = 0x04;
 	public static final int DEBUG = 0x05;
-	
-	//Biome Colors
+
+	// Biome Colors
 	public static final int GRASS_GREEN = 0xFFA4E767;
 	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
-	
-	//Building Roof Colors / Main Area Color Theme
+
+	// Building Roof Colors / Main Area Color Theme
 	public static final int AREA_1_COLOR = 0xFFA495B0;
 
 	/**
@@ -45,29 +45,29 @@ public class WorldConstants {
 		}
 		Area area = null;
 		switch (areaID) {
-			case TEST_WORLD_1:
-				area = new Area(Art.testArea, TEST_WORLD_1);
-				break;
-			case TEST_WORLD_2:
-				area = new Area(Art.testArea2, TEST_WORLD_2);
-				break;
-			case TEST_WORLD_3:
-				area = new Area(Art.testArea3, TEST_WORLD_3);
-				break;
-			case TEST_WORLD_4:
-				area = new Area(Art.testArea4, TEST_WORLD_4);
-				break;
-			case DEBUG:
-				area = new Area(Art.testArea_debug, DEBUG);
-				break;
-			default:
-				area = null;
-				break;
+		case TEST_WORLD_1:
+			area = new Area(Art.testArea, TEST_WORLD_1);
+			break;
+		case TEST_WORLD_2:
+			area = new Area(Art.testArea2, TEST_WORLD_2);
+			break;
+		case TEST_WORLD_3:
+			area = new Area(Art.testArea3, TEST_WORLD_3);
+			break;
+		case TEST_WORLD_4:
+			area = new Area(Art.testArea4, TEST_WORLD_4);
+			break;
+		case DEBUG:
+			area = new Area(Art.testArea_debug, DEBUG);
+			break;
+		default:
+			area = null;
+			break;
 		}
 		areas.add(area);
 		return area;
 	}
-	
+
 	/**
 	 * Returns all available areas defined.
 	 * 
@@ -82,7 +82,7 @@ public class WorldConstants {
 		result.add(new Area(Art.testArea_debug, DEBUG));
 		return result;
 	}
-	
+
 	/**
 	 * Returns the area color theme of the given area ID.
 	 * 
@@ -92,10 +92,10 @@ public class WorldConstants {
 	 * */
 	public static int convertToAreaColor(int areaID) {
 		switch (areaID) {
-			case TEST_WORLD_1:
-				return AREA_1_COLOR;
-			default:
-				return 0;
+		case TEST_WORLD_1:
+			return AREA_1_COLOR;
+		default:
+			return 0;
 		}
 	}
 }

@@ -13,7 +13,7 @@ public class Rect {
 	public int bottomRightCorner_Y;
 	public int width;
 	public int height;
-	
+
 	public Rect(int x, int y, int w, int h) {
 		this.topLeftCorner_X = x;
 		this.topLeftCorner_Y = y;
@@ -22,7 +22,7 @@ public class Rect {
 		this.bottomRightCorner_X = x + w;
 		this.bottomRightCorner_Y = y + h;
 	}
-	
+
 	public Rect adjust(BaseScreen screen) {
 		if (this.topLeftCorner_X < 0)
 			this.topLeftCorner_X = 0;
@@ -34,5 +34,5 @@ public class Rect {
 			this.bottomRightCorner_Y = screen.height;
 		return this;
 	}
-	
+
 }

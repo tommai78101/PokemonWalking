@@ -23,20 +23,20 @@ import abstracts.Tile;
 
 public class ControlPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7481148146432931992L;
-	
-	private TilePropertiesPanel propertiesPanel; //Part of Control Panel 
-	private String iconName; //Used to display name in the status panel of Level Editor
-	private LevelEditor editor; //reference to parent
-	private Data selectedData; //reference to selected data.
-	
+
+	private TilePropertiesPanel propertiesPanel; // Part of Control Panel
+	private String iconName; // Used to display name in the status panel of Level Editor
+	private LevelEditor editor; // reference to parent
+	private Data selectedData; // reference to selected data.
+
 	public ControlPanel(LevelEditor editor) {
 		this.editor = editor;
 		this.selectedData = new Data();
 		this.selectedData.editorID = 0;
 		this.selectedData.filepath = "no_png.png";
-		
+
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
-		
+
 		JPanel iconsPanel = new JPanel();
 		iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.Y_AXIS));
 		EditorConstants constants = EditorConstants.getInstance();
@@ -47,10 +47,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 			d.button.addActionListener(this);
 			iconsPanel.add(d.button);
 		}
-		
+
 		JScrollPane scrollPanel = new JScrollPane(iconsPanel) {
 			private static final long serialVersionUID = 1L;
-			
+
 			@Override
 			public Dimension getPreferredSize() {
 				int maxWidth = 50;
@@ -62,7 +62,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 					dim.height = maxHeight;
 				return dim;
 			}
-			
+
 			@Override
 			public Dimension getMaximumSize() {
 				return getPreferredSize();
@@ -72,14 +72,14 @@ public class ControlPanel extends JPanel implements ActionListener {
 		scrollPanel.createVerticalScrollBar();
 		scrollPanel.setVisible(true);
 		this.add(scrollPanel);
-		
+
 		this.propertiesPanel = new TilePropertiesPanel();
 		this.add(propertiesPanel);
-		
+
 		this.propertiesPanel.setVisible(true);
 		this.setVisible(true);
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		JButton button = (JButton) event.getSource();
@@ -95,15 +95,15 @@ public class ControlPanel extends JPanel implements ActionListener {
 		}
 		editor.validate();
 	}
-	
+
 	public String getPickedEntityName() {
 		return this.iconName;
 	}
-	
+
 	public Data getSelectedData() {
 		return this.selectedData;
 	}
-	
+
 	public TilePropertiesPanel getPropertiesPanel() {
 		return this.propertiesPanel;
 	}

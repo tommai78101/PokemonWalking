@@ -14,7 +14,7 @@ public class Data {
 	enum DataType {
 		ALPHA, RED, GREEN, BLUE;
 	};
-	
+
 	public String name;
 	public String filepath;
 	public int editorID;

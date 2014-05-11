@@ -26,14 +26,14 @@ import abstracts.Tile;
 import dialogue.Dialogue;
 
 public class Inventory extends SubMenu {
-	
+
 	private Keys keys;
 	private List<Map.Entry<Item, Integer>> items;
 	private int itemCursor;
 	private int arrowPosition;
 	private int itemListSpan = 0;
 
-	//TODO: Continue to work on this.
+	// TODO: Continue to work on this.
 	public Inventory(String name, String enabled, String disabled, Game game) {
 		super(name, enabled, disabled, game);
 		this.itemCursor = 0;
@@ -41,7 +41,7 @@ public class Inventory extends SubMenu {
 		this.items.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, "RETURN", "Exit the inventory."), Integer.MAX_VALUE));
 		this.arrowPosition = 0;
 	}
-	
+
 	private void renderText(Graphics g) {
 		g.setFont(Art.font);
 		g.setColor(Color.black);
@@ -58,27 +58,25 @@ public class Inventory extends SubMenu {
 					g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (Tile.HEIGHT + 5) + ((i) * Tile.HEIGHT * MainComponent.GAME_SCALE));
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 		}
 		try {
 			Map.Entry<Item, Integer> entry = items.get(itemCursor);
 			String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
 			g.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
 			g.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+		} catch (Exception e) {
 		}
-		catch (Exception e) {
-		}
-		
+
 	}
 
 	@Override
 	public SubMenu initialize(Keys keys) {
-		//TODO: Add new inventory art for background.
+		// TODO: Add new inventory art for background.
 		this.keys = keys;
 		return Inventory.this;
 	}
-	
+
 	@Override
 	public void tick() {
 		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
@@ -114,12 +112,11 @@ public class Inventory extends SubMenu {
 
 		if (itemCursor >= (itemListSpan + 5)) {
 			itemListSpan++;
-		}
-		else if (itemCursor < itemListSpan) {
+		} else if (itemCursor < itemListSpan) {
 			itemListSpan--;
 		}
 	}
-	
+
 	@Override
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.subMenuActivation) {
@@ -131,7 +128,7 @@ public class Inventory extends SubMenu {
 			renderText(graphics);
 		}
 	}
-	
+
 	public void addItem(Item item) {
 		boolean heldItemExists = false;
 		for (int i = 0; i < items.size(); i++) {
@@ -145,7 +142,7 @@ public class Inventory extends SubMenu {
 		if (!heldItemExists)
 			this.items.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 	}
-	
+
 	public void tossItem() {
 		Map.Entry<Item, Integer> entry = items.get(itemCursor);
 		if (entry.getValue() - 1 <= 0)
@@ -153,14 +150,14 @@ public class Inventory extends SubMenu {
 		else
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
-	
+
 	public void resetCursor() {
 		this.itemCursor = 0;
 		this.arrowPosition = 0;
 		this.itemListSpan = 0;
 	}
 
-	//------------------------------------        PRIVATE METHODS        -----------------------------------------
+	// ------------------------------------ PRIVATE METHODS -----------------------------------------
 
 	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {

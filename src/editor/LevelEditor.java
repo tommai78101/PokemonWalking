@@ -20,19 +20,19 @@ public class LevelEditor extends JFrame {
 	public static final int WIDTH = 160;
 	public static final int HEIGHT = 144;
 	public static final int SIZE = 3;
-	
+
 	private ArrayList<Data> filepaths = new ArrayList<Data>();
-	
+
 	public ControlPanel controlPanel;
 	public FileControl fileControlPanel;
 	public DrawingBoard drawingBoardPanel;
 	public TilePropertiesPanel propertiesPanel;
 	public StatusPanel statusPanel;
-	
+
 	public String message;
 	public boolean running;
 	public EditorInput input;
-	
+
 	public LevelEditor(String name) {
 		super(name);
 		running = true;
@@ -41,41 +41,41 @@ public class LevelEditor extends JFrame {
 		this.setPreferredSize(size);
 		this.setMinimumSize(size);
 		this.setMaximumSize(size);
-		
+
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
 		this.setVisible(true);
-		
+
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
 				running = false;
 			}
 		});
-		
-		//		final File folder = new File("res");
-		//		getAllFiles(folder);
-		
+
+		// final File folder = new File("res");
+		// getAllFiles(folder);
+
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				if (input == null) {
 					input = new EditorInput(editor.LevelEditor.this);
 					addMouseListener(input);
-					//addMouseMotionListener(input);
+					// addMouseMotionListener(input);
 				}
 				if (fileControlPanel == null) {
 					fileControlPanel = new FileControl(editor.LevelEditor.this);
 					fileControlPanel.addMouseListener(input);
-					//fileControlPanel.addMouseMotionListener(input);
+					// fileControlPanel.addMouseMotionListener(input);
 					add(fileControlPanel, BorderLayout.NORTH);
 					validate();
 				}
 				if (controlPanel == null) {
 					controlPanel = new ControlPanel(editor.LevelEditor.this);
 					controlPanel.addMouseListener(input);
-					//controlPanel.addMouseMotionListener(input);
+					// controlPanel.addMouseMotionListener(input);
 					add(controlPanel, BorderLayout.WEST);
 					validate();
 				}
@@ -90,13 +90,13 @@ public class LevelEditor extends JFrame {
 				if (statusPanel == null) {
 					statusPanel = new StatusPanel();
 					statusPanel.addMouseListener(input);
-					//statusPanel.addMouseMotionListener(input);
+					// statusPanel.addMouseMotionListener(input);
 					add(statusPanel, BorderLayout.SOUTH);
 				}
 			}
 		});
 	}
-	
+
 	@Override
 	public void validate() {
 		super.validate();
@@ -107,7 +107,7 @@ public class LevelEditor extends JFrame {
 					StringBuilder builder = new StringBuilder();
 					builder.append("Picked: " + editor.LevelEditor.this.controlPanel.getPickedEntityName() + " ");
 					if (!input.isDragging())
-						//This is how we do the [panning + pixel position] math. 
+						// This is how we do the [panning + pixel position] math.
 						statusPanel.setMousePositionText((input.dx + input.mouseX), (input.dy + input.mouseY));
 					else
 						statusPanel.setMousePositionText(input.oldX, input.oldY);
@@ -116,11 +116,11 @@ public class LevelEditor extends JFrame {
 			}
 		});
 	}
-	
+
 	public ArrayList<Data> getResourceFilePaths() {
 		return this.filepaths;
 	}
-	
+
 	public static void main(String[] args) {
 		new LevelEditor("Level Editor (Hobby)");
 	}

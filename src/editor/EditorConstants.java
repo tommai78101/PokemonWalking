@@ -27,17 +27,17 @@ import javax.swing.JComponent;
 import abstracts.Tile;
 
 public class EditorConstants {
-	
-	//TODO: Add additional pixel data properties that can be edited/modified for the area.
-	
+
+	// TODO: Add additional pixel data properties that can be edited/modified for the area.
+
 	private final HashMap<Integer, Data> tileMap;
 	private static final EditorConstants instance = new EditorConstants();
-	
+
 	public static final Color GRASS_GREEN = new Color(164, 231, 103);
 	public static final Color ROAD_WHITE = new Color(255, 244, 201);
 	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
-	
+
 	private EditorConstants() {
 		int id = 0;
 		tileMap = new HashMap<Integer, Data>();
@@ -73,13 +73,11 @@ public class EditorConstants {
 				if (line.startsWith("#")) {
 					data = null;
 					continue;
-				}
-				else if (line.startsWith("-")) {
-					//TODO: Modify GUI to categorize tiles into groups.
+				} else if (line.startsWith("-")) {
+					// TODO: Modify GUI to categorize tiles into groups.
 					data = null;
 					continue;
-				}
-				else if (line.startsWith("%")) {
+				} else if (line.startsWith("%")) {
 					String trim = line.trim().replaceAll("\\s+", "").replaceAll("@", "00");
 					String[] tokens = trim.split("%");
 					data.name = tokens[1].replace('_', ' ');
@@ -93,17 +91,17 @@ public class EditorConstants {
 					ImageIcon icon = new ImageIcon(data.image);
 					data.button = new JButton(icon) {
 						private static final long serialVersionUID = 1L;
-						
+
 						@Override
 						public Dimension getMinimumSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
 						}
-						
+
 						@Override
 						public Dimension getSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
 						}
-						
+
 						@Override
 						public Dimension getPreferredSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
@@ -117,28 +115,26 @@ public class EditorConstants {
 							data.areaType = i;
 							tileMap.put(data.editorID, data);
 						}
-					}
-					else
+					} else
 						tileMap.put(data.editorID, data);
 					id++;
 					data = null;
 				}
 			}
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Failed to load data correctly in EditorConstants.", e);
 		}
 	}
-	
+
 	public static EditorConstants getInstance() {
 		return instance;
 	}
-	
+
 	public HashMap<Integer, Data> getTileMap() {
 		return this.tileMap;
 	}
-	
+
 	public List<Map.Entry<Integer, Data>> getSortedTileMap() {
 		final int size = this.tileMap.size();
 		final List<Map.Entry<Integer, Data>> list = new ArrayList<Map.Entry<Integer, Data>>(size);
