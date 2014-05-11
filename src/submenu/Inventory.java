@@ -29,47 +29,104 @@ import dialogue.Dialogue;
 
 public class Inventory extends SubMenu {
 
+	public enum Category {
+		POTIONS(0), KEYITEMS(1), POKEBALLS(2), TM_HM(3);
+
+		public int id;
+
+		private Category(int value) {
+			this.id = value;
+		}
+
+		public static Category getWrapped(int value) {
+			Category[] categories = Category.values();
+			if (value < 0)
+				value = (categories.length - 1);
+			if (value > categories.length - 1)
+				value = 0;
+			for (Category c : categories) {
+				if (c.id == value)
+					return categories[value];
+			}
+			return categories[0];
+		}
+
+		public int getID() {
+			return id;
+		}
+	};
+
 	private Keys keys;
-	private List<Map.Entry<Item, Integer>> items;
+	private List<Map.Entry<Item, Integer>> potions;
+	private List<Map.Entry<Item, Integer>> keyItems;
+	private List<Map.Entry<Item, Integer>> pokeballs;
+	private List<Map.Entry<Item, Integer>> TMs_HMs;
 	private int itemCursor;
 	private int arrowPosition;
 	private int itemListSpan = 0;
+	private Category category;
+	private byte tick = (byte) 0x0;
 
 	// TODO: Continue to work on this.
 	public Inventory(String name, String enabled, String disabled, Game game) {
 		super(name, enabled, disabled, game);
 		this.itemCursor = 0;
-		this.items = new ArrayList<Map.Entry<Item, Integer>>();
+		this.potions = new ArrayList<Map.Entry<Item, Integer>>();
+		this.keyItems = new ArrayList<Map.Entry<Item, Integer>>();
+		this.pokeballs = new ArrayList<Map.Entry<Item, Integer>>();
+		this.TMs_HMs = new ArrayList<Map.Entry<Item, Integer>>();
 		ItemText itemText = WorldConstants.items.get(WorldConstants.ITEM_RETURN);
-		this.items.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
+		this.potions.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
+		this.keyItems.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
+		this.pokeballs.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
+		this.TMs_HMs.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description), Integer.MAX_VALUE));
 		this.arrowPosition = 0;
+		this.category = Category.POTIONS;
 	}
 
 	private void renderText(Graphics g) {
-		g.setFont(Art.font);
-		g.setColor(Color.black);
+		if (tick >= (byte) 0x4) {
+			g.setFont(Art.font);
+			g.setColor(Color.black);
 
-		try {
-			for (int i = 0; i < 5; i++) {
-				if (i > items.size())
-					break;
-				Map.Entry<Item, Integer> entry = items.get(itemListSpan + i);
-				g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
-				int value = entry.getValue().intValue();
-				if (value != Integer.MAX_VALUE) {
-					String string = "*" + Integer.toString(value);
-					g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
-				}
+			List<Map.Entry<Item, Integer>> list = null;
+			switch (this.category) {
+			case POTIONS:
+				list = potions;
+				break;
+			case KEYITEMS:
+				list = keyItems;
+				break;
+			case POKEBALLS:
+				list = pokeballs;
+				break;
+			case TM_HM:
+				list = TMs_HMs;
+				break;
 			}
-		} catch (Exception e) {
-		}
-		try {
-			Map.Entry<Item, Integer> entry = items.get(itemCursor);
-			String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
-			g.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-			g.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
-		} catch (Exception e) {
-		}
+			try {
+				for (int i = 0; i < 5; i++) {
+					if (i >= list.size())
+						break;
+					Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
+					g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
+					int value = entry.getValue().intValue();
+					if (value != Integer.MAX_VALUE) {
+						String string = "*" + Integer.toString(value);
+						g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
+					}
+				}
+			} catch (Exception e) {
+			}
+			try {
+				Map.Entry<Item, Integer> entry = list.get(itemCursor);
+				String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
+				g.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+				g.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+			} catch (Exception e) {
+			}
+		} else
+			tick++;
 
 	}
 
@@ -82,12 +139,6 @@ public class Inventory extends SubMenu {
 
 	@Override
 	public void tick() {
-		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
-			this.keys.X.lastKeyState = true;
-			this.keys.PERIOD.lastKeyState = true;
-			this.resetCursor();
-			this.subMenuActivation = false;
-		}
 		if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
 			if (itemCursor > 0) {
 				itemCursor--;
@@ -98,7 +149,22 @@ public class Inventory extends SubMenu {
 			this.keys.W.lastKeyState = true;
 		}
 		if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
-			if (itemCursor < items.size() - 1) {
+			List<Map.Entry<Item, Integer>> list = null;
+			switch (this.category) {
+			case POTIONS:
+				list = potions;
+				break;
+			case KEYITEMS:
+				list = keyItems;
+				break;
+			case POKEBALLS:
+				list = pokeballs;
+				break;
+			case TM_HM:
+				list = TMs_HMs;
+				break;
+			}
+			if (itemCursor < list.size() - 1) {
 				itemCursor++;
 				if (arrowPosition < 4)
 					arrowPosition++;
@@ -106,10 +172,30 @@ public class Inventory extends SubMenu {
 			this.keys.down.lastKeyState = true;
 			this.keys.S.lastKeyState = true;
 		}
+		if ((this.keys.left.keyStateDown || this.keys.A.keyStateDown) && (!this.keys.left.lastKeyState || !this.keys.A.lastKeyState)) {
+			this.category = Category.getWrapped(this.category.getID() - 1);
+			this.tick = 0x0;
+			this.itemCursor = this.arrowPosition = 0;
+			this.keys.left.lastKeyState = true;
+			this.keys.A.lastKeyState = true;
+		}
+		if ((this.keys.right.keyStateDown || this.keys.D.keyStateDown) && (!this.keys.right.lastKeyState || !this.keys.D.lastKeyState)) {
+			this.category = Category.getWrapped(this.category.getID() + 1);
+			this.tick = 0x0;
+			this.itemCursor = this.arrowPosition = 0;
+			this.keys.right.lastKeyState = true;
+			this.keys.D.lastKeyState = true;
+		}
+		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
+			this.keys.X.lastKeyState = true;
+			this.keys.PERIOD.lastKeyState = true;
+			this.resetCursor();
+			this.subMenuActivation = false;
+		}
 		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 			this.keys.Z.lastKeyState = true;
 			this.keys.SLASH.lastKeyState = true;
-			Map.Entry<Item, Integer> entry = items.get(itemCursor);
+			Map.Entry<Item, Integer> entry = potions.get(itemCursor);
 			entry.getKey().doAction();
 		}
 
@@ -127,6 +213,22 @@ public class Inventory extends SubMenu {
 			Dialogue.renderBox(output, 0, 6, 9, 2);
 			renderListBox(output, 3, 1, 7, 5);
 			output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
+			//output.blit(Art.inventory_backpack, 0, 8, 48, 48);
+			switch (this.category) {
+			case POTIONS:
+			default:
+				output.blit(Art.inventory_backpack_potions, 0, 8, 48, 48);
+				break;
+			case KEYITEMS:
+				output.blit(Art.inventory_backpack_keyItems, 0, 8, 48, 48);
+				break;
+			case POKEBALLS:
+				output.blit(Art.inventory_backpack_pokeballs, 0, 8, 48, 48);
+				break;
+			case TM_HM:
+				output.blit(Art.inventory_backpack_TM_HM, 0, 8, 48, 48);
+				break;
+			}
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 			renderText(graphics);
 		}
@@ -134,8 +236,8 @@ public class Inventory extends SubMenu {
 
 	public void addItem(Item item) {
 		boolean heldItemExists = false;
-		for (int i = 0; i < items.size(); i++) {
-			Map.Entry<Item, Integer> entry = items.get(i);
+		for (int i = 0; i < potions.size(); i++) {
+			Map.Entry<Item, Integer> entry = potions.get(i);
 			if (entry.getKey().equals(item)) {
 				entry.setValue(entry.getValue().intValue() + 1);
 				heldItemExists = true;
@@ -143,13 +245,13 @@ public class Inventory extends SubMenu {
 			}
 		}
 		if (!heldItemExists)
-			this.items.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
+			this.potions.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 	}
 
 	public void tossItem() {
-		Map.Entry<Item, Integer> entry = items.get(itemCursor);
+		Map.Entry<Item, Integer> entry = potions.get(itemCursor);
 		if (entry.getValue() - 1 <= 0)
-			this.items.remove(itemCursor);
+			this.potions.remove(itemCursor);
 		else
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
@@ -158,6 +260,7 @@ public class Inventory extends SubMenu {
 		this.itemCursor = 0;
 		this.arrowPosition = 0;
 		this.itemListSpan = 0;
+		this.category = Category.POTIONS;
 	}
 
 	// ------------------------------------ PRIVATE METHODS -----------------------------------------
@@ -165,7 +268,7 @@ public class Inventory extends SubMenu {
 	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
-				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), (y * Tile.HEIGHT - 8) + (j * Tile.HEIGHT));
+				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), (y * Tile.HEIGHT - 7) + (j * Tile.HEIGHT));
 			}
 		}
 		for (int k = 0; k < width; k++)
