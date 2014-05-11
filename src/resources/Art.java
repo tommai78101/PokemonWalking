@@ -130,6 +130,10 @@ public class Art {
 	public static BaseBitmap inventory_backpack_keyItems;
 	public static BaseBitmap inventory_backpack_pokeballs;
 	public static BaseBitmap inventory_backpack_TM_HM;
+	public static BaseBitmap inventory_tag_potions;
+	public static BaseBitmap inventory_tag_keyItems;
+	public static BaseBitmap inventory_tag_pokeballs;
+	public static BaseBitmap inventory_tag_TM_HM;
 
 	// Object
 	public static BaseBitmap item;
@@ -242,6 +246,10 @@ public class Art {
 		inventory_backpack_keyItems = screen.load("art/inventory/backpack_keyitems.png");
 		inventory_backpack_pokeballs = screen.load("art/inventory/backpack_pokeballs.png");
 		inventory_backpack_TM_HM = screen.load("art/inventory/backpack_TM_HM.png");
+		inventory_tag_potions = screen.load("art/inventory/potions.png");
+		inventory_tag_keyItems = screen.load("art/inventory/keyitems.png");
+		inventory_tag_pokeballs = screen.load("art/inventory/pokeballs.png");
+		inventory_tag_TM_HM = screen.load("art/inventory/TM_HM.png");
 
 		// Object
 		item = screen.load("art/object/item.png");

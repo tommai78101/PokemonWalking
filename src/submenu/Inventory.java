@@ -213,20 +213,23 @@ public class Inventory extends SubMenu {
 			Dialogue.renderBox(output, 0, 6, 9, 2);
 			renderListBox(output, 3, 1, 7, 5);
 			output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
-			//output.blit(Art.inventory_backpack, 0, 8, 48, 48);
 			switch (this.category) {
 			case POTIONS:
 			default:
-				output.blit(Art.inventory_backpack_potions, 0, 8, 48, 48);
+				output.blit(Art.inventory_backpack_potions, 0, 8);
+				output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
 				break;
 			case KEYITEMS:
-				output.blit(Art.inventory_backpack_keyItems, 0, 8, 48, 48);
+				output.blit(Art.inventory_backpack_keyItems, 0, 8);
+				output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
 				break;
 			case POKEBALLS:
-				output.blit(Art.inventory_backpack_pokeballs, 0, 8, 48, 48);
+				output.blit(Art.inventory_backpack_pokeballs, 0, 8);
+				output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
 				break;
 			case TM_HM:
-				output.blit(Art.inventory_backpack_TM_HM, 0, 8, 48, 48);
+				output.blit(Art.inventory_backpack_TM_HM, 0, 8);
+				output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
 				break;
 			}
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
@@ -235,6 +238,7 @@ public class Inventory extends SubMenu {
 	}
 
 	public void addItem(Item item) {
+		//FIXME: Make new items have their own categories, so that they can be placed in correct lists.
 		boolean heldItemExists = false;
 		for (int i = 0; i < potions.size(); i++) {
 			Map.Entry<Item, Integer> entry = potions.get(i);
@@ -249,6 +253,7 @@ public class Inventory extends SubMenu {
 	}
 
 	public void tossItem() {
+		//FIXME: Make tossed items be removed from their respective item lists, and don't affect other lists.
 		Map.Entry<Item, Integer> entry = potions.get(itemCursor);
 		if (entry.getValue() - 1 <= 0)
 			this.potions.remove(itemCursor);
