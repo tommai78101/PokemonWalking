@@ -71,3 +71,5 @@
 % House % 09 % 05 % @ % @ % res/art/house/house_roof_right.png
 -
 % Door % 0A % @ % @ % @ % res/art/house/house_door.png
+-
+% Item % 0B % @ % @ % @ % res/art/object/item.png
