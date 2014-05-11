@@ -102,7 +102,8 @@ public class Game {
 			if (screen.getRenderingEffectTick() < (byte) 0x7) {
 				screen.flashing();
 				graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			} else {
+			}
+			else {
 				if (this.subMenu != null) {
 					this.subMenu.render(screen, graphics);
 
@@ -114,13 +115,15 @@ public class Game {
 			if (screen.getRenderingEffectTick() < (byte) 0x7) {
 				screen.flashing();
 				graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			} else {
+			}
+			else {
 				screen.clear(0xA4E767);
 				overworld.render(screen, player.getX(), player.getY());
 				// dialogue.render(screen, player.getX(), player.getY(), graphics);
 				if (startMenu.isActivated()) {
 					startMenu.render(screen, graphics);
-				} else {
+				}
+				else {
 					// dialogue.render(screen, player.getX(), player.getY(), graphics);
 					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				}
@@ -153,7 +156,8 @@ public class Game {
 		case INVENTORY: {
 			if (this.subMenu != null) {
 				this.subMenu.tick();
-			} else
+			}
+			else
 				break;
 			if (!this.subMenu.isActivated()) {
 				this.state = State.PAUSED;
@@ -249,14 +253,16 @@ public class Game {
 			if (this.subMenu != null)
 				this.subMenu.disableSubMenu();
 			this.subMenu = null;
-		} else if (str.equals(StartMenu.ITEM_NAME_INVENTORY)) {
+		}
+		else if (str.equals(StartMenu.ITEM_NAME_INVENTORY)) {
 			if (this.state != State.INVENTORY)
 				this.state = State.INVENTORY;
 			this.subMenu = entry.getValue();
 			if (!this.subMenu.isActivated())
 				this.subMenu.enableSubMenu();
 			screen.setRenderingEffectTick((byte) 0x0);
-		} else if (str.equals(StartMenu.ITEM_NAME_EXIT)) {
+		}
+		else if (str.equals(StartMenu.ITEM_NAME_EXIT)) {
 			if (this.state != State.GAME)
 				this.state = State.GAME;
 			if (this.subMenu != null)

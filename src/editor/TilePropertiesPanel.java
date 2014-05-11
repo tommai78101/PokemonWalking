@@ -197,7 +197,8 @@ public class TilePropertiesPanel extends JPanel {
 	public char getAlpha() {
 		try {
 			return (char) (Integer.valueOf(tileIDField.getText()) & 0xFF);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			return 0;
 		}
 	}
@@ -209,7 +210,8 @@ public class TilePropertiesPanel extends JPanel {
 	public char getRed() {
 		try {
 			return (char) (Integer.valueOf(extTileIDField.getText()) & 0xFF);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			return 0;
 		}
 	}
@@ -221,7 +223,8 @@ public class TilePropertiesPanel extends JPanel {
 	public char getGreen() {
 		try {
 			return (char) (Integer.valueOf(tileGGIDField.getText()) & 0xFF);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			return 0;
 		}
 	}
@@ -233,7 +236,8 @@ public class TilePropertiesPanel extends JPanel {
 	public char getBlue() {
 		try {
 			return (char) (Integer.valueOf(tileBBIDField.getText()) & 0xFF);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			return 0;
 		}
 	}

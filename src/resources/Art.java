@@ -261,7 +261,8 @@ public class Art {
 			// There are 16 frames for the water.
 			if (i < 10) {
 				result[i] = screen.load(filename + "0" + String.valueOf(i) + ".png");
-			} else {
+			}
+			else {
 				result[i] = screen.load(filename + String.valueOf(i) + ".png");
 			}
 		}
@@ -273,7 +274,8 @@ public class Art {
 		URL url = null;
 		try {
 			urls = Art.class.getClassLoader().getResources(filename);
-		} catch (IOException e2) {
+		}
+		catch (IOException e2) {
 			e2.printStackTrace();
 		}
 		for (; urls.hasMoreElements();) {
@@ -285,22 +287,29 @@ public class Art {
 		Font result = null;
 		try {
 			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
-		} catch (FontFormatException e) {
+		}
+		catch (FontFormatException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
-		} catch (NullPointerException e) {
+		}
+		catch (NullPointerException e) {
 			try {
 				result = Font.createFont(Font.TRUETYPE_FONT, Art.class.getResourceAsStream(filename));
-			} catch (FontFormatException e1) {
+			}
+			catch (FontFormatException e1) {
 				e1.printStackTrace();
-			} catch (IOException e1) {
+			}
+			catch (IOException e1) {
 				e1.printStackTrace();
 				try {
 					result = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/font.ttf"));
-				} catch (FontFormatException e2) {
+				}
+				catch (FontFormatException e2) {
 					e2.printStackTrace();
-				} catch (IOException e2) {
+				}
+				catch (IOException e2) {
 					e2.printStackTrace();
 				}
 			}

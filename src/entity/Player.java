@@ -120,15 +120,18 @@ public class Player extends Entity {
 			if (facing != UP) {
 				facing = UP;
 			}
-		} else if (keys.down.isTappedDown || keys.S.isTappedDown) {
+		}
+		else if (keys.down.isTappedDown || keys.S.isTappedDown) {
 			if (facing != DOWN) {
 				facing = DOWN;
 			}
-		} else if (keys.left.isTappedDown || keys.A.isTappedDown) {
+		}
+		else if (keys.left.isTappedDown || keys.A.isTappedDown) {
 			if (facing != LEFT) {
 				facing = LEFT;
 			}
-		} else if (keys.right.isTappedDown || keys.D.isTappedDown) {
+		}
+		else if (keys.right.isTappedDown || keys.D.isTappedDown) {
 			if (facing != RIGHT) {
 				facing = RIGHT;
 			}
@@ -145,7 +148,8 @@ public class Player extends Entity {
 				this.lockWalking = true;
 				yAccel--;
 			}
-		} else if (keys.down.isPressedDown || keys.S.isPressedDown) {
+		}
+		else if (keys.down.isPressedDown || keys.S.isPressedDown) {
 			if (facing != DOWN) {
 				facing = DOWN;
 			}
@@ -153,7 +157,8 @@ public class Player extends Entity {
 				this.lockWalking = true;
 				yAccel++;
 			}
-		} else if (keys.left.isPressedDown || keys.A.isPressedDown) {
+		}
+		else if (keys.left.isPressedDown || keys.A.isPressedDown) {
 			if (facing != LEFT) {
 				facing = LEFT;
 			}
@@ -161,7 +166,8 @@ public class Player extends Entity {
 				this.lockWalking = true;
 				xAccel--;
 			}
-		} else if (keys.right.isPressedDown || keys.D.isPressedDown) {
+		}
+		else if (keys.right.isPressedDown || keys.D.isPressedDown) {
 			if (facing != RIGHT) {
 				facing = RIGHT;
 			}
@@ -456,17 +462,20 @@ public class Player extends Entity {
 				public void run() {
 					try {
 						Thread.sleep(250);
-					} catch (InterruptedException e) {
+					}
+					catch (InterruptedException e) {
 					}
 					isOnBicycle = true;
 					try {
 						Thread.sleep(250);
-					} catch (InterruptedException e) {
+					}
+					catch (InterruptedException e) {
 					}
 					Player.unlockMovements();
 				}
 			}).start();
-		} else
+		}
+		else
 			this.warningsTriggered = true;
 	}
 
@@ -480,12 +489,14 @@ public class Player extends Entity {
 			public void run() {
 				try {
 					Thread.sleep(250);
-				} catch (InterruptedException e) {
+				}
+				catch (InterruptedException e) {
 				}
 				isOnBicycle = false;
 				try {
 					Thread.sleep(250);
-				} catch (InterruptedException e) {
+				}
+				catch (InterruptedException e) {
 				}
 				Player.unlockMovements();
 			}
@@ -629,7 +640,8 @@ public class Player extends Entity {
 			if (!this.isOnBicycle && !movementLock) {
 				xPosition += xAccel * 2;
 				yPosition += yAccel * 2;
-			} else {
+			}
+			else {
 				xPosition += xAccel * 4;
 				yPosition += yAccel * 4;
 			}
@@ -640,7 +652,8 @@ public class Player extends Entity {
 				// Resets every flag that locks the player.
 				this.lockWalking = false;
 			}
-		} else {
+		}
+		else {
 			// Before we walk, check to see if the oldX and oldY are up-to-date with the latest X and Y.
 			if (this.oldXPosition != this.xPosition)
 				this.oldXPosition = this.xPosition;
@@ -665,11 +678,14 @@ public class Player extends Entity {
 	private void checkFacing() {
 		if (keys.up.isTappedDown || keys.up.isPressedDown || keys.W.isTappedDown || keys.W.isPressedDown) {
 			facing = UP;
-		} else if (keys.down.isTappedDown || keys.down.isPressedDown || keys.S.isTappedDown || keys.S.isPressedDown) {
+		}
+		else if (keys.down.isTappedDown || keys.down.isPressedDown || keys.S.isTappedDown || keys.S.isPressedDown) {
 			facing = DOWN;
-		} else if (keys.left.isTappedDown || keys.left.isPressedDown || keys.A.isTappedDown || keys.A.isPressedDown) {
+		}
+		else if (keys.left.isTappedDown || keys.left.isPressedDown || keys.A.isTappedDown || keys.A.isPressedDown) {
 			facing = LEFT;
-		} else if (keys.right.isTappedDown || keys.right.isPressedDown || keys.D.isTappedDown || keys.D.isPressedDown) {
+		}
+		else if (keys.right.isTappedDown || keys.right.isPressedDown || keys.D.isTappedDown || keys.D.isPressedDown) {
 			facing = RIGHT;
 		}
 	}
@@ -681,19 +697,23 @@ public class Player extends Entity {
 				if (animationTick >= 10) {
 					animationTick = 0;
 				}
-			} else if ((this.facing == DOWN && this.facingsBlocked[DOWN])) {
+			}
+			else if ((this.facing == DOWN && this.facingsBlocked[DOWN])) {
 				if (animationTick >= 10) {
 					animationTick = 0;
 				}
-			} else if ((this.facing == LEFT && this.facingsBlocked[LEFT])) {
+			}
+			else if ((this.facing == LEFT && this.facingsBlocked[LEFT])) {
 				if (animationTick >= 10) {
 					animationTick = 0;
 				}
-			} else if ((this.facing == RIGHT && this.facingsBlocked[RIGHT])) {
+			}
+			else if ((this.facing == RIGHT && this.facingsBlocked[RIGHT])) {
 				if (animationTick >= 10) {
 					animationTick = 0;
 				}
-			} else {
+			}
+			else {
 				if (animationTick >= 4)
 					animationTick = 0;
 			}
@@ -725,10 +745,12 @@ public class Player extends Entity {
 				walk();
 				handleMovementCheck();
 				controlTick();
-			} else {
+			}
+			else {
 				stopAnimation();
 			}
-		} else
+		}
+		else
 			jump();
 	}
 
@@ -754,7 +776,8 @@ public class Player extends Entity {
 				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 			else
 				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
-		} else if (this.lockJumping) {
+		}
+		else if (this.lockJumping) {
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
 			// Walking animation while in the air. Shouldn't jump when in water.
 			if (this.isOnBicycle)
@@ -762,7 +785,8 @@ public class Player extends Entity {
 			else
 				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 
-		} else {
+		}
+		else {
 			// Blocking animation. Possibly done to create a perfect loop.
 			if (!this.isInWater && !this.isOnBicycle) {
 				// Walking
@@ -770,13 +794,15 @@ public class Player extends Entity {
 					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
-			} else if (this.isInWater && !this.isOnBicycle) {
+			}
+			else if (this.isInWater && !this.isOnBicycle) {
 				// Surfing
 				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown || keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
-			} else if (!this.isInWater && this.isOnBicycle) {
+			}
+			else if (!this.isInWater && this.isOnBicycle) {
 				// Riding
 				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown || keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
 					output.npcBlit(Art.player_bicycle[facing][animationPointer], this.xOffset + x, this.yOffset + y);

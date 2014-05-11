@@ -73,11 +73,13 @@ public class EditorConstants {
 				if (line.startsWith("#")) {
 					data = null;
 					continue;
-				} else if (line.startsWith("-")) {
+				}
+				else if (line.startsWith("-")) {
 					// TODO: Modify GUI to categorize tiles into groups.
 					data = null;
 					continue;
-				} else if (line.startsWith("%")) {
+				}
+				else if (line.startsWith("%")) {
 					String trim = line.trim().replaceAll("\\s+", "").replaceAll("@", "00");
 					String[] tokens = trim.split("%");
 					data.name = tokens[1].replace('_', ' ');
@@ -115,13 +117,15 @@ public class EditorConstants {
 							data.areaType = i;
 							tileMap.put(data.editorID, data);
 						}
-					} else
+					}
+					else
 						tileMap.put(data.editorID, data);
 					id++;
 					data = null;
 				}
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Failed to load data correctly in EditorConstants.", e);
 		}

@@ -43,7 +43,8 @@ public class BaseBitmap {
 
 			BufferedImage image = ImageIO.read(BaseBitmap.this.getClass().getClassLoader().getResource(filename));
 			return load(image);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -73,7 +74,8 @@ public class BaseBitmap {
 				}
 			}
 			return results;
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;

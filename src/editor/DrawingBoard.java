@@ -65,7 +65,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 			render();
 			try {
 				Thread.sleep(1);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 			}
 		}
 	}
@@ -185,7 +186,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 						this.setBiomeTile(tiles[j] & 0xFF, g);
 						break;
 					}
-				} else
+				}
+				else
 					g.setColor(Color.white);
 				g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 				g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);

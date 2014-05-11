@@ -40,7 +40,8 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		dy = oldY - event.getY();
 		if (event.getButton() == MouseEvent.BUTTON3) {
 			panning = true;
-		} else if (event.getButton() == MouseEvent.BUTTON1) {
+		}
+		else if (event.getButton() == MouseEvent.BUTTON1) {
 			drawing = true;
 		}
 		editor.validate();
@@ -59,7 +60,8 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		mouseY = event.getY();
 		if (event.getButton() == MouseEvent.BUTTON1) {
 			drawing = true;
-		} else if (event.getButton() == MouseEvent.BUTTON3) {
+		}
+		else if (event.getButton() == MouseEvent.BUTTON3) {
 			panning = true;
 		}
 		editor.validate();
@@ -87,7 +89,8 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		oldY = event.getY() + dy;
 		if (event.getButton() == MouseEvent.BUTTON1) {
 			drawing = true;
-		} else if (event.getButton() == MouseEvent.BUTTON3) {
+		}
+		else if (event.getButton() == MouseEvent.BUTTON3) {
 			panning = true;
 		}
 		editor.validate();

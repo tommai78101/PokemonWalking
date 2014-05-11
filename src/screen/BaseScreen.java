@@ -177,7 +177,8 @@ public class BaseScreen extends BaseBitmap {
 				this.pixels[i] = 0xFF000000 | (0xAAAAAA - (this.pixels[i] & 0xFFFFFF));
 			this.tick++;
 			return true;
-		} else if (this.tick < 0x6) {
+		}
+		else if (this.tick < 0x6) {
 			for (int i = 0; i < this.pixels.length; i++)
 				this.pixels[i] = 0xFFAAAAAA;
 			this.tick++;
@@ -193,12 +194,14 @@ public class BaseScreen extends BaseBitmap {
 				this.pixels[i] = 0xFFAAAAAA;
 			this.tick++;
 			return true;
-		} else if (this.tick < 0x4) {
+		}
+		else if (this.tick < 0x4) {
 			for (int i = 0; i < this.pixels.length; i++)
 				this.pixels[i] = 0xFFF7F7F7;
 			this.tick++;
 			return true;
-		} else if (this.tick < 0x6) {
+		}
+		else if (this.tick < 0x6) {
 			for (int i = 0; i < this.pixels.length; i++)
 				this.pixels[i] = 0xFFAAAAAA;
 			this.tick++;

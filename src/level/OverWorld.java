@@ -123,7 +123,8 @@ public class OverWorld extends World {
 		if (dialogue.isDoneDisplayingDialogue()) {
 			dialogue.reset();
 			this.player.stopInteraction();
-		} else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
+		}
+		else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
 			int alpha = (player.getInteractionID() >> 24) & 0xFF;
 			switch (alpha) {
 			case 0x08: {// Sign

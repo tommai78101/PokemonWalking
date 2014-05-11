@@ -37,8 +37,8 @@ public abstract class Item {
 	public void setDescription(String value) {
 		this.description = value;
 	}
-	
-	public void setCategory(Inventory.Category category){
+
+	public void setCategory(Inventory.Category category) {
 		this.category = category;
 	}
 
@@ -55,8 +55,8 @@ public abstract class Item {
 	public String getDescription() {
 		return description;
 	}
-	
-	public Category getCategory(){
+
+	public Category getCategory() {
 		return this.category;
 	}
 
@@ -86,7 +86,8 @@ public abstract class Item {
 			// if ((this.description == null) ? (item.getDescription() != null) : !this.description.equals(item.getDescription()))
 			// return false;
 			return true;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return false;
 		}
 	}
@@ -110,21 +111,28 @@ public abstract class Item {
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("%")) {
 					itemText.type = ItemText.Type.getType(line.split("%")[1]);
-				} else if (line.startsWith("#")) {
+				}
+				else if (line.startsWith("#")) {
 					itemText.itemName = line.split("#")[1];
-				} else if (line.startsWith("@")) {
+				}
+				else if (line.startsWith("@")) {
 					itemText.description = line.split("@")[1];
-				} else if (line.startsWith("^")) {
+				}
+				else if (line.startsWith("^")) {
 					String value = line.split("\\^")[1];
-					if (value.equals("POTIONS")){
+					if (value.equals("POTIONS")) {
 						itemText.category = Category.POTIONS;
-					} else if (value.equals("KEYITEMS")){
+					}
+					else if (value.equals("KEYITEMS")) {
 						itemText.category = Category.KEYITEMS;
-					} else if (value.equals("POKEBALLS")){
+					}
+					else if (value.equals("POKEBALLS")) {
 						itemText.category = Category.POKEBALLS;
-					} else if (value.equals("TM_HM")){
-						itemText.category = Category.TM_HM;	
-					} else if (value.equals("ALL")){
+					}
+					else if (value.equals("TM_HM")) {
+						itemText.category = Category.TM_HM;
+					}
+					else if (value.equals("ALL")) {
 						itemText.skipCheckCategory = true;
 					}
 				}
@@ -136,7 +144,8 @@ public abstract class Item {
 				}
 			}
 			return result;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return null;
 		}
 	}

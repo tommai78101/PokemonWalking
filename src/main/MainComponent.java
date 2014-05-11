@@ -124,7 +124,8 @@ public class MainComponent extends Canvas implements Runnable {
 		final double nsPerTick = 1000000000.0 / 30.0;
 		try {
 			init();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			return;
 		}
@@ -168,7 +169,8 @@ public class MainComponent extends Canvas implements Runnable {
 
 			try {
 				Thread.sleep(1);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 				System.out.println("Something is wrong... No response.");
 				this.requestFocus();
 			}

@@ -61,7 +61,8 @@ public class InputHandler implements KeyListener {
 						public void run() {
 							try {
 								Thread.sleep(100);
-							} catch (InterruptedException e) {
+							}
+							catch (InterruptedException e) {
 							}
 							if (key.keyStateDown) {
 								key.isPressedDown = true;
@@ -70,7 +71,8 @@ public class InputHandler implements KeyListener {
 						}
 					});
 					break;
-				} else
+				}
+				else
 					break;
 			}
 		}

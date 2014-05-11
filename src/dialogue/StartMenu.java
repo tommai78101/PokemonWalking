@@ -92,7 +92,8 @@ public class StartMenu {
 		if (this.activation) {
 			prepareMenuText();
 			handleMenuSelection();
-		} else if (Player.isMovementsLocked())
+		}
+		else if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}
 
@@ -165,7 +166,8 @@ public class StartMenu {
 			if (this.menuCursorPosition > this.items.size() - 1)
 				this.menuCursorPosition = 0;
 			this.keys.down.lastKeyState = true;
-		} else if (!this.keys.up.lastKeyState && this.keys.up.keyStateDown) {
+		}
+		else if (!this.keys.up.lastKeyState && this.keys.up.keyStateDown) {
 			this.menuCursorPosition--;
 			if (this.menuCursorPosition < 0)
 				this.menuCursorPosition = this.items.size() - 1;
@@ -198,7 +200,8 @@ public class StartMenu {
 		try {
 			g.drawString(tokens[0], 0, StartMenu.DESCRIPTION_FIRST_LINE_Y);
 			g.drawString(tokens[1], 0, StartMenu.DESCRIPTION_SECOND_LINE_Y);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 		}
 	}
 

@@ -64,7 +64,8 @@ public class FileControl extends JPanel implements ActionListener {
 						BufferedImage img = editor.drawingBoardPanel.getMapImage();
 						File file = chooser.getSelectedFile();
 						ImageIO.write(img, "png", new File(file.getAbsolutePath() + "\\" + file.getName() + ".png"));
-					} catch (IOException e) {
+					}
+					catch (IOException e) {
 						e.printStackTrace();
 					}
 				}
@@ -79,13 +80,15 @@ public class FileControl extends JPanel implements ActionListener {
 						File f = opener.getSelectedFile();
 						BufferedImage image = ImageIO.read(f);
 						editor.drawingBoardPanel.openMapImage(image);
-					} catch (IOException e1) {
+					}
+					catch (IOException e1) {
 						e1.printStackTrace();
 					}
 				}
 				break;
 			}
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			return;
 		}
 	}

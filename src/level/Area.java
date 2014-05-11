@@ -104,7 +104,8 @@ public class Area {
 							break;
 						}
 					}
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					this.player.stopInteraction();
 				}
 
@@ -112,7 +113,8 @@ public class Area {
 				// (or what pixel the player is currently on top of).
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
 				this.checkCurrentPositionDataAndSetProperties();
-			} else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
+			}
+			else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
 				// A
 				// This goes with B. (30 lines down below.)
 				// It may be possible the player is still in the air, and hasn't done checking if the current pixel
@@ -123,7 +125,8 @@ public class Area {
 					return;
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
 				this.checkCurrentPositionDataAndSetProperties();
-			} else {
+			}
+			else {
 				this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 			}
 		}
@@ -217,7 +220,8 @@ public class Area {
 		PixelData data = null;
 		try {
 			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			data = null;
 		}
 		if (data != null) {
@@ -460,7 +464,8 @@ public class Area {
 		PixelData data;
 		try {
 			data = this.areaData.get(yPlayerPosition + yOffset).get(xPlayerPosition + xOffset);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return -1;
 		}
 		if (data != null) {
@@ -494,7 +499,8 @@ public class Area {
 		PixelData data;
 		try {
 			data = this.areaData.get(yPlayerPosition + yOffset).get(xPlayerPosition + xOffset);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return 0;
 		}
 		if (data != null) {
