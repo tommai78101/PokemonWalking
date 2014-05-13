@@ -34,7 +34,7 @@ public class Inventory extends SubMenu {
 	public enum Category {
 		POTIONS(0), KEYITEMS(1), POKEBALLS(2), TM_HM(3);
 		
-		public int id;
+		private int id;
 		
 		private Category(int value) {
 			this.id = value;

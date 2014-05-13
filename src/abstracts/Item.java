@@ -30,6 +30,12 @@ public abstract class Item {
 	protected Inventory.Category category;
 	protected boolean picked;
 	
+	private static final String TAG_POTIONS = "POTIONS";
+	private static final String TAG_KEYITEMS = "KEYITEMS";
+	private static final String TAG_POKEBALLS = "POKEBALLS";
+	private static final String TAG_TM_HM = "TM_HM";
+	private static final String TAG_ALL = "ALL";
+	
 	public Item(Game game, String name, String description, Inventory.Category category) {
 		setName(name);
 		setDescription(description);
@@ -127,20 +133,21 @@ public abstract class Item {
 					itemText.description = line.split("@")[1];
 				}
 				else if (line.startsWith("^")) {
+					//'^' is a special character, therefore, one must use backslashes to get the literal form.
 					String value = line.split("\\^")[1];
-					if (value.equals("POTIONS")) {
+					if (value.equals(TAG_POTIONS)) {
 						itemText.category = Category.POTIONS;
 					}
-					else if (value.equals("KEYITEMS")) {
+					else if (value.equals(TAG_KEYITEMS)) {
 						itemText.category = Category.KEYITEMS;
 					}
-					else if (value.equals("POKEBALLS")) {
+					else if (value.equals(TAG_POKEBALLS)) {
 						itemText.category = Category.POKEBALLS;
 					}
-					else if (value.equals("TM_HM")) {
+					else if (value.equals(TAG_TM_HM)) {
 						itemText.category = Category.TM_HM;
 					}
-					else if (value.equals("ALL")) {
+					else if (value.equals(TAG_ALL)) {
 						itemText.skipCheckCategory = true;
 					}
 				}
