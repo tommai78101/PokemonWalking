@@ -1,7 +1,11 @@
 /**
- * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
 package main;
@@ -11,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
 import level.OverWorld;
 import screen.BaseScreen;
 import abstracts.SubMenu;
@@ -33,15 +36,15 @@ public class Game {
 	private SubMenu subMenu;
 	private World overworld;
 	private final Player player;
-
+	
 	private Dialogue dialogue;
-
+	
 	public enum State {
 		GAME, PAUSED, INVENTORY
 	};
-
+	
 	private State state;
-
+	
 	/**
 	 * Creates the core component of the game.
 	 * 
@@ -50,7 +53,8 @@ public class Game {
 	 * @param BaseScreen
 	 *            Takes in a BaseScreen that displays all rendered graphics to the screen.
 	 * @param Keys
-	 *            Takes the Keys object the input handler receives from the player for the game to handle. The input handler must control this Keys object.
+	 *            Takes the Keys object the input handler receives from the player for the game to handle. The input handler must control this Keys
+	 *            object.
 	 * @see BaseScreen
 	 * @see NewInputHandler
 	 * */
@@ -66,7 +70,7 @@ public class Game {
 		this.subMenu = null;
 		this.state = State.GAME;
 	}
-
+	
 	/**
 	 * Handles rendered objects.
 	 * 
@@ -82,57 +86,57 @@ public class Game {
 		// TODO: Do rendering by calling "BaseScreen" variable and call one of many draw methods provided.
 		// TODO: Re-create the player's fixed position to camera's center, while everything else moves around.
 		// TODO: Overworld must be drawn while the player is moving around. Small areas can only be seen after the camera culls out the overworld.
-
+		
 		switch (this.state) {
-		case GAME: {
-			screen.clear(0xA4E767);
-			overworld.render(screen, player.getX(), player.getY());
-			// dialogue.displayText("Hello World.", screen, Dial)
-			// dialogue.render(screen, 6, 0, 3, 8);
-			// FIXME: Need to do something about the font having to be rendered by graphics and not screen.
-			// dialogue.renderTextGraphics(graphics);
-			// dialogue.renderText(graphics);
-			if (dialogue.isDisplayingDialogue())
-				dialogue.render(screen, player.getX(), player.getY(), graphics);
-			else
-				graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			break;
-		}
-		case INVENTORY: {
-			if (screen.getRenderingEffectTick() < (byte) 0x7) {
-				screen.flashing();
-				graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			}
-			else {
-				if (this.subMenu != null) {
-					this.subMenu.render(screen, graphics);
-
-				}
-			}
-			break;
-		}
-		case PAUSED: {
-			if (screen.getRenderingEffectTick() < (byte) 0x7) {
-				screen.flashing();
-				graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			}
-			else {
+			case GAME: {
 				screen.clear(0xA4E767);
 				overworld.render(screen, player.getX(), player.getY());
-				// dialogue.render(screen, player.getX(), player.getY(), graphics);
-				if (startMenu.isActivated()) {
-					startMenu.render(screen, graphics);
-				}
-				else {
-					// dialogue.render(screen, player.getX(), player.getY(), graphics);
+				// dialogue.displayText("Hello World.", screen, Dial)
+				// dialogue.render(screen, 6, 0, 3, 8);
+				// FIXME: Need to do something about the font having to be rendered by graphics and not screen.
+				// dialogue.renderTextGraphics(graphics);
+				// dialogue.renderText(graphics);
+				if (dialogue.isDisplayingDialogue())
+					dialogue.render(screen, player.getX(), player.getY(), graphics);
+				else
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+				break;
+			}
+			case INVENTORY: {
+				if (screen.getRenderingEffectTick() < (byte) 0x7) {
+					screen.flashing();
 					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				}
+				else {
+					if (this.subMenu != null) {
+						this.subMenu.render(screen, graphics);
+						
+					}
+				}
+				break;
 			}
-			break;
-		}
+			case PAUSED: {
+				if (screen.getRenderingEffectTick() < (byte) 0x7) {
+					screen.flashing();
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+				}
+				else {
+					screen.clear(0xA4E767);
+					overworld.render(screen, player.getX(), player.getY());
+					// dialogue.render(screen, player.getX(), player.getY(), graphics);
+					if (startMenu.isActivated()) {
+						startMenu.render(screen, graphics);
+					}
+					else {
+						// dialogue.render(screen, player.getX(), player.getY(), graphics);
+						graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					}
+				}
+				break;
+			}
 		}
 	}
-
+	
 	/**
 	 * Updates the game.
 	 * 
@@ -147,51 +151,51 @@ public class Game {
 		 */
 		// player.tick();
 		switch (this.state) {
-		case GAME: {
-			overworld.tick();
-			dialogue.tick();
-			checkPausing();
-			break;
-		}
-		case INVENTORY: {
-			if (this.subMenu != null) {
-				this.subMenu.tick();
-			}
-			else
+			case GAME: {
+				overworld.tick();
+				dialogue.tick();
+				checkPausing();
 				break;
-			if (!this.subMenu.isActivated()) {
-				this.state = State.PAUSED;
-				screen.setRenderingEffectTick((byte) 0x0);
 			}
-			break;
-		}
-		case PAUSED: {
-			if (startMenu.isActivated())
-				startMenu.tick();
-			else
-				startMenu.openMenu();
-			checkUnpausing();
-			if (startMenu.isActionEventAvailable())
-				handleActionEvent(startMenu.getActionEvent());
-			break;
-		}
+			case INVENTORY: {
+				if (this.subMenu != null) {
+					this.subMenu.tick();
+				}
+				else
+					break;
+				if (!this.subMenu.isActivated()) {
+					this.state = State.PAUSED;
+					screen.setRenderingEffectTick((byte) 0x0);
+				}
+				break;
+			}
+			case PAUSED: {
+				if (startMenu.isActivated())
+					startMenu.tick();
+				else
+					startMenu.openMenu();
+				checkUnpausing();
+				if (startMenu.isActionEventAvailable())
+					handleActionEvent(startMenu.getActionEvent());
+				break;
+			}
 		}
 	}
-
+	
 	/**
 	 * Currently unused.
 	 * */
 	public void save() {
 		// TODO: Save data.
 	}
-
+	
 	/**
 	 * Currently unused.
 	 * */
 	public void load() {
 		// TODO: Load data.
 	}
-
+	
 	/**
 	 * Currently unused.
 	 * */
@@ -200,18 +204,18 @@ public class Game {
 		// this.xScroll = xCamCenter;
 		// this.yScroll = yCamCenter;
 	}
-
+	
 	/**
 	 * Currently unused. However, this is executed in the render() code.
 	 * */
 	public void setCameraRelativeToArea(int areaXPos, int areaYPos) {
 		// Not used at the moment.
-
+		
 		// cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
 		// this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
 		// this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
 	}
-
+	
 	// public void sendAction(Map.Entry<String, String> entry) {
 	// //TODO: Add actual game menu actions the player can do.
 	// String key = entry.getKey();
@@ -222,25 +226,25 @@ public class Game {
 	// this.player.getsOffBicycle();
 	// }
 	// }
-
+	
 	public Player getPlayer() {
 		return this.player;
 	}
-
+	
 	public StartMenu getStartMenu() {
 		return this.startMenu;
 	}
-
+	
 	public void setState(State state) {
 		this.state = state;
 	}
-
+	
 	public BaseScreen getBaseScreen() {
 		return this.screen;
 	}
-
+	
 	// ---------------------------------------------- PRIVATE METHODS -------------------------------------------------
-
+	
 	private void handleActionEvent(Map.Entry<Integer, SubMenu> entry) {
 		String str = entry.getValue().getName();
 		if (str.equals(StartMenu.ITEM_NAME_BICYCLE)) {
@@ -272,42 +276,42 @@ public class Game {
 		this.startMenu.clearActionEvent();
 		this.startMenu.closeMenu();
 	}
-
+	
 	private void checkPausing() {
 		Keys keys = this.player.keys;
 		if (!keys.START.lastKeyState && keys.START.keyStateDown) {
 			switch (this.state) {
-			case GAME:
-				if (this.player.isLockedWalking() || this.player.isLockedJumping()) {
+				case GAME:
+					if (this.player.isLockedWalking() || this.player.isLockedJumping()) {
+						break;
+					}
+					this.state = State.PAUSED;
+					if (!this.startMenu.isActivated())
+						this.startMenu.openMenu();
+					if (!Player.isMovementsLocked())
+						Player.lockMovements();
 					break;
-				}
-				this.state = State.PAUSED;
-				if (!this.startMenu.isActivated())
-					this.startMenu.openMenu();
-				if (!Player.isMovementsLocked())
-					Player.lockMovements();
-				break;
-			default:
-				break;
+				default:
+					break;
 			}
 			keys.START.lastKeyState = true;
 		}
 	}
-
+	
 	private void checkUnpausing() {
 		Keys keys = this.player.keys;
 		switch (this.state) {
-		case PAUSED:
-			if ((!keys.START.lastKeyState && keys.START.keyStateDown) || ((keys.X.keyStateDown || keys.PERIOD.keyStateDown) && (!keys.X.lastKeyState || !keys.PERIOD.lastKeyState))) {
-				this.state = State.GAME;
-				if (Player.isMovementsLocked())
-					Player.unlockMovements();
-				keys.START.lastKeyState = true;
-			}
-			break;
-		default:
-			break;
+			case PAUSED:
+				if ((!keys.START.lastKeyState && keys.START.keyStateDown) || ((keys.X.keyStateDown || keys.PERIOD.keyStateDown) && (!keys.X.lastKeyState || !keys.PERIOD.lastKeyState))) {
+					this.state = State.GAME;
+					if (Player.isMovementsLocked())
+						Player.unlockMovements();
+					keys.START.lastKeyState = true;
+				}
+				break;
+			default:
+				break;
 		}
-
+		
 	}
 }

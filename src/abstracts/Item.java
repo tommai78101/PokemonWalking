@@ -1,11 +1,19 @@
+/**
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
+ * */
+
 package abstracts;
 
 import item.ItemText;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-
 import level.Area;
 import main.Game;
 import resources.Art;
@@ -15,13 +23,13 @@ import submenu.Inventory.Category;
 import entity.Player;
 
 public abstract class Item {
-
+	
 	protected String name;
 	protected String description;
 	protected Game game;
 	protected Inventory.Category category;
 	protected boolean picked;
-
+	
 	public Item(Game game, String name, String description, Inventory.Category category) {
 		setName(name);
 		setDescription(description);
@@ -29,50 +37,50 @@ public abstract class Item {
 		this.game = game;
 		this.picked = false;
 	}
-
+	
 	public void setName(String value) {
 		this.name = value;
 	}
-
+	
 	public void setDescription(String value) {
 		this.description = value;
 	}
-
+	
 	public void setCategory(Inventory.Category category) {
 		this.category = category;
 	}
-
+	
 	public void renderTiles(BaseScreen output, int xOffset, int yOffset) {
 		if (!this.picked) {
 			output.blit(Art.item, xOffset, yOffset);
 		}
 	}
-
+	
 	public String getName() {
 		return name;
 	}
-
+	
 	public String getDescription() {
 		return description;
 	}
-
+	
 	public Category getCategory() {
 		return this.category;
 	}
-
+	
 	public void pick() {
 		this.picked = true;
 	}
-
+	
 	public void drop() {
 		this.picked = false;
 	}
-
+	
 	public void dropAt(Area area, Player player) {
 		this.picked = false;
 		// TODO: Add function that allows the item to be placed at.
 	}
-
+	
 	@Override
 	public boolean equals(Object object) {
 		try {
@@ -91,16 +99,16 @@ public abstract class Item {
 			return false;
 		}
 	}
-
+	
 	@Override
 	public int hashCode() {
 		int hash = 3;
 		hash = 53 * hash + ((this.name != null) ? this.name.hashCode() : 0);
 		return hash;
 	}
-
+	
 	public abstract void doAction();
-
+	
 	public static HashMap<Integer, ItemText> loadItemResources(String filename) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));

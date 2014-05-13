@@ -1,7 +1,11 @@
 /**
- * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
 package editor;
@@ -12,31 +16,29 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
 import java.util.Map;
-
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-
 import abstracts.Tile;
 
 public class ControlPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7481148146432931992L;
-
+	
 	private TilePropertiesPanel propertiesPanel; // Part of Control Panel
 	private String iconName; // Used to display name in the status panel of Level Editor
 	private LevelEditor editor; // reference to parent
 	private Data selectedData; // reference to selected data.
-
+	
 	public ControlPanel(LevelEditor editor) {
 		this.editor = editor;
 		this.selectedData = new Data();
 		this.selectedData.editorID = 0;
 		this.selectedData.filepath = "no_png.png";
-
+		
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
-
+		
 		JPanel iconsPanel = new JPanel();
 		iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.Y_AXIS));
 		EditorConstants constants = EditorConstants.getInstance();
@@ -47,10 +49,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 			d.button.addActionListener(this);
 			iconsPanel.add(d.button);
 		}
-
+		
 		JScrollPane scrollPanel = new JScrollPane(iconsPanel) {
 			private static final long serialVersionUID = 1L;
-
+			
 			@Override
 			public Dimension getPreferredSize() {
 				int maxWidth = 50;
@@ -62,7 +64,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 					dim.height = maxHeight;
 				return dim;
 			}
-
+			
 			@Override
 			public Dimension getMaximumSize() {
 				return getPreferredSize();
@@ -72,14 +74,14 @@ public class ControlPanel extends JPanel implements ActionListener {
 		scrollPanel.createVerticalScrollBar();
 		scrollPanel.setVisible(true);
 		this.add(scrollPanel);
-
+		
 		this.propertiesPanel = new TilePropertiesPanel();
 		this.add(propertiesPanel);
-
+		
 		this.propertiesPanel.setVisible(true);
 		this.setVisible(true);
 	}
-
+	
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		JButton button = (JButton) event.getSource();
@@ -95,15 +97,15 @@ public class ControlPanel extends JPanel implements ActionListener {
 		}
 		editor.validate();
 	}
-
+	
 	public String getPickedEntityName() {
 		return this.iconName;
 	}
-
+	
 	public Data getSelectedData() {
 		return this.selectedData;
 	}
-
+	
 	public TilePropertiesPanel getPropertiesPanel() {
 		return this.propertiesPanel;
 	}

@@ -1,7 +1,11 @@
 /**
- * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
 package dialogue;
@@ -11,7 +15,6 @@ import java.awt.Graphics;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
-
 import main.Game;
 import main.Keys;
 import main.MainComponent;
@@ -27,12 +30,12 @@ public class StartMenu {
 	// Description area
 	private static final int DESCRIPTION_FIRST_LINE_Y = (Tile.HEIGHT * 7) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 8) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
-
+	
 	// String constants
 	public static final String ITEM_NAME_BICYCLE = "BICYCLE";
 	public static final String ITEM_NAME_INVENTORY = "PACK";
 	public static final String ITEM_NAME_EXIT = "EXIT";
-
+	
 	private boolean activation;
 	private ArrayList<Map.Entry<Integer, SubMenu>> items = new ArrayList<Map.Entry<Integer, SubMenu>>();
 	private int menuCursorPosition;
@@ -41,7 +44,7 @@ public class StartMenu {
 	private String[] tokens;
 	private Map.Entry<Integer, SubMenu> actionEvent;
 	private Inventory inventory;
-
+	
 	public StartMenu(Game game) {
 		this.activation = false;
 		this.menuCursorPosition = 0;
@@ -49,7 +52,7 @@ public class StartMenu {
 		this.keys = game.getPlayer().keys;
 		this.actionEvent = null;
 	}
-
+	
 	public StartMenu initialize() {
 		SubMenu bicycle = new DummyMenu(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle", this.game);
 		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game).initialize(keys);
@@ -59,11 +62,11 @@ public class StartMenu {
 		this.addMenuItem(exit);
 		return this;
 	}
-
+	
 	public void addMenuItem(SubMenu SubMenu) {
 		this.items.add(new AbstractMap.SimpleEntry<Integer, SubMenu>(items.size(), SubMenu));
 	}
-
+	
 	public void removeMenuItem(int position) {
 		for (int i = 0; i < items.size(); i++) {
 			Map.Entry<Integer, SubMenu> entry = items.get(i);
@@ -75,7 +78,7 @@ public class StartMenu {
 			}
 		}
 	}
-
+	
 	public void tick() {
 		// if (!this.keys.START.lastKeyState && this.keys.START.keyStateDown) {
 		// if (!Player.isMovementsLocked())
@@ -96,7 +99,7 @@ public class StartMenu {
 		else if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}
-
+	
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.activation) {
 			Dialogue.renderBox(output, 5, 0, 4, items.size());
@@ -107,42 +110,42 @@ public class StartMenu {
 			this.renderMenuDescriptionText(graphics);
 		}
 	}
-
+	
 	public Map.Entry<Integer, SubMenu> getActionEvent() {
 		return this.actionEvent;
 	}
-
+	
 	public boolean isActionEventAvailable() {
 		return (this.actionEvent != null);
 	}
-
+	
 	public void clearActionEvent() {
 		this.actionEvent = null;
 	}
-
+	
 	public void closeMenu() {
 		this.activation = false;
 		if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}
-
+	
 	public void openMenu() {
 		this.activation = true;
 		this.menuCursorPosition = 0;
 	}
-
+	
 	public boolean isActivated() {
 		return this.activation;
 	}
-
+	
 	public SubMenu getSubMenu() {
 		return this.items.get(this.menuCursorPosition).getValue();
 	}
-
+	
 	public Inventory getInventory() {
 		return this.inventory;
 	}
-
+	
 	// ------------------------- PRIVATE METHODS -----------------------------------
 	private void prepareMenuText() {
 		Map.Entry<Integer, SubMenu> entry = this.items.get(this.menuCursorPosition);
@@ -157,7 +160,7 @@ public class StartMenu {
 		}
 		this.tokens = Dialogue.toLines(item.getDescription(), Dialogue.HALF_STRING_LENGTH);
 	}
-
+	
 	private void handleMenuSelection() {
 		if (!Player.isMovementsLocked())
 			Player.lockMovements();
@@ -173,7 +176,7 @@ public class StartMenu {
 				this.menuCursorPosition = this.items.size() - 1;
 			this.keys.up.lastKeyState = true;
 		}
-
+		
 		// Menu input mechanism
 		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 			this.keys.Z.lastKeyState = true;
@@ -182,7 +185,7 @@ public class StartMenu {
 			this.activation = true;
 		}
 	}
-
+	
 	private void renderMenuText(Graphics g) {
 		g.setFont(Art.font);
 		g.setColor(Color.black);
@@ -193,7 +196,7 @@ public class StartMenu {
 			}
 		}
 	}
-
+	
 	private void renderMenuDescriptionText(Graphics g) {
 		g.setFont(Art.font);
 		g.setColor(Color.black);
@@ -204,9 +207,9 @@ public class StartMenu {
 		catch (Exception e) {
 		}
 	}
-
+	
 	// ------------------------- STATIC METHODS --------------------------------------
-
+	
 	public static void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {

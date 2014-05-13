@@ -1,7 +1,11 @@
 /**
- * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
 package screen;
@@ -10,20 +14,19 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
-
 import javax.imageio.ImageIO;
 
 public class BaseBitmap {
 	protected int[] pixels;
 	protected int width;
 	protected int height;
-
+	
 	public BaseBitmap(int w, int h) {
 		this.width = w;
 		this.height = h;
 		this.pixels = new int[w * h];
 	}
-
+	
 	public BaseBitmap(int w, int h, int[] p) {
 		this.width = w;
 		this.height = h;
@@ -31,7 +34,7 @@ public class BaseBitmap {
 		for (int i = 0; i < p.length; i++)
 			this.pixels[i] = p[i];
 	}
-
+	
 	public BaseBitmap load(String filename) {
 		try {
 			// Prints out the bitmap filename. If there's something wrong, it won't print it out.
@@ -40,7 +43,7 @@ public class BaseBitmap {
 				url = urls.nextElement();
 				System.out.println(url.toString());
 			}
-
+			
 			BufferedImage image = ImageIO.read(BaseBitmap.this.getClass().getClassLoader().getResource(filename));
 			return load(image);
 		}
@@ -49,17 +52,17 @@ public class BaseBitmap {
 		}
 		return null;
 	}
-
+	
 	public BaseBitmap load(BufferedImage image) {
 		if (image == null)
 			return null;
-
+		
 		int width = image.getWidth();
 		int height = image.getHeight();
-
+		
 		return new BaseBitmap(width, height, image.getRGB(0, 0, width, height, null, 0, width));
 	}
-
+	
 	public BaseBitmap[][] cut(String filename, int w, int h, int clipW, int clipH) {
 		try {
 			// BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
@@ -80,15 +83,15 @@ public class BaseBitmap {
 		}
 		return null;
 	}
-
+	
 	public int getWidth() {
 		return this.width;
 	}
-
+	
 	public int getHeight() {
 		return this.height;
 	}
-
+	
 	public int[] getPixels() {
 		return this.pixels;
 	}

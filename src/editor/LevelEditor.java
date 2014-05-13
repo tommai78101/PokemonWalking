@@ -1,7 +1,11 @@
 /**
- * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
 package editor;
@@ -11,7 +15,6 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
-
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -20,19 +23,19 @@ public class LevelEditor extends JFrame {
 	public static final int WIDTH = 160;
 	public static final int HEIGHT = 144;
 	public static final int SIZE = 3;
-
+	
 	private ArrayList<Data> filepaths = new ArrayList<Data>();
-
+	
 	public ControlPanel controlPanel;
 	public FileControl fileControlPanel;
 	public DrawingBoard drawingBoardPanel;
 	public TilePropertiesPanel propertiesPanel;
 	public StatusPanel statusPanel;
-
+	
 	public String message;
 	public boolean running;
 	public EditorInput input;
-
+	
 	public LevelEditor(String name) {
 		super(name);
 		running = true;
@@ -41,22 +44,22 @@ public class LevelEditor extends JFrame {
 		this.setPreferredSize(size);
 		this.setMinimumSize(size);
 		this.setMaximumSize(size);
-
+		
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
 		this.setVisible(true);
-
+		
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
 				running = false;
 			}
 		});
-
+		
 		// final File folder = new File("res");
 		// getAllFiles(folder);
-
+		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -96,7 +99,7 @@ public class LevelEditor extends JFrame {
 			}
 		});
 	}
-
+	
 	@Override
 	public void validate() {
 		super.validate();
@@ -116,11 +119,11 @@ public class LevelEditor extends JFrame {
 			}
 		});
 	}
-
+	
 	public ArrayList<Data> getResourceFilePaths() {
 		return this.filepaths;
 	}
-
+	
 	public static void main(String[] args) {
 		new LevelEditor("Level Editor (Hobby)");
 	}

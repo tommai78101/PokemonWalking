@@ -1,14 +1,17 @@
 /**
- * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
 package dialogue;
 
 import item.DummyItem;
 import item.ItemText;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.io.BufferedReader;
@@ -18,7 +21,6 @@ import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
-
 import level.WorldConstants;
 import main.Game;
 import main.Keys;
@@ -39,18 +41,18 @@ public class Dialogue {
 	// When counting from left of the dialog to the right of the text's first letter.
 	// This is also how far the arrow is from the right of the dialog.
 	public static final int TEXT_SPACING_WIDTH = 8;
-
+	
 	// Background dialog color is 0xFFF8F8F8, or all RGB values are 248/255.
 	// Font size
 	public static final int FONT_SIZE = 24;
-
+	
 	// Dialogue max string length per line.
 	public static final int MAX_STRING_LENGTH = 18;
 	public static final int HALF_STRING_LENGTH = 9;
-
+	
 	// Styles
 	public static final int DIALOGUE_STYLE_SPEECH = 0xF1;
-
+	
 	// TODO: Optimize this, to make way for other types of dialogues to use.
 	private String[] tokens;
 	private int tokenPointer;
@@ -64,15 +66,15 @@ public class Dialogue {
 	private int secondLineIterator;
 	private boolean doneDisplayingDialogue;
 	private boolean itemPickedDialogue;
-
+	
 	private Keys input;
 	private Game game;
-
+	
 	// ---------------------------------------
 	private boolean isMenuActivated;
 	private ArrayList<Map.Entry<String, String>> menuItems = new ArrayList<Map.Entry<String, String>>();
 	private Thread itemDialogueThread;
-
+	
 	public Dialogue(Keys input, Game game) {
 		this.input = input;
 		this.game = game;
@@ -82,13 +84,13 @@ public class Dialogue {
 		this.nextTick = false;
 		this.tokenPointer = 0;
 		this.isMenuActivated = false;
-
+		
 		menuItems.add(new AbstractMap.SimpleEntry<String, String>("BICYCLE", "Use your bicycle."));
 		menuItems.add(new AbstractMap.SimpleEntry<String, String>("TEMP", "Do nothing."));
-
+		
 		this.itemDialogueThread = null;
 	}
-
+	
 	/**
 	 * Renders the dialogue box.
 	 * 
@@ -111,7 +113,7 @@ public class Dialogue {
 			output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
 		}
 	}
-
+	
 	/**
 	 * Hides the dialog by making it disappear from the screen.
 	 * 
@@ -132,7 +134,7 @@ public class Dialogue {
 			this.repeatDialogueTick = 0xF;
 		}
 	}
-
+	
 	/**
 	 * Renders the text onto the screen.
 	 * 
@@ -156,7 +158,7 @@ public class Dialogue {
 		catch (Exception e) {
 			// Ignore. Silently catch the any sorts of exception, and just let the game flow on.
 		}
-
+		
 		// if (this.isMenuActivated) {
 		// for (int i = 0; i < menuItems.size(); i++) {
 		// //TODO: We need to have an arrow pointing at the menu items.
@@ -166,17 +168,18 @@ public class Dialogue {
 		// }
 		// }
 	}
-
+	
 	/**
 	 * Updates the dialogues on a per-tick basis.
 	 * 
 	 * <p>
-	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when displaying dialogues. More information can be found by reading the comments in this method code.
+	 * Note that there is a slight exception handling abuse. It is used to thwart away hidden bugs that can contribute to erratic text behavior when
+	 * displaying dialogues. More information can be found by reading the comments in this method code.
 	 * 
 	 * @return Nothing.
 	 * */
 	public void tick() {
-
+		
 		// if (!this.input.START.lastKeyState && this.input.START.keyStateDown) {
 		// isMenuActivated = !isMenuActivated;
 		// this.input.START.lastKeyState = true;
@@ -237,7 +240,7 @@ public class Dialogue {
 		if (this.repeatDialogueTick > 0)
 			this.repeatDialogueTick--;
 	}
-
+	
 	// private void prepareDialogueText() {
 	// Player player = this.game.getPlayer();
 	// Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
@@ -250,7 +253,7 @@ public class Dialogue {
 	// }
 	// }
 	// }
-
+	
 	// private void menuDialogueText() {
 	// String menuLine = menuItems.get(menuPointerPosition).getValue();
 	// this.tokens = this.toLines(menuLine, HALF_STRING_LENGTH);
@@ -276,7 +279,7 @@ public class Dialogue {
 	// }
 	// this.doneDisplayingDialogue = false;
 	// }
-
+	
 	// private void menuDialogueHandling() {
 	// //Player input mechanism
 	// if (!Player.isMovementsLocked())
@@ -304,14 +307,14 @@ public class Dialogue {
 	// this.isMenuActivated = false;
 	// }
 	// }
-
+	
 	private void warningText() {
 		this.tokens = Dialogue.toLines("There's a time and place for everything, but not now.", MAX_STRING_LENGTH);
 		this.showDialog = true;
 		this.doneDisplayingDialogue = false;
 		this.firstLineIterator = this.secondLineIterator = 0;
 	}
-
+	
 	private void speechDialogueHandling() {
 		boolean result1 = false, result2 = false;
 		try {
@@ -370,7 +373,7 @@ public class Dialogue {
 				this.itemDialogueThread.start();
 		}
 	}
-
+	
 	/**
 	 * Creates a set of lines for use with the dialogues from a given dialogue message.
 	 * 
@@ -385,45 +388,45 @@ public class Dialogue {
 	 * */
 	public void createText(int key, int interactionID) {
 		switch (key) {
-		case 0x08: {// Sign
-			for (DialogueText dt : WorldConstants.dialogues) {
-				if (dt.dialogueID == interactionID) {
-					this.tokens = toLines(dt.dialogueMessage, MAX_STRING_LENGTH);
+			case 0x08: {// Sign
+				for (DialogueText dt : WorldConstants.dialogues) {
+					if (dt.dialogueID == interactionID) {
+						this.tokens = toLines(dt.dialogueMessage, MAX_STRING_LENGTH);
+						this.showDialog = true;
+						this.doneDisplayingDialogue = false;
+						this.itemPickedDialogue = false;
+						break;
+					}
+				}
+				break;
+			}
+			case 0x0B: { // Item
+				Inventory inventory = this.game.getStartMenu().getInventory();
+				ItemText itemText = WorldConstants.items.get(interactionID);
+				Item dummy = null;
+				switch (itemText.type) {
+					case DUMMY:
+						dummy = new DummyItem(this.game, itemText.itemName, itemText.description, itemText.category);
+						break;
+					default:
+						dummy = null;
+						break;
+				}
+				if (dummy != null) {
+					inventory.addItem(dummy);
+					this.tokens = toLines("Picked up " + dummy.getName() + "!", MAX_STRING_LENGTH);
 					this.showDialog = true;
 					this.doneDisplayingDialogue = false;
-					this.itemPickedDialogue = false;
-					break;
+					this.itemPickedDialogue = true;
+					this.next = false;
+					this.nextTick = false;
 				}
-			}
-			break;
-		}
-		case 0x0B: { // Item
-			Inventory inventory = this.game.getStartMenu().getInventory();
-			ItemText itemText = WorldConstants.items.get(interactionID);
-			Item dummy = null;
-			switch (itemText.type) {
-			case DUMMY:
-				dummy = new DummyItem(this.game, itemText.itemName, itemText.description, itemText.category);
-				break;
-			default:
-				dummy = null;
 				break;
 			}
-			if (dummy != null) {
-				inventory.addItem(dummy);
-				this.tokens = toLines("Picked up " + dummy.getName() + "!", MAX_STRING_LENGTH);
-				this.showDialog = true;
-				this.doneDisplayingDialogue = false;
-				this.itemPickedDialogue = true;
-				this.next = false;
-				this.nextTick = false;
-			}
-			break;
 		}
-		}
-
+		
 	}
-
+	
 	/**
 	 * Sets the dialogue checkpoint to true.
 	 * 
@@ -440,20 +443,21 @@ public class Dialogue {
 	// public void setDialogCheckpoint() {
 	// //this.dialogs.put(this.dialogKeyID, true);
 	// }
-
+	
 	/**
 	 * Checks to see if the dialogue checkpoint has been set.
 	 * 
 	 * @param key
 	 *            The dialogue ID used to identify the dialogue needed to check.
-	 * @return True, if the dialogue of the dialogue ID given has been set. False, if there are no checkpoints set, or if the dialogue of the dialogue ID given has not been set.
+	 * @return True, if the dialogue of the dialogue ID given has been set. False, if there are no checkpoints set, or if the dialogue of the dialogue
+	 *         ID given has not been set.
 	 * */
 	// public boolean isDialogCheckpointSet(int key) {
 	// if (this.dialogs.isEmpty())
 	// return false;
 	// return this.dialogs.get(key);
 	// }
-
+	
 	public void render(BaseScreen screen, int offsetX, int offsetY, Graphics g) {
 		screen.disableRenderHalf();
 		this.renderDialog(screen, 0, 6, 9, 2);
@@ -466,7 +470,7 @@ public class Dialogue {
 		// screen.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuPointerPosition * Tile.HEIGHT);
 		// }
 	}
-
+	
 	/**
 	 * Checks to see if the dialogue is allowed to be shown.
 	 * 
@@ -475,43 +479,43 @@ public class Dialogue {
 	public boolean isDisplayingDialogue() {
 		return this.showDialog;
 	}
-
+	
 	public boolean isDoneDisplayingDialogue() {
 		return this.doneDisplayingDialogue;
 	}
-
+	
 	public boolean isMenuActivated() {
 		return this.isMenuActivated;
 	}
-
+	
 	public void reset() {
 		this.showDialog = false;
 		if (this.repeatDialogueTick <= 0)
 			this.doneDisplayingDialogue = false;
 	}
-
+	
 	// ------------------------- STATIC FINAL METHODS ONLY -------------------------------
-
+	
 	public static final int getDialogueX() {
 		return 0;
 	}
-
+	
 	public static final int getDialogueY() {
 		return (MainComponent.GAME_HEIGHT - Dialogue.HEIGHT);
 	}
-
+	
 	public static final int getDialogueTextStartingX() {
 		return Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE;
 	}
-
+	
 	public static final int getDialogueTextStartingY() {
 		return (Dialogue.getDialogueY() * MainComponent.GAME_SCALE) + Dialogue.FIRST_LINE_SPACING_HEIGHT * MainComponent.GAME_SCALE + Dialogue.FONT_SIZE;
 	}
-
+	
 	public static final int getDialogueTextSecondLineStartingY() {
 		return (Dialogue.getDialogueY() * MainComponent.GAME_SCALE) + Dialogue.SECOND_LINE_SPACING_HEIGHT * MainComponent.GAME_SCALE + Dialogue.FONT_SIZE;
 	}
-
+	
 	public static ArrayList<DialogueText> loadDialogues(String filename) {
 		ArrayList<DialogueText> result = new ArrayList<DialogueText>();
 		try {
@@ -545,7 +549,7 @@ public class Dialogue {
 		}
 		return null;
 	}
-
+	
 	public static String[] toLines(String all, final int regex) {
 		ArrayList<String> lines = new ArrayList<>();
 		String[] words = all.split("\\s");
@@ -574,14 +578,14 @@ public class Dialogue {
 			lines.add(line);
 		return lines.toArray(new String[lines.size()]);
 	}
-
+	
 	public static void renderBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
 		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
 		}
 		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-
+		
 		for (int j = 0; j < centerHeight - 1; j++) {
 			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
 			for (int i = 0; i < centerWidth - 1; i++) {
@@ -589,7 +593,7 @@ public class Dialogue {
 			}
 			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
 		}
-
+		
 		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));

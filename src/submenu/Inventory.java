@@ -1,21 +1,23 @@
 /**
- * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
 package submenu;
 
 import item.DummyItem;
 import item.ItemText;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import level.WorldConstants;
 import main.Game;
 import main.Keys;
@@ -28,16 +30,16 @@ import abstracts.Tile;
 import dialogue.Dialogue;
 
 public class Inventory extends SubMenu {
-
+	
 	public enum Category {
 		POTIONS(0), KEYITEMS(1), POKEBALLS(2), TM_HM(3);
-
+		
 		public int id;
-
+		
 		private Category(int value) {
 			this.id = value;
 		}
-
+		
 		public static Category getWrapped(int value) {
 			Category[] categories = Category.values();
 			if (value < 0)
@@ -50,12 +52,12 @@ public class Inventory extends SubMenu {
 			}
 			return categories[0];
 		}
-
+		
 		public int getID() {
 			return id;
 		}
 	};
-
+	
 	private Keys keys;
 	private List<Map.Entry<Item, Integer>> potions;
 	private List<Map.Entry<Item, Integer>> keyItems;
@@ -66,7 +68,7 @@ public class Inventory extends SubMenu {
 	private int itemListSpan = 0;
 	private Category category;
 	private byte tick = (byte) 0x0;
-
+	
 	// TODO: Continue to work on this.
 	public Inventory(String name, String enabled, String disabled, Game game) {
 		super(name, enabled, disabled, game);
@@ -83,26 +85,26 @@ public class Inventory extends SubMenu {
 		this.arrowPosition = 0;
 		this.category = Category.POTIONS;
 	}
-
+	
 	private void renderText(Graphics g) {
 		if (tick >= (byte) 0x4) {
 			g.setFont(Art.font);
 			g.setColor(Color.black);
-
+			
 			List<Map.Entry<Item, Integer>> list = null;
 			switch (this.category) {
-			case POTIONS:
-				list = potions;
-				break;
-			case KEYITEMS:
-				list = keyItems;
-				break;
-			case POKEBALLS:
-				list = pokeballs;
-				break;
-			case TM_HM:
-				list = TMs_HMs;
-				break;
+				case POTIONS:
+					list = potions;
+					break;
+				case KEYITEMS:
+					list = keyItems;
+					break;
+				case POKEBALLS:
+					list = pokeballs;
+					break;
+				case TM_HM:
+					list = TMs_HMs;
+					break;
 			}
 			try {
 				for (int i = 0; i < 5; i++) {
@@ -130,16 +132,16 @@ public class Inventory extends SubMenu {
 		}
 		else
 			tick++;
-
+		
 	}
-
+	
 	@Override
 	public SubMenu initialize(Keys keys) {
 		// TODO: Add new inventory art for background.
 		this.keys = keys;
 		return Inventory.this;
 	}
-
+	
 	@Override
 	public void tick() {
 		if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
@@ -154,18 +156,18 @@ public class Inventory extends SubMenu {
 		if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
 			List<Map.Entry<Item, Integer>> list = null;
 			switch (this.category) {
-			case POTIONS:
-				list = potions;
-				break;
-			case KEYITEMS:
-				list = keyItems;
-				break;
-			case POKEBALLS:
-				list = pokeballs;
-				break;
-			case TM_HM:
-				list = TMs_HMs;
-				break;
+				case POTIONS:
+					list = potions;
+					break;
+				case KEYITEMS:
+					list = keyItems;
+					break;
+				case POKEBALLS:
+					list = pokeballs;
+					break;
+				case TM_HM:
+					list = TMs_HMs;
+					break;
 			}
 			if (itemCursor < list.size() - 1) {
 				itemCursor++;
@@ -201,7 +203,7 @@ public class Inventory extends SubMenu {
 			Map.Entry<Item, Integer> entry = potions.get(itemCursor);
 			entry.getKey().doAction();
 		}
-
+		
 		if (itemCursor >= (itemListSpan + 5)) {
 			itemListSpan++;
 		}
@@ -209,7 +211,7 @@ public class Inventory extends SubMenu {
 			itemListSpan--;
 		}
 	}
-
+	
 	@Override
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.subMenuActivation) {
@@ -218,46 +220,46 @@ public class Inventory extends SubMenu {
 			renderListBox(output, 3, 1, 7, 5);
 			output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
 			switch (this.category) {
-			case POTIONS:
-			default:
-				output.blit(Art.inventory_backpack_potions, 0, 8);
-				output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
-				break;
-			case KEYITEMS:
-				output.blit(Art.inventory_backpack_keyItems, 0, 8);
-				output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
-				break;
-			case POKEBALLS:
-				output.blit(Art.inventory_backpack_pokeballs, 0, 8);
-				output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
-				break;
-			case TM_HM:
-				output.blit(Art.inventory_backpack_TM_HM, 0, 8);
-				output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
-				break;
+				case POTIONS:
+				default:
+					output.blit(Art.inventory_backpack_potions, 0, 8);
+					output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+					break;
+				case KEYITEMS:
+					output.blit(Art.inventory_backpack_keyItems, 0, 8);
+					output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+					break;
+				case POKEBALLS:
+					output.blit(Art.inventory_backpack_pokeballs, 0, 8);
+					output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+					break;
+				case TM_HM:
+					output.blit(Art.inventory_backpack_TM_HM, 0, 8);
+					output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+					break;
 			}
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 			renderText(graphics);
 		}
 	}
-
+	
 	public void addItem(Item item) {
 		boolean heldItemExists = false;
 		List<Map.Entry<Item, Integer>> list = null;
 		switch (item.getCategory()) {
-		case POTIONS:
-		default:
-			list = potions;
-			break;
-		case KEYITEMS:
-			list = keyItems;
-			break;
-		case POKEBALLS:
-			list = pokeballs;
-			break;
-		case TM_HM:
-			list = TMs_HMs;
-			break;
+			case POTIONS:
+			default:
+				list = potions;
+				break;
+			case KEYITEMS:
+				list = keyItems;
+				break;
+			case POKEBALLS:
+				list = pokeballs;
+				break;
+			case TM_HM:
+				list = TMs_HMs;
+				break;
 		}
 		for (int i = 0; i < list.size(); i++) {
 			Map.Entry<Item, Integer> entry = list.get(i);
@@ -270,23 +272,23 @@ public class Inventory extends SubMenu {
 		if (!heldItemExists)
 			list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 	}
-
+	
 	public void tossItem() {
 		List<Map.Entry<Item, Integer>> list = null;
 		switch (this.category) {
-		case POTIONS:
-		default:
-			list = potions;
-			break;
-		case KEYITEMS:
-			list = keyItems;
-			break;
-		case POKEBALLS:
-			list = pokeballs;
-			break;
-		case TM_HM:
-			list = TMs_HMs;
-			break;
+			case POTIONS:
+			default:
+				list = potions;
+				break;
+			case KEYITEMS:
+				list = keyItems;
+				break;
+			case POKEBALLS:
+				list = pokeballs;
+				break;
+			case TM_HM:
+				list = TMs_HMs;
+				break;
 		}
 		Map.Entry<Item, Integer> entry = list.get(itemCursor);
 		if (entry.getValue() - 1 <= 0)
@@ -294,16 +296,16 @@ public class Inventory extends SubMenu {
 		else
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
-
+	
 	public void resetCursor() {
 		this.itemCursor = 0;
 		this.arrowPosition = 0;
 		this.itemListSpan = 0;
 		this.category = Category.POTIONS;
 	}
-
+	
 	// ------------------------------------ PRIVATE METHODS -----------------------------------------
-
+	
 	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {

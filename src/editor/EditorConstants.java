@@ -1,7 +1,11 @@
 /**
- * THIS IS CREATED BY tom_mai78101. GIVE PROJECT CREATOR ITS CREDITS.
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. THIS IS A CLONE. 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
 package editor;
@@ -19,25 +23,23 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-
 import abstracts.Tile;
 
 public class EditorConstants {
-
+	
 	// TODO: Add additional pixel data properties that can be edited/modified for the area.
-
+	
 	private final HashMap<Integer, Data> tileMap;
 	private static final EditorConstants instance = new EditorConstants();
-
+	
 	public static final Color GRASS_GREEN = new Color(164, 231, 103);
 	public static final Color ROAD_WHITE = new Color(255, 244, 201);
 	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
-
+	
 	private EditorConstants() {
 		int id = 0;
 		tileMap = new HashMap<Integer, Data>();
@@ -93,17 +95,17 @@ public class EditorConstants {
 					ImageIcon icon = new ImageIcon(data.image);
 					data.button = new JButton(icon) {
 						private static final long serialVersionUID = 1L;
-
+						
 						@Override
 						public Dimension getMinimumSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
 						}
-
+						
 						@Override
 						public Dimension getSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
 						}
-
+						
 						@Override
 						public Dimension getPreferredSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
@@ -130,15 +132,15 @@ public class EditorConstants {
 			throw new RuntimeException("Failed to load data correctly in EditorConstants.", e);
 		}
 	}
-
+	
 	public static EditorConstants getInstance() {
 		return instance;
 	}
-
+	
 	public HashMap<Integer, Data> getTileMap() {
 		return this.tileMap;
 	}
-
+	
 	public List<Map.Entry<Integer, Data>> getSortedTileMap() {
 		final int size = this.tileMap.size();
 		final List<Map.Entry<Integer, Data>> list = new ArrayList<Map.Entry<Integer, Data>>(size);
