@@ -91,21 +91,7 @@ public class Inventory extends SubMenu {
 			g.setFont(Art.font);
 			g.setColor(Color.black);
 			
-			List<Map.Entry<Item, Integer>> list = null;
-			switch (this.category) {
-				case POTIONS:
-					list = potions;
-					break;
-				case KEYITEMS:
-					list = keyItems;
-					break;
-				case POKEBALLS:
-					list = pokeballs;
-					break;
-				case TM_HM:
-					list = TMs_HMs;
-					break;
-			}
+			List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 			try {
 				for (int i = 0; i < 5; i++) {
 					if (i >= list.size())
@@ -121,6 +107,7 @@ public class Inventory extends SubMenu {
 			}
 			catch (Exception e) {
 			}
+			//This needs to be separated, else if there's a problem, the latter won't render anything.
 			try {
 				Map.Entry<Item, Integer> entry = list.get(itemCursor);
 				String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
@@ -154,21 +141,7 @@ public class Inventory extends SubMenu {
 			this.keys.W.lastKeyState = true;
 		}
 		if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
-			List<Map.Entry<Item, Integer>> list = null;
-			switch (this.category) {
-				case POTIONS:
-					list = potions;
-					break;
-				case KEYITEMS:
-					list = keyItems;
-					break;
-				case POKEBALLS:
-					list = pokeballs;
-					break;
-				case TM_HM:
-					list = TMs_HMs;
-					break;
-			}
+			List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 			if (itemCursor < list.size() - 1) {
 				itemCursor++;
 				if (arrowPosition < 4)
@@ -198,6 +171,7 @@ public class Inventory extends SubMenu {
 			this.subMenuActivation = false;
 		}
 		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+			//TODO: Add a submenu and confirmation dialogues before initiating the doAction().
 			this.keys.Z.lastKeyState = true;
 			this.keys.SLASH.lastKeyState = true;
 			Map.Entry<Item, Integer> entry = potions.get(itemCursor);
@@ -245,22 +219,7 @@ public class Inventory extends SubMenu {
 	
 	public void addItem(Item item) {
 		boolean heldItemExists = false;
-		List<Map.Entry<Item, Integer>> list = null;
-		switch (item.getCategory()) {
-			case POTIONS:
-			default:
-				list = potions;
-				break;
-			case KEYITEMS:
-				list = keyItems;
-				break;
-			case POKEBALLS:
-				list = pokeballs;
-				break;
-			case TM_HM:
-				list = TMs_HMs;
-				break;
-		}
+		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(item);
 		for (int i = 0; i < list.size(); i++) {
 			Map.Entry<Item, Integer> entry = list.get(i);
 			if (entry.getKey().equals(item)) {
@@ -274,22 +233,7 @@ public class Inventory extends SubMenu {
 	}
 	
 	public void tossItem() {
-		List<Map.Entry<Item, Integer>> list = null;
-		switch (this.category) {
-			case POTIONS:
-			default:
-				list = potions;
-				break;
-			case KEYITEMS:
-				list = keyItems;
-				break;
-			case POKEBALLS:
-				list = pokeballs;
-				break;
-			case TM_HM:
-				list = TMs_HMs;
-				break;
-		}
+		List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 		Map.Entry<Item, Integer> entry = list.get(itemCursor);
 		if (entry.getValue() - 1 <= 0)
 			list.remove(itemCursor);
@@ -314,5 +258,43 @@ public class Inventory extends SubMenu {
 		}
 		for (int k = 0; k < width; k++)
 			output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (k * Tile.WIDTH), (height * Tile.HEIGHT));
+	}
+	
+	private List<Map.Entry<Item, Integer>> getCurrentList() {
+		List<Map.Entry<Item, Integer>> result = null;
+		switch (this.category) {
+			case POTIONS:
+				result = potions;
+				break;
+			case KEYITEMS:
+				result = keyItems;
+				break;
+			case POKEBALLS:
+				result = pokeballs;
+				break;
+			case TM_HM:
+				result = TMs_HMs;
+				break;
+		}
+		return result;
+	}
+	
+	private List<Map.Entry<Item, Integer>> getItemCategoryList(Item item) {
+		List<Map.Entry<Item, Integer>> result = null;
+		switch (item.getCategory()) {
+			case POTIONS:
+				result = potions;
+				break;
+			case KEYITEMS:
+				result = keyItems;
+				break;
+			case POKEBALLS:
+				result = pokeballs;
+				break;
+			case TM_HM:
+				result = TMs_HMs;
+				break;
+		}
+		return result;
 	}
 }
