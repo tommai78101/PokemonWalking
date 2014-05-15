@@ -252,6 +252,12 @@ public class Inventory extends SubMenu {
 						this.state = State.USE;
 						this.resetSelectionCursor();
 					}
+					else if ("SET".equals(command)) {
+						//Key Items only.
+						//Optional command.
+						//Cannot be tossed.
+						//TODO: Work on this "SET" command.
+					}
 				}
 				break;
 			}
