@@ -31,6 +31,10 @@ import dialogue.Dialogue;
 
 public class Inventory extends SubMenu {
 	
+	private enum State {
+		SELECTION, MENU, USE, TOSS
+	};
+	
 	public enum Category {
 		POTIONS(0), KEYITEMS(1), POKEBALLS(2), TM_HM(3);
 		
@@ -74,11 +78,15 @@ public class Inventory extends SubMenu {
 	private List<Map.Entry<Item, Integer>> keyItems;
 	private List<Map.Entry<Item, Integer>> pokeballs;
 	private List<Map.Entry<Item, Integer>> TMs_HMs;
+	private List<String> selectionMenu;
 	private int itemCursor;
 	private int arrowPosition;
 	private int itemListSpan = 0;
 	private Category category;
 	private byte tick = (byte) 0x0;
+	private State state;
+	private int stateArrowPosition = 0;
+	private int amountToToss = 0;
 	
 	// TODO: Continue to work on this.
 	public Inventory(String name, String enabled, String disabled, Game game) {
@@ -88,13 +96,16 @@ public class Inventory extends SubMenu {
 		this.keyItems = new ArrayList<Map.Entry<Item, Integer>>();
 		this.pokeballs = new ArrayList<Map.Entry<Item, Integer>>();
 		this.TMs_HMs = new ArrayList<Map.Entry<Item, Integer>>();
+		this.selectionMenu = new ArrayList<String>();
 		ItemText itemText = WorldConstants.items.get(WorldConstants.ITEM_RETURN);
-		this.potions.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description, itemText.category), Integer.MAX_VALUE));
-		this.keyItems.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description, itemText.category), Integer.MAX_VALUE));
-		this.pokeballs.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description, itemText.category), Integer.MAX_VALUE));
-		this.TMs_HMs.add(new AbstractMap.SimpleEntry<Item, Integer>(new DummyItem(game, itemText.itemName, itemText.description, itemText.category), Integer.MAX_VALUE));
+		Item returnExit = new DummyItem(game, itemText.itemName, itemText.description, null);
+		this.potions.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
+		this.keyItems.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
+		this.pokeballs.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
+		this.TMs_HMs.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
 		this.arrowPosition = 0;
 		this.category = Category.POTIONS;
+		this.state = State.SELECTION;
 	}
 	
 	private void renderText(Graphics g) {
@@ -110,7 +121,7 @@ public class Inventory extends SubMenu {
 					Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
 					g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
 					int value = entry.getValue().intValue();
-					if (value != Integer.MAX_VALUE && this.category != Category.KEYITEMS) {
+					if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null && this.category != Category.KEYITEMS) {
 						String string = "*" + Integer.toString(value);
 						g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
 					}
@@ -142,51 +153,150 @@ public class Inventory extends SubMenu {
 	
 	@Override
 	public void tick() {
-		if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
-			if (itemCursor > 0) {
-				itemCursor--;
-				if (arrowPosition > 0)
-					arrowPosition--;
+		switch (this.state) {
+			case SELECTION: {
+				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
+					if (itemCursor > 0) {
+						itemCursor--;
+						if (arrowPosition > 0)
+							arrowPosition--;
+					}
+					this.keys.up.lastKeyState = true;
+					this.keys.W.lastKeyState = true;
+				}
+				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					if (itemCursor < list.size() - 1) {
+						itemCursor++;
+						if (arrowPosition < 4)
+							arrowPosition++;
+					}
+					this.keys.down.lastKeyState = true;
+					this.keys.S.lastKeyState = true;
+				}
+				else if ((this.keys.left.keyStateDown || this.keys.A.keyStateDown) && (!this.keys.left.lastKeyState || !this.keys.A.lastKeyState)) {
+					this.category = Category.getWrapped(this.category.getID() - 1);
+					this.tick = 0x0;
+					this.itemCursor = this.arrowPosition = 0;
+					this.keys.left.lastKeyState = true;
+					this.keys.A.lastKeyState = true;
+				}
+				else if ((this.keys.right.keyStateDown || this.keys.D.keyStateDown) && (!this.keys.right.lastKeyState || !this.keys.D.lastKeyState)) {
+					this.category = Category.getWrapped(this.category.getID() + 1);
+					this.tick = 0x0;
+					this.itemCursor = this.arrowPosition = 0;
+					this.keys.right.lastKeyState = true;
+					this.keys.D.lastKeyState = true;
+				}
+				else if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
+					this.keys.X.lastKeyState = true;
+					this.keys.PERIOD.lastKeyState = true;
+					this.resetCursor();
+					this.subMenuActivation = false;
+				}
+				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+					//TODO: Add a submenu and confirmation dialogues before initiating the doAction().
+					this.keys.Z.lastKeyState = true;
+					this.keys.SLASH.lastKeyState = true;
+					
+					//This state is used when the player has selected an item, and wants to do something to the item.
+					//Example, using the item, tossing the item, etc.
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					Map.Entry<Item, Integer> entry = list.get(itemCursor);
+					if (entry.getKey().getCategory() == null && entry.getValue() == Integer.MAX_VALUE) {
+						//If getCategory() returns null, it is not an item.
+						//Return option.
+						this.resetCursor();
+						this.subMenuActivation = false;
+						break;
+					}
+					this.state = State.MENU;
+					this.resetSelectionCursor();
+				}
+				break;
 			}
-			this.keys.up.lastKeyState = true;
-			this.keys.W.lastKeyState = true;
-		}
-		if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
-			List<Map.Entry<Item, Integer>> list = this.getCurrentList();
-			if (itemCursor < list.size() - 1) {
-				itemCursor++;
-				if (arrowPosition < 4)
-					arrowPosition++;
+			case MENU: {
+				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
+					this.keys.up.lastKeyState = true;
+					this.keys.W.lastKeyState = true;
+					if (stateArrowPosition > 0)
+						stateArrowPosition--;
+				}
+				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
+					this.keys.down.lastKeyState = true;
+					this.keys.S.lastKeyState = true;
+					if (stateArrowPosition < 2)
+						stateArrowPosition++;
+				}
+				else if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
+					this.keys.X.lastKeyState = true;
+					this.keys.PERIOD.lastKeyState = true;
+					this.state = State.SELECTION;
+					this.resetSelectionCursor();
+				}
+				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+					//TODO: Add a submenu and confirmation dialogues before initiating the doAction().
+					this.keys.Z.lastKeyState = true;
+					this.keys.SLASH.lastKeyState = true;
+					
+					String command = this.selectionMenu.get(stateArrowPosition);
+					if ("CANCEL".equals(command)) {
+						this.state = State.SELECTION;
+						this.resetSelectionCursor();
+					}
+					else if ("TOSS".equals(command)) {
+						this.state = State.TOSS;
+						this.resetSelectionCursor();
+					}
+					else if ("USE".equals(command)) {
+						this.state = State.USE;
+						this.resetSelectionCursor();
+					}
+				}
+				break;
 			}
-			this.keys.down.lastKeyState = true;
-			this.keys.S.lastKeyState = true;
-		}
-		if ((this.keys.left.keyStateDown || this.keys.A.keyStateDown) && (!this.keys.left.lastKeyState || !this.keys.A.lastKeyState)) {
-			this.category = Category.getWrapped(this.category.getID() - 1);
-			this.tick = 0x0;
-			this.itemCursor = this.arrowPosition = 0;
-			this.keys.left.lastKeyState = true;
-			this.keys.A.lastKeyState = true;
-		}
-		if ((this.keys.right.keyStateDown || this.keys.D.keyStateDown) && (!this.keys.right.lastKeyState || !this.keys.D.lastKeyState)) {
-			this.category = Category.getWrapped(this.category.getID() + 1);
-			this.tick = 0x0;
-			this.itemCursor = this.arrowPosition = 0;
-			this.keys.right.lastKeyState = true;
-			this.keys.D.lastKeyState = true;
-		}
-		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
-			this.keys.X.lastKeyState = true;
-			this.keys.PERIOD.lastKeyState = true;
-			this.resetCursor();
-			this.subMenuActivation = false;
-		}
-		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-			//TODO: Add a submenu and confirmation dialogues before initiating the doAction().
-			this.keys.Z.lastKeyState = true;
-			this.keys.SLASH.lastKeyState = true;
-			Map.Entry<Item, Integer> entry = potions.get(itemCursor);
-			entry.getKey().doAction();
+			case USE: {
+				List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+				Map.Entry<Item, Integer> entry = list.get(itemCursor);
+				entry.getKey().doAction();
+				this.resetCursor();
+				this.subMenuActivation = false;
+				break;
+			}
+			case TOSS: {
+				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
+					this.keys.up.lastKeyState = true;
+					this.keys.W.lastKeyState = true;
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					Map.Entry<Item, Integer> entry = list.get(itemCursor);
+					if (entry.getValue() > this.amountToToss)
+						this.amountToToss++;
+				}
+				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
+					this.keys.down.lastKeyState = true;
+					this.keys.S.lastKeyState = true;
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					Map.Entry<Item, Integer> entry = list.get(itemCursor);
+					if (this.amountToToss > 0)
+						this.amountToToss--;
+				}
+				else if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
+					this.keys.X.lastKeyState = true;
+					this.keys.PERIOD.lastKeyState = true;
+					this.state = State.MENU;
+				}
+				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+					//TODO: Add a submenu and confirmation dialogues before initiating the doAction().
+					this.keys.Z.lastKeyState = true;
+					this.keys.SLASH.lastKeyState = true;
+					for (int i = 0; i < this.amountToToss; i++) {
+						this.tossItem();
+					}
+					this.resetSelectionCursor();
+					this.state = State.SELECTION;
+				}
+				break;
+			}
 		}
 		
 		if (itemCursor >= (itemListSpan + 5)) {
@@ -199,32 +309,103 @@ public class Inventory extends SubMenu {
 	
 	@Override
 	public void render(BaseScreen output, Graphics graphics) {
+		//WARNING: Due to the way it was rendered, the most direct method of rendering is used.
+		//Do not edit the order or shorten it into multiple calls of private methods, it has been done before, and has made this problem even harder to solve.
 		if (this.subMenuActivation) {
-			output.blit(Art.inventory_gui, 0, 0);
-			Dialogue.renderBox(output, 0, 6, 9, 2);
-			renderListBox(output, 3, 1, 7, 5);
-			output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
-			switch (this.category) {
-				case POTIONS:
-				default:
-					output.blit(Art.inventory_backpack_potions, 0, 8);
-					output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+			switch (this.state) {
+				default: {
+					output.blit(Art.inventory_gui, 0, 0);
+					Dialogue.renderBox(output, 0, 6, 9, 2);
+					renderListBox(output, 3, 1, 7, 5);
+					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
+					switch (this.category) {
+						case POTIONS:
+						default:
+							output.blit(Art.inventory_backpack_potions, 0, 8);
+							output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case KEYITEMS:
+							output.blit(Art.inventory_backpack_keyItems, 0, 8);
+							output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case POKEBALLS:
+							output.blit(Art.inventory_backpack_pokeballs, 0, 8);
+							output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case TM_HM:
+							output.blit(Art.inventory_backpack_TM_HM, 0, 8);
+							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+							break;
+					}
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					renderText(graphics);
 					break;
-				case KEYITEMS:
-					output.blit(Art.inventory_backpack_keyItems, 0, 8);
-					output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+				}
+				case MENU: {
+					output.blit(Art.inventory_gui, 0, 0);
+					Dialogue.renderBox(output, 0, 6, 9, 2);
+					renderListBox(output, 3, 1, 7, 5);
+					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
+					Dialogue.renderBox(output, 5, 3, 4, 2);
+					output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, ((12 * this.stateArrowPosition) + Tile.HEIGHT * 3 + 8));
+					switch (this.category) {
+						case POTIONS:
+						default:
+							output.blit(Art.inventory_backpack_potions, 0, 8);
+							output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case KEYITEMS:
+							output.blit(Art.inventory_backpack_keyItems, 0, 8);
+							output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case POKEBALLS:
+							output.blit(Art.inventory_backpack_pokeballs, 0, 8);
+							output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case TM_HM:
+							output.blit(Art.inventory_backpack_TM_HM, 0, 8);
+							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+							break;
+					}
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					renderText(graphics);
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					renderItemMenuText(list, graphics);
 					break;
-				case POKEBALLS:
-					output.blit(Art.inventory_backpack_pokeballs, 0, 8);
-					output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+				}
+				case TOSS: {
+					output.blit(Art.inventory_gui, 0, 0);
+					Dialogue.renderBox(output, 0, 6, 9, 2);
+					renderListBox(output, 3, 1, 7, 5);
+					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
+					Dialogue.renderBox(output, 5, 4, 4, 1);
+					//output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, ((12 * this.stateArrowPosition) + Tile.HEIGHT * 3 + 8));
+					switch (this.category) {
+						case POTIONS:
+						default:
+							output.blit(Art.inventory_backpack_potions, 0, 8);
+							output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case KEYITEMS:
+							output.blit(Art.inventory_backpack_keyItems, 0, 8);
+							output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case POKEBALLS:
+							output.blit(Art.inventory_backpack_pokeballs, 0, 8);
+							output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case TM_HM:
+							output.blit(Art.inventory_backpack_TM_HM, 0, 8);
+							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+							break;
+					}
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					renderText(graphics);
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					renderItemMenuText(list, graphics);
 					break;
-				case TM_HM:
-					output.blit(Art.inventory_backpack_TM_HM, 0, 8);
-					output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
-					break;
+				}
 			}
-			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			renderText(graphics);
 		}
 	}
 	
@@ -256,7 +437,14 @@ public class Inventory extends SubMenu {
 		this.itemCursor = 0;
 		this.arrowPosition = 0;
 		this.itemListSpan = 0;
+		this.resetSelectionCursor();
 		this.category = Category.POTIONS;
+		this.state = State.SELECTION;
+	}
+	
+	public void resetSelectionCursor() {
+		this.selectionMenu.clear();
+		this.stateArrowPosition = 0;
 	}
 	
 	// ------------------------------------ PRIVATE METHODS -----------------------------------------
@@ -307,5 +495,77 @@ public class Inventory extends SubMenu {
 				break;
 		}
 		return result;
+	}
+	
+	private void renderItemMenuText(List<Map.Entry<Item, Integer>> list, Graphics graphics) {
+		switch (this.state) {
+			case TOSS: {
+				Item item = list.get(itemCursor).getKey();
+				if (item.getCategory() == null)
+					break;
+				if (item != null && list.get(itemCursor).getValue() != Integer.MAX_VALUE && list.get(itemCursor).getValue() > 0 && this.selectionMenu.isEmpty()) {
+					this.selectionMenu.add(0, "TOSS*");
+				}
+				
+				graphics.setFont(Art.font);
+				graphics.setColor(Color.black);
+				
+				try {
+					String tossAmount = amountToToss < 10 ? "0" + Integer.toString(amountToToss) : Integer.toString(amountToToss);
+					graphics.drawString(this.selectionMenu.get(0), (4 * Tile.WIDTH + (3 * Dialogue.TEXT_SPACING_WIDTH)) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (Tile.HEIGHT * 5 + 6));
+					graphics.drawString(tossAmount, (4 * Tile.WIDTH + ((11 - tossAmount.length()) * Dialogue.TEXT_SPACING_WIDTH)) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (Tile.HEIGHT * 5 + 6));
+				}
+				catch (Exception e) {
+				}
+				//This needs to be separated, else if there's a problem, the latter won't render anything.
+				break;
+			}
+			case MENU: {
+				Item item = list.get(itemCursor).getKey();
+				if (item.getCategory() == null)
+					break;
+				if (item != null && list.get(itemCursor).getValue() != Integer.MAX_VALUE) {
+					switch (item.getCategory()) {
+						case POTIONS:
+						case POKEBALLS:
+						case TM_HM:
+							if (this.selectionMenu.isEmpty()) {
+								this.selectionMenu.add(0, "CANCEL");
+								this.selectionMenu.add(0, "TOSS");
+								this.selectionMenu.add(0, "USE");
+							}
+							break;
+						case KEYITEMS:
+							if (this.selectionMenu.isEmpty()) {
+								this.selectionMenu.add(0, "CANCEL");
+								this.selectionMenu.add(0, "SET");
+								this.selectionMenu.add(0, "USE");
+							}
+							break;
+					}
+					graphics.setFont(Art.font);
+					graphics.setColor(Color.black);
+					try {
+						for (int i = 0; i < this.selectionMenu.size(); i++) {
+							graphics.drawString(this.selectionMenu.get(i), MainComponent.GAME_SCALE * (Tile.WIDTH * 6 + 4), MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (12 * i) + Tile.HEIGHT * 3));
+						}
+					}
+					catch (Exception e) {
+					}
+					//This needs to be separated, else if there's a problem, the latter won't render anything.
+					break;
+				}
+			}
+			default:
+				break;
+		}
+		try {
+			Map.Entry<Item, Integer> entry = list.get(itemCursor);
+			String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
+			graphics.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
+			graphics.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+		}
+		catch (Exception e) {
+		}
 	}
 }
