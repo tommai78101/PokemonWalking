@@ -40,6 +40,17 @@ public class Inventory extends SubMenu {
 			this.id = value;
 		}
 		
+		/**
+		 * Obtains a Category enum value that matches the given ID number.
+		 * 
+		 * <p>
+		 * If there is no Category that comes after the last element, it will give the first element, and wraps from there.
+		 * 
+		 * @param value
+		 *            The ID number of the category that is to be obtained.
+		 * 
+		 * @return The category that matches the given ID number.
+		 * */
 		public static Category getWrapped(int value) {
 			Category[] categories = Category.values();
 			if (value < 0)
