@@ -51,6 +51,11 @@ public class Inventory extends SubMenu {
 	private int stateArrowPosition = 0;
 	private int amountToToss = 0;
 	
+	public static final String MENU_USE = "USE";
+	public static final String MENU_SET = "SET";
+	public static final String MENU_TOSS = "TOSS";
+	public static final String MENU_CANCEL = "CANCEL";
+	
 	// TODO: Continue to work on this.
 	public Inventory(String name, String enabled, String disabled, Game game) {
 		super(name, enabled, disabled, game);
@@ -188,7 +193,7 @@ public class Inventory extends SubMenu {
 				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
 					this.keys.down.lastKeyState = true;
 					this.keys.S.lastKeyState = true;
-					if (stateArrowPosition < 2)
+					if (stateArrowPosition < this.selectionMenu.size() - 1)
 						stateArrowPosition++;
 				}
 				else if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
@@ -203,23 +208,20 @@ public class Inventory extends SubMenu {
 					this.keys.SLASH.lastKeyState = true;
 					
 					String command = this.selectionMenu.get(stateArrowPosition);
-					if ("CANCEL".equals(command)) {
+					if (command.equals(MENU_CANCEL)) {
 						this.state = State.SELECTION;
 						this.resetSelectionCursor();
 					}
-					else if ("TOSS".equals(command)) {
+					else if (command.equals(MENU_TOSS)) {
 						this.state = State.TOSS;
 						this.resetSelectionCursor();
 					}
-					else if ("USE".equals(command)) {
+					else if (command.equals(MENU_USE)) {
 						this.state = State.USE;
 						this.resetSelectionCursor();
 					}
-					else if ("SET".equals(command)) {
-						//Key Items only.
-						//Optional command.
-						//Cannot be tossed.
-						//TODO: Work on this "SET" command.
+					else if (command.equals(MENU_SET)) {
+						//TODO: Work more on "SET" command.
 					}
 				}
 				break;
@@ -315,8 +317,8 @@ public class Inventory extends SubMenu {
 					Dialogue.renderBox(output, 0, 6, 9, 2);
 					renderListBox(output, 3, 1, 7, 5);
 					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
-					Dialogue.renderBox(output, 5, 3, 4, 2);
-					output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, ((12 * this.stateArrowPosition) + Tile.HEIGHT * 3 + 8));
+					Dialogue.renderBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4, this.selectionMenu.size() - 1);
+					output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, (12 * this.stateArrowPosition + Tile.HEIGHT * (7 - this.selectionMenu.size())) - 8);
 					switch (this.category) {
 						case POTIONS:
 						default:
@@ -498,25 +500,19 @@ public class Inventory extends SubMenu {
 						case POTIONS:
 						case POKEBALLS:
 						case TM_HM:
-							if (this.selectionMenu.isEmpty()) {
-								this.selectionMenu.add(0, "CANCEL");
-								this.selectionMenu.add(0, "TOSS");
-								this.selectionMenu.add(0, "USE");
-							}
+							if (this.selectionMenu.isEmpty())
+								this.selectionMenu.addAll(item.getAvailableCommands());
 							break;
 						case KEYITEMS:
-							if (this.selectionMenu.isEmpty()) {
-								this.selectionMenu.add(0, "CANCEL");
-								this.selectionMenu.add(0, "SET");
-								this.selectionMenu.add(0, "USE");
-							}
+							if (this.selectionMenu.isEmpty())
+								this.selectionMenu.addAll(item.getAvailableCommands());
 							break;
 					}
 					graphics.setFont(Art.font);
 					graphics.setColor(Color.black);
 					try {
 						for (int i = 0; i < this.selectionMenu.size(); i++) {
-							graphics.drawString(this.selectionMenu.get(i), MainComponent.GAME_SCALE * (Tile.WIDTH * 6 + 4), MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (12 * i) + Tile.HEIGHT * 3));
+							graphics.drawString(this.selectionMenu.get(i), MainComponent.GAME_SCALE * (Tile.WIDTH * 6 + 4), MainComponent.GAME_SCALE * ((12 * i) + Tile.HEIGHT * (7 - this.selectionMenu.size())));
 						}
 					}
 					catch (Exception e) {

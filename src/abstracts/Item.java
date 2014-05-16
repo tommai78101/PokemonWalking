@@ -13,11 +13,14 @@ package abstracts;
 import item.ItemText;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import level.Area;
 import main.Game;
 import resources.Art;
 import screen.BaseScreen;
+import submenu.Inventory;
 import entity.Player;
 
 public abstract class Item {
@@ -65,12 +68,17 @@ public abstract class Item {
 	protected Game game;
 	protected Category category;
 	protected boolean picked;
+	protected List<String> availableCommands;
 	
 	private static final String TAG_POTIONS = "POTIONS";
 	private static final String TAG_KEYITEMS = "KEYITEMS";
 	private static final String TAG_POKEBALLS = "POKEBALLS";
 	private static final String TAG_TM_HM = "TM_HM";
 	private static final String TAG_ALL = "ALL";
+	private static final String FLAG_SET_COMMAND = "$";
+	private static final String FLAG_USE_COMMAND = "!";
+	private static final String FLAG_TOSS_COMMAND = "&";
+	private static final String ITEM_DELIMITER = ";";
 	
 	public Item(Game game, String name, String description, Category category) {
 		setName(name);
@@ -78,6 +86,7 @@ public abstract class Item {
 		setCategory(category);
 		this.game = game;
 		this.picked = false;
+		availableCommands = new ArrayList<String>();
 	}
 	
 	public void setName(String value) {
@@ -121,6 +130,20 @@ public abstract class Item {
 	public void dropAt(Area area, Player player) {
 		this.picked = false;
 		// TODO: Add function that allows the item to be placed at.
+	}
+	
+	public List<String> getAvailableCommands() {
+		return this.availableCommands;
+	}
+	
+	public void initializeCommands(ItemText itemText) {
+		this.availableCommands.add(0, Inventory.MENU_CANCEL);
+		if (itemText.tossCommandFlag)
+			this.availableCommands.add(0, Inventory.MENU_TOSS);
+		if (itemText.setCommandFlag)
+			this.availableCommands.add(0, Inventory.MENU_SET);
+		if (itemText.useCommandFlag)
+			this.availableCommands.add(0, Inventory.MENU_USE);
 	}
 	
 	@Override
@@ -187,6 +210,19 @@ public abstract class Item {
 						itemText.skipCheckCategory = true;
 					}
 				}
+				else if (line.startsWith(FLAG_SET_COMMAND)) {
+					itemText.setCommandFlag = true;
+				}
+				else if (line.startsWith(FLAG_USE_COMMAND)) {
+					itemText.useCommandFlag = true;
+				}
+				else if (line.startsWith(FLAG_TOSS_COMMAND)) {
+					itemText.tossCommandFlag = true;
+				}
+				else if (line.startsWith(ITEM_DELIMITER)) {
+					itemText.done = true;
+				}
+				
 				if (itemText.isComplete()) {
 					itemText.id = id;
 					result.put(id, itemText);

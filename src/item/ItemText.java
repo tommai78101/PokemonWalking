@@ -37,18 +37,23 @@ public class ItemText {
 	public Category category;
 	public boolean skipCheckCategory;
 	public int id;
+	public boolean setCommandFlag;
+	public boolean useCommandFlag;
+	public boolean tossCommandFlag;
+	public boolean done;
 	
 	public ItemText() {
 		type = null;
 		itemName = null;
 		description = null;
 		category = null;
+		id = -1;
 		skipCheckCategory = false;
+		setCommandFlag = useCommandFlag = tossCommandFlag = false;
+		done = false;
 	}
 	
 	public boolean isComplete() {
-		if (type == null || itemName == null || description == null || (!skipCheckCategory ? category == null : false))
-			return false;
-		return true;
+		return done;
 	}
 }

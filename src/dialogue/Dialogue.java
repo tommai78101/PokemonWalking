@@ -413,6 +413,7 @@ public class Dialogue {
 						break;
 				}
 				if (dummy != null) {
+					dummy.initializeCommands(itemText);
 					inventory.addItem(dummy);
 					this.tokens = toLines("Picked up " + dummy.getName() + "!", MAX_STRING_LENGTH);
 					this.showDialog = true;
