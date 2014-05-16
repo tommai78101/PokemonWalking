@@ -10,7 +10,7 @@
 
 package item;
 
-import submenu.Inventory;
+import abstracts.Item.Category;
 
 public class ItemText {
 	public enum Type {
@@ -31,6 +31,13 @@ public class ItemText {
 		}
 	};
 	
+	public Type type;
+	public String itemName;
+	public String description;
+	public Category category;
+	public boolean skipCheckCategory;
+	public int id;
+	
 	public ItemText() {
 		type = null;
 		itemName = null;
@@ -38,13 +45,6 @@ public class ItemText {
 		category = null;
 		skipCheckCategory = false;
 	}
-	
-	public Type type;
-	public String itemName;
-	public String description;
-	public Inventory.Category category;
-	public boolean skipCheckCategory;
-	public int id;
 	
 	public boolean isComplete() {
 		if (type == null || itemName == null || description == null || (!skipCheckCategory ? category == null : false))

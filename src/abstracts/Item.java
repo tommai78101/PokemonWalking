@@ -18,16 +18,52 @@ import level.Area;
 import main.Game;
 import resources.Art;
 import screen.BaseScreen;
-import submenu.Inventory;
-import submenu.Inventory.Category;
 import entity.Player;
 
 public abstract class Item {
 	
+	public enum Category {
+		POTIONS(0), KEYITEMS(1), POKEBALLS(2), TM_HM(3);
+		
+		private int id;
+		
+		private Category(int value) {
+			this.id = value;
+		}
+		
+		/**
+		 * Obtains a Category enum value that matches the given ID number.
+		 * 
+		 * <p>
+		 * If there is no Category that comes after the last element, it will give the first element, and wraps from there.
+		 * 
+		 * @param value
+		 *            The ID number of the category that is to be obtained.
+		 * 
+		 * @return The category that matches the given ID number.
+		 * */
+		public static Category getWrapped(int value) {
+			Category[] categories = Category.values();
+			if (value < 0)
+				value = (categories.length - 1);
+			if (value > categories.length - 1)
+				value = 0;
+			for (Category c : categories) {
+				if (c.id == value)
+					return categories[value];
+			}
+			return categories[0];
+		}
+		
+		public int getID() {
+			return id;
+		}
+	};
+	
 	protected String name;
 	protected String description;
 	protected Game game;
-	protected Inventory.Category category;
+	protected Category category;
 	protected boolean picked;
 	
 	private static final String TAG_POTIONS = "POTIONS";
@@ -36,7 +72,7 @@ public abstract class Item {
 	private static final String TAG_TM_HM = "TM_HM";
 	private static final String TAG_ALL = "ALL";
 	
-	public Item(Game game, String name, String description, Inventory.Category category) {
+	public Item(Game game, String name, String description, Category category) {
 		setName(name);
 		setDescription(description);
 		setCategory(category);
@@ -52,7 +88,7 @@ public abstract class Item {
 		this.description = value;
 	}
 	
-	public void setCategory(Inventory.Category category) {
+	public void setCategory(Category category) {
 		this.category = category;
 	}
 	
