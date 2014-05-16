@@ -1,14 +1,33 @@
 // %: Item Type (for the game to recognize).
 // #: Item Name.
 // @: Item Description.
-// ^: Item specified category (One of Potions, KeyItems, Pokéballs, or TM/HM)
+// ^: Item specified category (One of POTIONS, KEYITEMS, POKEBALLS, TM_HM, or ALL)
+// ;: Item delimiter. Marks the end of an item section.
+
+// ------  Item Commands  ------
+// $: Item with "SET" command.
+// !: Item with "USE" command.
+// &: Item with "TOSS" command.
 
 %DUMMY
 #RETURN
 @Return to menu.
 ^ALL
+;
 
 %DUMMY
 #TEST
 @Test item. Returns to menu.
-^POKEBALLS
+^KEYITEMS
+!
+$
+&
+;
+
+%DUMMY
+#3_OPTIONS
+@Another test item.
+^POTIONS
+!
+$
+;
