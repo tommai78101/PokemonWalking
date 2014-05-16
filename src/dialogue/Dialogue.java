@@ -56,7 +56,6 @@ public class Dialogue {
 	// TODO: Optimize this, to make way for other types of dialogues to use.
 	private String[] tokens;
 	private int tokenPointer;
-	// private Map<Integer, Boolean> dialogs;
 	private boolean next;
 	private boolean nextTick;
 	private byte arrowTickSpeed;
@@ -158,15 +157,6 @@ public class Dialogue {
 		catch (Exception e) {
 			// Ignore. Silently catch the any sorts of exception, and just let the game flow on.
 		}
-		
-		// if (this.isMenuActivated) {
-		// for (int i = 0; i < menuItems.size(); i++) {
-		// //TODO: We need to have an arrow pointing at the menu items.
-		// //We can't do anything about it. Scaling problems.
-		// g.drawString(menuItems.get(i).getKey(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
-		//
-		// }
-		// }
 	}
 	
 	/**
@@ -179,13 +169,6 @@ public class Dialogue {
 	 * @return Nothing.
 	 * */
 	public void tick() {
-		
-		// if (!this.input.START.lastKeyState && this.input.START.keyStateDown) {
-		// isMenuActivated = !isMenuActivated;
-		// this.input.START.lastKeyState = true;
-		// }
-		// if ((this.input.X.keyStateDown || this.input.PERIOD.keyStateDown) && this.isMenuActivated)
-		// this.isMenuActivated = false;
 		if (this.next) {
 			if (input.Z.isPressedDown || input.Z.isTappedDown || input.X.isTappedDown || input.X.isPressedDown || input.SLASH.isTappedDown || input.SLASH.isPressedDown || input.PERIOD.isTappedDown || input.PERIOD.isPressedDown) {
 				this.next = false;
@@ -225,11 +208,6 @@ public class Dialogue {
 		if (this.showDialog) {
 			speechDialogueHandling();
 		}
-		// else if (this.isMenuActivated) {
-		// prepareDialogueText();
-		// menuDialogueText();
-		// menuDialogueHandling();
-		// }
 		else if (this.game.getPlayer().warningsTriggered) {
 			warningText();
 			this.game.getPlayer().warningsTriggered = false;
@@ -240,73 +218,6 @@ public class Dialogue {
 		if (this.repeatDialogueTick > 0)
 			this.repeatDialogueTick--;
 	}
-	
-	// private void prepareDialogueText() {
-	// Player player = this.game.getPlayer();
-	// Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
-	// if (entry.getKey().equals("BICYCLE")) {
-	// if (player.isRidingBicycle()) {
-	// entry.setValue("Get off bicycle.");
-	// }
-	// else {
-	// entry.setValue("Use your bicycle.");
-	// }
-	// }
-	// }
-	
-	// private void menuDialogueText() {
-	// String menuLine = menuItems.get(menuPointerPosition).getValue();
-	// this.tokens = this.toLines(menuLine, HALF_STRING_LENGTH);
-	// this.tokenPointer = 0;
-	// try {
-	// this.firstLineIterator = this.tokens[this.tokenPointer].length();
-	// }
-	// catch (Exception e) {
-	// this.doneDisplayingDialogue = true;
-	// return;
-	// }
-	// if (this.tokens.length > 2) {
-	// this.secondLineIterator = HALF_STRING_LENGTH;
-	// this.next = true;
-	// }
-	// else {
-	// try {
-	// this.secondLineIterator = this.tokens[this.tokenPointer + 1].length();
-	// }
-	// catch (Exception e) {
-	// this.secondLineIterator = 0;
-	// }
-	// }
-	// this.doneDisplayingDialogue = false;
-	// }
-	
-	// private void menuDialogueHandling() {
-	// //Player input mechanism
-	// if (!Player.isMovementsLocked())
-	// Player.lockMovements();
-	// if (!this.input.down.lastKeyState && this.input.down.keyStateDown) {
-	// this.menuPointerPosition++;
-	// if (this.menuPointerPosition > this.menuItems.size() - 1)
-	// this.menuPointerPosition = 0;
-	// this.input.down.lastKeyState = true;
-	// }
-	// else if (!this.input.up.lastKeyState && this.input.up.keyStateDown) {
-	// this.menuPointerPosition--;
-	// if (this.menuPointerPosition < 0)
-	// this.menuPointerPosition = this.menuItems.size() - 1;
-	// this.input.up.lastKeyState = true;
-	// }
-	//
-	// //Menu input mechanism
-	// if ((this.input.Z.keyStateDown || this.input.SLASH.keyStateDown) && (!this.input.Z.lastKeyState || !this.input.SLASH.lastKeyState)) {
-	// Map.Entry<String, String> entry = menuItems.get(menuPointerPosition);
-	// game.sendAction(entry);
-	// this.input.Z.lastKeyState = true;
-	// this.input.SLASH.lastKeyState = true;
-	// this.doneDisplayingDialogue = true;
-	// this.isMenuActivated = false;
-	// }
-	// }
 	
 	private void warningText() {
 		this.tokens = Dialogue.toLines("There's a time and place for everything, but not now.", MAX_STRING_LENGTH);
@@ -428,48 +339,11 @@ public class Dialogue {
 		
 	}
 	
-	/**
-	 * Sets the dialogue checkpoint to true.
-	 * 
-	 * <p>
-	 * This must be used when the current dialogue has completed, or when a checkpoint in the game has been set.
-	 * 
-	 * <p>
-	 * This must be used after when {@link #setDialogKeyID(int)} has been called.
-	 * 
-	 * @return Nothing.
-	 * @see #setDialogKeyID(int)
-	 * 
-	 * */
-	// public void setDialogCheckpoint() {
-	// //this.dialogs.put(this.dialogKeyID, true);
-	// }
-	
-	/**
-	 * Checks to see if the dialogue checkpoint has been set.
-	 * 
-	 * @param key
-	 *            The dialogue ID used to identify the dialogue needed to check.
-	 * @return True, if the dialogue of the dialogue ID given has been set. False, if there are no checkpoints set, or if the dialogue of the dialogue
-	 *         ID given has not been set.
-	 * */
-	// public boolean isDialogCheckpointSet(int key) {
-	// if (this.dialogs.isEmpty())
-	// return false;
-	// return this.dialogs.get(key);
-	// }
-	
 	public void render(BaseScreen screen, int offsetX, int offsetY, Graphics g) {
 		screen.disableRenderHalf();
 		this.renderDialog(screen, 0, 6, 9, 2);
 		g.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		this.renderText(g);
-		// else if (this.isMenuActivated) {
-		// this.renderDialog(screen, 0, 6, 4, 2);
-		// this.renderDialog(screen, 5, 0, 4, menuItems.size()); //TODO: This needs to use a array list size as height.
-		// //Scaling problems again.
-		// screen.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuPointerPosition * Tile.HEIGHT);
-		// }
 	}
 	
 	/**

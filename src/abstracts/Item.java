@@ -156,8 +156,6 @@ public abstract class Item {
 			final Item item = (Item) object;
 			if ((this.name == null) ? (item.getName() != null) : !this.name.equals(item.getName()))
 				return false;
-			// if ((this.description == null) ? (item.getDescription() != null) : !this.description.equals(item.getDescription()))
-			// return false;
 			return true;
 		}
 		catch (Exception e) {

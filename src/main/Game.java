@@ -91,11 +91,6 @@ public class Game {
 			case GAME: {
 				screen.clear(0xA4E767);
 				overworld.render(screen, player.getX(), player.getY());
-				// dialogue.displayText("Hello World.", screen, Dial)
-				// dialogue.render(screen, 6, 0, 3, 8);
-				// FIXME: Need to do something about the font having to be rendered by graphics and not screen.
-				// dialogue.renderTextGraphics(graphics);
-				// dialogue.renderText(graphics);
 				if (dialogue.isDisplayingDialogue())
 					dialogue.render(screen, player.getX(), player.getY(), graphics);
 				else

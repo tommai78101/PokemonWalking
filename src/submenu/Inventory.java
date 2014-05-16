@@ -163,7 +163,6 @@ public class Inventory extends SubMenu {
 					this.subMenuActivation = false;
 				}
 				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-					//TODO: Add a submenu and confirmation dialogues before initiating the doAction().
 					this.keys.Z.lastKeyState = true;
 					this.keys.SLASH.lastKeyState = true;
 					
@@ -203,7 +202,6 @@ public class Inventory extends SubMenu {
 					this.resetSelectionCursor();
 				}
 				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-					//TODO: Add a submenu and confirmation dialogues before initiating the doAction().
 					this.keys.Z.lastKeyState = true;
 					this.keys.SLASH.lastKeyState = true;
 					
@@ -257,7 +255,6 @@ public class Inventory extends SubMenu {
 					this.state = State.MENU;
 				}
 				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-					//TODO: Add a submenu and confirmation dialogues before initiating the doAction().
 					this.keys.Z.lastKeyState = true;
 					this.keys.SLASH.lastKeyState = true;
 					for (int i = 0; i < this.amountToToss; i++) {
@@ -350,7 +347,6 @@ public class Inventory extends SubMenu {
 					renderListBox(output, 3, 1, 7, 5);
 					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
 					Dialogue.renderBox(output, 5, 4, 4, 1);
-					//output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, ((12 * this.stateArrowPosition) + Tile.HEIGHT * 3 + 8));
 					switch (this.category) {
 						case POTIONS:
 						default:

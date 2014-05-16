@@ -80,16 +80,6 @@ public class StartMenu {
 	}
 	
 	public void tick() {
-		// if (!this.keys.START.lastKeyState && this.keys.START.keyStateDown) {
-		// if (!Player.isMovementsLocked())
-		// Player.lockMovements();
-		// final Player player = this.game.getPlayer();
-		// if (!player.isLockedWalking() && !player.isLockedJumping()) {
-		// activation = !activation;
-		// this.menuCursorPosition = 0;
-		// }
-		// this.keys.START.lastKeyState = true;
-		// }
 		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && this.activation)
 			this.activation = false;
 		if (this.activation) {
@@ -191,7 +181,6 @@ public class StartMenu {
 		g.setColor(Color.black);
 		if (this.activation) {
 			for (int i = 0; i < this.items.size(); i++) {
-				// TODO: We need to have an arrow pointing at the menu items.
 				g.drawString(this.items.get(i).getValue().getName(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
 			}
 		}
