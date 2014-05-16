@@ -244,7 +244,8 @@ public class Dialogue {
 		}
 		try {
 			if (this.secondLineIterator >= this.tokens[this.tokenPointer + 1].length()) {
-				this.next = true;
+				if (!this.itemPickedDialogue)
+					this.next = true;
 			}
 			else {
 				if (this.secondLineIterator < this.tokens[this.tokenPointer + 1].length() && this.firstLineIterator >= this.tokens[this.tokenPointer].length())
@@ -257,8 +258,10 @@ public class Dialogue {
 			// Therefore, it returns true in both cases.
 			result2 = true;
 		}
-		if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length && !this.itemPickedDialogue)
-			this.next = true;
+		if (result1 && result2 && this.tokenPointer + 1 >= this.tokens.length) {
+			if (!this.itemPickedDialogue)
+				this.next = true;
+		}
 		if (this.itemPickedDialogue) {
 			if (this.itemDialogueThread != null && this.itemDialogueThread.getState() == Thread.State.TERMINATED) {
 				this.itemDialogueThread = null;
