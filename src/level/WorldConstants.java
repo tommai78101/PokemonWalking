@@ -34,6 +34,7 @@ public class WorldConstants {
 	// Item IDs
 	public static final int ITEM_RETURN = 0;
 	public static final int ITEM_TEST = 1;
+	public static final int ITEM_BICYCLE = 3;
 	
 	// Biome Colors
 	public static final int GRASS_GREEN = 0xFFA4E767;

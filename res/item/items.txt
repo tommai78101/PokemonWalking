@@ -1,7 +1,7 @@
 // %: Item Type (for the game to recognize).
 // #: Item Name.
 // @: Item Description.
-// ^: Item specified category (One of POTIONS, KEYITEMS, POKEBALLS, TM_HM, or ALL)
+// ^: Item specified category for inventory. (One of POTIONS, KEYITEMS, POKEBALLS, TM_HM, or ALL)
 // ;: Item delimiter. Marks the end of an item section.
 
 // ------  Item Commands  ------
@@ -28,6 +28,13 @@ $
 #3_OPTIONS
 @Another test item.
 ^POTIONS
+!
+$
+;
+
+%ACTION
+#BICYCLE
+^KEYITEMS
 !
 $
 ;

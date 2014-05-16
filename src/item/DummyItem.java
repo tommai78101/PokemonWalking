@@ -15,8 +15,8 @@ import main.Game.State;
 import abstracts.Item;
 
 public class DummyItem extends Item {
-	public DummyItem(Game game, String name, String description, Category category) {
-		super(game, name, description, category);
+	public DummyItem(Game game, String name, String description, Category category, int id) {
+		super(game, name, description, category, id);
 	}
 	
 	@Override

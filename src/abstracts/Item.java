@@ -68,6 +68,7 @@ public abstract class Item {
 	protected Game game;
 	protected Category category;
 	protected boolean picked;
+	protected int id;
 	protected List<String> availableCommands;
 	
 	private static final String TAG_POTIONS = "POTIONS";
@@ -80,10 +81,11 @@ public abstract class Item {
 	private static final String FLAG_TOSS_COMMAND = "&";
 	private static final String ITEM_DELIMITER = ";";
 	
-	public Item(Game game, String name, String description, Category category) {
+	public Item(Game game, String name, String description, Category category, int id) {
 		setName(name);
 		setDescription(description);
 		setCategory(category);
+		setID(id);
 		this.game = game;
 		this.picked = false;
 		availableCommands = new ArrayList<String>();
@@ -99,6 +101,10 @@ public abstract class Item {
 	
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+	
+	public void setID(int value) {
+		this.id = value;
 	}
 	
 	public void renderTiles(BaseScreen output, int xOffset, int yOffset) {
@@ -117,6 +123,10 @@ public abstract class Item {
 	
 	public Category getCategory() {
 		return this.category;
+	}
+	
+	public int getID() {
+		return this.id;
 	}
 	
 	public void pick() {

@@ -242,18 +242,7 @@ public class Game {
 	
 	private void handleActionEvent(Map.Entry<Integer, SubMenu> entry) {
 		String str = entry.getValue().getName();
-		if (str.equals(StartMenu.ITEM_NAME_BICYCLE)) {
-			if (this.state != State.GAME)
-				this.state = State.GAME;
-			if (!this.player.isRidingBicycle())
-				this.player.startsRidingBicycle();
-			else
-				this.player.getsOffBicycle();
-			if (this.subMenu != null)
-				this.subMenu.disableSubMenu();
-			this.subMenu = null;
-		}
-		else if (str.equals(StartMenu.ITEM_NAME_INVENTORY)) {
+		if (str.equals(StartMenu.ITEM_NAME_INVENTORY)) {
 			if (this.state != State.INVENTORY)
 				this.state = State.INVENTORY;
 			this.subMenu = entry.getValue();

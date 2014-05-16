@@ -10,6 +10,7 @@
 
 package submenu;
 
+import item.Bicycle;
 import item.DummyItem;
 import item.ItemText;
 import java.awt.Color;
@@ -66,7 +67,7 @@ public class Inventory extends SubMenu {
 		this.TMs_HMs = new ArrayList<Map.Entry<Item, Integer>>();
 		this.selectionMenu = new ArrayList<String>();
 		ItemText itemText = WorldConstants.items.get(WorldConstants.ITEM_RETURN);
-		Item returnExit = new DummyItem(game, itemText.itemName, itemText.description, null);
+		Item returnExit = new DummyItem(game, itemText.itemName, itemText.description, null, 0);
 		this.potions.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
 		this.keyItems.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
 		this.pokeballs.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
@@ -376,7 +377,7 @@ public class Inventory extends SubMenu {
 		}
 	}
 	
-	public void addItem(Item item) {
+	public void addItem(ItemText itemText, Item item) {
 		boolean heldItemExists = false;
 		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(item);
 		for (int i = 0; i < list.size(); i++) {
@@ -387,8 +388,34 @@ public class Inventory extends SubMenu {
 				break;
 			}
 		}
-		if (!heldItemExists)
-			list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
+		if (!heldItemExists) {
+			switch (itemText.type) {
+				case DUMMY:
+					item.initializeCommands(itemText);
+					list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
+					break;
+				case ACTION: {
+					//Action items must have ID, else it would be a dummy item.
+					switch (item.getID()) {
+						case WorldConstants.ITEM_BICYCLE:
+							item = new Bicycle(this.game, item.getName(), item.getDescription(), item.getCategory());
+							item.initializeCommands(itemText);
+							list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
+							break;
+						default:
+							//Dummy item creation.
+							item.initializeCommands(itemText);
+							list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
+							break;
+					}
+					break;
+				}
+				default:
+					//Nothing to see here.
+					break;
+			}
+			
+		}
 	}
 	
 	public void tossItem() {

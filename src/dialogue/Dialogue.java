@@ -10,6 +10,7 @@
 
 package dialogue;
 
+import item.ActionItem;
 import item.DummyItem;
 import item.ItemText;
 import java.awt.Color;
@@ -84,7 +85,7 @@ public class Dialogue {
 		this.tokenPointer = 0;
 		this.isMenuActivated = false;
 		
-		menuItems.add(new AbstractMap.SimpleEntry<String, String>("BICYCLE", "Use your bicycle."));
+		//menuItems.add(new AbstractMap.SimpleEntry<String, String>("BICYCLE", "Use your bicycle."));
 		menuItems.add(new AbstractMap.SimpleEntry<String, String>("TEMP", "Do nothing."));
 		
 		this.itemDialogueThread = null;
@@ -317,19 +318,21 @@ public class Dialogue {
 			case 0x0B: { // Item
 				Inventory inventory = this.game.getStartMenu().getInventory();
 				ItemText itemText = WorldConstants.items.get(interactionID);
-				Item dummy = null;
+				Item item = null;
 				switch (itemText.type) {
 					case DUMMY:
-						dummy = new DummyItem(this.game, itemText.itemName, itemText.description, itemText.category);
+						item = new DummyItem(this.game, itemText.itemName, itemText.description, itemText.category, itemText.id);
+						break;
+					case ACTION:
+						item = new ActionItem(this.game, itemText.itemName, itemText.description, itemText.category, itemText.id);
 						break;
 					default:
-						dummy = null;
+						item = null;
 						break;
 				}
-				if (dummy != null) {
-					dummy.initializeCommands(itemText);
-					inventory.addItem(dummy);
-					this.tokens = toLines("Picked up " + dummy.getName() + "!", MAX_STRING_LENGTH);
+				if (item != null) {
+					inventory.addItem(itemText, item);
+					this.tokens = toLines("Picked up " + item.getName() + "!", MAX_STRING_LENGTH);
 					this.showDialog = true;
 					this.doneDisplayingDialogue = false;
 					this.itemPickedDialogue = true;

@@ -32,7 +32,7 @@ public class StartMenu {
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 8) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
 	
 	// String constants
-	public static final String ITEM_NAME_BICYCLE = "BICYCLE";
+	//public static final String ITEM_NAME_BICYCLE = "BICYCLE";
 	public static final String ITEM_NAME_INVENTORY = "PACK";
 	public static final String ITEM_NAME_EXIT = "EXIT";
 	
@@ -54,10 +54,10 @@ public class StartMenu {
 	}
 	
 	public StartMenu initialize() {
-		SubMenu bicycle = new DummyMenu(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle", this.game);
+		//SubMenu bicycle = new DummyMenu(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle", this.game);
 		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game).initialize(keys);
 		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu", this.game);
-		this.addMenuItem(bicycle);
+		//this.addMenuItem(bicycle);
 		this.addMenuItem(inventory);
 		this.addMenuItem(exit);
 		return this;
@@ -141,13 +141,6 @@ public class StartMenu {
 		Map.Entry<Integer, SubMenu> entry = this.items.get(this.menuCursorPosition);
 		SubMenu item = entry.getValue();
 		// TODO: Make this modular.
-		if (item.getName().equals(StartMenu.ITEM_NAME_BICYCLE)) {
-			Player player = this.game.getPlayer();
-			if (player.isRidingBicycle())
-				item.toggleDescription(false);
-			else
-				item.toggleDescription(true);
-		}
 		this.tokens = Dialogue.toLines(item.getDescription(), Dialogue.HALF_STRING_LENGTH);
 	}
 	

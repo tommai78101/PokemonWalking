@@ -14,7 +14,7 @@ import abstracts.Item.Category;
 
 public class ItemText {
 	public enum Type {
-		ALL("ALL"), DUMMY("DUMMY");
+		ALL("ALL"), DUMMY("DUMMY"), ACTION("ACTION");
 		
 		private String value;
 		
