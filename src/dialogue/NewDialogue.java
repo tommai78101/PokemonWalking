@@ -214,9 +214,11 @@ public class NewDialogue {
 					}
 					else {
 						//Time to scroll.
-						g.setClip(rect.x, rect.y, rect.width, rect.height);
-						g.drawString(this.completedLines.get(0), X, Y1 - scrollDistance);
-						g.drawString(this.completedLines.get(1), X, Y2 - scrollDistance);
+						//DEBUG: Needs testing to see if there's any problem with it.
+						Graphics g_clipped = g.create();
+						g_clipped.setClip(rect.x, rect.y, rect.width, rect.height);
+						g_clipped.drawString(this.completedLines.get(0), X, Y1 - scrollDistance);
+						g_clipped.drawString(this.completedLines.get(1), X, Y2 - scrollDistance);
 						if (tickCount == 0x0) {
 							if (scrollDistance >= Y2 - Y1) {
 								this.scrollFlag = false;
@@ -226,7 +228,7 @@ public class NewDialogue {
 								this.lines.get(this.lineIterator).setValue(true);
 							}
 						}
-						g.setClip(0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT);
+						g_clipped.dispose();
 					}
 					break;
 			}
