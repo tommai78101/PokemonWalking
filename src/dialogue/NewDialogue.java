@@ -180,7 +180,7 @@ public class NewDialogue {
 		final Rectangle rect = new Rectangle(X, Y1 - Tile.HEIGHT * 2, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT);
 		
 		g.setFont(Art.font);
-		g.setColor(Color.blue);
+		g.setColor(Color.black);
 		
 		String string = null;
 		try {
