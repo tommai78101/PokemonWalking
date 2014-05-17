@@ -140,11 +140,6 @@ public class Game {
 	 * @return Nothing.
 	 * */
 	public void tick() {
-		// TODO: This updates for all objects given.
-		/*
-		 * for (World w : worlds) if (w != null) w.tick();
-		 */
-		// player.tick();
 		switch (this.state) {
 			case GAME: {
 				overworld.tick();
