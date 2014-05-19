@@ -45,7 +45,7 @@ public class MainComponent extends Canvas implements Runnable {
 	private Game game;
 	// -----------------------
 	
-	private final Keys keys = new Keys();
+	private static final Keys keys = new Keys();
 	// Wrong input handler. Requires a rewrite.
 	// private InputHandler inputHandler;
 	private InputHandler inputHandler;
@@ -345,6 +345,10 @@ public class MainComponent extends Canvas implements Runnable {
 	
 	// ---------------------------------
 	// Other methods
+	
+	public static final Keys getMainInput(){
+		return keys;
+	}
 	
 	// ---------------------------------
 	// Main execution method
