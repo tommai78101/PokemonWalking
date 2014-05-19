@@ -1,4 +1,4 @@
-// %: Item Type (for the game to recognize).
+// %: Item Type for the game to recognize. (One of DUMMY, or ACTION)
 // #: Item Name.
 // @: Item Description.
 // ^: Item specified category for inventory. (One of POTIONS, KEYITEMS, POKEBALLS, TM_HM, or ALL)
@@ -29,7 +29,7 @@ $
 @Another test item.
 ^POTIONS
 !
-$
+&
 ;
 
 %ACTION
