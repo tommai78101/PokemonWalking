@@ -14,27 +14,27 @@ import screen.BaseScreen;
 import abstracts.Tile;
 
 public class NewDialogue {
-	private ArrayList<Map.Entry<String, Boolean>> lines;
-	private ArrayList<String> completedLines;
-	private int subStringIterator;
-	private int lineLength;
-	private int totalDialogueLength;
-	private byte tickCount = 0x0;
-	private boolean scrollFlag;
-	private int scrollDistance;
-	private int lineIterator;
-	private boolean nextFlag;
-	private byte nextTick;
-	private Keys input;
-	private boolean showDialog;
-	private int type;
-
-	public static final int DIALOGUE_SPEECH = 0x40;
 	public static final int DIALOGUE_QUESTION = 0x41;
-
+	public static final int DIALOGUE_SPEECH = 0x40;
+	public static final int HALF_STRING_LENGTH = 9;
 	// Dialogue max string length per line.
 	public static final int MAX_STRING_LENGTH = 18;
-	public static final int HALF_STRING_LENGTH = 9;
+	private ArrayList<String> completedLines;
+	private Keys input;
+	private int lineIterator;
+	private int lineLength;
+	private ArrayList<Map.Entry<String, Boolean>> lines;
+	private boolean nextFlag;
+	private byte nextTick;
+	private int scrollDistance;
+	private boolean scrollFlag;
+	private boolean showDialog;
+
+	private int subStringIterator;
+	private byte tickCount = 0x0;
+
+	private int totalDialogueLength;
+	private int type;
 
 	private NewDialogue(Keys keys) {
 		lines = new ArrayList<Map.Entry<String, Boolean>>();
@@ -52,53 +52,12 @@ public class NewDialogue {
 		this.type = 0;
 	}
 
-	public static void renderDialogBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
-		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
-		}
-		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-
-		for (int j = 0; j < centerHeight - 1; j++) {
-			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			}
-			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-		}
-
-		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
-		}
-		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+	public boolean dialogBoxIsShowing() {
+		return this.showDialog;
 	}
 
-	private static void renderDialogBorderBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
-		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
-		}
-		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-
-		for (int j = 0; j < centerHeight - 1; j++) {
-			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-		}
-
-		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
-		}
-		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-	}
-
-	private static void renderDialogBackground(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
-		for (int j = 0; j < centerHeight - 1; j++) {
-			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			}
-		}
+	public void render(BaseScreen output, Graphics graphics) {
+		render(output, graphics, 0, 6, 9, 2);
 	}
 
 	public void render(BaseScreen output, Graphics graphics, int x, int y, int w, int h) {
@@ -124,8 +83,8 @@ public class NewDialogue {
 		}
 	}
 
-	public void render(BaseScreen output, Graphics graphics) {
-		render(output, graphics, 0, 6, 9, 2);
+	public boolean textIsCreated() {
+		return !this.lines.isEmpty();
 	}
 
 	public void tick() {		
@@ -207,14 +166,6 @@ public class NewDialogue {
 		}
 	}
 
-	public boolean textIsCreated() {
-		return !this.lines.isEmpty();
-	}
-
-	public boolean dialogBoxIsShowing() {
-		return this.showDialog;
-	}
-
 	private void renderText(Graphics g) {
 		final int X = 8 * MainComponent.GAME_SCALE;
 		final int Y1 = 360;
@@ -285,6 +236,55 @@ public class NewDialogue {
 		dialogues.type = type;
 		dialogues.showDialog = true;
 		return dialogues;
+	}
+
+	public static void renderDialogBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
+		}
+		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
+
+		for (int j = 0; j < centerHeight - 1; j++) {
+			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			for (int i = 0; i < centerWidth - 1; i++) {
+				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			}
+			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+		}
+
+		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
+		}
+		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+	}
+
+	private static void renderDialogBackground(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+		for (int j = 0; j < centerHeight - 1; j++) {
+			for (int i = 0; i < centerWidth - 1; i++) {
+				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			}
+		}
+	}
+
+	private static void renderDialogBorderBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
+		}
+		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
+
+		for (int j = 0; j < centerHeight - 1; j++) {
+			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+		}
+
+		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
+		}
+		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 	}
 
 	private static ArrayList<Map.Entry<String, Boolean>> toLines(String all, final int regex) {
