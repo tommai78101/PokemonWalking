@@ -39,7 +39,7 @@ It's still in very early stages of development. Possibly even earlier than "alph
 **Known Issues:**
 * There may be issues with the tiles-to-tiles interaction, causing unwanted bugs.
 * There may be hidden issues I haven't seen/know of yet.
-* Inventory management is incomplete. All items will exit out of inventory.
+* All items will exit out of inventory.
 
 **Plans:**
 * ~~Implement all walking situations from the original games. Walking, surfing, jumping over ledges, riding bicycle, etc. (MAIN GOAL)~~  (MILESTONE COMPLETE!)
