@@ -151,15 +151,15 @@ public class Game {
 				break;
 			}
 			case INVENTORY: {
+				if (!this.subMenu.isActivated()) {
+					this.state = State.PAUSED;
+					screen.setRenderingEffectTick((byte) 0x0);
+				}
 				if (this.subMenu != null) {
 					this.subMenu.tick();
 				}
 				else
 					break;
-				if (!this.subMenu.isActivated()) {
-					this.state = State.PAUSED;
-					screen.setRenderingEffectTick((byte) 0x0);
-				}
 				break;
 			}
 			case PAUSED: {

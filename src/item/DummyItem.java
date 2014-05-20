@@ -18,7 +18,7 @@ public class DummyItem extends Item {
 	public DummyItem(Game game, String name, String description, Category category, int id) {
 		super(game, name, description, category, id);
 	}
-	
+
 	@Override
 	public void doAction() {
 		game.getBaseScreen().setRenderingEffectTick((byte) 0x0);
