@@ -16,6 +16,8 @@ import item.ItemText;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,8 +159,11 @@ public class Inventory extends SubMenu {
 							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
 							break;
 					}
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-					renderText(graphics);
+					BufferedImage old = output.getBufferedImage();
+					Graphics2D g2d = old.createGraphics();
+					renderText(g2d);
+					g2d.dispose();
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(old), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 				case MENU: {
@@ -187,10 +192,13 @@ public class Inventory extends SubMenu {
 							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
 							break;
 					}
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-					renderText(graphics);
+					BufferedImage old = output.getBufferedImage();
+					Graphics2D g2d = old.createGraphics();
+					renderText(g2d);
 					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
-					renderItemMenuText(list, graphics);
+					renderItemMenuText(list, g2d);
+					g2d.dispose();
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 				case TOSS: {
@@ -218,10 +226,13 @@ public class Inventory extends SubMenu {
 							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
 							break;
 					}
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-					renderText(graphics);
+					BufferedImage old = output.getBufferedImage();
+					Graphics2D g2d = old.createGraphics();
+					renderText(g2d);
 					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
-					renderItemMenuText(list, graphics);
+					renderItemMenuText(list, g2d);
+					g2d.dispose();
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 				case SET: {
@@ -370,14 +381,13 @@ public class Inventory extends SubMenu {
 				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
 					this.keys.down.lastKeyState = true;
 					this.keys.S.lastKeyState = true;
-					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
-					Map.Entry<Item, Integer> entry = list.get(itemCursor);
 					if (this.amountToToss > 0)
 						this.amountToToss--;
 				}
 				else if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
 					this.keys.X.lastKeyState = true;
 					this.keys.PERIOD.lastKeyState = true;
+					this.resetSelectionCursor();
 					this.state = State.MENU;
 				}
 				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
@@ -465,13 +475,13 @@ public class Inventory extends SubMenu {
 					this.selectionMenu.add(0, "TOSS*");
 				}
 
-				graphics.setFont(Art.font);
+				graphics.setFont(Art.font.deriveFont(8f));
 				graphics.setColor(Color.black);
 
 				try {
 					String tossAmount = amountToToss < 10 ? "0" + Integer.toString(amountToToss) : Integer.toString(amountToToss);
-					graphics.drawString(this.selectionMenu.get(0), (4 * Tile.WIDTH + (3 * Dialogue.TEXT_SPACING_WIDTH)) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (Tile.HEIGHT * 5 + 6));
-					graphics.drawString(tossAmount, (4 * Tile.WIDTH + ((11 - tossAmount.length()) * Dialogue.TEXT_SPACING_WIDTH)) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * (Tile.HEIGHT * 5 + 6));
+					graphics.drawString(this.selectionMenu.get(0), (4 * Tile.WIDTH + (3 * Dialogue.TEXT_SPACING_WIDTH)), (Tile.HEIGHT * 5 + 6));
+					graphics.drawString(tossAmount, (4 * Tile.WIDTH + ((11 - tossAmount.length()) * Dialogue.TEXT_SPACING_WIDTH)), (Tile.HEIGHT * 5 + 6));
 				}
 				catch (Exception e) {
 				}
@@ -495,11 +505,11 @@ public class Inventory extends SubMenu {
 								this.selectionMenu.addAll(item.getAvailableCommands());
 							break;
 					}
-					graphics.setFont(Art.font);
+					graphics.setFont(Art.font.deriveFont(8f));
 					graphics.setColor(Color.black);
 					try {
 						for (int i = 0; i < this.selectionMenu.size(); i++) {
-							graphics.drawString(this.selectionMenu.get(i), MainComponent.GAME_SCALE * (Tile.WIDTH * 6 + 4), MainComponent.GAME_SCALE * ((12 * i) + Tile.HEIGHT * (7 - this.selectionMenu.size())));
+							graphics.drawString(this.selectionMenu.get(i), (Tile.WIDTH * 6 + 4), ((12 * i) + Tile.HEIGHT * (7 - this.selectionMenu.size())));
 						}
 					}
 					catch (Exception e) {
@@ -514,8 +524,8 @@ public class Inventory extends SubMenu {
 		try {
 			Map.Entry<Item, Integer> entry = list.get(itemCursor);
 			String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
-			graphics.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-			graphics.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+			graphics.drawString(tokens[0], 8, 144 - 32 + 7);
+			graphics.drawString(tokens[1], 8, 144 - 16 + 7);
 		}
 		catch (Exception e) {
 		}
@@ -532,23 +542,22 @@ public class Inventory extends SubMenu {
 	}
 
 	private void renderText(Graphics g) {
+		g.setFont(Art.font.deriveFont(8f));
+		g.setColor(Color.black);
 		switch (this.state) {
 			default: {
 				if (tick >= (byte) 0x4) {
-					g.setFont(Art.font);
-					g.setColor(Color.black);
-
 					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					try {
 						for (int i = 0; i < 5; i++) {
 							if (i >= list.size())
 								break;
 							Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
-							g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
+							g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH, ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 3);
 							int value = entry.getValue().intValue();
 							if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null && this.category != Category.KEYITEMS) {
 								String string = "*" + Integer.toString(value);
-								g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH * MainComponent.GAME_SCALE + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH) * MainComponent.GAME_SCALE, MainComponent.GAME_SCALE * ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 12);
+								g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH), ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 4);
 							}
 						}
 					}
@@ -558,8 +567,8 @@ public class Inventory extends SubMenu {
 					try {
 						Map.Entry<Item, Integer> entry = list.get(itemCursor);
 						String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
-						g.drawString(tokens[0], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-						g.drawString(tokens[1], Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+						g.drawString(tokens[0], 8, 144 - 32 + 7);
+						g.drawString(tokens[1], 8, 144 - 16 + 7);
 					}
 					catch (Exception e) {
 					}
