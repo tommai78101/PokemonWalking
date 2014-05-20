@@ -10,6 +10,7 @@
 
 package submenu;
 
+import item.ActionItem;
 import item.Bicycle;
 import item.DummyItem;
 import item.ItemText;
@@ -34,6 +35,7 @@ import abstracts.Item.Category;
 import abstracts.SubMenu;
 import abstracts.Tile;
 import dialogue.Dialogue;
+import entity.Player;
 
 public class Inventory extends SubMenu {
 
@@ -55,6 +57,11 @@ public class Inventory extends SubMenu {
 	private State state;
 	private int stateArrowPosition = 0;
 	private int amountToToss = 0;
+	private int set_tokenIterator = 0;
+	private boolean set_end;
+	private int set_subStringIterator = 0;
+	private ArrayList<String> set_completedLines;
+	private Thread inventoryDialogueThread;
 
 	public static final String MENU_USE = "USE";
 	public static final String MENU_SET = "SET";
@@ -79,6 +86,7 @@ public class Inventory extends SubMenu {
 		this.arrowPosition = 0;
 		this.category = Category.POTIONS;
 		this.state = State.SELECTION;
+		this.set_completedLines = new ArrayList<String>();
 	}
 
 	public void addItem(ItemText itemText, Item item) {
@@ -171,8 +179,6 @@ public class Inventory extends SubMenu {
 					Dialogue.renderBox(output, 0, 6, 9, 2);
 					renderListBox(output, 3, 1, 7, 5);
 					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
-					Dialogue.renderBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4, this.selectionMenu.size() - 1);
-					output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, (12 * this.stateArrowPosition + Tile.HEIGHT * (7 - this.selectionMenu.size())) - 8);
 					switch (this.category) {
 						case POTIONS:
 						default:
@@ -195,10 +201,14 @@ public class Inventory extends SubMenu {
 					BufferedImage old = output.getBufferedImage();
 					Graphics2D g2d = old.createGraphics();
 					renderText(g2d);
-					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
-					renderItemMenuText(list, g2d);
-					g2d.dispose();
+					if (!this.selectionMenu.isEmpty()) {
+						Dialogue.renderBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4, this.selectionMenu.size() - 1);
+						output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, (12 * this.stateArrowPosition + Tile.HEIGHT * (7 - this.selectionMenu.size())) - 8);
+						List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+						renderItemMenuText(list, g2d);
+					}
 					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					g2d.dispose();
 					break;
 				}
 				case TOSS: {
@@ -236,6 +246,34 @@ public class Inventory extends SubMenu {
 					break;
 				}
 				case SET: {
+					output.blit(Art.inventory_gui, 0, 0);
+					Dialogue.renderBox(output, 0, 6, 9, 2);
+					renderListBox(output, 3, 1, 7, 5);
+					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
+					switch (this.category) {
+						case POTIONS:
+						default:
+							output.blit(Art.inventory_backpack_potions, 0, 8);
+							output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case KEYITEMS:
+							output.blit(Art.inventory_backpack_keyItems, 0, 8);
+							output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case POKEBALLS:
+							output.blit(Art.inventory_backpack_pokeballs, 0, 8);
+							output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+							break;
+						case TM_HM:
+							output.blit(Art.inventory_backpack_TM_HM, 0, 8);
+							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+							break;
+					}
+					BufferedImage old = output.getBufferedImage();
+					Graphics2D g2d = old.createGraphics();
+					renderText(g2d);
+					g2d.dispose();
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(old), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 			}
@@ -316,6 +354,21 @@ public class Inventory extends SubMenu {
 					}
 					this.state = State.MENU;
 					this.resetSelectionCursor();
+					if (this.selectionMenu.isEmpty()) {
+						Item item = list.get(itemCursor).getKey();
+						if (item != null && list.get(itemCursor).getValue() != Integer.MAX_VALUE) {
+							switch (item.getCategory()) {
+								case POTIONS:
+								case POKEBALLS:
+								case TM_HM:
+									this.selectionMenu.addAll(item.getAvailableCommands());
+									break;
+								case KEYITEMS:
+									this.selectionMenu.addAll(item.getAvailableCommands());
+									break;
+							}
+						}
+					}
 				}
 				break;
 			}
@@ -341,7 +394,6 @@ public class Inventory extends SubMenu {
 				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 					this.keys.Z.lastKeyState = true;
 					this.keys.SLASH.lastKeyState = true;
-
 					String command = this.selectionMenu.get(stateArrowPosition);
 					if (command.equals(MENU_CANCEL)) {
 						this.state = State.SELECTION;
@@ -356,7 +408,12 @@ public class Inventory extends SubMenu {
 						this.resetSelectionCursor();
 					}
 					else if (command.equals(MENU_SET)) {
-						//TODO: Work more on "SET" command.
+						this.state = State.SET;
+						this.resetSelectionCursor();
+						this.set_end = false;
+						this.set_tokenIterator = 0;
+						this.set_subStringIterator = 0;
+						this.set_completedLines.clear();
 					}
 				}
 				break;
@@ -402,6 +459,19 @@ public class Inventory extends SubMenu {
 				break;
 			}
 			case SET: {
+				Map.Entry<Item, Integer> entry = this.getCurrentList().get(itemCursor);
+				ActionItem actionItem = (ActionItem) entry.getKey();
+				if (!this.game.itemHasBeenRegistered(actionItem)) {
+					this.game.setRegisteredItem(actionItem);
+				}
+				if (this.set_end) {
+					if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+						this.keys.Z.lastKeyState = true;
+						this.keys.SLASH.lastKeyState = true;
+						this.resetSelectionCursor();
+						this.state = State.SELECTION;
+					}
+				}
 				break;
 			}
 		}
@@ -493,18 +563,6 @@ public class Inventory extends SubMenu {
 				if (item.getCategory() == null)
 					break;
 				if (item != null && list.get(itemCursor).getValue() != Integer.MAX_VALUE) {
-					switch (item.getCategory()) {
-						case POTIONS:
-						case POKEBALLS:
-						case TM_HM:
-							if (this.selectionMenu.isEmpty())
-								this.selectionMenu.addAll(item.getAvailableCommands());
-							break;
-						case KEYITEMS:
-							if (this.selectionMenu.isEmpty())
-								this.selectionMenu.addAll(item.getAvailableCommands());
-							break;
-					}
 					graphics.setFont(Art.font.deriveFont(8f));
 					graphics.setColor(Color.black);
 					try {
@@ -541,13 +599,17 @@ public class Inventory extends SubMenu {
 			output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (k * Tile.WIDTH), (height * Tile.HEIGHT));
 	}
 
+	private void setState(State value) {
+		this.state = value;
+	}
+
 	private void renderText(Graphics g) {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
+		List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 		switch (this.state) {
 			default: {
 				if (tick >= (byte) 0x4) {
-					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					try {
 						for (int i = 0; i < 5; i++) {
 							if (i >= list.size())
@@ -574,6 +636,101 @@ public class Inventory extends SubMenu {
 					}
 				}
 				break;
+			}
+			case SET: {
+				try {
+					for (int i = 0; i < 5; i++) {
+						if (i >= list.size())
+							break;
+						Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
+						g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH, ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 3);
+						int value = entry.getValue().intValue();
+						if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null && this.category != Category.KEYITEMS) {
+							String string = "*" + Integer.toString(value);
+							g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH), ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 4);
+						}
+					}
+				}
+				catch (Exception e) {
+				}
+				try {
+					Map.Entry<Item, Integer> entry = list.get(itemCursor);
+					String[] tokens = Dialogue.toLines(entry.getKey().getName() + " has been registered.", Dialogue.MAX_STRING_LENGTH);
+					switch (this.set_completedLines.size()) {
+						case 0:
+							g.drawString(tokens[set_tokenIterator].substring(0, set_subStringIterator), 8, 144 - 32 + 7);
+							break;
+						case 1:
+							g.drawString(this.set_completedLines.get(0), 8, 144 - 32 + 7);
+							g.drawString(tokens[set_tokenIterator].substring(0, set_subStringIterator), 8, 144 - 16 + 7);
+							break;
+						case 2:
+							g.drawString(this.set_completedLines.get(0), 8, 144 - 32 + 7);
+							g.drawString(this.set_completedLines.get(1), 8, 144 - 16 + 7);
+							break;
+					}
+					if (this.set_completedLines.size() < 2) {
+						this.set_subStringIterator++;
+						if (set_subStringIterator > tokens[set_tokenIterator].length()) {
+							this.set_completedLines.add(tokens[set_tokenIterator]);
+							this.set_subStringIterator = 0;
+							this.set_tokenIterator++;
+						}
+					}
+					else {
+						if (this.inventoryDialogueThread != null && this.inventoryDialogueThread.getState() == Thread.State.TERMINATED) {
+							this.inventoryDialogueThread = null;
+							this.set_end = true;
+							return;
+						}
+						if (this.inventoryDialogueThread == null) {
+							this.inventoryDialogueThread = new Thread(new Runnable() {
+								@Override
+								public void run() {
+									Player.lockMovements();
+									try {
+										Thread.sleep(1500);
+									}
+									catch (InterruptedException e) {
+									}
+									setState(State.SELECTION);
+									set_end = true;
+									Player.unlockMovements();
+								}
+							});
+							this.inventoryDialogueThread.setName("Inventory Dialogue Thread");
+						}
+						if (this.inventoryDialogueThread.getState() == Thread.State.NEW)
+							this.inventoryDialogueThread.start();
+					}
+					break;
+				}
+				catch (Exception e) {
+					if (this.inventoryDialogueThread != null && this.inventoryDialogueThread.getState() == Thread.State.TERMINATED) {
+						this.inventoryDialogueThread = null;
+						this.set_end = true;
+						return;
+					}
+					if (this.inventoryDialogueThread == null) {
+						this.inventoryDialogueThread = new Thread(new Runnable() {
+							@Override
+							public void run() {
+								Player.lockMovements();
+								try {
+									Thread.sleep(2000);
+								}
+								catch (InterruptedException e) {
+								}
+								setState(State.SELECTION);
+								set_end = true;
+								Player.unlockMovements();
+							}
+						});
+						this.inventoryDialogueThread.setName("Inventory Dialogue Thread");
+					}
+					if (this.inventoryDialogueThread.getState() == Thread.State.NEW)
+						this.inventoryDialogueThread.start();
+				}
 			}
 		}
 

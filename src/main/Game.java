@@ -10,11 +10,14 @@
 
 package main;
 
+import item.ActionItem;
+
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
 import level.OverWorld;
 import screen.BaseScreen;
 import abstracts.SubMenu;
@@ -36,15 +39,16 @@ public class Game {
 	private SubMenu subMenu;
 	private World overworld;
 	private final Player player;
-	
+	private ActionItem registeredItem;
+
 	private Dialogue dialogue;
-	
+
 	public enum State {
 		GAME, PAUSED, INVENTORY
 	};
-	
+
 	private State state;
-	
+
 	/**
 	 * Creates the core component of the game.
 	 * 
@@ -53,8 +57,7 @@ public class Game {
 	 * @param BaseScreen
 	 *            Takes in a BaseScreen that displays all rendered graphics to the screen.
 	 * @param Keys
-	 *            Takes the Keys object the input handler receives from the player for the game to handle. The input handler must control this Keys
-	 *            object.
+	 *            Takes the Keys object the input handler receives from the player for the game to handle. The input handler must control this Keys object.
 	 * @see BaseScreen
 	 * @see NewInputHandler
 	 * */
@@ -70,7 +73,7 @@ public class Game {
 		this.subMenu = null;
 		this.state = State.GAME;
 	}
-	
+
 	/**
 	 * Handles rendered objects.
 	 * 
@@ -86,7 +89,7 @@ public class Game {
 		// TODO: Do rendering by calling "BaseScreen" variable and call one of many draw methods provided.
 		// TODO: Re-create the player's fixed position to camera's center, while everything else moves around.
 		// TODO: Overworld must be drawn while the player is moving around. Small areas can only be seen after the camera culls out the overworld.
-		
+
 		switch (this.state) {
 			case GAME: {
 				screen.clear(0xA4E767);
@@ -105,7 +108,7 @@ public class Game {
 				else {
 					if (this.subMenu != null) {
 						this.subMenu.render(screen, graphics);
-						
+
 					}
 				}
 				break;
@@ -131,7 +134,7 @@ public class Game {
 			}
 		}
 	}
-	
+
 	/**
 	 * Updates the game.
 	 * 
@@ -171,21 +174,21 @@ public class Game {
 			}
 		}
 	}
-	
+
 	/**
 	 * Currently unused.
 	 * */
 	public void save() {
 		// TODO: Save data.
 	}
-	
+
 	/**
 	 * Currently unused.
 	 * */
 	public void load() {
 		// TODO: Load data.
 	}
-	
+
 	/**
 	 * Currently unused.
 	 * */
@@ -194,47 +197,48 @@ public class Game {
 		// this.xScroll = xCamCenter;
 		// this.yScroll = yCamCenter;
 	}
-	
+
 	/**
 	 * Currently unused. However, this is executed in the render() code.
 	 * */
 	public void setCameraRelativeToArea(int areaXPos, int areaYPos) {
 		// Not used at the moment.
-		
+
 		// cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
 		// this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
 		// this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
 	}
-	
-	// public void sendAction(Map.Entry<String, String> entry) {
-	// //TODO: Add actual game menu actions the player can do.
-	// String key = entry.getKey();
-	// if (key.equals("BICYCLE")) {
-	// if (!this.player.isRidingBicycle())
-	// this.player.startsRidingBicycle();
-	// else
-	// this.player.getsOffBicycle();
-	// }
-	// }
-	
+
 	public Player getPlayer() {
 		return this.player;
 	}
-	
+
 	public StartMenu getStartMenu() {
 		return this.startMenu;
 	}
-	
+
 	public void setState(State state) {
 		this.state = state;
 	}
-	
+
 	public BaseScreen getBaseScreen() {
 		return this.screen;
 	}
-	
+
+	public void setRegisteredItem(ActionItem item) {
+		this.registeredItem = item;
+		//TODO: Continue to handle registered item's action event.
+	}
+
+	public boolean itemHasBeenRegistered(ActionItem item) {
+		if (this.registeredItem == null)
+			return false;
+		return this.registeredItem.equals(item);
+
+	}
+
 	// ---------------------------------------------- PRIVATE METHODS -------------------------------------------------
-	
+
 	private void handleActionEvent(Map.Entry<Integer, SubMenu> entry) {
 		String str = entry.getValue().getName();
 		if (str.equals(StartMenu.ITEM_NAME_INVENTORY)) {
@@ -255,7 +259,7 @@ public class Game {
 		this.startMenu.clearActionEvent();
 		this.startMenu.closeMenu();
 	}
-	
+
 	private void checkPausing() {
 		Keys keys = this.player.keys;
 		if (!keys.START.lastKeyState && keys.START.keyStateDown) {
@@ -276,7 +280,7 @@ public class Game {
 			keys.START.lastKeyState = true;
 		}
 	}
-	
+
 	private void checkUnpausing() {
 		Keys keys = this.player.keys;
 		switch (this.state) {
@@ -291,6 +295,6 @@ public class Game {
 			default:
 				break;
 		}
-		
+
 	}
 }
