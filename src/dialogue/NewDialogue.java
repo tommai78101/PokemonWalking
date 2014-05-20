@@ -6,7 +6,7 @@ import java.awt.Rectangle;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
-import main.Game;
+
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
@@ -87,18 +87,20 @@ public class NewDialogue {
 		return !this.lines.isEmpty();
 	}
 
-	public void tick() {		
-	
+	public void tick() {
+
 		if (this.subStringIterator < this.totalDialogueLength && (!this.nextFlag && !this.scrollFlag)) {
 			tickCount++;
 			if (tickCount > 0x3)
 				tickCount = 0x0;
-		} else if (this.nextFlag) {
+		}
+		else if (this.nextFlag) {
 			this.nextTick++;
 			if (this.nextTick > 0xE)
 				this.nextTick = 0x0;
-		} else if (this.subStringIterator >= this.totalDialogueLength) {
-			if (this.lineIterator > this.lines.size()){
+		}
+		else if (this.subStringIterator >= this.totalDialogueLength) {
+			if (this.lineIterator > this.lines.size()) {
 				this.showDialog = false;
 				if (!this.lines.isEmpty())
 					this.lines.clear();
@@ -112,7 +114,7 @@ public class NewDialogue {
 		}
 
 		try {
-			
+
 			if (!this.nextFlag) {
 				if (tickCount == 0x0) {
 					if (!this.scrollFlag)
@@ -135,7 +137,8 @@ public class NewDialogue {
 					input.Z.lastKeyState = true;
 					tickCount = 0x0;
 				}
-			} else {
+			}
+			else {
 				if (input.Z.keyStateDown && !(input.Z.lastKeyState)) {
 					input.Z.lastKeyState = true;
 					if (this.type == DIALOGUE_SPEECH) {
@@ -153,12 +156,14 @@ public class NewDialogue {
 				this.scrollDistance += 8;
 			}
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (this.lineIterator >= this.lines.size()) {
 				if (this.scrollFlag) {
 					this.showDialog = false;
 					this.lines.clear();
-				} else {
+				}
+				else {
 					if (this.type == DIALOGUE_SPEECH)
 						this.nextFlag = true;
 				}
@@ -178,52 +183,56 @@ public class NewDialogue {
 		String string = null;
 		try {
 			switch (this.completedLines.size()) {
-			case 0:
-				// None completed.
-				string = this.lines.get(this.lineIterator).getKey();
-				if (this.subStringIterator > string.length()) {
-					g.drawString(string.substring(0, string.length() - 1), X, Y1);
-					this.subStringIterator = this.lineLength;
-				} else
-					g.drawString(string.substring(0, this.subStringIterator), X, Y1);
-				break;
-			case 1:
-				// One line completed.
-				g.drawString(this.completedLines.get(0), X, Y1);
-				string = this.lines.get(this.lineIterator).getKey();
-				if (this.subStringIterator > string.length()) {
-					g.drawString(string.substring(0, string.length()), X, Y2);
-					this.subStringIterator = this.lineLength;
-				} else
-					g.drawString(string.substring(0, this.subStringIterator), X, Y2);
-				break;
-			case 2:
-				// Two lines completed.
-				if (!this.scrollFlag) {
-					g.drawString(this.completedLines.get(0), X, Y1);
-					g.drawString(this.completedLines.get(1), X, Y2);
-				} else {
-					// Time to scroll.
-					// DEBUG: Needs testing to see if there's any problem with
-					// it.
-					Graphics g_clipped = g.create();
-					g_clipped.setClip(rect.x, rect.y, rect.width, rect.height);
-					g_clipped.drawString(this.completedLines.get(0), X, Y1 - scrollDistance);
-					g_clipped.drawString(this.completedLines.get(1), X, Y2 - scrollDistance);
-					if (tickCount == 0x0) {
-						if (scrollDistance >= Y2 - Y1) {
-							this.scrollFlag = false;
-							this.scrollDistance = 0;
-							this.subStringIterator = 0;
-							this.completedLines.remove(0);
-							this.lines.get(this.lineIterator).setValue(true);
-						}
+				case 0:
+					// None completed.
+					string = this.lines.get(this.lineIterator).getKey();
+					if (this.subStringIterator > string.length()) {
+						g.drawString(string.substring(0, string.length() - 1), X, Y1);
+						this.subStringIterator = this.lineLength;
 					}
-					g_clipped.dispose();
-				}
-				break;
+					else
+						g.drawString(string.substring(0, this.subStringIterator), X, Y1);
+					break;
+				case 1:
+					// One line completed.
+					g.drawString(this.completedLines.get(0), X, Y1);
+					string = this.lines.get(this.lineIterator).getKey();
+					if (this.subStringIterator > string.length()) {
+						g.drawString(string.substring(0, string.length()), X, Y2);
+						this.subStringIterator = this.lineLength;
+					}
+					else
+						g.drawString(string.substring(0, this.subStringIterator), X, Y2);
+					break;
+				case 2:
+					// Two lines completed.
+					if (!this.scrollFlag) {
+						g.drawString(this.completedLines.get(0), X, Y1);
+						g.drawString(this.completedLines.get(1), X, Y2);
+					}
+					else {
+						// Time to scroll.
+						// DEBUG: Needs testing to see if there's any problem with
+						// it.
+						Graphics g_clipped = g.create();
+						g_clipped.setClip(rect.x, rect.y, rect.width, rect.height);
+						g_clipped.drawString(this.completedLines.get(0), X, Y1 - scrollDistance);
+						g_clipped.drawString(this.completedLines.get(1), X, Y2 - scrollDistance);
+						if (tickCount == 0x0) {
+							if (scrollDistance >= Y2 - Y1) {
+								this.scrollFlag = false;
+								this.scrollDistance = 0;
+								this.subStringIterator = 0;
+								this.completedLines.remove(0);
+								this.lines.get(this.lineIterator).setValue(true);
+							}
+						}
+						g_clipped.dispose();
+					}
+					break;
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 		}
 
 	}
