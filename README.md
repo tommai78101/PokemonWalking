@@ -10,9 +10,6 @@
 
 Implements the walking algorithm used in classic Pokémon G/S/C games. Also includes a level editor to create your own game areas.
 
-**Note #1:** *It does not mimic the walking algorithm used in Pokémon R/B/Y games (1st generation games).*
-**Note #2:** *I no longer put new releases here at GitHub, due to the lack of showing downloads count.*
-
 ===
 
 **Description:**
@@ -23,7 +20,9 @@ If all bodes well, it's possible that this will become a Java port of the Pokém
 
 It's still in very early stages of development. Possibly even earlier than "alpha". *Everything is done from scratch/by hand. Only the character design is mostly mimicked from the original Pokémon games.*
 
-*MILESTONE HAS REACHED, ALL PRIORITIES ARE SHIFTED TO LOW!* That means I won't be working on this as active as I used to be, but it is still in development.
+*MILESTONE HAS REACHED, ALL PRIORITIES ARE SHIFTED TO LOW!* That means I won't be working on this as active as I used to be, but it is still in development. Note that it does not mimic the walking algorithm used in Pokémon R/B/Y games (1st generation games). I also no longer put new releases here at GitHub, due to the lack of showing downloads count.
+
+
 
 ===
 
