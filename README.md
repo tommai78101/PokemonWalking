@@ -1,6 +1,6 @@
-![Imgur](http://i.imgur.com/PCOgSUH.png)
+![Imgur](http://i.imgur.com/P56aP0J.png)
 
-![Imgur](http://i.imgur.com/0cUssp3.png)
+![Imgur](http://i.imgur.com/PCOgSUH.png)
 
 ### Pokémon Walking Algorithm (Working Title) 
 ===
@@ -34,7 +34,7 @@ It's still in very early stages of development. Possibly even earlier than "alph
 * Entity interaction. (Alpha)
 * Level Editor (Main features complete! Bare functionalities only!)
 * Item Balls (Complete.)
-* Inventory (Alpha.)
+* Inventory (Complete.)
 
 **Known Issues:**
 * There may be issues with the tiles-to-tiles interaction, causing unwanted bugs.
@@ -44,6 +44,10 @@ It's still in very early stages of development. Possibly even earlier than "alph
 **Plans:**
 * ~~Implement all walking situations from the original games. Walking, surfing, jumping over ledges, riding bicycle, etc. (MAIN GOAL)~~  (MILESTONE COMPLETE!)
 * Create a game completely different from Pokémon games. (Extended Plan, low priority, low activity, won't guarantee completion.)
+
+**Downloads:**
+* Walking v15:  http://www.thehelper.net/attachments/walking_v15-zip.18668/
+* Editor v3:    http://www.thehelper.net/attachments/editor_v3-zip.18662/
 
 **Wanna chat?**
 You may head over to The Helper Forums, or Java-Gaming.org to post your feedback. Much appreciated.     
