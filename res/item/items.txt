@@ -17,16 +17,15 @@
 
 %DUMMY
 #TEST
-@Test item. Returns to menu.
+@When used, it returns to menu.
 ^KEYITEMS
 !
-$
 &
 ;
 
 %DUMMY
 #3_OPTIONS
-@Another test item.
+@Tests 3 options. Returns to menu.
 ^POTIONS
 !
 &

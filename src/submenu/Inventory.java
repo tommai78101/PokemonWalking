@@ -446,6 +446,22 @@ public class Inventory extends SubMenu {
 					this.keys.PERIOD.lastKeyState = true;
 					this.resetSelectionCursor();
 					this.state = State.MENU;
+					if (this.selectionMenu.isEmpty()) {
+						List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+						Item item = list.get(itemCursor).getKey();
+						if (item != null && list.get(itemCursor).getValue() != Integer.MAX_VALUE) {
+							switch (item.getCategory()) {
+								case POTIONS:
+								case POKEBALLS:
+								case TM_HM:
+									this.selectionMenu.addAll(item.getAvailableCommands());
+									break;
+								case KEYITEMS:
+									this.selectionMenu.addAll(item.getAvailableCommands());
+									break;
+							}
+						}
+					}
 				}
 				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 					this.keys.Z.lastKeyState = true;
