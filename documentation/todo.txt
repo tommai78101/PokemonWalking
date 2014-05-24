@@ -1,0 +1,24 @@
+By line order (Specific --> Abstract):
+
+Change all font rendering to use BufferedImage.createGraphics().
+Work on NewDialogue.QUESTION.
+Work on replacing Dialogue with NewDialogue.
+Work on Saving.
+Work on Short Grass.
+Work on Tall Grass.
+Work on subregions, integrating with Saving.
+Work on items, integrating with Saving.
+Work on area modification by game events, integrating with Saving.
+Work on Battles.
+Work on Intro.
+Work on Victory Conditions.
+Work on Losing Conditions.
+Work on AI
+Work on NPC
+Work on Special Buildings. (Gyms, Pokemon Centers, Shops, Residentals, etc.)
+Work on Special NPCs (Gym Leaders, Nurse Joys, Clerks, etc.)
+Work on Story Plot
+Work on Special Story Plots
+Replace ALL art resources with non-copyrighted resources.
+Add audio.
+Grand-scale RPG.
