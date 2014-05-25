@@ -15,6 +15,7 @@ import item.DummyItem;
 import item.ItemText;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -150,10 +151,13 @@ public class Dialogue {
 	 * */
 	public void renderText(Graphics g) {
 		g.setColor(Color.black);
-		g.setFont(Art.font);
+		g.setFont(Art.font.deriveFont(8f));
 		try {
-			g.drawString(this.tokens[this.tokenPointer].substring(0, this.firstLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextStartingY());
-			g.drawString(this.tokens[this.tokenPointer + 1].substring(0, secondLineIterator), Dialogue.getDialogueTextStartingX(), Dialogue.getDialogueTextSecondLineStartingY());
+			final int X = 8;
+			final int Y1 = 120;
+			final int Y2 = 136;
+			g.drawString(this.tokens[this.tokenPointer].substring(0, this.firstLineIterator), X, Y1);
+			g.drawString(this.tokens[this.tokenPointer + 1].substring(0, secondLineIterator), X, Y2);
 		}
 		catch (Exception e) {
 			// Ignore. Silently catch the any sorts of exception, and just let the game flow on.
@@ -348,8 +352,11 @@ public class Dialogue {
 	public void render(BaseScreen screen, int offsetX, int offsetY, Graphics g) {
 		screen.disableRenderHalf();
 		this.renderDialog(screen, 0, 6, 9, 2);
+		Graphics2D g2d = screen.getBufferedImage().createGraphics();
+		this.renderText(g2d);
+		g2d.dispose();
 		g.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-		this.renderText(g);
+		
 	}
 	
 	/**

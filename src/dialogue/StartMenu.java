@@ -12,6 +12,7 @@ package dialogue;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
@@ -28,8 +29,8 @@ import entity.Player;
 
 public class StartMenu {
 	// Description area
-	private static final int DESCRIPTION_FIRST_LINE_Y = (Tile.HEIGHT * 7) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
-	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 8) * MainComponent.GAME_SCALE + Tile.HEIGHT * 2;
+	private static final int DESCRIPTION_FIRST_LINE_Y = (Tile.HEIGHT * 8) - 8;
+	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 9) - 8;
 	
 	// String constants
 	//public static final String ITEM_NAME_BICYCLE = "BICYCLE";
@@ -95,9 +96,11 @@ public class StartMenu {
 			Dialogue.renderBox(output, 5, 0, 4, items.size());
 			StartMenu.renderDescriptionBox(output, 0, 7, 5, 3);
 			output.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuCursorPosition * Tile.HEIGHT);
+			Graphics2D g2d = output.getBufferedImage().createGraphics();
+			this.renderMenuText(g2d);
+			this.renderMenuDescriptionText(g2d);
+			g2d.dispose();
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			this.renderMenuText(graphics);
-			this.renderMenuDescriptionText(graphics);
 		}
 	}
 	
@@ -170,17 +173,17 @@ public class StartMenu {
 	}
 	
 	private void renderMenuText(Graphics g) {
-		g.setFont(Art.font);
+		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
 		if (this.activation) {
 			for (int i = 0; i < this.items.size(); i++) {
-				g.drawString(this.items.get(i).getValue().getName(), MainComponent.GAME_SCALE * (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16) * MainComponent.GAME_SCALE));
+				g.drawString(this.items.get(i).getValue().getName(), (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16)));
 			}
 		}
 	}
 	
 	private void renderMenuDescriptionText(Graphics g) {
-		g.setFont(Art.font);
+		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
 		try {
 			g.drawString(tokens[0], 0, StartMenu.DESCRIPTION_FIRST_LINE_Y);

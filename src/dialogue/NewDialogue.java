@@ -2,11 +2,11 @@ package dialogue;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
-
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
@@ -29,13 +29,13 @@ public class NewDialogue {
 	private int scrollDistance;
 	private boolean scrollFlag;
 	private boolean showDialog;
-
+	
 	private int subStringIterator;
 	private byte tickCount = 0x0;
-
+	
 	private int totalDialogueLength;
 	private int type;
-
+	
 	private NewDialogue(Keys keys) {
 		lines = new ArrayList<Map.Entry<String, Boolean>>();
 		completedLines = new ArrayList<String>(3);
@@ -51,15 +51,15 @@ public class NewDialogue {
 		this.showDialog = false;
 		this.type = 0;
 	}
-
+	
 	public boolean dialogBoxIsShowing() {
 		return this.showDialog;
 	}
-
+	
 	public void render(BaseScreen output, Graphics graphics) {
 		render(output, graphics, 0, 6, 9, 2);
 	}
-
+	
 	public void render(BaseScreen output, Graphics graphics, int x, int y, int w, int h) {
 		if (x < 0)
 			x = 0;
@@ -78,17 +78,19 @@ public class NewDialogue {
 			renderDialogBorderBox(output, x, y, w, h);
 			if (this.nextFlag && this.nextTick < 0x8)
 				output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
+			Graphics2D g2d = output.getBufferedImage().createGraphics();
+			renderText(g2d);
+			g2d.dispose();
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
-			renderText(graphics);
 		}
 	}
-
+	
 	public boolean textIsCreated() {
 		return !this.lines.isEmpty();
 	}
-
+	
 	public void tick() {
-
+		
 		if (this.subStringIterator < this.totalDialogueLength && (!this.nextFlag && !this.scrollFlag)) {
 			tickCount++;
 			if (tickCount > 0x3)
@@ -112,9 +114,9 @@ public class NewDialogue {
 			if (this.type == DIALOGUE_SPEECH)
 				this.nextFlag = true;
 		}
-
+		
 		try {
-
+			
 			if (!this.nextFlag) {
 				if (tickCount == 0x0) {
 					if (!this.scrollFlag)
@@ -125,7 +127,7 @@ public class NewDialogue {
 						this.completedLines.add(entry.getKey());
 						this.lineIterator++;
 					}
-
+					
 					if (this.completedLines.size() == 2) {
 						if (!this.scrollFlag) {
 							if (this.type == DIALOGUE_SPEECH)
@@ -155,7 +157,7 @@ public class NewDialogue {
 				}
 				this.scrollDistance += 8;
 			}
-
+			
 		}
 		catch (Exception e) {
 			if (this.lineIterator >= this.lines.size()) {
@@ -170,16 +172,16 @@ public class NewDialogue {
 			}
 		}
 	}
-
+	
 	private void renderText(Graphics g) {
-		final int X = 8 * MainComponent.GAME_SCALE;
-		final int Y1 = 360;
-		final int Y2 = 408;
-		final Rectangle rect = new Rectangle(X, Y1 - Tile.HEIGHT * 2, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT);
-
-		g.setFont(Art.font);
+		final int X = 8;
+		final int Y1 = 120;
+		final int Y2 = 136;
+		final Rectangle rect = new Rectangle(X, Y1 - Tile.HEIGHT * 2, MainComponent.GAME_WIDTH, MainComponent.GAME_HEIGHT);
+		
+		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
-
+		
 		String string = null;
 		try {
 			switch (this.completedLines.size()) {
@@ -187,7 +189,7 @@ public class NewDialogue {
 					// None completed.
 					string = this.lines.get(this.lineIterator).getKey();
 					if (this.subStringIterator > string.length()) {
-						g.drawString(string.substring(0, string.length() - 1), X, Y1);
+						g.drawString(string.substring(0, string.length()), X, Y1);
 						this.subStringIterator = this.lineLength;
 					}
 					else
@@ -234,9 +236,9 @@ public class NewDialogue {
 		}
 		catch (Exception e) {
 		}
-
+		
 	}
-
+	
 	public static NewDialogue createText(String dialogue, int length, int type) {
 		NewDialogue dialogues = new NewDialogue(MainComponent.getMainInput());
 		dialogues.lines = toLines(dialogue, length);
@@ -246,14 +248,14 @@ public class NewDialogue {
 		dialogues.showDialog = true;
 		return dialogues;
 	}
-
+	
 	public static void renderDialogBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
 		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
 		}
 		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-
+		
 		for (int j = 0; j < centerHeight - 1; j++) {
 			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
 			for (int i = 0; i < centerWidth - 1; i++) {
@@ -261,14 +263,14 @@ public class NewDialogue {
 			}
 			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
 		}
-
+		
 		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
 		}
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 	}
-
+	
 	private static void renderDialogBackground(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
 		for (int j = 0; j < centerHeight - 1; j++) {
 			for (int i = 0; i < centerWidth - 1; i++) {
@@ -276,26 +278,26 @@ public class NewDialogue {
 			}
 		}
 	}
-
+	
 	private static void renderDialogBorderBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
 		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
 		}
 		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-
+		
 		for (int j = 0; j < centerHeight - 1; j++) {
 			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
 			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
 		}
-
+		
 		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
 		}
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 	}
-
+	
 	private static ArrayList<Map.Entry<String, Boolean>> toLines(String all, final int regex) {
 		ArrayList<Map.Entry<String, Boolean>> lines = new ArrayList<>();
 		String[] words = all.split("\\s");
@@ -324,5 +326,5 @@ public class NewDialogue {
 			lines.add(new AbstractMap.SimpleEntry<String, Boolean>(line, false));
 		return lines;
 	}
-
+	
 }

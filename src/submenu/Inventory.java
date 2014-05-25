@@ -14,7 +14,6 @@ import item.ActionItem;
 import item.Bicycle;
 import item.DummyItem;
 import item.ItemText;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,7 +22,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import level.WorldConstants;
 import main.Game;
 import main.Keys;
@@ -38,11 +36,11 @@ import dialogue.Dialogue;
 import entity.Player;
 
 public class Inventory extends SubMenu {
-
+	
 	private enum State {
 		SELECTION, MENU, USE, TOSS, SET
 	};
-
+	
 	private Keys keys;
 	private List<Map.Entry<Item, Integer>> potions;
 	private List<Map.Entry<Item, Integer>> keyItems;
@@ -62,12 +60,12 @@ public class Inventory extends SubMenu {
 	private int set_subStringIterator = 0;
 	private ArrayList<String> set_completedLines;
 	private Thread inventoryDialogueThread;
-
+	
 	public static final String MENU_USE = "USE";
 	public static final String MENU_SET = "SET";
 	public static final String MENU_TOSS = "TOSS";
 	public static final String MENU_CANCEL = "CANCEL";
-
+	
 	// TODO: Continue to work on this.
 	public Inventory(String name, String enabled, String disabled, Game game) {
 		super(name, enabled, disabled, game);
@@ -88,7 +86,7 @@ public class Inventory extends SubMenu {
 		this.state = State.SELECTION;
 		this.set_completedLines = new ArrayList<String>();
 	}
-
+	
 	public void addItem(ItemText itemText, Item item) {
 		boolean heldItemExists = false;
 		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(item);
@@ -126,17 +124,17 @@ public class Inventory extends SubMenu {
 					//Nothing to see here.
 					break;
 			}
-
+			
 		}
 	}
-
+	
 	@Override
 	public SubMenu initialize(Keys keys) {
 		// TODO: Add new inventory art for background.
 		this.keys = keys;
 		return Inventory.this;
 	}
-
+	
 	@Override
 	public void render(BaseScreen output, Graphics graphics) {
 		//WARNING: Due to the way it was rendered, the most direct method of rendering is used.
@@ -167,11 +165,10 @@ public class Inventory extends SubMenu {
 							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
 							break;
 					}
-					BufferedImage old = output.getBufferedImage();
-					Graphics2D g2d = old.createGraphics();
+					Graphics2D g2d = output.getBufferedImage().createGraphics();
 					renderText(g2d);
 					g2d.dispose();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(old), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 				case MENU: {
@@ -269,17 +266,16 @@ public class Inventory extends SubMenu {
 							output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
 							break;
 					}
-					BufferedImage old = output.getBufferedImage();
-					Graphics2D g2d = old.createGraphics();
+					Graphics2D g2d = output.getBufferedImage().createGraphics();
 					renderText(g2d);
 					g2d.dispose();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(old), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 			}
 		}
 	}
-
+	
 	public void resetCursor() {
 		this.itemCursor = 0;
 		this.arrowPosition = 0;
@@ -288,12 +284,12 @@ public class Inventory extends SubMenu {
 		this.category = Category.POTIONS;
 		this.state = State.SELECTION;
 	}
-
+	
 	public void resetSelectionCursor() {
 		this.selectionMenu.clear();
 		this.stateArrowPosition = 0;
 	}
-
+	
 	@Override
 	public void tick() {
 		switch (this.state) {
@@ -340,7 +336,7 @@ public class Inventory extends SubMenu {
 				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 					this.keys.Z.lastKeyState = true;
 					this.keys.SLASH.lastKeyState = true;
-
+					
 					//This state is used when the player has selected an item, and wants to do something to the item.
 					//Example, using the item, tossing the item, etc.
 					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
@@ -491,7 +487,7 @@ public class Inventory extends SubMenu {
 				break;
 			}
 		}
-
+		
 		if (itemCursor >= (itemListSpan + 5)) {
 			itemListSpan++;
 		}
@@ -501,7 +497,7 @@ public class Inventory extends SubMenu {
 		if (tick < 0xE)
 			tick++;
 	}
-
+	
 	public void tossItem() {
 		List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 		Map.Entry<Item, Integer> entry = list.get(itemCursor);
@@ -510,7 +506,7 @@ public class Inventory extends SubMenu {
 		else
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
-
+	
 	private List<Map.Entry<Item, Integer>> getCurrentList() {
 		List<Map.Entry<Item, Integer>> result = null;
 		switch (this.category) {
@@ -529,9 +525,9 @@ public class Inventory extends SubMenu {
 		}
 		return result;
 	}
-
+	
 	// ------------------------------------ PRIVATE METHODS -----------------------------------------
-
+	
 	private List<Map.Entry<Item, Integer>> getItemCategoryList(Item item) {
 		List<Map.Entry<Item, Integer>> result = null;
 		switch (item.getCategory()) {
@@ -550,7 +546,7 @@ public class Inventory extends SubMenu {
 		}
 		return result;
 	}
-
+	
 	private void renderItemMenuText(List<Map.Entry<Item, Integer>> list, Graphics graphics) {
 		switch (this.state) {
 			case TOSS: {
@@ -560,10 +556,10 @@ public class Inventory extends SubMenu {
 				if (item != null && list.get(itemCursor).getValue() != Integer.MAX_VALUE && list.get(itemCursor).getValue() > 0 && this.selectionMenu.isEmpty()) {
 					this.selectionMenu.add(0, "TOSS*");
 				}
-
+				
 				graphics.setFont(Art.font.deriveFont(8f));
 				graphics.setColor(Color.black);
-
+				
 				try {
 					String tossAmount = amountToToss < 10 ? "0" + Integer.toString(amountToToss) : Integer.toString(amountToToss);
 					graphics.drawString(this.selectionMenu.get(0), (4 * Tile.WIDTH + (3 * Dialogue.TEXT_SPACING_WIDTH)), (Tile.HEIGHT * 5 + 6));
@@ -604,7 +600,7 @@ public class Inventory extends SubMenu {
 		catch (Exception e) {
 		}
 	}
-
+	
 	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
@@ -614,11 +610,11 @@ public class Inventory extends SubMenu {
 		for (int k = 0; k < width; k++)
 			output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (k * Tile.WIDTH), (height * Tile.HEIGHT));
 	}
-
+	
 	private void setState(State value) {
 		this.state = value;
 	}
-
+	
 	private void renderText(Graphics g) {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
@@ -749,6 +745,6 @@ public class Inventory extends SubMenu {
 				}
 			}
 		}
-
+		
 	}
 }
