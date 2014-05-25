@@ -114,7 +114,7 @@ public class NewDialogue {
 		}
 	}
 	
-	public boolean textIsCreated() {
+	public boolean isTextCreated() {
 		return !this.lines.isEmpty();
 	}
 	
@@ -123,18 +123,32 @@ public class NewDialogue {
 	}
 	
 	public void tick() {
-		if (this.subStringIterator < this.totalDialogueLength && (!this.nextFlag && !this.scrollFlag)) {
+		int count = 0;
+		for (int i = 0; i < this.lineIterator; i++) {
+			count += this.lines.get(i).getKey().length();
+			if (i != this.lines.size() - 1)
+				count += 1;
+		}
+		if (count < this.totalDialogueLength && (!this.nextFlag && !this.scrollFlag)) {
 			tickCount++;
 			if (tickCount > 0x1)
 				tickCount = 0x0;
 		}
 		else if (this.nextFlag) {
 			switch (this.type) {
-				case DIALOGUE_QUESTION:
-					this.simpleQuestionFlag = true;
-					this.nextFlag = false;
-					this.scrollFlag = false;
+				case DIALOGUE_QUESTION: {
+					if (count >= this.totalDialogueLength) {
+						this.simpleQuestionFlag = true;
+						this.nextFlag = false;
+						this.scrollFlag = false;
+					}
+					else {
+						this.nextTick++;
+						if (this.nextTick > 0xE)
+							this.nextTick = 0x0;
+					}
 					break;
+				}
 				case DIALOGUE_SPEECH:
 					this.nextTick++;
 					if (this.nextTick > 0xE)
@@ -142,8 +156,8 @@ public class NewDialogue {
 					break;
 			}
 		}
-		else if (this.subStringIterator >= this.totalDialogueLength) {
-			if (this.lineIterator > this.lines.size()) {
+		else if (count >= this.totalDialogueLength) {
+			if (this.lineIterator >= this.lines.size()) {
 				switch (this.type) {
 					case DIALOGUE_QUESTION:
 						this.simpleQuestionFlag = true;
@@ -155,17 +169,19 @@ public class NewDialogue {
 						return;
 				}
 			}
-			Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
-			this.completedLines.add(entry.getKey());
-			this.lineIterator++;
-			switch (this.type) {
-				case DIALOGUE_SPEECH:
-					this.nextFlag = true;
-					break;
-				case DIALOGUE_QUESTION:
-					this.simpleQuestionFlag = true;
-					this.nextFlag = false;
-					break;
+			else {
+				Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
+				this.completedLines.add(entry.getKey());
+				this.lineIterator++;
+				switch (this.type) {
+					case DIALOGUE_SPEECH:
+						this.nextFlag = true;
+						break;
+					case DIALOGUE_QUESTION:
+						this.simpleQuestionFlag = true;
+						this.nextFlag = false;
+						break;
+				}
 			}
 		}
 		
@@ -189,7 +205,7 @@ public class NewDialogue {
 									break;
 								case DIALOGUE_QUESTION:
 									//Must get to the end of the entire dialogue before asking for answers.
-									if (this.subStringIterator >= this.totalDialogueLength)
+									if (count >= this.totalDialogueLength)
 										this.simpleQuestionFlag = true;
 									else
 										this.nextFlag = true;
@@ -222,15 +238,14 @@ public class NewDialogue {
 				if ((this.input.Z.keyStateDown && !this.input.Z.lastKeyState) || (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
 					this.input.Z.lastKeyState = true;
 					this.input.SLASH.lastKeyState = true;
-					this.yesNoCursorPosition = true;
 					this.simpleQuestionFlag = false;
-					this.simpleQuestionAnswerFlag = true; //Confirmed
+					this.simpleQuestionAnswerFlag = this.yesNoCursorPosition; //Confirmed
 					this.closeDialog();
 				}
 				else if ((this.input.X.keyStateDown && !this.input.X.lastKeyState) || (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
 					this.input.X.lastKeyState = true;
 					this.input.PERIOD.lastKeyState = true;
-					this.yesNoCursorPosition = true;
+					this.yesNoCursorPosition = false;
 					this.simpleQuestionFlag = false;
 					this.simpleQuestionAnswerFlag = false; //Rejected.
 					this.closeDialog();
