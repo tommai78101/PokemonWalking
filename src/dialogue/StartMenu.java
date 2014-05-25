@@ -23,6 +23,7 @@ import resources.Art;
 import screen.BaseScreen;
 import submenu.DummyMenu;
 import submenu.Inventory;
+import submenu.Save;
 import abstracts.SubMenu;
 import abstracts.Tile;
 import entity.Player;
@@ -33,9 +34,9 @@ public class StartMenu {
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 9) - 8;
 	
 	// String constants
-	//public static final String ITEM_NAME_BICYCLE = "BICYCLE";
-	public static final String ITEM_NAME_INVENTORY = "PACK";
 	public static final String ITEM_NAME_EXIT = "EXIT";
+	public static final String ITEM_NAME_INVENTORY = "PACK";
+	public static final String ITEM_NAME_SAVE = "SAVE";
 	
 	private boolean activation;
 	private ArrayList<Map.Entry<Integer, SubMenu>> items = new ArrayList<Map.Entry<Integer, SubMenu>>();
@@ -45,6 +46,7 @@ public class StartMenu {
 	private String[] tokens;
 	private Map.Entry<Integer, SubMenu> actionEvent;
 	private Inventory inventory;
+	private Save save;
 	
 	public StartMenu(Game game) {
 		this.activation = false;
@@ -55,11 +57,11 @@ public class StartMenu {
 	}
 	
 	public StartMenu initialize() {
-		//SubMenu bicycle = new DummyMenu(ITEM_NAME_BICYCLE, "Use the bicycle", "Get off bicycle", this.game);
 		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game).initialize(keys);
+		save = (Save) new Save(ITEM_NAME_SAVE, "Save the game.", "Save the game.", this.game).initialize(keys);
 		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu", this.game);
-		//this.addMenuItem(bicycle);
 		this.addMenuItem(inventory);
+		this.addMenuItem(save);
 		this.addMenuItem(exit);
 		return this;
 	}
