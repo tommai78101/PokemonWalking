@@ -25,6 +25,7 @@ public class NewDialogue {
 	private int lineLength;
 	private ArrayList<Map.Entry<String, Boolean>> lines;
 	private boolean nextFlag;
+	private boolean simpleQuestionFlag;
 	private byte nextTick;
 	private int scrollDistance;
 	private boolean scrollFlag;
@@ -90,10 +91,9 @@ public class NewDialogue {
 	}
 	
 	public void tick() {
-		
 		if (this.subStringIterator < this.totalDialogueLength && (!this.nextFlag && !this.scrollFlag)) {
 			tickCount++;
-			if (tickCount > 0x3)
+			if (tickCount > 0x1)
 				tickCount = 0x0;
 		}
 		else if (this.nextFlag) {
@@ -111,8 +111,14 @@ public class NewDialogue {
 			Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
 			this.completedLines.add(entry.getKey());
 			this.lineIterator++;
-			if (this.type == DIALOGUE_SPEECH)
-				this.nextFlag = true;
+			switch (this.type) {
+				case DIALOGUE_SPEECH:
+					this.nextFlag = true;
+					break;
+				case DIALOGUE_QUESTION:
+					this.simpleQuestionFlag = true;
+					break;
+			}
 		}
 		
 		try {
@@ -127,11 +133,16 @@ public class NewDialogue {
 						this.completedLines.add(entry.getKey());
 						this.lineIterator++;
 					}
-					
 					if (this.completedLines.size() == 2) {
 						if (!this.scrollFlag) {
-							if (this.type == DIALOGUE_SPEECH)
-								this.nextFlag = true;
+							switch (this.type) {
+								case DIALOGUE_SPEECH:
+									this.nextFlag = true;
+									break;
+								case DIALOGUE_QUESTION:
+									this.simpleQuestionFlag = true;
+									break;
+							}
 						}
 					}
 				}
@@ -143,21 +154,26 @@ public class NewDialogue {
 			else {
 				if (input.Z.keyStateDown && !(input.Z.lastKeyState)) {
 					input.Z.lastKeyState = true;
-					if (this.type == DIALOGUE_SPEECH) {
-						this.nextFlag = false;
-						this.scrollFlag = true;
+					switch (this.type) {
+						case DIALOGUE_SPEECH:
+							this.nextFlag = false;
+							this.scrollFlag = true;
+							break;
+						case DIALOGUE_QUESTION:
+							this.simpleQuestionFlag = false;
+							this.scrollFlag = true;
+							break;
 					}
 				}
-			}
-			if (this.scrollFlag) {
-				if (this.lineIterator >= this.lines.size()) {
-					this.showDialog = false;
-					this.lines.clear();
-					return;
+				if (this.scrollFlag) {
+					if (this.lineIterator >= this.lines.size()) {
+						this.showDialog = false;
+						this.lines.clear();
+						return;
+					}
+					this.scrollDistance += 8;
 				}
-				this.scrollDistance += 8;
 			}
-			
 		}
 		catch (Exception e) {
 			if (this.lineIterator >= this.lines.size()) {
@@ -166,11 +182,21 @@ public class NewDialogue {
 					this.lines.clear();
 				}
 				else {
-					if (this.type == DIALOGUE_SPEECH)
-						this.nextFlag = true;
+					switch (this.type) {
+						case DIALOGUE_SPEECH:
+							this.nextFlag = true;
+							break;
+						case DIALOGUE_QUESTION:
+							this.simpleQuestionFlag = true;
+							break;
+					}
 				}
 			}
 		}
+	}
+	
+	public int getDialogueType() {
+		return this.type;
 	}
 	
 	private void renderText(Graphics g) {
