@@ -118,6 +118,10 @@ public class NewDialogue {
 		return !this.lines.isEmpty();
 	}
 	
+	public boolean getAnswerToSimpleQuestion() {
+		return this.simpleQuestionAnswerFlag;
+	}
+	
 	public void tick() {
 		if (this.subStringIterator < this.totalDialogueLength && (!this.nextFlag && !this.scrollFlag)) {
 			tickCount++;
