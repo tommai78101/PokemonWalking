@@ -168,7 +168,6 @@ public class Inventory extends SubMenu {
 					Graphics2D g2d = output.getBufferedImage().createGraphics();
 					renderText(g2d);
 					g2d.dispose();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 				case MENU: {
@@ -204,7 +203,6 @@ public class Inventory extends SubMenu {
 						List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 						renderItemMenuText(list, g2d);
 					}
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					g2d.dispose();
 					break;
 				}
@@ -239,7 +237,6 @@ public class Inventory extends SubMenu {
 					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					renderItemMenuText(list, g2d);
 					g2d.dispose();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 				case SET: {
@@ -269,7 +266,6 @@ public class Inventory extends SubMenu {
 					Graphics2D g2d = output.getBufferedImage().createGraphics();
 					renderText(g2d);
 					g2d.dispose();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 			}

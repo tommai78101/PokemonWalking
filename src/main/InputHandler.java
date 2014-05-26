@@ -20,7 +20,7 @@ import main.Keys.Key;
 
 public class InputHandler implements KeyListener {
 	public Map<Key, Integer> mappings = new HashMap<Key, Integer>();
-	private ExecutorService threadPool = Executors.newCachedThreadPool();
+	public static final ExecutorService threadPool = Executors.newCachedThreadPool();
 	
 	/**
 	 * Initializes the control inputs.
@@ -59,7 +59,7 @@ public class InputHandler implements KeyListener {
 					key.isTappedDown = true;
 					key.isPressedDown = false;
 					key.keyStateDown = true;
-					this.threadPool.execute(new Runnable() {
+					InputHandler.threadPool.execute(new Runnable() {
 						@Override
 						public void run() {
 							try {

@@ -95,19 +95,15 @@ public class Game {
 				overworld.render(screen, player.getX(), player.getY());
 				if (dialogue.isDisplayingDialogue())
 					dialogue.render(screen, player.getX(), player.getY(), graphics);
-				else
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				break;
 			}
 			case INVENTORY: {
 				if (screen.getRenderingEffectTick() < (byte) 0x7) {
 					screen.flashing();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				}
 				else {
 					if (this.subMenu != null) {
 						this.subMenu.render(screen, graphics);
-						
 					}
 				}
 				break;
@@ -115,18 +111,12 @@ public class Game {
 			case PAUSED: {
 				if (screen.getRenderingEffectTick() < (byte) 0x7) {
 					screen.flashing();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 				}
 				else {
 					screen.clear(0xA4E767);
 					overworld.render(screen, player.getX(), player.getY());
-					// dialogue.render(screen, player.getX(), player.getY(), graphics);
 					if (startMenu.isActivated()) {
 						startMenu.render(screen, graphics);
-					}
-					else {
-						// dialogue.render(screen, player.getX(), player.getY(), graphics);
-						graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					}
 				}
 				break;
@@ -140,6 +130,7 @@ public class Game {
 				break;
 			}
 		}
+		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 	}
 	
 	/**
@@ -161,12 +152,11 @@ public class Game {
 				if (!this.subMenu.isActivated()) {
 					this.state = State.PAUSED;
 					screen.setRenderingEffectTick((byte) 0x0);
+					break;
 				}
 				if (this.subMenu != null) {
 					this.subMenu.tick();
 				}
-				else
-					break;
 				break;
 			}
 			case PAUSED: {
@@ -182,12 +172,11 @@ public class Game {
 			case SAVE: {
 				if (!this.subMenu.isActivated()) {
 					this.state = State.PAUSED;
+					break;
 				}
 				if (this.subMenu != null) {
 					this.subMenu.tick();
 				}
-				else
-					break;
 				break;
 			}
 		}

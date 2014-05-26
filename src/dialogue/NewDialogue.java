@@ -16,23 +16,30 @@ import entity.Player;
 
 public class NewDialogue {
 	public static final int DIALOGUE_QUESTION = 0x41;
+	
 	public static final int DIALOGUE_SPEECH = 0x40;
+	
 	public static final int HALF_STRING_LENGTH = 9;
+	
 	// Dialogue max string length per line.
 	public static final int MAX_STRING_LENGTH = 18;
+	
 	private ArrayList<String> completedLines;
+	
 	private Keys input;
+	
 	private int lineIterator;
 	private int lineLength;
 	private ArrayList<Map.Entry<String, Boolean>> lines;
 	private boolean nextFlag;
 	private boolean simpleQuestionFlag;
+	private boolean simpleSpeechFlag;
 	private boolean yesNoCursorPosition;
+	private Boolean yesNoAnswerFlag;
 	private byte nextTick;
 	private int scrollDistance;
 	private boolean scrollFlag;
 	private boolean showDialog;
-	private boolean simpleQuestionAnswerFlag;
 	
 	private int subStringIterator;
 	private byte tickCount = 0x0;
@@ -42,12 +49,13 @@ public class NewDialogue {
 	
 	private NewDialogue(Keys keys) {
 		lines = new ArrayList<Map.Entry<String, Boolean>>();
-		completedLines = new ArrayList<String>(3);
+		completedLines = new ArrayList<String>();
 		this.subStringIterator = 0;
 		this.lineLength = 0;
 		this.totalDialogueLength = 0;
 		this.nextFlag = false;
 		this.simpleQuestionFlag = false;
+		this.simpleSpeechFlag = false;
 		this.scrollFlag = false;
 		this.scrollDistance = 0;
 		this.nextTick = 0x0;
@@ -56,9 +64,28 @@ public class NewDialogue {
 		this.showDialog = false;
 		this.type = 0;
 		this.yesNoCursorPosition = true;
+		this.yesNoAnswerFlag = null; //Default
 	}
 	
-	public boolean dialogBoxIsShowing() {
+	public Boolean getAnswerToSimpleQuestion() {
+		if (this.yesNoAnswerFlag == null)
+			return null;
+		return this.yesNoAnswerFlag.booleanValue();
+	}
+	
+	public int getDialogueType() {
+		return this.type;
+	}
+	
+	public boolean isDialogueCompleted() {
+		return (this.lineIterator >= this.lines.size() && !this.showDialog);
+	}
+	
+	public boolean isDialogueTextSet() {
+		return !this.lines.isEmpty();
+	}
+	
+	public boolean isShowingDialog() {
 		return this.showDialog;
 	}
 	
@@ -89,7 +116,6 @@ public class NewDialogue {
 					Graphics2D g2d = output.getBufferedImage().createGraphics();
 					renderText(g2d);
 					g2d.dispose();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 				case DIALOGUE_QUESTION: {
@@ -98,8 +124,8 @@ public class NewDialogue {
 					if (this.simpleQuestionFlag && !this.nextFlag) {
 						renderDialogBackground(output, 7, 3, 2, 2);
 						renderDialogBorderBox(output, 7, 3, 2, 2);
-						//Offset by -3 for the Y axis. 
-						output.blit(Art.dialogue_pointer, MainComponent.GAME_WIDTH - Tile.WIDTH * 3 + 8, yesNoCursorPosition ? (Tile.HEIGHT * 4 - 3) : (Tile.HEIGHT * 5 - 3));
+						//Offset by -3 for the Y axis.
+						output.blit(Art.dialogue_pointer, MainComponent.GAME_WIDTH - Tile.WIDTH * 3 + 8, this.yesNoCursorPosition ? (Tile.HEIGHT * 4 - 3) : (Tile.HEIGHT * 5 - 3));
 					}
 					else if (!this.simpleQuestionFlag && (this.nextFlag && this.nextTick < 0x8))
 						output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
@@ -107,27 +133,40 @@ public class NewDialogue {
 					renderText(g2d);
 					renderYesNoAnswerText(g2d);
 					g2d.dispose();
-					graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 					break;
 				}
 			}
 		}
 	}
 	
-	public boolean isTextCreated() {
-		return !this.lines.isEmpty();
-	}
-	
-	public boolean getAnswerToSimpleQuestion() {
-		return this.simpleQuestionAnswerFlag;
+	public void renderYesNoAnswerText(Graphics g) {
+		if (this.simpleQuestionFlag) {
+			g.setFont(Art.font.deriveFont(8f));
+			g.setColor(Color.black);
+			
+			final int X = Tile.WIDTH * 8;
+			final int YES_HEIGHT = Tile.HEIGHT * 4 + 4;
+			final int NO_HEIGHT = Tile.HEIGHT * 5 + 4;
+			try {
+				g.drawString("YES", X, YES_HEIGHT);
+				g.drawString("NO", X, NO_HEIGHT);
+			}
+			catch (Exception e) {
+			}
+		}
 	}
 	
 	public void tick() {
 		int count = 0;
-		for (int i = 0; i < this.lineIterator; i++) {
-			count += this.lines.get(i).getKey().length();
-			if (i != this.lines.size() - 1)
-				count += 1;
+		try {
+			for (int i = 0; i < this.lineIterator; i++) {
+				count += this.lines.get(i).getKey().length();
+				if (i != this.lines.size() - 1)
+					count += 1;
+			}
+		}
+		catch (Exception e) {
+			count = 0;
 		}
 		if (count < this.totalDialogueLength && (!this.nextFlag && !this.scrollFlag)) {
 			tickCount++;
@@ -165,8 +204,10 @@ public class NewDialogue {
 						this.nextFlag = false;
 						break;
 					case DIALOGUE_SPEECH:
-						this.closeDialog();
-						return;
+						//this.closeDialog();
+						this.simpleSpeechFlag = true;
+						this.nextFlag = false;
+						break;
 				}
 			}
 			else {
@@ -179,7 +220,7 @@ public class NewDialogue {
 						break;
 					case DIALOGUE_QUESTION:
 						this.simpleQuestionFlag = true;
-						this.nextFlag = false;
+						this.nextFlag = true;
 						break;
 				}
 			}
@@ -205,8 +246,10 @@ public class NewDialogue {
 									break;
 								case DIALOGUE_QUESTION:
 									//Must get to the end of the entire dialogue before asking for answers.
-									if (count >= this.totalDialogueLength)
+									if (this.lineIterator >= this.lines.size()) {
 										this.simpleQuestionFlag = true;
+										this.nextFlag = false;
+									}
 									else
 										this.nextFlag = true;
 									break;
@@ -214,9 +257,22 @@ public class NewDialogue {
 						}
 					}
 				}
-				if (input.Z.keyStateDown && !(input.Z.lastKeyState)) {
-					input.Z.lastKeyState = true;
-					tickCount = 0x0;
+				//Speeds up text speed.
+				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || (input.SLASH.keyStateDown && !input.SLASH.lastKeyState)) {
+					if (this.subStringIterator >= this.lineLength - 2) {
+						input.Z.lastKeyState = true;
+						input.SLASH.lastKeyState = true;
+					}
+					else if (this.subStringIterator < this.lineLength) {
+						this.subStringIterator++;
+					}
+				}
+				if ((input.X.keyStateDown && !(input.X.lastKeyState)) || (input.PERIOD.keyStateDown && !input.PERIOD.lastKeyState)) {
+					if (this.subStringIterator < this.lineLength - 1) {
+						this.subStringIterator = this.lineLength - 1;
+						input.X.lastKeyState = true;
+						input.PERIOD.lastKeyState = true;
+					}
 				}
 			}
 			else if (this.simpleQuestionFlag && !this.nextFlag && !this.scrollFlag) {
@@ -227,33 +283,43 @@ public class NewDialogue {
 					this.input.up.lastKeyState = true;
 					this.input.W.lastKeyState = true;
 					//Made it consistent with Inventory's menu selection, where it doesn't wrap around.
-					this.yesNoCursorPosition = true;
+					this.yesNoCursorPosition = !this.yesNoCursorPosition;
 				}
 				else if ((this.input.down.keyStateDown && !this.input.down.lastKeyState) || (this.input.S.keyStateDown && !this.input.S.lastKeyState)) {
 					this.input.down.lastKeyState = true;
 					this.input.S.lastKeyState = true;
 					//Made it consistent with Inventory's menu selection, where it doesn't wrap around.
-					this.yesNoCursorPosition = false;
+					this.yesNoCursorPosition = !this.yesNoCursorPosition;
 				}
 				if ((this.input.Z.keyStateDown && !this.input.Z.lastKeyState) || (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
 					this.input.Z.lastKeyState = true;
 					this.input.SLASH.lastKeyState = true;
+					//The answer to simple questions have already been set by UP and DOWN.
+					this.yesNoAnswerFlag = this.yesNoCursorPosition;
 					this.simpleQuestionFlag = false;
-					this.simpleQuestionAnswerFlag = this.yesNoCursorPosition; //Confirmed
 					this.closeDialog();
 				}
 				else if ((this.input.X.keyStateDown && !this.input.X.lastKeyState) || (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
 					this.input.X.lastKeyState = true;
 					this.input.PERIOD.lastKeyState = true;
+					//Always negative for cancel button.
+					this.yesNoAnswerFlag = false;
 					this.yesNoCursorPosition = false;
 					this.simpleQuestionFlag = false;
-					this.simpleQuestionAnswerFlag = false; //Rejected.
+					this.closeDialog();
+				}
+			}
+			else if (this.simpleSpeechFlag) {
+				if ((input.Z.keyStateDown && !(input.Z.lastKeyState) || (input.SLASH.keyStateDown && !input.SLASH.lastKeyState))) {
+					input.Z.lastKeyState = true;
+					input.SLASH.lastKeyState = true;
 					this.closeDialog();
 				}
 			}
 			else {
-				if (input.Z.keyStateDown && !(input.Z.lastKeyState)) {
+				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || ((input.SLASH.keyStateDown) && !input.SLASH.lastKeyState)) {
 					input.Z.lastKeyState = true;
+					input.SLASH.lastKeyState = true;
 					switch (this.type) {
 						case DIALOGUE_SPEECH:
 							this.nextFlag = false;
@@ -297,6 +363,7 @@ public class NewDialogue {
 							break;
 						case DIALOGUE_QUESTION:
 							this.simpleQuestionFlag = true;
+							this.nextFlag = false;
 							break;
 					}
 				}
@@ -304,12 +371,15 @@ public class NewDialogue {
 		}
 	}
 	
-	public int getDialogueType() {
-		return this.type;
+	public boolean yesNoQuestionHasBeenAnswered() {
+		return this.yesNoAnswerFlag != null;
 	}
 	
-	private void closeDialog() {
+	public void closeDialog() {
 		this.showDialog = false;
+	}
+	
+	public void clearDialogueLines() {
 		if (!this.lines.isEmpty())
 			this.lines.clear();
 	}
@@ -380,19 +450,8 @@ public class NewDialogue {
 		
 	}
 	
-	public void renderYesNoAnswerText(Graphics g) {
-		g.setFont(Art.font.deriveFont(8f));
-		g.setColor(Color.black);
-		
-		final int X = Tile.WIDTH * 8;
-		final int YES_HEIGHT = Tile.HEIGHT * 4 + 4;
-		final int NO_HEIGHT = Tile.HEIGHT * 5 + 4;
-		try {
-			g.drawString("YES", X, YES_HEIGHT);
-			g.drawString("NO", X, NO_HEIGHT);
-		}
-		catch (Exception e) {
-		}
+	public static NewDialogue createEmptyDialogue() {
+		return new NewDialogue(MainComponent.getMainInput());
 	}
 	
 	public static NewDialogue createText(String dialogue, int length, int type) {
