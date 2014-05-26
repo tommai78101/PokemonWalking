@@ -1,6 +1,7 @@
 By line order (Specific --> Abstract):
 
-Change all font rendering to use BufferedImage.createGraphics().
+*	Change all font rendering to use bufferedimage.creategraphics().
+Fix NewDialogue rendering issues.
 Work on NewDialogue.QUESTION.
 Work on replacing Dialogue with NewDialogue.
 Work on Saving.
