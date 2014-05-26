@@ -12,11 +12,11 @@ package main;
 
 import item.ActionItem;
 import java.awt.Graphics;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import level.OverWorld;
+import saving.GameSave;
 import screen.BaseScreen;
 import abstracts.SubMenu;
 import abstracts.World;
@@ -182,7 +182,6 @@ public class Game {
 	 * */
 	public void save() {
 		// TODO: Save data.
-		File save = new File(SAVE_FILE_NAME);
 		
 	}
 	
@@ -192,7 +191,7 @@ public class Game {
 	 * @return True, if it detects previous saved data. False, otherwise.
 	 * */
 	public boolean checkSaveData() {
-		return new File(SAVE_FILE_NAME).exists();
+		return GameSave.check(SAVE_FILE_NAME);
 	}
 	
 	/**
