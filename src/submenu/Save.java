@@ -2,6 +2,7 @@ package submenu;
 
 import java.awt.Graphics;
 import main.Game;
+import main.InputHandler;
 import main.Keys;
 import screen.BaseScreen;
 import abstracts.SubMenu;
@@ -14,7 +15,6 @@ public class Save extends SubMenu {
 		ASK, OVERWRITE, SAVING
 	}
 	
-	private Keys keys;
 	private State state;
 	private NewDialogue newDialogue;
 	
@@ -26,7 +26,6 @@ public class Save extends SubMenu {
 	
 	@Override
 	public SubMenu initialize(Keys keys) {
-		this.keys = keys;
 		return Save.this;
 	}
 	
@@ -47,7 +46,10 @@ public class Save extends SubMenu {
 							this.newDialogue.tick();
 						if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
 							//TODO: This is the place to check to see if there exists an old save file.
-							this.state = State.OVERWRITE;
+							if (this.game.checkSaveData())
+								this.state = State.OVERWRITE;
+							else
+								this.state = State.SAVING;
 							this.newDialogue.clearDialogueLines();
 						}
 						else if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.FALSE)
@@ -84,8 +86,15 @@ public class Save extends SubMenu {
 			case SAVING: {
 				if (!this.newDialogue.isDialogueTextSet())
 					this.newDialogue = NewDialogue.createText("Saving Complete.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
-				if (!this.newDialogue.isDialogueCompleted())
+				if (!this.newDialogue.isDialogueCompleted()) {
 					this.newDialogue.tick();
+					InputHandler.threadPool.execute(new Runnable() {
+						@Override
+						public void run() {
+							game.save();
+						}
+					});
+				}
 				else {
 					disableSubMenu();
 				}

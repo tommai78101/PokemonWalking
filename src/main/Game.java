@@ -12,10 +12,10 @@ package main;
 
 import item.ActionItem;
 import java.awt.Graphics;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import level.OverWorld;
 import screen.BaseScreen;
 import abstracts.SubMenu;
@@ -25,13 +25,8 @@ import dialogue.StartMenu;
 import entity.Player;
 
 public class Game {
-	// Handles different types of worlds for the game to use.
-	// It acts as a pointer that points to many different worlds.
-	// Each world stays loaded, while the pointer just "slides" across towards the next world it is transitioning to.
-	public static Random Randomize = new Random(System.currentTimeMillis());
+	private static final String SAVE_FILE_NAME = "game_save.sav";
 	private final BaseScreen screen;
-	// private final Keys inputs;
-	// private final Gui guiInterface;
 	private final List<World> worlds;
 	private StartMenu startMenu;
 	private SubMenu subMenu;
@@ -183,10 +178,21 @@ public class Game {
 	}
 	
 	/**
-	 * Currently unused.
+	 * Saves the game.
 	 * */
 	public void save() {
 		// TODO: Save data.
+		File save = new File(SAVE_FILE_NAME);
+		
+	}
+	
+	/**
+	 * Checks for any previous saved data.
+	 * 
+	 * @return True, if it detects previous saved data. False, otherwise.
+	 * */
+	public boolean checkSaveData() {
+		return new File(SAVE_FILE_NAME).exists();
 	}
 	
 	/**
