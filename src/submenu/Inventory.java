@@ -66,7 +66,19 @@ public class Inventory extends SubMenu {
 	public static final String MENU_TOSS = "TOSS";
 	public static final String MENU_CANCEL = "CANCEL";
 	
-	// TODO: Continue to work on this.
+	/**
+	 * Creates the Inventory submenu, with all the default settings.
+	 * 
+	 * @param name
+	 *            The submenu title that is to be displayed in the start menu.
+	 * @param enabled
+	 *            The description that is to be shown when the submenu is activated/enabled.
+	 * @param disabled
+	 *            The description that is to be shown when the submenu is deactivated/disabled.
+	 * @param game
+	 *            The Game object that controls most of the actions/events the player has done when managing/using the Inventory.
+	 * @return Nothing. It's a constructor after all.
+	 * */
 	public Inventory(String name, String enabled, String disabled, Game game) {
 		super(name, enabled, disabled, game);
 		this.itemCursor = 0;
@@ -87,6 +99,15 @@ public class Inventory extends SubMenu {
 		this.set_completedLines = new ArrayList<String>();
 	}
 	
+	/**
+	 * Adds an item with its text description into the Inventory, being categorized into its relevant "pocket" of the player's bag.
+	 * 
+	 * @param itemText
+	 *            The item description of the item that is to be added into the Inventory.
+	 * @param item
+	 *            The item object that is to be added into the Inventory.
+	 * @return Nothing.
+	 * */
 	public void addItem(ItemText itemText, Item item) {
 		boolean heldItemExists = false;
 		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(item);
@@ -128,6 +149,16 @@ public class Inventory extends SubMenu {
 		}
 	}
 	
+	/**
+	 * Initializes the Inventory with the inputs.
+	 * 
+	 * <p>
+	 * Does not initialize anything else.
+	 * 
+	 * @param keys
+	 *            The input keys the player is using.
+	 * @return Itself.
+	 * */
 	@Override
 	public SubMenu initialize(Keys keys) {
 		// TODO: Add new inventory art for background.
@@ -135,6 +166,19 @@ public class Inventory extends SubMenu {
 		return Inventory.this;
 	}
 	
+	/**
+	 * Renders the Inventory to the screen.
+	 * 
+	 * <p>
+	 * Note that it doesn't render the {@link screen.BaseScreen#getBufferedImage() BufferedImage} to the actual
+	 * {@link main.MainComponent#getBufferStrategy() BufferStrategy}.
+	 * 
+	 * @param output
+	 *            The display that is to be rendered.
+	 * @param graphics
+	 *            The Graphics object that the main component creates using {@link java.awt.Canvas#getBufferStrategy() BufferStrategy} object.
+	 * @return Nothing.
+	 * */
 	@Override
 	public void render(BaseScreen output, Graphics graphics) {
 		//WARNING: Due to the way it was rendered, the most direct method of rendering is used.
@@ -272,6 +316,11 @@ public class Inventory extends SubMenu {
 		}
 	}
 	
+	/**
+	 * Resets the position of the pointer that points to the items.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void resetCursor() {
 		this.itemCursor = 0;
 		this.arrowPosition = 0;
@@ -281,11 +330,21 @@ public class Inventory extends SubMenu {
 		this.state = State.SELECTION;
 	}
 	
+	/**
+	 * Resets the position of the pointer and delete the selection menu commands of the item that the player is allowed to do.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void resetSelectionCursor() {
 		this.selectionMenu.clear();
 		this.stateArrowPosition = 0;
 	}
 	
+	/**
+	 * Updates the Inventory each tick.
+	 * 
+	 * @return Nothing.
+	 * */
 	@Override
 	public void tick() {
 		switch (this.state) {
@@ -494,6 +553,14 @@ public class Inventory extends SubMenu {
 			tick++;
 	}
 	
+	/**
+	 * Toss away an item.
+	 * 
+	 * <p>
+	 * Can be put in a loop to toss away multiple items at the same time.
+	 * 
+	 * @return Nothing.
+	 * */
 	public void tossItem() {
 		List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 		Map.Entry<Item, Integer> entry = list.get(itemCursor);
@@ -503,6 +570,13 @@ public class Inventory extends SubMenu {
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
 	
+	// ------------------------------------ PRIVATE METHODS -----------------------------------------
+	
+	/**
+	 * Obtains the list of items the player is currently browsing in the Inventory.
+	 * 
+	 * @return A list of all the items and their corresponding amount of the items that the player is currently browsing in.
+	 * */
 	private List<Map.Entry<Item, Integer>> getCurrentList() {
 		List<Map.Entry<Item, Integer>> result = null;
 		switch (this.category) {
@@ -522,8 +596,13 @@ public class Inventory extends SubMenu {
 		return result;
 	}
 	
-	// ------------------------------------ PRIVATE METHODS -----------------------------------------
-	
+	/**
+	 * Obtains the list of items of the category the item belongs to in the Inventory.
+	 * 
+	 * @param item
+	 *            The target item that is used to get the list of items that the targeted item belongs to.
+	 * @return A list of all the items and their corresponding amount of the items that the targeted item belongs to.
+	 * */
 	private List<Map.Entry<Item, Integer>> getItemCategoryList(Item item) {
 		List<Map.Entry<Item, Integer>> result = null;
 		switch (item.getCategory()) {
@@ -543,6 +622,17 @@ public class Inventory extends SubMenu {
 		return result;
 	}
 	
+	/**
+	 * Retrieves the list of available commands the item allows from the given list of items.
+	 * 
+	 * @param list
+	 *            The list of all the items that is currently being active and browsed by the player.
+	 * 
+	 * @param graphics
+	 *            The Graphics object that renders the custom font to the screen.
+	 * 
+	 * @return Nothing.
+	 * */
 	private void renderItemMenuText(List<Map.Entry<Item, Integer>> list, Graphics graphics) {
 		switch (this.state) {
 			case TOSS: {
@@ -597,6 +687,22 @@ public class Inventory extends SubMenu {
 		}
 	}
 	
+	/**
+	 * Renders the background of the Inventory, which its rendering area is where the list of items are to be drawn on top of.
+	 * 
+	 * @param output
+	 *            The screen that the game used to draw for the player to see.
+	 * @param x
+	 *            The X coordinates of where the text is to be drawn at.
+	 * @param y
+	 *            The Y coordinates of where the text is to be drawn at.
+	 * @param width
+	 *            The width of the list box that is to be drawn.
+	 * @param height
+	 *            The height of the lsit box that is too be drawn
+	 * 
+	 * @return Nothing.
+	 * */
 	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
@@ -607,10 +713,27 @@ public class Inventory extends SubMenu {
 			output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (k * Tile.WIDTH), (height * Tile.HEIGHT));
 	}
 	
+	/**
+	 * Sets the inventory state.
+	 * 
+	 * @return Nothing.
+	 * */
 	private void setState(State value) {
 		this.state = value;
 	}
 	
+	/**
+	 * Renders all the texts that are to be drawn to the screen.
+	 * 
+	 * <p>
+	 * Does not draw text for the dialogues.
+	 * 
+	 * @param g
+	 *            The Graphics object that is passed to draw the text messages. It can be a Graphics object that is created from a BufferedImage, or a
+	 *            Graphics object that is created from a BufferStrategy().
+	 * 
+	 * @return Nothing.
+	 */
 	private void renderText(Graphics g) {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
