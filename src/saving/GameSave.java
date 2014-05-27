@@ -1,6 +1,14 @@
 package saving;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import main.Game;
 
 public class GameSave {
@@ -10,13 +18,82 @@ public class GameSave {
 	 * All saving/loading schemes use the documentation as guidelines. It will be
 	 * changed in the future, as the development continues.
 	 * */
+	//	
+	//	//Header
+	//	private static final byte[] HEADER = createTag("Header", 16);
+	//	private static final byte[] HEADER_IDENTIFICATION = createTag("Pokémon Walking", 16);
+	//	private static final byte[] HEADER_CODE = createTag("In-dev", 16);
+	//	private static final byte[] HEADER_FORMAT = createTag("sav", 16);
+	//	
+	//	private static final byte DATA_DELIMITER = (byte) 0xA1; //A1 Sauce, that I like.
+	//	
+	//	private static final byte[][] chunks = new byte[][]{
+	//			HEADER, HEADER_IDENTIFICATION, HEADER_CODE, HEADER_FORMAT
+	//	};
+	//	
+	//	private static byte[] createTag(String tag, int length) {
+	//		byte[] data = tag.getBytes();
+	//		if (length > data.length)
+	//			length = data.length;
+	//		byte[] result = new byte[length];
+	//		for (int i = 0; i < length - 1; i++) {
+	//			if (i < data.length)
+	//				result[i] = data[i];
+	//			else
+	//				result[i] = 0;
+	//		}
+	//		result[length - 1] = DATA_DELIMITER;
+	//		return result;
+	//	}
 	
-	public static void save(Game game, String filename) {
-		
+	public static void save(Game game, String filename, Chunk[] chunks) {
+		File save = new File(filename);
+		if (!save.isFile()) {
+			DataOutputStream output = null;
+			try {
+				output = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(save)));
+				for (int iterator = 0; iterator < chunks.length; iterator++)
+					chunks[iterator].write(output);
+			}
+			catch (FileNotFoundException e) {
+				throw new RuntimeException("Something with the file not being found.", e);
+			}
+			catch (IOException e) {
+				throw new RuntimeException("Something is wrong with writing to the save file.", e);
+			}
+			finally {
+				if (output != null)
+					try {
+						output.close();
+					}
+					catch (IOException e) {
+						throw new RuntimeException("Unable to close the save file correctly.", e);
+					}
+			}
+		}
 	}
 	
-	public static void load(String filename) {
-		
+	public static void load(String filename, Chunk[] chunks) {
+		File load = new File(filename);
+		if (load.isFile()) {
+			DataInputStream input = null;
+			try {
+				input = new DataInputStream(new BufferedInputStream(new FileInputStream(load)));
+				for (int i = 0; i < chunks.length; i++)
+					chunks[i].read(input);
+			}
+			catch (FileNotFoundException e) {
+				throw new RuntimeException("Something with the file not being found.", e);
+			}
+			finally {
+				try {
+					input.close();
+				}
+				catch (IOException e) {
+					throw new RuntimeException("Unable to close the save file correctly.", e);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -34,4 +111,11 @@ public class GameSave {
 		File save = new File(filename);
 		return save.isFile();
 	}
+	
+	//	private static byte[] concatenateByteArray(byte[] first, byte[] second) {
+	//		byte[] result = new byte[first.length + second.length];
+	//		System.arraycopy(first, 0, result, 0, first.length);
+	//		System.arraycopy(second, 0, result, first.length, second.length);
+	//		return result;
+	//	}
 }
