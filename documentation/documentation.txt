@@ -11,6 +11,7 @@
 Pokémon Walking - Documentation
 
 Changelogs:
+r9: Added File Formats, Control Schemes.
 r8: Added items.
 r7: Changing some of the info below.
 r6: Added more tiles.
@@ -54,9 +55,10 @@ Metadata...........................[PWD04]
 Player.............................[PWD05]
 Controls...........................[PWD06]
 	Walking Algorithm..............[PWD06#01]
-Contributors.......................[PWD07]
-Terms of License...................[PWD08]
-Credits............................[PWD09]
+File Format........................[PWD07]
+Contributors.......................[PWD08]
+Terms of License...................[PWD09]
+Credits............................[PWD10]
 
 
 
@@ -762,6 +764,9 @@ Pokémon games, Gold, Silver, and Crystal versions.
 The character design and artwork were done by hand,
 and they are merely placeholder art.
 
+The player can access their Inventory via the start
+menu by pressing START key.
+
 -------------------------------
 
 Controls [PWD06]
@@ -769,6 +774,17 @@ Controls [PWD06]
 To move the player around, use either WASD keys or 
 the arrow keys. Tap any key to let the Player face 
 towards the direction the tapped key represents.
+
+All of the inputs handled by the game are defined in
+the InputHandler class object. They are defined below:
+
+UP			W				Moves the player upwards.
+DOWN		S				Moves the player downwards.
+LEFT		A				Moves the player to the left.
+RIGHT		D				Moves the player to the right.
+ENTER						START BUTTON
+Z			/				The Action Button. (GameBoy equivalent of the A button.)
+X			.				The Cancel Button. (GameBoy equivalent of the B button.)
 
 -  -  -  -  -  -  -  -  -  -  -
 
@@ -778,13 +794,74 @@ towards the direction the tapped key represents.
 
 -------------------------------
 
-Contributors [PWD07]
+File Format [PWD07]
+
+The data file format is used to structure saved
+data that the game is able to read/write/modify
+easily. 
+
+It is decided that the file format is to use a
+tree structure hierarchy for storing relevant
+data bits as the game progresses. The file 
+format will expand further as the game includes
+more features that require persistent data.
+
+The order of the file format tree hierarchy is
+determined by the last date of creation. Anything
+newer is inserted from the bottom of the main tree
+hierarchy, with nodes extending from the root to
+define the data for the game to use. This allows
+categorization, which can be used with the level
+editor for easier modification and possibly enable
+modding potential for the future community.
+
+Below is a diagram that shows how the tree structure
+is built. Note that for some text readers, they may
+use a non-monospaced font. To view correctly, please
+use a monospaced font. The encoding used is UTF-8.
+
+File Format
+|
+├ Header Information ┬ Identification Code
+|                    ├ Header Code
+|                    └ Format Suffix
+├ Player Information ┬ Player Name
+|                    ├ Player Gender
+|                    ├ Inventory ─────────────┬ Potions
+|                    |                        ├ Key Items
+|                    |                        ├ Pokéballs
+|                    |                        └ TMs/HMs
+|                    ├ Positional Data ───────┬ Current Area ─────┬ Area ID
+|                    |                        |                   └ Area Region
+|                    |                        ├ Current OverWorld
+|                    |                        ├ X Location
+|                    |                        └ Y Location
+|                    └ Player State
+├ Date of Saved Data ┬ Last Saved Time
+|                    ├ Day/Night State
+|                    └ Elasped Time
+├ Using Custom Maps ─┬ Custom Area File Name
+|                    ├ Custom Area ID
+|                    └ Custom Area Region
+└ (Future TODO)
+
+Each node contains 2 bytes used for identifying the 
+nodes when the file format is being read. And another
+2 bytes containing the size of the chunk of the nodes.
+
+In each chunk, the data is read into groups, where
+the game will separate data it wants, and set the
+variables accordingly.
+
+-------------------------------
+
+Contributors [PWD08]
 
 Developer - tom_mai78101
 
 -------------------------------
 
-Terms of License [PWD08]
+Terms of License [PWD09]
 
 This entire project is Apache Licensed. For more
 information, please read the terms and regulations
@@ -792,6 +869,6 @@ of the license file in the root of the project folder.
 
 -------------------------------
 
-Credits [PWD09]
+Credits [PWD10]
 
 Author - tom_mai78101
