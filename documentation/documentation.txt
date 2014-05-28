@@ -822,11 +822,11 @@ use a monospaced font. The encoding used is UTF-8.
 
 File Format
 |
-├ Header Information ┬ Identification Code
-|                    ├ Header Code
-|                    └ Format Suffix
-├ Player Information ┬ Player Name
-|                    ├ Player Gender
+├ Header Information ┬ Identification Code (int)
+|                    ├ Header Code (int)
+|                    └ Format Suffix (int)
+├ Player Information ┬ Player Name (2 longs, 16 bytes)
+|                    ├ Player Gender (1 byte)
 |                    ├ Inventory ─────────────┬ Potions
 |                    |                        ├ Key Items
 |                    |                        ├ Pokéballs
