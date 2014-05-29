@@ -204,7 +204,6 @@ public class NewDialogue {
 						this.nextFlag = false;
 						break;
 					case DIALOGUE_SPEECH:
-						//this.closeDialog();
 						this.simpleSpeechFlag = true;
 						this.nextFlag = false;
 						break;
@@ -267,7 +266,7 @@ public class NewDialogue {
 						this.subStringIterator++;
 					}
 				}
-				if ((input.X.keyStateDown && !(input.X.lastKeyState)) || (input.PERIOD.keyStateDown && !input.PERIOD.lastKeyState)) {
+				else if ((input.X.keyStateDown && !(input.X.lastKeyState)) || (input.PERIOD.keyStateDown && !input.PERIOD.lastKeyState)) {
 					if (this.subStringIterator < this.lineLength - 1) {
 						this.subStringIterator = this.lineLength - 1;
 						input.X.lastKeyState = true;
@@ -388,7 +387,7 @@ public class NewDialogue {
 		final int X = 8;
 		final int Y1 = 120;
 		final int Y2 = 136;
-		final Rectangle rect = new Rectangle(X, Y1 - Tile.HEIGHT * 2, MainComponent.GAME_WIDTH, MainComponent.GAME_HEIGHT);
+		final Rectangle rect = new Rectangle(X, Y1 - Tile.HEIGHT, MainComponent.GAME_WIDTH - 16, Tile.HEIGHT * 2);
 		
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
