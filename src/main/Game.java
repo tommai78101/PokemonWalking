@@ -18,6 +18,7 @@ import java.util.Map;
 import level.OverWorld;
 import saving.GameSave;
 import screen.BaseScreen;
+import submenu.Save;
 import abstracts.SubMenu;
 import abstracts.World;
 import dialogue.Dialogue;
@@ -166,6 +167,13 @@ public class Game {
 			}
 			case SAVE: {
 				if (!this.subMenu.isActivated()) {
+					final Save saveSubMenu = (Save) this.subMenu;
+					if (saveSubMenu.getState() == Save.State.SAVED || saveSubMenu.getState() == Save.State.ERROR) {
+						saveSubMenu.setState(Save.State.ASK);
+						this.startMenu.closeMenu();
+						this.state = State.GAME;
+						break;
+					}
 					this.state = State.PAUSED;
 					break;
 				}

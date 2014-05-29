@@ -13,7 +13,7 @@ import entity.Player;
 
 public class Save extends SubMenu {
 	
-	private enum State {
+	public enum State {
 		ASK, OVERWRITE, SAVING, SAVED, ERROR
 	}
 	
@@ -63,7 +63,7 @@ public class Save extends SubMenu {
 			}
 			case OVERWRITE: {
 				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = NewDialogue.createText("There is already an old save file.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
+					this.newDialogue = NewDialogue.createText("There is already an old save file. TESTING SCROLLING.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
 				if (!this.newDialogue.isDialogueCompleted()) {
 					this.newDialogue.tick();
 				}
@@ -139,6 +139,14 @@ public class Save extends SubMenu {
 		}
 	}
 	
+	public State getState() {
+		return this.state;
+	}
+	
+	public void setState(State state) {
+		this.state = state;
+	}
+	
 	@Override
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.newDialogue != null)
@@ -147,7 +155,14 @@ public class Save extends SubMenu {
 	
 	@Override
 	public void disableSubMenu() {
-		this.state = State.ASK;
+		switch (this.state) {
+			default:
+				this.state = State.ASK;
+				break;
+			case SAVED:
+			case ERROR:
+				break;
+		}
 		if (Player.isMovementsLocked())
 			Player.unlockMovements();
 		this.newDialogue = NewDialogue.createEmptyDialogue();
