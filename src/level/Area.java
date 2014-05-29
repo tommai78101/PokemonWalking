@@ -385,7 +385,11 @@ public class Area {
 	
 	// Getters/Setters
 	public int getPlayerX() {
-		return this.xPlayerPosition;
+		return this.player.getX();
+	}
+	
+	public int getPlayerXInArea() {
+		return this.player.getXInArea();
 	}
 	
 	public void setPlayerX(int x) {
@@ -393,7 +397,11 @@ public class Area {
 	}
 	
 	public int getPlayerY() {
-		return this.yPlayerPosition;
+		return this.player.getY();
+	}
+	
+	public int getPlayerYInArea() {
+		return this.player.getYInArea();
 	}
 	
 	public void setPlayerY(int y) {

@@ -202,8 +202,8 @@ public class GameSave {
 		Area currentArea = game.getWorld().getCurrentArea();
 		byte[] bufArea = ByteBuffer.allocate(4).putInt(currentArea.getAreaID()).array();
 		byte[] bufSector = ByteBuffer.allocate(4).putInt(currentArea.getSectorID()).array();
-		byte[] bufX = ByteBuffer.allocate(4).putInt(currentArea.getPlayerX()).array();
-		byte[] bufY = ByteBuffer.allocate(4).putInt(currentArea.getPlayerY()).array();
+		byte[] bufX = ByteBuffer.allocate(4).putInt(currentArea.getPlayerXInArea()).array();
+		byte[] bufY = ByteBuffer.allocate(4).putInt(currentArea.getPlayerYInArea()).array();
 		for (int i = 0; i < 4; i++) {
 			this.playerInfo.player_current_area_id[i] = bufArea[i];
 			this.playerInfo.player_current_area_sector_id[i] = bufSector[i];
