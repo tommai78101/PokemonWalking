@@ -92,25 +92,12 @@ public class GameSave {
 				raf.write(buf);
 			}
 			
-			//Current items in the inventory.
-			//			size = 0;
-			//			byte listType = 0x1;
-			//			for (int i = 0; i < this.inventory.size(); i++)
-			//				size += this.inventory.get(i).length + 1;
-			//			raf.writeByte(size + ITEM.length);
-			//			raf.write(ITEM);
-			//			for (int i = 0; i < inventory.size(); i++) {
-			//				byte[] buf = inventory.get(i);
-			//				raf.writeByte(listType);
-			//				raf.writeByte(buf.length);
-			//				raf.write(buf);
-			//				listType++;
-			//			}
+			//Inventory
 			size = 0;
 			for (int i = 0; i < 4; i++) {
 				ArrayList<byte[]> list = this.getAllItemsList().get(i);
 				if (list.size() > 0) {
-					size += 2;
+					size += 3;
 					for (int j = 0; j < this.getAllItemsList().get(i).size(); j++)
 						size += this.getAllItemsList().get(i).get(j).length + 1;
 				}
@@ -122,7 +109,7 @@ public class GameSave {
 				ArrayList<byte[]> list = this.getAllItemsList().get(listType);
 				if (list.size() > 0) {
 					raf.write(listType + 0x1);
-					raf.write(list.size());
+					raf.writeChar(list.size());
 					for (int j = 0; j < list.size(); j++) {
 						raf.write(list.get(j).length);
 						raf.write(list.get(j));
@@ -154,6 +141,10 @@ public class GameSave {
 		
 		public void reset() {
 			this.byteSize = 0;
+		}
+		
+		public int getByteSize() {
+			return this.byteSize;
 		}
 		
 		public List<ArrayList<byte[]>> getAllItemsList() {
@@ -217,7 +208,9 @@ public class GameSave {
 		this.playerInfo.increment(concatenate(new byte[]{0x0}, concatenate(PlayerInfo.MENU, byteArray)));
 		
 		//Inventory
+		//FIXME: Incorrect size of packets from inventory. Please check for inconsistencies.
 		byte listType = 0x1;
+		this.playerInfo.increment(concatenate(new byte[]{0x0}, PlayerInfo.ITEM));
 		for (List<Map.Entry<Item, Integer>> itemList : game.getStartMenu().getInventory().getAllItemsList()) {
 			if (itemList.size() - 1 > 0) {
 				byteArray = new byte[]{listType}; //Type of list (Potions/KeyItems/Pokeball/TMHM)
@@ -225,12 +218,15 @@ public class GameSave {
 				byte[] itemInfo = null;
 				for (int i = 0; i < itemList.size() - 1; i++) {
 					Map.Entry<Item, Integer> entry = itemList.get(i);
-					ByteBuffer buffer = ByteBuffer.allocate(4 * 2);
+					ByteBuffer buffer = ByteBuffer.allocate(1);
+					buffer.put((byte) (entry.getKey().getName().getBytes().length & 0xFF));
+					itemInfo = buffer.array();
+					buffer = ByteBuffer.allocate(4 * 2);
 					buffer.putInt(entry.getKey().getID()); //Item ID
 					buffer.putInt(entry.getValue()); //Item quantity
-					itemInfo = entry.getKey().getName().getBytes();
+					itemInfo = concatenate(itemInfo, entry.getKey().getName().getBytes());
 					itemInfo = concatenate(itemInfo, buffer.array());
-					byteArray = concatenate(byteArray, itemInfo); //Item Name <- ID <- Quantity
+					byteArray = concatenate(byteArray, itemInfo); //Item Name Length <- Item Name <- ID <- Quantity
 				}
 				this.playerInfo.getAllItemsList().get(listType - 0x1).add(itemInfo);
 				this.playerInfo.increment(byteArray);
@@ -263,9 +259,7 @@ public class GameSave {
 		this.playerInfo.increment(concatenate(concatenate(new byte[]{0x0}, PlayerInfo.AXIS), byteArray));
 		
 		//Player State
-		byteArray = new byte[]{};
-		byteArray = concatenate(byteArray, bufFacing);
-		this.playerInfo.increment(concatenate(concatenate(new byte[]{0x0}, PlayerInfo.TURN), byteArray));
+		this.playerInfo.increment(concatenate(concatenate(new byte[]{0x0}, PlayerInfo.TURN), bufFacing));
 	}
 	
 	public static void save(Game game, String filename) {
