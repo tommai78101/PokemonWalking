@@ -101,7 +101,11 @@ public class Save extends SubMenu {
 						});
 						executor.shutdown();
 						try {
-							executor.awaitTermination(1, TimeUnit.MINUTES);
+							if (!executor.awaitTermination(1, TimeUnit.MINUTES)) {
+								this.state = State.ERROR;
+								this.newDialogue.clearDialogueLines();
+								break;
+							}
 						}
 						catch (InterruptedException e) {
 							this.state = State.ERROR;

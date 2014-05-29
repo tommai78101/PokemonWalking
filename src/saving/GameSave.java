@@ -43,7 +43,10 @@ public class GameSave {
 		public final byte[] player_name = new byte[16];
 		public final byte[] player_gender = new byte[1];
 		public final ArrayList<byte[]> startMenu = new ArrayList<byte[]>();
-		public final ArrayList<byte[]> inventory = new ArrayList<byte[]>();
+		public final ArrayList<byte[]> potions = new ArrayList<byte[]>();
+		public final ArrayList<byte[]> keyItems = new ArrayList<byte[]>();
+		public final ArrayList<byte[]> pokéballs = new ArrayList<byte[]>();
+		public final ArrayList<byte[]> tm_hm = new ArrayList<byte[]>();
 		public final byte[] player_current_area_id = new byte[4];
 		public final byte[] player_current_area_sector_id = new byte[4];
 		public final byte[] player_x = new byte[4];
@@ -90,15 +93,41 @@ public class GameSave {
 			}
 			
 			//Current items in the inventory.
+			//			size = 0;
+			//			byte listType = 0x1;
+			//			for (int i = 0; i < this.inventory.size(); i++)
+			//				size += this.inventory.get(i).length + 1;
+			//			raf.writeByte(size + ITEM.length);
+			//			raf.write(ITEM);
+			//			for (int i = 0; i < inventory.size(); i++) {
+			//				byte[] buf = inventory.get(i);
+			//				raf.writeByte(listType);
+			//				raf.writeByte(buf.length);
+			//				raf.write(buf);
+			//				listType++;
+			//			}
 			size = 0;
-			for (int i = 0; i < this.inventory.size(); i++)
-				size += this.inventory.get(i).length + 2;
+			for (int i = 0; i < 4; i++) {
+				ArrayList<byte[]> list = this.getAllItemsList().get(i);
+				if (list.size() > 0) {
+					size += 2;
+					for (int j = 0; j < this.getAllItemsList().get(i).size(); j++)
+						size += this.getAllItemsList().get(i).get(j).length + 1;
+				}
+				
+			}
 			raf.writeByte(size + ITEM.length);
 			raf.write(ITEM);
-			for (int i = 0; i < inventory.size(); i++) {
-				byte[] buf = inventory.get(i);
-				raf.writeByte(buf.length);
-				raf.write(buf);
+			for (byte listType = 0; listType < 4; listType++) {
+				ArrayList<byte[]> list = this.getAllItemsList().get(listType);
+				if (list.size() > 0) {
+					raf.write(listType + 0x1);
+					raf.write(list.size());
+					for (int j = 0; j < list.size(); j++) {
+						raf.write(list.get(j).length);
+						raf.write(list.get(j));
+					}
+				}
 			}
 			
 			//Current Area Info
@@ -125,6 +154,15 @@ public class GameSave {
 		
 		public void reset() {
 			this.byteSize = 0;
+		}
+		
+		public List<ArrayList<byte[]>> getAllItemsList() {
+			List<ArrayList<byte[]>> result = new ArrayList<ArrayList<byte[]>>();
+			result.add(this.potions);
+			result.add(this.keyItems);
+			result.add(this.pokéballs);
+			result.add(this.tm_hm);
+			return result;
 		}
 	}
 	
@@ -178,33 +216,27 @@ public class GameSave {
 		}
 		this.playerInfo.increment(concatenate(new byte[]{0x0}, concatenate(PlayerInfo.MENU, byteArray)));
 		
-		//All items in the player's inventory.
-		
-		ByteBuffer buf = null;
-		ArrayList<byte[]> byteList = new ArrayList<byte[]>();
-		byteArray = new byte[]{};
+		//Inventory
+		byte listType = 0x1;
 		for (List<Map.Entry<Item, Integer>> itemList : game.getStartMenu().getInventory().getAllItemsList()) {
 			if (itemList.size() - 1 > 0) {
-				short size = (short) ((itemList.size() - 1) & 0xFFFF);
-				buf = ByteBuffer.allocate(2);
-				buf.putShort(size);
-				byteArray = concatenate(byteArray, concatenate(new byte[]{0x0}, buf.array()));
-				for (Map.Entry<Item, Integer> entry : itemList) {
-					Item.Category category = entry.getKey().getCategory();
-					if (category != null) {
-						buf = ByteBuffer.allocate(4 * 2);
-						Item item = entry.getKey();
-						int item_id = item.getID();
-						int quantity = entry.getValue();
-						buf.putInt(item_id);
-						buf.putInt(quantity);
-						byteList.add(buf.array());
-						byteArray = concatenate(byteArray, buf.array());
-					}
+				byteArray = new byte[]{listType}; //Type of list (Potions/KeyItems/Pokeball/TMHM)
+				byteArray = concatenate(byteArray, ByteBuffer.allocate(2).putChar((char) ((itemList.size() - 1) & 0xFFFF)).array()); //How many items in a list?
+				byte[] itemInfo = null;
+				for (int i = 0; i < itemList.size() - 1; i++) {
+					Map.Entry<Item, Integer> entry = itemList.get(i);
+					ByteBuffer buffer = ByteBuffer.allocate(4 * 2);
+					buffer.putInt(entry.getKey().getID()); //Item ID
+					buffer.putInt(entry.getValue()); //Item quantity
+					itemInfo = entry.getKey().getName().getBytes();
+					itemInfo = concatenate(itemInfo, buffer.array());
+					byteArray = concatenate(byteArray, itemInfo); //Item Name <- ID <- Quantity
 				}
+				this.playerInfo.getAllItemsList().get(listType - 0x1).add(itemInfo);
+				this.playerInfo.increment(byteArray);
+				listType++;
 			}
 		}
-		this.playerInfo.increment(concatenate(new byte[]{0x0}, concatenate(PlayerInfo.ITEM, byteArray)));
 		
 		//Current Area & Player State
 		Area currentArea = game.getWorld().getCurrentArea();
