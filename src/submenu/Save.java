@@ -63,7 +63,7 @@ public class Save extends SubMenu {
 			}
 			case OVERWRITE: {
 				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = NewDialogue.createText("There is already an old save file. TESTING SCROLLING.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
+					this.newDialogue = NewDialogue.createText("There is already an old save file.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
 				if (!this.newDialogue.isDialogueCompleted()) {
 					this.newDialogue.tick();
 				}

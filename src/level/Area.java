@@ -312,7 +312,6 @@ public class Area {
 				case 0x03: // Small tree
 					return true;
 				case 0x04: // Warp point
-					// this.isInWarpZone = true;
 					return false;
 				case 0x05: // Area Connection point.
 					return false;

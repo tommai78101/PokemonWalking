@@ -146,6 +146,7 @@ public class GameSave {
 		playerInfo.write(raf);
 	}
 	
+	@SuppressWarnings("unused")
 	private void handleLoadedBuffers(Game game, ArrayList<byte[]> buffers) {
 		//TODO: For each byte[] array in the array list, take apart the data so that the game can read the data and load from there.
 	}
