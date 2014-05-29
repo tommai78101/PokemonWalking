@@ -48,6 +48,7 @@ public class GameSave {
 		public final byte[] player_current_area_sector_id = new byte[4];
 		public final byte[] player_x = new byte[4];
 		public final byte[] player_y = new byte[4];
+		public final byte[] player_facing = new byte[4];
 		
 		public static final byte[] PLAY = "PLAY".getBytes(); //Player Info
 		public static final byte[] NAME = "NAME".getBytes(); //Player name.
@@ -56,6 +57,7 @@ public class GameSave {
 		public static final byte[] ITEM = "ITEM".getBytes(); //Player Inventory.
 		public static final byte[] AREA = "AREA".getBytes(); //Current Area.
 		public static final byte[] AXIS = "AXIS".getBytes(); //Current Position.
+		public static final byte[] TURN = "TURN".getBytes(); //Current Direction.
 		
 		private int byteSize = 0;
 		
@@ -110,6 +112,11 @@ public class GameSave {
 			raf.write(AXIS);
 			raf.write(player_x);
 			raf.write(player_y);
+			
+			//Current Player Direction Facing.
+			raf.writeByte(TURN.length + player_facing.length);
+			raf.write(TURN);
+			raf.write(player_facing);
 		}
 		
 		public void increment(byte[] list) {
@@ -198,17 +205,19 @@ public class GameSave {
 		}
 		this.playerInfo.increment(concatenate(new byte[]{0x0}, concatenate(PlayerInfo.ITEM, byteArray)));
 		
-		//Current Area
+		//Current Area & Player State
 		Area currentArea = game.getWorld().getCurrentArea();
 		byte[] bufArea = ByteBuffer.allocate(4).putInt(currentArea.getAreaID()).array();
 		byte[] bufSector = ByteBuffer.allocate(4).putInt(currentArea.getSectorID()).array();
 		byte[] bufX = ByteBuffer.allocate(4).putInt(currentArea.getPlayerXInArea()).array();
 		byte[] bufY = ByteBuffer.allocate(4).putInt(currentArea.getPlayerYInArea()).array();
+		byte[] bufFacing = ByteBuffer.allocate(4).putInt(gamePlayer.getFacing()).array();
 		for (int i = 0; i < 4; i++) {
 			this.playerInfo.player_current_area_id[i] = bufArea[i];
 			this.playerInfo.player_current_area_sector_id[i] = bufSector[i];
 			this.playerInfo.player_x[i] = bufX[i];
 			this.playerInfo.player_y[i] = bufY[i];
+			this.playerInfo.player_facing[i] = bufFacing[i];
 		}
 		byteArray = new byte[]{};
 		byteArray = concatenate(byteArray, bufArea);
@@ -220,8 +229,10 @@ public class GameSave {
 		byteArray = concatenate(byteArray, bufY);
 		this.playerInfo.increment(concatenate(concatenate(new byte[]{0x0}, PlayerInfo.AXIS), byteArray));
 		
-		//Player States
-		//TODO
+		//Player State
+		byteArray = new byte[]{};
+		byteArray = concatenate(byteArray, bufFacing);
+		this.playerInfo.increment(concatenate(concatenate(new byte[]{0x0}, PlayerInfo.TURN), byteArray));
 	}
 	
 	public static void save(Game game, String filename) {
