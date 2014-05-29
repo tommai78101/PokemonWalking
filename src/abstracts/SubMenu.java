@@ -65,6 +65,10 @@ public abstract class SubMenu {
 			return this.disabledDescription;
 	}
 	
+	public byte[] getSubMenuData() {
+		return this.name.getBytes();
+	}
+	
 	public abstract SubMenu initialize(Keys keys);
 	
 	public abstract void tick();

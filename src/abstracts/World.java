@@ -83,4 +83,7 @@ public abstract class World {
 	// this.yPosition = y;
 	// }
 	
+	public Area getCurrentArea() {
+		return this.currentArea;
+	}
 }

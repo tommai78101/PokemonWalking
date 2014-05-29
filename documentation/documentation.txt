@@ -827,10 +827,10 @@ File Format
 |                    └ Format Suffix (int)
 ├ Player Information ┬ Player Name (2 longs, 16 bytes)
 |                    ├ Player Gender (1 byte)
-|                    ├ Inventory ─────────────┬ Potions
-|                    |                        ├ Key Items
-|                    |                        ├ Pokéballs
-|                    |                        └ TMs/HMs
+|                    ├ Inventory ─────────────┬ Potions ───────────┐
+|                    |                        ├ Key Items ─────────┼──────────── Items ───┬ Item Name
+|                    |                        ├ Pokéballs ─────────┤                      └ Item Quantity
+|                    |                        └ TMs/HMs ───────────┘
 |                    ├ Positional Data ───────┬ Current Area ─────┬ Area ID
 |                    |                        |                   └ Area Region
 |                    |                        ├ Current OverWorld

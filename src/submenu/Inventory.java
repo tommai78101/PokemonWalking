@@ -44,7 +44,7 @@ public class Inventory extends SubMenu {
 	private Keys keys;
 	private List<Map.Entry<Item, Integer>> potions;
 	private List<Map.Entry<Item, Integer>> keyItems;
-	private List<Map.Entry<Item, Integer>> pokeballs;
+	private List<Map.Entry<Item, Integer>> pokéballs;
 	private List<Map.Entry<Item, Integer>> TMs_HMs;
 	private List<String> selectionMenu;
 	private int itemCursor;
@@ -84,14 +84,14 @@ public class Inventory extends SubMenu {
 		this.itemCursor = 0;
 		this.potions = new ArrayList<Map.Entry<Item, Integer>>();
 		this.keyItems = new ArrayList<Map.Entry<Item, Integer>>();
-		this.pokeballs = new ArrayList<Map.Entry<Item, Integer>>();
+		this.pokéballs = new ArrayList<Map.Entry<Item, Integer>>();
 		this.TMs_HMs = new ArrayList<Map.Entry<Item, Integer>>();
 		this.selectionMenu = new ArrayList<String>();
 		ItemText itemText = WorldConstants.items.get(WorldConstants.ITEM_RETURN);
 		Item returnExit = new DummyItem(game, itemText.itemName, itemText.description, null, 0);
 		this.potions.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
 		this.keyItems.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
-		this.pokeballs.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
+		this.pokéballs.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
 		this.TMs_HMs.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
 		this.arrowPosition = 0;
 		this.category = Category.POTIONS;
@@ -570,6 +570,15 @@ public class Inventory extends SubMenu {
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
 	
+	public List<List<Map.Entry<Item, Integer>>> getAllItemsList() {
+		List<List<Map.Entry<Item, Integer>>> result = new ArrayList<List<Map.Entry<Item, Integer>>>();
+		result.add(potions);
+		result.add(keyItems);
+		result.add(pokéballs);
+		result.add(TMs_HMs);
+		return result;
+	}
+	
 	// ------------------------------------ PRIVATE METHODS -----------------------------------------
 	
 	/**
@@ -587,7 +596,7 @@ public class Inventory extends SubMenu {
 				result = keyItems;
 				break;
 			case POKEBALLS:
-				result = pokeballs;
+				result = pokéballs;
 				break;
 			case TM_HM:
 				result = TMs_HMs;
@@ -613,7 +622,7 @@ public class Inventory extends SubMenu {
 				result = keyItems;
 				break;
 			case POKEBALLS:
-				result = pokeballs;
+				result = pokéballs;
 				break;
 			case TM_HM:
 				result = TMs_HMs;

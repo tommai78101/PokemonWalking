@@ -120,7 +120,6 @@ public class MainComponent extends Canvas implements Runnable {
 	 * */
 	public void stop() {
 		running = false;
-		game.save();
 	}
 	
 	@Override
@@ -320,11 +319,9 @@ public class MainComponent extends Canvas implements Runnable {
 	
 	public static void main(String[] args) {
 		System.out.println("Game is now loading, it will take a while.");
-		
-		MainComponent game = new MainComponent();
 		JFrame frame = new JFrame(GAME_TITLE);
-		
 		JPanel panel = new JPanel(new BorderLayout());
+		MainComponent game = new MainComponent();
 		panel.add(game);
 		frame.setContentPane(panel);
 		frame.pack();

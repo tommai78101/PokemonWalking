@@ -25,6 +25,9 @@ public abstract class Entity extends Tile {
 	
 	protected BaseBitmap bitmap;
 	
+	protected String name;
+	protected Boolean gender;
+	
 	public boolean isRemoved;
 	protected byte typeId = 0;
 	
@@ -45,5 +48,27 @@ public abstract class Entity extends Tile {
 	public void setPosition(int x, int y) {
 		this.xPosition = x;
 		this.yPosition = y;
+	}
+	
+	public byte[] getByteName() {
+		if (name == null)
+			name = "Joe";
+		byte[] result = new byte[16];
+		byte[] nameData = name.getBytes();
+		for (int i = 0; i < result.length; i++) {
+			if (i < name.length())
+				result[i] = nameData[i];
+			else
+				result[i] = 0;
+		}
+		return result;
+	}
+	
+	public byte[] getByteGender() {
+		byte[] result = new byte[1];
+		if (gender == null)
+			gender = Boolean.TRUE; //Default gender: Male. False = Female.
+		result[0] = (byte) (gender.booleanValue() ? 0x1 : 0xFF);
+		return result;
 	}
 }

@@ -1,8 +1,10 @@
 package submenu;
 
 import java.awt.Graphics;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import main.Game;
-import main.InputHandler;
 import main.Keys;
 import screen.BaseScreen;
 import abstracts.SubMenu;
@@ -12,11 +14,12 @@ import entity.Player;
 public class Save extends SubMenu {
 	
 	private enum State {
-		ASK, OVERWRITE, SAVING
+		ASK, OVERWRITE, SAVING, SAVED, ERROR
 	}
 	
 	private State state;
 	private NewDialogue newDialogue;
+	ExecutorService executor;
 	
 	public Save(String name, String enabled, String disabled, Game game) {
 		super(name, enabled, disabled, game);
@@ -85,23 +88,55 @@ public class Save extends SubMenu {
 			}
 			case SAVING: {
 				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = NewDialogue.createText("Saving Complete.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
+					this.newDialogue = NewDialogue.createText("Saving...", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
 				if (!this.newDialogue.isDialogueCompleted()) {
 					this.newDialogue.tick();
-					InputHandler.threadPool.execute(new Runnable() {
-						@Override
-						public void run() {
-							game.save();
+					if (executor == null) {
+						executor = Executors.newFixedThreadPool(1);
+						executor.execute(new Runnable() {
+							@Override
+							public void run() {
+								game.save();
+							}
+						});
+						executor.shutdown();
+						try {
+							executor.awaitTermination(1, TimeUnit.MINUTES);
 						}
-					});
+						catch (InterruptedException e) {
+							this.state = State.ERROR;
+							this.newDialogue.clearDialogueLines();
+						}
+					}
 				}
 				else {
-					disableSubMenu();
+					if (executor.isTerminated()) {
+						executor = null;
+						this.state = State.SAVED;
+						this.newDialogue.clearDialogueLines();
+					}
 				}
 				break;
 			}
+			case SAVED: {
+				if (!this.newDialogue.isDialogueTextSet())
+					this.newDialogue = NewDialogue.createText("Saving Complete.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
+				if (!this.newDialogue.isDialogueCompleted())
+					this.newDialogue.tick();
+				else
+					disableSubMenu();
+				break;
+			}
+			case ERROR: {
+				if (!this.newDialogue.isDialogueTextSet())
+					this.newDialogue = NewDialogue.createText("I am ERROR.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
+				if (!this.newDialogue.isDialogueCompleted())
+					this.newDialogue.tick();
+				else
+					disableSubMenu();
+				break;
+			}
 		}
-		
 	}
 	
 	@Override

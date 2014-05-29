@@ -25,7 +25,7 @@ import dialogue.StartMenu;
 import entity.Player;
 
 public class Game {
-	private static final String SAVE_FILE_NAME = "game_save.sav";
+	private static final String SAVE_FILE_NAME = "data.sav";
 	private final BaseScreen screen;
 	private final List<World> worlds;
 	private StartMenu startMenu;
@@ -181,8 +181,7 @@ public class Game {
 	 * Saves the game.
 	 * */
 	public void save() {
-		// TODO: Save data.
-		
+		GameSave.save(this, SAVE_FILE_NAME);
 	}
 	
 	/**
@@ -247,6 +246,10 @@ public class Game {
 			return false;
 		return this.registeredItem.equals(item);
 		
+	}
+	
+	public World getWorld() {
+		return this.overworld;
 	}
 	
 	// ---------------------------------------------- PRIVATE METHODS -------------------------------------------------

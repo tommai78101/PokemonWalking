@@ -15,6 +15,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import main.Game;
 import main.Keys;
@@ -139,6 +140,10 @@ public class StartMenu {
 	
 	public Inventory getInventory() {
 		return this.inventory;
+	}
+	
+	public List<Map.Entry<Integer, SubMenu>> getSubMenusList() {
+		return this.items;
 	}
 	
 	// ------------------------- PRIVATE METHODS -----------------------------------
