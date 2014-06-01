@@ -37,6 +37,33 @@ public class GameSave {
 			raf.write(header_code);
 			raf.write(header_format);
 		}
+
+		public void read(RandomAccessFile raf) throws IOException {
+			int size = raf.read();
+			byte[] info = new byte[size];
+			raf.read(info);
+			try {
+				for (int i = 0; i < header_id.length; i++) {
+					if (header_id[i] != info[i]) {
+						throw new RuntimeException("Incorrect header id signature.");
+					}
+				}
+				for (int j = 0; j < header_code.length; j++) {
+					if (header_code[j] != info[j + header_id.length]) {
+						throw new RuntimeException("Incorrect header code signature.");
+					}
+				}
+				for (int k = 0; k < header_format.length; k++) {
+					if (header_format[k] != info[k + header_id.length + header_code.length]) {
+						throw new RuntimeException("Incorrect header code signature.");
+					}
+				}
+			}
+			catch (Exception e) {
+				raf.close();
+				throw new IOException("Error in reading the data file.", e);
+			}
+		}
 	}
 
 	public static class PlayerInfo {
@@ -155,6 +182,139 @@ public class GameSave {
 			result.add(this.tm_hm);
 			return result;
 		}
+
+		public void read(RandomAccessFile raf) throws IOException {
+			this.byteSize = raf.readShort();
+			byte[] data = new byte[byteSize];
+			int readBytes;
+			int offset = 0;
+			while ((readBytes = raf.read(data)) != -1) {
+				//Checks if "PLAY" tag is set.
+				for (; offset < PLAY.length; offset++) {
+					if (data[offset] != PLAY[offset])
+						throw new IOException("Incorrect Player Info Header chunk.");
+				}
+
+				//Checks for "NAME" tag.
+				byte size = data[offset++];
+				for (int i = 0; i < NAME.length; offset++, i++, size--) {
+					if (data[offset] != NAME[i])
+						throw new IOException("Incorrect Player Info NAME chunk.");
+				}
+				for (int i = 0; i < this.player_name.length; offset++, i++, size--) {
+					if (size < 0)
+						throw new IOException("Something is wrong with the size in NAME chunk.");
+					this.player_name[i] = data[offset];
+				}
+
+				//Checks for "Gender" tag.
+				size = data[offset++];
+				for (int i = 0; i < GNDR.length; offset++, i++, size--) {
+					if (data[offset] != GNDR[i])
+						throw new IOException("Incorrect Player Info GNDR chunk.");
+				}
+				for (int i = 0; i < this.player_gender.length; offset++, i++, size--) {
+					if (size < 0)
+						throw new IOException("Something is wrong with the size in GNDR chunk.");
+					this.player_gender[i] = data[offset];
+				}
+
+				//Menu tag.
+				size = data[offset++];
+				for (int i = 0; i < MENU.length; offset++, i++, size--) {
+					if (data[offset] != MENU[i])
+						throw new IOException("Incorrect Player Info MENU chunk.");
+				}
+				byte[] menuName = null;
+				byte count = 0;
+				for (; size > 0; size--, offset++) {
+					if (menuName == null) {
+						menuName = new byte[data[offset++]];
+						size--;
+					}
+					menuName[count++] = data[offset];
+					if (count > menuName.length - 1) {
+						count = 0x0;
+						this.startMenu.add(menuName);
+						menuName = null;
+					}
+				}
+
+				//Inventory tag
+				size = data[offset++];
+				for (int i = 0; i < ITEM.length; i++, offset++, size--) {
+					if (data[offset] != ITEM[i])
+						throw new IOException("Incorrect Player Info ITEM chunk.");
+				}
+				for (int i = 0; i < this.getAllItemsList().size(); i++) {
+					if (size > 0) {
+						byte listType = data[offset++];
+						size--;
+
+						raf.seek(offset);
+						char listSize = raf.readChar();
+						offset += 2;
+						size -= 2;
+
+						if (listSize > 0) {
+							List<byte[]> list = this.getAllItemsList().get(listType - 0x1);
+							for (int k = 0; k < listSize; k++) {
+								byte listElementSize = data[offset++];
+								size--;
+
+								byte nameSize = data[offset];
+								byte[] entry = new byte[1 + nameSize + 4 + 4];
+								for (int j = 0; i < entry.length; j++, offset++, size--, listElementSize--) {
+									if (listElementSize < 0)
+										throw new IOException("Something is wrong with the element item size in ITEM chunk.");
+									entry[j] = data[offset];
+								}
+
+								list.add(entry);
+							}
+						}
+					}
+					else
+						break;
+				}
+
+				//Current Area tag
+				size = data[offset++];
+				for (int i = 0; i < AREA.length; offset++, i++, size--) {
+					if (data[offset] != AREA[i])
+						throw new IOException("Incorrect Player Info AREA chunk.");
+				}
+				for (int i = 0; i < this.player_current_area_id.length; i++, offset++, size--) {
+					this.player_current_area_id[i] = data[offset];
+				}
+				for (int i = 0; i < this.player_current_area_sector_id.length; i++, offset++, size--) {
+					this.player_current_area_sector_id[i] = data[offset];
+				}
+
+				//Current Position tag
+				size = data[offset++];
+				for (int i = 0; i < AXIS.length; offset++, i++, size--) {
+					if (data[offset] != AXIS[i])
+						throw new IOException("Incorrect Player Info AXIS chunk.");
+				}
+				for (int i = 0; i < this.player_x.length; i++, offset++, size--) {
+					this.player_x[i] = data[offset];
+				}
+				for (int i = 0; i < this.player_y.length; i++, offset++, size--) {
+					this.player_y[i] = data[offset];
+				}
+
+				//Current Direction Facing tag
+				size = data[offset++];
+				for (int i = 0; i < TURN.length; offset++, i++, size--) {
+					if (data[offset] != TURN[i])
+						throw new IOException("Incorrect Player Info TURN chunk.");
+				}
+				for (int i = 0; i < this.player_facing.length; i++, offset++, size--) {
+					this.player_facing[i] = data[offset];
+				}
+			}
+		}
 	}
 
 	public static final byte[] SIGNATURE = new byte[] { (byte) 137, 0x53, 0x41, 0x56, 0x20, 0x20, 0x20, 0x20 };
@@ -173,14 +333,13 @@ public class GameSave {
 		playerInfo.write(raf);
 	}
 
-	@SuppressWarnings("unused")
-	private void handleLoadedBuffers(Game game, ArrayList<byte[]> buffers) {
-		//TODO: For each byte[] array in the array list, take apart the data so that the game can read the data and load from there.
+	private void read(RandomAccessFile raf) throws IOException {
+		raf.seek(0);
+		headerInfo.read(raf);
+		playerInfo.read(raf);
 	}
 
 	private void generateSaveData(Game game) {
-		//TODO: Write all game data to byte equivalent values and insert it into a byte array.
-
 		Player gamePlayer = game.getPlayer();
 		if (this.playerInfo != null)
 			this.playerInfo.reset();
@@ -206,14 +365,13 @@ public class GameSave {
 		this.playerInfo.increment(concatenate(new byte[] { 0x0 }, concatenate(PlayerInfo.MENU, byteArray)));
 
 		//Inventory
-		//FIXME: Incorrect size of packets from inventory. Please check for inconsistencies.
 		byte listType = 0x1;
 		this.playerInfo.increment(concatenate(new byte[] { 0x0 }, PlayerInfo.ITEM));
 		for (List<Map.Entry<Item, Integer>> itemList : game.getStartMenu().getInventory().getAllItemsList()) {
 			if (itemList.size() - 1 > 0) {
 				byteArray = new byte[] { listType }; //Type of list (Potions/KeyItems/Pokeball/TMHM)
 				byteArray = concatenate(byteArray, ByteBuffer.allocate(2).putChar((char) ((itemList.size() - 1) & 0xFFFF)).array()); //How many items in a list?
-				byteArray = concatenate(byteArray, ByteBuffer.allocate(1).put((byte) itemList.size()).array());
+				byteArray = concatenate(byteArray, ByteBuffer.allocate(1).put((byte) itemList.size()).array()); //ItemInfo size.
 				byte[] itemInfo = null;
 				for (int i = 0; i < itemList.size() - 1; i++) {
 					Map.Entry<Item, Integer> entry = itemList.get(i);
@@ -261,6 +419,11 @@ public class GameSave {
 		this.playerInfo.increment(concatenate(concatenate(new byte[] { 0x0 }, PlayerInfo.TURN), bufFacing));
 	}
 
+	private void generateLoadData(Game game) {
+		Player gamePlayer = game.getPlayer();
+
+	}
+
 	public static void save(Game game, String filename) {
 		GameSave data = new GameSave();
 		data.generateSaveData(game);
@@ -292,7 +455,23 @@ public class GameSave {
 	public static void load(Game game, String filename) {
 		File load = new File(filename);
 		if (load.isFile()) {
-
+			GameSave data = new GameSave();
+			RandomAccessFile raf = null;
+			try {
+				raf = new RandomAccessFile(load, "r");
+				data.read(raf);
+				data.generateLoadData(game);
+			}
+			catch (Exception e) {
+			}
+			finally {
+				try {
+					raf.close();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
