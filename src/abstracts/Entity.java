@@ -14,42 +14,42 @@ import screen.BaseBitmap;
 import screen.BaseScreen;
 
 public abstract class Entity extends Tile {
-	
+
 	public int id;
-	
+
 	protected int xPosition;
 	protected int yPosition;
-	
+
 	protected int xOffset;
 	protected int yOffset;
-	
+
 	protected BaseBitmap bitmap;
-	
+
 	protected String name;
 	protected Boolean gender;
-	
+
 	public boolean isRemoved;
 	protected byte typeId = 0;
-	
+
 	// public abstract void initialize(BaseWorld world);
-	
+
 	public abstract void tick();
-	
+
 	public abstract void render(BaseScreen screen, int x, int y);
-	
+
 	public int getX() {
 		return xPosition;
 	}
-	
+
 	public int getY() {
 		return yPosition;
 	}
-	
-	public void setPosition(int x, int y) {
+
+	protected void setPosition(int x, int y) {
 		this.xPosition = x;
 		this.yPosition = y;
 	}
-	
+
 	public byte[] getByteName() {
 		if (name == null)
 			name = "Joe";
@@ -63,7 +63,7 @@ public abstract class Entity extends Tile {
 		}
 		return result;
 	}
-	
+
 	public byte[] getByteGender() {
 		byte[] result = new byte[1];
 		if (gender == null)

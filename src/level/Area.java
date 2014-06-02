@@ -11,6 +11,7 @@
 package level;
 
 import java.util.ArrayList;
+
 import screen.BaseBitmap;
 import screen.BaseScreen;
 import abstracts.Tile;
@@ -20,11 +21,11 @@ public class Area {
 	private final int width;
 	private final int height;
 	private final int[] pixels;
-	
+
 	private int xPlayerPosition;
 	private int yPlayerPosition;
 	private Player player;
-	
+
 	private boolean isInWarpZone;
 	private boolean isInConnectionPoint;
 	private PixelData currentPixelData;
@@ -32,9 +33,9 @@ public class Area {
 	private int sectorID;
 	// TODO: Add area type.
 	// private int areaType;
-	
+
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
-	
+
 	public Area(BaseBitmap bitmap, final int areaID) {
 		this.width = bitmap.getWidth();
 		this.height = bitmap.getHeight();
@@ -42,7 +43,7 @@ public class Area {
 		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInConnectionPoint = false;
-		
+
 		for (int y = 0; y < this.height; y++) {
 			areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
@@ -52,19 +53,19 @@ public class Area {
 			}
 		}
 	}
-	
+
 	public void setPlayer(Player player) {
 		this.player = player;
 	}
-	
+
 	public int getWidth() {
 		return this.width;
 	}
-	
+
 	public int getHeight() {
 		return this.height;
 	}
-	
+
 	/**
 	 * Updates the area.
 	 * 
@@ -79,11 +80,11 @@ public class Area {
 				yPlayerPosition = player.getYInArea();
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
-				
+
 				// try {
 				// Up, Down, Left, Right
 				// TODO: Fix player facing. Interactions need player facing. Else, it's wonky.
-				
+
 				// Not sure why there has to be two instances of the same method call.
 				this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
 				// }
@@ -111,7 +112,7 @@ public class Area {
 				catch (Exception e) {
 					this.player.stopInteraction();
 				}
-				
+
 				// Target pixel is used to determine what pixel the player is currently standing on
 				// (or what pixel the player is currently on top of).
 				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
@@ -134,10 +135,9 @@ public class Area {
 			}
 		}
 	}
-	
+
 	/**
-	 * Checks the pixel data the player is currently on, and sets the tile properties according to the documentation provided. The tile the pixel data
-	 * is representing determines the properties this will set, and will affect how the game interacts with the player.
+	 * Checks the pixel data the player is currently on, and sets the tile properties according to the documentation provided. The tile the pixel data is representing determines the properties this will set, and will affect how the game interacts with the player.
 	 * 
 	 * @return Nothing.
 	 * */
@@ -207,10 +207,9 @@ public class Area {
 				break;
 		}
 	}
-	
+
 	/**
-	 * Checks the pixel data and sets properties according to the documentation provided. The tile the pixel data is representing determines whether
-	 * it should allow or block the player from walking towards it.
+	 * Checks the pixel data and sets properties according to the documentation provided. The tile the pixel data is representing determines whether it should allow or block the player from walking towards it.
 	 * 
 	 * <p>
 	 * In other words, this is the method call that works out the collision detection/response in the game.
@@ -219,9 +218,7 @@ public class Area {
 	 *            Sets the offset of the PixelData it should check by the X axis.
 	 * @param yOffset
 	 *            Sets the offset of the PixelData it should check by the Y axis.
-	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through. Returns true to allow player to walk
-	 *         from the player's last position to this tile. Returns false to block the player from walking from the player's last position to this
-	 *         tile.
+	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through. Returns true to allow player to walk from the player's last position to this tile. Returns false to block the player from walking from the player's last position to this tile.
 	 * */
 	private boolean checkSurroundingData(int xOffset, int yOffset) {
 		PixelData data = null;
@@ -293,7 +290,7 @@ public class Area {
 						case 0x07: // Bottom Right
 							// TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!
 							return false;
-							
+
 							// ------------------------- MOUNTAIN LEDGES ------------------------
 						case 0x0C:
 							int y = this.yPlayerPosition + yOffset;
@@ -353,7 +350,7 @@ public class Area {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Renders the bitmap tiles based on the given pixel data.
 	 * 
@@ -363,11 +360,9 @@ public class Area {
 	 * @param screen
 	 *            The screen display where the bitmaps are to output to.
 	 * @param xOff
-	 *            The X offset based on the player's X position in absolute world coordinates. The absolute world coordinates mean the precise X
-	 *            position on the Canvas.
+	 *            The X offset based on the player's X position in absolute world coordinates. The absolute world coordinates mean the precise X position on the Canvas.
 	 * @param yOff
-	 *            The Y offset based on the player's Y position in absolute world coordinates. The absolute world coordinates mean the precise Y
-	 *            position on the Canvas.
+	 *            The Y offset based on the player's Y position in absolute world coordinates. The absolute world coordinates mean the precise Y position on the Canvas.
 	 * @return Nothing.
 	 * 
 	 * */
@@ -381,37 +376,41 @@ public class Area {
 			}
 		}
 	}
-	
+
 	// Getters/Setters
 	public int getPlayerX() {
 		return this.player.getX();
 	}
-	
+
 	public int getPlayerXInArea() {
 		return this.player.getXInArea();
 	}
-	
+
 	public void setPlayerX(int x) {
 		this.xPlayerPosition = x;
 	}
-	
+
+	public void setSectorID(int value) {
+		this.sectorID = value;
+	}
+
 	public int getPlayerY() {
 		return this.player.getY();
 	}
-	
+
 	public int getPlayerYInArea() {
 		return this.player.getYInArea();
 	}
-	
+
 	public void setPlayerY(int y) {
 		this.yPlayerPosition = y;
 	}
-	
+
 	public void setDebugDefaultPosition() {
 		// When the game starts from the very beginning, the player must always start from the very first way point.
 		player.setAreaPosition(0, 0);
 	}
-	
+
 	/**
 	 * Sets the player's position according to the given warp point pixel data.
 	 * 
@@ -434,25 +433,25 @@ public class Area {
 			}
 		}
 	}
-	
+
 	public boolean playerIsInWarpZone() {
 		return this.isInWarpZone;
 	}
-	
+
 	public PixelData getCurrentPixelData() {
 		// Return the pixel data the player is currently on top of.
 		return this.currentPixelData;
 		// return this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 	}
-	
+
 	public int getAreaID() {
 		return this.areaID;
 	}
-	
+
 	public boolean playerIsInConnectionPoint() {
 		return this.isInConnectionPoint;
 	}
-	
+
 	public boolean playerHasLeftConnectionPoint() {
 		if (this.isInConnectionPoint) {
 			if (this.player.isLockedWalking()) {
@@ -462,11 +461,11 @@ public class Area {
 		}
 		return false;
 	}
-	
+
 	public int getSectorID() {
 		return this.sectorID;
 	}
-	
+
 	/**
 	 * Obtains the tile ID of the tile being offset by the player's position.
 	 * 
@@ -484,20 +483,19 @@ public class Area {
 		catch (Exception e) {
 			return -1;
 		}
-		if (data != null) { return (data.getColor() >> 24) & 0xFF; }
+		if (data != null) {
+			return (data.getColor() >> 24) & 0xFF;
+		}
 		return -1;
 	}
-	
+
 	/**
-	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that the player is allowed to walk on, or when the
-	 * conditions are right for the player to move on the tile.
+	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that the player is allowed to walk on, or when the conditions are right for the player to move on the tile.
 	 * 
 	 * @param targetIDToCompare
-	 *            The target tile ID used to test and see if it's allowable for the player to move/walk on. Use getSurroundingTileID() to fetch the
-	 *            target tile ID.
+	 *            The target tile ID used to test and see if it's allowable for the player to move/walk on. Use getSurroundingTileID() to fetch the target tile ID.
 	 * @param multipleTileIDs
-	 *            The many tile IDs that are to be compared to the target tile ID to see if the target tile ID is one of the allowed tile IDs. You may
-	 *            use as many tile IDs for comparison as you wished.
+	 *            The many tile IDs that are to be compared to the target tile ID to see if the target tile ID is one of the allowed tile IDs. You may use as many tile IDs for comparison as you wished.
 	 * @return True, if the target tile ID is one of the many tile IDs that's allowable. False, if none of the tile IDs match the target tile ID.
 	 * 
 	 * */
@@ -511,7 +509,7 @@ public class Area {
 		}
 		return result;
 	}
-	
+
 	public int getTileColor(int xOffset, int yOffset) {
 		PixelData data;
 		try {
@@ -520,14 +518,16 @@ public class Area {
 		catch (Exception e) {
 			return 0;
 		}
-		if (data != null) { return (data.getColor()); }
+		if (data != null) {
+			return (data.getColor());
+		}
 		return 0;
 	}
-	
+
 	public void setPixelData(PixelData data, int xPosition, int yPosition) {
 		this.areaData.get(yPosition).set(xPosition, data);
 	}
-	
+
 	public PixelData getPixelData(int x, int y) {
 		return this.areaData.get(y).get(x);
 	}

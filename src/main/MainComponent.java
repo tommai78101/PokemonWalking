@@ -30,7 +30,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import saving.GameSave;
 import screen.BaseScreen;
 
 public class MainComponent extends Canvas implements Runnable {
@@ -143,7 +142,7 @@ public class MainComponent extends Canvas implements Runnable {
 		}
 
 		//DEBUG
-		GameSave.load(this.game, "data.sav");
+		//GameSave.load(this.game, "data.sav");
 		//DEBUG    END
 
 		while (running) {

@@ -17,6 +17,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import main.Game;
 import main.Keys;
 import main.MainComponent;
@@ -33,12 +34,12 @@ public class StartMenu {
 	// Description area
 	private static final int DESCRIPTION_FIRST_LINE_Y = (Tile.HEIGHT * 8) - 8;
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 9) - 8;
-	
+
 	// String constants
 	public static final String ITEM_NAME_EXIT = "EXIT";
 	public static final String ITEM_NAME_INVENTORY = "PACK";
 	public static final String ITEM_NAME_SAVE = "SAVE";
-	
+
 	private boolean activation;
 	private ArrayList<Map.Entry<Integer, SubMenu>> items = new ArrayList<Map.Entry<Integer, SubMenu>>();
 	private int menuCursorPosition;
@@ -48,7 +49,7 @@ public class StartMenu {
 	private Map.Entry<Integer, SubMenu> actionEvent;
 	private Inventory inventory;
 	private Save save;
-	
+
 	public StartMenu(Game game) {
 		this.activation = false;
 		this.menuCursorPosition = 0;
@@ -56,7 +57,7 @@ public class StartMenu {
 		this.keys = game.getPlayer().keys;
 		this.actionEvent = null;
 	}
-	
+
 	public StartMenu initialize() {
 		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game).initialize(keys);
 		save = (Save) new Save(ITEM_NAME_SAVE, "Save the game.", "Save the game.", this.game).initialize(keys);
@@ -66,11 +67,17 @@ public class StartMenu {
 		this.addMenuItem(exit);
 		return this;
 	}
-	
-	public void addMenuItem(SubMenu SubMenu) {
-		this.items.add(new AbstractMap.SimpleEntry<Integer, SubMenu>(items.size(), SubMenu));
+
+	public void addMenuItem(SubMenu submenu) {
+		if (!this.items.isEmpty()) {
+			for (Map.Entry<Integer, SubMenu> entry : this.items) {
+				if (entry.getValue().equals(submenu))
+					return;
+			}
+		}
+		this.items.add(new AbstractMap.SimpleEntry<Integer, SubMenu>(items.size(), submenu));
 	}
-	
+
 	public void removeMenuItem(int position) {
 		for (int i = 0; i < items.size(); i++) {
 			Map.Entry<Integer, SubMenu> entry = items.get(i);
@@ -82,7 +89,7 @@ public class StartMenu {
 			}
 		}
 	}
-	
+
 	public void tick() {
 		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && this.activation)
 			this.activation = false;
@@ -93,7 +100,7 @@ public class StartMenu {
 		else if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}
-	
+
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.activation) {
 			Dialogue.renderBox(output, 5, 0, 4, items.size());
@@ -106,46 +113,46 @@ public class StartMenu {
 			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		}
 	}
-	
+
 	public Map.Entry<Integer, SubMenu> getActionEvent() {
 		return this.actionEvent;
 	}
-	
+
 	public boolean isActionEventAvailable() {
 		return (this.actionEvent != null);
 	}
-	
+
 	public void clearActionEvent() {
 		this.actionEvent = null;
 	}
-	
+
 	public void closeMenu() {
 		this.activation = false;
 		if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}
-	
+
 	public void openMenu() {
 		this.activation = true;
 		this.menuCursorPosition = 0;
 	}
-	
+
 	public boolean isActivated() {
 		return this.activation;
 	}
-	
+
 	public SubMenu getSubMenu() {
 		return this.items.get(this.menuCursorPosition).getValue();
 	}
-	
+
 	public Inventory getInventory() {
 		return this.inventory;
 	}
-	
+
 	public List<Map.Entry<Integer, SubMenu>> getSubMenusList() {
 		return this.items;
 	}
-	
+
 	// ------------------------- PRIVATE METHODS -----------------------------------
 	private void prepareMenuText() {
 		Map.Entry<Integer, SubMenu> entry = this.items.get(this.menuCursorPosition);
@@ -153,7 +160,7 @@ public class StartMenu {
 		// TODO: Make this modular.
 		this.tokens = Dialogue.toLines(item.getDescription(), Dialogue.HALF_STRING_LENGTH);
 	}
-	
+
 	private void handleMenuSelection() {
 		if (!Player.isMovementsLocked())
 			Player.lockMovements();
@@ -169,7 +176,7 @@ public class StartMenu {
 				this.menuCursorPosition = this.items.size() - 1;
 			this.keys.up.lastKeyState = true;
 		}
-		
+
 		// Menu input mechanism
 		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 			this.keys.Z.lastKeyState = true;
@@ -178,7 +185,7 @@ public class StartMenu {
 			this.activation = true;
 		}
 	}
-	
+
 	private void renderMenuText(Graphics g) {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
@@ -188,7 +195,7 @@ public class StartMenu {
 			}
 		}
 	}
-	
+
 	private void renderMenuDescriptionText(Graphics g) {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
@@ -199,9 +206,9 @@ public class StartMenu {
 		catch (Exception e) {
 		}
 	}
-	
+
 	// ------------------------- STATIC METHODS --------------------------------------
-	
+
 	public static void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {

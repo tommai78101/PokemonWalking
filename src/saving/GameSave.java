@@ -1,5 +1,9 @@
 package saving;
 
+import item.ActionItem;
+import item.DummyItem;
+import item.ItemText;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,9 +14,14 @@ import java.util.List;
 import java.util.Map;
 
 import level.Area;
+import level.WorldConstants;
 import main.Game;
+import submenu.DummyMenu;
+import submenu.Inventory;
+import submenu.Save;
 import abstracts.Item;
 import abstracts.SubMenu;
+import dialogue.StartMenu;
 import entity.Player;
 
 public class GameSave {
@@ -251,8 +260,7 @@ public class GameSave {
 						byte listType = data[offset++];
 						size--;
 
-						raf.seek(offset);
-						char listSize = raf.readChar();
+						int listSize = ((data[offset] << 8) | data[offset + 1]) & 0xFFFF;
 						offset += 2;
 						size -= 2;
 
@@ -264,7 +272,7 @@ public class GameSave {
 
 								byte nameSize = data[offset];
 								byte[] entry = new byte[1 + nameSize + 4 + 4];
-								for (int j = 0; i < entry.length; j++, offset++, size--, listElementSize--) {
+								for (int j = 0; j < entry.length; j++, offset++, size--, listElementSize--) {
 									if (listElementSize < 0)
 										throw new IOException("Something is wrong with the element item size in ITEM chunk.");
 									entry[j] = data[offset];
@@ -421,6 +429,78 @@ public class GameSave {
 
 	private void generateLoadData(Game game) {
 		Player gamePlayer = game.getPlayer();
+		//Get name
+		gamePlayer.setName(new String(this.playerInfo.player_name));
+		//Get gender
+		gamePlayer.setGender(this.playerInfo.player_gender[0] == 0x1 ? Boolean.TRUE.booleanValue() : Boolean.FALSE.booleanValue());
+		//Get menu options.
+		if (!game.getStartMenu().getSubMenusList().isEmpty())
+			game.getStartMenu().getSubMenusList().clear();
+		for (int i = 0; i < this.playerInfo.startMenu.size(); i++) {
+			byte[] data = this.playerInfo.startMenu.get(i);
+			switch (new String(data)) {
+				case StartMenu.ITEM_NAME_EXIT:
+					game.getStartMenu().addMenuItem(new DummyMenu(StartMenu.ITEM_NAME_EXIT, "Close this menu", "Close this menu", game));
+					break;
+				case StartMenu.ITEM_NAME_INVENTORY:
+					game.getStartMenu().addMenuItem(new Inventory(StartMenu.ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", game).initialize(game.getPlayer().keys));
+					break;
+				case StartMenu.ITEM_NAME_SAVE:
+					game.getStartMenu().addMenuItem(new Save(StartMenu.ITEM_NAME_SAVE, "Save the game.", "Save the game.", game).initialize(game.getPlayer().keys));
+					break;
+			}
+		}
+		//Get inventory items
+		Inventory inventory = game.getStartMenu().getInventory();
+		for (int k = 0; k < this.playerInfo.getAllItemsList().size(); k++) {
+			ArrayList<byte[]> list = this.playerInfo.getAllItemsList().get(k);
+			for (int i = 0; i < list.size(); i++) {
+				byte[] data = list.get(i);
+				byte[] name = new byte[data[0]];
+				byte offset = 0x0;
+				for (; offset < data[0]; offset++)
+					name[offset] = data[offset + 0x1];
+				offset++;
+				int id = data[offset] | data[offset + 1] | data[offset + 2] | data[offset + 3];
+				offset += 4;
+				int quantity = data[offset] | data[offset + 1] | data[offset + 2] | data[offset + 3];
+
+				ItemText itemText = WorldConstants.items.get(id);
+				Item item = null;
+				switch (itemText.type) {
+					case DUMMY:
+						item = new DummyItem(game, itemText.itemName, itemText.description, itemText.category, itemText.id);
+						break;
+					case ACTION:
+						item = new ActionItem(game, itemText.itemName, itemText.description, itemText.category, itemText.id);
+						break;
+					default:
+						item = null;
+						break;
+				}
+				if (item != null) {
+					for (; quantity > 0; quantity--)
+						inventory.addItem(itemText, item);
+				}
+			}
+		}
+		//Get current area
+		//TODO: Probably need to set world ID first before setting the current area ID and SECTOR.
+		int value = this.playerInfo.player_current_area_id[0] | this.playerInfo.player_current_area_id[1] | this.playerInfo.player_current_area_id[2] | this.playerInfo.player_current_area_id[3];
+		game.getWorld().setCurrentArea(WorldConstants.convertToArea(WorldConstants.getAllAreas(), value));
+		value = this.playerInfo.player_current_area_sector_id[0] | this.playerInfo.player_current_area_sector_id[1] | this.playerInfo.player_current_area_sector_id[2] | this.playerInfo.player_current_area_sector_id[3];
+		game.getWorld().getCurrentArea().setSectorID(value);
+		//Get Player Position
+		int x = this.playerInfo.player_x[0] | this.playerInfo.player_x[1] | this.playerInfo.player_x[2] | this.playerInfo.player_x[3];
+		int y = this.playerInfo.player_y[0] | this.playerInfo.player_y[1] | this.playerInfo.player_y[2] | this.playerInfo.player_y[3];
+		game.getPlayer().setAreaPosition(x, y);
+		game.getWorld().getCurrentArea().setPlayerX(x);
+		game.getWorld().getCurrentArea().setPlayerY(y);
+		game.getWorld().getCurrentArea().setPlayer(game.getPlayer());
+
+		//Get Player direction facing.
+		value = this.playerInfo.player_facing[0] | this.playerInfo.player_facing[1] | this.playerInfo.player_facing[2] | this.playerInfo.player_facing[3];
+		game.getPlayer().setFacing(value);
 
 	}
 
@@ -463,6 +543,7 @@ public class GameSave {
 				data.generateLoadData(game);
 			}
 			catch (Exception e) {
+				e.printStackTrace();
 			}
 			finally {
 				try {
