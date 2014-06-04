@@ -195,9 +195,8 @@ public class GameSave {
 		public void read(RandomAccessFile raf) throws IOException {
 			this.byteSize = raf.readShort();
 			byte[] data = new byte[byteSize];
-			int readBytes;
 			int offset = 0;
-			while ((readBytes = raf.read(data)) != -1) {
+			while (raf.read(data) != -1) {
 				//Checks if "PLAY" tag is set.
 				for (; offset < PLAY.length; offset++) {
 					if (data[offset] != PLAY[offset])
@@ -323,6 +322,10 @@ public class GameSave {
 				}
 			}
 		}
+	}
+
+	public static class AreaInfo {
+
 	}
 
 	public static final byte[] SIGNATURE = new byte[] { (byte) 137, 0x53, 0x41, 0x56, 0x20, 0x20, 0x20, 0x20 };

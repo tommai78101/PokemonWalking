@@ -141,10 +141,6 @@ public class MainComponent extends Canvas implements Runnable {
 			return;
 		}
 
-		//DEBUG
-		//GameSave.load(this.game, "data.sav");
-		//DEBUG    END
-
 		while (running) {
 			// For debugging, this is disabled.
 			// shouldRender = false;

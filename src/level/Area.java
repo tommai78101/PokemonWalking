@@ -531,4 +531,8 @@ public class Area {
 	public PixelData getPixelData(int x, int y) {
 		return this.areaData.get(y).get(x);
 	}
+
+	public ArrayList<ArrayList<PixelData>> getAllPixelDatas() {
+		return this.areaData;
+	}
 }
