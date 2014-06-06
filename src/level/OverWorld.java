@@ -10,8 +10,6 @@
 
 package level;
 
-import java.util.ArrayList;
-import java.util.List;
 import screen.BaseScreen;
 import abstracts.Tile;
 import abstracts.World;
@@ -19,9 +17,6 @@ import dialogue.Dialogue;
 import entity.Player;
 
 public class OverWorld extends World {
-	// Contains overworld specific areas.
-	public List<Area> areas = new ArrayList<Area>();
-	
 	// Overworld properties.
 	private boolean invertBitmapColors;
 	private int currentAreaSectorID;
@@ -38,6 +33,8 @@ public class OverWorld extends World {
 	public OverWorld(Player player, Dialogue dialogue) {
 		// There should be a maximum number of areas available for the OverWorld.
 		// All areas defined must be placed in WorldConstants.
+		this.worldID = WorldConstants.OVERWORLD;
+		
 		this.areas = WorldConstants.getAllAreas();
 		
 		// Overworld properties

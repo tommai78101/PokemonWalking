@@ -10,6 +10,9 @@
 
 package abstracts;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import level.Area;
 import screen.BaseScreen;
 import entity.Player;
@@ -34,6 +37,10 @@ public abstract class World {
 
 	protected Player player;
 	protected Area currentArea;
+	
+	public List<Area> areas = new ArrayList<Area>();
+	
+	protected int worldID;
 
 	// Contains new objects, must add them.
 	// protected List<WayPoint> warpPoints;
@@ -90,4 +97,37 @@ public abstract class World {
 	public void setCurrentArea(Area area) {
 		this.currentArea = area;
 	}
+	
+	public List<Area> getAllAreas(){
+		return this.areas;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + worldID;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		World other = (World) obj;
+		if (worldID != other.worldID) {
+			return false;
+		}
+		return true;
+	}
+
+	
+	
 }

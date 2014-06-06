@@ -330,6 +330,22 @@ public class PixelData {
 	}
 	
 	/**
+	 * Prepares the bitmap if the color has been pre-determined.
+	 * 
+	 * <p>
+	 * Will cause undefined behaviors if the colors have not been set yet.
+	 * 
+	 * @return Nothing.
+	 * */
+	public void prepareBitmap(){
+		int alpha = (this.color >> 24) & 0xFF;
+		int red = (this.color >> 16) & 0xFF;
+		int green = (this.color >> 8) & 0xFF;
+		int blue = this.color & 0xFF;
+		this.prepareBitmap(alpha, red, green, blue);
+	}
+	
+	/**
 	 * Sets the properties of a given pixel data. This is where the game gets the area's information on what the player should do and don't.
 	 * 
 	 * <p>

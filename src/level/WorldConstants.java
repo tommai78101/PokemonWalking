@@ -46,6 +46,9 @@ public class WorldConstants {
 
 	// Building Roof Colors / Main Area Color Theme
 	public static final int AREA_1_COLOR = 0xFFA495B0;
+	
+	//World IDs
+	public static final int OVERWORLD = 0x0A000001;
 
 	// Dialogues
 	public static ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("dialogue/dialogue.txt");
