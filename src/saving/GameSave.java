@@ -127,7 +127,8 @@ public class GameSave {
 		byteArray = new byte[] {};
 		byteArray = concatenate(byteArray, bufArea);
 		byteArray = concatenate(byteArray, bufSector);
-		this.areaInfo.increment(concatenate(concatenate(new byte[] { 0x0 }, AreaInfo.AREA), byteArray));
+		//Size of total AreaInfo chunk + size of AreaInfo header chunk for the two 0x0s.
+		this.areaInfo.increment(concatenate(concatenate(new byte[] { 0x0 , 0x0}, AreaInfo.AREA), byteArray));
 		bufArea = bufSector = null;
 		
 		byteArray = new byte[] {};
@@ -142,7 +143,8 @@ public class GameSave {
 		
 		// Area Data
 		byteArray = new byte[] {};
-		for (Area area : game.getWorld().getAllAreas()) {
+		List<Area> areaList =game.getWorld().getAllAreas(); 
+		for (Area area : areaList) {
 			ArrayList<PixelData> pixelList = area.getModifiedPixelDataList();
 			if (!pixelList.isEmpty()) {
 				for (PixelData px : pixelList) {
@@ -237,6 +239,7 @@ public class GameSave {
 		game.getPlayer().setFacing(value);
 		
 		// Get modified pixel data for all areas.
+		//List<Area> loadedAreas = game.getWorld().getAllAreas();
 		
 	}
 	

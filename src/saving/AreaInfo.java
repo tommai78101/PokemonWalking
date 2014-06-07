@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import abstracts.ChunkInfo;
 
 public class AreaInfo extends ChunkInfo {
-	public static final byte[] AREA = "AREA".getBytes(); //Current Area.
-	public static final byte[] PIXELDATA = "PXDT".getBytes(); //Changed pixels data.
+	public static final byte[] AREA = "AREA".getBytes(); // Current Area.
+	public static final byte[] PIXELDATA = "PXDT".getBytes(); // Changed pixels data.
 	
 	public final byte[] current_area_id = new byte[4];
 	public final byte[] current_area_sector_id = new byte[4];
@@ -21,14 +21,14 @@ public class AreaInfo extends ChunkInfo {
 	
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
-		//Area Info chunk total size
-		size = raf.readByte();
+		// Area Info chunk total size
+		this.size = raf.readByte();
 		
-		
-		//Area Info
+		// Area Info
 		int offset = 0;
-		byte[] data = new byte[size];
+		byte[] data = new byte[raf.readByte()];
 		raf.read(data);
+		
 		for (int i = 0; i < AREA.length; offset++, i++, size--) {
 			if (data[offset] != AREA[i])
 				throw new IOException("Incorrect Area Info AREA chunk.");
@@ -40,35 +40,40 @@ public class AreaInfo extends ChunkInfo {
 			this.current_area_sector_id[i] = data[offset];
 		}
 		
+		// Changed pixel data
 		
-		//Changed pixel data
-		int pixelSize = ((((data[offset] << 8) | data[offset+1]) & 0xFFFF) - PIXELDATA.length) / (4*5);
-		offset+=2;
-		for (int i=0; i< PIXELDATA.length;i++, offset++)
-			if (data[offset] != PIXELDATA[i])
-				throw new IOException("Incorrect Area Info PIXELDATA chunk.");
-		for (; pixelSize > 0; pixelSize--){
-			byte[] px = new byte[4*5];
-			for (int i = 0; i<px.length; i++, offset++)
-				px[i] = data[offset];
-			this.changedPixelData.add(px);
+		int pixelSize = raf.readByte();
+		if (pixelSize > 0) {
+			data = new byte[pixelSize];
+			raf.read(data);
+			offset = 0;
+			for (int i = 0; i < PIXELDATA.length; i++, offset++)
+				if (data[offset] != PIXELDATA[i])
+					throw new IOException("Incorrect Area Info PIXELDATA chunk.");
+			for (; pixelSize > 0; pixelSize--) {
+				byte[] px = new byte[4 * 5];
+				for (int i = 0; i < px.length; i++, offset++)
+					px[i] = data[offset];
+				this.changedPixelData.add(px);
+			}
 		}
 	}
 	
 	@Override
 	public void write(RandomAccessFile raf) throws IOException {
-		//Total chunk size.
+		// Total chunk size.
 		raf.writeByte(size);
 		
-		//Current Area Info
+		// Current Area Info
+		raf.write(AREA.length + current_area_id.length + current_area_sector_id.length);
 		raf.write(AREA);
 		raf.write(current_area_id);
 		raf.write(current_area_sector_id);
 		
-		//Changed pixel data
+		// Changed pixel data
 		raf.writeChar(this.changedPixelData.size() * 4 * 5 + PIXELDATA.length);
 		raf.write(PIXELDATA);
-		for (byte[] b: this.changedPixelData)
+		for (byte[] b : this.changedPixelData)
 			raf.write(b);
 	}
 	
