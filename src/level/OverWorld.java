@@ -36,7 +36,7 @@ public class OverWorld extends World {
 		this.worldID = WorldConstants.OVERWORLD;
 		
 		if (this.areas.isEmpty())
-			this.areas = WorldConstants.getAllAreas();
+			this.areas = WorldConstants.getAllNewAreas();
 		
 		// Overworld properties
 		this.invertBitmapColors = false;
