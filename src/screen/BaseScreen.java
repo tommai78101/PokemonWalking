@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 import java.util.Random;
+
 import level.PixelData;
 import level.WorldConstants;
 import resources.Art;
@@ -297,6 +298,10 @@ public class BaseScreen extends BaseBitmap {
 				break;
 		}
 		return color;
+	}
+	
+	public void reload(){
+		this.tick = 0x7;
 	}
 	
 	public static int lighten(int color, float amount) {

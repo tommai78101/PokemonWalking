@@ -839,4 +839,12 @@ public class Player extends Entity {
 	public static boolean isMovementsLocked() {
 		return movementLock;
 	}
+
+	public void reload() {
+		this.lockWalking = false;
+		this.lockJumping = false;
+		this.enableInteraction = false;
+		this.facing = Player.DOWN;
+		this.animationTick = 0x7;
+	}
 }

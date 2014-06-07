@@ -219,9 +219,10 @@ public class Game {
 	 * */
 	public void load() {
 		// TODO: Load data.
+		this.screen.reload();
 		Mod.loadModdedResources(this.screen);
 		WorldConstants.isModsEnabled = null;
-		player.setFacing(Player.DOWN);
+		player.reload();
 		this.overworld = new OverWorld(player, this.dialogue);
 		this.state = State.GAME;
 		GameSave.load(this, SAVE_FILE_NAME);
@@ -344,6 +345,5 @@ public class Game {
 			default:
 				break;
 		}
-
 	}
 }
