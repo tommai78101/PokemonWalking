@@ -229,7 +229,7 @@ public class GameSave {
 		// Get current area
 		// TODO: Probably need to set world ID first before setting the current area ID and SECTOR.
 		int currentAreaID = (this.areaInfo.current_area_id[0] << 24) | (this.areaInfo.current_area_id[1] << 16) | (this.areaInfo.current_area_id[2] << 8) | this.areaInfo.current_area_id[3];
-		game.getWorld().setCurrentArea(WorldConstants.convertToArea(game.getWorld().getAllAreas(), currentAreaID);
+		game.getWorld().setCurrentArea(WorldConstants.convertToArea(game.getWorld().getAllAreas(), currentAreaID));
 		int currentSectorID = (this.areaInfo.current_area_sector_id[0] <<24) | (this.areaInfo.current_area_sector_id[1]<<16) | (this.areaInfo.current_area_sector_id[2]<<8) | this.areaInfo.current_area_sector_id[3];
 		game.getWorld().getCurrentArea().setSectorID(currentSectorID);
 		
