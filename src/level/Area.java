@@ -415,7 +415,15 @@ public class Area {
 	
 	public void setDebugDefaultPosition() {
 		// When the game starts from the very beginning, the player must always start from the very first way point.
-		player.setAreaPosition(0, 0);
+		SET_LOOP:
+		for (ArrayList<PixelData> y: this.areaData){
+			for (PixelData x: y){
+				if (((x.getColor() >> 24) & 0xFF) == 0x01){
+					player.setAreaPosition(x.xPosition, x.yPosition);
+					break SET_LOOP;
+				}
+			}
+		}
 	}
 	
 	/**

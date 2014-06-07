@@ -57,6 +57,9 @@ public class WorldConstants {
 	public static HashMap<Integer, ItemText> items = Item.loadItemResources("item/items.txt");
 
 	//Mod Area IDs;
+	
+	//Modded maps enabled?
+	public static boolean isModsEnabled = false;
 
 	/**
 	 * Returns the area matching the given area ID value.
@@ -101,9 +104,10 @@ public class WorldConstants {
 	 * 
 	 * @return A List<Area> object containing all available areas in specified order defined.
 	 * */
-	public static List<Area> getAllAreas() {
+	public static List<Area> getAllNewAreas() {
 		List<Area> result = new ArrayList<Area>();
 		if (Mod.moddedAreas.isEmpty()) {
+			WorldConstants.isModsEnabled = false;
 			result.add(new Area(Art.testArea, TEST_WORLD_1));
 			result.add(new Area(Art.testArea2, TEST_WORLD_2));
 			result.add(new Area(Art.testArea3, TEST_WORLD_3));
@@ -111,6 +115,7 @@ public class WorldConstants {
 			result.add(new Area(Art.testArea_debug, DEBUG));
 		}
 		else {
+			WorldConstants.isModsEnabled = true;
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
 				result.add(new Area(Mod.moddedAreas.get(i), i + 1));
 			}
