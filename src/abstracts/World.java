@@ -134,6 +134,15 @@ public abstract class World {
 		return true;
 	}
 
+	public void refresh() {
+		for (int i=0; i<this.areas.size(); i++){
+			if (this.areas.get(i).getAreaID() == this.currentArea.getAreaID()){
+				this.currentArea = this.areas.get(i);
+				break;
+			}
+		}
+	}
+
 	
 	
 }
