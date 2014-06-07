@@ -228,9 +228,9 @@ public class GameSave {
 		
 		// Get current area
 		// TODO: Probably need to set world ID first before setting the current area ID and SECTOR.
-		int currentAreaID = (this.areaInfo.current_area_id[0] << 24) | (this.areaInfo.current_area_id[1] << 16) | (this.areaInfo.current_area_id[2] << 8) | this.areaInfo.current_area_id[3];
+		int currentAreaID = (this.areaInfo.current_area_id[0] & 0xFF)<< 24 | (this.areaInfo.current_area_id[1]&0xFF) << 16 | (this.areaInfo.current_area_id[2]&0xFF) << 8 | (this.areaInfo.current_area_id[3] & 0xFF);
 		game.getWorld().setCurrentArea(WorldConstants.convertToArea(game.getWorld().getAllAreas(), currentAreaID));
-		int currentSectorID = (this.areaInfo.current_area_sector_id[0] <<24) | (this.areaInfo.current_area_sector_id[1]<<16) | (this.areaInfo.current_area_sector_id[2]<<8) | this.areaInfo.current_area_sector_id[3];
+		int currentSectorID = (this.areaInfo.current_area_sector_id[0]&0xFF) <<24 | (this.areaInfo.current_area_sector_id[1]&0xFF)<<16 | (this.areaInfo.current_area_sector_id[2]&0xFF)<<8 | this.areaInfo.current_area_sector_id[3]&0xFF;
 		game.getWorld().getCurrentArea().setSectorID(currentSectorID);
 		
 		
@@ -243,7 +243,7 @@ public class GameSave {
 		game.getWorld().getCurrentArea().setPlayer(game.getPlayer());
 		
 		// Get Player direction facing.
-		int facing = (this.playerInfo.player_facing[0]<<24) | (this.playerInfo.player_facing[1]<<16) | (this.playerInfo.player_facing[2]<<8) | this.playerInfo.player_facing[3];
+		int facing = (this.playerInfo.player_facing[0]&0xFF)<<24 | (this.playerInfo.player_facing[1]&0xFF)<<16 | (this.playerInfo.player_facing[2]&0xFF)<<8 | this.playerInfo.player_facing[3]&0xFF;
 		game.getPlayer().setFacing(facing);
 		
 		// Get modified pixel data for all areas.
@@ -252,21 +252,21 @@ public class GameSave {
 			for (Iterator<byte[]> it = this.areaInfo.changedPixelData.iterator(); it.hasNext();){
 				byte[] data = it.next();
 				int offset = 0;
-				int areaID = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
+				int areaID = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8| data[offset + 3]&0xFF;
 				offset += 4;
 				
 				//Currently, unknown use at the moment.
-				int sectorID = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
+				int sectorID = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
 				offset+=4;
 				
 				LOADED_AREA:
 				for (Area area: loadedAreas){
 					if (areaID == area.getAreaID()){
-						int xPixelData = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
+						int xPixelData = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
 						offset+=4;
-						int yPixelData = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
+						int yPixelData = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
 						offset+=4;
-						int color = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
+						int color = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
 						
 						PixelData pxData = new PixelData(color	, xPixelData, yPixelData);
 						area.getModifiedPixelDataList().add(pxData);

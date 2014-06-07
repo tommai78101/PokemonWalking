@@ -440,12 +440,16 @@ public class PixelData {
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x04: // Warp Point
-				this.targetArea = red;
+				//this.targetArea = red;
+				//FIXME: Level Editor must set target area ID to at least 1 or above.
+				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.isWarpZone = true;
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 			case 0x05: // ACP (Refer to documentation.)
-				this.targetArea = red;
+				//this.targetArea = red;
+				//FIXME: Level Editor must set target area ID to at least 1 or above.
+				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.targetSector = green;
 				this.isWarpZone = false;
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
@@ -463,7 +467,9 @@ public class PixelData {
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x0A: // House Door
-				this.targetArea = red;
+				//this.targetArea = red;
+				//FIXME: Level Editor must set target area ID to at least 1 or above.
+				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.isWarpZone = true;
 				break;
 			case 0x0B: // Item
