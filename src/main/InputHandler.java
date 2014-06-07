@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
 import main.Keys.Key;
 
 public class InputHandler implements KeyListener {
@@ -46,6 +47,10 @@ public class InputHandler implements KeyListener {
 		mappings.put(keys.PERIOD, KeyEvent.VK_PERIOD);
 		
 		mappings.put(keys.START, KeyEvent.VK_ENTER);
+		
+		//Debugging purposes
+		mappings.put(keys.F1, KeyEvent.VK_F1);
+		
 	}
 	
 	@Override

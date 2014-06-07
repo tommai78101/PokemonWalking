@@ -48,4 +48,7 @@ public class Keys {
 	public Key PERIOD = new Key(".");
 	
 	public Key START = new Key("ENTER");
+	
+	//Debugging purposes
+	public Key F1 = new Key("F1");
 }
