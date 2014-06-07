@@ -99,12 +99,12 @@ public abstract class World {
 	}
 	
 	public List<Area> getAllAreas(){
-		for (int i=0; i<this.areas.size(); i++){
-			if (this.areas.get(i).getAreaID() == this.currentArea.getAreaID()){
-				this.areas.set(i, this.currentArea);
-				break;
-			}
-		}
+//		for (int i=0; i<this.areas.size(); i++){
+//			if (this.areas.get(i).getAreaID() == this.currentArea.getAreaID()){
+//				this.areas.set(i, this.currentArea);
+//				break;
+//			}
+//		}
 		return this.areas;
 	}
 

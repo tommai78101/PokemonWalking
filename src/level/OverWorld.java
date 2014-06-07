@@ -35,8 +35,9 @@ public class OverWorld extends World {
 		// All areas defined must be placed in WorldConstants.
 		this.worldID = WorldConstants.OVERWORLD;
 		
-		if (this.areas.isEmpty())
-			this.areas = WorldConstants.getAllNewAreas();
+		if (!this.areas.isEmpty())
+			areas.clear();
+		this.areas = WorldConstants.getAllNewAreas();
 		
 		// Overworld properties
 		this.invertBitmapColors = false;
@@ -99,18 +100,28 @@ public class OverWorld extends World {
 		this.currentArea.tick();
 		
 		if (this.currentArea.playerIsInWarpZone()) {
-			for (int i=0; i<this.areas.size(); i++){
-				if (this.areas.get(i).getAreaID() == this.currentArea.getAreaID()){
+			boolean currentAreaFound = false;
+			int currentAreaID = 0;
+			if (this.currentArea.getAreaID() < 1000 && WorldConstants.isModsEnabled.booleanValue())
+				currentAreaID = this.currentArea.getAreaID() + 1000;
+			else
+				currentAreaID = this.currentArea.getAreaID();
+			for (int i = 0; i < this.areas.size(); i++) {
+				if (this.areas.get(i).getAreaID() == currentAreaID) {
 					this.areas.set(i, this.currentArea);
+					currentAreaFound = true;
 					break;
 				}
 			}
-			PixelData data = this.currentArea.getCurrentPixelData();
-			this.currentArea = WorldConstants.convertToArea(areas, data.getTargetAreaID());
-			this.currentArea.setPlayer(player);
-			this.currentArea.setDefaultPosition(data);
-			this.invertBitmapColors = true;
-			this.player.forceLockWalking();
+			if (currentAreaFound) {
+				PixelData data = this.currentArea.getCurrentPixelData();
+				this.currentArea = WorldConstants.convertToArea(areas, data.getTargetAreaID());
+				this.currentArea.setPlayer(player);
+				this.currentArea.setDefaultPosition(data);
+				this.invertBitmapColors = true;
+				this.player.forceLockWalking();
+				this.currentArea.playerWentPastWarpZone();
+			}
 		}
 		if (!this.player.isLockedWalking()) {
 			if (this.currentArea.getSectorID() != this.currentAreaSectorID) {

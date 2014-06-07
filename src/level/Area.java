@@ -453,6 +453,10 @@ public class Area {
 		return this.isInWarpZone;
 	}
 	
+	public void playerWentPastWarpZone(){
+		this.isInWarpZone = false;
+	}
+	
 	public PixelData getCurrentPixelData() {
 		// Return the pixel data the player is currently on top of.
 		return this.currentPixelData;

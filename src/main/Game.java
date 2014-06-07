@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import level.OverWorld;
+import level.WorldConstants;
+import resources.Mod;
 import saving.GameSave;
 import screen.BaseScreen;
 import submenu.Save;
@@ -142,6 +144,7 @@ public class Game {
 		//Debugging purposes
 		if (this.player.keys.F1.keyStateDown && !(this.player.keys.F1.lastKeyState)){
 			this.player.keys.F1.lastKeyState = true;
+			Mod.resetLoading();
 			this.load();
 		}
 		//End debugging purposes
@@ -216,6 +219,9 @@ public class Game {
 	 * */
 	public void load() {
 		// TODO: Load data.
+		Mod.loadModdedResources(this.screen);
+		WorldConstants.isModsEnabled = null;
+		player.setFacing(Player.DOWN);
 		this.overworld = new OverWorld(player, this.dialogue);
 		this.state = State.GAME;
 		GameSave.load(this, SAVE_FILE_NAME);

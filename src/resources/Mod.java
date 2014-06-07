@@ -4,17 +4,20 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import screen.BaseBitmap;
 import screen.BaseScreen;
 
 public class Mod {
 	private static final String[] names = new String[] { "area" };
-	public static List<BaseBitmap> moddedAreas = new ArrayList<BaseBitmap>();
+	public static List<Map.Entry<BaseBitmap, Integer>> moddedAreas = new ArrayList<Map.Entry<BaseBitmap, Integer>>();
+	private static boolean hasLoaded = false;
 
 	private static Comparator<File> ALPHABETICAL_ORDER = new Comparator<File>() {
 		@Override
@@ -25,20 +28,28 @@ public class Mod {
 			return (res != 0) ? res : str1.compareTo(str2);
 		}
 	};
+	
+	public static void resetLoading(){
+		Mod.hasLoaded = false;
+	}
 
 	public static void loadModdedResources(BaseScreen screen) {
+		if (Mod.hasLoaded)
+			return;
 		initialization();
+		int id = 1;
 		File directory = new File("mod");
 		if (directory.exists()) {
 			List<File> list = Mod.getContents(directory);
 			Collections.sort(list, ALPHABETICAL_ORDER);
 			for (File f : list) {
-				moddedAreas.add(screen.load(f));
+				moddedAreas.add(new AbstractMap.SimpleEntry<BaseBitmap, Integer>(screen.load(f), id + 1000));
+				id++;
 			}
 		}
 		else
 			throw new RuntimeException("Something is wrong with detecting the mod folder.");
-
+		Mod.hasLoaded = true;
 	}
 
 	private static void initialization() {
