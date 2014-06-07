@@ -42,9 +42,11 @@ public class AreaInfo extends ChunkInfo {
 		
 		// Changed pixel data
 		
-		int pixelSize = raf.readByte();
+		int arraySize = raf.readChar();
+		int pixelSize = (arraySize - 4) / 20;
+		
 		if (pixelSize > 0) {
-			data = new byte[pixelSize];
+			data = new byte[arraySize];
 			raf.read(data);
 			offset = 0;
 			for (int i = 0; i < PIXELDATA.length; i++, offset++)

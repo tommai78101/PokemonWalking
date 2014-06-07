@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,6 @@ public class GameSave {
 		headerInfo.read(raf);
 		playerInfo.read(raf);
 		areaInfo.read(raf);
-		;
 	}
 	
 	private void generateSaveData(Game game) {
@@ -127,8 +127,8 @@ public class GameSave {
 		byteArray = new byte[] {};
 		byteArray = concatenate(byteArray, bufArea);
 		byteArray = concatenate(byteArray, bufSector);
-		//Size of total AreaInfo chunk + size of AreaInfo header chunk for the two 0x0s.
-		this.areaInfo.increment(concatenate(concatenate(new byte[] { 0x0 , 0x0}, AreaInfo.AREA), byteArray));
+		// Size of total AreaInfo chunk + size of AreaInfo header chunk for the two 0x0s.
+		this.areaInfo.increment(concatenate(concatenate(new byte[] { 0x0, 0x0 }, AreaInfo.AREA), byteArray));
 		bufArea = bufSector = null;
 		
 		byteArray = new byte[] {};
@@ -143,7 +143,7 @@ public class GameSave {
 		
 		// Area Data
 		byteArray = new byte[] {};
-		List<Area> areaList =game.getWorld().getAllAreas(); 
+		List<Area> areaList = game.getWorld().getAllAreas();
 		for (Area area : areaList) {
 			ArrayList<PixelData> pixelList = area.getModifiedPixelDataList();
 			if (!pixelList.isEmpty()) {
@@ -239,7 +239,36 @@ public class GameSave {
 		game.getPlayer().setFacing(value);
 		
 		// Get modified pixel data for all areas.
-		//List<Area> loadedAreas = game.getWorld().getAllAreas();
+		if (this.areaInfo.changedPixelData.size() > 0) {
+			List<Area> loadedAreas = game.getWorld().getAllAreas();
+			for (Iterator<byte[]> it = this.areaInfo.changedPixelData.iterator(); it.hasNext();){
+				byte[] data = it.next();
+				int offset = 0;
+				int areaID = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+				offset += 4;
+				
+				//Currently, unknown use at the moment.
+				int sectorID = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+				offset+=4;
+				
+				LOADED_AREA:
+				for (Area area: loadedAreas){
+					if (areaID == area.getAreaID()){
+						int xPixelData = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+						offset+=4;
+						int yPixelData = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+						offset+=4;
+						int color = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+						
+						PixelData pxData = new PixelData(color	, xPixelData, yPixelData);
+						area.getModifiedPixelDataList().add(pxData);
+						area.loadModifiedPixelDataList();
+						break LOADED_AREA;
+					}
+				}
+			}
+			game.getWorld().refresh();
+		}
 		
 	}
 	

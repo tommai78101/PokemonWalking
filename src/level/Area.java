@@ -537,6 +537,12 @@ public class Area {
 		this.modifiedAreaData.add(data);
 	}
 	
+	public void loadModifiedPixelDataList(){
+		for (PixelData px: this.modifiedAreaData){
+			this.areaData.get(px.yPosition).set(px.xPosition, px);
+		}
+	}
+	
 	public ArrayList<PixelData> getModifiedPixelDataList(){
 		return this.modifiedAreaData;
 	}
