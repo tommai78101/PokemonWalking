@@ -216,6 +216,8 @@ public class Game {
 	 * */
 	public void load() {
 		// TODO: Load data.
+		this.overworld = new OverWorld(player, this.dialogue);
+		this.state = State.GAME;
 		GameSave.load(this, SAVE_FILE_NAME);
 	}
 

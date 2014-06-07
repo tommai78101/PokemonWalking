@@ -197,9 +197,9 @@ public class GameSave {
 				for (; offset < data[0]; offset++)
 					name[offset] = data[offset + 0x1];
 				offset++;
-				int id = data[offset] | data[offset + 1] | data[offset + 2] | data[offset + 3];
+				int id = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
 				offset += 4;
-				int quantity = data[offset] | data[offset + 1] | data[offset + 2] | data[offset + 3];
+				int quantity = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
 				
 				ItemText itemText = WorldConstants.items.get(id);
 				Item item = null;
@@ -227,15 +227,15 @@ public class GameSave {
 		value = this.areaInfo.current_area_sector_id[0] | this.areaInfo.current_area_sector_id[1] | this.areaInfo.current_area_sector_id[2] | this.areaInfo.current_area_sector_id[3];
 		game.getWorld().getCurrentArea().setSectorID(value);
 		// Get Player Position
-		int x = this.playerInfo.player_x[0] | this.playerInfo.player_x[1] | this.playerInfo.player_x[2] | this.playerInfo.player_x[3];
-		int y = this.playerInfo.player_y[0] | this.playerInfo.player_y[1] | this.playerInfo.player_y[2] | this.playerInfo.player_y[3];
+		int x = (this.playerInfo.player_x[0]<<24) | (this.playerInfo.player_x[1]<<16) | (this.playerInfo.player_x[2]<<8) | this.playerInfo.player_x[3];
+		int y = (this.playerInfo.player_y[0]<<24) | (this.playerInfo.player_y[1]<<16) | (this.playerInfo.player_y[2]<<8) | this.playerInfo.player_y[3];
 		game.getPlayer().setAreaPosition(x, y);
 		game.getWorld().getCurrentArea().setPlayerX(x);
 		game.getWorld().getCurrentArea().setPlayerY(y);
 		game.getWorld().getCurrentArea().setPlayer(game.getPlayer());
 		
 		// Get Player direction facing.
-		value = this.playerInfo.player_facing[0] | this.playerInfo.player_facing[1] | this.playerInfo.player_facing[2] | this.playerInfo.player_facing[3];
+		value = (this.playerInfo.player_facing[0]<<24) | (this.playerInfo.player_facing[1]<<16) | (this.playerInfo.player_facing[2]<<8) | this.playerInfo.player_facing[3];
 		game.getPlayer().setFacing(value);
 		
 		// Get modified pixel data for all areas.
@@ -244,21 +244,21 @@ public class GameSave {
 			for (Iterator<byte[]> it = this.areaInfo.changedPixelData.iterator(); it.hasNext();){
 				byte[] data = it.next();
 				int offset = 0;
-				int areaID = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+				int areaID = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
 				offset += 4;
 				
 				//Currently, unknown use at the moment.
-				int sectorID = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+				int sectorID = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
 				offset+=4;
 				
 				LOADED_AREA:
 				for (Area area: loadedAreas){
 					if (areaID == area.getAreaID()){
-						int xPixelData = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+						int xPixelData = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
 						offset+=4;
-						int yPixelData = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+						int yPixelData = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
 						offset+=4;
-						int color = data[offset] | data[offset+1] | data[offset+2] | data[offset+3];
+						int color = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
 						
 						PixelData pxData = new PixelData(color	, xPixelData, yPixelData);
 						area.getModifiedPixelDataList().add(pxData);
