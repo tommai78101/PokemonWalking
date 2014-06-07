@@ -138,6 +138,15 @@ public class Game {
 	 * @return Nothing.
 	 * */
 	public void tick() {
+		
+		//Debugging purposes
+		if (this.player.keys.F1.keyStateDown && !(this.player.keys.F1.lastKeyState)){
+			this.player.keys.F1.lastKeyState = true;
+			this.load();
+		}
+		//End debugging purposes
+		
+		
 		switch (this.state) {
 			case GAME: {
 				overworld.tick();

@@ -35,7 +35,8 @@ public class OverWorld extends World {
 		// All areas defined must be placed in WorldConstants.
 		this.worldID = WorldConstants.OVERWORLD;
 		
-		this.areas = WorldConstants.getAllAreas();
+		if (this.areas.isEmpty())
+			this.areas = WorldConstants.getAllAreas();
 		
 		// Overworld properties
 		this.invertBitmapColors = false;
@@ -45,9 +46,10 @@ public class OverWorld extends World {
 		
 		// Going to set this area as test default only. This will need to change in the future.
 		this.currentArea = this.areas.get(0);
+		this.setCurrentArea(this.areas.get(0));
 		this.currentArea.setPlayer(player);
 		this.currentArea.setDebugDefaultPosition();
-		this.setCurrentAreaSector(-1);
+		this.setCurrentAreaSector(0);
 		// TODO: Add a method that executes according to the sector ID. Basically,
 		// it needs to tell the player that they entered a new sector.
 		// Needs a marker in the area that points to where the area connects together.
@@ -97,6 +99,12 @@ public class OverWorld extends World {
 		this.currentArea.tick();
 		
 		if (this.currentArea.playerIsInWarpZone()) {
+			for (int i=0; i<this.areas.size(); i++){
+				if (this.areas.get(i).getAreaID() == this.currentArea.getAreaID()){
+					this.areas.set(i, this.currentArea);
+					break;
+				}
+			}
 			PixelData data = this.currentArea.getCurrentPixelData();
 			this.currentArea = WorldConstants.convertToArea(areas, data.getTargetAreaID());
 			this.currentArea.setPlayer(player);
