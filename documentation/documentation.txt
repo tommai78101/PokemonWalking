@@ -387,14 +387,18 @@ not assume their information to be permanent.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
-		Path [PWD04#03@01]
+		Floor [PWD04#03@01]
 		
 		Tile ID:
-			A: 01 - Path
+			A: 01 - Floor
 		Extended Tile ID:
-			R: 00 - Grass.
-			R: 01 - Mountain ground.
-			R: 02 - Path.
+			R: 00 - Grass. (Path)
+			R: 01 - Mountain Ground. (Path)
+			R: 02 - Path. (Path)
+			R: 03 - Carpet (Indoors)
+			R: 04 - Carpet (Outdoors)
+			R: 05 - Hardwood (Indoors)
+			R: 06 - Tatami (Indoors)
 		Tile Specific ID:
 			G: TT - Area Type.
 			B: HH - Ground Height.
