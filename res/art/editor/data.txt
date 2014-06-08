@@ -10,31 +10,35 @@
 # Here's how it is written:
 #		% Tile Name % Alpha % Red % Green % Blue % Filepath
 
-% Empty % 00 % 00 % 00 %00 % res/art/debug/no_png.png
+% Empty % 00 % 00 % 00 %00 % res/art/editor/no_png.png
 -
 % Path_[Grass] % 01 % 00 % * % @ % res/art/floor/grass.png 
 % Path_[Dirt] % 01 % 01 % * % @ % res/art/floor/mt_ground.png
 % Path_[Road] % 01 % 02 % * % @ % res/art/floor/path.png
+% Floor_[Carpet Indoors] % 01 % 03 % * % @ % res/art/floor/carpet_indoors.png
+% Floor_[Carpet Outdoors] % 01 % 04 % * % @ % res/art/floor/carpet_outdoors.png
+% Floor_[Hardwood Indoors] % 01 % 05 % * % @ % res/art/floor/hardwood_indoors.png
+% Floor_[Tatami Indoors] % 01 % 06 % * % @ % res/art/floor/tatami_indoors.png
 -
-% Ledge % 02 % 00 % * % @ % res/art/wall/ledge_bottom.png
-% Ledge % 02 % 01 % * % @ % res/art/wall/ledge_bottom_left.png
-% Ledge % 02 % 02 % * % @ % res/art/wall/ledge_left.png
-% Ledge % 02 % 03 % * % @ % res/art/wall/ledge_top_left.png
-% Ledge % 02 % 04 % * % @ % res/art/wall/ledge_top.png
-% Ledge % 02 % 05 % * % @ % res/art/wall/ledge_top_right.png
-% Ledge % 02 % 06 % * % @ % res/art/wall/ledge_right.png
-% Ledge % 02 % 07 % * % @ % res/art/wall/ledge_bottom_right.png
+% Ledge % 02 % 00 % * % @ % res/art/ledge/ledge_bottom.png
+% Ledge % 02 % 01 % * % @ % res/art/ledge/ledge_bottom_left.png
+% Ledge % 02 % 02 % * % @ % res/art/ledge/ledge_left.png
+% Ledge % 02 % 03 % * % @ % res/art/ledge/ledge_top_left.png
+% Ledge % 02 % 04 % * % @ % res/art/ledge/ledge_top.png
+% Ledge % 02 % 05 % * % @ % res/art/ledge/ledge_top_right.png
+% Ledge % 02 % 06 % * % @ % res/art/ledge/ledge_right.png
+% Ledge % 02 % 07 % * % @ % res/art/ledge/ledge_bottom_right.png
 -
-% Ledge_[Mountain] % 02 % 08 % * % @ % res/art/wall/ledge_mt_bottom.png
-% Ledge_[Mountain] % 02 % 09 % * % @ % res/art/wall/ledge_mt_bottom_left.png
-% Ledge_[Mountain] % 02 % 0A % * % @ % res/art/wall/ledge_mt_left.png
-% Ledge_[Mountain] % 02 % 0B % * % @ % res/art/wall/ledge_mt_top_left.png
-% Ledge_[Mountain] % 02 % 0C % * % @ % res/art/wall/ledge_mt_top.png
-% Ledge_[Mountain] % 02 % 0D % * % @ % res/art/wall/ledge_mt_top_right.png
-% Ledge_[Mountain] % 02 % 0E % * % @ % res/art/wall/ledge_mt_right.png
-% Ledge_[Mountain] % 02 % 0F % * % @ % res/art/wall/ledge_mt_bottom_right.png
+% Ledge_[Mountain] % 02 % 08 % * % @ % res/art/ledge/ledge_mt_bottom.png
+% Ledge_[Mountain] % 02 % 09 % * % @ % res/art/ledge/ledge_mt_bottom_left.png
+% Ledge_[Mountain] % 02 % 0A % * % @ % res/art/ledge/ledge_mt_left.png
+% Ledge_[Mountain] % 02 % 0B % * % @ % res/art/ledge/ledge_mt_top_left.png
+% Ledge_[Mountain] % 02 % 0C % * % @ % res/art/ledge/ledge_mt_top.png
+% Ledge_[Mountain] % 02 % 0D % * % @ % res/art/ledge/ledge_mt_top_right.png
+% Ledge_[Mountain] % 02 % 0E % * % @ % res/art/ledge/ledge_mt_right.png
+% Ledge_[Mountain] % 02 % 0F % * % @ % res/art/ledge/ledge_mt_bottom_right.png
 -
-% Tree_[Small] % 03 % 00 % 00 % 00 % res/art/wall/treeSmall.png
+% Tree_[Small] % 03 % 00 % 00 % 00 % res/art/obstacle/small_tree.png
 -
 % ForestEntrance % 04 % @ % @ % @ % res/art/floor/forestEntrance.png
 -
@@ -61,7 +65,7 @@
 % Water % 07 % 04 % * % @ % res/art/editor/water_top_right.gif
 % Water % 07 % 05 % * % @ % res/art/editor/water_right.gif
 -
-% Sign % 08 % @ % @ % @ % res/art/wall/sign.png
+% Sign % 08 % @ % @ % @ % res/art/sign/sign.png
 -
 % House % 09 % 00 % @ % @ % res/art/house/house_bottom.png
 % House % 09 % 01 % @ % @ % res/art/house/house_bottom_left.png

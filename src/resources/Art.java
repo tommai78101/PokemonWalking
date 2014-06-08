@@ -202,10 +202,10 @@ public class Art {
 		stairs_mt_top = screen.load("art/floor/stairs_mt_top.png");
 		stairs_mt_right = screen.load("art/floor/stairs_mt_right.png");
 		stairs_mt_bottom = screen.load("art/floor/stairs_mt_bottom.png");
-		carpet_indoors	=screen.load("art/floor/carpet_indoors.png");    	
-		carpet_outdoors	= screen.load("art/floor/carpet_outdoors.png");  	
-		hardwood_indoors=screen.load("art/floor/hardwood_indoors.png");    	
-		tatami_indoors	= screen.load("art/floor/tatami_indoors.png");		
+		carpet_indoors = screen.load("art/floor/carpet_indoors.png");
+		carpet_outdoors = screen.load("art/floor/carpet_outdoors.png");
+		hardwood_indoors = screen.load("art/floor/hardwood_indoors.png");
+		tatami_indoors = screen.load("art/floor/tatami_indoors.png");
 		
 		// House
 		house_door = screen.load("art/house/house_door.png");
