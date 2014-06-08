@@ -486,12 +486,15 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Tree [PWD04#03@03]
+		Obstacles [PWD04#03@03]
 	
 		Tile ID:
-			A: 03 - Tree
+			A: 03 - Obstacles
 		Extended Tile ID:
-			R: 00 - Small tree
+			R: 00 - Small Tree
+			R: 01 - Pile of Wooden Logs
+			R: 02 - Planks
+			R: 03 - Scaffolding (Wide)
 		Tile Specific ID:
 			G: None specified.
 			B: None specified.
@@ -526,10 +529,10 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Area Connection Point (ACP) [PWD04#03@05]
+		Area Sector Point (ASP) [PWD04#03@05]
 		
 		Tile ID:
-			A: 05 - Area Connection Point (ACP)
+			A: 05 - Area Sector Point (ASP)
 		Extended Tile ID:
 			R: TT - Target Area ID
 		Tile Specific ID:
@@ -736,14 +739,18 @@ not assume their information to be permanent.
 		Extended Tile ID:
 			R: XX - Specific Item.
 		Tile Specific ID:
-			G: NN - Not used.
+			G: OO - Object Types.
 			B: NN - Not used.
 		Full Data(s):
-			0B XX NN NN
+			0B XX OO NN
 		Description:
 			An object that can be picked up and be used by the player. The object
 			itself can block a player's path, therefore, it can also act as an 
 			obstacle.
+			
+			Object Type determines whether or not the items can be picked up or 
+			can be moved around. By default, Values 00 is for items only. 
+			Anything else would be object types that would be moved around.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
