@@ -13,6 +13,7 @@ package dialogue;
 import item.ActionItem;
 import item.DummyItem;
 import item.ItemText;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,6 +24,7 @@ import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
+
 import level.WorldConstants;
 import main.Game;
 import main.Keys;
@@ -55,7 +57,7 @@ public class Dialogue {
 	// Styles
 	public static final int DIALOGUE_STYLE_SPEECH = 0xF1;
 	
-	// TODO: Optimize this, to make way for other types of dialogues to use.
+	//FIXME: Replace "Dialogue" with "NewDialogue".
 	private String[] tokens;
 	private int tokenPointer;
 	private boolean next;

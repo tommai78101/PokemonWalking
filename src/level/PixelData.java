@@ -472,8 +472,7 @@ public class PixelData {
 			case 0x06: // Stairs
 				break;
 			case 0x07: // Water
-				// TODO: Needs to do something with this. It must not block the player, however, without
-				// special boolean value, it will always block player from advancing.
+				// TODO: Needs to do something with this. It must not block the player, however, without special boolean value, it will always block player from advancing. 
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 			case 0x08: // Sign
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;

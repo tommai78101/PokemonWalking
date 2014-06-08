@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
 import main.Game;
 import main.Keys;
 import screen.BaseScreen;
@@ -48,7 +49,6 @@ public class Save extends SubMenu {
 						if (!this.newDialogue.yesNoQuestionHasBeenAnswered())
 							this.newDialogue.tick();
 						if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							//TODO: This is the place to check to see if there exists an old save file.
 							if (this.game.checkSaveData())
 								this.state = State.OVERWRITE;
 							else

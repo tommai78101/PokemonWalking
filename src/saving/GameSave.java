@@ -345,6 +345,7 @@ public class GameSave {
 	 * @return True, if the saved data file exists. False, if otherwise.
 	 * */
 	public static boolean check(String filename) {
+		//FIXME: Make this method checks for invalid headers before actually returning the result.
 		File save = new File(filename);
 		return save.isFile();
 	}
