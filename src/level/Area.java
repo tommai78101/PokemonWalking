@@ -34,6 +34,8 @@ public class Area {
 	// TODO: Add area type.
 	// private int areaType;
 	
+	private boolean displayExitArrow;
+	
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	private final ArrayList<PixelData> modifiedAreaData = new ArrayList<PixelData>();
 	
@@ -44,6 +46,7 @@ public class Area {
 		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInConnectionPoint = false;
+		this.displayExitArrow = false;
 		
 		for (int y = 0; y < this.height; y++) {
 			areaData.add(new ArrayList<PixelData>());
@@ -138,8 +141,7 @@ public class Area {
 	}
 	
 	/**
-	 * Checks the pixel data the player is currently on, and sets the tile properties according to the documentation provided. The tile the pixel data
-	 * is representing determines the properties this will set, and will affect how the game interacts with the player.
+	 * Checks the pixel data the player is currently on, and sets the tile properties according to the documentation provided. The tile the pixel data is representing determines the properties this will set, and will affect how the game interacts with the player.
 	 * 
 	 * @return Nothing.
 	 * */
@@ -151,6 +153,19 @@ public class Area {
 		int green = (pixel >> 8) & 0xFF;
 		int blue = pixel & 0xFF;
 		switch (alpha) {
+			case 0x01: // Floor
+			{
+				switch (red) {
+					case 0x03: // Indoor Carpet
+						this.displayExitArrow = true;
+						break;
+					default:
+						if (this.displayExitArrow)
+							this.displayExitArrow = false;
+						break;
+				}
+				break;
+			}
 			case 0x02: // Ledges
 			{
 				switch (red) {
@@ -211,8 +226,7 @@ public class Area {
 	}
 	
 	/**
-	 * Checks the pixel data and sets properties according to the documentation provided. The tile the pixel data is representing determines whether
-	 * it should allow or block the player from walking towards it.
+	 * Checks the pixel data and sets properties according to the documentation provided. The tile the pixel data is representing determines whether it should allow or block the player from walking towards it.
 	 * 
 	 * <p>
 	 * In other words, this is the method call that works out the collision detection/response in the game.
@@ -221,9 +235,7 @@ public class Area {
 	 *            Sets the offset of the PixelData it should check by the X axis.
 	 * @param yOffset
 	 *            Sets the offset of the PixelData it should check by the Y axis.
-	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through. Returns true to allow player to walk
-	 *         from the player's last position to this tile. Returns false to block the player from walking from the player's last position to this
-	 *         tile.
+	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through. Returns true to allow player to walk from the player's last position to this tile. Returns false to block the player from walking from the player's last position to this tile.
 	 * */
 	private boolean checkSurroundingData(int xOffset, int yOffset) {
 		PixelData data = null;
@@ -365,11 +377,9 @@ public class Area {
 	 * @param screen
 	 *            The screen display where the bitmaps are to output to.
 	 * @param xOff
-	 *            The X offset based on the player's X position in absolute world coordinates. The absolute world coordinates mean the precise X
-	 *            position on the Canvas.
+	 *            The X offset based on the player's X position in absolute world coordinates. The absolute world coordinates mean the precise X position on the Canvas.
 	 * @param yOff
-	 *            The Y offset based on the player's Y position in absolute world coordinates. The absolute world coordinates mean the precise Y
-	 *            position on the Canvas.
+	 *            The Y offset based on the player's Y position in absolute world coordinates. The absolute world coordinates mean the precise Y position on the Canvas.
 	 * @return Nothing.
 	 * 
 	 * */
@@ -377,7 +387,10 @@ public class Area {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
-				screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
+				if (!this.player.isLockedWalking() && this.player.getXInArea() == x && this.player.getYInArea() == y && ((((data.getColor() >> 24) & 0xFF) == 0x01) && (((data.getColor() >> 16) & 0xFF) == 0x03)))
+					this.renderExitArrow(screen, xOff, yOff, data, x, y);
+				else
+					screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
 				screen.blitBiome(data.getBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
 				data.tick();
 			}
@@ -415,10 +428,9 @@ public class Area {
 	
 	public void setDebugDefaultPosition() {
 		// When the game starts from the very beginning, the player must always start from the very first way point.
-		SET_LOOP:
-		for (ArrayList<PixelData> y: this.areaData){
-			for (PixelData x: y){
-				if (((x.getColor() >> 24) & 0xFF) == 0x01){
+		SET_LOOP: for (ArrayList<PixelData> y : this.areaData) {
+			for (PixelData x : y) {
+				if (((x.getColor() >> 24) & 0xFF) == 0x01) {
 					player.setAreaPosition(x.xPosition, x.yPosition);
 					break SET_LOOP;
 				}
@@ -453,7 +465,7 @@ public class Area {
 		return this.isInWarpZone;
 	}
 	
-	public void playerWentPastWarpZone(){
+	public void playerWentPastWarpZone() {
 		this.isInWarpZone = false;
 	}
 	
@@ -502,20 +514,19 @@ public class Area {
 		catch (Exception e) {
 			return -1;
 		}
-		if (data != null) { return (data.getColor() >> 24) & 0xFF; }
+		if (data != null) {
+			return (data.getColor() >> 24) & 0xFF;
+		}
 		return -1;
 	}
 	
 	/**
-	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that the player is allowed to walk on, or when the
-	 * conditions are right for the player to move on the tile.
+	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that the player is allowed to walk on, or when the conditions are right for the player to move on the tile.
 	 * 
 	 * @param targetIDToCompare
-	 *            The target tile ID used to test and see if it's allowable for the player to move/walk on. Use getSurroundingTileID() to fetch the
-	 *            target tile ID.
+	 *            The target tile ID used to test and see if it's allowable for the player to move/walk on. Use getSurroundingTileID() to fetch the target tile ID.
 	 * @param multipleTileIDs
-	 *            The many tile IDs that are to be compared to the target tile ID to see if the target tile ID is one of the allowed tile IDs. You may
-	 *            use as many tile IDs for comparison as you wished.
+	 *            The many tile IDs that are to be compared to the target tile ID to see if the target tile ID is one of the allowed tile IDs. You may use as many tile IDs for comparison as you wished.
 	 * @return True, if the target tile ID is one of the many tile IDs that's allowable. False, if none of the tile IDs match the target tile ID.
 	 * 
 	 * */
@@ -538,7 +549,9 @@ public class Area {
 		catch (Exception e) {
 			return 0;
 		}
-		if (data != null) { return (data.getColor()); }
+		if (data != null) {
+			return (data.getColor());
+		}
 		return 0;
 	}
 	
@@ -549,13 +562,13 @@ public class Area {
 		this.modifiedAreaData.add(data);
 	}
 	
-	public void loadModifiedPixelDataList(){
-		for (PixelData px: this.modifiedAreaData){
+	public void loadModifiedPixelDataList() {
+		for (PixelData px : this.modifiedAreaData) {
 			this.areaData.get(px.yPosition).set(px.xPosition, px);
 		}
 	}
 	
-	public ArrayList<PixelData> getModifiedPixelDataList(){
+	public ArrayList<PixelData> getModifiedPixelDataList() {
 		return this.modifiedAreaData;
 	}
 	
@@ -565,5 +578,17 @@ public class Area {
 	
 	public ArrayList<ArrayList<PixelData>> getAllPixelDatas() {
 		return this.areaData;
+	}
+	
+	//           ---------------------            PRIVATE METHODS       ----------------------
+	
+	private void renderExitArrow(BaseScreen screen, int xOff, int yOff, PixelData data, int x, int y){
+		int height = this.getHeight();
+		if (y+1 == height && this.player.getFacing() == Player.DOWN){
+			screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff + 4, (y+1) * Tile.HEIGHT - yOff + 2, data);
+		}
+		else if (y == 0 && this.player.getFacing() == Player.UP){
+			//TODO: Draw exit arrow point upwards.
+		}
 	}
 }

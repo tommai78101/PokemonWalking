@@ -97,6 +97,9 @@ public class OverWorld extends World {
 	public void tick() {
 		if (!this.invertBitmapColors)
 			this.player.tick();
+		//FIXME: Find a way to revert back to default settings when game save data is invalid.
+		if (this.currentArea == null)
+			this.currentArea = this.areas.get(0);
 		this.currentArea.tick();
 		
 		if (this.currentArea.playerIsInWarpZone()) {

@@ -163,7 +163,7 @@ public class GameSave {
 		}
 	}
 	
-	private void generateLoadData(Game game) {
+	private void generateLoadData(Game game) throws Exception {
 		Player gamePlayer = game.getPlayer();
 		
 		// Get name
@@ -230,6 +230,8 @@ public class GameSave {
 		// TODO: Probably need to set world ID first before setting the current area ID and SECTOR.
 		int currentAreaID = (this.areaInfo.current_area_id[0] & 0xFF)<< 24 | (this.areaInfo.current_area_id[1]&0xFF) << 16 | (this.areaInfo.current_area_id[2]&0xFF) << 8 | (this.areaInfo.current_area_id[3] & 0xFF);
 		game.getWorld().setCurrentArea(WorldConstants.convertToArea(game.getWorld().getAllAreas(), currentAreaID));
+		if (game.getWorld().getCurrentArea() == null)
+			throw new Exception ("There is no area set.");
 		int currentSectorID = (this.areaInfo.current_area_sector_id[0]&0xFF) <<24 | (this.areaInfo.current_area_sector_id[1]&0xFF)<<16 | (this.areaInfo.current_area_sector_id[2]&0xFF)<<8 | this.areaInfo.current_area_sector_id[3]&0xFF;
 		game.getWorld().getCurrentArea().setSectorID(currentSectorID);
 		

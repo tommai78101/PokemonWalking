@@ -32,6 +32,8 @@ public class Art {
 	public static BaseBitmap[] water_left;
 	public static BaseBitmap[] water_top_right;
 	public static BaseBitmap[] water_right;
+	// ----------------------------------------------------------
+	public static BaseBitmap[] exit_arrow;
 	
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Dialog
@@ -172,6 +174,8 @@ public class Art {
 		water_left = loadAnimation(screen, 16, "art/animation/water/water_left00");
 		water_top_right = loadAnimation(screen, 16, "art/animation/water/water_top_right00");
 		water_right = loadAnimation(screen, 16, "art/animation/water/water_right00");
+		// ----------------------------------------------------------
+		exit_arrow = loadAnimation(screen, 10, "art/animation/arrow/arrow00");
 		
 		// Dialogue
 		dialogue_next = screen.load("art/dialog/dialogue_next.png");

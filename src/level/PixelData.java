@@ -82,17 +82,14 @@ public class PixelData {
 	 * Sets the bitmap tile the pixel data is representing.
 	 * 
 	 * <p>
-	 * When setting the bitmap, first it must set the bitmap to something other than null. Since the bitmap variable holds an array, it takes in at
-	 * least 1 bitmap pre-loaded by the Art class. Then, once the bitmap is set, it must break all the way outside of the nested switch conditions,
-	 * otherwise, setting bitmaps will overwrite correct data with incorrect data.
+	 * When setting the bitmap, first it must set the bitmap to something other than null. Since the bitmap variable holds an array, it takes in at least 1 bitmap pre-loaded by the Art class. Then, once the bitmap is set, it must break all the way outside of the nested switch conditions, otherwise,
+	 * setting bitmaps will overwrite correct data with incorrect data.
 	 * 
 	 * <p>
-	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error bitmap, which when loaded into the game, the game will not crash, and
-	 * the developers/players can tell where the bitmap loading has gone wrong.
+	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error bitmap, which when loaded into the game, the game will not crash, and the developers/players can tell where the bitmap loading has gone wrong.
 	 * 
 	 * <p>
-	 * If the bitmap is an animated bitmap, the Art class will load the animated bitmap into an array. The next step would be to just pass the array
-	 * to this bitmap.
+	 * If the bitmap is an animated bitmap, the Art class will load the animated bitmap into an array. The next step would be to just pass the array to this bitmap.
 	 * 
 	 * @param alpha
 	 *            The alpha value of the pixel data's color.
@@ -108,29 +105,47 @@ public class PixelData {
 		switch (alpha) {
 			case 0x01: // Path
 				this.bitmap = new BaseBitmap[1];
-				switch (red) { // Tile Type
-					case 0x00: // Grass
+				// Tile Type
+				switch (red) {
+					case 0x00: // Grass Path
 						this.bitmap[0] = Art.grass;
 						break;
-					case 0x01: // Mountain ground
+					case 0x01: // Mountain Ground Path
 						this.bitmap[0] = Art.mt_ground;
 						break;
-					case 0x02: // Road / Path
+					case 0x02: // Road Path
 						this.bitmap[0] = Art.path;
+						break;
+					case 0x03: // Carpet Floor (Indoors)
+						this.bitmap[0] = Art.carpet_indoors;
+						this.biomeBitmap = Art.exit_arrow;
+						break;
+					case 0x04: // Carpet Floor (Outdoors)
+						this.bitmap[0] = Art.carpet_outdoors;
+						this.biomeBitmap = Art.exit_arrow;
+						break;
+					case 0x05: // Hardwood Floor (Indoors)
+						this.bitmap[0] = Art.hardwood_indoors;
+						break;
+					case 0x06: // Tatami Floor (Indoors)
+						this.bitmap[0] = Art.tatami_indoors;
 						break;
 					default:
 						break;
 				}
-				this.biomeBitmap = new BaseBitmap[1];
-				switch (green) { // Area Type
-					case 0x00:
-						this.biomeBitmap[0] = Art.grass; // Forest
-						break;
-					case 0x02:
-						this.biomeBitmap[0] = Art.mt_ground; // Mountain
-						break;
-					default:
-						break;
+				if (this.biomeBitmap == null) {
+					switch (green) { // Area Type
+						case 0x00:
+							this.biomeBitmap = new BaseBitmap[1];
+							this.biomeBitmap[0] = Art.grass; // Forest
+							break;
+						case 0x02:
+							this.biomeBitmap = new BaseBitmap[1];
+							this.biomeBitmap[0] = Art.mt_ground; // Mountain
+							break;
+						default:
+							break;
+					}
 				}
 				break;
 			case 0x02: // Ledge
@@ -337,7 +352,7 @@ public class PixelData {
 	 * 
 	 * @return Nothing.
 	 * */
-	public void prepareBitmap(){
+	public void prepareBitmap() {
 		int alpha = (this.color >> 24) & 0xFF;
 		int red = (this.color >> 16) & 0xFF;
 		int green = (this.color >> 8) & 0xFF;
@@ -440,15 +455,15 @@ public class PixelData {
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x04: // Warp Point
-				//this.targetArea = red;
-				//FIXME: Level Editor must set target area ID to at least 1 or above.
+				// this.targetArea = red;
+				// FIXME: Level Editor must set target area ID to at least 1 or above.
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.isWarpZone = true;
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 			case 0x05: // ACP (Refer to documentation.)
-				//this.targetArea = red;
-				//FIXME: Level Editor must set target area ID to at least 1 or above.
+				// this.targetArea = red;
+				// FIXME: Level Editor must set target area ID to at least 1 or above.
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.targetSector = green;
 				this.isWarpZone = false;
@@ -467,8 +482,8 @@ public class PixelData {
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x0A: // House Door
-				//this.targetArea = red;
-				//FIXME: Level Editor must set target area ID to at least 1 or above.
+				// this.targetArea = red;
+				// FIXME: Level Editor must set target area ID to at least 1 or above.
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.isWarpZone = true;
 				break;
