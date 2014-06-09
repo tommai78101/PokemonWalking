@@ -97,49 +97,22 @@ public class OverWorld extends World {
 	public void tick() {
 		if (!this.invertBitmapColors)
 			this.player.tick();
-		//FIXME: Find a way to revert back to default settings when game save data is invalid.
+		// FIXME: Find a way to revert back to default settings when game save data is invalid.
 		if (this.currentArea == null)
 			this.currentArea = this.areas.get(0);
 		this.currentArea.tick();
 		
-		if (this.currentArea.playerIsInWarpZone()) {
-			boolean currentAreaFound = false;
-			int currentAreaID = 0;
-			if (this.currentArea.getAreaID() < 1000 && WorldConstants.isModsEnabled.booleanValue())
-				currentAreaID = this.currentArea.getAreaID() + 1000;
-			else
-				currentAreaID = this.currentArea.getAreaID();
-			for (int i = 0; i < this.areas.size(); i++) {
-				if (this.areas.get(i).getAreaID() == currentAreaID) {
-					this.areas.set(i, this.currentArea);
-					currentAreaFound = true;
-					break;
-				}
-			}
-			if (currentAreaFound) {
-				PixelData data = this.currentArea.getCurrentPixelData();
-				this.currentArea = WorldConstants.convertToArea(areas, data.getTargetAreaID());
-				this.currentArea.setPlayer(player);
-				this.currentArea.setDefaultPosition(data);
-				this.invertBitmapColors = true;
-				this.player.forceLockWalking();
-				this.currentArea.playerWentPastWarpZone();
-			}
+		if (this.currentArea.playerIsInWarpZone() || (this.currentArea.isDisplayingExitArrow() && this.player.isColliding())) {
+			this.handleWarpPointEvent();
 		}
+		
 		if (!this.player.isLockedWalking()) {
 			if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
 				this.currentAreaSectorID = this.currentArea.getSectorID();
 				// This is where you get the latest sector id at.
 				System.out.println("Area: " + this.currentArea.getAreaID() + " Sector: " + currentArea.getSectorID());
 			}
-			
 		}
-		// dialogue.displayDialog("Hello World. Press Z, X, /, or . to continue. For the next release, I'll be cleaning up the codes. No more features until then.", 1);
-		// dialogue.displayDialog("Hello World. I'm coming for you. Yeah!", 2);
-		// if (dialogue.isDisplayingDialogue()) {
-		// dialogue.setCheckpoint(2, true);
-		// }
-		// if (!dialogue.isDialogCheckpointSet(1))
 		
 		// TODO: Fix the awkward interaction caused by so many states not working properly.
 		if (dialogue.isDoneDisplayingDialogue()) {
@@ -186,6 +159,54 @@ public class OverWorld extends World {
 			
 		}
 		
+	}
+	
+	private void handleWarpPointEvent() {
+		boolean currentAreaFound = false;
+		int currentAreaID = 0;
+		if (WorldConstants.isModsEnabled.booleanValue() && this.currentArea.getAreaID() < 1000)
+			currentAreaID = this.currentArea.getAreaID() + 1000;
+		else
+			currentAreaID = this.currentArea.getAreaID();
+		for (int i = 0; i < this.areas.size(); i++) {
+			if (this.areas.get(i).getAreaID() == currentAreaID) {
+				this.areas.set(i, this.currentArea);
+				currentAreaFound = true;
+				break;
+			}
+		}
+		if (currentAreaFound) {
+			PixelData data = this.currentArea.getCurrentPixelData();
+			int targetAreaID = 0;
+			if (WorldConstants.isModsEnabled.booleanValue() && this.currentArea.getAreaID() < 1000)
+				targetAreaID = data.getTargetAreaID() + 1000;
+			else
+				targetAreaID = data.getTargetAreaID();
+			this.currentArea = WorldConstants.convertToArea(areas, targetAreaID);
+			if (currentArea == null) {
+				this.currentArea.playerWentPastWarpZone();
+				return;
+			}
+			this.currentArea.setPlayer(this.player);
+			this.currentArea.setDefaultPosition(data);
+			this.invertBitmapColors = true;
+			
+			switch ((data.getColor() >> 24) & 0xFF) {
+				case 0x04: //Warp point
+					this.player.forceLockWalking();
+					break;
+				case 0x0A: //Door
+					this.player.tick();
+					break;
+				case 0x0C: //Carpet (Indoors)
+				case 0x0D: //Carpet (Outdoors)
+					this.player.forceLockWalking();
+					this.player.tick();
+					break;
+			}
+			
+			this.currentArea.playerWentPastWarpZone();
+		}
 	}
 	
 	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {

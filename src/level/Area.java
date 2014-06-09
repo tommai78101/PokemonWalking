@@ -27,7 +27,7 @@ public class Area {
 	private Player player;
 	
 	private boolean isInWarpZone;
-	private boolean isInConnectionPoint;
+	private boolean isInSectorPoint;
 	private PixelData currentPixelData;
 	private final int areaID;
 	private int sectorID;
@@ -45,7 +45,7 @@ public class Area {
 		this.pixels = bitmap.getPixels();
 		this.areaID = areaID;
 		this.isInWarpZone = false;
-		this.isInConnectionPoint = false;
+		this.isInSectorPoint = false;
 		this.displayExitArrow = false;
 		
 		for (int y = 0; y < this.height; y++) {
@@ -153,19 +153,6 @@ public class Area {
 		int green = (pixel >> 8) & 0xFF;
 		int blue = pixel & 0xFF;
 		switch (alpha) {
-			case 0x01: // Floor
-			{
-				switch (red) {
-					case 0x03: // Indoor Carpet
-						this.displayExitArrow = true;
-						break;
-					default:
-						if (this.displayExitArrow)
-							this.displayExitArrow = false;
-						break;
-				}
-				break;
-			}
 			case 0x02: // Ledges
 			{
 				switch (red) {
@@ -197,14 +184,13 @@ public class Area {
 				break;
 			}
 			case 0x04: // Determines warp zone.
-			case 0x0A: // House Doors are a type of warp zones.
 				if (!this.player.isLockedWalking()) {
 					this.isInWarpZone = true;
 				}
 				break;
 			case 0x05: // Area Connection Point.
 				if (!this.player.isLockedWalking() && !this.isInWarpZone) {
-					this.isInConnectionPoint = true;
+					this.isInSectorPoint = true;
 					this.sectorID = this.currentPixelData.getTargetSectorID();
 				}
 				break;
@@ -212,11 +198,23 @@ public class Area {
 				if (!this.player.isInWater())
 					this.player.goesInWater();
 				break;
+			case 0x0A: // House Doors are a type of warp zones.
+				if (!this.player.isLockedWalking()) {
+					this.isInWarpZone = true;
+				}
+				break;
+			case 0x0C: // Carpet Indoors
+				//
+				// this.displayExitArrow = true;
+				break;
+			case 0x0D: // Carpet Outdoors
+				// this.displayExitArrow = true;
+				break;
 			default:
 				// If no special tiles, then it will keep reseting the flags.
 				if (!this.player.isLockedWalking() || !this.player.isLockedJumping()) {
 					this.isInWarpZone = false;
-					this.isInConnectionPoint = false;
+					this.isInSectorPoint = false;
 				}
 				// This is to check to see if player has left the water.
 				if (this.player.isInWater())
@@ -243,6 +241,7 @@ public class Area {
 			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
 		}
 		catch (Exception e) {
+			//This means it is out of the area boundaries.
 			data = null;
 		}
 		if (data != null) {
@@ -257,9 +256,9 @@ public class Area {
 				case 0x02: // Ledge
 				{
 					switch (red) {
-					/*
-					 * TODO: Incorporate pixel data facingsBlocked variable to this section. Currently, the facingsBlocked[] variable for each pixel data isn't used.
-					 */
+						/*
+						 * TODO: Incorporate pixel data facingsBlocked variable to this section. Currently, the facingsBlocked[] variable for each pixel data isn't used.
+						 */
 						case 0x00: { // Bottom
 							int y = this.yPlayerPosition + yOffset;
 							if (this.checkIfValuesAreAllowed((this.getTileColor(0, 2) >> 24) & 0xFF, 0x02, 0x03))
@@ -387,11 +386,10 @@ public class Area {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
-				if (!this.player.isLockedWalking() && this.player.getXInArea() == x && this.player.getYInArea() == y && ((((data.getColor() >> 24) & 0xFF) == 0x01) && (((data.getColor() >> 16) & 0xFF) == 0x03)))
-					this.renderExitArrow(screen, xOff, yOff, data, x, y);
-				else
-					screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
+				screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
 				screen.blitBiome(data.getBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
+				if (x == this.player.getXInArea() && y == this.player.getYInArea() && ((((data.getColor() >> 24) & 0xFF) == 0x0C) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
+					renderExitArrow(screen, xOff, yOff, data, x, y);
 				data.tick();
 			}
 		}
@@ -452,6 +450,8 @@ public class Area {
 		switch (alpha) {
 			case 0x04: // Warp point
 			case 0x0A: // Door
+			case 0x0C: //Carpet (Indoors)
+			case 0x0D: //Carpet (Outdoors)
 			{
 				int green = (color >> 8) & 0xFF;
 				int blue = color & 0xFF;
@@ -480,11 +480,11 @@ public class Area {
 	}
 	
 	public boolean playerIsInConnectionPoint() {
-		return this.isInConnectionPoint;
+		return this.isInSectorPoint;
 	}
 	
 	public boolean playerHasLeftConnectionPoint() {
-		if (this.isInConnectionPoint) {
+		if (this.isInSectorPoint) {
 			if (this.player.isLockedWalking()) {
 				// Leaving
 				return true;
@@ -580,15 +580,22 @@ public class Area {
 		return this.areaData;
 	}
 	
-	//           ---------------------            PRIVATE METHODS       ----------------------
+	public boolean isDisplayingExitArrow() {
+		return this.displayExitArrow;
+	}
 	
-	private void renderExitArrow(BaseScreen screen, int xOff, int yOff, PixelData data, int x, int y){
+	// --------------------- PRIVATE METHODS ----------------------
+	
+	private void renderExitArrow(BaseScreen screen, int xOff, int yOff, PixelData data, int x, int y) {
 		int height = this.getHeight();
-		if (y+1 == height && this.player.getFacing() == Player.DOWN){
-			screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff + 4, (y+1) * Tile.HEIGHT - yOff + 2, data);
+		if (y + 1 == height && this.player.getFacing() == Player.DOWN) {
+			screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff + 4, (y + 1) * Tile.HEIGHT - yOff + 2, data);
+			this.displayExitArrow = true;
 		}
-		else if (y == 0 && this.player.getFacing() == Player.UP){
-			//TODO: Draw exit arrow point upwards.
+		else if (y == 0 && this.player.getFacing() == Player.UP) {
+			// TODO: Draw exit arrow point upwards.
 		}
+		else
+			this.displayExitArrow = false;
 	}
 }
