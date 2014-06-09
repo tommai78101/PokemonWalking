@@ -21,12 +21,15 @@ public class Player extends Entity {
 	public static boolean isMovementsLocked() {
 		return movementLock;
 	}
+	
 	public static void lockMovements() {
 		movementLock = true;
 	}
+	
 	public static void unlockMovements() {
 		movementLock = false;
 	}
+	
 	public static final int UP = 2;
 	
 	public static final int DOWN = 0;
@@ -58,7 +61,6 @@ public class Player extends Entity {
 	private boolean jumpHeightSignedFlag = false;
 	private int varyingJumpHeight = 0;
 	
-	
 	// This variable is set to true, no matter what, in the Player class if the player tries to do action that's not allowed.
 	// It must be turned off (set to False) somewhere else in other classes. By design!
 	public boolean warningsTriggered;
@@ -83,6 +85,23 @@ public class Player extends Entity {
 	public void forceLockWalking() {
 		this.lockWalking = true;
 		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+		
+		if (this.xAccel == 0 && this.yAccel == 0) {
+			switch (this.facing) {
+				case UP:
+					this.yAccel--;
+					break;
+				case DOWN:
+					this.yAccel++;
+					break;
+				case LEFT:
+					this.xAccel--;
+					break;
+				case RIGHT:
+					this.xAccel++;
+					break;
+			}
+		}
 	}
 	
 	/**
@@ -640,7 +659,6 @@ public class Player extends Entity {
 		// Check if player is currently locked to walking.
 		if (this.lockWalking) {
 			
-			
 			// When being locked to walking, facing must stay constant.
 			
 			if (this.walking != this.facing)
@@ -688,17 +706,16 @@ public class Player extends Entity {
 				checkFacing();
 			
 			// Now about to walk. First, check to see if there's an obstacle blocking the path.
-			if (this.facingsBlocked[this.facing]){
+			if (this.facingsBlocked[this.facing]) {
 				this.lockWalking = false;
 			}
 			
+			// FIXME: Find a way to detect if the player is colliding anything WHILE it is in walking state.
 			
-			//FIXME: Find a way to detect if the player is colliding anything WHILE it is in walking state.
-			
-//			if (this.facingsBlocked[UP] || this.facingsBlocked[DOWN] || this.facingsBlocked[LEFT] || this.facingsBlocked[RIGHT]){
-//				this.lockWalking = false;
-//				this.isColliding = true;
-//			}
+			// if (this.facingsBlocked[UP] || this.facingsBlocked[DOWN] || this.facingsBlocked[LEFT] || this.facingsBlocked[RIGHT]){
+			// this.lockWalking = false;
+			// this.isColliding = true;
+			// }
 		}
 	}
 	
@@ -823,7 +840,7 @@ public class Player extends Entity {
 					return;
 				}
 			}
-			else if (keys.up.keyStateDown || keys.W.keyStateDown){
+			else if (keys.up.isPressedDown || keys.W.isPressedDown) {
 				this.isColliding = true;
 				return;
 			}
@@ -835,7 +852,7 @@ public class Player extends Entity {
 					return;
 				}
 			}
-			else if (keys.down.keyStateDown || keys.S.keyStateDown){
+			else if (keys.down.isPressedDown || keys.S.isPressedDown) {
 				this.isColliding = true;
 				return;
 			}
@@ -847,7 +864,7 @@ public class Player extends Entity {
 					return;
 				}
 			}
-			else if (keys.left.keyStateDown || keys.A.keyStateDown){
+			else if (keys.left.isPressedDown || keys.A.isPressedDown) {
 				this.isColliding = true;
 				return;
 			}
@@ -859,7 +876,7 @@ public class Player extends Entity {
 					return;
 				}
 			}
-			else if (keys.right.keyStateDown || keys.D.keyStateDown){
+			else if (keys.right.isPressedDown || keys.D.isPressedDown) {
 				this.isColliding = true;
 				return;
 			}
