@@ -324,6 +324,7 @@ public class Area {
 						case 0x02: //Planks
 						case 0x03: //Scaffolding
 						case 0x04: //Scaffolding
+						case 0x05:
 							if (this.player.isInteracting())
 								return true;
 							if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
@@ -346,17 +347,6 @@ public class Area {
 					// TODO: Add something that detects a special boolean value
 					// in order to let the player move on water.
 					return false;
-				case 0x08: // Sign
-					if (this.player.isInteracting())
-						return true;
-					if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
-						if ((player.keys.Z.keyStateDown || player.keys.SLASH.keyStateDown) && (!player.keys.Z.lastKeyState || !player.keys.SLASH.lastKeyState)) {
-							this.player.startInteraction();
-							player.keys.Z.lastKeyState = true;
-							player.keys.SLASH.lastKeyState = true;
-						}
-					}
-					return true;
 				case 0x09: // House
 					return true;
 				case 0x0A: // House Door

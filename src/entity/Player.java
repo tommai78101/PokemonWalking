@@ -221,10 +221,11 @@ public class Player extends Entity {
 				switch (red) {
 					case 0x00: // Small tree
 						break;
-					case 0x01:
-					case 0x02:
-					case 0x03:
-					case 0x04:
+					case 0x01: //Logs
+					case 0x02: //Planks
+					case 0x03: //Scaffolding Left
+					case 0x04: //Scaffolding Right
+					case 0x05: //Sign
 						if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 							this.enableInteraction = false;
 							if (Player.isMovementsLocked())

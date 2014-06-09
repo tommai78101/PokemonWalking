@@ -42,7 +42,7 @@
 % Planks % 03 % 02 % 00 % 00 % res/art/obstacle/planks.png
 % Scaffolding_[Left] % 03 % 03 % 00 % 00 % res/art/obstacle/scaffolding_left.png
 % Scaffolding_[Right] % 03 % 04 % 00 % 00 % res/art/obstacle/scaffolding_right.png
-% Sign % 08 % @ % @ % @ % res/art/obstacle/sign.png
+% Sign % 03 % 05 % @ % @ % res/art/obstacle/sign.png
 -
 % ForestEntrance % 04 % @ % @ % @ % res/art/floor/forestEntrance.png
 -

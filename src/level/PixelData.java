@@ -239,6 +239,9 @@ public class PixelData {
 					case 0x04: //Scaffolding (Right)
 						this.bitmap[0] = Art.scaffolding_right;
 						break;
+					case 0x05: //Sign
+						this.bitmap[0] = Art.sign;
+						break;
 				}
 				break;
 			case 0x04: // Warp point (Refer to documentation for flaws.)
@@ -304,10 +307,6 @@ public class PixelData {
 				}
 				break;
 			}
-			case 0x08: // Sign
-				this.bitmap = new BaseBitmap[1];
-				this.bitmap[0] = Art.sign;
-				break;
 			case 0x09: // House
 				this.bitmap = new BaseBitmap[1];
 				switch (red) { // House related tiles. Way too many to list them orderly.
