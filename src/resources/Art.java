@@ -62,7 +62,8 @@ public class Art {
 	public static BaseBitmap carpet_indoors;
 	public static BaseBitmap carpet_outdoors;
 	public static BaseBitmap hardwood_indoors;
-	public static BaseBitmap tatami_indoors;
+	public static BaseBitmap tatami_1_indoors;
+	public static BaseBitmap tatami_2_indoors;
 	// ----------------------------------------------------------
 	public static BaseBitmap stairs_left;
 	public static BaseBitmap stairs_top;
@@ -209,7 +210,8 @@ public class Art {
 		carpet_indoors = screen.load("art/floor/carpet_indoors.png");
 		carpet_outdoors = screen.load("art/floor/carpet_outdoors.png");
 		hardwood_indoors = screen.load("art/floor/hardwood_indoors.png");
-		tatami_indoors = screen.load("art/floor/tatami_indoors.png");
+		tatami_1_indoors = screen.load("art/floor/tatami_1_indoors.png");
+		tatami_2_indoors = screen.load("art/floor/tatami_2_indoors.png");
 		
 		// House
 		house_door = screen.load("art/house/house_door.png");

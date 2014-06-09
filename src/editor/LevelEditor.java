@@ -15,6 +15,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -56,9 +57,6 @@ public class LevelEditor extends JFrame {
 				running = false;
 			}
 		});
-		
-		// final File folder = new File("res");
-		// getAllFiles(folder);
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
