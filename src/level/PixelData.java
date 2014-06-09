@@ -116,36 +116,29 @@ public class PixelData {
 					case 0x02: // Road Path
 						this.bitmap[0] = Art.path;
 						break;
-					case 0x03: // Carpet Floor (Indoors)
-						this.bitmap[0] = Art.carpet_indoors;
-						this.biomeBitmap = Art.exit_arrow;
-						break;
-					case 0x04: // Carpet Floor (Outdoors)
-						this.bitmap[0] = Art.carpet_outdoors;
-						this.biomeBitmap = Art.exit_arrow;
-						break;
-					case 0x05: // Hardwood Floor (Indoors)
+					case 0x03: // Hardwood Floor (Indoors)
 						this.bitmap[0] = Art.hardwood_indoors;
 						break;
-					case 0x06: // Tatami Floor (Indoors)
-						this.bitmap[0] = Art.tatami_indoors;
+					case 0x04: // Tatami Floor Type 1 (Indoors)
+						this.bitmap[0] = Art.tatami_1_indoors;
+						break;
+					case 0x05: // Tatami Floor Type 2 (Indoors)
+						this.bitmap[0] = Art.tatami_2_indoors;
 						break;
 					default:
 						break;
 				}
-				if (this.biomeBitmap == null) {
-					switch (green) { // Area Type
-						case 0x00:
-							this.biomeBitmap = new BaseBitmap[1];
-							this.biomeBitmap[0] = Art.grass; // Forest
-							break;
-						case 0x02:
-							this.biomeBitmap = new BaseBitmap[1];
-							this.biomeBitmap[0] = Art.mt_ground; // Mountain
-							break;
-						default:
-							break;
-					}
+				switch (green) { // Area Type
+					case 0x00:
+						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap[0] = Art.grass; // Forest
+						break;
+					case 0x02:
+						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap[0] = Art.mt_ground; // Mountain
+						break;
+					default:
+						break;
 				}
 				break;
 			case 0x02: // Ledge
@@ -331,6 +324,16 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.item;
 				break;
+			case 0x0C: // Carpet Floor (Indoors)
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.carpet_indoors;
+				this.biomeBitmap = Art.exit_arrow;
+				break;
+			case 0x0D: // Carpet Floors (Outdoors)
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.carpet_outdoors;
+				this.biomeBitmap = Art.exit_arrow;
+				break;
 			default: // Any other type of tiles.
 				break;
 		}
@@ -389,67 +392,6 @@ public class PixelData {
 				this.groundHeight = blue;
 				break;
 			case 0x02: // Ledges
-				// switch (red) {
-				// case 0x00: //Bottom
-				// this.facingsBlocked[Player.UP] = false;
-				// this.facingsBlocked[Player.DOWN] = true;
-				// this.facingsBlocked[Player.LEFT] = false;
-				// this.facingsBlocked[Player.RIGHT] = false;
-				// break;
-				// case 0x01: //Bottom left
-				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-				// break;
-				// case 0x02: //Left
-				// this.facingsBlocked[Player.UP] = false;
-				// this.facingsBlocked[Player.DOWN] = false;
-				// this.facingsBlocked[Player.LEFT] = false;
-				// this.facingsBlocked[Player.RIGHT] = false;
-				// break;
-				// case 0x03: //Top left
-				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-				// break;
-				// case 0x04: //Top
-				// this.facingsBlocked[Player.UP] = true;
-				// this.facingsBlocked[Player.DOWN] = false;
-				// this.facingsBlocked[Player.LEFT] = false;
-				// this.facingsBlocked[Player.RIGHT] = false;
-				// break;
-				// case 0x05: //Top Right
-				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-				// break;
-				// case 0x06: //Right
-				// this.facingsBlocked[Player.UP] = false;
-				// this.facingsBlocked[Player.DOWN] = false;
-				// this.facingsBlocked[Player.LEFT] = false;
-				// this.facingsBlocked[Player.RIGHT] = false;
-				// break;
-				// case 0x07: //Bottom Right
-				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-				// break;
-				// //------------------------------------------------------------
-				// //Same order, but with mountain ledges.
-				// case 0x08:
-				// case 0x09:
-				// case 0x0A:
-				// case 0x0B:
-				// case 0x0C:
-				// case 0x0D:
-				// case 0x0E:
-				// case 0x0F:
-				// case 0x10:
-				// case 0x11:
-				// case 0x12:
-				// case 0x13:
-				// case 0x14:
-				// case 0x15:
-				// case 0x16:
-				// case 0x17:
-				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-				// break;
-				// default:
-				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-				// break;
-				// }
 				break;
 			case 0x03: // Trees
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
@@ -472,7 +414,7 @@ public class PixelData {
 			case 0x06: // Stairs
 				break;
 			case 0x07: // Water
-				// TODO: Needs to do something with this. It must not block the player, however, without special boolean value, it will always block player from advancing. 
+				// TODO: Needs to do something with this. It must not block the player, however, without special boolean value, it will always block player from advancing.
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 			case 0x08: // Sign
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
@@ -487,6 +429,11 @@ public class PixelData {
 				this.isWarpZone = true;
 				break;
 			case 0x0B: // Item
+				break;
+			case 0x0C: //Carpets 
+			case 0x0D: //Carpets
+				// FIXME: Level Editor must set target area ID to at least 1 or above.
+				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				break;
 			default:
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
