@@ -25,7 +25,6 @@ import screen.BaseScreen;
 import submenu.Save;
 import abstracts.SubMenu;
 import abstracts.World;
-import dialogue.Dialogue;
 import dialogue.StartMenu;
 import entity.Player;
 
@@ -39,7 +38,6 @@ public class Game {
 	private final Player player;
 	private ActionItem registeredItem;
 	
-	private Dialogue dialogue;
 	
 	public enum State {
 		GAME, PAUSED, INVENTORY, SAVE
@@ -63,8 +61,7 @@ public class Game {
 		this.screen = main.getBaseScreen();
 		this.player = new Player(input);
 		this.player.setCenterCamPosition(this.screen);
-		this.dialogue = new Dialogue(input, this);
-		this.overworld = new OverWorld(player, this.dialogue);
+		this.overworld = new OverWorld(player);
 		this.worlds = new ArrayList<World>();
 		this.worlds.add(this.overworld);
 		this.startMenu = new StartMenu(this).initialize();
@@ -88,8 +85,6 @@ public class Game {
 			case GAME: {
 				screen.clear(0xA4E767);
 				overworld.render(screen, player.getX(), player.getY());
-				if (dialogue.isDisplayingDialogue())
-					dialogue.render(screen, player.getX(), player.getY(), graphics);
 				break;
 			}
 			case INVENTORY: {
@@ -149,7 +144,6 @@ public class Game {
 		switch (this.state) {
 			case GAME: {
 				overworld.tick();
-				dialogue.tick();
 				checkPausing();
 				break;
 			}
@@ -219,7 +213,7 @@ public class Game {
 		Mod.loadModdedResources(this.screen);
 		WorldConstants.isModsEnabled = null;
 		player.reload();
-		this.overworld = new OverWorld(player, this.dialogue);
+		this.overworld = new OverWorld(player);
 		this.state = State.GAME;
 		GameSave.load(this, SAVE_FILE_NAME);
 	}

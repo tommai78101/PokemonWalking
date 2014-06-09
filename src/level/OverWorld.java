@@ -10,13 +10,15 @@
 
 package level;
 
+import item.ItemText;
+
 import java.util.ArrayList;
+import java.util.Map;
 
 import obstacle.Obstacle;
 import screen.BaseScreen;
 import abstracts.Tile;
 import abstracts.World;
-import dialogue.Dialogue;
 import dialogue.NewDialogue;
 import entity.Player;
 
@@ -24,7 +26,6 @@ public class OverWorld extends World {
 	// Overworld properties.
 	private boolean invertBitmapColors;
 	private int currentAreaSectorID;
-	private Dialogue dialogue;
 	private NewDialogue newDialogue;
 	
 	/**
@@ -35,7 +36,7 @@ public class OverWorld extends World {
 	 * @param Player
 	 *            Takes a Player object. The overworld then loads all related properties in respect to the Player object.
 	 * */
-	public OverWorld(Player player, Dialogue dialogue) {
+	public OverWorld(Player player) {
 		// There should be a maximum number of areas available for the OverWorld.
 		// All areas defined must be placed in WorldConstants.
 		this.worldID = WorldConstants.OVERWORLD;
@@ -61,7 +62,6 @@ public class OverWorld extends World {
 		// Needs a marker in the area that points to where the area connects together.
 		
 		// Dialogue
-		this.dialogue = dialogue;
 		this.newDialogue = null;
 	}
 	
@@ -121,79 +121,81 @@ public class OverWorld extends World {
 		}
 		
 		// TODO: Fix the awkward interaction caused by so many states not working properly.
-		if (dialogue.isDoneDisplayingDialogue()) {
-			dialogue.reset();
-			this.player.stopInteraction();
-		}
-		else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
-			int alpha = (player.getInteractionID() >> 24) & 0xFF;
-			int red = (player.getInteractionID() >> 16) & 0xFF;
+		if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
+			int interactionID = player.getInteractionID();
+			int alpha = (interactionID >> 24) & 0xFF;
+			int red = (interactionID >> 16) & 0xFF;
 			switch (alpha) {
-				//TODO: Merge "Signs" with "Obstacles", as they now have similar functions.
-				case 0x03: {//Obstacles
-					ArrayList<Obstacle> list = this.currentArea.getObstaclesList();
-					OBSTACLE_LOOP:
-						for (int i = 0; i < list.size(); i++){
-							Obstacle obstacle = list.get(i);
-							if (obstacle.getID() != red)
-								continue;
-							this.newDialogue = obstacle.getDialogue();
-							break OBSTACLE_LOOP;
+				case 0x03: {// Obstacles
+					switch (red) {
+						case 0x05: {// Signs
+							int dialogueID = (interactionID & 0xFFFF);
+							SIGN_LOOP: for (Map.Entry<NewDialogue, Integer> entry : WorldConstants.signTexts) {
+								if (entry.getValue() == dialogueID) {
+									this.newDialogue = entry.getKey();
+									break SIGN_LOOP;
+								}
+							}
+							break;
 						}
-					break;
-				}
-				case 0x08: {// Sign
-					if (!dialogue.isDisplayingDialogue()) {
-						dialogue.createText(alpha, this.player.getInteractionID() & 0xFFFF);
+						default: // Other obstacles
+							ArrayList<Obstacle> list = this.currentArea.getObstaclesList();
+							OBSTACLE_LOOP: for (int i = 0; i < list.size(); i++) {
+								Obstacle obstacle = list.get(i);
+								if (obstacle.getID() != red)
+									continue;
+								this.newDialogue = obstacle.getDialogue();
+								break OBSTACLE_LOOP;
+							}
+							break;
 					}
 					break;
 				}
 				case 0x0B: {// Item
-					int red_itemType = (player.getInteractionID() >> 16) & 0xFF;
-					if (!dialogue.isDisplayingDialogue()) {
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								PixelData data = currentArea.getCurrentPixelData();
-								switch (player.getFacing()) {
-									case Player.UP:
-										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() - 1);
-										break;
-									case Player.DOWN:
-										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() + 1);
-										break;
-									case Player.LEFT:
-										currentArea.setPixelData(data, player.getXInArea() - 1, player.getYInArea());
-										break;
-									case Player.RIGHT:
-										currentArea.setPixelData(data, player.getXInArea() + 1, player.getYInArea());
-										break;
-								}
+					ItemText text = WorldConstants.items.get(red);
+					if (this.newDialogue == null)
+						this.newDialogue = NewDialogue.createText(text.itemName + " has been found.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_ALERT, true);
+					
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							PixelData data = currentArea.getCurrentPixelData();
+							switch (player.getFacing()) {
+								case Player.UP:
+									currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() - 1);
+									break;
+								case Player.DOWN:
+									currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() + 1);
+									break;
+								case Player.LEFT:
+									currentArea.setPixelData(data, player.getXInArea() - 1, player.getYInArea());
+									break;
+								case Player.RIGHT:
+									currentArea.setPixelData(data, player.getXInArea() + 1, player.getYInArea());
+									break;
 							}
-						}).start();
-						dialogue.createText(alpha, red_itemType);
-					}
-					break;
+						}
+					}).start();
 				}
+				break;
 			}
-			
 		}
 		
-		if (this.newDialogue != null){
-			//The order is IMPORTANT!!
-			if (this.newDialogue.isDialogueCompleted() && this.newDialogue.isScrolling()){
+		if (this.newDialogue != null) {
+			// The order is IMPORTANT!!
+			if (this.newDialogue.isDialogueCompleted() && this.newDialogue.isScrolling()) {
 				Player.unlockMovements();
 				this.newDialogue.resetDialogue();
 				this.newDialogue = null;
 				this.player.stopInteraction();
 			}
-			else if (this.newDialogue.isDialogueCompleted() && !this.newDialogue.isScrolling()){
+			else if (this.newDialogue.isDialogueCompleted() && !this.newDialogue.isScrolling()) {
 				this.newDialogue.tick();
 			}
-			else if (this.newDialogue.isDialogueTextSet() && !(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())){
+			else if (this.newDialogue.isDialogueTextSet() && !(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
 				Player.lockMovements();
 				this.newDialogue.tick();
-			} 
+			}
 		}
 	}
 	
@@ -228,14 +230,14 @@ public class OverWorld extends World {
 			this.invertBitmapColors = true;
 			
 			switch ((data.getColor() >> 24) & 0xFF) {
-				case 0x04: //Warp point
+				case 0x04: // Warp point
 					this.player.forceLockWalking();
 					break;
-				case 0x0A: //Door
+				case 0x0A: // Door
 					this.player.tick();
 					break;
-				case 0x0C: //Carpet (Indoors)
-				case 0x0D: //Carpet (Outdoors)
+				case 0x0C: // Carpet (Indoors)
+				case 0x0D: // Carpet (Outdoors)
 					this.player.forceLockWalking();
 					this.player.tick();
 					break;

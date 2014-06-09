@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
@@ -16,9 +18,9 @@ import abstracts.Tile;
 import entity.Player;
 
 public class NewDialogue {
-	public static final int DIALOGUE_QUESTION = 0x41;
-	
 	public static final int DIALOGUE_SPEECH = 0x40;
+	public static final int DIALOGUE_QUESTION = 0x41;
+	public static final int DIALOGUE_ALERT = 0x42;
 	
 	public static final int HALF_STRING_LENGTH = 9;
 	
@@ -82,11 +84,11 @@ public class NewDialogue {
 		return (this.lineIterator >= this.lines.size());
 	}
 	
-	public boolean isScrolling(){
+	public boolean isScrolling() {
 		return this.scrollFlag;
 	}
 	
-	public void resetDialogue(){
+	public void resetDialogue() {
 		this.subStringIterator = 0;
 		this.nextFlag = false;
 		this.simpleQuestionFlag = false;
@@ -155,6 +157,14 @@ public class NewDialogue {
 					g2d.dispose();
 					break;
 				}
+				case DIALOGUE_ALERT: {
+					renderDialogBackground(output, x, y, w, h);
+					renderDialogBorderBox(output, x, y, w, h);
+					Graphics2D g2d = output.getBufferedImage().createGraphics();
+					renderText(g2d);
+					g2d.dispose();
+					break;
+				}
 			}
 		}
 	}
@@ -208,11 +218,18 @@ public class NewDialogue {
 					}
 					break;
 				}
-				case DIALOGUE_SPEECH:
+				case DIALOGUE_SPEECH: {
 					this.nextTick++;
 					if (this.nextTick > 0xE)
 						this.nextTick = 0x0;
 					break;
+				}
+				case DIALOGUE_ALERT: {
+					this.nextTick++;
+					if (this.nextTick > 0xE)
+						this.nextTick = 0x0;
+					break;
+				}
 			}
 		}
 		else if (count >= this.totalDialogueLength) {
@@ -224,6 +241,10 @@ public class NewDialogue {
 						this.nextFlag = false;
 						break;
 					case DIALOGUE_SPEECH:
+						this.simpleSpeechFlag = true;
+						this.nextFlag = false;
+						break;
+					case DIALOGUE_ALERT:
 						this.simpleSpeechFlag = true;
 						this.nextFlag = false;
 						break;
@@ -239,6 +260,9 @@ public class NewDialogue {
 						break;
 					case DIALOGUE_QUESTION:
 						this.simpleQuestionFlag = true;
+						this.nextFlag = true;
+						break;
+					case DIALOGUE_ALERT:
 						this.nextFlag = true;
 						break;
 				}
@@ -272,25 +296,31 @@ public class NewDialogue {
 									else
 										this.nextFlag = true;
 									break;
+								case DIALOGUE_ALERT:
+									this.nextFlag = true;
+									break;
 							}
 						}
 					}
 				}
+				
 				// Speeds up text speed.
-				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || (input.SLASH.keyStateDown && !input.SLASH.lastKeyState)) {
-					if (this.subStringIterator >= this.lineLength - 2) {
-						input.Z.lastKeyState = true;
-						input.SLASH.lastKeyState = true;
+				if (this.type != DIALOGUE_ALERT) {
+					if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || (input.SLASH.keyStateDown && !input.SLASH.lastKeyState)) {
+						if (this.subStringIterator >= this.lineLength - 2) {
+							input.Z.lastKeyState = true;
+							input.SLASH.lastKeyState = true;
+						}
+						else if (this.subStringIterator < this.lineLength) {
+							this.subStringIterator++;
+						}
 					}
-					else if (this.subStringIterator < this.lineLength) {
-						this.subStringIterator++;
-					}
-				}
-				else if ((input.X.keyStateDown && !(input.X.lastKeyState)) || (input.PERIOD.keyStateDown && !input.PERIOD.lastKeyState)) {
-					if (this.subStringIterator < this.lineLength - 1) {
-						this.subStringIterator = this.lineLength - 1;
-						input.X.lastKeyState = true;
-						input.PERIOD.lastKeyState = true;
+					else if ((input.X.keyStateDown && !(input.X.lastKeyState)) || (input.PERIOD.keyStateDown && !input.PERIOD.lastKeyState)) {
+						if (this.subStringIterator < this.lineLength - 1) {
+							this.subStringIterator = this.lineLength - 1;
+							input.X.lastKeyState = true;
+							input.PERIOD.lastKeyState = true;
+						}
 					}
 				}
 			}
@@ -336,9 +366,12 @@ public class NewDialogue {
 				}
 			}
 			else {
-				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || ((input.SLASH.keyStateDown) && !input.SLASH.lastKeyState)) {
+				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || ((input.SLASH.keyStateDown) && !input.SLASH.lastKeyState)
+						|| (input.X.keyStateDown && !(input.X.lastKeyState)) || (input.PERIOD.keyStateDown && !(input.PERIOD.lastKeyState))) {
 					input.Z.lastKeyState = true;
 					input.SLASH.lastKeyState = true;
+					input.X.lastKeyState = true;
+					input.PERIOD.lastKeyState = true;
 					switch (this.type) {
 						case DIALOGUE_SPEECH:
 							this.nextFlag = false;
@@ -347,6 +380,10 @@ public class NewDialogue {
 						case DIALOGUE_QUESTION:
 							// Must get to the end of the entire dialogue before asking questions.
 							this.simpleQuestionFlag = false;
+							this.nextFlag = false;
+							this.scrollFlag = true;
+							break;
+						case DIALOGUE_ALERT:
 							this.nextFlag = false;
 							this.scrollFlag = true;
 							break;
@@ -361,6 +398,9 @@ public class NewDialogue {
 								this.nextFlag = false;
 								break;
 							case DIALOGUE_SPEECH:
+								this.closeDialog();
+								return;
+							case DIALOGUE_ALERT:
 								this.closeDialog();
 								return;
 						}
@@ -378,6 +418,7 @@ public class NewDialogue {
 				else {
 					switch (this.type) {
 						case DIALOGUE_SPEECH:
+						case DIALOGUE_ALERT:
 							this.nextFlag = true;
 							break;
 						case DIALOGUE_QUESTION:
@@ -509,34 +550,40 @@ public class NewDialogue {
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 	}
 	
-	private static void renderDialogBackground(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
-		for (int j = 0; j < centerHeight - 1; j++) {
-			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+	public static ArrayList<Map.Entry<NewDialogue, Integer>> loadDialogues(String filename) {
+		ArrayList<Map.Entry<NewDialogue, Integer>> result = new ArrayList<Map.Entry<NewDialogue, Integer>>();
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(NewDialogue.class.getClassLoader().getResourceAsStream(filename)));
+			String line;
+			String[] tokens;
+			boolean done;
+			int dialogueID = 0;
+			NewDialogue temp = null;
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("#")) {
+					// Dialogue ID
+					tokens = line.split("#");
+					dialogueID = Integer.valueOf(tokens[1]);
+				}
+				else if (line.startsWith("@")) {
+					// Dialogue message
+					tokens = line.split("@");
+					temp = NewDialogue.createText(tokens[1], NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, false);
+				}
+				else if (line.startsWith("-")) {
+					// Dialogue delimiter
+					Map.Entry<NewDialogue, Integer> entry = new AbstractMap.SimpleEntry<NewDialogue, Integer>(temp, dialogueID);
+					result.add(entry);
+				}
 			}
 		}
+		catch (Exception e) {
+			return null;
+		}
+		return result;
 	}
 	
-	private static void renderDialogBorderBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
-		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
-		}
-		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
-		
-		for (int j = 0; j < centerHeight - 1; j++) {
-			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
-		}
-		
-		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
-		}
-		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
-	}
-	
-	private static ArrayList<Map.Entry<String, Boolean>> toLines(String all, final int regex) {
+	public static ArrayList<Map.Entry<String, Boolean>> toLines(String all, final int regex) {
 		ArrayList<Map.Entry<String, Boolean>> lines = new ArrayList<>();
 		String[] words = all.split("\\s");
 		String line = "";
@@ -563,6 +610,33 @@ public class NewDialogue {
 		if (line.length() > 0)
 			lines.add(new AbstractMap.SimpleEntry<String, Boolean>(line, false));
 		return lines;
+	}
+	
+	private static void renderDialogBackground(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+		for (int j = 0; j < centerHeight - 1; j++) {
+			for (int i = 0; i < centerWidth - 1; i++) {
+				output.blit(Art.dialogue_background, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			}
+		}
+	}
+	
+	private static void renderDialogBorderBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+		output.blit(Art.dialogue_top_left, x * Tile.WIDTH, y * Tile.HEIGHT);
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_top, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), y * Tile.HEIGHT);
+		}
+		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tile.WIDTH, y * Tile.HEIGHT);
+		
+		for (int j = 0; j < centerHeight - 1; j++) {
+			output.blit(Art.dialogue_left, x * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+			output.blit(Art.dialogue_right, (x + centerWidth) * Tile.WIDTH, ((y + 1) * Tile.HEIGHT) + j * Tile.HEIGHT);
+		}
+		
+		output.blit(Art.dialogue_bottom_left, x * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_bottom, ((x + 1) * Tile.WIDTH) + (i * Tile.WIDTH), ((y + centerHeight) * Tile.HEIGHT));
+		}
+		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tile.WIDTH, ((y + centerHeight) * Tile.HEIGHT));
 	}
 	
 }

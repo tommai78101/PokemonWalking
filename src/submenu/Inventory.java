@@ -14,6 +14,7 @@ import item.ActionItem;
 import item.Bicycle;
 import item.DummyItem;
 import item.ItemText;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -22,6 +23,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import level.WorldConstants;
 import main.Game;
 import main.Keys;
@@ -32,7 +34,7 @@ import abstracts.Item;
 import abstracts.Item.Category;
 import abstracts.SubMenu;
 import abstracts.Tile;
-import dialogue.Dialogue;
+import dialogue.NewDialogue;
 import entity.Player;
 
 public class Inventory extends SubMenu {
@@ -187,7 +189,7 @@ public class Inventory extends SubMenu {
 			switch (this.state) {
 				default: {
 					output.blit(Art.inventory_gui, 0, 0);
-					Dialogue.renderBox(output, 0, 6, 9, 2);
+					NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
 					renderListBox(output, 3, 1, 7, 5);
 					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
 					switch (this.category) {
@@ -216,7 +218,7 @@ public class Inventory extends SubMenu {
 				}
 				case MENU: {
 					output.blit(Art.inventory_gui, 0, 0);
-					Dialogue.renderBox(output, 0, 6, 9, 2);
+					NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
 					renderListBox(output, 3, 1, 7, 5);
 					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
 					switch (this.category) {
@@ -242,7 +244,7 @@ public class Inventory extends SubMenu {
 					Graphics2D g2d = old.createGraphics();
 					renderText(g2d);
 					if (!this.selectionMenu.isEmpty()) {
-						Dialogue.renderBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4, this.selectionMenu.size() - 1);
+						NewDialogue.renderDialogBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4, this.selectionMenu.size() - 1);
 						output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, (12 * this.stateArrowPosition + Tile.HEIGHT * (7 - this.selectionMenu.size())) - 8);
 						List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 						renderItemMenuText(list, g2d);
@@ -252,10 +254,10 @@ public class Inventory extends SubMenu {
 				}
 				case TOSS: {
 					output.blit(Art.inventory_gui, 0, 0);
-					Dialogue.renderBox(output, 0, 6, 9, 2);
+					NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
 					renderListBox(output, 3, 1, 7, 5);
 					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
-					Dialogue.renderBox(output, 5, 4, 4, 1);
+					NewDialogue.renderDialogBox(output, 5, 4, 4, 1);
 					switch (this.category) {
 						case POTIONS:
 						default:
@@ -285,7 +287,7 @@ public class Inventory extends SubMenu {
 				}
 				case SET: {
 					output.blit(Art.inventory_gui, 0, 0);
-					Dialogue.renderBox(output, 0, 6, 9, 2);
+					NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
 					renderListBox(output, 3, 1, 7, 5);
 					output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE, ((Tile.HEIGHT * this.arrowPosition)) + 12);
 					switch (this.category) {
@@ -657,8 +659,8 @@ public class Inventory extends SubMenu {
 				
 				try {
 					String tossAmount = amountToToss < 10 ? "0" + Integer.toString(amountToToss) : Integer.toString(amountToToss);
-					graphics.drawString(this.selectionMenu.get(0), (4 * Tile.WIDTH + (3 * Dialogue.TEXT_SPACING_WIDTH)), (Tile.HEIGHT * 5 + 6));
-					graphics.drawString(tossAmount, (4 * Tile.WIDTH + ((11 - tossAmount.length()) * Dialogue.TEXT_SPACING_WIDTH)), (Tile.HEIGHT * 5 + 6));
+					graphics.drawString(this.selectionMenu.get(0), (4 * Tile.WIDTH + (3 * (Tile.WIDTH / 2))), (Tile.HEIGHT * 5 + 6));
+					graphics.drawString(tossAmount, (4 * Tile.WIDTH + ((11 - tossAmount.length()) * (Tile.WIDTH / 2))), (Tile.HEIGHT * 5 + 6));
 				}
 				catch (Exception e) {
 				}
@@ -688,9 +690,9 @@ public class Inventory extends SubMenu {
 		}
 		try {
 			Map.Entry<Item, Integer> entry = list.get(itemCursor);
-			String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
-			graphics.drawString(tokens[0], 8, 144 - 32 + 7);
-			graphics.drawString(tokens[1], 8, 144 - 16 + 7);
+			ArrayList<Map.Entry<String, Boolean>> tokens = NewDialogue.toLines(entry.getKey().getDescription(), NewDialogue.MAX_STRING_LENGTH);
+			graphics.drawString(tokens.get(0).getKey(), 8, 144 - 32 + 7);
+			graphics.drawString(tokens.get(1).getKey(), 8, 144 - 16 + 7);
 		}
 		catch (Exception e) {
 		}
@@ -755,11 +757,11 @@ public class Inventory extends SubMenu {
 							if (i >= list.size())
 								break;
 							Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
-							g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH, ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 3);
+							g.drawString(entry.getKey().getName(), 8 * (Tile.WIDTH / 2), ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 3);
 							int value = entry.getValue().intValue();
 							if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null && this.category != Category.KEYITEMS) {
 								String string = "*" + Integer.toString(value);
-								g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH), ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 4);
+								g.drawString(string, 8 * (Tile.WIDTH / 2) + ((12 - string.length()) * (Tile.WIDTH / 2)), ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 4);
 							}
 						}
 					}
@@ -768,9 +770,9 @@ public class Inventory extends SubMenu {
 					//This needs to be separated, else if there's a problem, the latter won't render anything.
 					try {
 						Map.Entry<Item, Integer> entry = list.get(itemCursor);
-						String[] tokens = Dialogue.toLines(entry.getKey().getDescription(), Dialogue.MAX_STRING_LENGTH);
-						g.drawString(tokens[0], 8, 144 - 32 + 7);
-						g.drawString(tokens[1], 8, 144 - 16 + 7);
+						ArrayList<Map.Entry<String, Boolean>> tokens = NewDialogue.toLines(entry.getKey().getDescription(), NewDialogue.MAX_STRING_LENGTH);
+						g.drawString(tokens.get(0).getKey(), 8, 144 - 32 + 7);
+						g.drawString(tokens.get(1).getKey(), 8, 144 - 16 + 7);
 					}
 					catch (Exception e) {
 					}
@@ -783,11 +785,11 @@ public class Inventory extends SubMenu {
 						if (i >= list.size())
 							break;
 						Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
-						g.drawString(entry.getKey().getName(), 8 * Dialogue.TEXT_SPACING_WIDTH, ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 3);
+						g.drawString(entry.getKey().getName(), 8 * (Tile.WIDTH / 2), ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 3);
 						int value = entry.getValue().intValue();
 						if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null && this.category != Category.KEYITEMS) {
 							String string = "*" + Integer.toString(value);
-							g.drawString(string, 8 * Dialogue.TEXT_SPACING_WIDTH + ((12 - string.length()) * Dialogue.TEXT_SPACING_WIDTH), ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 4);
+							g.drawString(string, 8 * (Tile.WIDTH / 2) + ((12 - string.length()) * (Tile.WIDTH / 2)), ((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 4);
 						}
 					}
 				}
@@ -795,14 +797,14 @@ public class Inventory extends SubMenu {
 				}
 				try {
 					Map.Entry<Item, Integer> entry = list.get(itemCursor);
-					String[] tokens = Dialogue.toLines(entry.getKey().getName() + " has been registered.", Dialogue.MAX_STRING_LENGTH);
+					ArrayList<Map.Entry<String, Boolean>> tokens = NewDialogue.toLines(entry.getKey().getName() + " has been registered.", NewDialogue.MAX_STRING_LENGTH);
 					switch (this.set_completedLines.size()) {
 						case 0:
-							g.drawString(tokens[set_tokenIterator].substring(0, set_subStringIterator), 8, 144 - 32 + 7);
+							g.drawString(tokens.get(set_tokenIterator).getKey().substring(0, set_subStringIterator), 8, 144 - 32 + 7);
 							break;
 						case 1:
 							g.drawString(this.set_completedLines.get(0), 8, 144 - 32 + 7);
-							g.drawString(tokens[set_tokenIterator].substring(0, set_subStringIterator), 8, 144 - 16 + 7);
+							g.drawString(tokens.get(set_tokenIterator).getKey().substring(0, set_subStringIterator), 8, 144 - 16 + 7);
 							break;
 						case 2:
 							g.drawString(this.set_completedLines.get(0), 8, 144 - 32 + 7);
@@ -811,8 +813,8 @@ public class Inventory extends SubMenu {
 					}
 					if (this.set_completedLines.size() < 2) {
 						this.set_subStringIterator++;
-						if (set_subStringIterator > tokens[set_tokenIterator].length()) {
-							this.set_completedLines.add(tokens[set_tokenIterator]);
+						if (set_subStringIterator > tokens.get(set_tokenIterator).getKey().length()) {
+							this.set_completedLines.add(tokens.get(set_tokenIterator).getKey());
 							this.set_subStringIterator = 0;
 							this.set_tokenIterator++;
 						}

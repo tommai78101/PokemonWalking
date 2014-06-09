@@ -144,6 +144,7 @@ public class Art {
 	public static BaseBitmap planks;
 	public static BaseBitmap scaffolding_left;
 	public static BaseBitmap scaffolding_right;
+	public static BaseBitmap sign;
 	
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Player (Entities)
@@ -151,10 +152,6 @@ public class Art {
 	public static BaseBitmap[][] player_surf;
 	public static BaseBitmap[][] player_bicycle;
 	public static BaseBitmap shadow;
-	
-	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-	// Sign
-	public static BaseBitmap sign;
 	
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Area
@@ -277,15 +274,13 @@ public class Art {
 		scaffolding_left= screen.load("art/obstacle/scaffolding_left.png");
 		scaffolding_right= screen.load("art/obstacle/scaffolding_right.png");
 		smallTree = screen.load("art/obstacle/small_tree.png");
+		sign = screen.load("art/obstacle/sign.png");
 		
 		// Player, NPCs
 		player = screen.cut("art/player/player.png", 16, 16, 0, 0);
 		player_surf = screen.cut("art/player/player_surf.png", 16, 16, 0, 0);
 		player_bicycle = screen.cut("art/player/player_bicycle.png", 16, 16, 0, 0);
 		shadow = screen.load("art/player/shadow.png");
-		
-		// Sign
-		sign = screen.load("art/sign/sign.png");
 		
 		// Areas
 		testArea = screen.load("area/test/testArea.png");

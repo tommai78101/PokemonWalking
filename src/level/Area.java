@@ -55,8 +55,7 @@ public class Area {
 			for (int x = 0; x < this.width; x++) {
 				int pixel = this.pixels[y * this.width + x];
 				PixelData px = new PixelData(pixel, x, y);
-				int alpha =(pixel >> 24) & 0xFF; 
-				if (alpha == 0x03)
+				if (((pixel >> 24) & 0xFF) == 0x03)
 					areaObstacles.add(new Obstacle(px, (pixel >> 16) & 0xFF));
 				areaData.get(y).add(px);
 			}

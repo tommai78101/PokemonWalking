@@ -21,8 +21,7 @@ import resources.Art;
 import resources.Mod;
 import screen.BaseBitmap;
 import abstracts.Item;
-import dialogue.Dialogue;
-import dialogue.DialogueText;
+import dialogue.NewDialogue;
 
 public class WorldConstants {
 	private WorldConstants() {
@@ -53,7 +52,7 @@ public class WorldConstants {
 	public static final int OVERWORLD = 0x0A000001;
 	
 	// Dialogues
-	public static ArrayList<DialogueText> dialogues = Dialogue.loadDialogues("dialogue/dialogue.txt");
+	public static ArrayList<Map.Entry<NewDialogue, Integer>> signTexts = NewDialogue.loadDialogues("dialogue/dialogue.txt");
 	
 	// Items
 	public static HashMap<Integer, ItemText> items = Item.loadItemResources("item/items.txt");

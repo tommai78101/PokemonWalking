@@ -19,7 +19,6 @@ import level.PixelData;
 import level.WorldConstants;
 import resources.Art;
 import resources.Mod;
-import dialogue.Dialogue;
 
 public class BaseScreen extends BaseBitmap {
 	
@@ -30,7 +29,7 @@ public class BaseScreen extends BaseBitmap {
 	protected int yOffset;
 	
 	private byte tick = 0x7;
-	private boolean cutScreen;
+	//private boolean cutScreen;
 	
 	public BaseScreen(int w, int h) {
 		super(w, h);
@@ -79,11 +78,6 @@ public class BaseScreen extends BaseBitmap {
 		
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
 			
-			// Place the cut height here.
-			if (cutScreen) {
-				if (yy > Dialogue.getDialogueY())
-					break;
-			}
 			int tgt = yy * this.width + blitArea.topLeftCorner_X;
 			int src = (yy - y) * bitmap.width + (blitArea.topLeftCorner_X - x);
 			tgt -= src;
@@ -117,11 +111,6 @@ public class BaseScreen extends BaseBitmap {
 		
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
 			
-			// Place the cut height here.
-			if (cutScreen) {
-				if (yy > Dialogue.getDialogueY())
-					break;
-			}
 			int tgt = yy * this.width + blitArea.topLeftCorner_X;
 			int src = (yy - y) * bitmap.width + (blitArea.topLeftCorner_X - x);
 			tgt -= src;
@@ -224,32 +213,6 @@ public class BaseScreen extends BaseBitmap {
 		return this.tick;
 	}
 	
-	/**
-	 * Allows the screen to be displayed with half of the screen gone.
-	 * 
-	 * @return Nothing.
-	 * */
-	public void enableRenderHalf() {
-		this.cutScreen = true;
-	}
-	
-	/**
-	 * Allows the screen to be displayed in its entirely.
-	 * 
-	 * @return Nothing.
-	 * */
-	public void disableRenderHalf() {
-		this.cutScreen = false;
-	}
-	
-	/**
-	 * Checks to see if the screen is displayed entirely or not.
-	 * 
-	 * @return True, if the screen is displayed with a portion not rendered. False, if the screen is rendered in its entirely.
-	 * */
-	public boolean isRenderingHalf() {
-		return this.cutScreen;
-	}
 	
 	// -------------------------------------------
 	// Private methods
