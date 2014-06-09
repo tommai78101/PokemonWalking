@@ -11,19 +11,23 @@ public class Obstacle {
 	public Obstacle(PixelData data, int id) {
 		this.id = id;
 		this.color = data.getColor();
+		reset();
+	}
+	
+	public void reset(){
 		switch (id){
 			case 0x00: //Small Tree
 				this.dialogue = null;
 				break;
 			case 0x01: //Logs
-				this.dialogue = NewDialogue.createText("A pile of wooden logs. That's where raw materials are get.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
+				this.dialogue = NewDialogue.createText("A pile of wooden logs. That's where raw materials are get.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, false);
 				break;
 			case 0x02: //Planks
-				this.dialogue = NewDialogue.createText("Some wooden planks. Used in the house construction.",NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
+				this.dialogue = NewDialogue.createText("Some wooden planks. Used in the house construction.",NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, false);
 				break;
 			case 0x03: //Scaffolding Left
 			case 0x04: //Scaffolding Right
-				this.dialogue = NewDialogue.createText("Some rubbles. Was used as scaffoldings during most of the construction.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
+				this.dialogue = NewDialogue.createText("Some rubbles. Was used as scaffoldings during most of the construction.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, false);
 				break;
 		}
 	}

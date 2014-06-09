@@ -40,8 +40,8 @@ public class Save extends SubMenu {
 		switch (this.state) {
 			case ASK: {
 				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = NewDialogue.createText("Do you want to save the game?", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_QUESTION);
-				if (this.newDialogue.isDialogueTextSet() && !this.newDialogue.isDialogueCompleted()) {
+					this.newDialogue = NewDialogue.createText("Do you want to save the game?", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_QUESTION, true);
+				if (this.newDialogue.isDialogueTextSet() && !(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
 					this.newDialogue.tick();
 				}
 				else {
@@ -63,14 +63,14 @@ public class Save extends SubMenu {
 			}
 			case OVERWRITE: {
 				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = NewDialogue.createText("There is already an old save file.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
-				if (!this.newDialogue.isDialogueCompleted()) {
+					this.newDialogue = NewDialogue.createText("There is already an old save file.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
+				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
 					this.newDialogue.tick();
 				}
 				else {
 					switch (this.newDialogue.getDialogueType()) {
 						case NewDialogue.DIALOGUE_SPEECH:
-							this.newDialogue = NewDialogue.createText("Do you want to overwrite it?", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_QUESTION);
+							this.newDialogue = NewDialogue.createText("Do you want to overwrite it?", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_QUESTION, true);
 							break;
 						case NewDialogue.DIALOGUE_QUESTION:
 							if (!this.newDialogue.yesNoQuestionHasBeenAnswered())
@@ -88,8 +88,8 @@ public class Save extends SubMenu {
 			}
 			case SAVING: {
 				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = NewDialogue.createText("Saving...", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
-				if (!this.newDialogue.isDialogueCompleted()) {
+					this.newDialogue = NewDialogue.createText("Saving...", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
+				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
 					this.newDialogue.tick();
 					if (executor == null) {
 						executor = Executors.newFixedThreadPool(1);
@@ -124,17 +124,17 @@ public class Save extends SubMenu {
 			}
 			case SAVED: {
 				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = NewDialogue.createText("Saving Complete.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
-				if (!this.newDialogue.isDialogueCompleted())
+					this.newDialogue = NewDialogue.createText("Saving Complete.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
+				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
 					this.newDialogue.tick();
 				else
 					disableSubMenu();
 				break;
 			}
 			case ERROR: {
-				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = NewDialogue.createText("I am ERROR.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH);
-				if (!this.newDialogue.isDialogueCompleted())
+				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
+					this.newDialogue = NewDialogue.createText("I am ERROR.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
+				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
 					this.newDialogue.tick();
 				else
 					disableSubMenu();

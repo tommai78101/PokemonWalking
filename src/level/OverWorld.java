@@ -180,16 +180,21 @@ public class OverWorld extends World {
 		}
 		
 		if (this.newDialogue != null){
-			if (this.newDialogue.isDialogueTextSet() && !this.newDialogue.isDialogueCompleted()){
-				Player.lockMovements();
+			//The order is IMPORTANT!!
+			if (this.newDialogue.isDialogueCompleted() && this.newDialogue.isScrolling()){
+				Player.unlockMovements();
+				this.newDialogue.resetDialogue();
+				this.newDialogue = null;
+				this.player.stopInteraction();
+			}
+			else if (this.newDialogue.isDialogueCompleted() && !this.newDialogue.isScrolling()){
 				this.newDialogue.tick();
 			}
-			if (this.newDialogue.isDialogueCompleted()){
-				Player.unlockMovements();
-				this.newDialogue = null;
-			}
+			else if (this.newDialogue.isDialogueTextSet() && !(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())){
+				Player.lockMovements();
+				this.newDialogue.tick();
+			} 
 		}
-		
 	}
 	
 	private void handleWarpPointEvent() {

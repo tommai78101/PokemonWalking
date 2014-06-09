@@ -7,6 +7,7 @@ import java.awt.Rectangle;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
+
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
@@ -64,7 +65,7 @@ public class NewDialogue {
 		this.showDialog = false;
 		this.type = 0;
 		this.yesNoCursorPosition = true;
-		this.yesNoAnswerFlag = null; //Default
+		this.yesNoAnswerFlag = null; // Default
 	}
 	
 	public Boolean getAnswerToSimpleQuestion() {
@@ -78,7 +79,26 @@ public class NewDialogue {
 	}
 	
 	public boolean isDialogueCompleted() {
-		return (this.lineIterator >= this.lines.size() && !this.showDialog);
+		return (this.lineIterator >= this.lines.size());
+	}
+	
+	public boolean isScrolling(){
+		return this.scrollFlag;
+	}
+	
+	public void resetDialogue(){
+		this.subStringIterator = 0;
+		this.nextFlag = false;
+		this.simpleQuestionFlag = false;
+		this.simpleSpeechFlag = false;
+		this.scrollFlag = false;
+		this.scrollDistance = 0;
+		this.nextTick = 0x0;
+		this.lineIterator = 0;
+		this.showDialog = true;
+		this.yesNoCursorPosition = true;
+		this.yesNoAnswerFlag = null;
+		this.completedLines.clear();
 	}
 	
 	public boolean isDialogueTextSet() {
@@ -124,7 +144,7 @@ public class NewDialogue {
 					if (this.simpleQuestionFlag && !this.nextFlag) {
 						renderDialogBackground(output, 7, 3, 2, 2);
 						renderDialogBorderBox(output, 7, 3, 2, 2);
-						//Offset by -3 for the Y axis.
+						// Offset by -3 for the Y axis.
 						output.blit(Art.dialogue_pointer, MainComponent.GAME_WIDTH - Tile.WIDTH * 3 + 8, this.yesNoCursorPosition ? (Tile.HEIGHT * 4 - 3) : (Tile.HEIGHT * 5 - 3));
 					}
 					else if (!this.simpleQuestionFlag && (this.nextFlag && this.nextTick < 0x8))
@@ -244,7 +264,7 @@ public class NewDialogue {
 									this.nextFlag = true;
 									break;
 								case DIALOGUE_QUESTION:
-									//Must get to the end of the entire dialogue before asking for answers.
+									// Must get to the end of the entire dialogue before asking for answers.
 									if (this.lineIterator >= this.lines.size()) {
 										this.simpleQuestionFlag = true;
 										this.nextFlag = false;
@@ -256,7 +276,7 @@ public class NewDialogue {
 						}
 					}
 				}
-				//Speeds up text speed.
+				// Speeds up text speed.
 				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || (input.SLASH.keyStateDown && !input.SLASH.lastKeyState)) {
 					if (this.subStringIterator >= this.lineLength - 2) {
 						input.Z.lastKeyState = true;
@@ -275,25 +295,25 @@ public class NewDialogue {
 				}
 			}
 			else if (this.simpleQuestionFlag && !this.nextFlag && !this.scrollFlag) {
-				//Making sure this doesn't trigger the "Next" arrow.
+				// Making sure this doesn't trigger the "Next" arrow.
 				this.nextFlag = false;
 				
 				if ((this.input.up.keyStateDown && !this.input.up.lastKeyState) || (this.input.W.keyStateDown && !this.input.W.lastKeyState)) {
 					this.input.up.lastKeyState = true;
 					this.input.W.lastKeyState = true;
-					//Made it consistent with Inventory's menu selection, where it doesn't wrap around.
+					// Made it consistent with Inventory's menu selection, where it doesn't wrap around.
 					this.yesNoCursorPosition = !this.yesNoCursorPosition;
 				}
 				else if ((this.input.down.keyStateDown && !this.input.down.lastKeyState) || (this.input.S.keyStateDown && !this.input.S.lastKeyState)) {
 					this.input.down.lastKeyState = true;
 					this.input.S.lastKeyState = true;
-					//Made it consistent with Inventory's menu selection, where it doesn't wrap around.
+					// Made it consistent with Inventory's menu selection, where it doesn't wrap around.
 					this.yesNoCursorPosition = !this.yesNoCursorPosition;
 				}
 				if ((this.input.Z.keyStateDown && !this.input.Z.lastKeyState) || (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
 					this.input.Z.lastKeyState = true;
 					this.input.SLASH.lastKeyState = true;
-					//The answer to simple questions have already been set by UP and DOWN.
+					// The answer to simple questions have already been set by UP and DOWN.
 					this.yesNoAnswerFlag = this.yesNoCursorPosition;
 					this.simpleQuestionFlag = false;
 					this.closeDialog();
@@ -301,7 +321,7 @@ public class NewDialogue {
 				else if ((this.input.X.keyStateDown && !this.input.X.lastKeyState) || (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
 					this.input.X.lastKeyState = true;
 					this.input.PERIOD.lastKeyState = true;
-					//Always negative for cancel button.
+					// Always negative for cancel button.
 					this.yesNoAnswerFlag = false;
 					this.yesNoCursorPosition = false;
 					this.simpleQuestionFlag = false;
@@ -325,7 +345,7 @@ public class NewDialogue {
 							this.scrollFlag = true;
 							break;
 						case DIALOGUE_QUESTION:
-							//Must get to the end of the entire dialogue before asking questions.
+							// Must get to the end of the entire dialogue before asking questions.
 							this.simpleQuestionFlag = false;
 							this.nextFlag = false;
 							this.scrollFlag = true;
@@ -453,15 +473,17 @@ public class NewDialogue {
 		return new NewDialogue(MainComponent.getMainInput());
 	}
 	
-	public static NewDialogue createText(String dialogue, int length, int type) {
+	public static NewDialogue createText(String dialogue, int length, int type, boolean lock) {
 		NewDialogue dialogues = new NewDialogue(MainComponent.getMainInput());
 		dialogues.lines = toLines(dialogue, length);
 		dialogues.lineLength = length;
 		dialogues.totalDialogueLength = dialogue.length();
 		dialogues.type = type;
 		dialogues.showDialog = true;
-		if (!Player.isMovementsLocked())
-			Player.lockMovements();
+		if (lock) {
+			if (!Player.isMovementsLocked())
+				Player.lockMovements();
+		}
 		return dialogues;
 	}
 	
