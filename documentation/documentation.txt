@@ -498,7 +498,8 @@ not assume their information to be permanent.
 			R: 00 - Small Tree
 			R: 01 - Pile of Wooden Logs
 			R: 02 - Planks
-			R: 03 - Scaffolding (Wide)
+			R: 03 - Scaffolding (Left)
+			R: 04 - Scaffolding (Right)
 		Tile Specific ID:
 			G: None specified.
 			B: None specified.
