@@ -214,7 +214,39 @@ public class Player extends Entity {
 	 * */
 	public void interact(int dataColor) {
 		int alpha = (dataColor >> 24) & 0xFF;
+		int red = (dataColor >> 16) & 0xFF;
 		switch (alpha) {
+			//TODO: Merge "Signs" with "Obstacles", as they now have similar functions.
+			case 0x03: {// Obstacles
+				switch (red) {
+					case 0x00: // Small tree
+						break;
+					case 0x01:
+					case 0x02:
+					case 0x03:
+					case 0x04:
+						if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
+							this.enableInteraction = false;
+							if (Player.isMovementsLocked())
+								Player.unlockMovements();
+							break;
+						}
+						if (!movementLock) {
+							if (this.interactionID != 0) {
+								this.enableInteraction = false;
+								return;
+							}
+							if (!this.enableInteraction)
+								this.enableInteraction = true;
+						}
+						// }
+						if (this.enableInteraction) {
+							this.interactionID = dataColor;
+						}
+						break;
+				}
+				break;
+			}
 			case 0x08: {// Sign
 				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 					this.enableInteraction = false;
@@ -222,9 +254,6 @@ public class Player extends Entity {
 						Player.unlockMovements();
 					break;
 				}
-				// if ((this.keys.Z.isTappedDown || this.keys.SLASH.isTappedDown || this.keys.Z.isPressedDown || this.keys.SLASH.isPressedDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-				// this.keys.Z.lastKeyState = true;
-				// this.keys.SLASH.lastKeyState = true;
 				if (!movementLock) {
 					if (this.interactionID != 0) {
 						this.enableInteraction = false;

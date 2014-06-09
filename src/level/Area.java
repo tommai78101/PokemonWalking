@@ -12,6 +12,7 @@ package level;
 
 import java.util.ArrayList;
 
+import obstacle.Obstacle;
 import screen.BaseBitmap;
 import screen.BaseScreen;
 import abstracts.Tile;
@@ -37,6 +38,7 @@ public class Area {
 	private boolean displayExitArrow;
 	
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
+	private final ArrayList<Obstacle> areaObstacles = new ArrayList<Obstacle>();
 	private final ArrayList<PixelData> modifiedAreaData = new ArrayList<PixelData>();
 	
 	public Area(BaseBitmap bitmap, final int areaID) {
@@ -53,6 +55,9 @@ public class Area {
 			for (int x = 0; x < this.width; x++) {
 				int pixel = this.pixels[y * this.width + x];
 				PixelData px = new PixelData(pixel, x, y);
+				int alpha =(pixel >> 24) & 0xFF; 
+				if (alpha == 0x03)
+					areaObstacles.add(new Obstacle(px, (pixel >> 16) & 0xFF));
 				areaData.get(y).add(px);
 			}
 		}
@@ -84,17 +89,7 @@ public class Area {
 				yPlayerPosition = player.getYInArea();
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
-				
-				// try {
-				// Up, Down, Left, Right
-				// TODO: Fix player facing. Interactions need player facing. Else, it's wonky.
-				
-				// Not sure why there has to be two instances of the same method call.
 				this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
-				// }
-				// catch (Exception e) {
-				// this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
-				// }
 				try {
 					if (this.player.isInteracting()) {
 						switch (this.player.getFacing()) {
@@ -322,7 +317,25 @@ public class Area {
 					}
 					break;
 				}
-				case 0x03: // Small tree
+				case 0x03: // Obstacle
+					switch (red){
+						case 0x00: //Small tree
+							return true;
+						case 0x01: //Logs
+						case 0x02: //Planks
+						case 0x03: //Scaffolding
+						case 0x04: //Scaffolding
+							if (this.player.isInteracting())
+								return true;
+							if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
+								if ((player.keys.Z.keyStateDown || player.keys.SLASH.keyStateDown) && (!player.keys.Z.lastKeyState || !player.keys.SLASH.lastKeyState)) {
+									this.player.startInteraction();
+									player.keys.Z.lastKeyState = true;
+									player.keys.SLASH.lastKeyState = true;
+								}
+							}
+							return true;
+					}
 					return true;
 				case 0x04: // Warp point
 					return false;
@@ -582,6 +595,10 @@ public class Area {
 	
 	public boolean isDisplayingExitArrow() {
 		return this.displayExitArrow;
+	}
+	
+	public ArrayList<Obstacle> getObstaclesList(){
+		return this.areaObstacles;
 	}
 	
 	// --------------------- PRIVATE METHODS ----------------------

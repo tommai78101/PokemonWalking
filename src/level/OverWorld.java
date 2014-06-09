@@ -10,10 +10,14 @@
 
 package level;
 
+import java.util.ArrayList;
+
+import obstacle.Obstacle;
 import screen.BaseScreen;
 import abstracts.Tile;
 import abstracts.World;
 import dialogue.Dialogue;
+import dialogue.NewDialogue;
 import entity.Player;
 
 public class OverWorld extends World {
@@ -21,6 +25,7 @@ public class OverWorld extends World {
 	private boolean invertBitmapColors;
 	private int currentAreaSectorID;
 	private Dialogue dialogue;
+	private NewDialogue newDialogue;
 	
 	/**
 	 * Initializes the overworld in the game.
@@ -57,6 +62,7 @@ public class OverWorld extends World {
 		
 		// Dialogue
 		this.dialogue = dialogue;
+		this.newDialogue = null;
 	}
 	
 	// Will add this in the future. Currently, the only entity is Player.
@@ -121,7 +127,21 @@ public class OverWorld extends World {
 		}
 		else if (this.player.isInteracting() && this.player.getInteractionID() != 0) {
 			int alpha = (player.getInteractionID() >> 24) & 0xFF;
+			int red = (player.getInteractionID() >> 16) & 0xFF;
 			switch (alpha) {
+				//TODO: Merge "Signs" with "Obstacles", as they now have similar functions.
+				case 0x03: {//Obstacles
+					ArrayList<Obstacle> list = this.currentArea.getObstaclesList();
+					OBSTACLE_LOOP:
+						for (int i = 0; i < list.size(); i++){
+							Obstacle obstacle = list.get(i);
+							if (obstacle.getID() != red)
+								continue;
+							this.newDialogue = obstacle.getDialogue();
+							break OBSTACLE_LOOP;
+						}
+					break;
+				}
 				case 0x08: {// Sign
 					if (!dialogue.isDisplayingDialogue()) {
 						dialogue.createText(alpha, this.player.getInteractionID() & 0xFFFF);
@@ -157,6 +177,17 @@ public class OverWorld extends World {
 				}
 			}
 			
+		}
+		
+		if (this.newDialogue != null){
+			if (this.newDialogue.isDialogueTextSet() && !this.newDialogue.isDialogueCompleted()){
+				Player.lockMovements();
+				this.newDialogue.tick();
+			}
+			if (this.newDialogue.isDialogueCompleted()){
+				Player.unlockMovements();
+				this.newDialogue = null;
+			}
 		}
 		
 	}
@@ -235,6 +266,9 @@ public class OverWorld extends World {
 		
 		if (screen.getRenderingEffectTick() < (byte) 0x4 || screen.getRenderingEffectTick() >= (byte) 0x7)
 			player.render(screen, 0, 0);
+		
+		if (this.newDialogue != null)
+			this.newDialogue.render(screen, screen.getBufferedImage().createGraphics());
 	}
 	
 	// private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {

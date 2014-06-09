@@ -142,7 +142,8 @@ public class Art {
 	public static BaseBitmap smallTree;
 	public static BaseBitmap logs;
 	public static BaseBitmap planks;
-	public static BaseBitmap scaffolding_wide;
+	public static BaseBitmap scaffolding_left;
+	public static BaseBitmap scaffolding_right;
 	
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Player (Entities)
@@ -273,7 +274,8 @@ public class Art {
 		// Obstacle
 		logs = screen.load("art/obstacle/logs.png");
 		planks = screen.load("art/obstacle/planks.png");
-		scaffolding_wide = screen.load("art/obstacle/scaffolding.png");
+		scaffolding_left= screen.load("art/obstacle/scaffolding_left.png");
+		scaffolding_right= screen.load("art/obstacle/scaffolding_right.png");
 		smallTree = screen.load("art/obstacle/small_tree.png");
 		
 		// Player, NPCs

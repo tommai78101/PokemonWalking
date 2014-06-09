@@ -12,13 +12,12 @@
 
 % Empty % 00 % 00 % 00 %00 % res/art/editor/no_png.png
 -
-% Path_[Grass] % 01 % 00 % * % @ % res/art/floor/grass.png 
-% Path_[Dirt] % 01 % 01 % * % @ % res/art/floor/mt_ground.png
-% Path_[Road] % 01 % 02 % * % @ % res/art/floor/path.png
-% Floor_[Carpet Indoors] % 01 % 03 % * % @ % res/art/floor/carpet_indoors.png
-% Floor_[Carpet Outdoors] % 01 % 04 % * % @ % res/art/floor/carpet_outdoors.png
-% Floor_[Hardwood Indoors] % 01 % 05 % * % @ % res/art/floor/hardwood_indoors.png
-% Floor_[Tatami Indoors] % 01 % 06 % * % @ % res/art/floor/tatami_indoors.png
+% Path_[Grass] % 01 % 00 % @ % @ % res/art/floor/grass.png 
+% Path_[Dirt] % 01 % 01 % @ % @ % res/art/floor/mt_ground.png
+% Path_[Road] % 01 % 02 % @ % @ % res/art/floor/path.png
+% Floor_[Hardwood_Indoors] % 01 % 03 % @ % @ % res/art/floor/hardwood_indoors.png
+% Floor_[Tatami_Indoors_Type_1] % 01 % 04 % @ % @ % res/art/floor/tatami_1_indoors.png
+% Floor_[Tatami_Indoors_Type_2] % 01 % 05 % @ % @ % res/art/floor/tatami_2_indoors.png
 -
 % Ledge % 02 % 00 % * % @ % res/art/ledge/ledge_bottom.png
 % Ledge % 02 % 01 % * % @ % res/art/ledge/ledge_bottom_left.png
@@ -39,6 +38,10 @@
 % Ledge_[Mountain] % 02 % 0F % * % @ % res/art/ledge/ledge_mt_bottom_right.png
 -
 % Tree_[Small] % 03 % 00 % 00 % 00 % res/art/obstacle/small_tree.png
+% Logs % 03 % 01 % 00 % 00 % res/art/obstacle/logs.png
+% Planks % 03 % 02 % 00 % 00 % res/art/obstacle/planks.png
+% Scaffolding_[Left] % 03 % 03 % 00 % 00 % res/art/obstacle/scaffolding_left.png
+% Scaffolding_[Right] % 03 % 04 % 00 % 00 % res/art/obstacle/scaffolding_right.png
 -
 % ForestEntrance % 04 % @ % @ % @ % res/art/floor/forestEntrance.png
 -
@@ -77,3 +80,6 @@
 % Door % 0A % @ % @ % @ % res/art/house/house_door.png
 -
 % Item % 0B % @ % @ % @ % res/art/object/item.png
+-
+% Carpet_[Indoors] % 0C % 00 % @ % @ % res/art/floor/carpet_indoors.png
+% Carpet_[Outdoors] % 0C % 01 % @ % @ % res/art/floor/carpet_outdoors.png

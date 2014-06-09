@@ -169,7 +169,7 @@ public class PixelData {
 					case 0x07: // Bottom Right
 						this.bitmap[0] = Art.ledge_bottom_right;
 						break;
-					// ---------------------------------------------------------
+						// ---------------------------------------------------------
 					case 0x08:
 						this.bitmap[0] = Art.ledge_mt_bottom;
 						break;
@@ -221,9 +221,25 @@ public class PixelData {
 				}
 				break;
 			}
-			case 0x03: // Small tree
+			case 0x03: // Obstacles
 				this.bitmap = new BaseBitmap[1];
-				this.bitmap[0] = Art.smallTree;
+				switch (red){
+					case 0x00: //Small Tree
+						this.bitmap[0] = Art.smallTree;
+						break;
+					case 0x01: //Logs
+						this.bitmap[0] = Art.logs;
+						break;
+					case 0x02: //Planks
+						this.bitmap[0] = Art.planks;
+						break;
+					case 0x03: //Scaffolding (Left)
+						this.bitmap[0] = Art.scaffolding_left;
+						break;
+					case 0x04: //Scaffolding (Right)
+						this.bitmap[0] = Art.scaffolding_right;
+						break;
+				}
 				break;
 			case 0x04: // Warp point (Refer to documentation for flaws.)
 				this.bitmap = new BaseBitmap[1];
@@ -393,7 +409,7 @@ public class PixelData {
 				break;
 			case 0x02: // Ledges
 				break;
-			case 0x03: // Trees
+			case 0x03: // Obstacles
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x04: // Warp Point
