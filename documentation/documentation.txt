@@ -52,7 +52,8 @@ Metadata...........................[PWD04]
 		House......................[PWD04#03@08]
 		House Door.................[PWD04#03@09]
 		Items......................[PWD04#03@10]
-Player.............................[PWD05]
+Entities...........................[PWD05]
+	Player.........................[PWD05#01]
 Controls...........................[PWD06]
 	Walking Algorithm..............[PWD06#01]
 File Format........................[PWD07]
@@ -702,6 +703,105 @@ not assume their information to be permanent.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
+		Carpet (Indoors) [PWD04#03@11]
+
+		Tile ID:
+			A: 0C - Carpet (Indoors)
+		Extended Tile ID:
+			R: AA - Target Area ID.
+		Tile Specific ID:
+			G: XX - Target X position.
+			B: YY - Target Y position.
+		Full Data(s):
+			0C AA XX YY
+		Description:
+
+		Acts similar to Warp Points, the only difference is that when the player 
+		is stepping on the carpet, an exit arrow will be displayed, telling the
+		player where the exit is, and where the player should go in order to exit.
+
+		Upon exiting, the player will walk out the exit.
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		Carpet (Outdoors) [PWD04#03@12]
+
+		Tile ID:
+			A: 0D - Carpet (Outdoors)
+		Extended Tile ID:
+			R: AA - Target Area ID.
+		Tile Specific ID:
+			G: XX - Target X position.
+			B: YY - Target Y position.
+		Full Data(s):
+			0D AA XX YY
+		Description:
+
+		Acts similar to Warp Points, the only difference is that when the player 
+		is stepping on the carpet, an entrance arrow will be displayed, telling the
+		player where the entrance is, and where the player should go in order to 
+		enter.
+
+		Upon entering, the player will walk into the entrance before warping, and 
+		then stand still at the extrance.
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+-------------------------------
+
+		Triggers [PWD04#03@13]
+
+		Tile ID:
+			A: 0E - Triggers
+		Extended Tile ID;
+			R: XX - Any one of all available bitmaps
+		Tile Specific ID:
+			G: GG - Script ID
+			B: BB - Script ID
+		Description:
+			Depending on how it was triggered, this tile will trigger a scripted
+			event matching the script ID.
+
+			The bitmap value determines what tile bitmap this trigger will use
+			when it is displayed on the screen. Depending on the bitmap tile
+			value, it can either be stepped on, or is blocking the player.
+
+			If the player steps on this tile, or if the player interacts with this
+			tile, it will start triggering.
+
+
+NEW PLAN:
+
+	Rewrite Level Editor.
+	I mean, really rewrite level editor. Risk must be taken. Waste lots of resources.
+	Must relearn Swing and how to get things right.
+
+	Needs to incorporate triggers, NPCs, and pixel data.
+	
+	Triggers are a necessity.
+	NPCs are a necessity.
+
+	In short, a rewrite.
+
+-----------
+
+	After rewrite, rewrite loading area maps.
+
+-----------
+	Finally, implement triggers and NPCs.
+	
+	
+
+
+
+
+
+
+
+
+
+-------------------------------
+
 		NPCs
 		
 		* Don't know how they are to be placed on a map.
@@ -710,17 +810,104 @@ not assume their information to be permanent.
 			
 -------------------------------
 
-Player [PWD05]
+	Entities [PWD05]
+	
+	Entities are animated beings in the game, and they
+	represent how life-like the game is going to look
+	when the players play the game.
+	
+	In order to make entites be animated, it must
+	conform to a specific set of rules to follow. These
+	rules, when set in place, will allow the entities
+	to move freely and possibly provide interactions
+	and feedback based on movements to the players.
+	
+	The set of rules are created using a scripting
+	language syntax, read from a file. Not only this
+	provides easier modifications, but also allow the
+	possibility to extend implementations for future
+	versions.
+	
+	The set of rules are given in the following list:
+	
+	Directions:
+	1.		U: Up. Makes the entity face up.
+	2.		D: Down. Makes the entity face down.
+	3.		L: Left. Same as above for left.
+	4.		R: Right. Same as above for right.
+	
+	Syntax:	<Direction> + #: How many steps the entity
+				should take. The number must be positive
+				and unsigned, ranging from 0 to 9.
+				0 represents turning around. Anything
+				above 0 represents steps the entity
+				should take until it is out of the screen.
+	Syntax: <Direction> + # + <Same Direction> + # + ...:
+				The entity will continue to walk in the
+				given direction until otherwise. This is
+				used mostly in cinematics where the
+				entity leads the players to some place far
+				from where the players are standing before
+				the interaction.
+				
+	Dialogues:
+	5.		@: Dialogue. Makes tne entity interact with
+				another entity.
 
-Currently, the Player is represented as "Joe," a 
-character that appeared in the 2nd generation 
-Pokémon games, Gold, Silver, and Crystal versions.
+	Syntax: @ + #: What dialogue should the entity use to
+				interact. The number indicates the
+				dialogue ID number, specifying what dialogue
+				to use.
+			@ + # + & + # + & + ...: What multiple dialogues
+				should the entity use to interact. The 
+				ampersand ('&') represents concatenation of
+				multiple dialogues, interacted in a way that
+				makes the entity tell something that one or
+				two dialogues aren't enough to finish.
+			@ + # + ?: What dialogue the entity should ask.
+				The number specifies the dialogue. The
+				question mark represents the dialogue type
+				is a question, and the answers are either
+				'Yes' or 'No'.
+			@ + # + ? + [...]: What dialogue the entity should
+				ask. Similar to above, but this provides
+				multiple, custom answers. To be implemented.
+			@ + # + !: What dialogue is used for the entity to
+				alert about. Usually used for specific story
+				plot events, or other player actions only.
+				The exclamation mark represents the dialogue
+				type is an alert, therefore the text being
+				displayed should be slow and meaningful, mostly
+				never more than 2 lines.
+	
+	Note that all of the syntaxes may be changed in
+	the future.
+	
+	6.		$ + #: Script header. Tells the game that this is
+				the	start of the script. The number indicates
+				the script ID. This allows multiple entities
+				to use the same script multiple times.
+	7.		%: Script delimiter. The script has ended.
+	8.		/: Comments.
+	9.		^: Movement header. Tells the game that this is
+				the start of movement scripts. One entire
+				line of infinite movements counts as one 
+				movement script. Adding a newline ends the 
+				movement script.
+	
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+		
+	Player [PWD05#01]
 
-The character design and artwork were done by hand,
-and they are merely placeholder art.
-
-The player can access their Inventory via the start
-menu by pressing START key.
+	Currently, the Player is represented as "Joe," a 
+	character that designed in the 2nd generation 
+	Pokémon games, Gold, Silver, and Crystal versions.
+	
+	The character design and artwork were done by hand,
+	and they are merely placeholder art.
+	
+	The player can access their Inventory via the start
+	menu by pressing START key.
 
 -------------------------------
 

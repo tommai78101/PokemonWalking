@@ -1,0 +1,10 @@
+/ Automation
+/
+/ Entities that can walk, or run, must be required to have movements for the game
+/ to feel lively.
+
+
+/ Turn clockwise in a circle.
+$1
+^U0R0D0L0
+%

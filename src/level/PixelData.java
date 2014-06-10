@@ -45,7 +45,8 @@ public class PixelData {
 	private int targetSector;
 	private int groundHeight;
 	
-	// private int parentArea;
+	private boolean triggerFlag;
+	private int targetMovementScriptID;
 	
 	public PixelData(int pixel, int x, int y) {
 		this.xPosition = x;
@@ -56,6 +57,8 @@ public class PixelData {
 		this.groundHeight = 0; // Default
 		this.bitmapTick = 0;
 		this.biomeBitmapTick = 0;
+		this.triggerFlag = false;
+		this.targetMovementScriptID = 0;
 		
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
@@ -64,6 +67,22 @@ public class PixelData {
 		
 		setProperties(alpha, red, green, blue);
 		prepareBitmap(alpha, red, green, blue);
+	}
+	
+	public void enableTrigger() {
+		this.triggerFlag = true;
+	}
+	
+	public void disableTrigger() {
+		this.triggerFlag = false;
+	}
+	
+	public boolean hasTriggerEvent() {
+		return this.triggerFlag;
+	}
+	
+	public int getTargetScriptID() {
+		return this.targetMovementScriptID;
 	}
 	
 	public void disableWarpZone() {
