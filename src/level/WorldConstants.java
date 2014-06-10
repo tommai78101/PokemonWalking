@@ -57,9 +57,6 @@ public class WorldConstants {
 	// Items
 	public static HashMap<Integer, ItemText> items = Item.loadItemResources("item/items.txt");
 	
-	// Mod Area IDs;
-	
-	
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
 	

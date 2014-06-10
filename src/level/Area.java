@@ -318,13 +318,7 @@ public class Area {
 				}
 				case 0x03: // Obstacle
 					switch (red){
-						case 0x00: //Small tree
-							return true;
-						case 0x01: //Logs
-						case 0x02: //Planks
-						case 0x03: //Scaffolding
-						case 0x04: //Scaffolding
-						case 0x05:
+						default:
 							if (this.player.isInteracting())
 								return true;
 							if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
@@ -336,7 +330,6 @@ public class Area {
 							}
 							return true;
 					}
-					return true;
 				case 0x04: // Warp point
 					return false;
 				case 0x05: // Area Connection point.

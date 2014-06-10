@@ -366,7 +366,7 @@ public class NewDialogue {
 				}
 			}
 			else {
-				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || ((input.SLASH.keyStateDown) && !input.SLASH.lastKeyState)
+				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)) || (input.SLASH.keyStateDown && !(input.SLASH.lastKeyState))
 						|| (input.X.keyStateDown && !(input.X.lastKeyState)) || (input.PERIOD.keyStateDown && !(input.PERIOD.lastKeyState))) {
 					input.Z.lastKeyState = true;
 					input.SLASH.lastKeyState = true;

@@ -219,13 +219,13 @@ public class Player extends Entity {
 			//TODO: Merge "Signs" with "Obstacles", as they now have similar functions.
 			case 0x03: {// Obstacles
 				switch (red) {
-					case 0x00: // Small tree
-						break;
-					case 0x01: //Logs
-					case 0x02: //Planks
-					case 0x03: //Scaffolding Left
-					case 0x04: //Scaffolding Right
-					case 0x05: //Sign
+					default:
+						//					case 0x00: // Small tree
+						//					case 0x01: //Logs
+						//					case 0x02: //Planks
+						//					case 0x03: //Scaffolding Left
+						//					case 0x04: //Scaffolding Right
+						//					case 0x05: //Sign
 						if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 							this.enableInteraction = false;
 							if (Player.isMovementsLocked())
