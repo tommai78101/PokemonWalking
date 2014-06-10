@@ -43,6 +43,9 @@
 % Scaffolding_[Left] % 03 % 03 % 00 % 00 % res/art/obstacle/scaffolding_left.png
 % Scaffolding_[Right] % 03 % 04 % 00 % 00 % res/art/obstacle/scaffolding_right.png
 % Sign % 03 % 05 % @ % @ % res/art/obstacle/sign.png
+% Workbench_[Left] % 03 % 06 % @ % @ % res/art/obstacle/workbench_left.png
+% Workbench_[Right] % 03 % 07 % @ % @ % res/art/obstacle/workbench_right.png
+% Small_Dead_Tree % 03 % 08 % @ % @ % res/art/obstacle/dead_small_tree.png
 -
 % ForestEntrance % 04 % @ % @ % @ % res/art/floor/forestEntrance.png
 -

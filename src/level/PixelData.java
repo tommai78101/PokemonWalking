@@ -242,6 +242,15 @@ public class PixelData {
 					case 0x05: //Sign
 						this.bitmap[0] = Art.sign;
 						break;
+					case 0x06: //Workbench Left
+						this.bitmap[0] = Art.workbench_left;
+						break;
+					case 0x07: //Workbench Right
+						this.bitmap[0] = Art.workbench_right;
+						break;
+					case 0x08: //Dead small tree
+						this.bitmap[0] = Art.deadSmallTree;
+						break;
 				}
 				break;
 			case 0x04: // Warp point (Refer to documentation for flaws.)
