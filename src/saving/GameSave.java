@@ -1,3 +1,13 @@
+/**
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
+ * */
+
 package saving;
 
 import item.ActionItem;
@@ -262,20 +272,20 @@ public class GameSave {
 				offset+=4;
 				
 				LOADED_AREA:
-				for (Area area: loadedAreas){
-					if (areaID == area.getAreaID()){
-						int xPixelData = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
-						offset+=4;
-						int yPixelData = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
-						offset+=4;
-						int color = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
-						
-						PixelData pxData = new PixelData(color	, xPixelData, yPixelData);
-						area.getModifiedPixelDataList().add(pxData);
-						area.loadModifiedPixelDataList();
-						break LOADED_AREA;
+					for (Area area: loadedAreas){
+						if (areaID == area.getAreaID()){
+							int xPixelData = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
+							offset+=4;
+							int yPixelData = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
+							offset+=4;
+							int color = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
+							
+							PixelData pxData = new PixelData(color	, xPixelData, yPixelData);
+							area.getModifiedPixelDataList().add(pxData);
+							area.loadModifiedPixelDataList();
+							break LOADED_AREA;
+						}
 					}
-				}
 			}
 			game.getWorld().refresh();
 		}

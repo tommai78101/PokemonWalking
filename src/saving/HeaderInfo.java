@@ -1,3 +1,13 @@
+/**
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
+ * */
+
 package saving;
 
 import java.io.IOException;
@@ -46,16 +56,16 @@ public class HeaderInfo extends ChunkInfo {
 						throw new IOException("Unable to determine version.");
 				}
 			}
-			ID_CHECK: for (int i = 0; i < header_id.length; i++) {
-				if (header_id[i] != info[i+header_version.length]) {
-					if (olderVersion) {
-						new RuntimeException("Incorrect header id signature. Attempting to update.").printStackTrace();
-						break ID_CHECK;
-					}
-					else
-						throw new RuntimeException("Unknown header id signature.");
+		ID_CHECK: for (int i = 0; i < header_id.length; i++) {
+			if (header_id[i] != info[i+header_version.length]) {
+				if (olderVersion) {
+					new RuntimeException("Incorrect header id signature. Attempting to update.").printStackTrace();
+					break ID_CHECK;
 				}
+				else
+					throw new RuntimeException("Unknown header id signature.");
 			}
+		}
 			for (int k = 0; k < header_format.length; k++) {
 				if (header_format[k] != info[k + header_id.length + header_version.length]) { throw new RuntimeException("Incorrect header code signature."); }
 			}

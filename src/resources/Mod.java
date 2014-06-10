@@ -1,3 +1,13 @@
+/**
+ * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * 
+ * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
+ * 
+ * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
+ * 
+ * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
+ * */
+
 package resources;
 
 import java.io.BufferedWriter;
@@ -18,7 +28,7 @@ public class Mod {
 	private static final String[] names = new String[] { "area" };
 	public static List<Map.Entry<BaseBitmap, Integer>> moddedAreas = new ArrayList<Map.Entry<BaseBitmap, Integer>>();
 	private static boolean hasLoaded = false;
-
+	
 	private static Comparator<File> ALPHABETICAL_ORDER = new Comparator<File>() {
 		@Override
 		public int compare(File file1, File file2) {
@@ -32,7 +42,7 @@ public class Mod {
 	public static void resetLoading(){
 		Mod.hasLoaded = false;
 	}
-
+	
 	public static void loadModdedResources(BaseScreen screen) {
 		if (Mod.hasLoaded)
 			return;
@@ -51,13 +61,13 @@ public class Mod {
 			throw new RuntimeException("Something is wrong with detecting the mod folder.");
 		Mod.hasLoaded = true;
 	}
-
+	
 	private static void initialization() {
 		File directory = new File("mod");
 		if (!directory.exists())
 			directory.mkdir();
 		if (directory.exists()) {
-
+			
 			for (int namesIterator = 0; namesIterator < names.length; namesIterator++) {
 				File folder = new File(directory.getPath() + File.separator + names[namesIterator]);
 				if (!folder.exists())
@@ -132,7 +142,7 @@ public class Mod {
 			}
 		}
 	}
-
+	
 	private static List<File> getContents(File file) {
 		List<File> results = new ArrayList<File>();
 		if (file.exists()) {
@@ -154,7 +164,7 @@ public class Mod {
 		}
 		return results;
 	}
-
+	
 	@SuppressWarnings("unused")
 	private static int getFilesCount(File file) {
 		File[] files = file.listFiles();
