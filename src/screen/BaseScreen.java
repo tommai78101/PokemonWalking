@@ -29,7 +29,8 @@ public class BaseScreen extends BaseBitmap {
 	protected int yOffset;
 	
 	private byte tick = 0x7;
-	//private boolean cutScreen;
+	
+	// private boolean cutScreen;
 	
 	public BaseScreen(int w, int h) {
 		super(w, h);
@@ -213,7 +214,6 @@ public class BaseScreen extends BaseBitmap {
 		return this.tick;
 	}
 	
-	
 	// -------------------------------------------
 	// Private methods
 	
@@ -263,7 +263,7 @@ public class BaseScreen extends BaseBitmap {
 		return color;
 	}
 	
-	public void reload(){
+	public void reload() {
 		this.tick = 0x7;
 	}
 	

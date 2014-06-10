@@ -169,7 +169,7 @@ public class PixelData {
 					case 0x07: // Bottom Right
 						this.bitmap[0] = Art.ledge_bottom_right;
 						break;
-						// ---------------------------------------------------------
+					// ---------------------------------------------------------
 					case 0x08:
 						this.bitmap[0] = Art.ledge_mt_bottom;
 						break;
@@ -223,32 +223,32 @@ public class PixelData {
 			}
 			case 0x03: // Obstacles
 				this.bitmap = new BaseBitmap[1];
-				switch (red){
-					case 0x00: //Small Tree
+				switch (red) {
+					case 0x00: // Small Tree
 						this.bitmap[0] = Art.smallTree;
 						break;
-					case 0x01: //Logs
+					case 0x01: // Logs
 						this.bitmap[0] = Art.logs;
 						break;
-					case 0x02: //Planks
+					case 0x02: // Planks
 						this.bitmap[0] = Art.planks;
 						break;
-					case 0x03: //Scaffolding (Left)
+					case 0x03: // Scaffolding (Left)
 						this.bitmap[0] = Art.scaffolding_left;
 						break;
-					case 0x04: //Scaffolding (Right)
+					case 0x04: // Scaffolding (Right)
 						this.bitmap[0] = Art.scaffolding_right;
 						break;
-					case 0x05: //Sign
+					case 0x05: // Sign
 						this.bitmap[0] = Art.sign;
 						break;
-					case 0x06: //Workbench Left
+					case 0x06: // Workbench Left
 						this.bitmap[0] = Art.workbench_left;
 						break;
-					case 0x07: //Workbench Right
+					case 0x07: // Workbench Right
 						this.bitmap[0] = Art.workbench_right;
 						break;
-					case 0x08: //Dead small tree
+					case 0x08: // Dead small tree
 						this.bitmap[0] = Art.deadSmallTree;
 						break;
 				}
@@ -454,8 +454,8 @@ public class PixelData {
 				break;
 			case 0x0B: // Item
 				break;
-			case 0x0C: //Carpets 
-			case 0x0D: //Carpets
+			case 0x0C: // Carpets
+			case 0x0D: // Carpets
 				// FIXME: Level Editor must set target area ID to at least 1 or above.
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				break;

@@ -22,15 +22,15 @@ import main.Keys;
 import screen.BaseScreen;
 
 public abstract class SubMenu {
-
+	
 	protected boolean subMenuActivation;
-
+	
 	private String name;
 	private String enabledDescription;
 	private String disabledDescription;
 	protected Game game;
 	private boolean enabled;
-
+	
 	public SubMenu(String name, String enabled, String disabled, Game game) {
 		this.name = name;
 		this.enabledDescription = enabled;
@@ -38,38 +38,38 @@ public abstract class SubMenu {
 		this.game = game;
 		this.subMenuActivation = false;
 	}
-
+	
 	public boolean isActivated() {
 		return this.subMenuActivation;
 	}
-
+	
 	public void enableSubMenu() {
 		this.subMenuActivation = true;
 	}
-
+	
 	public void disableSubMenu() {
 		this.subMenuActivation = false;
 	}
-
+	
 	public void toggleDescription(boolean value) {
 		this.enabled = value;
 	}
-
+	
 	public String getName() {
 		return this.name;
 	}
-
+	
 	public String getDescription() {
 		if (this.enabled)
 			return this.enabledDescription;
 		else
 			return this.disabledDescription;
 	}
-
+	
 	public byte[] getSubMenuData() {
 		return this.name.getBytes();
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -79,7 +79,7 @@ public abstract class SubMenu {
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
-
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -109,10 +109,10 @@ public abstract class SubMenu {
 			return false;
 		return true;
 	}
-
+	
 	public abstract SubMenu initialize(Keys keys);
-
+	
 	public abstract void tick();
-
+	
 	public abstract void render(BaseScreen output, Graphics graphics);
 }

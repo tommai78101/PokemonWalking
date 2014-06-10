@@ -14,42 +14,47 @@ import screen.BaseBitmap;
 import screen.BaseScreen;
 
 public abstract class Entity extends Tile {
-
+	
+	public static final int UP = 2;
+	public static final int DOWN = 0;
+	public static final int LEFT = 1;
+	public static final int RIGHT = 3;
+	
 	public int id;
-
+	
 	protected int xPosition;
 	protected int yPosition;
-
+	
 	protected int xOffset;
 	protected int yOffset;
-
+	
 	protected BaseBitmap bitmap;
-
+	
 	protected String name;
 	protected Boolean gender;
-
+	
 	public boolean isRemoved;
 	protected byte typeId = 0;
-
+	
 	// public abstract void initialize(BaseWorld world);
-
+	
 	public abstract void tick();
-
+	
 	public abstract void render(BaseScreen screen, int x, int y);
-
+	
 	public int getX() {
 		return xPosition;
 	}
-
+	
 	public int getY() {
 		return yPosition;
 	}
-
+	
 	protected void setPosition(int x, int y) {
 		this.xPosition = x;
 		this.yPosition = y;
 	}
-
+	
 	public byte[] getByteName() {
 		if (name == null)
 			name = "Joe";
@@ -63,11 +68,11 @@ public abstract class Entity extends Tile {
 		}
 		return result;
 	}
-
+	
 	public byte[] getByteGender() {
 		byte[] result = new byte[1];
 		if (gender == null)
-			gender = Boolean.TRUE; //Default gender: Male. False = Female.
+			gender = Boolean.TRUE; // Default gender: Male. False = Female.
 		result[0] = (byte) (gender.booleanValue() ? 0x1 : 0xFF);
 		return result;
 	}

@@ -39,7 +39,7 @@ public class Mod {
 		}
 	};
 	
-	public static void resetLoading(){
+	public static void resetLoading() {
 		Mod.hasLoaded = false;
 	}
 	
@@ -74,7 +74,7 @@ public class Mod {
 					folder.mkdir();
 				if (folder.exists()) {
 					switch (namesIterator) {
-						case 0: {//area
+						case 0: {// area
 							File text = new File(folder.getPath() + File.separator + "readme.txt");
 							BufferedWriter writer = null;
 							try {

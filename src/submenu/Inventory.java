@@ -128,7 +128,7 @@ public class Inventory extends SubMenu {
 					list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 					break;
 				case ACTION: {
-					//Action items must have ID, else it would be a dummy item.
+					// Action items must have ID, else it would be a dummy item.
 					switch (item.getID()) {
 						case WorldConstants.ITEM_BICYCLE:
 							item = new Bicycle(this.game, item.getName(), item.getDescription(), item.getCategory());
@@ -136,7 +136,7 @@ public class Inventory extends SubMenu {
 							list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 							break;
 						default:
-							//Dummy item creation.
+							// Dummy item creation.
 							item.initializeCommands(itemText);
 							list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 							break;
@@ -144,7 +144,7 @@ public class Inventory extends SubMenu {
 					break;
 				}
 				default:
-					//Nothing to see here.
+					// Nothing to see here.
 					break;
 			}
 			
@@ -172,8 +172,7 @@ public class Inventory extends SubMenu {
 	 * Renders the Inventory to the screen.
 	 * 
 	 * <p>
-	 * Note that it doesn't render the {@link screen.BaseScreen#getBufferedImage() BufferedImage} to the actual
-	 * {@link main.MainComponent#getBufferStrategy() BufferStrategy}.
+	 * Note that it doesn't render the {@link screen.BaseScreen#getBufferedImage() BufferedImage} to the actual {@link main.MainComponent#getBufferStrategy() BufferStrategy}.
 	 * 
 	 * @param output
 	 *            The display that is to be rendered.
@@ -183,8 +182,8 @@ public class Inventory extends SubMenu {
 	 * */
 	@Override
 	public void render(BaseScreen output, Graphics graphics) {
-		//WARNING: Due to the way it was rendered, the most direct method of rendering is used.
-		//Do not edit the order or shorten it into multiple calls of private methods, it has been done before, and has made this problem even harder to solve.
+		// WARNING: Due to the way it was rendered, the most direct method of rendering is used.
+		// Do not edit the order or shorten it into multiple calls of private methods, it has been done before, and has made this problem even harder to solve.
 		if (this.subMenuActivation) {
 			switch (this.state) {
 				default: {
@@ -394,13 +393,13 @@ public class Inventory extends SubMenu {
 					this.keys.Z.lastKeyState = true;
 					this.keys.SLASH.lastKeyState = true;
 					
-					//This state is used when the player has selected an item, and wants to do something to the item.
-					//Example, using the item, tossing the item, etc.
+					// This state is used when the player has selected an item, and wants to do something to the item.
+					// Example, using the item, tossing the item, etc.
 					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					Map.Entry<Item, Integer> entry = list.get(itemCursor);
 					if (entry.getKey().getCategory() == null && entry.getValue() == Integer.MAX_VALUE) {
-						//If getCategory() returns null, it is not an item.
-						//Return option.
+						// If getCategory() returns null, it is not an item.
+						// Return option.
 						this.resetCursor();
 						this.subMenuActivation = false;
 						break;
@@ -664,7 +663,7 @@ public class Inventory extends SubMenu {
 				}
 				catch (Exception e) {
 				}
-				//This needs to be separated, else if there's a problem, the latter won't render anything.
+				// This needs to be separated, else if there's a problem, the latter won't render anything.
 				break;
 			}
 			case MENU: {
@@ -681,7 +680,7 @@ public class Inventory extends SubMenu {
 					}
 					catch (Exception e) {
 					}
-					//This needs to be separated, else if there's a problem, the latter won't render anything.
+					// This needs to be separated, else if there's a problem, the latter won't render anything.
 					break;
 				}
 			}
@@ -740,8 +739,7 @@ public class Inventory extends SubMenu {
 	 * Does not draw text for the dialogues.
 	 * 
 	 * @param g
-	 *            The Graphics object that is passed to draw the text messages. It can be a Graphics object that is created from a BufferedImage, or a
-	 *            Graphics object that is created from a BufferStrategy().
+	 *            The Graphics object that is passed to draw the text messages. It can be a Graphics object that is created from a BufferedImage, or a Graphics object that is created from a BufferStrategy().
 	 * 
 	 * @return Nothing.
 	 */
@@ -767,7 +765,7 @@ public class Inventory extends SubMenu {
 					}
 					catch (Exception e) {
 					}
-					//This needs to be separated, else if there's a problem, the latter won't render anything.
+					// This needs to be separated, else if there's a problem, the latter won't render anything.
 					try {
 						Map.Entry<Item, Integer> entry = list.get(itemCursor);
 						ArrayList<Map.Entry<String, Boolean>> tokens = NewDialogue.toLines(entry.getKey().getDescription(), NewDialogue.MAX_STRING_LENGTH);

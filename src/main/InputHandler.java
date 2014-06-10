@@ -48,7 +48,7 @@ public class InputHandler implements KeyListener {
 		
 		mappings.put(keys.START, KeyEvent.VK_ENTER);
 		
-		//Debugging purposes
+		// Debugging purposes
 		mappings.put(keys.F1, KeyEvent.VK_F1);
 		
 	}

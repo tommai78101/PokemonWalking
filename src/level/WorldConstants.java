@@ -19,6 +19,7 @@ import java.util.Map;
 
 import resources.Art;
 import resources.Mod;
+import resources.Movement;
 import screen.BaseBitmap;
 import abstracts.Item;
 import dialogue.NewDialogue;
@@ -59,6 +60,12 @@ public class WorldConstants {
 	
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
+	
+	// Movement
+	public static ArrayList<Map.Entry<Integer, Movement>> scripts = Movement.loadMovement("script/scripts.txt");
+	
+	// All bitmaps
+	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
 	
 	/**
 	 * Returns the area matching the given area ID value.
@@ -122,7 +129,7 @@ public class WorldConstants {
 		}
 		else {
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
-				Map.Entry<BaseBitmap, Integer> entry =Mod.moddedAreas.get(i); 
+				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
 				result.add(new Area(entry.getKey(), entry.getValue()));
 			}
 		}

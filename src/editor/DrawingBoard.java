@@ -33,20 +33,20 @@ import abstracts.Tile;
 public class DrawingBoard extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 	private LevelEditor editor;
-
+	
 	private BufferedImage image;
 	private int[] tiles;
 	private int[] tilesEditorID;
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
-
+	
 	public DrawingBoard(final LevelEditor editor) {
 		super();
 		this.editor = editor;
 		offsetX = offsetY = 0;
 	}
-
+	
 	@Override
 	public void run() {
 		long now, lastTime = System.nanoTime();
@@ -56,12 +56,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 			now = System.nanoTime();
 			unprocessed += (now - lastTime) / nsPerTick;
 			lastTime = now;
-
+			
 			if (unprocessed >= 40.0)
 				unprocessed = 40.0;
 			if (unprocessed <= 0.0)
 				unprocessed = 1.0;
-
+			
 			while (unprocessed >= 1.0) {
 				tick();
 				unprocessed -= 1.0;
@@ -74,7 +74,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			}
 		}
 	}
-
+	
 	@Override
 	public void setSize(int width, int height) {
 		int w = width * Tile.WIDTH;
@@ -87,7 +87,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		this.validate();
 		this.editor.validate();
 	}
-
+	
 	public void setImageSize(int w, int h) {
 		if (w <= 0 || h <= 0)
 			return;
@@ -116,7 +116,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		bitmapWidth = w;
 		bitmapHeight = h;
 	}
-
+	
 	public void newImage() {
 		System.out.println("I have pressed \"NEW\" button. Pop-up should appear soon.");
 		EventQueue.invokeLater(new Runnable() {
@@ -146,7 +146,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			}
 		});
 	}
-
+	
 	public void render() {
 		BufferStrategy bs = this.getBufferStrategy();
 		if (bs == null) {
@@ -161,7 +161,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					break;
 				int w = j % bitmapWidth;
 				int h = j / bitmapWidth;
-
+				
 				Data data = EditorConstants.getInstance().getTileMap().get(tilesEditorID[j]);
 				if (data == null) {
 					break;
@@ -171,7 +171,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					tilesEditorID[j] = 0;
 					continue;
 				}
-
+				
 				Image img = data.image;
 				BufferedImage bimg;
 				if (img instanceof BufferedImage)
@@ -182,7 +182,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					g.drawImage(img, 0, 0, null);
 					g.dispose();
 				}
-
+				
 				Graphics g = this.image.getGraphics();
 				// TODO: Area Type ID must be included.
 				if (data.areaTypeIncluded) {
@@ -207,26 +207,26 @@ public class DrawingBoard extends Canvas implements Runnable {
 				g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 				g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
 				g.dispose();
-
+				
 			}
 		}
-
+		
 		Graphics g = bs.getDrawGraphics();
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-
+		
 		g.translate(-offsetX, -offsetY);
-
+		
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
-
+		
 		if (image != null) {
 			g.drawImage(image, 0, 0, null);
 		}
 		g.dispose();
 		bs.show();
 	}
-
+	
 	private void setBiomeTile(final int toCompare, Graphics g) {
 		switch (toCompare) {
 			case 0x00: // grass
@@ -248,13 +248,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 				break;
 		}
 	}
-
+	
 	public void tick() {
 		if (editor.input.isDragging()) {
 			offsetX = editor.input.dx;
 			offsetY = editor.input.dy;
 		}
-
+		
 		if (editor.input.isDrawing()) {
 			this.mouseOnTileX = offsetX + editor.input.mouseX;
 			if (this.mouseOnTileX < 0)
@@ -277,19 +277,19 @@ public class DrawingBoard extends Canvas implements Runnable {
 			editor.validate();
 		}
 	}
-
+	
 	public void start() {
 		new Thread(this).start();
 	}
-
+	
 	public int getMouseTileX() {
 		return this.mouseOnTileX / Tile.WIDTH;
 	}
-
+	
 	public int getMouseTileY() {
 		return this.mouseOnTileY / Tile.HEIGHT;
 	}
-
+	
 	public BufferedImage getMapImage() {
 		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
@@ -298,7 +298,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		return buffer;
 	}
-
+	
 	public void openMapImage(BufferedImage image) {
 		this.setImageSize(image.getWidth(), image.getHeight());
 		int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
@@ -342,7 +342,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						break;
 				}
 			}
-
+			
 			// for (int i = 0; i< srcTiles.length; i++){
 			// tiles[i] = srcTiles[i];
 			// int alpha = (srcTiles[i] >> 24)&0xFF;

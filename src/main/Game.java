@@ -38,7 +38,6 @@ public class Game {
 	private final Player player;
 	private ActionItem registeredItem;
 	
-	
 	public enum State {
 		GAME, PAUSED, INVENTORY, SAVE
 	};
@@ -132,14 +131,13 @@ public class Game {
 	 * */
 	public void tick() {
 		
-		//Debugging purposes
-		if (this.player.keys.F1.keyStateDown && !(this.player.keys.F1.lastKeyState)){
+		// Debugging purposes
+		if (this.player.keys.F1.keyStateDown && !(this.player.keys.F1.lastKeyState)) {
 			this.player.keys.F1.lastKeyState = true;
 			Mod.resetLoading();
 			this.load();
 		}
-		//End debugging purposes
-		
+		// End debugging purposes
 		
 		switch (this.state) {
 			case GAME: {
@@ -256,7 +254,7 @@ public class Game {
 	
 	public void setRegisteredItem(ActionItem item) {
 		this.registeredItem = item;
-		//TODO: Continue to handle registered item's action event.
+		// TODO: Continue to handle registered item's action event.
 	}
 	
 	public boolean itemHasBeenRegistered(ActionItem item) {

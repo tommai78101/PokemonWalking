@@ -200,7 +200,7 @@ public abstract class Item {
 					itemText.description = line.split("@")[1];
 				}
 				else if (line.startsWith("^")) {
-					//'^' is a special character, therefore, one must use backslashes to get the literal form.
+					// '^' is a special character, therefore, one must use backslashes to get the literal form.
 					String value = line.split("\\^")[1];
 					if (value.equals(TAG_POTIONS)) {
 						itemText.category = Category.POTIONS;

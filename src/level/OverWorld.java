@@ -179,7 +179,7 @@ public class OverWorld extends World {
 						}
 					}).start();
 				}
-				break;
+					break;
 			}
 		}
 		else {
@@ -210,12 +210,12 @@ public class OverWorld extends World {
 				}
 			}
 			else {
-				switch (this.newDialogues[this.newDialoguesIterator].getDialogueType()){
+				switch (this.newDialogues[this.newDialoguesIterator].getDialogueType()) {
 					case NewDialogue.DIALOGUE_SPEECH:
 						if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && this.newDialogues[this.newDialoguesIterator].isScrolling()) {
 							Player.unlockMovements();
 							this.newDialogues[this.newDialoguesIterator].resetDialogue();
-							if (this.newDialoguesIterator < this.newDialogues.length-1) {
+							if (this.newDialoguesIterator < this.newDialogues.length - 1) {
 								this.newDialoguesIterator++;
 								this.handleDialogues();
 							}
@@ -234,14 +234,14 @@ public class OverWorld extends World {
 						}
 						break;
 					case NewDialogue.DIALOGUE_QUESTION:
-						if (!this.newDialogues[this.newDialoguesIterator].yesNoQuestionHasBeenAnswered()){
+						if (!this.newDialogues[this.newDialoguesIterator].yesNoQuestionHasBeenAnswered()) {
 							this.newDialogues[this.newDialoguesIterator].tick();
 							if (!Player.isMovementsLocked())
 								Player.lockMovements();
 						}
 						if (this.newDialogues[this.newDialoguesIterator].getAnswerToSimpleQuestion() == Boolean.TRUE) {
 							this.newDialogues[this.newDialoguesIterator].resetDialogue();
-							if (this.newDialoguesIterator < this.newDialogues.length-1) {
+							if (this.newDialoguesIterator < this.newDialogues.length - 1) {
 								this.newDialoguesIterator++;
 								this.handleDialogues();
 							}

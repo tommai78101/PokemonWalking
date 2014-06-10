@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 public class FileControl extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
-	private String[] tags = new String[]{"New", "Save", "Open"};
+	private String[] tags = new String[] { "New", "Save", "Open" };
 	private LevelEditor editor;
 	HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
 	

@@ -235,7 +235,7 @@ public class Area {
 			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
 		}
 		catch (Exception e) {
-			//This means it is out of the area boundaries.
+			// This means it is out of the area boundaries.
 			data = null;
 		}
 		if (data != null) {
@@ -250,9 +250,9 @@ public class Area {
 				case 0x02: // Ledge
 				{
 					switch (red) {
-						/*
-						 * TODO: Incorporate pixel data facingsBlocked variable to this section. Currently, the facingsBlocked[] variable for each pixel data isn't used.
-						 */
+					/*
+					 * TODO: Incorporate pixel data facingsBlocked variable to this section. Currently, the facingsBlocked[] variable for each pixel data isn't used.
+					 */
 						case 0x00: { // Bottom
 							int y = this.yPlayerPosition + yOffset;
 							if (this.checkIfValuesAreAllowed((this.getTileColor(0, 2) >> 24) & 0xFF, 0x02, 0x03))
@@ -317,7 +317,7 @@ public class Area {
 					break;
 				}
 				case 0x03: // Obstacle
-					switch (red){
+					switch (red) {
 						default:
 							if (this.player.isInteracting())
 								return true;
@@ -445,8 +445,8 @@ public class Area {
 		switch (alpha) {
 			case 0x04: // Warp point
 			case 0x0A: // Door
-			case 0x0C: //Carpet (Indoors)
-			case 0x0D: //Carpet (Outdoors)
+			case 0x0C: // Carpet (Indoors)
+			case 0x0D: // Carpet (Outdoors)
 			{
 				int green = (color >> 8) & 0xFF;
 				int blue = color & 0xFF;
@@ -579,7 +579,7 @@ public class Area {
 		return this.displayExitArrow;
 	}
 	
-	public ArrayList<Obstacle> getObstaclesList(){
+	public ArrayList<Obstacle> getObstaclesList() {
 		return this.areaObstacles;
 	}
 	

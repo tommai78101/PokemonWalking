@@ -25,7 +25,7 @@ public class Obstacle {
 	}
 	
 	public void reset() {
-		//Sets how many dialogues an obstacle can have.
+		// Sets how many dialogues an obstacle can have.
 		switch (id) {
 			case 0x08:
 				this.dialogue = new NewDialogue[3];
@@ -34,7 +34,7 @@ public class Obstacle {
 				this.dialogue = new NewDialogue[1];
 				break;
 		}
-		//Sets the dialogues. Note there there are no error checking here.
+		// Sets the dialogues. Note there there are no error checking here.
 		switch (id) {
 			case 0x00: // Small Tree
 				this.dialogue[0] = NewDialogue.createText("This tree is born from the ground that was created 6 months ago.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, false);

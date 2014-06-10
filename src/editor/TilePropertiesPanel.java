@@ -25,7 +25,7 @@ public class TilePropertiesPanel extends JPanel {
 	public JTextField tileGGIDField;
 	public JTextField tileBBIDField;
 	
-	@SuppressWarnings({"serial"})
+	@SuppressWarnings({ "serial" })
 	public TilePropertiesPanel() {
 		super();
 		

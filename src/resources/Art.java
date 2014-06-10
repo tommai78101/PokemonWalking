@@ -274,8 +274,8 @@ public class Art {
 		// Obstacle
 		logs = screen.load("art/obstacle/logs.png");
 		planks = screen.load("art/obstacle/planks.png");
-		scaffolding_left= screen.load("art/obstacle/scaffolding_left.png");
-		scaffolding_right= screen.load("art/obstacle/scaffolding_right.png");
+		scaffolding_left = screen.load("art/obstacle/scaffolding_left.png");
+		scaffolding_right = screen.load("art/obstacle/scaffolding_right.png");
 		smallTree = screen.load("art/obstacle/small_tree.png");
 		sign = screen.load("art/obstacle/sign.png");
 		workbench_left = screen.load("art/obstacle/workbench_left.png");

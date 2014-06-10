@@ -211,9 +211,9 @@ public class GameSave {
 				for (; offset < data[0]; offset++)
 					name[offset] = data[offset + 0x1];
 				offset++;
-				int id = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
+				int id = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
 				offset += 4;
-				int quantity = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2]<<8) | data[offset + 3];
+				int quantity = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
 				
 				ItemText itemText = WorldConstants.items.get(id);
 				Item item = null;
@@ -235,57 +235,54 @@ public class GameSave {
 			}
 		}
 		
-		
 		// Get current area
 		// TODO: Probably need to set world ID first before setting the current area ID and SECTOR.
-		int currentAreaID = (this.areaInfo.current_area_id[0] & 0xFF)<< 24 | (this.areaInfo.current_area_id[1]&0xFF) << 16 | (this.areaInfo.current_area_id[2]&0xFF) << 8 | (this.areaInfo.current_area_id[3] & 0xFF);
+		int currentAreaID = (this.areaInfo.current_area_id[0] & 0xFF) << 24 | (this.areaInfo.current_area_id[1] & 0xFF) << 16 | (this.areaInfo.current_area_id[2] & 0xFF) << 8 | (this.areaInfo.current_area_id[3] & 0xFF);
 		game.getWorld().setCurrentArea(WorldConstants.convertToArea(game.getWorld().getAllAreas(), currentAreaID));
 		if (game.getWorld().getCurrentArea() == null)
-			throw new Exception ("There is no area set.");
-		int currentSectorID = (this.areaInfo.current_area_sector_id[0]&0xFF) <<24 | (this.areaInfo.current_area_sector_id[1]&0xFF)<<16 | (this.areaInfo.current_area_sector_id[2]&0xFF)<<8 | this.areaInfo.current_area_sector_id[3]&0xFF;
+			throw new Exception("There is no area set.");
+		int currentSectorID = (this.areaInfo.current_area_sector_id[0] & 0xFF) << 24 | (this.areaInfo.current_area_sector_id[1] & 0xFF) << 16 | (this.areaInfo.current_area_sector_id[2] & 0xFF) << 8 | this.areaInfo.current_area_sector_id[3] & 0xFF;
 		game.getWorld().getCurrentArea().setSectorID(currentSectorID);
 		
-		
 		// Get Player Position
-		int x = (this.playerInfo.player_x[0]<<24) | (this.playerInfo.player_x[1]<<16) | (this.playerInfo.player_x[2]<<8) | this.playerInfo.player_x[3];
-		int y = (this.playerInfo.player_y[0]<<24) | (this.playerInfo.player_y[1]<<16) | (this.playerInfo.player_y[2]<<8) | this.playerInfo.player_y[3];
+		int x = (this.playerInfo.player_x[0] << 24) | (this.playerInfo.player_x[1] << 16) | (this.playerInfo.player_x[2] << 8) | this.playerInfo.player_x[3];
+		int y = (this.playerInfo.player_y[0] << 24) | (this.playerInfo.player_y[1] << 16) | (this.playerInfo.player_y[2] << 8) | this.playerInfo.player_y[3];
 		game.getPlayer().setAreaPosition(x, y);
 		game.getWorld().getCurrentArea().setPlayerX(x);
 		game.getWorld().getCurrentArea().setPlayerY(y);
 		game.getWorld().getCurrentArea().setPlayer(game.getPlayer());
 		
 		// Get Player direction facing.
-		int facing = (this.playerInfo.player_facing[0]&0xFF)<<24 | (this.playerInfo.player_facing[1]&0xFF)<<16 | (this.playerInfo.player_facing[2]&0xFF)<<8 | this.playerInfo.player_facing[3]&0xFF;
+		int facing = (this.playerInfo.player_facing[0] & 0xFF) << 24 | (this.playerInfo.player_facing[1] & 0xFF) << 16 | (this.playerInfo.player_facing[2] & 0xFF) << 8 | this.playerInfo.player_facing[3] & 0xFF;
 		game.getPlayer().setFacing(facing);
 		
 		// Get modified pixel data for all areas.
 		if (this.areaInfo.changedPixelData.size() > 0) {
 			List<Area> loadedAreas = game.getWorld().getAllAreas();
-			for (Iterator<byte[]> it = this.areaInfo.changedPixelData.iterator(); it.hasNext();){
+			for (Iterator<byte[]> it = this.areaInfo.changedPixelData.iterator(); it.hasNext();) {
 				byte[] data = it.next();
 				int offset = 0;
-				int areaID = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8| data[offset + 3]&0xFF;
+				int areaID = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 				offset += 4;
 				
-				//Currently, unknown use at the moment.
-				int sectorID = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
-				offset+=4;
+				// Currently, unknown use at the moment.
+				int sectorID = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
+				offset += 4;
 				
-				LOADED_AREA:
-					for (Area area: loadedAreas){
-						if (areaID == area.getAreaID()){
-							int xPixelData = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
-							offset+=4;
-							int yPixelData = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
-							offset+=4;
-							int color = (data[offset]&0xFF) << 24 | (data[offset + 1]&0xFF) << 16 | (data[offset + 2]&0xFF)<<8 | data[offset + 3]&0xFF;
-							
-							PixelData pxData = new PixelData(color	, xPixelData, yPixelData);
-							area.getModifiedPixelDataList().add(pxData);
-							area.loadModifiedPixelDataList();
-							break LOADED_AREA;
-						}
+				LOADED_AREA: for (Area area : loadedAreas) {
+					if (areaID == area.getAreaID()) {
+						int xPixelData = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
+						offset += 4;
+						int yPixelData = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
+						offset += 4;
+						int color = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
+						
+						PixelData pxData = new PixelData(color, xPixelData, yPixelData);
+						area.getModifiedPixelDataList().add(pxData);
+						area.loadModifiedPixelDataList();
+						break LOADED_AREA;
 					}
+				}
 			}
 			game.getWorld().refresh();
 		}
@@ -355,7 +352,7 @@ public class GameSave {
 	 * @return True, if the saved data file exists. False, if otherwise.
 	 * */
 	public static boolean check(String filename) {
-		//FIXME: Make this method checks for invalid headers before actually returning the result.
+		// FIXME: Make this method checks for invalid headers before actually returning the result.
 		File save = new File(filename);
 		return save.isFile();
 	}

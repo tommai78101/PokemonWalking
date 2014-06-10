@@ -49,6 +49,6 @@ public class Keys {
 	
 	public Key START = new Key("ENTER");
 	
-	//Debugging purposes
+	// Debugging purposes
 	public Key F1 = new Key("F1");
 }

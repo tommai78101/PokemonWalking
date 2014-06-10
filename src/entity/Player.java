@@ -30,13 +30,6 @@ public class Player extends Entity {
 		movementLock = false;
 	}
 	
-	public static final int UP = 2;
-	
-	public static final int DOWN = 0;
-	
-	public static final int LEFT = 1;
-	public static final int RIGHT = 3;
-	
 	public Keys keys;
 	private byte animationTick = 0;
 	private byte animationPointer = 0;
@@ -60,6 +53,7 @@ public class Player extends Entity {
 	private boolean enableInteraction;
 	private boolean jumpHeightSignedFlag = false;
 	private int varyingJumpHeight = 0;
+	private boolean automaticMode;
 	
 	// This variable is set to true, no matter what, in the Player class if the player tries to do action that's not allowed.
 	// It must be turned off (set to False) somewhere else in other classes. By design!
@@ -73,6 +67,7 @@ public class Player extends Entity {
 	 * */
 	public Player(Keys keys) {
 		this.keys = keys;
+		this.automaticMode = false;
 	}
 	
 	/**
@@ -216,16 +211,16 @@ public class Player extends Entity {
 		int alpha = (dataColor >> 24) & 0xFF;
 		int red = (dataColor >> 16) & 0xFF;
 		switch (alpha) {
-			//TODO: Merge "Signs" with "Obstacles", as they now have similar functions.
+		// TODO: Merge "Signs" with "Obstacles", as they now have similar functions.
 			case 0x03: {// Obstacles
 				switch (red) {
 					default:
-						//					case 0x00: // Small tree
-						//					case 0x01: //Logs
-						//					case 0x02: //Planks
-						//					case 0x03: //Scaffolding Left
-						//					case 0x04: //Scaffolding Right
-						//					case 0x05: //Sign
+						// case 0x00: // Small tree
+						// case 0x01: //Logs
+						// case 0x02: //Planks
+						// case 0x03: //Scaffolding Left
+						// case 0x04: //Scaffolding Right
+						// case 0x05: //Sign
 						if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
 							this.enableInteraction = false;
 							if (Player.isMovementsLocked())
@@ -605,7 +600,14 @@ public class Player extends Entity {
 	
 	public void stopInteraction() {
 		this.enableInteraction = false;
-		// Player.unlockMovements();
+	}
+	
+	public void enableAutomaticMode() {
+		this.automaticMode = true;
+	}
+	
+	public void disableAutomaticMode() {
+		this.automaticMode = false;
 	}
 	
 	// ---------------------------------------------------------------------
@@ -613,18 +615,23 @@ public class Player extends Entity {
 	
 	@Override
 	public void tick() {
-		if (!this.lockJumping) {
-			if (!this.enableInteraction) {
-				walk();
-				handleMovementCheck();
-				controlTick();
-			}
-			else {
-				stopAnimation();
-			}
+		if (this.automaticMode) {
+			automaticTick();
 		}
-		else
-			jump();
+		else {
+			if (!this.lockJumping) {
+				if (!this.enableInteraction) {
+					walk();
+					handleMovementCheck();
+					controlTick();
+				}
+				else {
+					stopAnimation();
+				}
+			}
+			else
+				jump();
+		}
 	}
 	
 	private void checkFacing() {
@@ -911,5 +918,9 @@ public class Player extends Entity {
 				return;
 			}
 		}
+	}
+	
+	private void automaticTick() {
+		
 	}
 }

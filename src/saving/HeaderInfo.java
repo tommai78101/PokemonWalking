@@ -56,18 +56,20 @@ public class HeaderInfo extends ChunkInfo {
 						throw new IOException("Unable to determine version.");
 				}
 			}
-		ID_CHECK: for (int i = 0; i < header_id.length; i++) {
-			if (header_id[i] != info[i+header_version.length]) {
-				if (olderVersion) {
-					new RuntimeException("Incorrect header id signature. Attempting to update.").printStackTrace();
-					break ID_CHECK;
+			ID_CHECK: for (int i = 0; i < header_id.length; i++) {
+				if (header_id[i] != info[i + header_version.length]) {
+					if (olderVersion) {
+						new RuntimeException("Incorrect header id signature. Attempting to update.").printStackTrace();
+						break ID_CHECK;
+					}
+					else
+						throw new RuntimeException("Unknown header id signature.");
 				}
-				else
-					throw new RuntimeException("Unknown header id signature.");
 			}
-		}
 			for (int k = 0; k < header_format.length; k++) {
-				if (header_format[k] != info[k + header_id.length + header_version.length]) { throw new RuntimeException("Incorrect header code signature."); }
+				if (header_format[k] != info[k + header_id.length + header_version.length]) {
+					throw new RuntimeException("Incorrect header code signature.");
+				}
 			}
 		}
 		catch (Exception e) {
