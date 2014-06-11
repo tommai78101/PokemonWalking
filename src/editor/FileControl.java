@@ -65,8 +65,7 @@ public class FileControl extends JPanel implements ActionListener {
 					JFileChooser chooser = new JFileChooser();
 					chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 					chooser.setCurrentDirectory(lastSavedDirectory);
-					FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG files", "png");
-					chooser.setFileFilter(filter);
+					chooser.setFileFilter(new FileNameExtensionFilter("PNG files", "png"));
 					chooser.setVisible(true);
 					int result = chooser.showSaveDialog(null);
 					if (result == JFileChooser.APPROVE_OPTION) {
@@ -84,11 +83,14 @@ public class FileControl extends JPanel implements ActionListener {
 				case 2: // Open
 					JFileChooser opener = new JFileChooser();
 					opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+					opener.setCurrentDirectory(this.lastSavedDirectory);
+					opener.setFileFilter(new FileNameExtensionFilter("PNG files", "png"));
 					opener.setVisible(true);
 					int answer = opener.showOpenDialog(null);
 					if (answer == JFileChooser.APPROVE_OPTION) {
 						try {
 							File f = opener.getSelectedFile();
+							this.lastSavedDirectory = f.getParentFile();
 							BufferedImage image = ImageIO.read(f);
 							editor.drawingBoardPanel.openMapImage(image);
 						}
@@ -103,5 +105,4 @@ public class FileControl extends JPanel implements ActionListener {
 			return;
 		}
 	}
-	
 }
