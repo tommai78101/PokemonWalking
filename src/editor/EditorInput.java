@@ -17,7 +17,7 @@ import java.awt.event.MouseMotionListener;
 public class EditorInput implements MouseListener, MouseMotionListener {
 	
 	public int mouseX, mouseY;
-	public int dx, dy;
+	public int offsetX, offsetY;
 	public int oldX, oldY;
 	
 	private boolean panning;
@@ -40,13 +40,17 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	
 	@Override
 	public void mouseDragged(MouseEvent event) {
-		dx = oldX - event.getX();
-		dy = oldY - event.getY();
-		if (event.getButton() == MouseEvent.BUTTON3) {
-			panning = true;
-		}
-		else if (event.getButton() == MouseEvent.BUTTON1) {
+		int button1 = MouseEvent.BUTTON1_DOWN_MASK;
+		int button3 = MouseEvent.BUTTON3_DOWN_MASK;
+		if ((event.getModifiersEx() & (button1 | button3)) == button1) {
 			drawing = true;
+			mouseX = event.getX();
+			mouseY = event.getY();
+		}
+		else if ((event.getModifiersEx() & (button1 | button3)) == button3) {
+			panning = true;
+			offsetX = oldX - event.getX();
+			offsetY = oldY - event.getY();
 		}
 		editor.validate();
 	}
@@ -60,51 +64,51 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	
 	@Override
 	public void mouseClicked(MouseEvent event) {
-		mouseX = event.getX();
-		mouseY = event.getY();
 		if (event.getButton() == MouseEvent.BUTTON1) {
 			drawing = true;
+			mouseX = event.getX();
+			mouseY = event.getY();
 		}
-		else if (event.getButton() == MouseEvent.BUTTON3) {
-			panning = true;
-		}
+		panning = false;
 		editor.validate();
 	}
 	
 	@Override
 	public void mouseEntered(MouseEvent event) {
+		drawing = false;
 		mouseX = event.getX();
 		mouseY = event.getY();
 		editor.validate();
-		drawing = false;
 	}
 	
 	@Override
 	public void mouseExited(MouseEvent event) {
+		drawing = false;
 		mouseX = event.getX();
 		mouseY = event.getY();
 		editor.validate();
-		drawing = false;
+		
 	}
 	
 	@Override
 	public void mousePressed(MouseEvent event) {
-		oldX = event.getX() + dx;
-		oldY = event.getY() + dy;
 		if (event.getButton() == MouseEvent.BUTTON1) {
 			drawing = true;
+			mouseX = event.getX();
+			mouseY = event.getY();
 		}
 		else if (event.getButton() == MouseEvent.BUTTON3) {
 			panning = true;
+			oldX = event.getX() + offsetX;
+			oldY = event.getY() + offsetY;
 		}
 		editor.validate();
 	}
 	
 	@Override
 	public void mouseReleased(MouseEvent event) {
-		dx = oldX - event.getX();
-		dy = oldY - event.getY();
-		
+		offsetX = oldX - event.getX();
+		offsetY = oldY - event.getY();
 		drawing = false;
 		panning = false;
 		editor.validate();

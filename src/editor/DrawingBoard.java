@@ -112,7 +112,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			}
 		}
 		offsetX = offsetY = 0;
-		editor.input.dx = editor.input.dy = 0;
+		editor.input.offsetX = editor.input.offsetY = 0;
 		bitmapWidth = w;
 		bitmapHeight = h;
 	}
@@ -251,8 +251,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 	
 	public void tick() {
 		if (editor.input.isDragging()) {
-			offsetX = editor.input.dx;
-			offsetY = editor.input.dy;
+			offsetX = editor.input.offsetX;
+			offsetY = editor.input.offsetY;
 		}
 		
 		if (editor.input.isDrawing()) {
@@ -273,7 +273,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 				tiles[i] = (panel.getAlpha() << 24) | (panel.getRed() << 16) | (panel.getGreen() << 8) | panel.getBlue();
 				tilesEditorID[i] = d.editorID;
 			}
-			editor.input.forceCancelDrawing();
+			// editor.input.forceCancelDrawing();
 			editor.validate();
 		}
 	}
@@ -288,6 +288,14 @@ public class DrawingBoard extends Canvas implements Runnable {
 	
 	public int getMouseTileY() {
 		return this.mouseOnTileY / Tile.HEIGHT;
+	}
+	
+	public int getBitmapWidth() {
+		return this.bitmapWidth;
+	}
+	
+	public int getBitmapHeight() {
+		return this.bitmapHeight;
 	}
 	
 	public BufferedImage getMapImage() {

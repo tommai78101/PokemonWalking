@@ -64,19 +64,19 @@ public class LevelEditor extends JFrame {
 				if (input == null) {
 					input = new EditorInput(editor.LevelEditor.this);
 					addMouseListener(input);
-					// addMouseMotionListener(input);
+					addMouseMotionListener(input);
 				}
 				if (fileControlPanel == null) {
 					fileControlPanel = new FileControl(editor.LevelEditor.this);
 					fileControlPanel.addMouseListener(input);
-					// fileControlPanel.addMouseMotionListener(input);
+					fileControlPanel.addMouseMotionListener(input);
 					add(fileControlPanel, BorderLayout.NORTH);
 					validate();
 				}
 				if (controlPanel == null) {
 					controlPanel = new ControlPanel(editor.LevelEditor.this);
 					controlPanel.addMouseListener(input);
-					// controlPanel.addMouseMotionListener(input);
+					controlPanel.addMouseMotionListener(input);
 					add(controlPanel, BorderLayout.WEST);
 					validate();
 				}
@@ -91,7 +91,7 @@ public class LevelEditor extends JFrame {
 				if (statusPanel == null) {
 					statusPanel = new StatusPanel();
 					statusPanel.addMouseListener(input);
-					// statusPanel.addMouseMotionListener(input);
+					statusPanel.addMouseMotionListener(input);
 					add(statusPanel, BorderLayout.SOUTH);
 				}
 			}
@@ -107,9 +107,24 @@ public class LevelEditor extends JFrame {
 				if (statusPanel != null) {
 					StringBuilder builder = new StringBuilder();
 					builder.append("Picked: " + editor.LevelEditor.this.controlPanel.getPickedEntityName() + " ");
-					if (!input.isDragging())
+					if (!input.isDragging()) {
 						// This is how we do the [panning + pixel position] math.
-						statusPanel.setMousePositionText((input.dx + input.mouseX), (input.dy + input.mouseY));
+						int w = 0;
+						int h = 0;
+						try {
+							w = (input.offsetX + input.mouseX) / drawingBoardPanel.getBitmapWidth();
+						}
+						catch (Exception e) {
+							w = 0;
+						}
+						try {
+							h = (input.offsetY + input.mouseY) / drawingBoardPanel.getBitmapHeight();
+						}
+						catch (Exception e) {
+							h = 0;
+						}
+						statusPanel.setMousePositionText(w, h);
+					}
 					else
 						statusPanel.setMousePositionText(input.oldX, input.oldY);
 					statusPanel.setStatusMessageText(builder.toString());

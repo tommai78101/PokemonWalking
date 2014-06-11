@@ -17,10 +17,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class FileControl extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
@@ -28,11 +30,13 @@ public class FileControl extends JPanel implements ActionListener {
 	private String[] tags = new String[] { "New", "Save", "Open" };
 	private LevelEditor editor;
 	HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
+	private File lastSavedDirectory;
 	
 	public FileControl(LevelEditor editor) {
 		super();
 		this.editor = editor;
 		this.setLayout(new GridLayout(1, tags.length));
+		this.lastSavedDirectory = new File("C:\\Users\\Student\\Desktop");
 		
 		for (int i = 0; i < tags.length; i++) {
 			JButton button = new JButton(tags[i]);
@@ -60,13 +64,17 @@ public class FileControl extends JPanel implements ActionListener {
 				case 1: // Save
 					JFileChooser chooser = new JFileChooser();
 					chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+					chooser.setCurrentDirectory(lastSavedDirectory);
+					FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG files", "png");
+					chooser.setFileFilter(filter);
 					chooser.setVisible(true);
 					int result = chooser.showSaveDialog(null);
 					if (result == JFileChooser.APPROVE_OPTION) {
 						try {
 							BufferedImage img = editor.drawingBoardPanel.getMapImage();
 							File file = chooser.getSelectedFile();
-							ImageIO.write(img, "png", new File(file.getAbsolutePath() + "\\" + file.getName() + ".png"));
+							this.lastSavedDirectory = chooser.getCurrentDirectory();
+							ImageIO.write(img, "png", new File(this.lastSavedDirectory.getAbsolutePath() + "\\" + file.getName() + ".png"));
 						}
 						catch (IOException e) {
 							e.printStackTrace();
