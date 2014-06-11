@@ -299,12 +299,18 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 	
 	public BufferedImage getMapImage() {
+		if (bitmapWidth * bitmapHeight == 0)
+			return null;
 		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
 		for (int i = 0; i < tiles.length; i++) {
 			pixels[i] = tiles[i];
 		}
 		return buffer;
+	}
+	
+	public boolean hasBitmap() {
+		return (this.bitmapHeight * this.bitmapWidth != 0);
 	}
 	
 	public void openMapImage(BufferedImage image) {
@@ -350,24 +356,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 						break;
 				}
 			}
-			
-			// for (int i = 0; i< srcTiles.length; i++){
-			// tiles[i] = srcTiles[i];
-			// int alpha = (srcTiles[i] >> 24)&0xFF;
-			// int red = (srcTiles[i]>>16)&0xFF;
-			// int blue = srcTiles[i]&0xFF;
-			// for (int j=0; j <list.size(); j++){
-			// Map.Entry<Integer, Data> entry = list.get(j);
-			// Data data = entry.getValue();
-			// if (alpha == Integer.valueOf(data.alpha)) {
-			// if (red == Integer.valueOf(data.red) || blue == Integer.valueOf(data.blue)){
-			// //Target Area
-			// tilesEditorID[i] = data.editorID;
-			// break;
-			// }
-			// }
-			// }
-			// }
 		}
 	}
 }

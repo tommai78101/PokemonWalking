@@ -21,6 +21,7 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -62,6 +63,10 @@ public class FileControl extends JPanel implements ActionListener {
 					break;
 				}
 				case 1: // Save
+					if (!editor.drawingBoardPanel.hasBitmap()) {
+						JOptionPane.showMessageDialog(null, "No created maps to save.");
+						break;
+					}
 					JFileChooser chooser = new JFileChooser();
 					chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 					chooser.setCurrentDirectory(lastSavedDirectory);
@@ -71,9 +76,14 @@ public class FileControl extends JPanel implements ActionListener {
 					if (result == JFileChooser.APPROVE_OPTION) {
 						try {
 							BufferedImage img = editor.drawingBoardPanel.getMapImage();
-							File file = chooser.getSelectedFile();
-							this.lastSavedDirectory = chooser.getCurrentDirectory();
-							ImageIO.write(img, "png", new File(this.lastSavedDirectory.getAbsolutePath() + "\\" + file.getName() + ".png"));
+							if (img != null) {
+								File file = chooser.getSelectedFile();
+								String filename = file.getName();
+								while (filename.endsWith(".png"))
+									filename = filename.substring(0, filename.length() - ".png".length());
+								this.lastSavedDirectory = chooser.getCurrentDirectory();
+								ImageIO.write(img, "png", new File(this.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"));
+							}
 						}
 						catch (IOException e) {
 							e.printStackTrace();
