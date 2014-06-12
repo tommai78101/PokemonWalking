@@ -23,7 +23,7 @@ public class LevelEditor extends JFrame {
 	private static final long serialVersionUID = -8739477187675627751L;
 	public static final int WIDTH = 160;
 	public static final int HEIGHT = 144;
-	public static final int SIZE = 3;
+	public static final int SIZE = 4;
 	
 	private ArrayList<Data> filepaths = new ArrayList<Data>();
 	
@@ -32,6 +32,7 @@ public class LevelEditor extends JFrame {
 	public DrawingBoard drawingBoardPanel;
 	public TilePropertiesPanel propertiesPanel;
 	public StatusPanel statusPanel;
+	public Properties properties;
 	
 	public String message;
 	public boolean running;
@@ -88,11 +89,22 @@ public class LevelEditor extends JFrame {
 					add(drawingBoardPanel, BorderLayout.CENTER);
 					drawingBoardPanel.start();
 				}
+				
+				// TODO: Add Trigger properties here.
+				if (properties == null) {
+					properties = new Properties(editor.LevelEditor.this);
+					properties.addMouseListener(input);
+					properties.addMouseMotionListener(input);
+					add(properties, BorderLayout.EAST);
+					validate();
+				}
+				
 				if (statusPanel == null) {
 					statusPanel = new StatusPanel();
 					statusPanel.addMouseListener(input);
 					statusPanel.addMouseMotionListener(input);
 					add(statusPanel, BorderLayout.SOUTH);
+					validate();
 				}
 			}
 		});
@@ -115,18 +127,24 @@ public class LevelEditor extends JFrame {
 							w = (input.offsetX + input.mouseX) / drawingBoardPanel.getBitmapWidth();
 						}
 						catch (Exception e) {
-							w = 0;
+							w = (input.offsetX + input.mouseX) / (WIDTH * SIZE);
 						}
 						try {
 							h = (input.offsetY + input.mouseY) / drawingBoardPanel.getBitmapHeight();
 						}
 						catch (Exception e) {
-							h = 0;
+							h = (input.offsetY + input.mouseY) / (WIDTH * SIZE);
 						}
 						statusPanel.setMousePositionText(w, h);
 					}
-					else
-						statusPanel.setMousePositionText(input.oldX, input.oldY);
+					else {
+						try {
+							statusPanel.setMousePositionText(input.oldX / drawingBoardPanel.getBitmapWidth(), input.oldY / drawingBoardPanel.getBitmapHeight());
+						}
+						catch (Exception e) {
+							statusPanel.setMousePositionText(0, 0);
+						}
+					}
 					statusPanel.setStatusMessageText(builder.toString());
 				}
 			}

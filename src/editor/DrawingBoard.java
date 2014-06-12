@@ -20,8 +20,7 @@ import java.awt.Image;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.List;
-import java.util.Map;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -162,7 +161,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 				int w = j % bitmapWidth;
 				int h = j / bitmapWidth;
 				
-				Data data = EditorConstants.getInstance().getTileMap().get(tilesEditorID[j]);
+				Data data = EditorConstants.getInstance().getDatas().get(tilesEditorID[j]);
 				if (data == null) {
 					break;
 				}
@@ -254,26 +253,23 @@ public class DrawingBoard extends Canvas implements Runnable {
 			offsetX = editor.input.offsetX;
 			offsetY = editor.input.offsetY;
 		}
-		
-		if (editor.input.isDrawing()) {
-			this.mouseOnTileX = offsetX + editor.input.mouseX;
+		else if (editor.input.isDrawing()) {
+			this.mouseOnTileX = offsetX + editor.input.drawingX;
 			if (this.mouseOnTileX < 0)
 				return;
 			if (this.mouseOnTileX >= bitmapWidth * Tile.WIDTH)
 				return;
-			this.mouseOnTileY = offsetY + editor.input.mouseY;
+			this.mouseOnTileY = offsetY + editor.input.drawingY;
 			if (this.mouseOnTileY < 0)
 				return;
 			if (this.mouseOnTileY >= bitmapHeight * Tile.HEIGHT)
 				return;
 			Data d = editor.controlPanel.getSelectedData();
 			if (d != null) {
-				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
-				tiles[i] = (panel.getAlpha() << 24) | (panel.getRed() << 16) | (panel.getGreen() << 8) | panel.getBlue();
+				tiles[i] = (d.alpha << 24) | (d.red << 16) | (d.green << 8) | d.blue;
 				tilesEditorID[i] = d.editorID;
 			}
-			// editor.input.forceCancelDrawing();
 			editor.validate();
 		}
 	}
@@ -318,12 +314,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
 		for (int i = 0; i < srcTiles.length; i++)
 			tiles[i] = srcTiles[i];
-		List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getSortedTileMap();
+		ArrayList<Data> list = EditorConstants.getInstance().getDatas();
 		for (int i = 0; i < tiles.length; i++) {
 			int alpha = ((srcTiles[i] >> 24) & 0xFF);
 			for (int j = 0; j < list.size(); j++) {
-				Map.Entry<Integer, Data> entry = list.get(j);
-				Data d = entry.getValue();
+				Data d = list.get(i);
 				switch (alpha) {
 					case 0x01: // Path
 					case 0x02: // Ledges

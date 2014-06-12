@@ -12,25 +12,32 @@ package editor;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-public class TilePropertiesPanel extends JPanel {
+import editor.EditorConstants.Tools;
+
+public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	private static final long serialVersionUID = 1L;
 	
-	public JTextField tileIDField;
-	public JTextField extTileIDField;
-	public JTextField tileGGIDField;
-	public JTextField tileBBIDField;
+	public JTextField alphaField;
+	public JTextField redField;
+	public JTextField greenField;
+	public JTextField blueField;
+	public Data selectedData;
 	
 	@SuppressWarnings({ "serial" })
 	public TilePropertiesPanel() {
 		super();
-		
 		final Dimension size = new Dimension(60, 10);
 		final Dimension inputSize = new Dimension(15, 15);
+		
+		this.selectedData = new Data();
 		
 		JLabel tileID = new JLabel("Tile ID:") {
 			@Override
@@ -95,7 +102,7 @@ public class TilePropertiesPanel extends JPanel {
 				return size;
 			}
 		};
-		tileIDField = new JTextField() {
+		alphaField = new JTextField() {
 			@Override
 			public Dimension getSize() {
 				return inputSize;
@@ -116,7 +123,7 @@ public class TilePropertiesPanel extends JPanel {
 				return inputSize;
 			}
 		};
-		extTileIDField = new JTextField() {
+		redField = new JTextField() {
 			@Override
 			public Dimension getSize() {
 				return inputSize;
@@ -137,7 +144,7 @@ public class TilePropertiesPanel extends JPanel {
 				return inputSize;
 			}
 		}; // RR
-		tileGGIDField = new JTextField() {
+		greenField = new JTextField() {
 			@Override
 			public Dimension getSize() {
 				return inputSize;
@@ -158,7 +165,7 @@ public class TilePropertiesPanel extends JPanel {
 				return inputSize;
 			}
 		}; // GG
-		tileBBIDField = new JTextField() {
+		blueField = new JTextField() {
 			@Override
 			public Dimension getSize() {
 				return inputSize;
@@ -182,24 +189,28 @@ public class TilePropertiesPanel extends JPanel {
 		tileID.setHorizontalAlignment(SwingConstants.CENTER);
 		extendedTileID.setHorizontalAlignment(SwingConstants.CENTER);
 		tileSpecificID.setHorizontalAlignment(SwingConstants.CENTER);
-		tileIDField.setHorizontalAlignment(SwingConstants.CENTER);
-		extTileIDField.setHorizontalAlignment(SwingConstants.CENTER);
-		tileGGIDField.setHorizontalAlignment(SwingConstants.CENTER);
-		tileBBIDField.setHorizontalAlignment(SwingConstants.CENTER);
+		alphaField.setHorizontalAlignment(SwingConstants.CENTER);
+		redField.setHorizontalAlignment(SwingConstants.CENTER);
+		greenField.setHorizontalAlignment(SwingConstants.CENTER);
+		blueField.setHorizontalAlignment(SwingConstants.CENTER);
+		alphaField.getDocument().addDocumentListener(this);
+		redField.getDocument().addDocumentListener(this);
+		greenField.getDocument().addDocumentListener(this);
+		blueField.getDocument().addDocumentListener(this);
 		
 		this.setLayout(new GridLayout(0, 1));
 		this.add(tileID);
-		this.add(tileIDField);
+		this.add(alphaField);
 		this.add(extendedTileID);
-		this.add(extTileIDField);
+		this.add(redField);
 		this.add(tileSpecificID);
-		this.add(tileGGIDField);
-		this.add(tileBBIDField);
+		this.add(greenField);
+		this.add(blueField);
 	}
 	
 	public char getAlpha() {
 		try {
-			return (char) (Integer.valueOf(tileIDField.getText()) & 0xFF);
+			return (char) (Integer.valueOf(alphaField.getText()) & 0xFF);
 		}
 		catch (NumberFormatException e) {
 			return 0;
@@ -207,12 +218,12 @@ public class TilePropertiesPanel extends JPanel {
 	}
 	
 	public String getTileIDString() {
-		return tileIDField.getText();
+		return alphaField.getText();
 	}
 	
 	public char getRed() {
 		try {
-			return (char) (Integer.valueOf(extTileIDField.getText()) & 0xFF);
+			return (char) (Integer.valueOf(redField.getText()) & 0xFF);
 		}
 		catch (NumberFormatException e) {
 			return 0;
@@ -220,12 +231,12 @@ public class TilePropertiesPanel extends JPanel {
 	}
 	
 	public String getExtendedTileIDString() {
-		return extTileIDField.getText();
+		return redField.getText();
 	}
 	
 	public char getGreen() {
 		try {
-			return (char) (Integer.valueOf(tileGGIDField.getText()) & 0xFF);
+			return (char) (Integer.valueOf(greenField.getText()) & 0xFF);
 		}
 		catch (NumberFormatException e) {
 			return 0;
@@ -233,12 +244,12 @@ public class TilePropertiesPanel extends JPanel {
 	}
 	
 	public String getTileIDGString() {
-		return tileGGIDField.getText();
+		return greenField.getText();
 	}
 	
 	public char getBlue() {
 		try {
-			return (char) (Integer.valueOf(tileBBIDField.getText()) & 0xFF);
+			return (char) (Integer.valueOf(blueField.getText()) & 0xFF);
 		}
 		catch (NumberFormatException e) {
 			return 0;
@@ -246,6 +257,56 @@ public class TilePropertiesPanel extends JPanel {
 	}
 	
 	public String getTileIDBString() {
-		return tileBBIDField.getText();
+		return blueField.getText();
+	}
+	
+	public Data getSelectedData() {
+		return this.selectedData;
+	}
+	
+	@Override
+	public void changedUpdate(DocumentEvent arg0) {
+		EditorConstants.chooser = Tools.TileProperties;
+		try {
+			int alpha = Integer.parseInt(this.alphaField.getText());
+			int red = Integer.parseInt(this.redField.getText());
+			int green = Integer.parseInt(this.greenField.getText());
+			int blue = Integer.parseInt(this.blueField.getText());
+			this.selectedData = EditorConstants.getData(alpha, red, green, blue);
+		}
+		catch (Exception e) {
+			EditorConstants.chooser = Tools.ControlPanel;
+		}
+		
+	}
+	
+	@Override
+	public void insertUpdate(DocumentEvent arg0) {
+		EditorConstants.chooser = Tools.TileProperties;
+		try {
+			int alpha = Integer.parseInt(this.alphaField.getText());
+			int red = Integer.parseInt(this.redField.getText());
+			int green = Integer.parseInt(this.greenField.getText());
+			int blue = Integer.parseInt(this.blueField.getText());
+			this.selectedData = EditorConstants.getData(alpha, red, green, blue);
+		}
+		catch (Exception e) {
+			EditorConstants.chooser = Tools.ControlPanel;
+		}
+	}
+	
+	@Override
+	public void removeUpdate(DocumentEvent arg0) {
+		EditorConstants.chooser = Tools.TileProperties;
+		try {
+			int alpha = Integer.parseInt(this.alphaField.getText());
+			int red = Integer.parseInt(this.redField.getText());
+			int green = Integer.parseInt(this.greenField.getText());
+			int blue = Integer.parseInt(this.blueField.getText());
+			this.selectedData = EditorConstants.getData(alpha, red, green, blue);
+		}
+		catch (Exception e) {
+			EditorConstants.chooser = Tools.ControlPanel;
+		}
 	}
 }

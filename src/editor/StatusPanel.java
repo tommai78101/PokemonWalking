@@ -11,6 +11,7 @@
 package editor;
 
 import java.awt.FlowLayout;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -18,6 +19,7 @@ public class StatusPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JLabel mousePosition;
 	private JLabel statusMessage;
+	private String tileName;
 	
 	public StatusPanel() {
 		super();
@@ -39,5 +41,13 @@ public class StatusPanel extends JPanel {
 	public void setStatusMessageText(String msg) {
 		this.statusMessage.setText(msg);
 		this.validate();
+	}
+	
+	public void setTileName(String value) {
+		this.tileName = value;
+	}
+	
+	public String getTileName() {
+		return this.tileName;
 	}
 }

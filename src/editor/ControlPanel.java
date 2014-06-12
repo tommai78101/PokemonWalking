@@ -14,14 +14,15 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Iterator;
-import java.util.Map;
+
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+
 import abstracts.Tile;
+import editor.EditorConstants.Tools;
 
 public class ControlPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7481148146432931992L;
@@ -42,9 +43,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 		JPanel iconsPanel = new JPanel();
 		iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.Y_AXIS));
 		EditorConstants constants = EditorConstants.getInstance();
-		for (Iterator<Map.Entry<Integer, Data>> it = constants.getSortedTileMap().iterator(); it.hasNext();) {
-			Map.Entry<Integer, Data> entry = it.next();
-			Data d = entry.getValue();
+		for (Data d : EditorConstants.getInstance().getDatas()) {
 			d.button.setActionCommand(Integer.toString(d.editorID));
 			d.button.addActionListener(this);
 			iconsPanel.add(d.button);
@@ -86,24 +85,45 @@ public class ControlPanel extends JPanel implements ActionListener {
 	public void actionPerformed(ActionEvent event) {
 		JButton button = (JButton) event.getSource();
 		int id = Integer.parseInt(button.getActionCommand());
-		Data d = EditorConstants.getInstance().getTileMap().get(id);
+		Data d = EditorConstants.getInstance().getDatas().get(id);
 		if (d != null) {
 			this.selectedData = d;
 			this.iconName = d.name;
-			this.propertiesPanel.tileIDField.setText(Integer.toString(d.alpha));
-			this.propertiesPanel.extTileIDField.setText(Integer.toString(d.red));
-			this.propertiesPanel.tileGGIDField.setText(Integer.toString(d.green));
-			this.propertiesPanel.tileBBIDField.setText(Integer.toString(d.blue));
+			this.propertiesPanel.alphaField.setText(Integer.toString(d.alpha));
+			this.propertiesPanel.redField.setText(Integer.toString(d.red));
+			this.propertiesPanel.greenField.setText(Integer.toString(d.green));
+			this.propertiesPanel.blueField.setText(Integer.toString(d.blue));
+			EditorConstants.chooser = Tools.ControlPanel;
 		}
 		editor.validate();
 	}
 	
 	public String getPickedEntityName() {
-		return this.iconName;
+		switch (EditorConstants.chooser) {
+			case ControlPanel:
+				return this.selectedData.name;
+			case TileProperties:
+				return this.propertiesPanel.getSelectedData().name;
+			case Properties:
+				return this.selectedData.name;
+		}
+		return "";
 	}
 	
 	public Data getSelectedData() {
-		return this.selectedData;
+		switch (EditorConstants.chooser) {
+			case ControlPanel:
+				return this.selectedData;
+			case Properties:
+				return editor.properties.getSelectedData();
+			case TileProperties:
+				return this.propertiesPanel.getSelectedData();
+		}
+		return null;
+	}
+	
+	public void setSelectedData(Data data) {
+		this.selectedData = data;
 	}
 	
 	public TilePropertiesPanel getPropertiesPanel() {
