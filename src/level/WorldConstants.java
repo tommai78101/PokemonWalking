@@ -19,7 +19,6 @@ import java.util.Map;
 
 import resources.Art;
 import resources.Mod;
-import resources.Movement;
 import screen.BaseBitmap;
 import abstracts.Item;
 import dialogue.NewDialogue;
@@ -62,7 +61,7 @@ public class WorldConstants {
 	public static Boolean isModsEnabled = null;
 	
 	// Movement
-	public static ArrayList<Map.Entry<Integer, Movement>> scripts = Movement.loadMovement("script/scripts.txt");
+	// public static ArrayList<Map.Entry<Integer, Movement>> scripts = Movement.loadMovement("script/scripts.txt");
 	
 	// All bitmaps
 	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
