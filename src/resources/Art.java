@@ -323,10 +323,8 @@ public class Art {
 		catch (IOException e2) {
 			e2.printStackTrace();
 		}
-		for (; urls.hasMoreElements();) {
+		for (; urls.hasMoreElements();)
 			url = urls.nextElement();
-			System.out.println(url.toString());
-		}
 		
 		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		Font result = null;
@@ -361,6 +359,7 @@ public class Art {
 		}
 		if (result != null) {
 			ge.registerFont(result);
+			System.out.println(filename);
 		}
 		return result.deriveFont(Font.PLAIN, 8f * MainComponent.GAME_SCALE);
 	}
