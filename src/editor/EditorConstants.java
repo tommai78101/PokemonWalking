@@ -35,6 +35,7 @@ public class EditorConstants {
 	
 	private final ArrayList<Category> categories = new ArrayList<Category>();
 	private final ArrayList<Data> datas = new ArrayList<Data>();
+	private final ArrayList<Trigger> triggers = new ArrayList<Trigger>();
 	
 	private static final EditorConstants instance = new EditorConstants();
 	
@@ -47,14 +48,29 @@ public class EditorConstants {
 		ControlPanel, Properties, TileProperties
 	};
 	
+	public static enum Metadata {
+		Pixel_Data("Pixel Data"), Triggers("Triggers");
+		
+		private String name;
+		
+		private Metadata(String text) {
+			this.name = text;
+		}
+		
+		public String getName() {
+			return this.name;
+		}
+	};
+	
 	public static Tools chooser = Tools.ControlPanel;
+	public static Metadata metadata = Metadata.Pixel_Data;
 	
 	private EditorConstants() {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
 			String line;
 			String[] tokens;
-			int categoryID = -1;
+			int categoryID = 0;
 			int editorID = 0;
 			Category c = null;
 			ArrayList<Data> temp = new ArrayList<Data>();
@@ -177,6 +193,10 @@ public class EditorConstants {
 	
 	public ArrayList<Data> getDatas() {
 		return this.datas;
+	}
+	
+	public ArrayList<Trigger> getTriggers() {
+		return this.triggers;
 	}
 	
 	public static Data getData(int alpha, int red, int green, int blue) {
