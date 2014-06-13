@@ -58,17 +58,29 @@ This level editor is released to the public to allow players to create their own
 **Demo and Usage:**
 
 *How to use the Level Editor, part 1:*
+
 http://www.gfycat.com/NextNeighboringFluke
+
 *How to use the Level Editor, part 2:*
+
 http://www.gfycat.com/FrighteningGargantuanDonkey
+
 *How to use the Level Editor, part 3:*
+
 http://www.gfycat.com/SneakyTalkativeAcaciarat
+
 *You Should Know when starting the game:*
+
 http://www.gfycat.com/CloudyBonyGlowworm
+
 *Adding your Custom Maps:*
+
 http://www.gfycat.com/WeepyUnsightlyFairybluebird
+
 *Loading your Custom Maps:*
+
 http://www.gfycat.com/FamiliarUncommonIndianabat
+
 
 ===
 
