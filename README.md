@@ -22,7 +22,53 @@ If all bodes well, it's possible that this will become a Java port of the Pokém
 
 It's still in very early stages of development. Possibly even earlier than "alpha". *Everything is done from scratch/by hand. Only the character design is mostly mimicked from the original Pokémon games.*
 
+===
 
+**Demo:**
+
+http://www.gfycat.com/EachIlliterateHyrax#
+http://www.gfycat.com/ShabbySoupyDobermanpinscher
+
+===
+
+![Imgur](http://i.imgur.com/m13jfwm.png)
+
+### Level Editor
+
+===
+
+**Abstract:**
+
+A level editor used to create custom maps that can be loaded into the game by anyone.
+
+===
+
+**Description:**
+
+This level editor is designed with the intention of easily create maps and allow better focus on development. Since the game loads the area maps from PNG bitmap files, I thought that it would be much nicer if there's a program that allows me to draw area maps more quicker and easier.
+
+It used to be painstakingly laborious to draw area maps. I had to open up Paint.NET, a graphics editor that I used, and follow the rules of drawing tiles set forth by the documentations that I wrote for this game, and have to use an Eyedropper tool to look up the pixel colors in Paint.NET to check for consistencies and errors. And once that was done, I would had to redo everything if the area map loaded up by the game turns out to be wrong or a tile was drawn incorrectly. Everything about it was just tedious to begin with.
+
+With this level editor, I was able to speed up development, and easily draw out test areas for debugging new game mechanics. Just fire up this program, quickly draw something, save it, let the game load it up, and then finally test everything out. It's quick, simple, and gets the job done.
+
+This level editor is released to the public to allow players to create their own custom areas and play them from the game.
+
+===
+
+**Demo and Usage:**
+
+*How to use the Level Editor, part 1:*
+http://www.gfycat.com/NextNeighboringFluke
+*How to use the Level Editor, part 2:*
+http://www.gfycat.com/FrighteningGargantuanDonkey
+*How to use the Level Editor, part 3:*
+http://www.gfycat.com/SneakyTalkativeAcaciarat
+*You Should Know when starting the game:*
+http://www.gfycat.com/CloudyBonyGlowworm
+*Adding your Custom Maps:*
+http://www.gfycat.com/WeepyUnsightlyFairybluebird
+*Loading your Custom Maps:*
+http://www.gfycat.com/FamiliarUncommonIndianabat
 
 ===
 
@@ -39,6 +85,7 @@ It's still in very early stages of development. Possibly even earlier than "alph
 | | | Item Balls |
 | | | Inventory |
 | | | Saving/Loading |
+| | | Level Editor |
 
 \*All movements: Walking, Facing/Turning, Surfing, Bicycling, Jumping, etc.
 
@@ -62,7 +109,7 @@ It's still in very early stages of development. Possibly even earlier than "alph
 | Downloads | Latest Stable Version | Link |
 |:---:|:---:|:---:|
 | Walking | v18 | http://www.thehelper.net/attachments/walking_v18-zip.18686/ |
-| Editor | v3 | http://www.thehelper.net/attachments/editor_v3-zip.18662/ |
+| Editor | v4 | http://www.thehelper.net/attachments/editor_v4-zip.18688/ |
 
 Extract the JAR file from the ZIP file after you have downloaded it. Then double-click on it to run.
 
