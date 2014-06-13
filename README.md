@@ -32,6 +32,29 @@ http://www.gfycat.com/ShabbySoupyDobermanpinscher
 
 ===
 
+**Controls:**
+
+*Inputs:*
+
+* Use WASD keys or the arrow keys to navigate around. Tapping the keys will "turn on the spot".
+
+* Just walk into the water to surf around.
+
+* Use Z, X to interact. / and . can also be used. ZX and arrow keys are for right hand users, WASD and ./ are for left hand users.
+
+* Press Enter to open start menu.
+
+
+*Save/Load:*
+
+* To save your game, use the in-game menu option called "Save".
+
+* To load your game, just start up the game. Loading is done automatically upon start up.
+
+* To delete your saved data, just delete the "data.sav" file that was generated when you save your game.
+
+===
+
 ![Imgur](http://i.imgur.com/m13jfwm.png)
 
 ### Level Editor
