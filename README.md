@@ -98,7 +98,6 @@ http://www.gfycat.com/FamiliarUncommonIndianabat
 | | | Item Balls |
 | | | Inventory |
 | | | Saving/Loading |
-| | | Level Editor |
 
 \*All movements: Walking, Facing/Turning, Surfing, Bicycling, Jumping, etc.
 
