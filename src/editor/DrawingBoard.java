@@ -196,24 +196,23 @@ public class DrawingBoard extends Canvas implements Runnable {
 						BufferedImage bimg = new BufferedImage(data.image.getIconWidth(), data.image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 						Graphics gB = bimg.getGraphics();
 						// TODO: Area Type ID must be included.
-						gB.drawImage(data.image.getImage(),  0, 0, null);
+						gB.drawImage(data.image.getImage(), 0, 0, null);
 						gB.dispose();
-						
 						
 						if (data.areaTypeIncluded) {
 							switch (data.areaTypeIDType) {
 								case ALPHA:
 								default:
-									this.setBiomeTile((tiles[j] >> 24) & 0xFF, g );
+									this.setBiomeTile((tiles[j] >> 24) & 0xFF, g);
 									break;
 								case RED:
-									this.setBiomeTile((tiles[j] >> 16) & 0xFF, g );
+									this.setBiomeTile((tiles[j] >> 16) & 0xFF, g);
 									break;
 								case GREEN:
-									this.setBiomeTile((tiles[j] >> 8) & 0xFF, g );
+									this.setBiomeTile((tiles[j] >> 8) & 0xFF, g);
 									break;
 								case BLUE:
-									this.setBiomeTile(tiles[j] & 0xFF, g );
+									this.setBiomeTile(tiles[j] & 0xFF, g);
 									break;
 							}
 						}
@@ -394,24 +393,24 @@ public class DrawingBoard extends Canvas implements Runnable {
 		for (int i = 0; i < tiles.length; i++) {
 			int alpha = ((srcTiles[i] >> 24) & 0xFF);
 			for (int j = 0; j < list.size(); j++) {
-				Data d = list.get(i);
+				Data d = list.get(j);
 				switch (alpha) {
 					case 0x01: // Path
 					case 0x02: // Ledges
+					case 0x03: // Obstacles
 					case 0x06: // Stairs
 					case 0x07: // Water
-					case 0x09: // House
-						// Extended Tile IDs are used to differenate tiles.
+					case 0x08: // House
+						// Extended Tile IDs are used to differentiate tiles.
 						if (alpha == Integer.valueOf(d.alpha)) {
 							int red = ((srcTiles[i] >> 16) & 0xFF);
 							if (red == Integer.valueOf(d.red)) {
 								tilesEditorID[i] = d.editorID;
-								break;
 							}
 						}
 						continue;
-					case 0x05: // Area Zone
-						// Extended Tile IDs are used to differenate tiles.
+					case 0x05: {// Area Zone
+						// Extended Tile IDs are used to differentiate tiles.
 						if (alpha == Integer.valueOf(d.alpha)) {
 							int blue = srcTiles[i] & 0xFF;
 							if (blue == d.blue) {
@@ -420,11 +419,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 							}
 						}
 						continue;
-					default:
+					}
+					default: {
 						// Alpha value is only used.
-						if (alpha == Integer.valueOf(d.alpha))
+						if (alpha == Integer.valueOf(d.alpha)) {
 							tilesEditorID[i] = d.editorID;
-						break;
+							break;
+						}
+						continue;
+					}
 				}
 			}
 		}
