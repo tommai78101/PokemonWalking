@@ -508,7 +508,7 @@ not assume their information to be permanent.
 			Anything else:
 				Undefined.
 		Full Data(s):
-			03 00 00 00
+			03 RR GG BB
 		Description:
 			An obstacle that blocks the Player's path. Currently, has no purposes
 			in the game.
@@ -522,7 +522,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		ForestEntrance [PWD04#03@04]
+		Warp Point [PWD04#03@04]
 		
 		Tile ID:
 			A: 04 - Warp Point
@@ -634,7 +634,7 @@ not assume their information to be permanent.
 		House [PWD04#03@08]
 		
 		Tile ID:
-			A: 09 - House
+			A: 08 - House
 		Extended Tile ID:
 			R: HH - House-related Tiles:
 				00 - Bottom

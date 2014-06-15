@@ -74,12 +74,12 @@
 % Top_Right                     % 07 % 04 % * % @ %   res/art/editor/water_top_right.gif
 % Right                         % 07 % 05 % * % @ %   res/art/editor/water_right.gif
 -House                                                
-% Bottom_Wall                   % 09 % 00 % @ % @ %   res/art/house/house_bottom.png
-% Left_Wall                     % 09 % 01 % @ % @ %   res/art/house/house_bottom_left.png
-% Right_Wall                    % 09 % 02 % @ % @ %   res/art/house/house_bottom_right.png
-% Left_Roof                     % 09 % 03 % @ % @ %   res/art/house/house_roof_left.png
-% Middle_Roof                   % 09 % 04 % @ % @ %   res/art/house/house_roof_middle.png
-% Right_Roof                    % 09 % 05 % @ % @ %   res/art/house/house_roof_right.png
+% Bottom_Wall                   % 08 % 00 % @ % @ %   res/art/house/house_bottom.png
+% Left_Wall                     % 08 % 01 % @ % @ %   res/art/house/house_bottom_left.png
+% Right_Wall                    % 08 % 02 % @ % @ %   res/art/house/house_bottom_right.png
+% Left_Roof                     % 08 % 03 % @ % @ %   res/art/house/house_roof_left.png
+% Middle_Roof                   % 08 % 04 % @ % @ %   res/art/house/house_roof_middle.png
+% Right_Roof                    % 08 % 05 % @ % @ %   res/art/house/house_roof_right.png
 % Door                          % 0A % @ %  @ % @ %   res/art/house/house_door.png
 % Carpet_[Indoors]              % 0C % 00 % @ % @ %   res/art/floor/carpet_indoors.png
 % Carpet_[Outdoors]             % 0C % 01 % @ % @ %   res/art/floor/carpet_outdoors.png

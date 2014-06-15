@@ -3,8 +3,16 @@
 / Entities that can walk, or run, must be required to have movements for the game
 / to feel lively.
 
+/ _: Whitespaces.
+
+/ DO NOT CHANGE.
+$0
+@Eraser
+%
+
 
 / Turn clockwise in a circle.
 $1
+@Testing_Script
 ^U0R0D0L0
 %
