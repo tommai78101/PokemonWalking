@@ -32,6 +32,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 	private LevelEditor editor; // reference to parent
 	private Data selectedData; // reference to selected data.
 	private Trigger selectedTrigger; // reference to selected trigger.
+	private JPanel iconsPanel;
+	private JScrollPane scrollPanel;
 	
 	public ControlPanel(LevelEditor editor) {
 		this.editor = editor;
@@ -43,7 +45,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 		
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 		
-		JPanel iconsPanel = new JPanel();
+		iconsPanel = new JPanel();
 		iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.Y_AXIS));
 		EditorConstants constants = EditorConstants.getInstance();
 		for (Data d : constants.getDatas()) {
@@ -52,7 +54,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 			iconsPanel.add(d.button);
 		}
 		
-		JScrollPane scrollPanel = new JScrollPane(iconsPanel) {
+		scrollPanel = new JScrollPane(iconsPanel) {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
@@ -157,8 +159,19 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void validate(){
 		super.validate();
-		
 		if (this.propertiesPanel != null)
 			this.propertiesPanel.validate();
+		switch (EditorConstants.metadata){
+			case Pixel_Data:
+				this.iconsPanel.setVisible(true);
+				this.iconsPanel.setEnabled(true);
+				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+				break;
+			case Triggers:
+				this.iconsPanel.setVisible(false);
+				this.iconsPanel.setEnabled(false);
+				scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				break;
+		}
 	}
 }
