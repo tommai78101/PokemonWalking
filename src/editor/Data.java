@@ -10,7 +10,7 @@
 
 package editor;
 
-import java.awt.Image;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 public class Data {
@@ -22,7 +22,7 @@ public class Data {
 	public String filepath;
 	public int editorID;
 	public int alpha, red, green, blue;
-	public Image image;
+	public ImageIcon image;
 	public JButton button;
 	public boolean areaTypeIncluded;
 	public DataType areaTypeIDType;

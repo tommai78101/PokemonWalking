@@ -16,12 +16,10 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
@@ -123,10 +121,8 @@ public class EditorConstants {
 					data.blue = Integer.valueOf(tokens[5], 16);
 					data.filepath = tokens[6];
 					data.editorID = editorID++;
-					URL location = EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]);
-					data.image = ImageIO.read(location);
-					final ImageIcon icon = new ImageIcon(location);
-					data.button = new JButton(icon) {
+					data.image = new ImageIcon(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
+					data.button = new JButton(data.image) {
 						private static final long serialVersionUID = 1L;
 						
 						@Override
@@ -188,21 +184,21 @@ public class EditorConstants {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("script/scripts.txt")));
 			String line;
 			Trigger trigger = null;
-			while ((line = reader.readLine()) != null){
+			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("/"))
 					continue;
-				else if (line.startsWith("$")){
+				else if (line.startsWith("$")) {
 					if (trigger == null)
 						trigger = new Trigger();
 					trigger.setTriggerID((char) (((Integer.valueOf(line.substring(line.length() - 1)) & 0xFFFF))));
 				}
-				else if (line.startsWith("%")){
+				else if (line.startsWith("%")) {
 					this.triggers.add(trigger);
 					trigger = null;
 				}
 			}
 		}
-		catch (Exception e){
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -225,10 +221,35 @@ public class EditorConstants {
 	
 	public static Data getData(int alpha, int red, int green, int blue) {
 		ArrayList<Data> list = EditorConstants.getInstance().datas;
+		Data temp = null;
 		for (Data d : list) {
-			if (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue)
-				return d;
+			if (d.areaTypeIncluded) {
+				switch (d.areaTypeIDType) {
+					case ALPHA:
+						if (d.red == red && d.green == green && d.blue == blue)
+							temp = d;
+						break;
+					case RED:
+						if (d.alpha == alpha && d.green == green && d.blue == blue)
+							temp = d;
+						break;
+					case GREEN:
+						if (d.alpha == alpha && d.red == red && d.blue == blue)
+							temp = d;
+						break;
+					case BLUE:
+						if (d.alpha == alpha && d.red == red && d.green == green)
+							temp = d;
+						break;
+					default:
+						if (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue)
+							temp = d;
+						break;
+				}
+			}
 		}
-		return null;
+		if (temp != null)
+			return temp;
+		return EditorConstants.getInstance().getDatas().get(0);
 	}
 }

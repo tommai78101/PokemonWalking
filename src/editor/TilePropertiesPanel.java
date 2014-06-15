@@ -273,6 +273,23 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			int green = Integer.parseInt(this.greenField.getText());
 			int blue = Integer.parseInt(this.blueField.getText());
 			this.selectedData = EditorConstants.getData(alpha, red, green, blue);
+			if (selectedData.areaTypeIncluded) {
+				switch (selectedData.areaTypeIDType) {
+					case ALPHA:
+					default:
+						selectedData.alpha = alpha;
+						break;
+					case RED:
+						selectedData.red = red;
+						break;
+					case GREEN:
+						selectedData.green = green;
+						break;
+					case BLUE:
+						selectedData.blue = blue;
+						break;
+				}
+			}
 		}
 		catch (Exception e) {
 			EditorConstants.chooser = Tools.ControlPanel;
@@ -289,6 +306,23 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			int green = Integer.parseInt(this.greenField.getText());
 			int blue = Integer.parseInt(this.blueField.getText());
 			this.selectedData = EditorConstants.getData(alpha, red, green, blue);
+			if (selectedData.areaTypeIncluded) {
+				switch (selectedData.areaTypeIDType) {
+					case ALPHA:
+					default:
+						selectedData.alpha = alpha;
+						break;
+					case RED:
+						selectedData.red = red;
+						break;
+					case GREEN:
+						selectedData.green = green;
+						break;
+					case BLUE:
+						selectedData.blue = blue;
+						break;
+				}
+			}
 		}
 		catch (Exception e) {
 			EditorConstants.chooser = Tools.ControlPanel;
@@ -304,6 +338,23 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			int green = Integer.parseInt(this.greenField.getText());
 			int blue = Integer.parseInt(this.blueField.getText());
 			this.selectedData = EditorConstants.getData(alpha, red, green, blue);
+			if (selectedData.areaTypeIncluded) {
+				switch (selectedData.areaTypeIDType) {
+					case ALPHA:
+					default:
+						selectedData.alpha = alpha;
+						break;
+					case RED:
+						selectedData.red = red;
+						break;
+					case GREEN:
+						selectedData.green = green;
+						break;
+					case BLUE:
+						selectedData.blue = blue;
+						break;
+				}
+			}
 		}
 		catch (Exception e) {
 			EditorConstants.chooser = Tools.ControlPanel;

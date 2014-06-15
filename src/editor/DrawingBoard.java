@@ -16,7 +16,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -31,6 +30,8 @@ import abstracts.Tile;
 
 public class DrawingBoard extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
+	private static boolean showAnimation;
+	
 	private LevelEditor editor;
 	
 	private BufferedImage image;
@@ -45,6 +46,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		super();
 		this.editor = editor;
 		offsetX = offsetY = 0;
+		this.showAnimation = false;
 	}
 	
 	@Override
@@ -185,38 +187,39 @@ public class DrawingBoard extends Canvas implements Runnable {
 							continue;
 						}
 						
-						Image img = data.image;
-						BufferedImage bimg;
-						if (img instanceof BufferedImage)
-							bimg = (BufferedImage) img;
-						else {
-							bimg = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-							Graphics g = bimg.getGraphics();
-							g.drawImage(img, 0, 0, null);
-							g.dispose();
-						}
-						
+						// BufferedImage bimg = new BufferedImage(data.image.getIconWidth(), data.image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+						// Graphics g = bimg.getGraphics();
+						// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+						// g.dispose();
+						//
 						Graphics g = this.image.getGraphics();
+						BufferedImage bimg = new BufferedImage(data.image.getIconWidth(), data.image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+						Graphics gB = bimg.getGraphics();
 						// TODO: Area Type ID must be included.
+						gB.drawImage(data.image.getImage(),  0, 0, null);
+						gB.dispose();
+						
+						
 						if (data.areaTypeIncluded) {
 							switch (data.areaTypeIDType) {
 								case ALPHA:
 								default:
-									this.setBiomeTile((tiles[j] >> 24) & 0xFF, g);
+									this.setBiomeTile((tiles[j] >> 24) & 0xFF, g );
 									break;
 								case RED:
-									this.setBiomeTile((tiles[j] >> 16) & 0xFF, g);
+									this.setBiomeTile((tiles[j] >> 16) & 0xFF, g );
 									break;
 								case GREEN:
-									this.setBiomeTile((tiles[j] >> 8) & 0xFF, g);
+									this.setBiomeTile((tiles[j] >> 8) & 0xFF, g );
 									break;
 								case BLUE:
-									this.setBiomeTile(tiles[j] & 0xFF, g);
+									this.setBiomeTile(tiles[j] & 0xFF, g );
 									break;
 							}
 						}
 						else
 							g.setColor(Color.white);
+						
 						g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 						g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
 						g.dispose();
@@ -226,8 +229,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 				break;
 			}
 			case Triggers: {
-				if (triggers != null){
-					for (int k = 0; k < triggers.length; k++){
+				if (triggers != null) {
+					for (int k = 0; k < triggers.length; k++) {
 						if (bitmapWidth <= 0)
 							break;
 						if (bitmapHeight <= 0)
@@ -240,8 +243,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 						try {
 							trigger = EditorConstants.getInstance().getTriggers().get(triggers[k]);
 						}
-						catch (Exception e){
-							for (Trigger t: EditorConstants.getInstance().getTriggers()){
+						catch (Exception e) {
+							for (Trigger t : EditorConstants.getInstance().getTriggers()) {
 								trigger = t;
 								break;
 							}
@@ -252,11 +255,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int w = k % bitmapWidth;
 						int h = k / bitmapWidth;
 						
-						
 						Graphics g = this.image.getGraphics();
-						setTriggerTile(trigger.getTriggerID(), g);
-						g.fillRect(w * Tile.WIDTH,  h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
-						//g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+						g.setColor(Color.cyan);
+						g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 						g.dispose();
 					}
 				}
@@ -297,14 +298,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 			case 0x05: // Door/Carpet
 			default:
 				g.setColor(Color.white);
-				break;
-		}
-	}
-	
-	private void setTriggerTile(int value, Graphics g) {
-		switch (value) {
-			default:
-				g.setColor(Color.cyan);
 				break;
 		}
 	}
