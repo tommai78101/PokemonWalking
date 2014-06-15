@@ -36,6 +36,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private BufferedImage image;
 	private int[] tiles;
 	private int[] tilesEditorID;
+	private int[] triggers;
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
@@ -96,9 +97,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		tiles = new int[w * h];
 		tilesEditorID = new int[w * h];
+		triggers = new int[w * h];
 		for (int i = 0; i < tiles.length; i++) {
 			tiles[i] = 0;
 			tilesEditorID[i] = 0;
+			triggers[i] = -1;
 		}
 		image = new BufferedImage(w * Tile.WIDTH, h * Tile.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
@@ -161,64 +164,105 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.createBufferStrategy(3);
 			bs = this.getBufferStrategy();
 		}
-		if (tilesEditorID != null) {
-			for (int j = 0; j < tilesEditorID.length; j++) {
-				if (bitmapWidth <= 0)
-					break;
-				if (bitmapHeight <= 0)
-					break;
-				int w = j % bitmapWidth;
-				int h = j / bitmapWidth;
-				
-				Data data = EditorConstants.getInstance().getDatas().get(tilesEditorID[j]);
-				if (data == null) {
-					break;
-				}
-				if (data.image == null) {
-					tiles[j] = 0;
-					tilesEditorID[j] = 0;
-					continue;
-				}
-				
-				Image img = data.image;
-				BufferedImage bimg;
-				if (img instanceof BufferedImage)
-					bimg = (BufferedImage) img;
-				else {
-					bimg = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-					Graphics g = bimg.getGraphics();
-					g.drawImage(img, 0, 0, null);
-					g.dispose();
-				}
-				
-				Graphics g = this.image.getGraphics();
-				// TODO: Area Type ID must be included.
-				if (data.areaTypeIncluded) {
-					switch (data.areaTypeIDType) {
-						case ALPHA:
-						default:
-							this.setBiomeTile((tiles[j] >> 24) & 0xFF, g);
+		switch (EditorConstants.metadata) {
+			case Pixel_Data: {
+				if (tilesEditorID != null) {
+					for (int j = 0; j < tilesEditorID.length; j++) {
+						if (bitmapWidth <= 0)
 							break;
-						case RED:
-							this.setBiomeTile((tiles[j] >> 16) & 0xFF, g);
+						if (bitmapHeight <= 0)
 							break;
-						case GREEN:
-							this.setBiomeTile((tiles[j] >> 8) & 0xFF, g);
+						int w = j % bitmapWidth;
+						int h = j / bitmapWidth;
+						
+						Data data = EditorConstants.getInstance().getDatas().get(tilesEditorID[j]);
+						if (data == null) {
 							break;
-						case BLUE:
-							this.setBiomeTile(tiles[j] & 0xFF, g);
-							break;
+						}
+						if (data.image == null) {
+							tiles[j] = 0;
+							tilesEditorID[j] = 0;
+							continue;
+						}
+						
+						Image img = data.image;
+						BufferedImage bimg;
+						if (img instanceof BufferedImage)
+							bimg = (BufferedImage) img;
+						else {
+							bimg = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+							Graphics g = bimg.getGraphics();
+							g.drawImage(img, 0, 0, null);
+							g.dispose();
+						}
+						
+						Graphics g = this.image.getGraphics();
+						// TODO: Area Type ID must be included.
+						if (data.areaTypeIncluded) {
+							switch (data.areaTypeIDType) {
+								case ALPHA:
+								default:
+									this.setBiomeTile((tiles[j] >> 24) & 0xFF, g);
+									break;
+								case RED:
+									this.setBiomeTile((tiles[j] >> 16) & 0xFF, g);
+									break;
+								case GREEN:
+									this.setBiomeTile((tiles[j] >> 8) & 0xFF, g);
+									break;
+								case BLUE:
+									this.setBiomeTile(tiles[j] & 0xFF, g);
+									break;
+							}
+						}
+						else
+							g.setColor(Color.white);
+						g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
+						g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+						g.dispose();
+						
 					}
 				}
-				else
-					g.setColor(Color.white);
-				g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
-				g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
-				g.dispose();
-				
+				break;
+			}
+			case Triggers: {
+				if (triggers != null){
+					for (int k = 0; k < triggers.length; k++){
+						if (bitmapWidth <= 0)
+							break;
+						if (bitmapHeight <= 0)
+							break;
+						
+						if (triggers[k] == -1)
+							continue;
+						
+						Trigger trigger = null;
+						try {
+							trigger = EditorConstants.getInstance().getTriggers().get(triggers[k]);
+						}
+						catch (Exception e){
+							for (Trigger t: EditorConstants.getInstance().getTriggers()){
+								trigger = t;
+								break;
+							}
+						}
+						
+						if (trigger == null)
+							break;
+						int w = k % bitmapWidth;
+						int h = k / bitmapWidth;
+						
+						
+						Graphics g = this.image.getGraphics();
+						setTriggerTile(trigger.getTriggerID(), g);
+						g.fillRect(w * Tile.WIDTH,  h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
+						//g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+						g.dispose();
+					}
+				}
+				break;
 			}
 		}
-		
 		Graphics g = bs.getDrawGraphics();
 		g.setColor(Color.LIGHT_GRAY);
 		g.fillRect(0, 0, this.getWidth(), this.getHeight());
@@ -257,29 +301,59 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 	
+	private void setTriggerTile(int value, Graphics g) {
+		switch (value) {
+			default:
+				g.setColor(Color.cyan);
+				break;
+		}
+	}
+	
 	public void tick() {
 		if (editor.input.isDragging()) {
 			offsetX = editor.input.offsetX;
 			offsetY = editor.input.offsetY;
 		}
-		else if (editor.input.isDrawing()) {
-			this.mouseOnTileX = offsetX + editor.input.drawingX;
-			if (this.mouseOnTileX < 0)
-				return;
-			if (this.mouseOnTileX >= bitmapWidth * Tile.WIDTH)
-				return;
-			this.mouseOnTileY = offsetY + editor.input.drawingY;
-			if (this.mouseOnTileY < 0)
-				return;
-			if (this.mouseOnTileY >= bitmapHeight * Tile.HEIGHT)
-				return;
-			Data d = editor.controlPanel.getSelectedData();
-			if (d != null) {
-				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
-				tiles[i] = (d.alpha << 24) | (d.red << 16) | (d.green << 8) | d.blue;
-				tilesEditorID[i] = d.editorID;
+		switch (EditorConstants.metadata) {
+			case Pixel_Data: {
+				if (editor.input.isDrawing()) {
+					this.mouseOnTileX = offsetX + editor.input.drawingX;
+					if (this.mouseOnTileX < 0)
+						return;
+					if (this.mouseOnTileX >= bitmapWidth * Tile.WIDTH)
+						return;
+					this.mouseOnTileY = offsetY + editor.input.drawingY;
+					if (this.mouseOnTileY < 0)
+						return;
+					if (this.mouseOnTileY >= bitmapHeight * Tile.HEIGHT)
+						return;
+					Data d = editor.controlPanel.getSelectedData();
+					if (d != null) {
+						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+						tiles[i] = (d.alpha << 24) | (d.red << 16) | (d.green << 8) | d.blue;
+						tilesEditorID[i] = d.editorID;
+					}
+					editor.validate();
+				}
+				break;
 			}
-			editor.validate();
+			case Triggers: {
+				if (editor.input.isDrawing()) {
+					this.mouseOnTileX = offsetX + editor.input.drawingX;
+					this.mouseOnTileY = offsetY + editor.input.drawingY;
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= bitmapWidth * Tile.WIDTH)
+						return;
+					if (this.mouseOnTileY < 0 || this.mouseOnTileY >= bitmapHeight * Tile.HEIGHT)
+						return;
+					Trigger t = editor.controlPanel.getSelectedTrigger();
+					if (t != null) {
+						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+						this.triggers[i] = t.getDataValue();
+					}
+					editor.validate();
+				}
+				break;
+			}
 		}
 	}
 	

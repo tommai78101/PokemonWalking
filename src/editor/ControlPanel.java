@@ -31,12 +31,15 @@ public class ControlPanel extends JPanel implements ActionListener {
 	private String iconName; // Used to display name in the status panel of Level Editor
 	private LevelEditor editor; // reference to parent
 	private Data selectedData; // reference to selected data.
+	private Trigger selectedTrigger; // reference to selected trigger.
 	
 	public ControlPanel(LevelEditor editor) {
 		this.editor = editor;
 		this.selectedData = new Data();
 		this.selectedData.editorID = 0;
 		this.selectedData.filepath = "no_png.png";
+		
+		this.selectedTrigger = null;
 		
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 		
@@ -83,19 +86,32 @@ public class ControlPanel extends JPanel implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		JButton button = (JButton) event.getSource();
-		int id = Integer.parseInt(button.getActionCommand());
-		Data d = EditorConstants.getInstance().getDatas().get(id);
-		if (d != null) {
-			this.selectedData = d;
-			this.iconName = d.name;
-			this.propertiesPanel.alphaField.setText(Integer.toString(d.alpha));
-			this.propertiesPanel.redField.setText(Integer.toString(d.red));
-			this.propertiesPanel.greenField.setText(Integer.toString(d.green));
-			this.propertiesPanel.blueField.setText(Integer.toString(d.blue));			
-			EditorConstants.chooser = Tools.ControlPanel;
+		switch (EditorConstants.metadata) {
+			case Pixel_Data: {
+				JButton button = (JButton) event.getSource();
+				int id = Integer.parseInt(button.getActionCommand());
+				Data d = EditorConstants.getInstance().getDatas().get(id);
+				if (d != null) {
+					this.selectedData = d;
+					this.iconName = d.name;
+					this.propertiesPanel.alphaField.setText(Integer.toString(d.alpha));
+					this.propertiesPanel.redField.setText(Integer.toString(d.red));
+					this.propertiesPanel.greenField.setText(Integer.toString(d.green));
+					this.propertiesPanel.blueField.setText(Integer.toString(d.blue));
+					EditorConstants.chooser = Tools.ControlPanel;
+					
+				}
+				editor.validate();
+				break;
+			}
+			case Triggers: {
+				this.selectedTrigger = new Trigger();
+				this.selectedTrigger.setTriggerID((char) 1);
+				this.selectedTrigger.setTriggerPositionX((byte) 0x1);
+				this.selectedTrigger.setTriggerPositionY((byte) 0x1);
+				break;
+			}
 		}
-		editor.validate();
 	}
 	
 	public String getPickedEntityName() {
@@ -124,6 +140,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 	
 	public void setSelectedData(Data data) {
 		this.selectedData = data;
+	}
+	
+	public Trigger getSelectedTrigger() {
+		return this.selectedTrigger;
 	}
 	
 	public TilePropertiesPanel getPropertiesPanel() {

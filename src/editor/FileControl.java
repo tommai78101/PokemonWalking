@@ -27,6 +27,8 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import editor.EditorConstants.Metadata;
+
 public class FileControl extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
@@ -115,13 +117,14 @@ public class FileControl extends JPanel implements ActionListener {
 						}
 					}
 					break;
-				case 3: { //Refresh
-					break;
-				}
 				case 4: { //Tileset
+					EditorConstants.metadata = Metadata.Pixel_Data;
+					editor.validate();
 					break;
 				}
 				case 5: { //Trigger
+					EditorConstants.metadata = Metadata.Triggers;
+					editor.validate();
 					break;
 				}
 			}

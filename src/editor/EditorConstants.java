@@ -183,6 +183,28 @@ public class EditorConstants {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("script/scripts.txt")));
+			String line;
+			Trigger trigger = null;
+			while ((line = reader.readLine()) != null){
+				if (line.startsWith("/"))
+					continue;
+				else if (line.startsWith("$")){
+					if (trigger == null)
+						trigger = new Trigger();
+					trigger.setTriggerID((char) (((Integer.valueOf(line.substring(line.length() - 1)) & 0xFFFF))));
+				}
+				else if (line.startsWith("%")){
+					this.triggers.add(trigger);
+					trigger = null;
+				}
+			}
+		}
+		catch (Exception e){
+			e.printStackTrace();
+		}
 	}
 	
 	public static EditorConstants getInstance() {
