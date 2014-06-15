@@ -197,7 +197,15 @@ public class EditorConstants {
 				else if (line.startsWith("$")) {
 					if (trigger == null)
 						trigger = new Trigger();
-					trigger.setTriggerID((char) (((Integer.valueOf(line.substring(line.length() - 1)) & 0xFFFF))));
+					int value = Integer.valueOf(line.substring(1));
+					if (value != 0){
+						trigger.setTriggerID((char) (value & 0xFFFF));
+					}
+					
+				}
+				else if (line.startsWith("@")){
+					if (trigger != null)
+						trigger.setName(line.substring(1));
 				}
 				else if (line.startsWith("%")) {
 					this.triggers.add(trigger);
@@ -208,7 +216,6 @@ public class EditorConstants {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("All is done.");
 	}
 	
 	public static EditorConstants getInstance() {
