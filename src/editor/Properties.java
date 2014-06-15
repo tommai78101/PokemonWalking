@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
 import editor.EditorConstants.Tools;
@@ -108,10 +108,17 @@ public class Properties extends JPanel {
 				System.out.println("Work more on this later.");
 			}
 		});
+
 		
+		JLabel label =new JLabel("Tileset Category");
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		this.add(label);
 		this.add(tileCategory);
 		this.add(tiles);
-		this.add(new JSeparator(SwingConstants.HORIZONTAL));
+		//this.add(new JSeparator(SwingConstants.HORIZONTAL));
+		label = new JLabel("Triggers");
+		label.setHorizontalAlignment(SwingConstants.CENTER);
+		this.add(label);
 		this.add(triggers);
 		
 		tileCategory.setSelectedIndex(0);

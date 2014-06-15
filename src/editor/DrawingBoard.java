@@ -113,10 +113,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 					pixels[j * image.getWidth() + i] = -1;
 			}
 		}
-		offsetX = offsetY = 0;
-		editor.input.offsetX = editor.input.offsetY = 0;
 		bitmapWidth = w;
 		bitmapHeight = h;
+		offsetX = -((this.getWidth() - (w * Tile.WIDTH))/ 2); 
+		offsetY = -((this.getHeight() - (h * Tile.HEIGHT)) / 2);
+		editor.input.offsetX = offsetX; 
+		editor.input.offsetY = offsetY;
+		
 	}
 	
 	public void newImage() {
@@ -184,12 +187,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 							tilesEditorID[j] = 0;
 							continue;
 						}
-						
-						// BufferedImage bimg = new BufferedImage(data.image.getIconWidth(), data.image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-						// Graphics g = bimg.getGraphics();
-						// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
-						// g.dispose();
-						//
 						Graphics g = this.image.getGraphics();
 						BufferedImage bimg = new BufferedImage(data.image.getIconWidth(), data.image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 						Graphics gB = bimg.getGraphics();
@@ -370,10 +367,30 @@ public class DrawingBoard extends Canvas implements Runnable {
 	public BufferedImage getMapImage() {
 		if (bitmapWidth * bitmapHeight == 0)
 			return null;
-		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight, BufferedImage.TYPE_INT_ARGB);
+		ArrayList<Trigger> list = EditorConstants.getInstance().getTriggers();
+		int size = list.size();
+		int w = size % (bitmapWidth + 1);
+		int h = size / (bitmapWidth + 1);
+		
+		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight + h, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
-		for (int i = 0; i < tiles.length; i++) {
-			pixels[i] = tiles[i];
+		
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				Trigger t = null;
+				try {
+					t = list.get(y * w + x);
+				}
+				catch (Exception e) {
+					pixels[y * w + x] = 0;
+					continue;
+				}
+				pixels[y * w + x] = t.getDataValue();
+				continue;
+			}
+		}
+		for (int i =0; i < tiles.length; i++) {
+			pixels[i + (size-1)] = tiles[i];
 		}
 		return buffer;
 	}
