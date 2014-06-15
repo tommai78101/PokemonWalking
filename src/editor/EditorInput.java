@@ -126,10 +126,16 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	
 	@Override
 	public void mouseReleased(MouseEvent event) {
-		mouseX = event.getX();
-		mouseY = event.getY();
-		offsetX = oldX - mouseX;
-		offsetY = oldY - mouseY;
+		if (drawing){
+			drawingX = event.getX();
+			drawingY = event.getY();
+		}
+		else if (panning){
+			mouseX = event.getX();
+			mouseY = event.getY();
+			offsetX = oldX - mouseX;
+			offsetY = oldY - mouseY;
+		}
 		drawing = false;
 		panning = false;
 		editor.validate();
