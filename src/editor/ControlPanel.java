@@ -43,7 +43,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 		JPanel iconsPanel = new JPanel();
 		iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.Y_AXIS));
 		EditorConstants constants = EditorConstants.getInstance();
-		for (Data d : EditorConstants.getInstance().getDatas()) {
+		for (Data d : constants.getDatas()) {
 			d.button.setActionCommand(Integer.toString(d.editorID));
 			d.button.addActionListener(this);
 			iconsPanel.add(d.button);
@@ -92,7 +92,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 			this.propertiesPanel.alphaField.setText(Integer.toString(d.alpha));
 			this.propertiesPanel.redField.setText(Integer.toString(d.red));
 			this.propertiesPanel.greenField.setText(Integer.toString(d.green));
-			this.propertiesPanel.blueField.setText(Integer.toString(d.blue));
+			this.propertiesPanel.blueField.setText(Integer.toString(d.blue));			
 			EditorConstants.chooser = Tools.ControlPanel;
 		}
 		editor.validate();

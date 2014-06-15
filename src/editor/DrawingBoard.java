@@ -146,6 +146,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 		});
 	}
 	
+	public void newImage(final int x, final int y) {
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				setImageSize(x, y);
+			}
+		});
+	}
+	
 	public void render() {
 		BufferStrategy bs = this.getBufferStrategy();
 		if (bs == null) {

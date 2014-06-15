@@ -23,12 +23,14 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class FileControl extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
-	private String[] tags = new String[] { "New", "Save", "Open" };
+	private String[] tags = new String[] { "New", "Save", "Open", "", "Tileset", "Trigger"};
 	private LevelEditor editor;
 	HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
 	private File lastSavedDirectory;
@@ -40,6 +42,10 @@ public class FileControl extends JPanel implements ActionListener {
 		this.lastSavedDirectory = new File("C:\\Users\\Student\\Desktop");
 		
 		for (int i = 0; i < tags.length; i++) {
+			if (i == 3){
+				this.add(new JSeparator(SwingConstants.VERTICAL));
+				continue;
+			}
 			JButton button = new JButton(tags[i]);
 			button.addActionListener(this);
 			String actionCommand = Integer.toString(i);
@@ -109,6 +115,15 @@ public class FileControl extends JPanel implements ActionListener {
 						}
 					}
 					break;
+				case 3: { //Refresh
+					break;
+				}
+				case 4: { //Tileset
+					break;
+				}
+				case 5: { //Trigger
+					break;
+				}
 			}
 		}
 		catch (NumberFormatException e) {

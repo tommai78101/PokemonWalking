@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import editor.EditorConstants.Metadata;
+
 public class LevelEditor extends JFrame {
 	private static final long serialVersionUID = -8739477187675627751L;
 	public static final int WIDTH = 160;
@@ -106,6 +108,7 @@ public class LevelEditor extends JFrame {
 					add(statusPanel, BorderLayout.SOUTH);
 					validate();
 				}
+				initialize();
 			}
 		});
 	}
@@ -149,6 +152,11 @@ public class LevelEditor extends JFrame {
 				}
 			}
 		});
+	}
+	
+	public final void initialize(){
+		EditorConstants.metadata = Metadata.Pixel_Data;
+		this.drawingBoardPanel.newImage(5, 5);
 	}
 	
 	public ArrayList<Data> getResourceFilePaths() {
