@@ -54,13 +54,13 @@ public class Properties extends JPanel {
 		};
 		triggers = new JComboBox<Trigger>();
 		triggers.setPreferredSize(SIZE);
-		new KeySelectionRenderer(triggers){
+		new KeySelectionRenderer(triggers) {
 			private static final long serialVersionUID = 1L;
 			
 			@Override
 			public String getDisplayValue(Object item) {
 				Trigger t = (Trigger) item;
-				return String.valueOf(t.getTriggerID());
+				return t.getName();
 			}
 		};
 		
@@ -104,24 +104,25 @@ public class Properties extends JPanel {
 				}
 			}
 		});
-		triggers.addItemListener(new ItemListener(){
+		triggers.addItemListener(new ItemListener() {
 			@Override
-			public void itemStateChanged(ItemEvent e){
+			public void itemStateChanged(ItemEvent e) {
 				EditorConstants.chooser = Tools.Properties;
-				Trigger t = (Trigger) e.getItem();
-				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
-				panel.alphaField.setText(Integer.toString(t.getPositionX()));
-				panel.redField.setText(Integer.toString(t.getPositionY()));
-				panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
-				panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
-				Properties.this.selectedTrigger = t;
-				editor.controlPanel.setSelectedTrigger(t);
-				editor.validate();
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					Trigger t = (Trigger) e.getItem();
+					TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+					panel.alphaField.setText(Integer.toString(t.getPositionX()));
+					panel.redField.setText(Integer.toString(t.getPositionY()));
+					panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
+					panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
+					Properties.this.selectedTrigger = t;
+					editor.controlPanel.setSelectedTrigger(t);
+					editor.validate();
+				}
 			}
 		});
-
 		
-		JLabel label =new JLabel("Tileset Category");
+		JLabel label = new JLabel("Tileset Category");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(label);
 		this.add(tileCategory);
@@ -134,10 +135,16 @@ public class Properties extends JPanel {
 		tileCategory.setSelectedIndex(0);
 		tiles.setSelectedIndex(0);
 		triggers.setSelectedIndex(0);
+		
+		this.validate();
 	}
 	
 	public Data getSelectedData() {
 		return this.selectedData;
+	}
+	
+	public Trigger getSelectedTrigger(){
+		return this.selectedTrigger;
 	}
 	
 	private void loadCategory() {
@@ -157,25 +164,27 @@ public class Properties extends JPanel {
 		}
 	}
 	
-	private void loadTriggers(){
+	private void loadTriggers() {
 		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
 		ArrayList<Trigger> list = EditorConstants.getInstance().getTriggers();
-		for (Trigger t: list){
+		for (Trigger t : list) {
 			model.addElement(t);
 		}
 	}
 	
 	@Override
-	public void validate(){
+	public void validate() {
 		super.validate();
-		switch (EditorConstants.metadata){
+		switch (EditorConstants.metadata) {
 			case Pixel_Data:
 				this.tileCategory.setEnabled(true);
 				this.tiles.setEnabled(true);
+				this.triggers.setEnabled(false);
 				break;
 			case Triggers:
 				this.tileCategory.setEnabled(false);
 				this.tiles.setEnabled(false);
+				this.triggers.setEnabled(true);
 				break;
 		}
 	}
