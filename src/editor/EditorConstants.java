@@ -123,7 +123,7 @@ public class EditorConstants {
 					data.filepath = tokens[6];
 					data.editorID = editorID++;
 					data.image = ImageIO.read(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
-					ImageIcon icon = new ImageIcon(data.image);
+					final ImageIcon icon = new ImageIcon(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
 					data.button = new JButton(icon) {
 						private static final long serialVersionUID = 1L;
 						
