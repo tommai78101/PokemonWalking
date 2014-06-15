@@ -3,6 +3,7 @@ package editor;
 public class Trigger {
 	private byte x, y;
 	private char triggerID;
+	private String name;
 	
 	private boolean[] valuesHasBeenSet = new boolean[3];
 	
@@ -58,5 +59,13 @@ public class Trigger {
 	
 	public char getTriggerID() {
 		return this.triggerID;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+	}
+	
+	public String getName(){
+		return this.name;
 	}
 }
