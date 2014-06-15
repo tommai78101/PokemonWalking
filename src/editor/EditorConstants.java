@@ -16,6 +16,7 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -122,8 +123,9 @@ public class EditorConstants {
 					data.blue = Integer.valueOf(tokens[5], 16);
 					data.filepath = tokens[6];
 					data.editorID = editorID++;
-					data.image = ImageIO.read(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
-					final ImageIcon icon = new ImageIcon(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
+					URL location = EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]);
+					data.image = ImageIO.read(location);
+					final ImageIcon icon = new ImageIcon(location);
 					data.button = new JButton(icon) {
 						private static final long serialVersionUID = 1L;
 						
