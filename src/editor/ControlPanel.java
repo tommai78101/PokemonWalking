@@ -146,6 +146,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 		return this.selectedTrigger;
 	}
 	
+	public void setSelectedTrigger(Trigger t){
+		this.selectedTrigger = t;
+	}
+	
 	public TilePropertiesPanel getPropertiesPanel() {
 		return this.propertiesPanel;
 	}

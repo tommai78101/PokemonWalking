@@ -23,6 +23,7 @@ public class Properties extends JPanel {
 	private JComboBox<Data> tiles;
 	private JComboBox<Trigger> triggers;
 	private Data selectedData;
+	private Trigger selectedTrigger;
 	public final LevelEditor editor;
 	
 	public Properties(final LevelEditor editor) {
@@ -65,6 +66,7 @@ public class Properties extends JPanel {
 		
 		loadCategory();
 		loadTiles();
+		loadTriggers();
 		
 		tileCategory.addItemListener(new ItemListener() {
 			@Override
@@ -105,7 +107,16 @@ public class Properties extends JPanel {
 		triggers.addItemListener(new ItemListener(){
 			@Override
 			public void itemStateChanged(ItemEvent e){
-				System.out.println("Work more on this later.");
+				EditorConstants.chooser = Tools.Properties;
+				Trigger t = (Trigger) e.getItem();
+				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+				panel.alphaField.setText(Integer.toString(t.getPositionX()));
+				panel.redField.setText(Integer.toString(t.getPositionY()));
+				panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
+				panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
+				Properties.this.selectedTrigger = t;
+				editor.controlPanel.setSelectedTrigger(t);
+				editor.validate();
 			}
 		});
 
@@ -115,7 +126,6 @@ public class Properties extends JPanel {
 		this.add(label);
 		this.add(tileCategory);
 		this.add(tiles);
-		//this.add(new JSeparator(SwingConstants.HORIZONTAL));
 		label = new JLabel("Triggers");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(label);
@@ -123,6 +133,7 @@ public class Properties extends JPanel {
 		
 		tileCategory.setSelectedIndex(0);
 		tiles.setSelectedIndex(0);
+		triggers.setSelectedIndex(0);
 	}
 	
 	public Data getSelectedData() {
@@ -143,6 +154,14 @@ public class Properties extends JPanel {
 		DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) tiles.getModel();
 		for (Data d : c.nodes) {
 			model.addElement(d);
+		}
+	}
+	
+	private void loadTriggers(){
+		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
+		ArrayList<Trigger> list = EditorConstants.getInstance().getTriggers();
+		for (Trigger t: list){
+			model.addElement(t);
 		}
 	}
 	

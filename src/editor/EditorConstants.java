@@ -65,6 +65,11 @@ public class EditorConstants {
 	public static Metadata metadata = Metadata.Pixel_Data;
 	
 	private EditorConstants() {
+		loadTilesetData();
+		loadTriggers();
+	}
+	
+	private void loadTilesetData(){
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
 			String line;
@@ -179,7 +184,9 @@ public class EditorConstants {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+	}
+	
+	private void loadTriggers(){
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("script/scripts.txt")));
 			String line;
@@ -201,6 +208,7 @@ public class EditorConstants {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		System.out.println("All is done.");
 	}
 	
 	public static EditorConstants getInstance() {

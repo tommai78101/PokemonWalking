@@ -115,9 +115,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		bitmapWidth = w;
 		bitmapHeight = h;
-		offsetX = -((this.getWidth() - (w * Tile.WIDTH))/ 2); 
+		offsetX = -((this.getWidth() - (w * Tile.WIDTH)) / 2);
 		offsetY = -((this.getHeight() - (h * Tile.HEIGHT)) / 2);
-		editor.input.offsetX = offsetX; 
+		editor.input.offsetX = offsetX;
 		editor.input.offsetY = offsetY;
 		
 	}
@@ -223,6 +223,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 				break;
 			}
 			case Triggers: {
+				hoverOnTriggers();
 				if (triggers != null) {
 					for (int k = 0; k < triggers.length; k++) {
 						if (bitmapWidth <= 0)
@@ -389,8 +390,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 				continue;
 			}
 		}
-		for (int i =0; i < tiles.length; i++) {
-			pixels[i + (size-1)] = tiles[i];
+		for (int i = 0; i < tiles.length; i++) {
+			pixels[i + (size - 1)] = tiles[i];
 		}
 		return buffer;
 	}
@@ -445,6 +446,43 @@ public class DrawingBoard extends Canvas implements Runnable {
 					}
 				}
 			}
+		}
+	}
+	
+	private void hoverOnTriggers() {
+		try {
+			int w = 0;
+			int h = 0;
+			
+			// try...catch for X position
+			try {
+				w = (editor.input.offsetX + editor.input.mouseX) / getBitmapWidth();
+			}
+			catch (Exception e) {
+				w = (editor.input.offsetX + editor.input.mouseX) / (LevelEditor.WIDTH * LevelEditor.SIZE);
+			}
+			
+			// try catch for Y position
+			try {
+				h = (editor.input.offsetY + editor.input.mouseY) / getBitmapHeight();
+			}
+			catch (Exception e) {
+				h = (editor.input.offsetY + editor.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);
+			}
+			
+			// checks for mouse hoving above triggers
+			int value = triggers[h * bitmapWidth + w];
+			if (value != -1) {
+				// Show trigger IDs and stuffs.
+				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+				panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
+				panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
+				panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));
+				panel.blueField.setText(Integer.toString(value & 0xFF));
+				panel.validate();
+			}
+		}
+		catch (Exception e) {
 		}
 	}
 }
