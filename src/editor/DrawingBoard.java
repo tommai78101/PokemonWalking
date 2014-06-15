@@ -30,7 +30,6 @@ import abstracts.Tile;
 
 public class DrawingBoard extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
-	private static boolean showAnimation;
 	
 	private LevelEditor editor;
 	
@@ -46,7 +45,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 		super();
 		this.editor = editor;
 		offsetX = offsetY = 0;
-		this.showAnimation = false;
 	}
 	
 	@Override
