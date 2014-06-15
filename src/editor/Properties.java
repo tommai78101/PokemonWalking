@@ -12,7 +12,6 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import editor.EditorConstants.Metadata;
 import editor.EditorConstants.Tools;
 
 public class Properties extends JPanel {
@@ -22,9 +21,9 @@ public class Properties extends JPanel {
 	
 	private JComboBox<Category> tileCategory;
 	private JComboBox<Data> tiles;
-	private JComboBox<Metadata> metadatas;
+	private JComboBox<Trigger> triggers;
 	private Data selectedData;
-	private final LevelEditor editor;
+	public final LevelEditor editor;
 	
 	public Properties(final LevelEditor editor) {
 		this.editor = editor;
@@ -52,39 +51,21 @@ public class Properties extends JPanel {
 				return d.name;
 			}
 		};
-		metadatas = new JComboBox<Metadata>();
-		metadatas.setPreferredSize(SIZE);
-		new KeySelectionRenderer(metadatas) {
+		triggers = new JComboBox<Trigger>();
+		triggers.setPreferredSize(SIZE);
+		new KeySelectionRenderer(triggers){
 			private static final long serialVersionUID = 1L;
 			
 			@Override
 			public String getDisplayValue(Object item) {
-				Metadata m = (Metadata) item;
-				return m.getName();
+				Trigger t = (Trigger) item;
+				return String.valueOf(t.getTriggerID());
 			}
 		};
 		
-		loadMetadatas();
 		loadCategory();
 		loadTiles();
 		
-		metadatas.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					Metadata m = (Metadata) e.getItem();
-					switch (m) {
-						case Pixel_Data:
-						default:
-							EditorConstants.metadata = Metadata.Pixel_Data;
-							break;
-						case Triggers:
-							EditorConstants.metadata = Metadata.Triggers;
-							break;
-					}
-				}
-			}
-		});
 		tileCategory.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
@@ -121,18 +102,20 @@ public class Properties extends JPanel {
 				}
 			}
 		});
-		
-		this.add(metadatas);
-		JSeparator x = new JSeparator(SwingConstants.HORIZONTAL);
-		x.setPreferredSize(new Dimension(40, 150));
-		this.add(x);
+		triggers.addItemListener(new ItemListener(){
+			@Override
+			public void itemStateChanged(ItemEvent e){
+				System.out.println("Work more on this later.");
+			}
+		});
 		
 		this.add(tileCategory);
 		this.add(tiles);
+		this.add(new JSeparator(SwingConstants.HORIZONTAL));
+		this.add(triggers);
 		
 		tileCategory.setSelectedIndex(0);
 		tiles.setSelectedIndex(0);
-		metadatas.setSelectedItem(0);
 	}
 	
 	public Data getSelectedData() {
@@ -156,12 +139,18 @@ public class Properties extends JPanel {
 		}
 	}
 	
-	private void loadMetadatas() {
-		Metadata[] metas = EditorConstants.Metadata.values();
-		DefaultComboBoxModel<Metadata> model = (DefaultComboBoxModel<Metadata>) metadatas.getModel();
-		for (Metadata m : metas) {
-			model.addElement(m);
+	@Override
+	public void validate(){
+		super.validate();
+		switch (EditorConstants.metadata){
+			case Pixel_Data:
+				this.tileCategory.setEnabled(true);
+				this.tiles.setEnabled(true);
+				break;
+			case Triggers:
+				this.tileCategory.setEnabled(false);
+				this.tiles.setEnabled(false);
+				break;
 		}
-		
 	}
 }

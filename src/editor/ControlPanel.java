@@ -149,4 +149,12 @@ public class ControlPanel extends JPanel implements ActionListener {
 	public TilePropertiesPanel getPropertiesPanel() {
 		return this.propertiesPanel;
 	}
+	
+	@Override
+	public void validate(){
+		super.validate();
+		
+		if (this.propertiesPanel != null)
+			this.propertiesPanel.validate();
+	}
 }

@@ -150,6 +150,17 @@ public class LevelEditor extends JFrame {
 					}
 					statusPanel.setStatusMessageText(builder.toString());
 				}
+				
+				if (LevelEditor.this.controlPanel != null)
+					LevelEditor.this.controlPanel.validate();
+				if (LevelEditor.this.fileControlPanel != null)
+					LevelEditor.this.fileControlPanel.validate();
+				if (LevelEditor.this.drawingBoardPanel != null)
+					LevelEditor.this.drawingBoardPanel.validate();
+				if (LevelEditor.this.properties != null)
+					LevelEditor.this.properties.validate();
+				if (LevelEditor.this.statusPanel != null)
+					LevelEditor.this.statusPanel.validate();
 			}
 		});
 	}
