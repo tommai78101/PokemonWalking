@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import abstracts.Tile;
 import editor.EditorConstants.Metadata;
 
 public class LevelEditor extends JFrame {
@@ -127,13 +128,13 @@ public class LevelEditor extends JFrame {
 						int w = 0;
 						int h = 0;
 						try {
-							w = (input.offsetX + input.mouseX) / drawingBoardPanel.getBitmapWidth();
+							w = (input.offsetX + input.mouseX) / Tile.WIDTH;
 						}
 						catch (Exception e) {
 							w = (input.offsetX + input.mouseX) / (WIDTH * SIZE);
 						}
 						try {
-							h = (input.offsetY + input.mouseY) / drawingBoardPanel.getBitmapHeight();
+							h = (input.offsetY + input.mouseY) / Tile.HEIGHT;
 						}
 						catch (Exception e) {
 							h = (input.offsetY + input.mouseY) / (WIDTH * SIZE);
