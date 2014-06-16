@@ -288,10 +288,8 @@ public class OverWorld extends World {
 			else
 				targetAreaID = data.getTargetAreaID();
 			this.currentArea = WorldConstants.convertToArea(areas, targetAreaID);
-			if (currentArea == null) {
-				this.currentArea.playerWentPastWarpZone();
+			if (currentArea == null)
 				return;
-			}
 			this.currentArea.setPlayer(this.player);
 			this.currentArea.setDefaultPosition(data);
 			this.invertBitmapColors = true;
