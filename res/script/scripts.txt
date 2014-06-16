@@ -4,6 +4,12 @@
 / to feel lively.
 
 / _: Whitespaces.
+/ @: Trigger name.
+/ ^: [Direction, Steps]. Can be chained for delays.
+/ $: Start of script.
+/ %: Script delimiter.
+/ #: Speech Dialogue.
+/ ?: Question Dialogue.
 
 / DO NOT CHANGE.
 $0
@@ -15,4 +21,6 @@ $0
 $1
 @Testing_Script
 ^D2R2U2L2
+#Hello_world. This is a test sentence.
+^D3U3R1L0
 %
