@@ -38,6 +38,7 @@ public class Area {
 	
 	private boolean displayExitArrow;
 	private boolean triggerIsBeingTriggered;
+	private TriggerData trigger;
 	
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	private final ArrayList<Obstacle> areaObstacles = new ArrayList<Obstacle>();
@@ -111,12 +112,19 @@ public class Area {
 				yPlayerPosition = player.getYInArea();
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
-				TriggerData temp = checkForTrigger(xPlayerPosition, yPlayerPosition);
-				if (temp != null) {
-					temp.tick(this, xPlayerPosition, yPlayerPosition);
+				
+				if (this.triggerIsBeingTriggered) {
+					trigger.tick(this, xPlayerPosition, yPlayerPosition);
+					if (this.trigger.isFinished())
+						this.triggerIsBeingTriggered = false;
 				}
-				else
-					handleSurroundingTiles();
+				else {
+					trigger = checkForTrigger(xPlayerPosition, yPlayerPosition);
+					if (trigger != null)
+						this.triggerIsBeingTriggered = true;
+					else
+						handleSurroundingTiles();
+				}
 			}
 			else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
 				// A
@@ -138,8 +146,10 @@ public class Area {
 	
 	private TriggerData checkForTrigger(int playerX, int playerY) {
 		for (TriggerData t : this.triggerDatas) {
-			if (t.x == playerX && t.y == playerY && !t.isFinished())
+			if (t.x == playerX && t.y == playerY && !t.isFinished()) {
+				this.triggerIsBeingTriggered = true;
 				return t;
+			}
 		}
 		return null;
 	}
@@ -624,7 +634,7 @@ public class Area {
 		return this.areaObstacles;
 	}
 	
-	public Player getPlayer(){
+	public Player getPlayer() {
 		return this.player;
 	}
 	

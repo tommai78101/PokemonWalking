@@ -14,5 +14,5 @@ $0
 / Turn clockwise in a circle.
 $1
 @Testing_Script
-^U0R0D0L0
+^D2R2U2L2
 %
