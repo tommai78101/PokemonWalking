@@ -30,160 +30,161 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public JTextField greenField;
 	public JTextField blueField;
 	public Data selectedData;
+	public JLabel tileID, extendedTileID, tileSpecificID;
+	private static final Dimension SIZE = new Dimension(70, 10);
+	private static final Dimension INPUT_SIZE = new Dimension(15, 15);
 	
 	@SuppressWarnings({ "serial" })
 	public TilePropertiesPanel() {
 		super();
-		final Dimension size = new Dimension(60, 10);
-		final Dimension inputSize = new Dimension(15, 15);
 		
 		this.selectedData = new Data();
 		
-		JLabel tileID = new JLabel("Tile ID:") {
+		tileID = new JLabel("Tile ID:") {
 			@Override
 			public Dimension getSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getPreferredSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getMaximumSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getMinimumSize() {
-				return size;
+				return SIZE;
 			}
 		};
-		JLabel extendedTileID = new JLabel("Ext. ID:") {
+		extendedTileID = new JLabel("Ext. ID:") {
 			@Override
 			public Dimension getSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getPreferredSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getMaximumSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getMinimumSize() {
-				return size;
+				return SIZE;
 			}
 		};
-		JLabel tileSpecificID = new JLabel("Other ID:") {
+		tileSpecificID = new JLabel("Other ID:") {
 			@Override
 			public Dimension getSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getPreferredSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getMaximumSize() {
-				return size;
+				return SIZE;
 			}
 			
 			@Override
 			public Dimension getMinimumSize() {
-				return size;
+				return SIZE;
 			}
 		};
 		alphaField = new JTextField() {
 			@Override
 			public Dimension getSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getPreferredSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getMaximumSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getMinimumSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 		};
 		redField = new JTextField() {
 			@Override
 			public Dimension getSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getPreferredSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getMaximumSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getMinimumSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 		}; // RR
 		greenField = new JTextField() {
 			@Override
 			public Dimension getSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getPreferredSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getMaximumSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getMinimumSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 		}; // GG
 		blueField = new JTextField() {
 			@Override
 			public Dimension getSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getPreferredSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getMaximumSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 			
 			@Override
 			public Dimension getMinimumSize() {
-				return inputSize;
+				return INPUT_SIZE;
 			}
 		}; // BB
 		tileID.setHorizontalAlignment(SwingConstants.CENTER);
@@ -358,6 +359,23 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		}
 		catch (Exception e) {
 			EditorConstants.chooser = Tools.ControlPanel;
+		}
+	}
+	
+	@Override
+	public void validate(){
+		super.validate();
+		switch (EditorConstants.metadata){
+			case Pixel_Data:
+				this.tileID.setText("Tile ID:");
+				this.extendedTileID.setText("Extended ID:");
+				this.tileSpecificID.setText("Other IDs:");
+				break;
+			case Triggers:
+				this.tileID.setText("X Position:");
+				this.extendedTileID.setText("Y Position:");
+				this.tileSpecificID.setText("Trigger ID:");
+				break;
 		}
 	}
 }
