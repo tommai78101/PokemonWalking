@@ -97,11 +97,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		tiles = new int[w * h];
 		tilesEditorID = new int[w * h];
-		triggers = new int[w * h];
 		for (int i = 0; i < tiles.length; i++) {
 			tiles[i] = 0;
 			tilesEditorID[i] = 0;
-			triggers[i] = 0;
 		}
 		image = new BufferedImage(w * Tile.WIDTH, h * Tile.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
@@ -248,7 +246,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						
 						Graphics g = this.image.getGraphics();
 						
-						if (triggers[k] != 0) {
+						if ((triggers[k] & 0xFFFF) != 0) {
 							g.setColor(Color.cyan);
 							g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 						}
@@ -416,9 +414,16 @@ public class DrawingBoard extends Canvas implements Runnable {
 	
 	public void openMapImage(BufferedImage image) {
 		int[] srcTiles = image.getRGB(0, 0, 1, 1, null, 0, 1);
-		
 		int triggerCount = srcTiles[0];
 		int row = (triggerCount / image.getWidth()) + 1;
+		
+		srcTiles = image.getRGB(0, 0, image.getWidth(), row, null, 0, image.getWidth());
+		this.triggers = new int[image.getWidth() * (image.getHeight() - row)];
+		for (int i = 0; i < triggerCount; i++){
+			int x = (srcTiles[i+1] >> 24) & 0xFF;
+			int y = (srcTiles[i+1] >> 16) & 0xFF;
+			triggers[y * image.getWidth() + x] = srcTiles[i+1];
+		}
 		
 		this.setImageSize(image.getWidth(), image.getHeight() - row);
 		srcTiles = image.getRGB(0, row, image.getWidth(), image.getHeight() - row, null, 0, image.getWidth());
