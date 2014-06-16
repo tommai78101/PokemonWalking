@@ -7,14 +7,44 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import abstracts.Entity;
+import dialogue.NewDialogue;
 
 public class Script {
 	public int triggerID;
-	public Movement moves;
+	public ArrayList<Map.Entry<Integer, Movement>> moves;
+	public ArrayList<Map.Entry<Integer, NewDialogue>> dialogues;
+	public int iteration;
 	
 	public Script(){
 		this.triggerID = 0;
-		this.moves = new Movement();
+		this.moves = new ArrayList<Map.Entry<Integer, Movement>> ();
+		this.dialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
+		this.iteration = 0;
+	}
+	
+	public Movement getIteratedMoves(){
+		for (Map.Entry<Integer, Movement> entry: this.moves){
+			if (entry.getKey() == this.iteration)
+				return entry.getValue();
+		}
+		return null;
+	}
+	
+	public NewDialogue getIteratedDialogues(){
+		for (Map.Entry<Integer, NewDialogue> entry: this.dialogues){
+			if (entry.getKey() == this.iteration){
+				return entry.getValue();
+			}
+		}
+		return null;
+	}
+	
+	public boolean incrementIteration(){
+		this.iteration++;
+		int size = this.moves.size() + this.dialogues.size();
+		if (this.iteration < size)
+			return true;
+		return false;
 	}
 	
 	public static ArrayList<Script> loadScript(String filename) {
@@ -23,6 +53,7 @@ public class Script {
 		// Scripts must contain a trigger data for Area to use, and must contain movements for Area to read.
 		
 		Script script = null;
+		int iteration = 0;
 		
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Script.class.getClassLoader().getResourceAsStream(filename)));
@@ -41,7 +72,10 @@ public class Script {
 				}
 				else if (line.startsWith("^")) {
 					if (script != null) {
-						append(script.moves, line.substring(1).toCharArray());
+						Movement moves = new Movement();
+						append(moves, line.substring(1).toCharArray());
+						script.moves.add(new AbstractMap.SimpleEntry<Integer, Movement>(iteration, moves));
+						iteration++;
 					}
 				}
 				else if (line.startsWith("%")) {
@@ -50,12 +84,21 @@ public class Script {
 						script = null;
 					}
 				}
+				else if (line.startsWith("#")){
+					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "), NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
+					script.dialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(iteration, d));
+					iteration++;
+				}
+				else if (line.startsWith("?")){
+					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "), NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_QUESTION, true);
+					script.dialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(iteration, d));
+					iteration++;
+				}
 			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		return result;
 	}
 	
