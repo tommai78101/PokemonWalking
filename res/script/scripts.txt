@@ -5,11 +5,12 @@
 
 / _: Whitespaces.
 / @: Trigger name.
-/ ^: [Direction, Steps]. Can be chained for delays.
+/ ^: [Direction, Steps]. Can be chained for delaying scripted movements.
 / $: Start of script.
 / %: Script delimiter.
 / #: Speech Dialogue.
 / ?: Question Dialogue.
+/ /: Comments. Gets ignored.
 
 / DO NOT CHANGE.
 $0
@@ -17,10 +18,16 @@ $0
 %
 
 
-/ Turn clockwise in a circle.
+/ Turn counter-clockwise in a circle.
 $1
 @Testing_Script
 ^D2R2U2L2
-#Hello_world. This is a test sentence.
+#Hello_world.
 ^D3U3R1L0
+%
+
+/ Turn clockwise in a circle.
+$2
+@Clockwise_Circle
+^R2D2L2U2
 %
