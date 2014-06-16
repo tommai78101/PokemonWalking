@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import obstacle.Obstacle;
 import screen.BaseBitmap;
 import screen.BaseScreen;
+import script.TriggerData;
 import abstracts.Tile;
 import entity.Player;
 
@@ -40,15 +41,30 @@ public class Area {
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	private final ArrayList<Obstacle> areaObstacles = new ArrayList<Obstacle>();
 	private final ArrayList<PixelData> modifiedAreaData = new ArrayList<PixelData>();
+	private final ArrayList<TriggerData> triggerDatas = new ArrayList<TriggerData>();
 	
 	public Area(BaseBitmap bitmap, final int areaID) {
+		int[] tempPixels =bitmap.getPixels();
+		int triggerSize = tempPixels[0];
+		int row = 0;
+		int column = 0;
+		for (int i = 0; i < triggerSize; i++) {
+			column = i + 1;
+			int color = tempPixels[column + (bitmap.getHeight()* row)];
+			//ID must not be negative. ID = 0 is reserved.
+			if (color > 0)
+				triggerDatas.add(new TriggerData().loadTriggerData(color));
+			if (column >= bitmap.getWidth()) {
+				row++;
+				column -= bitmap.getWidth();
+			}
+		}
+		//We need to add the row by 1 for the last row with trailing empty trigger IDs.
+		row++;
 		this.width = bitmap.getWidth();
-		this.height = bitmap.getHeight();
-		this.pixels = bitmap.getPixels();
-		this.areaID = areaID;
-		this.isInWarpZone = false;
-		this.isInSectorPoint = false;
-		this.displayExitArrow = false;
+		this.height = bitmap.getHeight() - row;
+		this.pixels = new int[this.width * this.height];
+		System.arraycopy(bitmap.getPixels(), this.width * row, this.pixels, 0, this.pixels.length);
 		
 		for (int y = 0; y < this.height; y++) {
 			areaData.add(new ArrayList<PixelData>());
@@ -60,6 +76,11 @@ public class Area {
 				areaData.get(y).add(px);
 			}
 		}
+		
+		this.areaID = areaID;
+		this.isInWarpZone = false;
+		this.isInSectorPoint = false;
+		this.displayExitArrow = false;
 	}
 	
 	public void setPlayer(Player player) {
@@ -421,7 +442,8 @@ public class Area {
 	
 	public void setDebugDefaultPosition() {
 		// When the game starts from the very beginning, the player must always start from the very first way point.
-		SET_LOOP: for (ArrayList<PixelData> y : this.areaData) {
+		SET_LOOP:
+		for (ArrayList<PixelData> y : this.areaData) {
 			for (PixelData x : y) {
 				if (((x.getColor() >> 24) & 0xFF) == 0x01) {
 					player.setAreaPosition(x.xPosition, x.yPosition);
@@ -582,6 +604,7 @@ public class Area {
 	public ArrayList<Obstacle> getObstaclesList() {
 		return this.areaObstacles;
 	}
+	
 	
 	// --------------------- PRIVATE METHODS ----------------------
 	

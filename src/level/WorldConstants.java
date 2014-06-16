@@ -20,6 +20,7 @@ import java.util.Map;
 import resources.Art;
 import resources.Mod;
 import screen.BaseBitmap;
+import script.Script;
 import abstracts.Item;
 import dialogue.NewDialogue;
 
@@ -61,7 +62,7 @@ public class WorldConstants {
 	public static Boolean isModsEnabled = null;
 	
 	// Movement
-	// public static ArrayList<Map.Entry<Integer, Movement>> scripts = Movement.loadMovement("script/scripts.txt");
+	public static ArrayList<Script> scripts = Script.loadScript("script/scripts.txt");
 	
 	// All bitmaps
 	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
@@ -121,10 +122,10 @@ public class WorldConstants {
 		}
 		if (WorldConstants.isModsEnabled == Boolean.FALSE) {
 			result.add(new Area(Art.testArea, TEST_WORLD_1));
-			result.add(new Area(Art.testArea2, TEST_WORLD_2));
-			result.add(new Area(Art.testArea3, TEST_WORLD_3));
-			result.add(new Area(Art.testArea4, TEST_WORLD_4));
-			result.add(new Area(Art.testArea_debug, DEBUG));
+//			result.add(new Area(Art.testArea2, TEST_WORLD_2));
+//			result.add(new Area(Art.testArea3, TEST_WORLD_3));
+//			result.add(new Area(Art.testArea4, TEST_WORLD_4));
+//			result.add(new Area(Art.testArea_debug, DEBUG));
 		}
 		else {
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
