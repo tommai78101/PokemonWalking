@@ -12,6 +12,11 @@ public class Script {
 	public int triggerID;
 	public Movement moves;
 	
+	public Script(){
+		this.triggerID = 0;
+		this.moves = new Movement();
+	}
+	
 	public static ArrayList<Script> loadScript(String filename) {
 		ArrayList<Script> result = new ArrayList<Script>();
 		
@@ -40,13 +45,15 @@ public class Script {
 					}
 				}
 				else if (line.startsWith("%")) {
-					if (script != null) {
+					if (script != null){
 						result.add(script);
+						script = null;
 					}
 				}
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 		}
 		
 		return result;
@@ -85,6 +92,7 @@ public class Script {
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new NumberFormatException("Incorrect script syntax from \"script.txt\"");
 		}
 	}

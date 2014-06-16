@@ -37,6 +37,7 @@ public class Area {
 	// private int areaType;
 	
 	private boolean displayExitArrow;
+	private boolean triggerIsBeingTriggered;
 	
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	private final ArrayList<Obstacle> areaObstacles = new ArrayList<Obstacle>();
@@ -44,14 +45,14 @@ public class Area {
 	private final ArrayList<TriggerData> triggerDatas = new ArrayList<TriggerData>();
 	
 	public Area(BaseBitmap bitmap, final int areaID) {
-		int[] tempPixels =bitmap.getPixels();
+		int[] tempPixels = bitmap.getPixels();
 		int triggerSize = tempPixels[0];
 		int row = 0;
 		int column = 0;
 		for (int i = 0; i < triggerSize; i++) {
 			column = i + 1;
-			int color = tempPixels[column + (bitmap.getHeight()* row)];
-			//ID must not be negative. ID = 0 is reserved.
+			int color = tempPixels[column + (bitmap.getHeight() * row)];
+			// ID must not be negative. ID = 0 is reserved.
 			if (color > 0)
 				triggerDatas.add(new TriggerData().loadTriggerData(color));
 			if (column >= bitmap.getWidth()) {
@@ -59,7 +60,7 @@ public class Area {
 				column -= bitmap.getWidth();
 			}
 		}
-		//We need to add the row by 1 for the last row with trailing empty trigger IDs.
+		// We need to add the row by 1 for the last row with trailing empty trigger IDs.
 		row++;
 		this.width = bitmap.getWidth();
 		this.height = bitmap.getHeight() - row;
@@ -81,6 +82,7 @@ public class Area {
 		this.isInWarpZone = false;
 		this.isInSectorPoint = false;
 		this.displayExitArrow = false;
+		this.triggerIsBeingTriggered = false;
 	}
 	
 	public void setPlayer(Player player) {
@@ -109,33 +111,12 @@ public class Area {
 				yPlayerPosition = player.getYInArea();
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
-				this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
-				try {
-					if (this.player.isInteracting()) {
-						switch (this.player.getFacing()) {
-							case Player.UP:
-								this.player.interact(areaData.get(this.yPlayerPosition - 1).get(xPlayerPosition).getColor());
-								break;
-							case Player.DOWN:
-								this.player.interact(areaData.get(this.yPlayerPosition + 1).get(xPlayerPosition).getColor());
-								break;
-							case Player.LEFT:
-								this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition - 1).getColor());
-								break;
-							case Player.RIGHT:
-								this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition + 1).getColor());
-								break;
-						}
-					}
+				TriggerData temp = checkForTrigger(xPlayerPosition, yPlayerPosition);
+				if (temp != null) {
+					temp.tick(this, xPlayerPosition, yPlayerPosition);
 				}
-				catch (Exception e) {
-					this.player.stopInteraction();
-				}
-				
-				// Target pixel is used to determine what pixel the player is currently standing on
-				// (or what pixel the player is currently on top of).
-				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-				this.checkCurrentPositionDataAndSetProperties();
+				else
+					handleSurroundingTiles();
 			}
 			else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
 				// A
@@ -153,6 +134,44 @@ public class Area {
 				this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 			}
 		}
+	}
+	
+	private TriggerData checkForTrigger(int playerX, int playerY) {
+		for (TriggerData t : this.triggerDatas) {
+			if (t.x == playerX && t.y == playerY && !t.isFinished())
+				return t;
+		}
+		return null;
+	}
+	
+	private void handleSurroundingTiles() {
+		this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
+		try {
+			if (this.player.isInteracting()) {
+				switch (this.player.getFacing()) {
+					case Player.UP:
+						this.player.interact(areaData.get(this.yPlayerPosition - 1).get(xPlayerPosition).getColor());
+						break;
+					case Player.DOWN:
+						this.player.interact(areaData.get(this.yPlayerPosition + 1).get(xPlayerPosition).getColor());
+						break;
+					case Player.LEFT:
+						this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition - 1).getColor());
+						break;
+					case Player.RIGHT:
+						this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition + 1).getColor());
+						break;
+				}
+			}
+		}
+		catch (Exception e) {
+			this.player.stopInteraction();
+		}
+		
+		// Target pixel is used to determine what pixel the player is currently standing on
+		// (or what pixel the player is currently on top of).
+		this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+		this.checkCurrentPositionDataAndSetProperties();
 	}
 	
 	/**
@@ -605,6 +624,9 @@ public class Area {
 		return this.areaObstacles;
 	}
 	
+	public Player getPlayer(){
+		return this.player;
+	}
 	
 	// --------------------- PRIVATE METHODS ----------------------
 	
