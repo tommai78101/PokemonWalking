@@ -438,6 +438,12 @@ public class Area {
 				data.tick();
 			}
 		}
+		
+		if (this.trigger != null){
+			screen.setOffset(0, 0);
+			this.trigger.render(screen, screen.getBufferedImage().createGraphics());
+			screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
+		}
 	}
 	
 	// Getters/Setters
@@ -636,6 +642,10 @@ public class Area {
 	
 	public Player getPlayer() {
 		return this.player;
+	}
+	
+	public TriggerData getTriggerData(){
+		return this.trigger;
 	}
 	
 	// --------------------- PRIVATE METHODS ----------------------
