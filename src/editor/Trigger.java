@@ -49,6 +49,14 @@ public class Trigger {
 		return this.valuesHasBeenSet[2];
 	}
 	
+	public boolean isAllSet(){
+		boolean result = true;
+		for (int i =0; i<this.valuesHasBeenSet.length; i++)
+			if (!this.valuesHasBeenSet[i])
+				result = false;
+		return result;
+	}
+	
 	public byte getPositionX() {
 		return this.x;
 	}

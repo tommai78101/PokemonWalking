@@ -245,13 +245,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int w = k % bitmapWidth;
 						int h = k / bitmapWidth;
 						
+						
 						Graphics g = this.image.getGraphics();
+						
 						if (triggers[k] != 0) {
 							g.setColor(Color.cyan);
 							g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 						}
 						else {
-							Data d =EditorConstants.getData(0, 0, 0, 0);
+							Data d = EditorConstants.getData(0, 0, 0, 0);
 							g.drawImage(d.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
 						}
 						g.dispose();
@@ -340,7 +342,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 						return;
 					Trigger t = editor.controlPanel.getSelectedTrigger();
 					if (t != null) {
-						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+						int x = this.getMouseTileX();
+						int y = this.getMouseTileY();
+						t.setTriggerPositionX((byte) x);
+						t.setTriggerPositionY((byte) y);
+						
+						int i = y * bitmapWidth + x;
 						this.triggers[i] = t.getDataValue();
 					}
 					editor.validate();
@@ -373,30 +380,32 @@ public class DrawingBoard extends Canvas implements Runnable {
 	public BufferedImage getMapImage() {
 		if (bitmapWidth * bitmapHeight == 0)
 			return null;
-		ArrayList<Trigger> list = EditorConstants.getInstance().getTriggers();
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for (int i: this.triggers){
+			if (i != 0)
+				list.add(Integer.valueOf(i));
+		}
+		
 		int size = list.size();
-		int w = size % (bitmapWidth + 1);
-		int h = size / (bitmapWidth + 1);
+		int h = (size / bitmapHeight) + 1;
 		
 		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight + h, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
 		
-		for (int y = 0; y < h; y++) {
-			for (int x = 0; x < w; x++) {
-				Trigger t = null;
-				try {
-					t = list.get(y * w + x);
-				}
-				catch (Exception e) {
-					pixels[y * w + x] = 0;
-					continue;
-				}
-				pixels[y * w + x] = t.getDataValue();
-				continue;
+		int index = 0;
+		int width = 0;
+		pixels[0] = list.size();
+		for (int i =0; i<list.size(); i++){
+			width = i + 1;
+			pixels[width + (index * bitmapHeight)] = list.get(i).intValue();
+			if (width >= bitmapHeight){
+				index++;
+				width -= bitmapHeight;
 			}
 		}
-		for (int i = 0; i < tiles.length; i++) {
-			pixels[i + (size - 1)] = tiles[i];
+		
+		for (int iterator = 0; iterator < tiles.length; iterator++) {
+			pixels[bitmapWidth * h + iterator] = tiles[iterator];
 		}
 		return buffer;
 	}
@@ -477,17 +486,21 @@ public class DrawingBoard extends Canvas implements Runnable {
 			
 			// checks for mouse hoving above triggers
 			int value = triggers[h * bitmapWidth + w];
-			if (value != -1) {
-				// Show trigger IDs and stuffs.
-				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
-				panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
-				panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
-				panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));
-				panel.blueField.setText(Integer.toString(value & 0xFF));
-				panel.validate();
-			}
+			// Show trigger IDs and stuffs.
+			TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+			panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
+			panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
+			panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));
+			panel.blueField.setText(Integer.toString(value & 0xFF));
+			panel.validate();
 		}
 		catch (Exception e) {
+			TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+			panel.alphaField.setText("");
+			panel.redField.setText("");
+			panel.greenField.setText("");
+			panel.blueField.setText("");
+			panel.validate();
 		}
 	}
 }
