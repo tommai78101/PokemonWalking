@@ -226,7 +226,21 @@ public class OverWorld extends World {
 							}
 						}
 						else if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && !this.newDialogues[this.newDialoguesIterator].isScrolling()) {
-							this.newDialogues[this.newDialoguesIterator].tick();
+							if (!this.newDialogues[this.newDialoguesIterator].isShowingDialog()){
+								Player.unlockMovements();
+								this.newDialogues[this.newDialoguesIterator].resetDialogue();
+								if (this.newDialoguesIterator < this.newDialogues.length - 1) {
+									this.newDialoguesIterator++;
+									this.handleDialogues();
+								}
+								else {
+									this.newDialogues = null;
+									this.newDialoguesIterator = 0;
+									this.player.stopInteraction();
+								}
+							}
+							else
+								this.newDialogues[this.newDialoguesIterator].tick();
 						}
 						else if (this.newDialogues[this.newDialoguesIterator].isDialogueTextSet() && !(this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && this.newDialogues[this.newDialoguesIterator].isShowingDialog())) {
 							Player.lockMovements();
