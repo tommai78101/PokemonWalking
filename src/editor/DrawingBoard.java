@@ -415,8 +415,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 	
 	public void openMapImage(BufferedImage image) {
-		this.setImageSize(image.getWidth(), image.getHeight());
-		int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+		int[] srcTiles = image.getRGB(0, 0, 1, 1, null, 0, 1);
+		
+		int triggerCount = srcTiles[0];
+		int row = (triggerCount / image.getWidth()) + 1;
+		
+		this.setImageSize(image.getWidth(), image.getHeight() - row);
+		srcTiles = image.getRGB(0, row, image.getWidth(), image.getHeight() - row, null, 0, image.getWidth());
+		
+		
 		for (int i = 0; i < srcTiles.length; i++)
 			tiles[i] = srcTiles[i];
 		ArrayList<Data> list = EditorConstants.getInstance().getDatas();
