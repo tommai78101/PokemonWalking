@@ -75,14 +75,24 @@
 % Right                         % 07 % 05 % * % @ %   res/art/editor/water_right.gif
 -House                                                
 % Bottom_Wall                   % 08 % 00 % @ % @ %   res/art/house/house_bottom.png
-% Left_Wall                     % 08 % 01 % @ % @ %   res/art/house/house_bottom_left.png
-% Right_Wall                    % 08 % 02 % @ % @ %   res/art/house/house_bottom_right.png
-% Left_Roof                     % 08 % 03 % @ % @ %   res/art/house/house_roof_left.png
-% Middle_Roof                   % 08 % 04 % @ % @ %   res/art/house/house_roof_middle.png
-% Right_Roof                    % 08 % 05 % @ % @ %   res/art/house/house_roof_right.png
-% Door                          % 0A % @ %  @ % @ %   res/art/house/house_door.png
+% Bottom_Left_Wall              % 08 % 01 % @ % @ %   res/art/house/house_bottom_left.png
+% Bottom_Right_Wall             % 08 % 02 % @ % @ %   res/art/house/house_bottom_right.png
+% Center_Wall                   % 08 % 03 % @ % @ %   res/art/house/house_center.png
+% Center_Windows                % 08 % 04 % @ % @ %   res/art/house/house_center_windows_center.png
+% Center_Left_Windows           % 08 % 05 % @ % @ %   res/art/house/house_center_windows_left.png
+% Center_Right_Windows          % 08 % 06 % @ % @ %   res/art/house/house_center_windows_right.png
+% Door                          % 0A % @  % @ % @ %   res/art/house/house_door.png
+% Left_Wall                     % 08 % 07 % @ % @ %   res/art/house/house_left.png
+% Left_Windows_Wall             % 08 % 08 % @ % @ %   res/art/house/house_left_windows_right.png
+% Right_Wall                    % 08 % 09 % @ % @ %   res/art/house/house_right.png
+% Right_Windows_Wall            % 08 % 0A % @ % @ %   res/art/house/house_right_windows_left.png
+% Left_Roof                     % 08 % 0B % @ % @ %   res/art/house/house_roof_left.png
+% Middle_Roof                   % 08 % 0C % @ % @ %   res/art/house/house_roof_middle.png
+% Right_Roof                    % 08 % 0D % @ % @ %   res/art/house/house_roof_right.png
 % Carpet_[Indoors]              % 0C % 00 % @ % @ %   res/art/floor/carpet_indoors.png
 % Carpet_[Outdoors]             % 0C % 01 % @ % @ %   res/art/floor/carpet_outdoors.png
 -Items
-% Item                          % 0B % @ % @ % @ %    res/art/object/item.png
+% Test                          % 0B % 01 % @ % @ %    res/art/object/item.png
+% 3_Options                     % 0B % 02 % @ % @ %    res/art/object/item.png
+% Bicycle                       % 0B % 03 % @ % @ %    res/art/object/item.png
 +

@@ -338,23 +338,47 @@ public class PixelData {
 			case 0x09: // House
 				this.bitmap = new BaseBitmap[1];
 				switch (red) { // House related tiles. Way too many to list them orderly.
-					case 0x00: // Door
+					case 0x00: // Bottom wall
 						this.bitmap[0] = Art.house_bottom;
 						break;
-					case 0x01: // Bottom building
+					case 0x01: // Bottom left wall
 						this.bitmap[0] = Art.house_bottom_left;
 						break;
-					case 0x02: // Bottom left building
+					case 0x02: // Bottom right wall
 						this.bitmap[0] = Art.house_bottom_right;
 						break;
-					case 0x03: // Roof left
+					case 0x03: //Center wall
+						this.bitmap[0] = Art.house_center; 
+						break;
+					case 0x04: //Center wall with windows in center
+						this.bitmap[0] = Art.house_center_windows_center; 
+						break;
+					case 0x05: //Center wall with windows on left
+						this.bitmap[0] = Art.house_center_windows_left; 
+						break;
+					case 0x06: //Center wall with windows on right
+						this.bitmap[0] = Art.house_center_windows_right; 
+						break;
+					case 0x07: //Left wall
+						this.bitmap[0] = Art.house_left; 
+						break;
+					case 0x08: //Left wall with windows on right
+						this.bitmap[0] = Art.house_left_windows_right; 
+						break;
+					case 0x09: //Right wall
+						this.bitmap[0] = Art.house_right;
+						break;
+					case 0x0A: //Right wall with windows on left
+						this.bitmap[0] = Art.house_right_windows_left; 
+						break;
+					case 0x0B: // Roof left
 						this.bitmap[0] = Art.changeColors(Art.house_roof_left, WorldConstants.convertToAreaColor(green), WorldConstants.convertToAreaColor(green));
 						// this.bitmap[0] = Art.house_roof_left;
 						break;
-					case 0x04: // Roof middle
+					case 0x0C: // Roof middle
 						this.bitmap[0] = Art.changeColors(Art.house_roof_middle, WorldConstants.convertToAreaColor(green), WorldConstants.convertToAreaColor(green));
 						break;
-					case 0x05: // Roof right
+					case 0x0D: // Roof right
 						this.bitmap[0] = Art.changeColors(Art.house_roof_right, WorldConstants.convertToAreaColor(green), WorldConstants.convertToAreaColor(green));
 						break;
 				}
