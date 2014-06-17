@@ -33,8 +33,6 @@ public class WorldConstants {
 	public static final int TEST_WORLD_1 = 0x01;
 	public static final int TEST_WORLD_2 = 0x02;
 	public static final int TEST_WORLD_3 = 0x03;
-	public static final int TEST_WORLD_4 = 0x04;
-	public static final int DEBUG = 0x05;
 	
 	// Item IDs
 	public static final int ITEM_RETURN = 0;
@@ -90,12 +88,6 @@ public class WorldConstants {
 				break;
 			case TEST_WORLD_3:
 				area = new Area(Art.testArea3, TEST_WORLD_3);
-				break;
-			case TEST_WORLD_4:
-				area = new Area(Art.testArea4, TEST_WORLD_4);
-				break;
-			case DEBUG:
-				area = new Area(Art.testArea_debug, DEBUG);
 				break;
 			default:
 				area = null;

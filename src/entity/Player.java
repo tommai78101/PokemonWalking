@@ -146,11 +146,6 @@ public class Player extends Entity {
 		}).start();
 	}
 	
-	@Override
-	public int getX() {
-		return this.xPosition;
-	}
-	
 	public int getXInArea() {
 		// Returns area position X.
 		int result = (xPosition / Tile.WIDTH);
@@ -163,11 +158,6 @@ public class Player extends Entity {
 					break;
 			}
 		return result;
-	}
-	
-	@Override
-	public int getY() {
-		return this.yPosition;
 	}
 	
 	public int getYInArea() {
@@ -449,6 +439,9 @@ public class Player extends Entity {
 	 * <p>
 	 * It uses the 2D Cartesian coordinates used in bitmaps. Positive X: Right. Positive Y: Down.
 	 * 
+	 * <p>
+	 * <i>Note that the player's X and Y positions are overwritten by the loading system.</i>
+	 * 
 	 * @param x
 	 *            The X coordinate the player is to be positioned at.
 	 * @param y
@@ -650,7 +643,7 @@ public class Player extends Entity {
 	}
 	
 	private void controlTick() {
-		if (this.lockWalking || this.lockJumping) {
+		if (!this.lockWalking || !this.lockJumping) {
 			animationTick++;
 			if ((this.facing == UP && this.facingsBlocked[UP])) {
 				if (animationTick >= 10) {
@@ -687,7 +680,6 @@ public class Player extends Entity {
 	private void handleFacingCheck(){
 		if (this.walking != this.facing){
 			this.walking = this.facing;
-			this.animationPointer = 0;
 		}
 	}
 	

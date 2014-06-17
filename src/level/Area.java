@@ -75,6 +75,11 @@ public class Area {
 				PixelData px = new PixelData(pixel, x, y);
 				if (((pixel >> 24) & 0xFF) == 0x03)
 					areaObstacles.add(new Obstacle(px, (pixel >> 16) & 0xFF));
+				if (((pixel >> 24) & 0xFF) == 0x0E){
+					this.setDefaultPosition(px);
+					this.setPlayerX(x);
+					this.setPlayerY(y);
+				}
 				areaData.get(y).add(px);
 			}
 		}
@@ -405,17 +410,16 @@ public class Area {
 					return false;
 				case 0x05: // Area Connection point.
 					return false;
-				case 0x06:
+				case 0x06: //Stairs
 					return false;
 				case 0x07: // Water
-					// TODO: Add something that detects a special boolean value
-					// in order to let the player move on water.
+					// TODO: Add something that detects a special boolean value in order to let the player move on water.
 					return false;
-				case 0x09: // House
+				case 0x08: // House
 					return true;
-				case 0x0A: // House Door
+				case 0x09: // House Door
 					return false;
-				case 0x0B: // Item
+				case 0x0A: // Item
 					if (this.player.isInteracting())
 						return true;
 					if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
@@ -426,6 +430,12 @@ public class Area {
 						}
 					}
 					return true; // Cannot go through items on the ground.
+				case 0x0B: //Carpet (Indoors)
+					break;
+				case 0x0C: //Carpet (Outdoors)
+					break;
+				case 0x0D: //Default starting point.
+					break;
 				default: // Any other type of tiles should be walkable, for no apparent reasons.
 					return false;
 			}
@@ -501,8 +511,10 @@ public class Area {
 		SET_LOOP:
 		for (ArrayList<PixelData> y : this.areaData) {
 			for (PixelData x : y) {
-				if (((x.getColor() >> 24) & 0xFF) == 0x01) {
+				if (((x.getColor() >> 24) & 0xFF) == 0x0E) {
 					player.setAreaPosition(x.xPosition, x.yPosition);
+					setPlayerX(x.xPosition);
+					setPlayerY(x.yPosition);
 					break SET_LOOP;
 				}
 			}

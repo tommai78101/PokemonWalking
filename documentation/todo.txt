@@ -1,7 +1,15 @@
 By line order (Specific --> Abstract):
 
 
-Work on scripted actions.
+TOP PRIORITY:
+	├ Must fix pixel data loading in both the game and the editor.
+	├ Must find all bugs related to loading bitmaps and incorrect map data.
+	├ Must find all bugs related to bitmap tile collision properties.
+	└ Must add Biome Bitmap selection panel to the editor. Add biomes.
+	
+Add debug messages throughout the entire project. Log messages to be exact.
+
+
 Work on scripted events.
 
 Update documentation on new map format.

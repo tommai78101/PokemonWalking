@@ -161,8 +161,6 @@ public class Art {
 	public static BaseBitmap testArea;
 	public static BaseBitmap testArea2;
 	public static BaseBitmap testArea3;
-	public static BaseBitmap testArea4;
-	public static BaseBitmap testArea_debug;
 	
 	// Font
 	public static Font font;
@@ -218,15 +216,15 @@ public class Art {
 		house_door = screen.load("art/house/house_door.png");
 		house_bottom = screen.load("art/house/house_bottom.png");
 		house_bottom_left = screen.load("art/house/house_bottom_left.png");
-		house_left = screen.load("art/house/house_left.png");
-		house_left_windows_right = screen.load("art/house/house_left_windows_right.png");
-		house_right = screen.load("art/house/house_right.png");
-		house_right_windows_left = screen.load("art/house/house_right_windows_left.png");
+		house_bottom_right = screen.load("art/house/house_bottom_right.png");
 		house_center = screen.load("art/house/house_center.png");
 		house_center_windows_center = screen.load("art/house/house_center_windows_center.png");
 		house_center_windows_left = screen.load("art/house/house_center_windows_left.png");
 		house_center_windows_right = screen.load("art/house/house_center_windows_right.png");
-		house_bottom_right = screen.load("art/house/house_bottom_right.png");
+		house_left = screen.load("art/house/house_left.png");
+		house_left_windows_right = screen.load("art/house/house_left_windows_right.png");
+		house_right = screen.load("art/house/house_right.png");
+		house_right_windows_left = screen.load("art/house/house_right_windows_left.png");
 		house_roof_left = screen.load("art/house/house_roof_left.png");
 		house_roof_middle = screen.load("art/house/house_roof_middle.png");
 		house_roof_right = screen.load("art/house/house_roof_right.png");
@@ -292,8 +290,6 @@ public class Art {
 		testArea = screen.load("area/test/testArea.png");
 		testArea2 = screen.load("area/test/testArea2.png");
 		testArea3 = screen.load("area/test/testArea3.png");
-		testArea4 = screen.load("area/test/testArea4.png");
-		testArea_debug = screen.load("area/test/testArea_debug.png");
 		
 		// Miscellaneous
 		font = loadFont("font/font.ttf");

@@ -42,6 +42,7 @@ Metadata...........................[PWD04]
 		Overworld..................[PWD04#02@01]
 		Sector.....................[PWD04#02@02]
 	Tiles..........................[PWD04#03]
+		Empty......................[PWD04#03@00]
 		Path.......................[PWD04#03@01]
 		Ledge......................[PWD04#03@02]
 		Tree.......................[PWD04#03@03]
@@ -387,6 +388,33 @@ not assume their information to be permanent.
 	format.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
+
+		Empty [PWD04#03@00]
+		
+		Tile ID:
+			A: 00 - Empty
+		Extended Tile ID:
+			R: 00
+		Tile Specific ID:
+			G: 00	
+			B: 00
+		Full Data:
+			00 00 00 00
+		Description:
+			Represents an empty, non-existing tile. Reserved for
+			both the game and the editor for its special uses.
+			
+			In the editor, this represents an "Eraser" tile, used
+			to clean the map tiles and reset their values back to
+			zero.
+			
+			In the game, this represents an "Error" tile, shown
+			as a "NO PNG" bitmap tile. When this tile shows up
+			in the game, it is definitely either human error when
+			creating a custom map, or there exists a bug that 
+			may generate from loading other pixel data.
+	
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
 		Floor [PWD04#03@01]
 		
@@ -396,10 +424,9 @@ not assume their information to be permanent.
 			R: 00 - Grass. (Path)
 			R: 01 - Mountain Ground. (Path)
 			R: 02 - Path. (Path)
-			R: 03 - Carpet (Indoors)
-			R: 04 - Carpet (Outdoors)
-			R: 05 - Hardwood (Indoors)
-			R: 06 - Tatami (Indoors)
+			R: 03 - Hardwood (Indoors)
+			R: 04 - Right Tatami Floor (Indoors)
+			R: 05 - Left Tatami Floor (Indoors)
 		Tile Specific ID:
 			G: TT - Area Type.
 			B: HH - Ground Height.
@@ -428,7 +455,8 @@ not assume their information to be permanent.
 					0x05 = Building
 			
 			More area types may be specified at a later time, or when it is
-			required to add a new area type.
+			required to add a new area type. All future area types are to 
+			refer back to this list.
 			
 			Ground height specifies the light level drawn onto the
 			screen.
@@ -502,6 +530,9 @@ not assume their information to be permanent.
 			R: 03 - Scaffolding (Left)
 			R: 04 - Scaffolding (Right)
 			R: 05 - Sign
+			R: 06 - Workbench (Left)
+			R: 07 - Workbench (Right)
+			R: 08 - Dead Small Tree
 		Tile Specific ID:
 			G: GG (Sign) Dialogue ID.
 			B: BB (Sign) Dialogue ID.
@@ -640,14 +671,22 @@ not assume their information to be permanent.
 				00 - Bottom
 				01 - Bottom Left
 				02 - Bottom Right
-				03 - Single Roof Left
-				04 - Single Roof Middle
-				05 - Single Roof Right
+				03 - Center Wall
+				04 - Center Window Wall
+				05 - Center Left Windows
+				06 - Center Right Windows
+				07 - Left Wall
+				08 - Left Window Wall
+				09 - Right Wall
+				0A - Right Window Wall
+				0B - Single Roof Left
+				0C - Single Roof Middle
+				0D - Single Roof Right
 		Tile Specific ID:
 			G: 00 - Area/Sector ID.
 			B: 00 - None specified.
 		Full Data(s):
-			09 HH 00 00
+			08 HH 00 00
 		Description:
 			Represents buildings in the game. A single tile only represents a 
 			portion of the building.
@@ -664,7 +703,7 @@ not assume their information to be permanent.
 		House Door [PWD04#03@09]
 		
 		Tile ID:
-			A: 0A - Door
+			A: 09 - Door
 		Extended Tile ID:
 			R: TT - Target Area
 		Tile Specific ID:
@@ -684,7 +723,7 @@ not assume their information to be permanent.
 		Items [PWD04#03@10]
 		
 		Tile ID:
-			A: 0B - Item
+			A: 0A - Item
 		Extended Tile ID:
 			R: XX - Specific Item.
 		Tile Specific ID:
@@ -706,7 +745,7 @@ not assume their information to be permanent.
 		Carpet (Indoors) [PWD04#03@11]
 
 		Tile ID:
-			A: 0C - Carpet (Indoors)
+			A: 0B - Carpet (Indoors)
 		Extended Tile ID:
 			R: AA - Target Area ID.
 		Tile Specific ID:
@@ -727,7 +766,7 @@ not assume their information to be permanent.
 		Carpet (Outdoors) [PWD04#03@12]
 
 		Tile ID:
-			A: 0D - Carpet (Outdoors)
+			A: 0C - Carpet (Outdoors)
 		Extended Tile ID:
 			R: AA - Target Area ID.
 		Tile Specific ID:
@@ -747,18 +786,32 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
--------------------------------
-
-		Triggers [PWD04#03@13]
-
+		Default Starting Point [PWD04#03@13]
+		
 		Tile ID:
-			A: 0E - Triggers
+			A: 0D - Triggers
 		Extended Tile ID;
 			R: XX - Any one of all available bitmaps
 		Tile Specific ID:
 			G: GG - Script ID
 			B: BB - Script ID
+		Full Data:
+			0D XX GG BB
 		Description:
+			(This should be used sparsingly. Useful for debugging maps.)
+			
+			This sets the default starting position for the player. If it so happens
+			that the game loads the map in such a way causing the player to be stuck,
+			then it means there is a problem with the game, the editor, or the map.
+
+
+-------------------------------
+
+		Triggers [PWD04#03@13]
+		
+		TODO: Must add a new section for it.
+
+		
 			Depending on how it was triggered, this tile will trigger a scripted
 			event matching the script ID.
 

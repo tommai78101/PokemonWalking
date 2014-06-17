@@ -243,7 +243,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int w = k % bitmapWidth;
 						int h = k / bitmapWidth;
 						
-						
 						Graphics g = this.image.getGraphics();
 						
 						if ((triggers[k] & 0xFFFF) != 0) {
@@ -378,14 +377,21 @@ public class DrawingBoard extends Canvas implements Runnable {
 	public BufferedImage getMapImage() {
 		if (bitmapWidth * bitmapHeight == 0)
 			return null;
+		
+		int size = 0;
+		int h = 0;
+		
+		if (this.triggers == null) {
+			this.triggers = new int[1];
+			this.triggers[0] = 0;
+		}
 		ArrayList<Integer> list = new ArrayList<Integer>();
-		for (int i: this.triggers){
+		for (int i : this.triggers) {
 			if (i != 0)
 				list.add(Integer.valueOf(i));
 		}
-		
-		int size = list.size();
-		int h = (size / bitmapHeight) + 1;
+		size = list.size();
+		h = (size / bitmapHeight) + 1;
 		
 		BufferedImage buffer = new BufferedImage(bitmapWidth, bitmapHeight + h, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
@@ -393,10 +399,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 		int index = 0;
 		int width = 0;
 		pixels[0] = list.size();
-		for (int i =0; i<list.size(); i++){
+		for (int i = 0; i < list.size(); i++) {
 			width = i + 1;
 			pixels[width + (index * bitmapHeight)] = list.get(i).intValue();
-			if (width >= bitmapHeight){
+			if (width >= bitmapHeight) {
 				index++;
 				width -= bitmapHeight;
 			}
@@ -419,15 +425,14 @@ public class DrawingBoard extends Canvas implements Runnable {
 		
 		srcTiles = image.getRGB(0, 0, image.getWidth(), row, null, 0, image.getWidth());
 		this.triggers = new int[image.getWidth() * (image.getHeight() - row)];
-		for (int i = 0; i < triggerCount; i++){
-			int x = (srcTiles[i+1] >> 24) & 0xFF;
-			int y = (srcTiles[i+1] >> 16) & 0xFF;
-			triggers[y * image.getWidth() + x] = srcTiles[i+1];
+		for (int i = 0; i < triggerCount; i++) {
+			int x = (srcTiles[i + 1] >> 24) & 0xFF;
+			int y = (srcTiles[i + 1] >> 16) & 0xFF;
+			triggers[y * image.getWidth() + x] = srcTiles[i + 1];
 		}
 		
 		this.setImageSize(image.getWidth(), image.getHeight() - row);
 		srcTiles = image.getRGB(0, row, image.getWidth(), image.getHeight() - row, null, 0, image.getWidth());
-		
 		
 		for (int i = 0; i < srcTiles.length; i++)
 			tiles[i] = srcTiles[i];

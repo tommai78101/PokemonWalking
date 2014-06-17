@@ -81,7 +81,7 @@
 % Center_Windows                % 08 % 04 % @ % @ %   res/art/house/house_center_windows_center.png
 % Center_Left_Windows           % 08 % 05 % @ % @ %   res/art/house/house_center_windows_left.png
 % Center_Right_Windows          % 08 % 06 % @ % @ %   res/art/house/house_center_windows_right.png
-% Door                          % 0A % @  % @ % @ %   res/art/house/house_door.png
+% Door                          % 09 % @  % @ % @ %   res/art/house/house_door.png
 % Left_Wall                     % 08 % 07 % @ % @ %   res/art/house/house_left.png
 % Left_Windows_Wall             % 08 % 08 % @ % @ %   res/art/house/house_left_windows_right.png
 % Right_Wall                    % 08 % 09 % @ % @ %   res/art/house/house_right.png
@@ -89,10 +89,12 @@
 % Left_Roof                     % 08 % 0B % @ % @ %   res/art/house/house_roof_left.png
 % Middle_Roof                   % 08 % 0C % @ % @ %   res/art/house/house_roof_middle.png
 % Right_Roof                    % 08 % 0D % @ % @ %   res/art/house/house_roof_right.png
-% Carpet_[Indoors]              % 0C % 00 % @ % @ %   res/art/floor/carpet_indoors.png
-% Carpet_[Outdoors]             % 0C % 01 % @ % @ %   res/art/floor/carpet_outdoors.png
+% Carpet_[Indoors]              % 0B % @  % @ % @ %   res/art/floor/carpet_indoors.png
+% Carpet_[Outdoors]             % 0C % @  % @ % @ %   res/art/floor/carpet_outdoors.png
 -Items
-% Test                          % 0B % 01 % @ % @ %    res/art/object/item.png
-% 3_Options                     % 0B % 02 % @ % @ %    res/art/object/item.png
-% Bicycle                       % 0B % 03 % @ % @ %    res/art/object/item.png
+% Test                          % 0A % 01 % @ % @ %    res/art/object/item.png
+% 3_Options                     % 0A % 02 % @ % @ %    res/art/object/item.png
+% Bicycle                       % 0A % 03 % @ % @ %    res/art/object/item.png
+-Game_Start_Position
+% Starting Position             % 0D % 00 % 00 % 00 %  res/art/player/shadow.png
 +

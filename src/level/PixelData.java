@@ -152,16 +152,25 @@ public class PixelData {
 						this.biomeBitmap = new BaseBitmap[1];
 						this.biomeBitmap[0] = Art.grass; // Forest
 						break;
+					case 0x01:
+						//TODO: Change this biome bitmap to something that represents the city even more.
+						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap[0] = Art.path; //City
 					case 0x02:
 						this.biomeBitmap = new BaseBitmap[1];
 						this.biomeBitmap[0] = Art.mt_ground; // Mountain
 						break;
+					case 0x03:
+						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap[0] = Art.water[0];
+						//TODO: Add more area type biome bitmaps here to the Path. (Refer to documentation.)
 					default:
 						break;
 				}
 				break;
 			case 0x02: // Ledge
 			{
+				//TODO: Add biome bitmaps to ledge.
 				this.bitmap = new BaseBitmap[1];
 				switch (red) {
 					case 0x00: // Bottom
@@ -213,6 +222,7 @@ public class PixelData {
 					case 0x0F:
 						this.bitmap[0] = Art.ledge_mt_bottom_right;
 						break;
+					// ---------------------------------------------------------						
 					case 0x10:
 						this.bitmap[0] = Art.ledge_inner_bottom;
 						break;
@@ -276,9 +286,10 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.forestEntrance;
 				break;
-			case 0x05: // ACP (Refer to documentation.)
+			case 0x05: // Area Sector Point (Refer to documentation.)
 				this.bitmap = new BaseBitmap[1];
 				// TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
+				// TODO: Create more biome bitmaps.
 				this.bitmap[0] = Art.grass;
 				break;
 			case 0x06: // Stairs
@@ -310,9 +321,10 @@ public class PixelData {
 						break;
 				}
 				break;
-			case 0x07: // Water
+			case 0x07: { // Water
 				// Always start with the first frame of any animation.
-			{
+				// TODO: Add more water tiles with borders.
+				// FIXME: Make the borders a bit more thicker.
 				switch (red) {
 					case 0x00: // Pure water, no border.
 						this.bitmap = Art.water;
@@ -335,7 +347,7 @@ public class PixelData {
 				}
 				break;
 			}
-			case 0x09: // House
+			case 0x08: // House
 				this.bitmap = new BaseBitmap[1];
 				switch (red) { // House related tiles. Way too many to list them orderly.
 					case 0x00: // Bottom wall
@@ -366,40 +378,44 @@ public class PixelData {
 						this.bitmap[0] = Art.house_left_windows_right; 
 						break;
 					case 0x09: //Right wall
-						this.bitmap[0] = Art.house_right;
+						this.bitmap[0] = Art.house_right;	
 						break;
 					case 0x0A: //Right wall with windows on left
 						this.bitmap[0] = Art.house_right_windows_left; 
 						break;
-					case 0x0B: // Roof left
+					case 0x0B: // Single Roof left
 						this.bitmap[0] = Art.changeColors(Art.house_roof_left, WorldConstants.convertToAreaColor(green), WorldConstants.convertToAreaColor(green));
 						// this.bitmap[0] = Art.house_roof_left;
 						break;
-					case 0x0C: // Roof middle
+					case 0x0C: // Single Roof middle
 						this.bitmap[0] = Art.changeColors(Art.house_roof_middle, WorldConstants.convertToAreaColor(green), WorldConstants.convertToAreaColor(green));
 						break;
-					case 0x0D: // Roof right
+					case 0x0D: // Single Roof right
 						this.bitmap[0] = Art.changeColors(Art.house_roof_right, WorldConstants.convertToAreaColor(green), WorldConstants.convertToAreaColor(green));
 						break;
 				}
 				break;
-			case 0x0A: // House Door
+			case 0x09: // House Door
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.house_door;
 				break;
-			case 0x0B: // Item
+			case 0x0A: // Item
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.item;
 				break;
-			case 0x0C: // Carpet Floor (Indoors)
+			case 0x0B: // Carpet Floor (Indoors)
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.carpet_indoors;
 				this.biomeBitmap = Art.exit_arrow;
 				break;
-			case 0x0D: // Carpet Floors (Outdoors)
+			case 0x0C: // Carpet Floors (Outdoors)
 				this.bitmap = new BaseBitmap[1];
 				this.bitmap[0] = Art.carpet_outdoors;
 				this.biomeBitmap = Art.exit_arrow;
+				break;
+			case 0x0D: //Starting position when game has initialized;
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.shadow;
 				break;
 			default: // Any other type of tiles.
 				break;
@@ -483,10 +499,7 @@ public class PixelData {
 			case 0x07: // Water
 				// TODO: Needs to do something with this. It must not block the player, however, without special boolean value, it will always block player from advancing.
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
-			case 0x08: // Sign
-				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-				break;
-			case 0x09: // House
+			case 0x08: // House
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x0A: // House Door
