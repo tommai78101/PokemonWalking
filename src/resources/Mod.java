@@ -25,7 +25,7 @@ import screen.BaseBitmap;
 import screen.BaseScreen;
 
 public class Mod {
-	private static final String[] names = new String[] { "area", "script" };
+	private static final String[] names = new String[] { "area" };
 	public static List<Map.Entry<BaseBitmap, Integer>> moddedAreas = new ArrayList<Map.Entry<BaseBitmap, Integer>>();
 	private static boolean hasLoaded = false;
 	
