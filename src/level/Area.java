@@ -107,40 +107,61 @@ public class Area {
 		// Since "setPlayer" method isn't always set, there should be checks everywhere to make sure "player" isn't null.
 		if (this.player != null) {
 			// PixelData data = null;
-			if (!this.player.isLockedWalking()) {
+			
+			if (this.triggerIsBeingTriggered) {
 				xPlayerPosition = player.getXInArea();
 				yPlayerPosition = player.getYInArea();
 				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
 					return;
-				
-				if (this.triggerIsBeingTriggered) {
-					trigger.tick(this, xPlayerPosition, yPlayerPosition);
-					if (this.trigger.isFinished())
-						this.triggerIsBeingTriggered = false;
-				}
-				else {
-					trigger = checkForTrigger(xPlayerPosition, yPlayerPosition);
-					if (trigger != null)
-						this.triggerIsBeingTriggered = true;
-					else
-						handleSurroundingTiles();
-				}
-			}
-			else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
-				// A
-				// This goes with B. (30 lines down below.)
-				// It may be possible the player is still in the air, and hasn't done checking if the current pixel
-				// data is a ledge or not. This continues the data checking. It's required.
-				xPlayerPosition = player.getXInArea();
-				yPlayerPosition = player.getYInArea();
-				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
-					return;
-				this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+				this.currentPixelData = this.areaData.get(yPlayerPosition).get(xPlayerPosition);
 				this.checkCurrentPositionDataAndSetProperties();
 			}
-			else {
-				this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
-			}
+			if (!this.triggerIsBeingTriggered && trigger == null && !this.player.isLockedWalking())
+				trigger = checkForTrigger(xPlayerPosition, yPlayerPosition);
+			if (!this.triggerIsBeingTriggered && trigger != null && !this.player.isLockedWalking())
+				this.triggerIsBeingTriggered = true;
+			if (this.triggerIsBeingTriggered && trigger != null && !this.player.isLockedWalking())
+				handleTriggerActions();
+			else if (!this.triggerIsBeingTriggered)
+				handlePlayerActions();
+			
+		}
+	}
+	
+	private void handleTriggerActions() {
+		if (!trigger.isFinished()) {
+			this.player.enableAutomaticMode();
+			trigger.tick(this, xPlayerPosition, yPlayerPosition);
+		}
+		else {
+			this.player.disableAutomaticMode();
+			this.triggerIsBeingTriggered = false;
+			trigger = null;
+		}
+	}
+	
+	private void handlePlayerActions() {
+		if (!this.player.isLockedWalking()) {
+			xPlayerPosition = player.getXInArea();
+			yPlayerPosition = player.getYInArea();
+			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
+				return;
+			handleSurroundingTiles();
+		}
+		else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
+			// A
+			// This goes with B. (30 lines down below.)
+			// It may be possible the player is still in the air, and hasn't done checking if the current pixel
+			// data is a ledge or not. This continues the data checking. It's required.
+			xPlayerPosition = player.getXInArea();
+			yPlayerPosition = player.getYInArea();
+			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
+				return;
+			this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+			this.checkCurrentPositionDataAndSetProperties();
+		}
+		else {
+			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 		}
 	}
 	
@@ -189,7 +210,7 @@ public class Area {
 	 * 
 	 * @return Nothing.
 	 * */
-	private void checkCurrentPositionDataAndSetProperties() {
+	public void checkCurrentPositionDataAndSetProperties() {
 		// TODO: Fix this checkup.
 		int pixel = this.getCurrentPixelData().getColor();
 		int alpha = (pixel >> 24) & 0xFF;
@@ -439,7 +460,7 @@ public class Area {
 			}
 		}
 		
-		if (this.trigger != null){
+		if (this.trigger != null) {
 			screen.setOffset(0, 0);
 			this.trigger.render(screen, screen.getBufferedImage().createGraphics());
 			screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
@@ -644,8 +665,12 @@ public class Area {
 		return this.player;
 	}
 	
-	public TriggerData getTriggerData(){
+	public TriggerData getTriggerData() {
 		return this.trigger;
+	}
+	
+	public boolean isBeingTriggered() {
+		return this.triggerIsBeingTriggered;
 	}
 	
 	// --------------------- PRIVATE METHODS ----------------------
@@ -662,4 +687,5 @@ public class Area {
 		else
 			this.displayExitArrow = false;
 	}
+	
 }

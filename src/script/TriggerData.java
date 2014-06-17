@@ -16,7 +16,6 @@ public class TriggerData {
 	public int iteration;
 	private boolean finished;
 	
-	
 	private Movement moves;
 	private NewDialogue dialogue;
 	
@@ -53,13 +52,22 @@ public class TriggerData {
 			dialogue = this.script.getIteratedDialogues();
 			
 			if (moves != null && dialogue == null) {
+				area.getPlayer().keys.resetInputs();
+				if (area.getPlayer().isLockedWalking())
+					return;
+				area.checkCurrentPositionDataAndSetProperties();
 				ArrayList<Map.Entry<Integer, Integer>> list = moves.getAllMoves();
 				if (iteration < list.size()) {
 					Map.Entry<Integer, Integer> entry = list.get(0);
+					if (entry.getKey() != area.getPlayer().getFacing()) {
+						area.getPlayer().setFacing(entry.getKey());
+						return;
+					}
 					int steps = entry.getValue();
 					if (steps >= 0) {
-						area.getPlayer().setFacing(entry.getKey());
-						if (steps > 0)
+						if (steps == 0)
+							area.getPlayer().setFacing(entry.getKey());
+						else
 							area.getPlayer().forceLockWalking();
 						steps--;
 						entry.setValue(steps);
@@ -71,6 +79,11 @@ public class TriggerData {
 							if (!this.script.incrementIteration())
 								this.finished = true;
 						}
+						else {
+							entry = list.get(0);
+							if (entry.getKey() != area.getPlayer().getFacing())
+								area.getPlayer().setFacing(entry.getKey());
+						}
 					}
 				}
 			}
@@ -79,15 +92,15 @@ public class TriggerData {
 					case NewDialogue.DIALOGUE_SPEECH:
 						if (dialogue.isDialogueCompleted() && dialogue.isScrolling()) {
 							Player.unlockMovements();
-							//dialogue.resetDialogue();
+							// dialogue.resetDialogue();
 							this.dialogue = null;
 							if (!this.script.incrementIteration())
 								this.finished = true;
 						}
 						else if (dialogue.isDialogueCompleted() && !dialogue.isScrolling()) {
-							if (!dialogue.isShowingDialog()){
+							if (!dialogue.isShowingDialog()) {
 								Player.unlockMovements();
-								//dialogue.resetDialogue();
+								// dialogue.resetDialogue();
 								this.dialogue = null;
 								if (!this.script.incrementIteration())
 									this.finished = true;
@@ -107,14 +120,14 @@ public class TriggerData {
 								Player.lockMovements();
 						}
 						if (dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							//dialogue.resetDialogue();
+							// dialogue.resetDialogue();
 							Player.unlockMovements();
 							this.dialogue = null;
 							if (!this.script.incrementIteration())
 								this.finished = true;
 						}
 						else if (dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
-							//dialogue.resetDialogue();
+							// dialogue.resetDialogue();
 							Player.unlockMovements();
 							this.dialogue = null;
 							if (!this.script.incrementIteration())
@@ -127,8 +140,8 @@ public class TriggerData {
 		}
 	}
 	
-	public void render(BaseScreen screen, Graphics2D graphics){
-		if (this.dialogue != null){
+	public void render(BaseScreen screen, Graphics2D graphics) {
+		if (this.dialogue != null) {
 			this.dialogue.render(screen, graphics);
 		}
 	}

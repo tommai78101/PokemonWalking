@@ -78,6 +78,7 @@ public class Player extends Entity {
 	 * @return Nothing.
 	 * */
 	public void forceLockWalking() {
+		this.keys.resetInputs();
 		this.lockWalking = true;
 		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 		
@@ -616,22 +617,21 @@ public class Player extends Entity {
 	@Override
 	public void tick() {
 		if (this.automaticMode) {
-			automaticTick();
+			this.keys.resetInputs();
+			handleFacingCheck();
 		}
-		else {
-			if (!this.lockJumping) {
-				if (!this.enableInteraction) {
-					walk();
-					handleMovementCheck();
-					controlTick();
-				}
-				else {
-					stopAnimation();
-				}
+		if (!this.lockJumping) {
+			if (!this.enableInteraction) {
+				walk();
+				handleMovementCheck();
+				controlTick();
 			}
-			else
-				jump();
+			else {
+				stopAnimation();
+			}
 		}
+		else
+			jump();
 	}
 	
 	private void checkFacing() {
@@ -650,7 +650,7 @@ public class Player extends Entity {
 	}
 	
 	private void controlTick() {
-		if (!movementLock) {
+		if (this.lockWalking || this.lockJumping) {
 			animationTick++;
 			if ((this.facing == UP && this.facingsBlocked[UP])) {
 				if (animationTick >= 10) {
@@ -684,6 +684,13 @@ public class Player extends Entity {
 		}
 	}
 	
+	private void handleFacingCheck(){
+		if (this.walking != this.facing){
+			this.walking = this.facing;
+			this.animationPointer = 0;
+		}
+	}
+	
 	/**
 	 * Makes adjustments to the player's position when the player is walking.
 	 * 
@@ -698,8 +705,7 @@ public class Player extends Entity {
 			
 			// When being locked to walking, facing must stay constant.
 			
-			if (this.walking != this.facing)
-				this.walking = this.facing;
+			handleFacingCheck();
 			
 			// Makes sure the acceleration stays limited to 1 pixel/tick.
 			if (xAccel > 1)
@@ -711,7 +717,7 @@ public class Player extends Entity {
 			if (yAccel < -1)
 				yAccel = -1;
 			
-			if (!this.isOnBicycle && !movementLock) {
+			if (!this.isOnBicycle && !Player.isMovementsLocked()) {
 				xPosition += xAccel * 2;
 				yPosition += yAccel * 2;
 			}
@@ -918,9 +924,5 @@ public class Player extends Entity {
 				return;
 			}
 		}
-	}
-	
-	private void automaticTick() {
-		
 	}
 }

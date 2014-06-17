@@ -124,7 +124,7 @@ public class OverWorld extends World {
 		
 		// TODO: Fix the awkward interaction caused by so many states not working properly.
 		int interactionID = player.getInteractionID();
-		if (this.player.isInteracting() && interactionID != 0) {
+		if (this.player.isInteracting() && interactionID != 0 && !this.currentArea.isBeingTriggered()) {
 			int alpha = (interactionID >> 24) & 0xFF;
 			int red = (interactionID >> 16) & 0xFF;
 			switch (alpha) {
@@ -132,7 +132,8 @@ public class OverWorld extends World {
 					switch (red) {
 						case 0x05: {// Signs
 							int dialogueID = (interactionID & 0xFFFF);
-							SIGN_LOOP: for (Map.Entry<NewDialogue, Integer> entry : WorldConstants.signTexts) {
+							SIGN_LOOP:
+							for (Map.Entry<NewDialogue, Integer> entry : WorldConstants.signTexts) {
 								if (entry.getValue() == dialogueID) {
 									this.newDialogues = new NewDialogue[] { entry.getKey() };
 									break SIGN_LOOP;
@@ -142,7 +143,8 @@ public class OverWorld extends World {
 						}
 						default: // Other obstacles
 							ArrayList<Obstacle> list = this.currentArea.getObstaclesList();
-							OBSTACLE_LOOP: for (int i = 0; i < list.size(); i++) {
+							OBSTACLE_LOOP:
+							for (int i = 0; i < list.size(); i++) {
 								Obstacle obstacle = list.get(i);
 								if (obstacle.getID() != red)
 									continue;
@@ -183,8 +185,10 @@ public class OverWorld extends World {
 			}
 		}
 		else {
-			if (Player.isMovementsLocked())
-				Player.unlockMovements();
+			if (!this.currentArea.isBeingTriggered()) {
+				if (Player.isMovementsLocked())
+					Player.unlockMovements();
+			}
 		}
 		
 		this.handleDialogues();
@@ -226,7 +230,7 @@ public class OverWorld extends World {
 							}
 						}
 						else if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && !this.newDialogues[this.newDialoguesIterator].isScrolling()) {
-							if (!this.newDialogues[this.newDialoguesIterator].isShowingDialog()){
+							if (!this.newDialogues[this.newDialoguesIterator].isShowingDialog()) {
 								Player.unlockMovements();
 								this.newDialogues[this.newDialoguesIterator].resetDialogue();
 								if (this.newDialoguesIterator < this.newDialogues.length - 1) {

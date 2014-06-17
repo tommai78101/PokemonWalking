@@ -29,6 +29,13 @@ public class Keys {
 			this.name = name;
 			Keys.this.all.add(this);
 		}
+		
+		public void reset(){
+			this.keyStateDown = false;
+			this.isTappedDown = false;
+			this.isPressedDown = false;
+			this.lastKeyState = false;
+		}
 	}
 	
 	List<Key> all = new ArrayList<Key>();
@@ -51,4 +58,24 @@ public class Keys {
 	
 	// Debugging purposes
 	public Key F1 = new Key("F1");
+	
+	public void resetAll(){
+		for (Key k: all)
+			k.reset();
+	}
+	
+	public void resetInputs(){
+		for (Key k: all){
+			switch (k.name){
+				case "Z":
+				case "X":
+				case "/":
+				case ".":
+					break;
+				default:
+					k.reset();
+					break;
+			}
+		}
+	}
 }
