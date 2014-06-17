@@ -55,7 +55,6 @@ public class TriggerData {
 				area.getPlayer().keys.resetInputs();
 				if (area.getPlayer().isLockedWalking())
 					return;
-				area.checkCurrentPositionDataAndSetProperties();
 				ArrayList<Map.Entry<Integer, Integer>> list = moves.getAllMoves();
 				if (iteration < list.size()) {
 					Map.Entry<Integer, Integer> entry = list.get(0);
@@ -76,8 +75,14 @@ public class TriggerData {
 						list.remove(entry);
 						if (list.isEmpty()) {
 							moves = null;
-							if (!this.script.incrementIteration())
+							try {
+								if (!this.script.incrementIteration())
+									this.finished = true;
+							}
+							catch (Exception e) {
 								this.finished = true;
+								return;
+							}
 						}
 						else {
 							entry = list.get(0);
@@ -94,16 +99,26 @@ public class TriggerData {
 							Player.unlockMovements();
 							// dialogue.resetDialogue();
 							this.dialogue = null;
-							if (!this.script.incrementIteration())
+							try {
+								this.finished = this.script.incrementIteration();
+							}
+							catch (Exception e) {
 								this.finished = true;
+								return;
+							}
 						}
 						else if (dialogue.isDialogueCompleted() && !dialogue.isScrolling()) {
 							if (!dialogue.isShowingDialog()) {
 								Player.unlockMovements();
 								// dialogue.resetDialogue();
 								this.dialogue = null;
-								if (!this.script.incrementIteration())
+								try {
+									this.finished = this.script.incrementIteration();
+								}
+								catch (Exception e) {
 									this.finished = true;
+									return;
+								}
 							}
 							else
 								dialogue.tick();
@@ -118,20 +133,37 @@ public class TriggerData {
 							dialogue.tick();
 							if (!Player.isMovementsLocked())
 								Player.lockMovements();
+							area.getPlayer().disableAutomaticMode();
 						}
 						if (dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							// dialogue.resetDialogue();
-							Player.unlockMovements();
+							if (Player.isMovementsLocked())
+								Player.unlockMovements();
+							area.getPlayer().enableAutomaticMode();
 							this.dialogue = null;
-							if (!this.script.incrementIteration())
+							try {
+								this.finished = this.script.incrementIteration();
+							}
+							catch (Exception e) {
 								this.finished = true;
+								return;
+							}
+							this.script.setAffirmativeFlag();
+							this.finished = false;
 						}
 						else if (dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
-							// dialogue.resetDialogue();
-							Player.unlockMovements();
+							if (Player.isMovementsLocked())
+								Player.unlockMovements();
+							area.getPlayer().enableAutomaticMode();
 							this.dialogue = null;
-							if (!this.script.incrementIteration())
+							try {
+								this.finished = this.script.incrementIteration();
+							}
+							catch (Exception e) {
 								this.finished = true;
+								return;
+							}
+							this.script.setNegativeFlag();
+							this.finished = false;
 						}
 						break;
 				}

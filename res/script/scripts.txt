@@ -9,8 +9,12 @@
 / $: Start of script.
 / %: Script delimiter.
 / #: Speech Dialogue.
-/ ?: Question Dialogue.
 / /: Comments. Gets ignored.
+/ ?: Question Dialogue.
+/ +: Affirmative dialogue. 
+/ -: Negative dialogue
+/ [: Affirmative Action
+/ ]: Negative Action
 
 / DO NOT CHANGE.
 $0
@@ -29,5 +33,8 @@ $1
 / Turn clockwise in a circle.
 $2
 @Clockwise_Circle
-^R2D2L2U2
+?Going to run in a circle?
++R2D2L2U2
+?Redo?
+-R2D2L2U2
 %
