@@ -54,7 +54,6 @@ public class Script {
 		
 		Script script = null;
 		int iteration = 0;
-		
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Script.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
@@ -82,6 +81,7 @@ public class Script {
 					if (script != null){
 						result.add(script);
 						script = null;
+						iteration = 0;
 					}
 				}
 				else if (line.startsWith("#")){
