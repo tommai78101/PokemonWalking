@@ -109,6 +109,7 @@ public class FileControl extends JPanel implements ActionListener {
 						try {
 							File f = opener.getSelectedFile();
 							this.lastSavedDirectory = f.getParentFile();
+							this.editor.setTitle(LevelEditor.NAME_TITLE + " - " + f);
 							BufferedImage image = ImageIO.read(f);
 							editor.drawingBoardPanel.openMapImage(image);
 						}

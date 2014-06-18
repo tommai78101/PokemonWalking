@@ -27,6 +27,7 @@ public class LevelEditor extends JFrame {
 	public static final int WIDTH = 160;
 	public static final int HEIGHT = 144;
 	public static final int SIZE = 4;
+	public static final String NAME_TITLE = "Level Editor (Hobby)";
 	
 	private ArrayList<Data> filepaths = new ArrayList<Data>();
 	
@@ -176,6 +177,6 @@ public class LevelEditor extends JFrame {
 	}
 	
 	public static void main(String[] args) {
-		new LevelEditor("Level Editor (Hobby)");
+		new LevelEditor(LevelEditor.NAME_TITLE);
 	}
 }

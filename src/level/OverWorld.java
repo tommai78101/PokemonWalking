@@ -318,11 +318,11 @@ public class OverWorld extends World {
 				case 0x04: // Warp point
 					this.player.forceLockWalking();
 					break;
-				case 0x0A: // Door
+				case 0x09: // Door
 					this.player.tick();
 					break;
-				case 0x0C: // Carpet (Indoors)
-				case 0x0D: // Carpet (Outdoors)
+				case 0x0B: // Carpet (Indoors)
+				case 0x0C: // Carpet (Outdoors)
 					this.player.forceLockWalking();
 					this.player.tick();
 					break;
