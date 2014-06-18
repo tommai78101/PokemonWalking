@@ -75,11 +75,6 @@ public class Area {
 				PixelData px = new PixelData(pixel, x, y);
 				if (((pixel >> 24) & 0xFF) == 0x03)
 					areaObstacles.add(new Obstacle(px, (pixel >> 16) & 0xFF));
-				if (((pixel >> 24) & 0xFF) == 0x0D){
-					this.setDefaultPosition(px);
-					this.setPlayerX(x);
-					this.setPlayerY(y);
-				}
 				areaData.get(y).add(px);
 			}
 		}
@@ -268,17 +263,20 @@ public class Area {
 				if (!this.player.isInWater())
 					this.player.goesInWater();
 				break;
-			case 0x0A: // House Doors are a type of warp zones.
+			case 0x09: // House Doors are a type of warp zones.
 				if (!this.player.isLockedWalking()) {
 					this.isInWarpZone = true;
 				}
 				break;
-			case 0x0C: // Carpet Indoors
+			case 0x0B: // Carpet Indoors
 				//
 				// this.displayExitArrow = true;
 				break;
-			case 0x0D: // Carpet Outdoors
+			case 0x0C: // Carpet Outdoors
 				// this.displayExitArrow = true;
+				break;
+			case 0x0D: //Default starting position
+				this.setPixelData(new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition), this.currentPixelData.xPosition, this.currentPixelData.yPosition);
 				break;
 			default:
 				// If no special tiles, then it will keep reseting the flags.
@@ -435,7 +433,7 @@ public class Area {
 				case 0x0C: //Carpet (Outdoors)
 					break;
 				case 0x0D: //Default starting point.
-					break;
+					return false;
 				default: // Any other type of tiles should be walkable, for no apparent reasons.
 					return false;
 			}
@@ -511,7 +509,7 @@ public class Area {
 		SET_LOOP:
 		for (ArrayList<PixelData> y : this.areaData) {
 			for (PixelData x : y) {
-				if (((x.getColor() >> 24) & 0xFF) == 0x0E) {
+				if (((x.getColor() >> 24) & 0xFF) == 0x0D) {
 					player.setAreaPosition(x.xPosition, x.yPosition);
 					setPlayerX(x.xPosition);
 					setPlayerY(x.yPosition);
@@ -537,12 +535,15 @@ public class Area {
 			case 0x0A: // Door
 			case 0x0C: // Carpet (Indoors)
 			case 0x0D: // Carpet (Outdoors)
+			case 0x0E: //Default starting point.
 			{
 				int green = (color >> 8) & 0xFF;
 				int blue = color & 0xFF;
-				this.player.setAreaPosition(green, blue);
+				this.xPlayerPosition = green;
+				this.yPlayerPosition = blue;
 				break;
 			}
+			
 		}
 	}
 	

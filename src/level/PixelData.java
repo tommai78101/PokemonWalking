@@ -415,7 +415,12 @@ public class PixelData {
 				break;
 			case 0x0D: //Starting position when game has initialized;
 				this.bitmap = new BaseBitmap[1];
-				this.bitmap[0] = Art.shadow;
+				switch (red){
+					case 0x01:
+					default:
+						this.bitmap[0] = Art.grass;
+						break;
+				}
 				break;
 			default: // Any other type of tiles.
 				break;
