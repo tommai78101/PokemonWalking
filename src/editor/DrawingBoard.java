@@ -361,7 +361,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 				Data temp = null;
 				for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
-					if (panel.dataValue == entry.getKey()){
+					if (panel.dataValue == entry.getKey()) {
 						temp = entry.getValue();
 						break;
 					}
@@ -376,9 +376,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 				}
 				break;
 			}
-			case 0x03:{
-				switch (d.red){
-					case 0x05: { //Sign
+			case 0x03: {
+				switch (d.red) {
+					case 0x05: { // Sign
 						TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 						int green = (panel.dataValue >> 8) & 0xFF;
 						int blue = (panel.dataValue & 0xFF);
@@ -392,7 +392,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 						Data temp = null;
 						for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
-							if (panel.dataValue == entry.getKey()){
+							if (panel.dataValue == entry.getKey()) {
 								temp = entry.getValue();
 								break;
 							}
@@ -410,18 +410,18 @@ public class DrawingBoard extends Canvas implements Runnable {
 				}
 				break;
 			}
-			case 0x04: //Warp point
-			case 0x05: //Sector point
-			case 0x09: //Door
-			case 0x0B: //Carpet
-			case 0x0C:{ //Carpet
+			case 0x04: // Warp point
+			case 0x05: // Sector point
+			case 0x09: // Door
+			case 0x0B: // Carpet
+			case 0x0C: { // Carpet
 				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 				tiles[i] = panel.dataValue;
 				tilesEditorID[i] = d.editorID;
 				break;
 			}
-			case 0x0A: { //Items
+			case 0x0A: { // Items
 				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 				tiles[i] = (d.alpha << 24) | panel.dataValue & 0xFFFFFF;
@@ -451,7 +451,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 				Data temp = null;
 				for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
-					if (panel.dataValue == entry.getKey()){
+					if (panel.dataValue == entry.getKey()) {
 						temp = entry.getValue();
 						break;
 					}
@@ -534,65 +534,72 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 	
 	public void openMapImage(BufferedImage image) {
-		int[] srcTiles = image.getRGB(0, 0, 1, 1, null, 0, 1);
-		int triggerCount = srcTiles[0];
-		int row = (triggerCount / image.getWidth()) + 1;
-		
-		srcTiles = image.getRGB(0, 0, image.getWidth(), row, null, 0, image.getWidth());
-		this.triggers = new int[image.getWidth() * (image.getHeight() - row)];
-		for (int i = 0; i < triggerCount; i++) {
-			int x = (srcTiles[i + 1] >> 24) & 0xFF;
-			int y = (srcTiles[i + 1] >> 16) & 0xFF;
-			triggers[y * image.getWidth() + x] = srcTiles[i + 1];
-		}
-		
-		this.setImageSize(image.getWidth(), image.getHeight() - row);
-		srcTiles = image.getRGB(0, row, image.getWidth(), image.getHeight() - row, null, 0, image.getWidth());
-		
-		for (int i = 0; i < srcTiles.length; i++)
-			tiles[i] = srcTiles[i];
-		ArrayList<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
-		for (int i = 0; i < tiles.length; i++) {
-			int alpha = ((srcTiles[i] >> 24) & 0xFF);
-			for (int j = 0; j < list.size(); j++) {
-				Map.Entry<Integer, Data> entry = list.get(j);
-				Data d = entry.getValue();
-				switch (alpha) {
-					case 0x01: // Path
-					case 0x02: // Ledges
-					case 0x03: // Obstacles
-					case 0x06: // Stairs
-					case 0x07: // Water
-					case 0x08: // House
-						// Extended Tile IDs are used to differentiate tiles.
-						if (alpha == Integer.valueOf(d.alpha)) {
-							int red = ((srcTiles[i] >> 16) & 0xFF);
-							if (red == Integer.valueOf(d.red)) {
-								tilesEditorID[i] = d.editorID;
+		try {
+			int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+			int triggerCount = srcTiles[0];
+			int triggerRows = (triggerCount / image.getWidth()) + 1;
+			
+			if (this.triggers != null)
+				this.triggers = null;
+			this.triggers = new int[image.getWidth() * (image.getHeight() - triggerRows)];
+			for (int i = 0; i < triggerCount; i++) {
+				int x = (srcTiles[i + 1] >> 24) & 0xFF;
+				int y = (srcTiles[i + 1] >> 16) & 0xFF;
+				this.triggers[y * image.getWidth() + x] = srcTiles[i + 1];
+			}
+			
+			this.setImageSize(image.getWidth(), (image.getHeight() - triggerRows));
+			for (int i = 0; i < srcTiles.length - (triggerRows * image.getWidth()); i++)
+				this.tiles[i] = srcTiles[i + (triggerRows * image.getWidth())];
+			ArrayList<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
+			for (int i = 0; i < tiles.length; i++) {
+				int alpha = ((tiles[i] >> 24) & 0xFF);
+				for (int j = 0; j < list.size(); j++) {
+					Map.Entry<Integer, Data> entry = list.get(j);
+					Data d = entry.getValue();
+					switch (alpha) {
+						case 0x01: // Path
+						case 0x02: // Ledges
+						case 0x03: // Obstacles
+						case 0x06: // Stairs
+						case 0x07: // Water
+						case 0x08: // House
+							// Extended Tile IDs are used to differentiate tiles.
+							if (alpha == Integer.valueOf(d.alpha)) {
+								int red = ((tiles[i] >> 16) & 0xFF);
+								if (red == Integer.valueOf(d.red)) {
+									tilesEditorID[i] = d.editorID;
+								}
 							}
+							continue;
+						case 0x05: {// Area Zone
+							// Extended Tile IDs are used to differentiate tiles.
+							if (alpha == Integer.valueOf(d.alpha)) {
+								int blue = tiles[i] & 0xFF;
+								if (blue == d.blue) {
+									tilesEditorID[i] = d.editorID;
+									break;
+								}
+							}
+							continue;
 						}
-						continue;
-					case 0x05: {// Area Zone
-						// Extended Tile IDs are used to differentiate tiles.
-						if (alpha == Integer.valueOf(d.alpha)) {
-							int blue = srcTiles[i] & 0xFF;
-							if (blue == d.blue) {
+						default: {
+							// Alpha value is only used.
+							if (alpha == Integer.valueOf(d.alpha)) {
 								tilesEditorID[i] = d.editorID;
 								break;
 							}
+							continue;
 						}
-						continue;
-					}
-					default: {
-						// Alpha value is only used.
-						if (alpha == Integer.valueOf(d.alpha)) {
-							tilesEditorID[i] = d.editorID;
-							break;
-						}
-						continue;
 					}
 				}
 			}
+		}
+		catch (NegativeArraySizeException e) {
+			JOptionPane.showMessageDialog(null, "Incorrect file format. The file does not contain necessary metadata.");
+		}
+		catch (Exception e){
+			JOptionPane.showMessageDialog(null, "Error loading the file. Unable to pinpoint the cause.");
 		}
 	}
 	
