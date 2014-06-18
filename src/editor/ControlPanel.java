@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -48,7 +49,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 		iconsPanel = new JPanel();
 		iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.Y_AXIS));
 		EditorConstants constants = EditorConstants.getInstance();
-		for (Data d : constants.getDatas()) {
+		for (Map.Entry<Integer, Data> entry : constants.getDatas()) {
+			Data d = entry.getValue();
 			d.button.setActionCommand(Integer.toString(d.editorID));
 			d.button.addActionListener(this);
 			iconsPanel.add(d.button);
@@ -92,14 +94,15 @@ public class ControlPanel extends JPanel implements ActionListener {
 			case Pixel_Data: {
 				JButton button = (JButton) event.getSource();
 				int id = Integer.parseInt(button.getActionCommand());
-				Data d = EditorConstants.getInstance().getDatas().get(id);
+				Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(id);
+				Data d = entry.getValue();
 				if (d != null) {
 					this.selectedData = d;
 					this.iconName = d.name;
-					this.propertiesPanel.alphaField.setText(Integer.toString(d.alpha));
-					this.propertiesPanel.redField.setText(Integer.toString(d.red));
-					this.propertiesPanel.greenField.setText(Integer.toString(d.green));
-					this.propertiesPanel.blueField.setText(Integer.toString(d.blue));
+					this.propertiesPanel.alphaInputField.setText(Integer.toString(d.alpha));
+					this.propertiesPanel.redInputField.setText(Integer.toString(d.red));
+					this.propertiesPanel.greenInputField.setText(Integer.toString(d.green));
+					this.propertiesPanel.blueInputField.setText(Integer.toString(d.blue));
 					EditorConstants.chooser = Tools.ControlPanel;
 					
 				}
@@ -120,8 +123,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 		switch (EditorConstants.chooser) {
 			case ControlPanel:
 				return this.selectedData.name;
-			case TileProperties:
-				return this.propertiesPanel.getSelectedData().name;
 			case Properties:
 				return this.selectedData.name;
 		}
@@ -134,8 +135,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 				return this.selectedData;
 			case Properties:
 				return editor.properties.getSelectedData();
-			case TileProperties:
-				return this.propertiesPanel.getSelectedData();
 		}
 		return null;
 	}
@@ -158,7 +157,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 	
 	@Override
 	public void validate(){
-		super.validate();
 		if (this.propertiesPanel != null)
 			this.propertiesPanel.validate();
 		switch (EditorConstants.metadata){
@@ -170,8 +168,9 @@ public class ControlPanel extends JPanel implements ActionListener {
 			case Triggers:
 				this.iconsPanel.setVisible(false);
 				this.iconsPanel.setEnabled(false);
-				scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 				break;
 		}
+		super.validate();
 	}
 }

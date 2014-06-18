@@ -16,9 +16,11 @@ import java.awt.Dimension;
 import java.awt.Insets;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Map;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -33,7 +35,7 @@ public class EditorConstants {
 	// private final ArrayList<Map.Entry<Integer, String>> categories;
 	
 	private final ArrayList<Category> categories = new ArrayList<Category>();
-	private final ArrayList<Data> datas = new ArrayList<Data>();
+	private final ArrayList<Map.Entry<Integer, Data>> datas = new ArrayList<Map.Entry<Integer, Data>>();
 	private final ArrayList<Trigger> triggers = new ArrayList<Trigger>();
 	
 	private static final EditorConstants instance = new EditorConstants();
@@ -44,7 +46,7 @@ public class EditorConstants {
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
 	
 	public static enum Tools {
-		ControlPanel, Properties, TileProperties
+		ControlPanel, Properties
 	};
 	
 	public static enum Metadata {
@@ -118,6 +120,22 @@ public class EditorConstants {
 						data.areaTypeIDType = type;
 						line = line.replace('*', '@');
 					}
+					if (line.contains("!")){
+						data.alphaByEditor = true;
+						line = line.replaceAll("!+", "00");
+					}
+					if (line.contains("^")){
+						data.redByEditor = true;
+						line = line.replaceAll("^+", "00");
+					}
+					if (line.contains("`")){
+						data.greenByEditor = true;
+						line = line.replaceAll("`+", "00");
+					}
+					if (line.contains("=")){
+						data.blueByEditor = true;
+						line = line.replaceAll("=+", "00");
+					}
 					tokens = line.trim().replaceAll("\\s+", "").replaceAll("@", "00").split("%");
 					data.name = tokens[1].replace('_', ' ');
 					data.alpha = Integer.valueOf(tokens[2], 16);
@@ -148,7 +166,7 @@ public class EditorConstants {
 					data.button.setAlignmentX(Component.CENTER_ALIGNMENT);
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
-					this.datas.add(data);
+					this.datas.add(new AbstractMap.SimpleEntry<Integer, Data>(data.getColorValue(), data));
 					temp.add(data);
 				}
 				else if (line.startsWith("+")) {
@@ -158,12 +176,12 @@ public class EditorConstants {
 				}
 			}
 			
-			Collections.sort(this.datas, new Comparator<Data>() {
+			Collections.sort(this.datas, new Comparator<Map.Entry<Integer, Data>>() {
 				@Override
-				public int compare(Data d1, Data d2) {
-					if (d1.editorID < d2.editorID)
+				public int compare(Map.Entry<Integer, Data> d1, Map.Entry<Integer, Data> d2) {
+					if (d1.getValue().editorID < d2.getValue().editorID)
 						return -1;
-					if (d1.editorID > d2.editorID)
+					if (d1.getValue().editorID > d2.getValue().editorID)
 						return 1;
 					return 0;
 				}
@@ -226,7 +244,7 @@ public class EditorConstants {
 		return this.categories;
 	}
 	
-	public ArrayList<Data> getDatas() {
+	public ArrayList<Map.Entry<Integer, Data>> getDatas() {
 		return this.datas;
 	}
 	
@@ -235,9 +253,10 @@ public class EditorConstants {
 	}
 	
 	public static Data getData(int alpha, int red, int green, int blue) {
-		ArrayList<Data> list = EditorConstants.getInstance().datas;
+		ArrayList<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().datas;
 		Data temp = null;
-		for (Data d : list) {
+		for (Map.Entry<Integer, Data> entry : list) {
+			Data d = entry.getValue();
 			if (d.areaTypeIncluded) {
 				switch (d.areaTypeIDType) {
 					case ALPHA:
@@ -265,6 +284,6 @@ public class EditorConstants {
 		}
 		if (temp != null)
 			return temp;
-		return EditorConstants.getInstance().getDatas().get(0);
+		return EditorConstants.getInstance().getDatas().get(0).getValue();
 	}
 }
