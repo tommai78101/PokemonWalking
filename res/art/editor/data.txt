@@ -4,6 +4,12 @@
 # #: This is a comment. It will be ignored.
 # %: Delimiter.
 # @: Values must be entered manually. Default is 0.
+# -----------------------------------------
+# !: Alpha is determined by editor.
+# ^: Red is determined by editor.
+# `: Green is determined by editor.
+# =: Blue is determined.
+# -----------------------------------------
 # -: New Section.
 # _: Space character placeholder.
 # *: Includes area type.
@@ -96,5 +102,5 @@
 % 3_Options                     % 0A % 02 % @ % @ %    res/art/object/item.png
 % Bicycle                       % 0A % 03 % @ % @ %    res/art/object/item.png
 -Game_Start_Position
-% Starting Position             % 0D % 00 % 00 % 00 %  res/art/player/shadow.png
+% Starting Position             % 0D % 00 % ` % = %  res/art/player/shadow.png
 +
