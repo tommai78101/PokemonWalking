@@ -45,6 +45,7 @@ public class MainComponent extends Canvas implements Runnable {
 	// -----------------------
 	private final BaseScreen screen;
 	private Game game;
+	private JFrame frame;
 	// -----------------------
 	
 	private static final Keys keys = new Keys();
@@ -65,10 +66,11 @@ public class MainComponent extends Canvas implements Runnable {
 	 * This is what the main() method executes in order to start the game.
 	 * 
 	 * */
-	public MainComponent() {
+	public MainComponent(JFrame frame) {
 		running = false;
 		screen = new BaseScreen(GAME_WIDTH, GAME_HEIGHT);
 		screen.loadResources();
+		this.frame = frame;
 	}
 	
 	/**
@@ -127,9 +129,9 @@ public class MainComponent extends Canvas implements Runnable {
 	@Override
 	public void run() {
 		long lastTime = System.nanoTime();
-		// long lastTimer = System.currentTimeMillis();
+		long lastTimer = System.currentTimeMillis();
 		double unprocessed = 0.0;
-		// int frames = 0;
+		int frames = 0;
 		int tick = 0;
 		// boolean shouldRender = false;
 		final double nsPerTick = 1000000000.0 / 30.0;
@@ -169,15 +171,12 @@ public class MainComponent extends Canvas implements Runnable {
 				tick--;
 				tick();
 				render();
+				frames++;
 				// For debugging, this is disabled.
 				// shouldRender = true;
 			}
 			
 			// For debugging, this is disabled.
-			// if (shouldRender) {
-			// //frames++;
-			// //render();
-			// }
 			
 			try {
 				Thread.sleep(1);
@@ -187,12 +186,11 @@ public class MainComponent extends Canvas implements Runnable {
 				this.requestFocus();
 			}
 			
-			// if (System.currentTimeMillis() - lastTimer > 1000) {
-			// lastTimer += 1000;
-			// //fps = frames;
-			// //System.out.println("FPS: " + Integer.toString(fps));
-			// //frames = 0;
-			// }
+			if (System.currentTimeMillis() - lastTimer > 1000) {
+				lastTimer += 1000;
+				MainComponent.this.frame.setTitle(GAME_TITLE + " - FPS: " + Integer.toString(frames));
+				frames = 0;
+			}
 		}
 		// Game loop has exited, everything stops from here on out.
 	}
@@ -321,7 +319,7 @@ public class MainComponent extends Canvas implements Runnable {
 		System.out.println("Game is now loading, it will take a while.");
 		JFrame frame = new JFrame(GAME_TITLE);
 		JPanel panel = new JPanel(new BorderLayout());
-		MainComponent game = new MainComponent();
+		MainComponent game = new MainComponent(frame);
 		panel.add(game);
 		frame.setContentPane(panel);
 		frame.pack();
