@@ -20,6 +20,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -165,6 +166,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.createBufferStrategy(3);
 			bs = this.getBufferStrategy();
 		}
+		hoverOver();
 		switch (EditorConstants.metadata) {
 			case Pixel_Data: {
 				if (tilesEditorID != null) {
@@ -176,7 +178,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int w = j % bitmapWidth;
 						int h = j / bitmapWidth;
 						
-						Data data = EditorConstants.getInstance().getDatas().get(tilesEditorID[j]);
+						Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(tilesEditorID[j]);
+						Data data = entry.getValue();
 						if (data == null) {
 							break;
 						}
@@ -221,7 +224,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 				break;
 			}
 			case Triggers: {
-				hoverOnTriggers();
 				if (triggers != null) {
 					for (int k = 0; k < triggers.length; k++) {
 						if (bitmapWidth <= 0)
@@ -317,9 +319,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						return;
 					Data d = editor.controlPanel.getSelectedData();
 					if (d != null) {
-						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
-						tiles[i] = (d.alpha << 24) | (d.red << 16) | (d.green << 8) | d.blue;
-						tilesEditorID[i] = d.editorID;
+						setDataProperties(d);
 					}
 					editor.validate();
 				}
@@ -348,6 +348,121 @@ public class DrawingBoard extends Canvas implements Runnable {
 						this.triggers[i] = t.getDataValue();
 					}
 					editor.validate();
+				}
+				break;
+			}
+		}
+	}
+	
+	private void setDataProperties(Data d) {
+		switch (d.alpha) {
+			case 0x02: {
+				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+				Data temp = null;
+				for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
+					if (panel.dataValue == entry.getKey()){
+						temp = entry.getValue();
+						break;
+					}
+				}
+				if (temp != null) {
+					tiles[i] = panel.dataValue;
+					tilesEditorID[i] = temp.editorID;
+				}
+				else {
+					tiles[i] = (d.alpha << 24) | (d.red << 16) | panel.dataValue & 0xFFFF;
+					tilesEditorID[i] = d.editorID;
+				}
+				break;
+			}
+			case 0x03:{
+				switch (d.red){
+					case 0x05: { //Sign
+						TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+						int green = (panel.dataValue >> 8) & 0xFF;
+						int blue = (panel.dataValue & 0xFF);
+						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+						tiles[i] = (d.alpha << 24) | (d.red << 16) | (green << 8) | blue;
+						tilesEditorID[i] = d.editorID;
+						break;
+					}
+					default: {
+						TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+						Data temp = null;
+						for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
+							if (panel.dataValue == entry.getKey()){
+								temp = entry.getValue();
+								break;
+							}
+						}
+						if (temp != null) {
+							tiles[i] = panel.dataValue;
+							tilesEditorID[i] = temp.editorID;
+						}
+						else {
+							tiles[i] = d.getColorValue();
+							tilesEditorID[i] = d.editorID;
+						}
+						break;
+					}
+				}
+				break;
+			}
+			case 0x04: //Warp point
+			case 0x05: //Sector point
+			case 0x09: //Door
+			case 0x0B: //Carpet
+			case 0x0C:{ //Carpet
+				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+				tiles[i] = panel.dataValue;
+				tilesEditorID[i] = d.editorID;
+				break;
+			}
+			case 0x0A: { //Items
+				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+				tiles[i] = (d.alpha << 24) | panel.dataValue & 0xFFFFFF;
+				tilesEditorID[i] = d.editorID;
+				break;
+			}
+			case 0x0D: { // Default starting point
+				int green = d.green;
+				int blue = d.blue;
+				if (d.greenByEditor)
+					green = this.getMouseTileX();
+				if (d.blueByEditor)
+					blue = this.getMouseTileY();
+				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+				tiles[i] = (d.alpha << 24) | (d.red << 16) | (green << 8) | blue;
+				tilesEditorID[i] = d.editorID;
+				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+				panel.greenInputField.setText(Integer.toString(green));
+				panel.blueInputField.setText(Integer.toString(blue));
+				panel.greenField.setText(Integer.toString(green));
+				panel.blueField.setText(Integer.toString(blue));
+				panel.validate();
+				break;
+			}
+			default: {
+				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+				Data temp = null;
+				for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
+					if (panel.dataValue == entry.getKey()){
+						temp = entry.getValue();
+						break;
+					}
+				}
+				if (temp != null) {
+					tiles[i] = panel.dataValue;
+					tilesEditorID[i] = temp.editorID;
+				}
+				else {
+					tiles[i] = d.getColorValue();
+					tilesEditorID[i] = d.editorID;
 				}
 				break;
 			}
@@ -436,11 +551,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 		
 		for (int i = 0; i < srcTiles.length; i++)
 			tiles[i] = srcTiles[i];
-		ArrayList<Data> list = EditorConstants.getInstance().getDatas();
+		ArrayList<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 		for (int i = 0; i < tiles.length; i++) {
 			int alpha = ((srcTiles[i] >> 24) & 0xFF);
 			for (int j = 0; j < list.size(); j++) {
-				Data d = list.get(j);
+				Map.Entry<Integer, Data> entry = list.get(j);
+				Data d = entry.getValue();
 				switch (alpha) {
 					case 0x01: // Path
 					case 0x02: // Ledges
@@ -480,7 +596,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 	
-	private void hoverOnTriggers() {
+	private void hoverOver() {
 		try {
 			int w = 0;
 			int h = 0;
@@ -502,7 +618,17 @@ public class DrawingBoard extends Canvas implements Runnable {
 			}
 			
 			// checks for mouse hoving above triggers
-			int value = triggers[h * bitmapWidth + w];
+			int[] list = null;
+			switch (EditorConstants.metadata) {
+				case Pixel_Data:
+				default:
+					list = tiles;
+					break;
+				case Triggers:
+					list = triggers;
+					break;
+			}
+			int value = list[h * bitmapWidth + w];
 			// Show trigger IDs and stuffs.
 			TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 			panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
