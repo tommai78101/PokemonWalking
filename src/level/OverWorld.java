@@ -115,10 +115,12 @@ public class OverWorld extends World {
 		}
 		
 		if (!this.player.isLockedWalking()) {
-			if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
-				this.currentAreaSectorID = this.currentArea.getSectorID();
-				// This is where you get the latest sector id at.
-				System.out.println("Area: " + this.currentArea.getAreaID() + " Sector: " + currentArea.getSectorID());
+			if (this.currentArea != null) {
+				if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
+					this.currentAreaSectorID = this.currentArea.getSectorID();
+					// This is where you get the latest sector id at.
+					System.out.println("Area: " + this.currentArea.getAreaID() + " Sector: " + currentArea.getSectorID());
+				}
 			}
 		}
 		
@@ -185,7 +187,7 @@ public class OverWorld extends World {
 			}
 		}
 		else {
-			if (!this.currentArea.isBeingTriggered()) {
+			if (this.currentArea != null && !this.currentArea.isBeingTriggered()) {
 				if (Player.isMovementsLocked())
 					Player.unlockMovements();
 			}
@@ -299,7 +301,7 @@ public class OverWorld extends World {
 			}
 		}
 		if (currentAreaFound) {
-			PixelData data = this.currentArea.getCurrentPixelData();
+			PixelData data = this.currentArea.getCurrentPixelData(); 
 			int targetAreaID = 0;
 			if (WorldConstants.isModsEnabled.booleanValue() && this.currentArea.getAreaID() < 1000)
 				targetAreaID = data.getTargetAreaID() + 1000;
@@ -344,7 +346,8 @@ public class OverWorld extends World {
 		// Setting area offsets with player positions
 		
 		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
-		this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
+		if (this.currentArea != null)
+			this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
 		
 		if (this.invertBitmapColors) {

@@ -429,9 +429,7 @@ public class Area {
 					}
 					return true; // Cannot go through items on the ground.
 				case 0x0B: //Carpet (Indoors)
-					break;
 				case 0x0C: //Carpet (Outdoors)
-					break;
 				case 0x0D: //Default starting point.
 					return false;
 				default: // Any other type of tiles should be walkable, for no apparent reasons.
@@ -462,7 +460,7 @@ public class Area {
 				PixelData data = this.areaData.get(y).get(x);
 				screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
 				screen.blitBiome(data.getBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
-				if (x == this.player.getXInArea() && y == this.player.getYInArea() && ((((data.getColor() >> 24) & 0xFF) == 0x0C) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
+				if (x == this.player.getXInArea() && y == this.player.getYInArea() && ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
 					renderExitArrow(screen, xOff, yOff, data, x, y);
 				data.tick();
 			}
@@ -532,15 +530,16 @@ public class Area {
 		int alpha = (color >> 24) & 0xFF;
 		switch (alpha) {
 			case 0x04: // Warp point
-			case 0x0A: // Door
-			case 0x0C: // Carpet (Indoors)
-			case 0x0D: // Carpet (Outdoors)
-			case 0x0E: //Default starting point.
+			case 0x09: // Door
+			case 0x0B: // Carpet (Indoors)
+			case 0x0C: // Carpet (Outdoors)
+			case 0x0D: //Default starting point.
 			{
 				int green = (color >> 8) & 0xFF;
 				int blue = color & 0xFF;
 				this.xPlayerPosition = green;
 				this.yPlayerPosition = blue;
+				this.player.setAreaPosition(xPlayerPosition, yPlayerPosition);
 				break;
 			}
 			

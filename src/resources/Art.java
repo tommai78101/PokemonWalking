@@ -289,7 +289,6 @@ public class Art {
 		// Areas
 		testArea = screen.load("area/test/testArea.png");
 		testArea2 = screen.load("area/test/testArea2.png");
-		testArea3 = screen.load("area/test/testArea3.png");
 		
 		// Miscellaneous
 		font = loadFont("font/font.ttf");

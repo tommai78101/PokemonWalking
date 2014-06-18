@@ -46,6 +46,7 @@ public class WorldConstants {
 	
 	// Building Roof Colors / Main Area Color Theme
 	public static final int AREA_1_COLOR = 0xFFA495B0;
+	public static final int AREA_2_COLOR = 0xFF345CBD;
 	
 	// World IDs
 	public static final int OVERWORLD = 0x0A000001;
@@ -75,7 +76,7 @@ public class WorldConstants {
 	public static Area convertToArea(List<Area> areas, int areaID) {
 		for (int i = 0; i < areas.size(); i++) {
 			Area area = areas.get(i);
-			if (area.getAreaID() == areaID)
+			if (area != null && area.getAreaID() == areaID)
 				return area;
 		}
 		Area area = null;
@@ -85,9 +86,6 @@ public class WorldConstants {
 				break;
 			case TEST_WORLD_2:
 				area = new Area(Art.testArea2, TEST_WORLD_2);
-				break;
-			case TEST_WORLD_3:
-				area = new Area(Art.testArea3, TEST_WORLD_3);
 				break;
 			default:
 				area = null;
@@ -114,7 +112,7 @@ public class WorldConstants {
 		}
 		if (WorldConstants.isModsEnabled == Boolean.FALSE) {
 			result.add(new Area(Art.testArea, TEST_WORLD_1));
-//			result.add(new Area(Art.testArea2, TEST_WORLD_2));
+			result.add(new Area(Art.testArea2, TEST_WORLD_2));
 //			result.add(new Area(Art.testArea3, TEST_WORLD_3));
 //			result.add(new Area(Art.testArea4, TEST_WORLD_4));
 //			result.add(new Area(Art.testArea_debug, DEBUG));
@@ -139,6 +137,8 @@ public class WorldConstants {
 		switch (areaID) {
 			case TEST_WORLD_1:
 				return AREA_1_COLOR;
+			case TEST_WORLD_2:
+				return AREA_2_COLOR;
 			default:
 				return 0;
 		}

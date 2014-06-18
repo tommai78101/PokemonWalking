@@ -507,18 +507,20 @@ public class PixelData {
 			case 0x08: // House
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
-			case 0x0A: // House Door
+			case 0x09: // House Door
 				// this.targetArea = red;
 				// FIXME: Level Editor must set target area ID to at least 1 or above.
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.isWarpZone = true;
 				break;
-			case 0x0B: // Item
+			case 0x0A: // Item
 				break;
+			case 0x0B: // Carpets
 			case 0x0C: // Carpets
-			case 0x0D: // Carpets
 				// FIXME: Level Editor must set target area ID to at least 1 or above.
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
+				break;
+			case 0x0D: //Default Starting Position
 				break;
 			default:
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
