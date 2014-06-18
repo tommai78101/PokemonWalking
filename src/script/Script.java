@@ -21,6 +21,7 @@ public class Script {
 	public int affirmativeIteration;
 	public int negativeIteration;
 	public Boolean questionResponse;
+	public boolean repeat;
 	
 	public Script() {
 		this.triggerID = 0;
@@ -34,6 +35,42 @@ public class Script {
 		this.affirmativeIteration = 0;
 		this.negativeIteration = 0;
 		this.questionResponse = null;
+		this.repeat = false;
+	}
+	
+	public Script(Script s){
+		//Deep copy
+		this.triggerID = s.triggerID;
+		
+		this.moves = new ArrayList<Map.Entry<Integer, Movement>>();
+		for (Map.Entry<Integer, Movement> e: s.moves)
+			this.moves.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
+		
+		this.affirmativeMoves = new ArrayList<Map.Entry<Integer, Movement>>();
+		for (Map.Entry<Integer, Movement> e: s.affirmativeMoves)
+			this.affirmativeMoves.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
+		
+		this.negativeMoves = new ArrayList<Map.Entry<Integer, Movement>>();
+		for (Map.Entry<Integer, Movement> e: s.negativeMoves)
+			this.negativeMoves.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
+		
+		this.dialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
+		for (Map.Entry<Integer, NewDialogue> e: s.dialogues)
+			this.dialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
+		
+		this.affirmativeDialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
+		for (Map.Entry<Integer, NewDialogue> e: s.affirmativeDialogues)
+			this.affirmativeDialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
+		
+		this.negativeDialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
+		for (Map.Entry<Integer, NewDialogue> e: s.negativeDialogues)
+			this.negativeDialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
+		
+		this.iteration = s.iteration;
+		this.affirmativeIteration = s.affirmativeIteration;
+		this.negativeIteration = s.negativeIteration;
+		this.questionResponse = s.questionResponse;
+		this.repeat = s.repeat;
 	}
 	
 	public Movement getIteratedMoves() {
@@ -194,6 +231,11 @@ public class Script {
 						append(moves, line.substring(1).toCharArray());
 						script.negativeMoves.add(new AbstractMap.SimpleEntry<Integer, Movement>(negativeIteration, moves));
 						negativeIteration++;
+					}
+				}
+				else if (line.startsWith(";")){
+					if (script != null){
+						script.repeat = true;
 					}
 				}
 			}

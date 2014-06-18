@@ -15,26 +15,19 @@
 / -: Negative dialogue
 / [: Affirmative Action
 / ]: Negative Action
+/ ;: Repeat Flag. If contains ';', it means it's enabled by default.
 
-/ DO NOT CHANGE.
+/ DO NOT CHANGE. THIS IS RESERVED.
 $0
 @Eraser
 %
 
 
-/ Turn counter-clockwise in a circle.
+/ Turn around after seeing things.
 $1
-@Testing_Script
-^D2R2U2L2
-#Hello_world.
-^D3U3R1L0
-%
-
-/ Turn clockwise in a circle.
-$2
-@Clockwise_Circle
-?Going to run in a circle?
-+R2D2L2U2
-?Redo?
--R2D2L2U2
+@Avoiding_Event
+#Something is not right around here.
+#I should probably move away from this place.
+^L2R0
+;
 %

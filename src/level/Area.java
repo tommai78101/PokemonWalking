@@ -167,9 +167,9 @@ public class Area {
 	
 	private TriggerData checkForTrigger(int playerX, int playerY) {
 		for (TriggerData t : this.triggerDatas) {
-			if (t.x == playerX && t.y == playerY && !t.isFinished()) {
+			if (t.x == playerX && t.y == playerY && (!t.isFinished() || t.isOnRepeat())) {
 				this.triggerIsBeingTriggered = true;
-				return t;
+				return new TriggerData(t).reset();
 			}
 		}
 		return null;
@@ -275,7 +275,7 @@ public class Area {
 			case 0x0C: // Carpet Outdoors
 				// this.displayExitArrow = true;
 				break;
-			case 0x0D: //Default starting position
+			case 0x0D: // Default starting position
 				this.setPixelData(new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition), this.currentPixelData.xPosition, this.currentPixelData.yPosition);
 				break;
 			default:
@@ -408,7 +408,7 @@ public class Area {
 					return false;
 				case 0x05: // Area Connection point.
 					return false;
-				case 0x06: //Stairs
+				case 0x06: // Stairs
 					return false;
 				case 0x07: // Water
 					// TODO: Add something that detects a special boolean value in order to let the player move on water.
@@ -428,9 +428,9 @@ public class Area {
 						}
 					}
 					return true; // Cannot go through items on the ground.
-				case 0x0B: //Carpet (Indoors)
-				case 0x0C: //Carpet (Outdoors)
-				case 0x0D: //Default starting point.
+				case 0x0B: // Carpet (Indoors)
+				case 0x0C: // Carpet (Outdoors)
+				case 0x0D: // Default starting point.
 					return false;
 				default: // Any other type of tiles should be walkable, for no apparent reasons.
 					return false;
@@ -533,7 +533,7 @@ public class Area {
 			case 0x09: // Door
 			case 0x0B: // Carpet (Indoors)
 			case 0x0C: // Carpet (Outdoors)
-			case 0x0D: //Default starting point.
+			case 0x0D: // Default starting point.
 			{
 				int green = (color >> 8) & 0xFF;
 				int blue = color & 0xFF;

@@ -15,6 +15,7 @@ public class TriggerData {
 	public Script script;
 	public int iteration;
 	private boolean finished;
+	private boolean repeat;
 	
 	private Movement moves;
 	private NewDialogue dialogue;
@@ -30,14 +31,25 @@ public class TriggerData {
 		finished = false;
 	}
 	
+	public TriggerData(TriggerData t) {
+		this.x = t.x;
+		this.y = t.y;
+		this.script = new Script(t.script);
+		this.finished = t.finished;
+	}
+
 	public TriggerData loadTriggerData(int pixel) {
 		this.x = (pixel >> 24) & 0xFF;
 		this.y = (pixel >> 16) & 0xFF;
+		if (this.finished)
+			this.finished = false;
 		if (WorldConstants.scripts.isEmpty())
 			System.out.println("Scripts are empty");
 		for (Script s : WorldConstants.scripts) {
 			if (s.triggerID == (pixel & 0xFFFF)) {
 				this.script = s;
+				if (s.repeat)
+					this.setRepeating();
 				break;
 			}
 		}
@@ -100,7 +112,7 @@ public class TriggerData {
 							// dialogue.resetDialogue();
 							this.dialogue = null;
 							try {
-								this.finished = this.script.incrementIteration();
+								this.finished = !this.script.incrementIteration();
 							}
 							catch (Exception e) {
 								this.finished = true;
@@ -113,7 +125,7 @@ public class TriggerData {
 								// dialogue.resetDialogue();
 								this.dialogue = null;
 								try {
-									this.finished = this.script.incrementIteration();
+									this.finished = !this.script.incrementIteration();
 								}
 								catch (Exception e) {
 									this.finished = true;
@@ -141,7 +153,7 @@ public class TriggerData {
 							area.getPlayer().enableAutomaticMode();
 							this.dialogue = null;
 							try {
-								this.finished = this.script.incrementIteration();
+								this.finished = !this.script.incrementIteration();
 							}
 							catch (Exception e) {
 								this.finished = true;
@@ -156,7 +168,7 @@ public class TriggerData {
 							area.getPlayer().enableAutomaticMode();
 							this.dialogue = null;
 							try {
-								this.finished = this.script.incrementIteration();
+								this.finished = !this.script.incrementIteration();
 							}
 							catch (Exception e) {
 								this.finished = true;
@@ -170,6 +182,23 @@ public class TriggerData {
 			}
 			
 		}
+	}
+	
+	public void setRepeating(){
+		this.repeat = true;
+	}
+	
+	public void stopRepeating(){
+		this.repeat = false;
+	}
+	
+	public boolean isOnRepeat(){
+		return this.repeat;
+	}
+	
+	public TriggerData reset(){
+		this.finished = false;
+		return this;
 	}
 	
 	public void render(BaseScreen screen, Graphics2D graphics) {

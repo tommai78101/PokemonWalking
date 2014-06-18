@@ -8,6 +8,7 @@ import javax.swing.JList;
 import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
+@SuppressWarnings("unchecked")
 public abstract class KeySelectionRenderer extends BasicComboBoxRenderer implements JComboBox.KeySelectionManager {
 	private static final long serialVersionUID = 2334229124492928364L;
 	private long currentTime;
@@ -24,7 +25,7 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 	 * @param box
 	 *            A JComboBox object that is to use this KeySelectionRenderer.
 	 */
-	public KeySelectionRenderer(JComboBox box) {
+	public KeySelectionRenderer(JComboBox box){
 		box.setRenderer(this);
 		box.setKeySelectionManager(this);
 		

@@ -80,6 +80,37 @@ public class NewDialogue {
 		this.yesNoAnswerFlag = null; // Default
 	}
 	
+	public NewDialogue(NewDialogue dialogue) {
+		// Deep copy
+		this.completedLines = new ArrayList<String>();
+		for (String s: dialogue.completedLines)
+			this.completedLines.add(s);
+		
+		this.input = dialogue.input;
+		
+		this.lineIterator = dialogue.lineIterator;
+		this.lineLength = dialogue.lineLength;
+		this.lines = new ArrayList<Map.Entry<String, Boolean>>();
+		for (Map.Entry<String, Boolean> e: dialogue.lines)
+			this.lines.add(new AbstractMap.SimpleEntry<String, Boolean>(e.getKey(), e.getValue()));
+		
+		
+		this .nextFlag = dialogue.nextFlag;
+		this .simpleQuestionFlag = dialogue.simpleQuestionFlag;
+		this .simpleSpeechFlag = dialogue.simpleSpeechFlag;
+		this .yesNoCursorPosition = dialogue.yesNoCursorPosition;
+		this .yesNoAnswerFlag = dialogue.yesNoAnswerFlag;
+		this.nextTick = dialogue.nextTick;
+		this.scrollDistance = dialogue.scrollDistance;
+		this.scrollFlag = dialogue.scrollFlag;
+		this.showDialog = dialogue.showDialog;
+		
+		this.subStringIterator = dialogue.subStringIterator;
+		this. tickCount = dialogue.tickCount;
+		this.totalDialogueLength = dialogue.totalDialogueLength;
+		this.type = dialogue.type;
+	}
+
 	public Boolean getAnswerToSimpleQuestion() {
 		if (this.yesNoAnswerFlag == null)
 			return null;
@@ -566,7 +597,6 @@ public class NewDialogue {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(NewDialogue.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
 			String[] tokens;
-			boolean done;
 			int dialogueID = 0;
 			NewDialogue temp = null;
 			while ((line = reader.readLine()) != null) {
