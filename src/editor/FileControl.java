@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
@@ -32,19 +33,19 @@ import editor.EditorConstants.Metadata;
 public class FileControl extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
-	private String[] tags = new String[] { "New", "Save", "Open", "", "Tileset", "Trigger"};
+	private String[] tags = new String[] { "New", "Save", "Open", "", "Tileset", "Trigger" };
 	private LevelEditor editor;
 	HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
-	private File lastSavedDirectory;
+	public static File lastSavedDirectory;
 	
 	public FileControl(LevelEditor editor) {
 		super();
 		this.editor = editor;
 		this.setLayout(new GridLayout(1, tags.length));
-		this.lastSavedDirectory = new File("C:\\Users\\Student\\Desktop");
+		FileControl.lastSavedDirectory = new File("C:\\");
 		
 		for (int i = 0; i < tags.length; i++) {
-			if (i == 3){
+			if (i == 3) {
 				this.add(new JSeparator(SwingConstants.VERTICAL));
 				continue;
 			}
@@ -89,8 +90,26 @@ public class FileControl extends JPanel implements ActionListener {
 								String filename = file.getName();
 								while (filename.endsWith(".png"))
 									filename = filename.substring(0, filename.length() - ".png".length());
-								this.lastSavedDirectory = chooser.getCurrentDirectory();
-								ImageIO.write(img, "png", new File(this.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"));
+								FileControl.lastSavedDirectory = chooser.getCurrentDirectory();
+								ImageIO.write(img, "png", new File(FileControl.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"));
+								
+								RandomAccessFile f = null;
+								try {
+									f = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+									f.seek(0);
+									f.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
+								}
+								catch (IOException e) {
+									e.printStackTrace();
+								}
+								finally {
+									try {
+										f.close();
+									}
+									catch (IOException e) {
+										e.printStackTrace();
+									}
+								}
 							}
 						}
 						catch (IOException e) {
@@ -101,29 +120,46 @@ public class FileControl extends JPanel implements ActionListener {
 				case 2: // Open
 					JFileChooser opener = new JFileChooser();
 					opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-					opener.setCurrentDirectory(this.lastSavedDirectory);
+					opener.setCurrentDirectory(FileControl.lastSavedDirectory);
 					opener.setFileFilter(new FileNameExtensionFilter("PNG files", "png"));
 					opener.setVisible(true);
 					int answer = opener.showOpenDialog(null);
 					if (answer == JFileChooser.APPROVE_OPTION) {
 						try {
 							File f = opener.getSelectedFile();
-							this.lastSavedDirectory = f.getParentFile();
+							FileControl.lastSavedDirectory = f.getParentFile();
 							this.editor.setTitle(LevelEditor.NAME_TITLE + " - " + f);
 							BufferedImage image = ImageIO.read(f);
 							editor.drawingBoardPanel.openMapImage(image);
+							RandomAccessFile rf = null;
+							try {
+								rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+								rf.seek(0);
+								rf.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
+							}
+							catch (IOException e) {
+								e.printStackTrace();
+							}
+							finally {
+								try {
+									rf.close();
+								}
+								catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
 						}
 						catch (IOException e1) {
 							e1.printStackTrace();
 						}
 					}
 					break;
-				case 4: { //Tileset
+				case 4: { // Tileset
 					EditorConstants.metadata = Metadata.Pixel_Data;
 					editor.validate();
 					break;
 				}
-				case 5: { //Trigger
+				case 5: { // Trigger
 					EditorConstants.metadata = Metadata.Triggers;
 					editor.validate();
 					break;

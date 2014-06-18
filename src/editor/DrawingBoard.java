@@ -122,7 +122,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 	
 	public void newImage() {
-		System.out.println("I have pressed \"NEW\" button. Pop-up should appear soon.");
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -130,21 +129,17 @@ public class DrawingBoard extends Canvas implements Runnable {
 				JTextField heightField;
 				int result;
 				do {
-					System.out.println("Setting the default values for width and height to 10");
 					widthField = new JTextField("10");
 					heightField = new JTextField("10");
-					System.out.println("Adding the width and height fields to the panel pane.");
 					JPanel panel = new JPanel(new GridLayout(1, 2));
 					panel.add(new JLabel("  Width:"));
 					panel.add(widthField);
 					panel.add(new JLabel("  Height:"));
 					panel.add(heightField);
-					System.out.println("Now showing the confirmation dialog to me. A pop-up should come up anytime soon.");
 					result = JOptionPane.showConfirmDialog(null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 				}
 				while (Integer.valueOf(widthField.getText()) <= 0 || Integer.valueOf(heightField.getText()) <= 0);
 				if (result == JOptionPane.OK_OPTION) {
-					System.out.println("Pop up has closed. Width and Height are now defined, now creating the image.");
 					setImageSize(Integer.valueOf(widthField.getText()), Integer.valueOf(heightField.getText()));
 				}
 			}
@@ -388,23 +383,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						break;
 					}
 					default: {
-						TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
-						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
-						Data temp = null;
-						for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
-							if (panel.dataValue == entry.getKey()) {
-								temp = entry.getValue();
-								break;
-							}
-						}
-						if (temp != null) {
-							tiles[i] = panel.dataValue;
-							tilesEditorID[i] = temp.editorID;
-						}
-						else {
-							tiles[i] = d.getColorValue();
-							tilesEditorID[i] = d.editorID;
-						}
+						defaultTileProperties(d);
 						break;
 					}
 				}
@@ -415,10 +394,24 @@ public class DrawingBoard extends Canvas implements Runnable {
 			case 0x09: // Door
 			case 0x0B: // Carpet
 			case 0x0C: { // Carpet
-				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
-				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
-				tiles[i] = panel.dataValue;
-				tilesEditorID[i] = d.editorID;
+				manualInputTileProperties(d);
+				break;
+			}
+			case 0x08: { //House
+				switch (d.red){
+					case 0x0B: //Left roof
+					case 0x0C: //Middle roof
+					case 0x0D: {//Right roof
+						TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+						tiles[i] = (d.alpha << 24) | (d.red << 16) | panel.dataValue & 0xFFFF;
+						tilesEditorID[i] = d.editorID;
+						break;
+					}
+					default:
+						defaultTileProperties(d);
+						break;
+				}
 				break;
 			}
 			case 0x0A: { // Items
@@ -447,26 +440,37 @@ public class DrawingBoard extends Canvas implements Runnable {
 				break;
 			}
 			default: {
-				TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
-				int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
-				Data temp = null;
-				for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
-					if (panel.dataValue == entry.getKey()) {
-						temp = entry.getValue();
-						break;
-					}
-				}
-				if (temp != null) {
-					tiles[i] = panel.dataValue;
-					tilesEditorID[i] = temp.editorID;
-				}
-				else {
-					tiles[i] = d.getColorValue();
-					tilesEditorID[i] = d.editorID;
-				}
+				defaultTileProperties(d);
 				break;
 			}
 		}
+	}
+	
+	private void defaultTileProperties(Data d){
+		TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+		int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+		Data temp = null;
+		for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
+			if (panel.dataValue == entry.getKey()) {
+				temp = entry.getValue();
+				break;
+			}
+		}
+		if (temp != null) {
+			tiles[i] = panel.dataValue;
+			tilesEditorID[i] = temp.editorID;
+		}
+		else {
+			tiles[i] = d.getColorValue();
+			tilesEditorID[i] = d.editorID;
+		}
+	}
+	
+	private void manualInputTileProperties(Data d){
+		TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+		int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
+		tiles[i] = panel.dataValue;
+		tilesEditorID[i] = d.editorID;
 	}
 	
 	public void start() {

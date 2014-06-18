@@ -14,6 +14,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
@@ -28,6 +32,7 @@ public class LevelEditor extends JFrame {
 	public static final int HEIGHT = 144;
 	public static final int SIZE = 4;
 	public static final String NAME_TITLE = "Level Editor (Hobby)";
+	public static final String SAVED_PATH_DATA = "cache.ini";
 	
 	private ArrayList<Data> filepaths = new ArrayList<Data>();
 	
@@ -113,6 +118,50 @@ public class LevelEditor extends JFrame {
 				initialize();
 			}
 		});
+		
+		
+		File file = new File(LevelEditor.SAVED_PATH_DATA);
+		if (!file.isFile()) {
+			RandomAccessFile f = null;
+			try {
+				f = new RandomAccessFile(file, "rw");
+				f.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
+			}
+			catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			finally {
+				try {
+					f.close();
+				}
+				catch (IOException e) {
+				}
+			}
+		}
+		else {
+			RandomAccessFile f = null;
+			try {
+				f = new RandomAccessFile(file, "rw");
+				FileControl.lastSavedDirectory = new File(f.readLine());
+			}
+			catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			finally {
+				try {
+					f.close();
+				}
+				catch (IOException e) {
+				}
+			}
+		}
+		
 	}
 	
 	@Override
@@ -167,7 +216,7 @@ public class LevelEditor extends JFrame {
 		});
 	}
 	
-	public final void initialize(){
+	public final void initialize() {
 		EditorConstants.metadata = Metadata.Pixel_Data;
 		this.drawingBoardPanel.newImage(5, 5);
 	}
