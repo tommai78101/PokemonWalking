@@ -95,10 +95,10 @@ public class Properties extends JPanel {
 					Data d = (Data) e.getItem();
 					Properties.this.selectedData = d;
 					TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
-					panel.alphaField.setText(Integer.toString(d.alpha));
-					panel.redField.setText(Integer.toString(d.red));
-					panel.greenField.setText(Integer.toString(d.green));
-					panel.blueField.setText(Integer.toString(d.blue));
+					panel.alphaInputField.setText(Integer.toString(d.alpha));
+					panel.redInputField.setText(Integer.toString(d.red));
+					panel.greenInputField.setText(Integer.toString(d.green));
+					panel.blueInputField.setText(Integer.toString(d.blue));
 					editor.controlPanel.setSelectedData(d);
 					editor.validate();
 				}
@@ -174,7 +174,6 @@ public class Properties extends JPanel {
 	
 	@Override
 	public void validate() {
-		super.validate();
 		switch (EditorConstants.metadata) {
 			case Pixel_Data:
 				this.tileCategory.setEnabled(true);
@@ -187,5 +186,6 @@ public class Properties extends JPanel {
 				this.triggers.setEnabled(true);
 				break;
 		}
+		super.validate();
 	}
 }
