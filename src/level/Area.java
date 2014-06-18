@@ -75,7 +75,7 @@ public class Area {
 				PixelData px = new PixelData(pixel, x, y);
 				if (((pixel >> 24) & 0xFF) == 0x03)
 					areaObstacles.add(new Obstacle(px, (pixel >> 16) & 0xFF));
-				if (((pixel >> 24) & 0xFF) == 0x0E){
+				if (((pixel >> 24) & 0xFF) == 0x0D){
 					this.setDefaultPosition(px);
 					this.setPlayerX(x);
 					this.setPlayerY(y);
