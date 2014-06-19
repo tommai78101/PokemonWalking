@@ -98,9 +98,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		tiles = new int[w * h];
 		tilesEditorID = new int[w * h];
+		triggers = new int[w * h];
 		for (int i = 0; i < tiles.length; i++) {
 			tiles[i] = 0;
 			tilesEditorID[i] = 0;
+			triggers[i] = 0;
 		}
 		image = new BufferedImage(w * Tile.WIDTH, h * Tile.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
@@ -233,7 +235,17 @@ public class DrawingBoard extends Canvas implements Runnable {
 						catch (Exception e) {
 							// Eraser.
 							trigger = EditorConstants.getInstance().getTriggers().get(0);
+							
 						}
+						Data data = null;						
+						try {
+							Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(tilesEditorID[k]);
+							data = entry.getValue();
+						}
+						catch (Exception e){
+							data = EditorConstants.getInstance().getDatas().get(0).getValue();
+						}
+						
 						
 						if (trigger == null)
 							break;
@@ -247,8 +259,36 @@ public class DrawingBoard extends Canvas implements Runnable {
 							g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 						}
 						else {
-							Data d = EditorConstants.getData(0, 0, 0, 0);
-							g.drawImage(d.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+//							g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+							Graphics gD = this.image.getGraphics();
+							BufferedImage bimg = new BufferedImage(data.image.getIconWidth(), data.image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+							Graphics gB = bimg.getGraphics();
+							// TODO: Area Type ID must be included.
+							gB.drawImage(data.image.getImage(), 0, 0, null);
+							gB.dispose();
+							
+							if (data.areaTypeIncluded) {
+								switch (data.areaTypeIDType) {
+									case ALPHA:
+									default:
+										this.setBiomeTile((tiles[k] >> 24) & 0xFF, g);
+										break;
+									case RED:
+										this.setBiomeTile((tiles[k] >> 16) & 0xFF, g);
+										break;
+									case GREEN:
+										this.setBiomeTile((tiles[k] >> 8) & 0xFF, g);
+										break;
+									case BLUE:
+										this.setBiomeTile(tiles[k] & 0xFF, g);
+										break;
+								}
+							}
+							else
+								gD.setColor(Color.white);
+							g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
+							g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+							g.dispose();
 						}
 						g.dispose();
 					}

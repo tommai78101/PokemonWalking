@@ -157,8 +157,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 	
 	@Override
 	public void validate(){
-		if (this.propertiesPanel != null)
-			this.propertiesPanel.validate();
 		switch (EditorConstants.metadata){
 			case Pixel_Data:
 				this.iconsPanel.setVisible(true);
@@ -172,5 +170,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 				break;
 		}
 		super.validate();
+		if (this.propertiesPanel != null)
+			this.propertiesPanel.validate();
 	}
 }
