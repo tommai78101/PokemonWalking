@@ -359,7 +359,7 @@ public class Art {
 		return result.deriveFont(Font.PLAIN, 8f * MainComponent.GAME_SCALE);
 	}
 	
-	public static BaseBitmap changeColors(BaseBitmap bitmap, int color, int alphaColor) {
+	public static BaseBitmap changeColors(BaseBitmap bitmap, int color) {
 		BaseBitmap result = new BaseBitmap(bitmap.getWidth(), bitmap.getHeight());
 		int[] pixels = bitmap.getPixels();
 		int[] resultPixels = result.getPixels();
@@ -368,7 +368,7 @@ public class Art {
 			// May be possible this will expand in the future.
 			switch (alpha) {
 				case 0x01:
-					resultPixels[i] = BaseScreen.lighten(color, 0.2f);
+					resultPixels[i] = 0xFF000000 | BaseScreen.lighten(color, 0.2f);
 					break;
 				default:
 					resultPixels[i] = 0xFF000000 | BaseScreen.darken(color, 0.1f);

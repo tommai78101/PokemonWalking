@@ -45,7 +45,7 @@ public class WorldConstants {
 	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
 	
 	// Building Roof Colors / Main Area Color Theme
-	public static final int AREA_1_COLOR = 0xFF3495B0;
+	public static final int AREA_1_COLOR = 0xFFC495B0;
 	public static final int AREA_2_COLOR = 0xFF345CBD;
 	
 	// World IDs
