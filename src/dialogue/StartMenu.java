@@ -141,8 +141,22 @@ public class StartMenu {
 		return this.activation;
 	}
 	
+	/**
+	 * Compares all available submenus before returning it.
+	 * 
+	 * <p>
+	 * <b>Note:</b> There's a legitimate logic error resulting in submenus having different reference values in the Java VM existing in this method. If this method
+	 * doesn't do any comparison beforehand, it will result in having the JVM using the wrong but correct references.
+	 * 
+	 * @return The chosen submenu that is equal to the submenu used for comparison.
+	 * */
 	public SubMenu getSubMenu() {
-		return this.items.get(this.menuCursorPosition).getValue();
+		SubMenu menu = this.items.get(this.menuCursorPosition).getValue();
+		if (menu.equals(this.inventory))
+			menu = this.inventory;
+		else if (menu.equals(this.save))
+			menu = save;
+		return menu;
 	}
 	
 	public Inventory getInventory() {

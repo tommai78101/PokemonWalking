@@ -44,11 +44,11 @@ public class Inventory extends SubMenu {
 	};
 	
 	private Keys keys;
-	private List<Map.Entry<Item, Integer>> potions;
-	private List<Map.Entry<Item, Integer>> keyItems;
-	private List<Map.Entry<Item, Integer>> pokéballs;
-	private List<Map.Entry<Item, Integer>> TMs_HMs;
-	private List<String> selectionMenu;
+	private final ArrayList<Map.Entry<Item, Integer>> potions;
+	private final ArrayList<Map.Entry<Item, Integer>> keyItems;
+	private final ArrayList<Map.Entry<Item, Integer>> pokéballs;
+	private final ArrayList<Map.Entry<Item, Integer>> TMs_HMs;
+	private final ArrayList<String> selectionMenu;
 	private int itemCursor;
 	private int arrowPosition;
 	private int itemListSpan = 0;
@@ -60,7 +60,7 @@ public class Inventory extends SubMenu {
 	private int set_tokenIterator = 0;
 	private boolean set_end;
 	private int set_subStringIterator = 0;
-	private ArrayList<String> set_completedLines;
+	private final ArrayList<String> set_completedLines;
 	private Thread inventoryDialogueThread;
 	
 	public static final String MENU_USE = "USE";
@@ -118,7 +118,7 @@ public class Inventory extends SubMenu {
 	 * */
 	public void addItem(ItemText itemText) {
 		boolean heldItemExists = false;
-		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(itemText);
+		ArrayList<Map.Entry<Item, Integer>> list = this.getItemCategoryList(itemText);
 		CHECK_LOOP:
 		for (int i = 0; i < list.size(); i++) {
 			Map.Entry<Item, Integer> entry = list.get(i);
@@ -265,7 +265,7 @@ public class Inventory extends SubMenu {
 					if (!this.selectionMenu.isEmpty()) {
 						NewDialogue.renderDialogBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4, this.selectionMenu.size() - 1);
 						output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE, (12 * this.stateArrowPosition + Tile.HEIGHT * (7 - this.selectionMenu.size())) - 8);
-						List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+						ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 						renderItemMenuText(list, g2d);
 					}
 					g2d.dispose();
@@ -299,7 +299,7 @@ public class Inventory extends SubMenu {
 					BufferedImage old = output.getBufferedImage();
 					Graphics2D g2d = old.createGraphics();
 					renderText(g2d);
-					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					renderItemMenuText(list, g2d);
 					g2d.dispose();
 					break;
@@ -368,6 +368,7 @@ public class Inventory extends SubMenu {
 	 * */
 	@Override
 	public void tick() {
+		System.out.println(this.keyItems.size());
 		switch (this.state) {
 			case SELECTION: {
 				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
@@ -380,7 +381,7 @@ public class Inventory extends SubMenu {
 					this.keys.W.lastKeyState = true;
 				}
 				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown) && (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
-					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					if (itemCursor < list.size() - 1) {
 						itemCursor++;
 						if (arrowPosition < 4)
@@ -415,7 +416,7 @@ public class Inventory extends SubMenu {
 					
 					// This state is used when the player has selected an item, and wants to do something to the item.
 					// Example, using the item, tossing the item, etc.
-					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					Map.Entry<Item, Integer> entry = list.get(itemCursor);
 					if (entry.getKey().getCategory() == null && entry.getValue() == Integer.MAX_VALUE) {
 						// If getCategory() returns null, it is not an item.
@@ -491,7 +492,7 @@ public class Inventory extends SubMenu {
 				break;
 			}
 			case USE: {
-				List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+				ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 				Map.Entry<Item, Integer> entry = list.get(itemCursor);
 				entry.getKey().doAction();
 				this.resetCursor();
@@ -502,7 +503,7 @@ public class Inventory extends SubMenu {
 				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
 					this.keys.up.lastKeyState = true;
 					this.keys.W.lastKeyState = true;
-					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					Map.Entry<Item, Integer> entry = list.get(itemCursor);
 					if (entry.getValue() > this.amountToToss)
 						this.amountToToss++;
@@ -519,7 +520,7 @@ public class Inventory extends SubMenu {
 					this.resetSelectionCursor();
 					this.state = State.MENU;
 					if (this.selectionMenu.isEmpty()) {
-						List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+						ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 						Item item = list.get(itemCursor).getKey();
 						if (item != null && list.get(itemCursor).getValue() != Integer.MAX_VALUE) {
 							switch (item.getCategory()) {
@@ -583,7 +584,7 @@ public class Inventory extends SubMenu {
 	 * @return Nothing.
 	 * */
 	public void tossItem() {
-		List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+		ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 		Map.Entry<Item, Integer> entry = list.get(itemCursor);
 		if (entry.getValue() - 1 <= 0)
 			list.remove(itemCursor);
@@ -591,13 +592,29 @@ public class Inventory extends SubMenu {
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
 	
-	public List<List<Map.Entry<Item, Integer>>> getAllItemsList() {
-		List<List<Map.Entry<Item, Integer>>> result = new ArrayList<List<Map.Entry<Item, Integer>>>();
+	public List<ArrayList<Map.Entry<Item, Integer>>> getAllItemsList() {
+		List<ArrayList<Map.Entry<Item, Integer>>> result = new ArrayList<ArrayList<Map.Entry<Item, Integer>>>();
 		result.add(potions);
 		result.add(keyItems);
 		result.add(pokéballs);
 		result.add(TMs_HMs);
 		return result;
+	}
+	
+	public ArrayList<Map.Entry<Item, Integer>> getPotions(){
+		return this.potions;
+	}
+	
+	public ArrayList<Map.Entry<Item, Integer>> getKeyItems(){
+		return this.keyItems;
+	}
+	
+	public ArrayList<Map.Entry<Item, Integer>> getPokeballs(){
+		return this.pokéballs;
+	}
+	
+	public ArrayList<Map.Entry<Item, Integer>> getTM_HM(){
+		return this.TMs_HMs;
 	}
 	
 	// ------------------------------------ PRIVATE METHODS -----------------------------------------
@@ -607,20 +624,20 @@ public class Inventory extends SubMenu {
 	 * 
 	 * @return A list of all the items and their corresponding amount of the items that the player is currently browsing in.
 	 * */
-	private List<Map.Entry<Item, Integer>> getCurrentList() {
-		List<Map.Entry<Item, Integer>> result = null;
+	private ArrayList<Map.Entry<Item, Integer>> getCurrentList() {
+		ArrayList<Map.Entry<Item, Integer>> result = null;
 		switch (this.category) {
 			case POTIONS:
-				result = potions;
+				result = this.potions;
 				break;
 			case KEYITEMS:
-				result = keyItems;
+				result = this.keyItems;
 				break;
 			case POKEBALLS:
-				result = pokéballs;
+				result = this.pokéballs;
 				break;
 			case TM_HM:
-				result = TMs_HMs;
+				result = this.TMs_HMs;
 				break;
 		}
 		return result;
@@ -633,8 +650,8 @@ public class Inventory extends SubMenu {
 	 *            The target item that is used to get the list of items that the targeted item belongs to.
 	 * @return A list of all the items and their corresponding amount of the items that the targeted item belongs to.
 	 * */
-	private List<Map.Entry<Item, Integer>> getItemCategoryList(ItemText itemText) {
-		List<Map.Entry<Item, Integer>> result = null;
+	private ArrayList<Map.Entry<Item, Integer>> getItemCategoryList(ItemText itemText) {
+		ArrayList<Map.Entry<Item, Integer>> result = null;
 		switch (itemText.category) {
 			case POTIONS:
 				result = potions;
@@ -766,7 +783,7 @@ public class Inventory extends SubMenu {
 	private void renderText(Graphics g) {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
-		List<Map.Entry<Item, Integer>> list = this.getCurrentList();
+		ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 		switch (this.state) {
 			default: {
 				if (tick >= (byte) 0x4) {

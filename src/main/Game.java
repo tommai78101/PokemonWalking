@@ -91,6 +91,10 @@ public class Game {
 					screen.flashing();
 				}
 				else {
+					if (this.subMenu.equals(this.startMenu.getInventory()))
+						this.subMenu = this.startMenu.getInventory();
+					else
+						this.subMenu = this.startMenu.getSubMenu();
 					if (this.subMenu != null) {
 						this.subMenu.render(screen, graphics);
 					}
@@ -151,7 +155,15 @@ public class Game {
 					screen.setRenderingEffectTick((byte) 0x0);
 					break;
 				}
+				if (this.subMenu.equals(this.startMenu.getInventory())) {
+					this.subMenu = this.startMenu.getInventory();
+				}
+				else {
+					this.subMenu = this.startMenu.getSubMenu();
+				}
 				if (this.subMenu != null) {
+					if (!this.subMenu.isActivated())
+						this.subMenu.enableSubMenu();
 					this.subMenu.tick();
 				}
 				break;
