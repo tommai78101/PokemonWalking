@@ -185,6 +185,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 							tilesEditorID[j] = 0;
 							continue;
 						}
+						if (image == null)
+							return;
 						Graphics g = this.image.getGraphics();
 						BufferedImage bimg = new BufferedImage(data.image.getIconWidth(), data.image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 						Graphics gB = bimg.getGraphics();
@@ -582,7 +584,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
 			int triggerCount = srcTiles[0];
 			int triggerRows = (triggerCount / image.getWidth()) + 1;
-			
+			this.setImageSize(image.getWidth(), (image.getHeight() - triggerRows));
 			if (this.triggers != null)
 				this.triggers = null;
 			this.triggers = new int[image.getWidth() * (image.getHeight() - triggerRows)];
@@ -591,8 +593,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 				int y = (srcTiles[i + 1] >> 16) & 0xFF;
 				this.triggers[y * image.getWidth() + x] = srcTiles[i + 1];
 			}
-			
-			this.setImageSize(image.getWidth(), (image.getHeight() - triggerRows));
 			for (int i = 0; i < srcTiles.length - (triggerRows * image.getWidth()); i++)
 				this.tiles[i] = srcTiles[i + (triggerRows * image.getWidth())];
 			ArrayList<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
