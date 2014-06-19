@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import level.Area;
+import main.Game;
 import screen.BaseScreen;
 import entity.Player;
 
@@ -37,6 +38,7 @@ public abstract class World {
 	
 	protected Player player;
 	protected Area currentArea;
+	protected Game game;
 	
 	public List<Area> areas = new ArrayList<Area>();
 	
@@ -57,6 +59,12 @@ public abstract class World {
 	// public Plot storyPlot;
 	// protected Data data;
 	// protected int id;
+	
+	public World(Player player, Game game){
+		this.player = player;
+		this.game = game;
+		this.currentArea = null;
+	}
 	
 	public void tick() {
 	}

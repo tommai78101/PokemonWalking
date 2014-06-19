@@ -24,6 +24,10 @@ public class Bicycle extends ActionItem {
 		super(game, "BICYCLE", ENABLING_DESCRIPTION, Category.KEYITEMS, WorldConstants.ITEM_BICYCLE);
 	}
 	
+	public Bicycle(Game game, ItemText text){
+		super(game, text);
+	}
+	
 	@Override
 	public void enable() {
 		super.enable();

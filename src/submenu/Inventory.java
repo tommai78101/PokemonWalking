@@ -89,7 +89,13 @@ public class Inventory extends SubMenu {
 		this.pokéballs = new ArrayList<Map.Entry<Item, Integer>>();
 		this.TMs_HMs = new ArrayList<Map.Entry<Item, Integer>>();
 		this.selectionMenu = new ArrayList<String>();
-		ItemText itemText = WorldConstants.items.get(WorldConstants.ITEM_RETURN);
+		ItemText itemText = null;
+		for (Map.Entry<ItemText, Item> e: WorldConstants.items){
+			if (e.getKey().id == WorldConstants.ITEM_RETURN){
+				itemText = e.getKey();
+				break;
+			}
+		}
 		Item returnExit = new DummyItem(game, itemText.itemName, itemText.description, null, 0);
 		this.potions.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
 		this.keyItems.add(new AbstractMap.SimpleEntry<Item, Integer>(returnExit, Integer.MAX_VALUE));
@@ -110,34 +116,48 @@ public class Inventory extends SubMenu {
 	 *            The item object that is to be added into the Inventory.
 	 * @return Nothing.
 	 * */
-	public void addItem(ItemText itemText, Item item) {
+	public void addItem(ItemText itemText) {
 		boolean heldItemExists = false;
-		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(item);
+		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(itemText);
+		CHECK_LOOP:
 		for (int i = 0; i < list.size(); i++) {
 			Map.Entry<Item, Integer> entry = list.get(i);
-			if (entry.getKey().equals(item)) {
-				entry.setValue(entry.getValue().intValue() + 1);
-				heldItemExists = true;
+			if (entry.getKey().getID() == itemText.id) {
+				switch (entry.getKey().getCategory()) {
+					case KEYITEMS: {
+						if (entry.getValue() < 1) {
+							heldItemExists = false;
+							break CHECK_LOOP;
+						}
+						break;
+					}
+					case POKEBALLS:
+					case POTIONS:
+					case TM_HM:
+						entry.setValue(entry.getValue().intValue() + 1);
+						break;
+				}
+				heldItemExists= true;
 				break;
 			}
 		}
 		if (!heldItemExists) {
+			Item item = null;
 			switch (itemText.type) {
 				case DUMMY:
-					item.initializeCommands(itemText);
+					item = new DummyItem(this.game, itemText);
 					list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 					break;
 				case ACTION: {
 					// Action items must have ID, else it would be a dummy item.
-					switch (item.getID()) {
+					switch (itemText.id) {
 						case WorldConstants.ITEM_BICYCLE:
-							item = new Bicycle(this.game, item.getName(), item.getDescription(), item.getCategory());
-							item.initializeCommands(itemText);
+							item = new Bicycle(this.game, itemText);
 							list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 							break;
 						default:
 							// Dummy item creation.
-							item.initializeCommands(itemText);
+							item = new DummyItem(this.game, itemText);
 							list.add(0, new AbstractMap.SimpleEntry<Item, Integer>(item, 1));
 							break;
 					}
@@ -613,9 +633,9 @@ public class Inventory extends SubMenu {
 	 *            The target item that is used to get the list of items that the targeted item belongs to.
 	 * @return A list of all the items and their corresponding amount of the items that the targeted item belongs to.
 	 * */
-	private List<Map.Entry<Item, Integer>> getItemCategoryList(Item item) {
+	private List<Map.Entry<Item, Integer>> getItemCategoryList(ItemText itemText) {
 		List<Map.Entry<Item, Integer>> result = null;
-		switch (item.getCategory()) {
+		switch (itemText.category) {
 			case POTIONS:
 				result = potions;
 				break;

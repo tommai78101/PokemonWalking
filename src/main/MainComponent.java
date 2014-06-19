@@ -44,7 +44,7 @@ public class MainComponent extends Canvas implements Runnable {
 	
 	// -----------------------
 	private final BaseScreen screen;
-	private Game game;
+	private static Game game;
 	private JFrame frame;
 	// -----------------------
 	
@@ -310,6 +310,10 @@ public class MainComponent extends Canvas implements Runnable {
 	
 	public static final Keys getMainInput() {
 		return keys;
+	}
+	
+	public static final Game getGame(){
+		return game;
 	}
 	
 	// ---------------------------------

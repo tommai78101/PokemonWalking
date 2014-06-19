@@ -234,28 +234,7 @@ public class Player extends Entity {
 				}
 				break;
 			}
-			case 0x08: {// Sign
-				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
-					this.enableInteraction = false;
-					if (Player.isMovementsLocked())
-						Player.unlockMovements();
-					break;
-				}
-				if (!movementLock) {
-					if (this.interactionID != 0) {
-						this.enableInteraction = false;
-						return;
-					}
-					if (!this.enableInteraction)
-						this.enableInteraction = true;
-				}
-				// }
-				if (this.enableInteraction) {
-					this.interactionID = dataColor;
-				}
-				break;
-			}
-			case 0x0B: {// Item
+			case 0x0A: {// Item
 				// if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)){
 				// this.keys.Z.lastKeyState = true;
 				// this.keys.SLASH.lastKeyState = true;

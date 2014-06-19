@@ -10,14 +10,26 @@
 
 package abstracts;
 
+import item.ActionItem;
+import item.Bicycle;
+import item.DummyItem;
 import item.ItemText;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import level.Area;
+import level.WorldConstants;
 import main.Game;
+import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
 import submenu.Inventory;
@@ -91,6 +103,16 @@ public abstract class Item {
 		availableCommands = new ArrayList<String>();
 	}
 	
+	public Item(Game game, ItemText itemText){
+		setName(itemText.itemName);
+		setDescription(itemText.description);
+		setCategory(itemText.category);
+		setID(itemText.id);
+		this.game = game;
+		this.picked = false;
+		availableCommands = new ArrayList<String>();
+	}
+	
 	public void setName(String value) {
 		this.name = value;
 	}
@@ -156,28 +178,36 @@ public abstract class Item {
 			this.availableCommands.add(0, Inventory.MENU_USE);
 	}
 	
-	@Override
-	public boolean equals(Object object) {
-		try {
-			if (object == null)
-				return false;
-			if (this.getClass() != object.getClass())
-				return false;
-			final Item item = (Item) object;
-			if ((this.name == null) ? (item.getName() != null) : !this.name.equals(item.getName()))
-				return false;
-			return true;
-		}
-		catch (Exception e) {
-			return false;
-		}
-	}
+	
 	
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Item other = (Item) obj;
+		if (category != other.category) {
+			return false;
+		}
+		if (id != other.id) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
 	public int hashCode() {
-		int hash = 3;
-		hash = 53 * hash + ((this.name != null) ? this.name.hashCode() : 0);
-		return hash;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((category == null) ? 0 : category.hashCode());
+		result = prime * result + id;
+		return result;
 	}
 	
 	public abstract void doAction();
@@ -243,5 +273,106 @@ public abstract class Item {
 		catch (Exception e) {
 			return null;
 		}
+	}
+	
+	public static ArrayList<Map.Entry<ItemText, Item>> loadItems(String filename) {
+		ArrayList<Map.Entry<ItemText, Item>> result = new ArrayList<Map.Entry<ItemText, Item>>();
+		try {
+			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
+			String line;
+			ItemText itemText = new ItemText();
+			
+			int id = 0;
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("%")) {
+					itemText.type = ItemText.Type.getType(line.split("%")[1]);
+				}
+				else if (line.startsWith("#")) {
+					itemText.itemName = line.split("#")[1];
+				}
+				else if (line.startsWith("@")) {
+					itemText.description = line.split("@")[1];
+				}
+				else if (line.startsWith("^")) {
+					// '^' is a special character, therefore, one must use backslashes to get the literal form.
+					String value = line.split("\\^")[1];
+					if (value.equals(TAG_POTIONS)) {
+						itemText.category = Category.POTIONS;
+					}
+					else if (value.equals(TAG_KEYITEMS)) {
+						itemText.category = Category.KEYITEMS;
+					}
+					else if (value.equals(TAG_POKEBALLS)) {
+						itemText.category = Category.POKEBALLS;
+					}
+					else if (value.equals(TAG_TM_HM)) {
+						itemText.category = Category.TM_HM;
+					}
+					else if (value.equals(TAG_ALL)) {
+						itemText.skipCheckCategory = true;
+					}
+				}
+				else if (line.startsWith(FLAG_SET_COMMAND)) {
+					itemText.setCommandFlag = true;
+				}
+				else if (line.startsWith(FLAG_USE_COMMAND)) {
+					itemText.useCommandFlag = true;
+				}
+				else if (line.startsWith(FLAG_TOSS_COMMAND)) {
+					itemText.tossCommandFlag = true;
+				}
+				else if (line.startsWith(ITEM_DELIMITER)) {
+					itemText.done = true;
+				}
+				
+				if (itemText.isComplete()) {
+					itemText.id = id;
+					result.add(new AbstractMap.SimpleEntry<ItemText, Item>(itemText, createNewItem(itemText)));
+					itemText = new ItemText();
+					id++;
+				}
+			}
+			
+			Collections.sort(result, new Comparator<Map.Entry<ItemText, Item>>(){
+				@Override
+				public int compare(Entry<ItemText, Item> e1, Entry<ItemText, Item> e2) {
+					if (e1.getKey().id < e2.getKey().id)
+						return -1;
+					if (e1.getKey().id > e2.getKey().id)
+						return 1;
+					return 0;
+				}
+			});
+			
+			
+			return result;
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+	
+	public static Item createNewItem(ItemText text) {
+		Item result = null;
+		switch (text.type) {
+			case DUMMY:
+				result = new DummyItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
+				break;
+			case ACTION:
+				switch (text.id){
+					case WorldConstants.ITEM_BICYCLE:
+						result = new Bicycle(MainComponent.getGame(), text.itemName, text.description, text.category);
+						break;
+					default:
+						result = new ActionItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
+						break;
+				}
+				break;
+			case ALL:
+			default:
+				result = null;
+				break;
+		}
+		return result;
 	}
 }

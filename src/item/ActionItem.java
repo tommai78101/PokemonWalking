@@ -21,6 +21,10 @@ public class ActionItem extends Item {
 		super(game, name, description, category, id);
 	}
 	
+	public ActionItem(Game game, ItemText text){
+		super(game, text);
+	}
+	
 	@Override
 	public void doAction() {
 		if (enabled)

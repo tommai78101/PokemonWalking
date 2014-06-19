@@ -60,7 +60,7 @@ public class Game {
 		this.screen = main.getBaseScreen();
 		this.player = new Player(input);
 		this.player.setCenterCamPosition(this.screen);
-		this.overworld = new OverWorld(player);
+		this.overworld = new OverWorld(player, this);
 		this.worlds = new ArrayList<World>();
 		this.worlds.add(this.overworld);
 		this.startMenu = new StartMenu(this).initialize();
@@ -211,7 +211,7 @@ public class Game {
 		Mod.loadModdedResources(this.screen);
 		WorldConstants.isModsEnabled = null;
 		player.reload();
-		this.overworld = new OverWorld(player);
+		this.overworld = new OverWorld(player, this);
 		this.state = State.GAME;
 		GameSave.load(this, SAVE_FILE_NAME);
 	}

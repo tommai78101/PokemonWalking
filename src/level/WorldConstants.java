@@ -13,7 +13,6 @@ package level;
 import item.ItemText;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +54,8 @@ public class WorldConstants {
 	public static ArrayList<Map.Entry<NewDialogue, Integer>> signTexts = NewDialogue.loadDialogues("dialogue/dialogue.txt");
 	
 	// Items
-	public static HashMap<Integer, ItemText> items = Item.loadItemResources("item/items.txt");
+	//public static HashMap<Integer, ItemText> itemms = Item.loadItemResources("item/items.txt");
+	public static ArrayList<Map.Entry<ItemText, Item>> items = Item.loadItems("item/items.txt");
 	
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;

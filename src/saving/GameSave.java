@@ -10,8 +10,6 @@
 
 package saving;
 
-import item.ActionItem;
-import item.DummyItem;
 import item.ItemText;
 
 import java.io.File;
@@ -215,23 +213,16 @@ public class GameSave {
 				offset += 4;
 				int quantity = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
 				
-				ItemText itemText = WorldConstants.items.get(id);
-				Item item = null;
-				switch (itemText.type) {
-					case DUMMY:
-						item = new DummyItem(game, itemText.itemName, itemText.description, itemText.category, itemText.id);
+				ItemText itemText = null;
+				ArrayList<Map.Entry<ItemText, Item>> itemList = WorldConstants.items;
+				for (Map.Entry<ItemText, Item> e : itemList) {
+					if (e.getKey().id == id) {
+						itemText = e.getKey();
 						break;
-					case ACTION:
-						item = new ActionItem(game, itemText.itemName, itemText.description, itemText.category, itemText.id);
-						break;
-					default:
-						item = null;
-						break;
+					}
 				}
-				if (item != null) {
-					for (; quantity > 0; quantity--)
-						inventory.addItem(itemText, item);
-				}
+				for (; quantity > 0; quantity--)
+					inventory.addItem(itemText);
 			}
 		}
 		
@@ -269,7 +260,8 @@ public class GameSave {
 				int sectorID = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 				offset += 4;
 				
-				LOADED_AREA: for (Area area : loadedAreas) {
+				LOADED_AREA:
+				for (Area area : loadedAreas) {
 					if (areaID == area.getAreaID()) {
 						int xPixelData = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 						offset += 4;

@@ -14,9 +14,13 @@ import item.ItemText;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import main.Game;
 import obstacle.Obstacle;
 import screen.BaseScreen;
+import submenu.Inventory;
+import abstracts.Item;
 import abstracts.Tile;
 import abstracts.World;
 import dialogue.NewDialogue;
@@ -37,9 +41,13 @@ public class OverWorld extends World {
 	 * @param Player
 	 *            Takes a Player object. The overworld then loads all related properties in respect to the Player object.
 	 * */
-	public OverWorld(Player player) {
+	public OverWorld(Player player, Game game) {
 		// There should be a maximum number of areas available for the OverWorld.
 		// All areas defined must be placed in WorldConstants.
+		
+		// Player and Game.
+		super(player, game);
+		
 		this.worldID = WorldConstants.OVERWORLD;
 		
 		if (!this.areas.isEmpty())
@@ -48,9 +56,6 @@ public class OverWorld extends World {
 		
 		// Overworld properties
 		this.invertBitmapColors = false;
-		
-		// Player
-		this.player = player;
 		
 		// Going to set this area as test default only. This will need to change in the future.
 		this.currentArea = this.areas.get(0);
@@ -124,6 +129,11 @@ public class OverWorld extends World {
 			}
 		}
 		
+		this.handlePlayerInteractions();
+		this.handleDialogues();
+	}
+	
+	private void handlePlayerInteractions() {
 		// TODO: Fix the awkward interaction caused by so many states not working properly.
 		int interactionID = player.getInteractionID();
 		if (this.player.isInteracting() && interactionID != 0 && !this.currentArea.isBeingTriggered()) {
@@ -157,33 +167,41 @@ public class OverWorld extends World {
 					}
 					break;
 				}
-				case 0x0B: {// Item
-					ItemText text = WorldConstants.items.get(red);
-					if (this.newDialogues == null)
-						this.newDialogues = new NewDialogue[] { NewDialogue.createText(text.itemName + " has been found.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_ALERT, true) };
-					
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-							PixelData data = currentArea.getCurrentPixelData();
-							switch (player.getFacing()) {
-								case Player.UP:
-									currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() - 1);
-									break;
-								case Player.DOWN:
-									currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() + 1);
-									break;
-								case Player.LEFT:
-									currentArea.setPixelData(data, player.getXInArea() - 1, player.getYInArea());
-									break;
-								case Player.RIGHT:
-									currentArea.setPixelData(data, player.getXInArea() + 1, player.getYInArea());
-									break;
-							}
+				case 0x0A: {// Item
+					ItemText text = null;
+					for (Entry<ItemText, Item> entry : WorldConstants.items) {
+						if (entry.getKey().id == red) {
+							text = entry.getKey();
+							break;
 						}
-					}).start();
-				}
+					}
+					if (this.newDialogues == null) {
+						this.newDialogues = new NewDialogue[] { NewDialogue.createText(text.itemName + " has been found.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_ALERT, true) };
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								PixelData data = currentArea.getCurrentPixelData();
+								switch (player.getFacing()) {
+									case Player.UP:
+										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() - 1);
+										break;
+									case Player.DOWN:
+										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() + 1);
+										break;
+									case Player.LEFT:
+										currentArea.setPixelData(data, player.getXInArea() - 1, player.getYInArea());
+										break;
+									case Player.RIGHT:
+										currentArea.setPixelData(data, player.getXInArea() + 1, player.getYInArea());
+										break;
+								}
+							}
+						}).start();
+						Inventory inventory = this.game.getStartMenu().getInventory();
+						inventory.addItem(text);
+					}
 					break;
+				}
 			}
 		}
 		else {
@@ -192,8 +210,6 @@ public class OverWorld extends World {
 					Player.unlockMovements();
 			}
 		}
-		
-		this.handleDialogues();
 	}
 	
 	private void handleDialogues() {
@@ -301,7 +317,7 @@ public class OverWorld extends World {
 			}
 		}
 		if (currentAreaFound) {
-			PixelData data = this.currentArea.getCurrentPixelData(); 
+			PixelData data = this.currentArea.getCurrentPixelData();
 			int targetAreaID = 0;
 			if (WorldConstants.isModsEnabled.booleanValue() && this.currentArea.getAreaID() < 1000)
 				targetAreaID = data.getTargetAreaID() + 1000;
