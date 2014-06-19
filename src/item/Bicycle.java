@@ -26,6 +26,7 @@ public class Bicycle extends ActionItem {
 	
 	public Bicycle(Game game, ItemText text){
 		super(game, text);
+		this.description = ENABLING_DESCRIPTION;
 	}
 	
 	@Override

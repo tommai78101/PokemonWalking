@@ -809,6 +809,7 @@ public class Inventory extends SubMenu {
 						g.drawString(tokens.get(1).getKey(), 8, 144 - 16 + 7);
 					}
 					catch (Exception e) {
+//						e.printStackTrace();
 					}
 				}
 				break;
