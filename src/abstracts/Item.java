@@ -111,6 +111,7 @@ public abstract class Item {
 		this.game = game;
 		this.picked = false;
 		availableCommands = new ArrayList<String>();
+		initializeCommands(itemText);
 	}
 	
 	public void setName(String value) {

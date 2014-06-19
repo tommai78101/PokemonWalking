@@ -368,7 +368,6 @@ public class Inventory extends SubMenu {
 	 * */
 	@Override
 	public void tick() {
-		System.out.println(this.keyItems.size());
 		switch (this.state) {
 			case SELECTION: {
 				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown) && (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {

@@ -221,8 +221,9 @@ public class GameSave {
 						break;
 					}
 				}
-				for (; quantity > 0; quantity--)
+				for (; quantity > 0; quantity--){
 					inventory.addItem(itemText);
+				}
 			}
 		}
 		
