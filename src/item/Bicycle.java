@@ -34,12 +34,17 @@ public class Bicycle extends ActionItem {
 		super.enable();
 		final Player player = this.game.getPlayer();
 		if (!player.isRidingBicycle()) {
+			Player.lockMovements();
+			player.enableAutomaticMode();
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
 					try {
 						Thread.sleep(800);
 						player.startsRidingBicycle();
+						Thread.sleep(800);
+						Player.unlockMovements();
+						player.disableAutomaticMode();
 					}
 					catch (InterruptedException e) {
 					}
@@ -56,12 +61,17 @@ public class Bicycle extends ActionItem {
 		super.disable();
 		final Player player = this.game.getPlayer();
 		if (player.isRidingBicycle()) {
+			Player.lockMovements();
+			player.enableAutomaticMode();
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
 					try {
 						Thread.sleep(800);
 						player.getsOffBicycle();
+						Thread.sleep(800);
+						Player.unlockMovements();
+						player.disableAutomaticMode();
 					}
 					catch (InterruptedException e) {
 					}
