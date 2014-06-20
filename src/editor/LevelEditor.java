@@ -119,7 +119,6 @@ public class LevelEditor extends JFrame {
 			}
 		});
 		
-		
 		File file = new File(LevelEditor.SAVED_PATH_DATA);
 		if (!file.isFile()) {
 			RandomAccessFile f = null;
@@ -142,10 +141,10 @@ public class LevelEditor extends JFrame {
 			}
 		}
 		else {
-			RandomAccessFile f = null;
+			RandomAccessFile raf = null;
 			try {
-				f = new RandomAccessFile(file, "rw");
-				FileControl.lastSavedDirectory = new File(f.readLine());
+				raf = new RandomAccessFile(file, "rw");
+				FileControl.lastSavedDirectory = new File(raf.readLine());
 			}
 			catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -155,7 +154,7 @@ public class LevelEditor extends JFrame {
 			}
 			finally {
 				try {
-					f.close();
+					raf.close();
 				}
 				catch (IOException e) {
 				}

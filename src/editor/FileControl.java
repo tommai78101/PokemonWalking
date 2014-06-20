@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
@@ -71,11 +72,31 @@ public class FileControl extends JPanel implements ActionListener {
 					editor.drawingBoardPanel.newImage();
 					break;
 				}
-				case 1: // Save
+				case 1: {// Save
 					if (!editor.drawingBoardPanel.hasBitmap()) {
 						JOptionPane.showMessageDialog(null, "No created maps to save.");
 						break;
 					}
+					
+					RandomAccessFile raf = null;
+					try {
+						raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+						FileControl.lastSavedDirectory = new File(raf.readLine());
+					}
+					catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					finally {
+						try {
+							raf.close();
+						}
+						catch (IOException e) {
+						}
+					}
+					
 					JFileChooser chooser = new JFileChooser();
 					chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 					chooser.setCurrentDirectory(lastSavedDirectory);
@@ -117,7 +138,28 @@ public class FileControl extends JPanel implements ActionListener {
 						}
 					}
 					break;
-				case 2: // Open
+				}
+				case 2: { // Open
+				
+					RandomAccessFile raf = null;
+					try {
+						raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+						FileControl.lastSavedDirectory = new File(raf.readLine());
+					}
+					catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					finally {
+						try {
+							raf.close();
+						}
+						catch (IOException e) {
+						}
+					}
+					
 					JFileChooser opener = new JFileChooser();
 					opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 					opener.setCurrentDirectory(FileControl.lastSavedDirectory);
@@ -154,6 +196,7 @@ public class FileControl extends JPanel implements ActionListener {
 						}
 					}
 					break;
+				}
 				case 4: { // Tileset
 					EditorConstants.metadata = Metadata.Pixel_Data;
 					editor.validate();
