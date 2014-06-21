@@ -55,10 +55,13 @@ public class LevelEditor extends JFrame {
 		this.setPreferredSize(size);
 		this.setMinimumSize(size);
 		this.setMaximumSize(size);
-		
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.pack();
+		this.setSize(size);// Mac issue.
+		this.setPreferredSize(size); // Mac issue.
+		this.setMinimumSize(size); // Mac issue.
+		this.setMaximumSize(size); // Mac issue.
 		this.setVisible(true);
 		
 		this.addWindowListener(new WindowAdapter() {
