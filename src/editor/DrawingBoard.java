@@ -42,10 +42,20 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
 	
-	public DrawingBoard(final LevelEditor editor) {
+	public DrawingBoard(final LevelEditor editor, int width, int height) {
 		super();
 		this.editor = editor;
 		offsetX = offsetY = 0;
+		
+		int w = width * Tile.WIDTH;
+		int h = height * Tile.HEIGHT;
+		Dimension size = new Dimension(w, h);
+		this.setSize(size);
+		this.setPreferredSize(size);
+		this.setMaximumSize(size);
+		this.setMinimumSize(size);
+		this.validate();
+		editor.validate();
 	}
 	
 	@Override
@@ -74,19 +84,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 			catch (InterruptedException e) {
 			}
 		}
-	}
-	
-	@Override
-	public void setSize(int width, int height) {
-		int w = width * Tile.WIDTH;
-		int h = height * Tile.HEIGHT;
-		Dimension size = new Dimension(w, h);
-		// this.setSize(size);
-		this.setPreferredSize(size);
-		this.setMaximumSize(size);
-		this.setMinimumSize(size);
-		this.validate();
-		this.editor.validate();
 	}
 	
 	public void setImageSize(int w, int h) {
@@ -239,15 +236,14 @@ public class DrawingBoard extends Canvas implements Runnable {
 							trigger = EditorConstants.getInstance().getTriggers().get(0);
 							
 						}
-						Data data = null;						
+						Data data = null;
 						try {
 							Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(tilesEditorID[k]);
 							data = entry.getValue();
 						}
-						catch (Exception e){
+						catch (Exception e) {
 							data = EditorConstants.getInstance().getDatas().get(0).getValue();
 						}
-						
 						
 						if (trigger == null)
 							break;
@@ -261,7 +257,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 							g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
 						}
 						else {
-//							g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+							// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
 							Graphics gD = this.image.getGraphics();
 							BufferedImage bimg = new BufferedImage(data.image.getIconWidth(), data.image.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
 							Graphics gB = bimg.getGraphics();
@@ -439,11 +435,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 				manualInputTileProperties(d);
 				break;
 			}
-			case 0x08: { //House
-				switch (d.red){
-					case 0x0B: //Left roof
-					case 0x0C: //Middle roof
-					case 0x0D: {//Right roof
+			case 0x08: { // House
+				switch (d.red) {
+					case 0x0B: // Left roof
+					case 0x0C: // Middle roof
+					case 0x0D: {// Right roof
 						TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 						int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 						tiles[i] = (d.alpha << 24) | (d.red << 16) | panel.dataValue & 0xFFFF;
@@ -488,7 +484,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 	
-	private void defaultTileProperties(Data d){
+	private void defaultTileProperties(Data d) {
 		TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 		int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 		Data temp = null;
@@ -508,7 +504,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 	
-	private void manualInputTileProperties(Data d){
+	private void manualInputTileProperties(Data d) {
 		TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
 		int i = this.getMouseTileY() * bitmapWidth + this.getMouseTileX();
 		tiles[i] = panel.dataValue;
@@ -642,7 +638,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		catch (NegativeArraySizeException e) {
 			JOptionPane.showMessageDialog(null, "Incorrect file format. The file does not contain necessary metadata.");
 		}
-		catch (Exception e){
+		catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Error loading the file. Unable to pinpoint the cause.");
 		}
 	}
