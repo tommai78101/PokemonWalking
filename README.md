@@ -1,6 +1,6 @@
-![Imgur](http://i.imgur.com/P56aP0J.png)
+![Imgur](http://i.imgur.com/rwkiHwC.png)
 
-![Imgur](http://i.imgur.com/PCOgSUH.png)
+![Imgur](http://i.imgur.com/P56aP0J.png)
 
 ### Pokémon Walking Algorithm (Working Title) 
 
@@ -115,8 +115,8 @@ http://www.gfycat.com/FamiliarUncommonIndianabat
 | Entity Interaction | Overworld | All Movements* |
 | Ground Height Lighting | Dialogues | Ledges |
 | ??? | Level Editor | Area Warping |
-| | ??? | Stairs |
-| | | Water |
+| | Triggers/Events | Stairs |
+| | ??? | Water |
 | | | Bitmap Animation |
 | | | Item Balls |
 | | | Inventory |
@@ -143,8 +143,8 @@ http://www.gfycat.com/FamiliarUncommonIndianabat
 
 | Downloads | Latest Stable Version | Link |
 |:---:|:---:|:---:|
-| Walking | v18 | http://www.thehelper.net/attachments/walking_v18-zip.18686/ |
-| Editor | v4 | http://www.thehelper.net/attachments/editor_v4-zip.18688/ |
+| Walking | v19 | http://www.thehelper.net/attachments/walking_v19-zip.18695/ |
+| Editor | v5 | http://www.thehelper.net/attachments/editor_v5-zip.18692/ |
 
 Extract the JAR file from the ZIP file after you have downloaded it. Then double-click on it to run.
 
