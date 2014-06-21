@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import javax.imageio.ImageIO;
@@ -43,7 +44,7 @@ public class FileControl extends JPanel implements ActionListener {
 		super();
 		this.editor = editor;
 		this.setLayout(new GridLayout(1, tags.length));
-		FileControl.lastSavedDirectory = new File("C:\\");
+		FileControl.lastSavedDirectory = new File(Paths.get("").toAbsolutePath().toString());
 		
 		for (int i = 0; i < tags.length; i++) {
 			if (i == 3) {

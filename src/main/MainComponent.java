@@ -312,7 +312,7 @@ public class MainComponent extends Canvas implements Runnable {
 		return keys;
 	}
 	
-	public static final Game getGame(){
+	public static final Game getGame() {
 		return game;
 	}
 	
@@ -332,7 +332,7 @@ public class MainComponent extends Canvas implements Runnable {
 		frame.setSize(new Dimension(inset.left + inset.right + GAME_WIDTH * GAME_SCALE, inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE));
 		frame.setLocationRelativeTo(null);
 		// DEBUG: START
-		frame.setAlwaysOnTop(true);
+		// frame.setAlwaysOnTop(true);
 		// DEBUG: END
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addWindowListener(game.getWindowListener());

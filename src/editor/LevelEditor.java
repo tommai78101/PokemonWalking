@@ -91,10 +91,9 @@ public class LevelEditor extends JFrame {
 					validate();
 				}
 				if (drawingBoardPanel == null) {
-					drawingBoardPanel = new DrawingBoard(editor.LevelEditor.this);
+					drawingBoardPanel = new DrawingBoard(editor.LevelEditor.this, 20, 20);
 					drawingBoardPanel.addMouseListener(input);
 					drawingBoardPanel.addMouseMotionListener(input);
-					drawingBoardPanel.setSize(20, 20);
 					add(drawingBoardPanel, BorderLayout.CENTER);
 					drawingBoardPanel.start();
 				}
@@ -119,6 +118,11 @@ public class LevelEditor extends JFrame {
 			}
 		});
 		
+		createCache();
+		
+	}
+	
+	public void createCache() {
 		File file = new File(LevelEditor.SAVED_PATH_DATA);
 		if (!file.isFile()) {
 			RandomAccessFile f = null;
@@ -160,7 +164,6 @@ public class LevelEditor extends JFrame {
 				}
 			}
 		}
-		
 	}
 	
 	@Override
@@ -217,7 +220,7 @@ public class LevelEditor extends JFrame {
 	
 	public final void initialize() {
 		EditorConstants.metadata = Metadata.Pixel_Data;
-		this.drawingBoardPanel.newImage(5, 5);
+		this.drawingBoardPanel.newImage(15, 15);
 	}
 	
 	public ArrayList<Data> getResourceFilePaths() {
