@@ -1,0 +1,132 @@
+package script_editor;
+
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+
+import editor.KeySelectionRenderer;
+import editor.Trigger;
+
+public class ScriptViewer extends JPanel implements ActionListener {
+	private final ScriptEditor editor;
+	
+	private DefaultListModel<Trigger> model;
+	private JList<Trigger> triggerList;
+	private JButton createButton;
+	private JButton removeButton;
+	
+	public ScriptViewer(ScriptEditor editor) {
+		super();
+		this.editor = editor;
+		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		constructingList();
+		constructingButtons();
+	}
+	
+	private void constructingButtons() {
+		JPanel panel = new JPanel();
+		Dimension size = new Dimension(90, 20);
+		
+		this.createButton = new JButton("Create");
+		this.createButton.setActionCommand(Integer.toString(0));
+		this.createButton.addActionListener(this);
+		this.createButton.setSize(size);
+		this.createButton.setMaximumSize(size);
+		this.createButton.setMinimumSize(size);
+		this.createButton.setPreferredSize(size);
+		panel.add(createButton);
+		
+		panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+		
+		this.removeButton = new JButton("Remove");
+		this.removeButton.setActionCommand(Integer.toString(1));
+		this.removeButton.addActionListener(this);
+		this.removeButton.setSize(size);
+		this.removeButton.setMaximumSize(size);
+		this.removeButton.setMinimumSize(size);
+		this.removeButton.setPreferredSize(size);
+		panel.add(removeButton);
+		
+		this.add(panel);
+	}
+	
+	private void constructingList() {
+		this.model = new DefaultListModel<Trigger>();
+		
+		this.triggerList = new JList<Trigger>();
+		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.triggerList.setLayoutOrientation(JList.VERTICAL);
+		this.triggerList.setVisibleRowCount(0);
+		
+		Dimension size = new Dimension(200, 300);
+		this.triggerList.setSize(size);
+		this.triggerList.setMaximumSize(size);
+		this.triggerList.setPreferredSize(size);
+		this.triggerList.setMinimumSize(size);
+		
+		this.triggerList.setModel(this.model);
+		new KeySelectionRenderer(this.triggerList) {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public String getDisplayValue(Object item) {
+				Trigger t = (Trigger) item;
+				return t.getName() + Integer.toString(t.getTriggerID());
+			}
+		};
+		
+		JScrollPane pane = new JScrollPane(this.triggerList);
+		pane.setSize(size);
+		pane.setMaximumSize(size);
+		pane.setMinimumSize(size);
+		pane.setPreferredSize(size);
+		
+		pane.setVisible(true);
+		this.add(pane);
+	}
+	
+	public void addTrigger(Trigger t) {
+		this.model.add(0, t);
+		this.validate();
+	}
+	
+	public void removeTrigger() {
+		this.model.remove(this.triggerList.getSelectedIndex());
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent event) {
+		switch (Integer.valueOf(event.getActionCommand())) {
+			default:
+				break;
+			case 0: {// Create Button
+				System.out.println("CREATE");
+				Trigger t = new Trigger();
+				t.setName("Hello");
+				t.setTriggerID((char) ((Integer.valueOf(ScriptViewer.this.model.getSize() - 1)) & 0xFFFF));
+				this.model.addElement(t);
+				break;
+			}
+			case 1: {// Remove button
+				System.out.println("REMOVE");
+				int index = this.triggerList.getSelectedIndex();
+				if (index != -1)
+					this.model.remove(index);
+				else
+					JOptionPane.showMessageDialog(null, "Please select a trigger to remove.");
+				break;
+			}
+		}
+	}
+}

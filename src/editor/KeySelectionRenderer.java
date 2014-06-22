@@ -25,9 +25,17 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 	 * @param box
 	 *            A JComboBox object that is to use this KeySelectionRenderer.
 	 */
-	public KeySelectionRenderer(JComboBox box){
+	
+	public KeySelectionRenderer(JComboBox box) {
 		box.setRenderer(this);
 		box.setKeySelectionManager(this);
+		
+		Long value = (Long) UIManager.get("ComboBox.timeFactor");
+		timeFactor = (value == null ? 250L : value.longValue());
+	}
+	
+	public KeySelectionRenderer(JList list) {
+		list.setCellRenderer(this);
 		
 		Long value = (Long) UIManager.get("ComboBox.timeFactor");
 		timeFactor = (value == null ? 250L : value.longValue());

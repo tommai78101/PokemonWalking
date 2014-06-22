@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import script_editor.ScriptEditor;
 import abstracts.Tile;
 import editor.EditorConstants.Metadata;
 
@@ -42,6 +43,7 @@ public class LevelEditor extends JFrame {
 	public TilePropertiesPanel propertiesPanel;
 	public StatusPanel statusPanel;
 	public Properties properties;
+	public ScriptEditor scriptEditor;
 	
 	public String message;
 	public boolean running;
@@ -56,7 +58,7 @@ public class LevelEditor extends JFrame {
 		this.setMinimumSize(size);
 		this.setMaximumSize(size);
 		this.setLayout(new BorderLayout());
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.pack();
 		this.setSize(size);// Mac issue.
 		this.setPreferredSize(size); // Mac issue.
@@ -68,6 +70,12 @@ public class LevelEditor extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent event) {
 				running = false;
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						Runtime.getRuntime().exit(0);
+					}
+				});
 			}
 		});
 		

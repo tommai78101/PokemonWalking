@@ -2,6 +2,8 @@ package editor;
 
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import script_editor.ScriptEditor;
 import editor.EditorConstants.Tools;
 
 public class Properties extends JPanel {
@@ -23,10 +26,11 @@ public class Properties extends JPanel {
 	private JComboBox<Category> tileCategory;
 	private JComboBox<Data> tiles;
 	private JComboBox<Trigger> triggers;
-	private JButton triggerCreate;
 	private Data selectedData;
 	private Trigger selectedTrigger;
+	
 	public final LevelEditor editor;
+	public JButton triggerCreate;
 	
 	public Properties(final LevelEditor editor) {
 		this.editor = editor;
@@ -45,6 +49,7 @@ public class Properties extends JPanel {
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(label);
 		this.add(triggers);
+		this.add(triggerCreate);
 		
 		tileCategory.setSelectedIndex(0);
 		tiles.setSelectedIndex(0);
@@ -176,6 +181,16 @@ public class Properties extends JPanel {
 			model.addElement(t);
 		}
 		
+		triggerCreate = new JButton("Script Editor");
+		triggerCreate.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				if (editor.scriptEditor == null) {
+					editor.scriptEditor = new ScriptEditor(ScriptEditor.TITLE, Properties.this.editor);
+					Properties.this.triggerCreate.setEnabled(false);
+				}
+			}
+		});
 	}
 	
 	@Override
@@ -185,11 +200,14 @@ public class Properties extends JPanel {
 				this.tileCategory.setEnabled(true);
 				this.tiles.setEnabled(true);
 				this.triggers.setEnabled(false);
+				this.triggerCreate.setEnabled(false);
 				break;
 			case Triggers:
 				this.tileCategory.setEnabled(false);
 				this.tiles.setEnabled(false);
 				this.triggers.setEnabled(true);
+				if (editor.scriptEditor == null)
+					this.triggerCreate.setEnabled(true);
 				break;
 		}
 		super.validate();

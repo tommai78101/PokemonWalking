@@ -14,6 +14,7 @@ public class Trigger {
 	public void reset() {
 		x = y = 0;
 		triggerID = 0;
+		name = "<Untitled>";
 		for (int i = 0; i < valuesHasBeenSet.length; i++)
 			valuesHasBeenSet[i] = false;
 	}
@@ -49,9 +50,9 @@ public class Trigger {
 		return this.valuesHasBeenSet[2];
 	}
 	
-	public boolean isAllSet(){
+	public boolean isAllSet() {
 		boolean result = true;
-		for (int i =0; i<this.valuesHasBeenSet.length; i++)
+		for (int i = 0; i < this.valuesHasBeenSet.length; i++)
 			if (!this.valuesHasBeenSet[i])
 				result = false;
 		return result;
@@ -69,11 +70,54 @@ public class Trigger {
 		return this.triggerID;
 	}
 	
-	public void setName(String name){
+	public void setName(String name) {
 		this.name = name;
 	}
 	
-	public String getName(){
+	public String getName() {
 		return this.name;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + triggerID;
+		result = prime * result + x;
+		result = prime * result + y;
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		Trigger other = (Trigger) obj;
+		if (name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		}
+		else if (!name.equals(other.name)) {
+			return false;
+		}
+		if (triggerID != other.triggerID) {
+			return false;
+		}
+		if (x != other.x) {
+			return false;
+		}
+		if (y != other.y) {
+			return false;
+		}
+		return true;
 	}
 }
