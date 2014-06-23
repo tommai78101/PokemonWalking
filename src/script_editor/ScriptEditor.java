@@ -13,13 +13,14 @@ import editor.LevelEditor;
 
 public class ScriptEditor extends JFrame {
 	public static final String TITLE = "Script Editor (Hobby)";
-	public static final int WIDTH = 400;
+	public static final int WIDTH = 600;
 	public static final int HEIGHT = 400;
 	
 	public LevelEditor parent;
 	public ScriptInput input;
 	public ScriptToolbar scriptToolbar;
 	public ScriptViewer scriptViewer;
+	public ScriptChanger scriptChanger;
 	
 	public ScriptEditor(String title, LevelEditor parent) {
 		super(title);
@@ -71,6 +72,13 @@ public class ScriptEditor extends JFrame {
 					scriptViewer.addMouseListener(input);
 					scriptViewer.addMouseMotionListener(input);
 					add(scriptViewer, BorderLayout.WEST);
+					validate();
+				}
+				if (scriptChanger == null) {
+					scriptChanger = new ScriptChanger(ScriptEditor.this);
+					scriptChanger.addMouseListener(input);
+					scriptChanger.addMouseMotionListener(input);
+					add(scriptChanger, BorderLayout.CENTER);
 					validate();
 				}
 			}

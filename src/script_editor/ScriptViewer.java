@@ -14,11 +14,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import editor.KeySelectionRenderer;
 import editor.Trigger;
 
-public class ScriptViewer extends JPanel implements ActionListener {
+public class ScriptViewer extends JPanel implements ActionListener, ListSelectionListener {
+	private static final long serialVersionUID = 1L;
+	
 	private final ScriptEditor editor;
 	
 	private DefaultListModel<Trigger> model;
@@ -26,13 +30,47 @@ public class ScriptViewer extends JPanel implements ActionListener {
 	private JScrollPane scrollPane;
 	private JButton createButton;
 	private JButton removeButton;
+	private Trigger selectedTrigger;
 	
 	public ScriptViewer(ScriptEditor editor) {
 		super();
 		this.editor = editor;
+		this.selectedTrigger = null;
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		constructingList();
 		constructingButtons();
+		
+	}
+	
+	private void constructingList() {
+		this.model = new DefaultListModel<Trigger>();
+		
+		this.triggerList = new JList<Trigger>();
+		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.triggerList.setLayoutOrientation(JList.VERTICAL);
+		this.triggerList.setVisibleRowCount(0);
+		Dimension size = new Dimension(200, 300);
+		this.triggerList.setSize(size);
+		this.triggerList.setMinimumSize(size);
+		
+		this.triggerList.setModel(this.model);
+		new KeySelectionRenderer(this.triggerList) {
+			private static final long serialVersionUID = 1L;
+			
+			@Override
+			public String getDisplayValue(Object item) {
+				Trigger t = (Trigger) item;
+				return t.getName();
+			}
+		};
+		this.triggerList.addListSelectionListener(this);
+		
+		scrollPane = new JScrollPane(this.triggerList);
+		scrollPane.setSize(size);
+		scrollPane.setMinimumSize(size);
+		
+		scrollPane.setVisible(true);
+		this.add(scrollPane);
 	}
 	
 	private void constructingButtons() {
@@ -60,35 +98,6 @@ public class ScriptViewer extends JPanel implements ActionListener {
 		panel.add(removeButton);
 		
 		this.add(panel);
-	}
-	
-	private void constructingList() {
-		this.model = new DefaultListModel<Trigger>();
-		
-		this.triggerList = new JList<Trigger>();
-		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.triggerList.setLayoutOrientation(JList.VERTICAL);
-		this.triggerList.setVisibleRowCount(0);
-		Dimension size = new Dimension(200, 300);
-		this.triggerList.setSize(size);
-		this.triggerList.setMinimumSize(size);
-		
-		this.triggerList.setModel(this.model);
-		new KeySelectionRenderer(this.triggerList) {
-			private static final long serialVersionUID = 1L;
-			
-			@Override
-			public String getDisplayValue(Object item) {
-				Trigger t = (Trigger) item;
-				return t.getName();
-			}
-		};
-		scrollPane = new JScrollPane(this.triggerList);
-		scrollPane.setSize(size);
-		scrollPane.setMinimumSize(size);
-		
-		scrollPane.setVisible(true);
-		this.add(scrollPane);
 	}
 	
 	public void addTrigger(Trigger t) {
@@ -120,14 +129,36 @@ public class ScriptViewer extends JPanel implements ActionListener {
 			case 1: {// Remove button
 				System.out.println("REMOVE");
 				int index = this.triggerList.getSelectedIndex();
-				if (index != -1)
+				if (index != -1 && !this.model.isEmpty())
 					this.model.remove(index);
 				else if (!this.model.isEmpty())
 					this.model.remove(this.model.getSize() - 1);
-				
 				break;
 			}
 		}
 		this.triggerList.validate();
+	}
+	
+	@Override
+	public void valueChanged(ListSelectionEvent event) {
+		if (!event.getValueIsAdjusting()) {
+			if (event.getSource() instanceof JList) {
+				@SuppressWarnings("unchecked")
+				JList<Trigger> list = (JList<Trigger>) event.getSource();
+				this.selectedTrigger = list.getSelectedValue();
+				if (this.selectedTrigger != null) {
+					this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());
+					this.editor.scriptChanger.getXField().setText(Integer.toString(this.selectedTrigger.getPositionX()));
+					this.editor.scriptChanger.getYField().setText(Integer.toString(this.selectedTrigger.getPositionY()));
+					this.editor.scriptChanger.getIDField().setText(Integer.toString(this.selectedTrigger.getTriggerID()));
+				}
+				else {
+					this.editor.scriptChanger.getNameField().setText("");
+					this.editor.scriptChanger.getXField().setText("");
+					this.editor.scriptChanger.getYField().setText("");
+					this.editor.scriptChanger.getIDField().setText("");
+				}
+			}
+		}
 	}
 }
