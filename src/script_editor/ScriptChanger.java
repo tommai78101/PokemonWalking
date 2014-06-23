@@ -12,6 +12,8 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class ScriptChanger extends JPanel implements ActionListener {
@@ -19,8 +21,9 @@ public class ScriptChanger extends JPanel implements ActionListener {
 	
 	private final ScriptEditor editor;
 	
-	private JTextField nameField, xField, yField, idField, scriptField;
+	private JTextField nameField, xField, yField, idField;
 	private JButton upButton, downButton, leftButton, rightButton;
+	private JTextArea scriptArea;
 	
 	public ScriptChanger(ScriptEditor editor) {
 		super();
@@ -153,8 +156,9 @@ public class ScriptChanger extends JPanel implements ActionListener {
 	private JPanel constructScripts() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		this.scriptField = new JTextField();
-		panel.add(this.scriptField, BorderLayout.CENTER);
+		this.scriptArea = new JTextArea();
+		this.scriptArea.setLineWrap(true);
+		panel.add(new JScrollPane(this.scriptArea), BorderLayout.CENTER);
 		panel.validate();
 		panel.setBorder(BorderFactory.createTitledBorder("Script:"));
 		return panel;
