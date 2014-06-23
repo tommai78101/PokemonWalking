@@ -1,11 +1,15 @@
 package script_editor;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -15,7 +19,8 @@ public class ScriptChanger extends JPanel implements ActionListener {
 	
 	private final ScriptEditor editor;
 	
-	private JTextField nameField, xField, yField, idField;
+	private JTextField nameField, xField, yField, idField, scriptField;
+	private JButton upButton, downButton, leftButton, rightButton;
 	
 	public ScriptChanger(ScriptEditor editor) {
 		super();
@@ -82,7 +87,6 @@ public class ScriptChanger extends JPanel implements ActionListener {
 		c.weightx = 0.5;
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
-		c.anchor = GridBagConstraints.WEST;
 		this.add(new JLabel("ID Value: "), c);
 		
 		c.gridx = 1;
@@ -96,23 +100,64 @@ public class ScriptChanger extends JPanel implements ActionListener {
 		// Empty panel for adding spaces only.
 		c.gridx = 0;
 		c.gridy = 4;
-		c.gridwidth = 1;
-		c.weightx = 0.5;
+		c.gridwidth = 2;
+		c.weightx = 0;
 		c.weighty = 10;
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;
-		this.add(new JPanel(), c);
-		c.gridx = 1;
-		c.gridy = 4;
-		c.gridwidth = 1;
-		c.weightx = 0.5;
-		c.weighty = 10;
-		c.fill = GridBagConstraints.BOTH;
-		c.anchor = GridBagConstraints.CENTER;
-		this.add(new JPanel(), c);
+		this.add(constructScripts(), c);
 		
-		this.setBorder(BorderFactory.createTitledBorder("DEBUG"));
+		// Fifth row (panel)
+		c.gridx = 0;
+		c.gridy = 5;
+		c.gridwidth = 1;
+		c.weightx = 0.5;
+		c.weighty = 0.5;
+		c.anchor = GridBagConstraints.CENTER;
+		this.add(constructDirections(), c);
+		
+		this.setBorder(BorderFactory.createTitledBorder("Trigger:"));
 		this.validate();
+	}
+	
+	private JPanel constructDirections() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		
+		final Dimension size = new Dimension(30, 10);
+		
+		JPanel top = new JPanel();
+		top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
+		upButton = new JButton("Up");
+		upButton.setSize(size);
+		top.add(upButton);
+		
+		JPanel across = new JPanel();
+		across.setLayout(new BoxLayout(across, BoxLayout.X_AXIS));
+		leftButton = new JButton("Left");
+		leftButton.setSize(size);
+		downButton = new JButton("Down");
+		downButton.setSize(size);
+		rightButton = new JButton("Right");
+		rightButton.setSize(size);
+		across.add(leftButton);
+		across.add(downButton);
+		across.add(rightButton);
+		
+		panel.add(top);
+		panel.add(across);
+		panel.setBorder(BorderFactory.createTitledBorder("Movements:"));
+		return panel;
+	}
+	
+	private JPanel constructScripts() {
+		JPanel panel = new JPanel();
+		panel.setLayout(new BorderLayout());
+		this.scriptField = new JTextField();
+		panel.add(this.scriptField, BorderLayout.CENTER);
+		panel.validate();
+		panel.setBorder(BorderFactory.createTitledBorder("Script:"));
+		return panel;
 	}
 	
 	public JTextField getNameField() {
