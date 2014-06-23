@@ -8,8 +8,8 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.ListSelectionModel;
@@ -23,6 +23,7 @@ public class ScriptViewer extends JPanel implements ActionListener {
 	
 	private DefaultListModel<Trigger> model;
 	private JList<Trigger> triggerList;
+	private JScrollPane scrollPane;
 	private JButton createButton;
 	private JButton removeButton;
 	
@@ -68,11 +69,8 @@ public class ScriptViewer extends JPanel implements ActionListener {
 		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.triggerList.setLayoutOrientation(JList.VERTICAL);
 		this.triggerList.setVisibleRowCount(0);
-		
 		Dimension size = new Dimension(200, 300);
 		this.triggerList.setSize(size);
-		this.triggerList.setMaximumSize(size);
-		this.triggerList.setPreferredSize(size);
 		this.triggerList.setMinimumSize(size);
 		
 		this.triggerList.setModel(this.model);
@@ -82,18 +80,15 @@ public class ScriptViewer extends JPanel implements ActionListener {
 			@Override
 			public String getDisplayValue(Object item) {
 				Trigger t = (Trigger) item;
-				return t.getName() + Integer.toString(t.getTriggerID());
+				return t.getName();
 			}
 		};
+		scrollPane = new JScrollPane(this.triggerList);
+		scrollPane.setSize(size);
+		scrollPane.setMinimumSize(size);
 		
-		JScrollPane pane = new JScrollPane(this.triggerList);
-		pane.setSize(size);
-		pane.setMaximumSize(size);
-		pane.setMinimumSize(size);
-		pane.setPreferredSize(size);
-		
-		pane.setVisible(true);
-		this.add(pane);
+		scrollPane.setVisible(true);
+		this.add(scrollPane);
 	}
 	
 	public void addTrigger(Trigger t) {
@@ -112,10 +107,14 @@ public class ScriptViewer extends JPanel implements ActionListener {
 				break;
 			case 0: {// Create Button
 				System.out.println("CREATE");
+				short value = Short.valueOf((short) (this.model.getSize() & Short.MAX_VALUE));
 				Trigger t = new Trigger();
-				t.setName("Hello");
-				t.setTriggerID((char) ((Integer.valueOf(ScriptViewer.this.model.getSize() - 1)) & 0xFFFF));
+				t.setTriggerID(value);
+				t.setName("<Untitled> " + Short.toString(value));
 				this.model.addElement(t);
+				this.validate();
+				JScrollBar vertical = scrollPane.getVerticalScrollBar();
+				vertical.setValue(vertical.getMaximum() + 1);
 				break;
 			}
 			case 1: {// Remove button
@@ -123,10 +122,12 @@ public class ScriptViewer extends JPanel implements ActionListener {
 				int index = this.triggerList.getSelectedIndex();
 				if (index != -1)
 					this.model.remove(index);
-				else
-					JOptionPane.showMessageDialog(null, "Please select a trigger to remove.");
+				else if (!this.model.isEmpty())
+					this.model.remove(this.model.getSize() - 1);
+				
 				break;
 			}
 		}
+		this.triggerList.validate();
 	}
 }

@@ -111,7 +111,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 			}
 			case Triggers: {
 				this.selectedTrigger = new Trigger();
-				this.selectedTrigger.setTriggerID((char) 1);
+				this.selectedTrigger.setTriggerID((short) 1);
 				this.selectedTrigger.setTriggerPositionX((byte) 0x1);
 				this.selectedTrigger.setTriggerPositionY((byte) 0x1);
 				break;
@@ -147,7 +147,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 		return this.selectedTrigger;
 	}
 	
-	public void setSelectedTrigger(Trigger t){
+	public void setSelectedTrigger(Trigger t) {
 		this.selectedTrigger = t;
 	}
 	
@@ -156,8 +156,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 	}
 	
 	@Override
-	public void validate(){
-		switch (EditorConstants.metadata){
+	public void validate() {
+		switch (EditorConstants.metadata) {
 			case Pixel_Data:
 				this.iconsPanel.setVisible(true);
 				this.iconsPanel.setEnabled(true);

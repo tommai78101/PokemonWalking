@@ -71,7 +71,7 @@ public class EditorConstants {
 		loadTriggers();
 	}
 	
-	private void loadTilesetData(){
+	private void loadTilesetData() {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
 			String line;
@@ -120,19 +120,19 @@ public class EditorConstants {
 						data.areaTypeIDType = type;
 						line = line.replace('*', '@');
 					}
-					if (line.contains("!")){
+					if (line.contains("!")) {
 						data.alphaByEditor = true;
 						line = line.replaceAll("!+", "00");
 					}
-					if (line.contains("^")){
+					if (line.contains("^")) {
 						data.redByEditor = true;
 						line = line.replaceAll("^+", "00");
 					}
-					if (line.contains("`")){
+					if (line.contains("`")) {
 						data.greenByEditor = true;
 						line = line.replaceAll("`+", "00");
 					}
-					if (line.contains("=")){
+					if (line.contains("=")) {
 						data.blueByEditor = true;
 						line = line.replaceAll("=+", "00");
 					}
@@ -204,7 +204,7 @@ public class EditorConstants {
 		}
 	}
 	
-	private void loadTriggers(){
+	private void loadTriggers() {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("script/scripts.txt")));
 			String line;
@@ -216,12 +216,12 @@ public class EditorConstants {
 					if (trigger == null)
 						trigger = new Trigger();
 					int value = Integer.valueOf(line.substring(1));
-					if (value != 0){
-						trigger.setTriggerID((char) (value & 0xFFFF));
+					if (value != 0) {
+						trigger.setTriggerID((short) (value & 0xFFFF));
 					}
 					
 				}
-				else if (line.startsWith("@")){
+				else if (line.startsWith("@")) {
 					if (trigger != null)
 						trigger.setName(line.substring(1));
 				}

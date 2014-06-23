@@ -2,7 +2,7 @@ package editor;
 
 public class Trigger {
 	private byte x, y;
-	private char triggerID;
+	private short triggerID;
 	private String name;
 	
 	private boolean[] valuesHasBeenSet = new boolean[3];
@@ -33,7 +33,7 @@ public class Trigger {
 		this.y = y;
 	}
 	
-	public void setTriggerID(char value) {
+	public void setTriggerID(short value) {
 		this.valuesHasBeenSet[2] = true;
 		this.triggerID = value;
 	}
@@ -66,7 +66,7 @@ public class Trigger {
 		return this.y;
 	}
 	
-	public char getTriggerID() {
+	public short getTriggerID() {
 		return this.triggerID;
 	}
 	

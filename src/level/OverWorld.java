@@ -376,8 +376,12 @@ public class OverWorld extends World {
 		if (screen.getRenderingEffectTick() < (byte) 0x4 || screen.getRenderingEffectTick() >= (byte) 0x7)
 			player.render(screen, 0, 0);
 		
-		if (this.newDialogues != null && this.newDialogues.length > 0)
+		if (this.newDialogues != null && this.newDialogues.length > 0) {
+			// FIXME: Fix this issue where switching dialogue types lead to turning off dialogue box rendering.
+			// TODO: Also, make this renderDialogBox optional for future customizable dialogues (if I can...)
+			NewDialogue.renderDialogBox(screen, 0, 6, 9, 2);
 			this.newDialogues[this.newDialoguesIterator].render(screen, screen.getBufferedImage().createGraphics());
+		}
 	}
 	
 	// private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {
