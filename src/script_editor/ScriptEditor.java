@@ -39,6 +39,10 @@ public class ScriptEditor extends JFrame {
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
+				
+				//TODO: 2014-6-26: Add the ability to save temp script data on the fly. Closing included.
+				
+				
 				ScriptEditor.this.dispose();
 				ScriptEditor.this.parent.properties.triggerCreate.setEnabled(true);
 				ScriptEditor.this.parent.scriptEditor = null;
