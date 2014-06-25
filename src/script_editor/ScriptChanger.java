@@ -15,8 +15,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
-public class ScriptChanger extends JPanel implements ActionListener {
+import editor.Trigger;
+
+public class ScriptChanger extends JPanel implements ActionListener, DocumentListener {
 	private static final long serialVersionUID = 1L;
 	
 	private final ScriptEditor editor;
@@ -24,6 +28,7 @@ public class ScriptChanger extends JPanel implements ActionListener {
 	private JTextField nameField, xField, yField, idField;
 	private JButton upButton, downButton, leftButton, rightButton;
 	private JTextArea scriptArea;
+	private boolean allowUpdate;
 	
 	public ScriptChanger(ScriptEditor editor) {
 		super();
@@ -48,6 +53,7 @@ public class ScriptChanger extends JPanel implements ActionListener {
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((nameField = new JTextField()), c);
+		nameField.getDocument().addDocumentListener(this);
 		
 		// Second row
 		c.gridx = 0;
@@ -65,6 +71,7 @@ public class ScriptChanger extends JPanel implements ActionListener {
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((xField = new JTextField()), c);
+		xField.getDocument().addDocumentListener(this);
 		
 		// Third row
 		c.gridx = 0;
@@ -82,6 +89,7 @@ public class ScriptChanger extends JPanel implements ActionListener {
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((yField = new JTextField()), c);
+		yField.getDocument().addDocumentListener(this);
 		
 		// Fourth row
 		c.gridx = 0;
@@ -99,6 +107,7 @@ public class ScriptChanger extends JPanel implements ActionListener {
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((idField = new JTextField()), c);
+		idField.getDocument().addDocumentListener(this);
 		
 		// Empty panel for adding spaces only.
 		c.gridx = 0;
@@ -158,6 +167,7 @@ public class ScriptChanger extends JPanel implements ActionListener {
 		panel.setLayout(new BorderLayout());
 		this.scriptArea = new JTextArea();
 		this.scriptArea.setLineWrap(true);
+		this.scriptArea.getDocument().addDocumentListener(this);
 		panel.add(new JScrollPane(this.scriptArea), BorderLayout.CENTER);
 		panel.validate();
 		panel.setBorder(BorderFactory.createTitledBorder("Script:"));
@@ -180,8 +190,77 @@ public class ScriptChanger extends JPanel implements ActionListener {
 		return this.idField;
 	}
 	
+	public JTextArea getScriptArea() {
+		return this.scriptArea;
+	}
+	
+	public void allowFieldsToUpdate() {
+		this.allowUpdate = true;
+	}
+	
+	public void disallowFieldsToUpdate() {
+		this.allowUpdate = false;
+	}
+	
+	// ActionListener
 	@Override
 	public void actionPerformed(ActionEvent event) {
+	}
+	
+	// DocumentListener
+	@Override
+	public void changedUpdate(DocumentEvent event) {
+	}
+	
+	// DocumentListener
+	@Override
+	public void insertUpdate(DocumentEvent event) {
+		if (this.allowUpdate) {
+			Trigger selectedTrigger = editor.scriptViewer.getSelectedTrigger();
+			if (selectedTrigger != null) {
+				String test = editor.scriptChanger.getNameField().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setName(test);
+				test = editor.scriptChanger.getXField().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setTriggerPositionX((byte) (Integer.valueOf(test) & 0xFF));
+				test = editor.scriptChanger.getYField().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setTriggerPositionY((byte) (Integer.valueOf(test) & 0xFF));
+				test = editor.scriptChanger.getIDField().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setTriggerID((short) (Integer.valueOf(test) & 0xFFFF));
+				test = editor.scriptChanger.getScriptArea().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setScript(test);
+			}
+		}
+	}
+	
+	// DocumentListener
+	@Override
+	public void removeUpdate(DocumentEvent event) {
+		
+		if (this.allowUpdate) {
+			Trigger selectedTrigger = editor.scriptViewer.getSelectedTrigger();
+			if (selectedTrigger != null) {
+				String test = editor.scriptChanger.getNameField().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setName(test);
+				test = editor.scriptChanger.getXField().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setTriggerPositionX((byte) (Integer.valueOf(test) & 0xFF));
+				test = editor.scriptChanger.getYField().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setTriggerPositionY((byte) (Integer.valueOf(test) & 0xFF));
+				test = editor.scriptChanger.getIDField().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setTriggerID((short) (Integer.valueOf(test) & 0xFFFF));
+				test = editor.scriptChanger.getScriptArea().getText();
+				if (!test.isEmpty() || !test.equals(""))
+					selectedTrigger.setScript(test);
+			}
+		}
 	}
 	
 }

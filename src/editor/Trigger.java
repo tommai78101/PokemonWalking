@@ -1,11 +1,13 @@
 package editor;
 
+
 public class Trigger {
 	private byte x, y;
 	private short triggerID;
 	private String name;
+	private String script;
 	
-	private boolean[] valuesHasBeenSet = new boolean[3];
+	private boolean[] valuesHasBeenSet = new boolean[4];
 	
 	public Trigger() {
 		reset();
@@ -38,6 +40,10 @@ public class Trigger {
 		this.triggerID = value;
 	}
 	
+	public void setScript(String script){
+		this.script = script;
+	}
+	
 	public boolean isPositionXSet() {
 		return this.valuesHasBeenSet[0];
 	}
@@ -50,12 +56,20 @@ public class Trigger {
 		return this.valuesHasBeenSet[2];
 	}
 	
-	public boolean isAllSet() {
+	public boolean isTriggerScriptSet(){
+		return this.valuesHasBeenSet[3];
+	}
+	
+	public boolean areRequiredFieldsAllSet() {
 		boolean result = true;
-		for (int i = 0; i < this.valuesHasBeenSet.length; i++)
+		for (int i = 0; i < 3; i++)
 			if (!this.valuesHasBeenSet[i])
 				result = false;
 		return result;
+	}
+	
+	public boolean isEmptyScriptTrigger(){
+		return this.valuesHasBeenSet[3];
 	}
 	
 	public byte getPositionX() {
@@ -76,6 +90,10 @@ public class Trigger {
 	
 	public String getName() {
 		return this.name;
+	}
+	
+	public String getScript(){
+		return this.script;
 	}
 	
 	@Override

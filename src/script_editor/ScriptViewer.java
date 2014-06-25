@@ -31,6 +31,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 	private JButton createButton;
 	private JButton removeButton;
 	private Trigger selectedTrigger;
+	private int iterator;
 	
 	public ScriptViewer(ScriptEditor editor) {
 		super();
@@ -109,6 +110,10 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.model.remove(this.triggerList.getSelectedIndex());
 	}
 	
+	public Trigger getSelectedTrigger(){
+		return this.selectedTrigger;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.valueOf(event.getActionCommand())) {
@@ -124,6 +129,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				this.validate();
 				JScrollBar vertical = scrollPane.getVerticalScrollBar();
 				vertical.setValue(vertical.getMaximum() + 1);
+				this.triggerList.setSelectedIndex(this.model.getSize() -1);
 				break;
 			}
 			case 1: {// Remove button
@@ -147,16 +153,19 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				JList<Trigger> list = (JList<Trigger>) event.getSource();
 				this.selectedTrigger = list.getSelectedValue();
 				if (this.selectedTrigger != null) {
-					this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());
-					this.editor.scriptChanger.getXField().setText(Integer.toString(this.selectedTrigger.getPositionX()));
-					this.editor.scriptChanger.getYField().setText(Integer.toString(this.selectedTrigger.getPositionY()));
-					this.editor.scriptChanger.getIDField().setText(Integer.toString(this.selectedTrigger.getTriggerID()));
-				}
-				else {
+					this.editor.scriptChanger.disallowFieldsToUpdate();
 					this.editor.scriptChanger.getNameField().setText("");
 					this.editor.scriptChanger.getXField().setText("");
 					this.editor.scriptChanger.getYField().setText("");
 					this.editor.scriptChanger.getIDField().setText("");
+					this.editor.scriptChanger.getScriptArea().setText("");
+					
+					this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());
+					this.editor.scriptChanger.getXField().setText(Integer.toString(this.selectedTrigger.getPositionX()));
+					this.editor.scriptChanger.getYField().setText(Integer.toString(this.selectedTrigger.getPositionY()));
+					this.editor.scriptChanger.getIDField().setText(Integer.toString(this.selectedTrigger.getTriggerID()));
+					this.editor.scriptChanger.getScriptArea().setText(this.selectedTrigger.getScript());
+					this.editor.scriptChanger.allowFieldsToUpdate();
 				}
 			}
 		}
