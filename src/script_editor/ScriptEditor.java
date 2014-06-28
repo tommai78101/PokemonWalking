@@ -104,5 +104,6 @@ public class ScriptEditor extends JFrame {
 			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
 			return;
 		}
+		
 	}
 }

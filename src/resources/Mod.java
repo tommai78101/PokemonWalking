@@ -25,7 +25,7 @@ import screen.BaseBitmap;
 import screen.BaseScreen;
 
 public class Mod {
-	private static final String[] names = new String[] { "area" };
+	private static final String[] names = new String[] { "area", "script" };
 	public static List<Map.Entry<BaseBitmap, Integer>> moddedAreas = new ArrayList<Map.Entry<BaseBitmap, Integer>>();
 	private static boolean hasLoaded = false;
 	
@@ -153,6 +153,55 @@ public class Mod {
 								writer.newLine();
 								writer.write("adhered to the game codes, which makes it more difficult to modify and edit.");
 								writer.newLine();
+								writer.newLine();
+								writer.write("------");
+								writer.newLine();
+								writer.newLine();
+								writer.write("Automation Script Format:");
+								writer.newLine();
+								writer.newLine();
+								writer.write("Entities that can walk, or run, must be required to have movements for the game");
+								writer.write("to feel lively.                                                                ");
+								writer.newLine();
+								writer.newLine();
+								writer.write("More commands to come.");
+								writer.newLine();
+								writer.newLine();
+								writer.write("_: Whitespaces.");
+								writer.newLine();
+								writer.write("@: Trigger name.");
+								writer.newLine();
+								writer.write("^: [Direction, Steps]. Can be chained for delaying scripted movements.");
+								writer.newLine();
+								writer.write("$: Start of script. Always appear at beginning of script. Must use numeric ID value.");
+								writer.newLine();
+								writer.write("%: Script delimiter. Always appear at end of script.");
+								writer.newLine();
+								writer.write("#: Speech Dialogue.");
+								writer.newLine();
+								writer.write("/: Comments. Gets ignored.");
+								writer.newLine();
+								writer.write("?: Question Dialogue.");
+								writer.newLine();
+								writer.write("+: Affirmative dialogue.");
+								writer.newLine();
+								writer.write("-: Negative dialogue.");
+								writer.newLine();
+								writer.write("[: Affirmative Action.");
+								writer.newLine();
+								writer.write("]: Negative Action.");
+								writer.newLine();
+								writer.write(";: Repeat Flag. If contains ';', it means it's enabled by default.");
+								writer.newLine();
+								writer.newLine();
+								writer.write("Example:");
+								writer.newLine();
+								writer.newLine();
+								writer.write("$0");
+								writer.newLine();
+								writer.write("@Eraser");
+								writer.newLine();
+								writer.write("%");
 							}
 							catch (Exception e) {
 							}
