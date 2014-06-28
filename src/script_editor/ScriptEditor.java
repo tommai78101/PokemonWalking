@@ -4,9 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -16,6 +18,8 @@ public class ScriptEditor extends JFrame {
 	public static final String TITLE = "Script Editor (Hobby)";
 	public static final int WIDTH = 600;
 	public static final int HEIGHT = 400;
+	
+	public static File LAST_SAVED_DIRECTORY; 
 	
 	public LevelEditor parent;
 	public ScriptInput input;
@@ -53,6 +57,8 @@ public class ScriptEditor extends JFrame {
 		});
 		
 		addingComponents();
+		
+		LAST_SAVED_DIRECTORY = parent.fileControlPanel.lastSavedDirectory;
 	}
 	
 	public void addingComponents() {
@@ -90,5 +96,13 @@ public class ScriptEditor extends JFrame {
 				}
 			}
 		});
+	}
+	
+	public void load(File script){
+		String format = script.getName();
+		if (!format.endsWith("script")){
+			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
+			return;
+		}
 	}
 }

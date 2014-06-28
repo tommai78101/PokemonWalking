@@ -139,7 +139,9 @@ public class LevelEditor extends JFrame {
 			RandomAccessFile f = null;
 			try {
 				f = new RandomAccessFile(file, "rw");
+				f.seek(0);
 				f.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
+				f.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
 			}
 			catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -159,13 +161,17 @@ public class LevelEditor extends JFrame {
 			RandomAccessFile raf = null;
 			try {
 				raf = new RandomAccessFile(file, "rw");
+				raf.seek(0);
 				FileControl.lastSavedDirectory = new File(raf.readLine());
+				ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
 			}
 			catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 			catch (IOException e) {
 				e.printStackTrace();
+			}
+			catch (NullPointerException e){
 			}
 			finally {
 				try {

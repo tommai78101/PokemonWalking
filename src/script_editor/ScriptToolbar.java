@@ -3,17 +3,26 @@ package script_editor;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import editor.FileControl;
+import editor.LevelEditor;
 
 public class ScriptToolbar extends JPanel implements ActionListener {
 	private final ScriptEditor editor;
 	private final String[] tags = {
-			"Test", ""
+			"Open", ""
 	};
 	private final HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
 	
@@ -43,7 +52,61 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.valueOf(event.getActionCommand())) {
-			case 0: { // Test
+			case 0: { // Open
+				
+				RandomAccessFile raf = null;
+				try {
+					raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+					raf.seek(FileControl.lastSavedDirectory.getAbsolutePath().length());
+					ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
+				}
+				catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+				catch (NullPointerException e){
+					ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
+				}
+				finally {
+					try {
+						raf.close();
+					}
+					catch (IOException e) {
+					}
+				}
+				
+				JFileChooser opener = new JFileChooser();
+				opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				opener.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
+				opener.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
+				opener.setVisible(true);
+				int answer = opener.showOpenDialog(null);
+				if (answer == JFileChooser.APPROVE_OPTION) {
+					File f = opener.getSelectedFile();
+					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
+					this.editor.setTitle(f.getName());
+					this.editor.load(f);
+					
+					RandomAccessFile rf = null;
+					try {
+						rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+						rf.seek(FileControl.lastSavedDirectory.getAbsolutePath().length());
+						rf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					finally {
+						try {
+							rf.close();
+						}
+						catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 				break;
 			}
 		}
