@@ -27,7 +27,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	
 	private void createButtons() {
 		for (int i = 0; i < tags.length; i++) {
-			if (i == 1) {
+			if (tags[i].isEmpty() || tags[i].equals("")) {
 				this.add(new JSeparator(SwingConstants.VERTICAL));
 				continue;
 			}

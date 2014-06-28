@@ -30,28 +30,29 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import script_editor.ScriptEditor;
 import editor.EditorConstants.Metadata;
 
 public class FileControl extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	
-	private String[] tags = new String[] { "New", "Save", "Open", "", "Tileset", "Trigger" };
+	public static final String[] TAGS = new String[] { "New", "Save", "Open", "", "Tileset", "Trigger", "", "Script" };
 	private LevelEditor editor;
-	HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
+	public HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
 	public static File lastSavedDirectory;
 	
 	public FileControl(LevelEditor editor) {
 		super();
 		this.editor = editor;
-		this.setLayout(new GridLayout(1, tags.length));
+		this.setLayout(new GridLayout(1, TAGS.length));
 		FileControl.lastSavedDirectory = new File(Paths.get("").toAbsolutePath().toString());
 		
-		for (int i = 0; i < tags.length; i++) {
-			if (i == 3) {
+		for (int i = 0; i < TAGS.length; i++) {
+			if (TAGS[i].isEmpty() || TAGS[i].equals("")) {
 				this.add(new JSeparator(SwingConstants.VERTICAL));
 				continue;
 			}
-			JButton button = new JButton(tags[i]);
+			JButton button = new JButton(TAGS[i]);
 			button.addActionListener(this);
 			String actionCommand = Integer.toString(i);
 			button.setActionCommand(actionCommand);
@@ -206,6 +207,13 @@ public class FileControl extends JPanel implements ActionListener {
 				case 5: { // Trigger
 					EditorConstants.metadata = Metadata.Triggers;
 					editor.validate();
+					break;
+				}
+				case 7: {//Script editor
+					if (editor.scriptEditor == null) {
+						editor.scriptEditor = new ScriptEditor(ScriptEditor.TITLE, this.editor);
+						button.setEnabled(false);
+					}
 					break;
 				}
 			}

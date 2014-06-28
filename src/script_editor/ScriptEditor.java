@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -44,7 +45,9 @@ public class ScriptEditor extends JFrame {
 				
 				
 				ScriptEditor.this.dispose();
-				ScriptEditor.this.parent.properties.triggerCreate.setEnabled(true);
+				// 7 is a magic number for "Script Editor" button action command. I don't like to make a new variable just for this.
+				JButton button =ScriptEditor.this.parent.fileControlPanel.buttonCache.get(Integer.toString(7));
+				button.setEnabled(true);
 				ScriptEditor.this.parent.scriptEditor = null;
 			}
 		});
