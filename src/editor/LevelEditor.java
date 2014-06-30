@@ -141,6 +141,7 @@ public class LevelEditor extends JFrame {
 				f = new RandomAccessFile(file, "rw");
 				f.seek(0);
 				f.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
+				f.writeBytes("\n");
 				f.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
 			}
 			catch (FileNotFoundException e) {

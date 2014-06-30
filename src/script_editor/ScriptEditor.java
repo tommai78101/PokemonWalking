@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import editor.FileControl;
 import editor.LevelEditor;
 
 public class ScriptEditor extends JFrame {
@@ -19,7 +20,7 @@ public class ScriptEditor extends JFrame {
 	public static final int WIDTH = 600;
 	public static final int HEIGHT = 400;
 	
-	public static File LAST_SAVED_DIRECTORY; 
+	public static File LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory; 
 	
 	public LevelEditor parent;
 	public ScriptInput input;
