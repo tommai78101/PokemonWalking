@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -18,11 +19,13 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import editor.FileControl;
 import editor.LevelEditor;
+import editor.Trigger;
 
 public class ScriptToolbar extends JPanel implements ActionListener {
+	private static final long serialVersionUID = 1L;
 	private final ScriptEditor editor;
 	private final String[] tags = {
-			"Open", ""
+			"Clear", "Save", "Open", ""
 	};
 	private final HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
 	
@@ -52,12 +55,30 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.valueOf(event.getActionCommand())) {
-			case 0: { // Open
-				
+			case 0: {// Clear / Reset
+				editor.scriptChanger.clear();
+				JList<Trigger> triggerList = editor.scriptViewer.getTriggerList();
+				Trigger t = triggerList.getSelectedValue();
+				if (t != null) {
+					t.setScript("");
+					t.setTriggerID((short) 0);
+					if (!t.getName().contains("<Untitled>"))
+						t.setName("<Untitled>");
+					t.setTriggerPositionX((byte) 0);
+					t.setTriggerPositionY((byte) 0);
+					triggerList.clearSelection();
+				}
+				break;
+			}
+			case 1: { // Save
+				break;
+			}
+			case 2: { // Open
+			
 				RandomAccessFile raf = null;
 				try {
 					raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
-					raf.readLine(); //The second line in the cache is for the Script Editor.
+					raf.readLine(); // The second line in the cache is for the Script Editor.
 					ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
 				}
 				catch (FileNotFoundException e) {
@@ -66,7 +87,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				catch (IOException e) {
 					e.printStackTrace();
 				}
-				catch (NullPointerException e){
+				catch (NullPointerException e) {
 					ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
 				}
 				finally {

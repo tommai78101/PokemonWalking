@@ -202,6 +202,14 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.allowUpdate = false;
 	}
 	
+	public void clear() {
+		nameField.setText("");
+		xField.setText("");
+		yField.setText("");
+		idField.setText("");
+		scriptArea.setText("");
+	}
+	
 	// ActionListener
 	@Override
 	public void actionPerformed(ActionEvent event) {
@@ -262,5 +270,4 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			}
 		}
 	}
-	
 }

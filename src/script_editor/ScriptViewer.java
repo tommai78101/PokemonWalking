@@ -114,17 +114,19 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		return this.selectedTrigger;
 	}
 	
+	public JList<Trigger> getTriggerList(){
+		return this.triggerList;
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.valueOf(event.getActionCommand())) {
 			default:
 				break;
 			case 0: {// Create Button
-				System.out.println("CREATE");
-				short value = Short.valueOf((short) (this.model.getSize() & Short.MAX_VALUE));
 				Trigger t = new Trigger();
-				t.setTriggerID(value);
-				t.setName("<Untitled> " + Short.toString(value));
+				t.setTriggerID((short) 0);
+				t.setName("<Untitled>");
 				this.model.addElement(t);
 				this.validate();
 				JScrollBar vertical = scrollPane.getVerticalScrollBar();
@@ -133,7 +135,6 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				break;
 			}
 			case 1: {// Remove button
-				System.out.println("REMOVE");
 				int index = this.triggerList.getSelectedIndex();
 				if (index != -1 && !this.model.isEmpty())
 					this.model.remove(index);
