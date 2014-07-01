@@ -5,12 +5,13 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
+import java.io.OutputStreamWriter;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
 import editor.FileControl;
@@ -121,10 +123,30 @@ public class ScriptEditor extends JFrame {
 			
 			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
+			model.clear();
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)));
 			String line = null;
+			String[] tokens;
+			Trigger trigger = null;
+			StringBuilder builder = new StringBuilder();
 			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
+				if (line.startsWith("$")){
+					tokens = line.split("\\$");
+					trigger = new Trigger();
+					trigger.setTriggerID(Short.valueOf(tokens[1]));
+				}
+				else if (line.startsWith("@")){
+					tokens = line.split("@");
+					trigger.setName(tokens[1]);
+				}
+				else if (line.startsWith("%")){
+					trigger.setScript(builder.toString());
+					model.addElement(trigger);
+					builder.setLength(0);
+				}
+				else {
+					builder.append(line).append("\n");
+				}
 			}
 		}
 		catch (IOException e) {
@@ -138,25 +160,42 @@ public class ScriptEditor extends JFrame {
 				e.printStackTrace();
 			}
 		}
+		this.scriptViewer.getTriggerList().clearSelection();
+		this.scriptViewer.revalidate();
 	}
 	
 	public void save(File script) {
-		RandomAccessFile raf = null;
+		BufferedWriter writer = null;
 		try {
-			raf = new RandomAccessFile(script.getAbsolutePath(), "rw");
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)));
+			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
 			
-			// TODO: Saving goes here.
+			for (int i = 0; i < model.getSize(); i++) {
+				Trigger t = model.get(i);
+				try {
+					writer.write("$" + Short.toString(t.getTriggerID()));
+					writer.newLine();
+					writer.write("@" + t.getName().replace(" ", "_"));
+					writer.newLine();
+					JTextArea area = this.scriptChanger.getScriptArea();
+					writer.write(area.getText());
+					writer.newLine();
+					writer.write("%");
+					writer.newLine();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 			
-		}
-		catch (FileNotFoundException e) {
-			e.printStackTrace();
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 		finally {
 			try {
-				raf.close();
+				writer.flush();
+				writer.close();
 			}
 			catch (IOException e) {
 				e.printStackTrace();

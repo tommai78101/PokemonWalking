@@ -173,13 +173,13 @@ public class Mod {
 								writer.newLine();
 								writer.write("^: [Direction, Steps]. Can be chained for delaying scripted movements.");
 								writer.newLine();
-								writer.write("$: Start of script. Always appear at beginning of script. Must use numeric ID value.");
+								writer.write("$: Start of script. Appears at beginning of script. Uses numeric ID values as Trigger IDs");
 								writer.newLine();
 								writer.write("%: Script delimiter. Always appear at end of script.");
 								writer.newLine();
 								writer.write("#: Speech Dialogue.");
 								writer.newLine();
-								writer.write("/: Comments. Gets ignored.");
+								writer.write("/: Comments. Whole line gets ignored, even if it's somewhere in the middle of the line.");
 								writer.newLine();
 								writer.write("?: Question Dialogue.");
 								writer.newLine();

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
@@ -25,7 +26,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private final ScriptEditor editor;
 	private final String[] tags = {
-			"Clear", "Save", "Open", ""
+			"New", "Save", "Open", ""
 	};
 	private final HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
 	
@@ -55,19 +56,12 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.valueOf(event.getActionCommand())) {
-			case 0: {// Clear / Reset
+			case 0: {// New
 				editor.scriptChanger.clear();
 				JList<Trigger> triggerList = editor.scriptViewer.getTriggerList();
-				Trigger t = triggerList.getSelectedValue();
-				if (t != null) {
-					t.setScript("");
-					t.setTriggerID((short) 0);
-					if (!t.getName().contains("<Untitled>"))
-						t.setName("<Untitled>");
-					t.setTriggerPositionX((byte) 0);
-					t.setTriggerPositionY((byte) 0);
-					triggerList.clearSelection();
-				}
+				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
+				model.clear();
+				triggerList.clearSelection();
 				break;
 			}
 			case 1: { // Save
@@ -103,8 +97,15 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				if (answer == JFileChooser.APPROVE_OPTION) {
 					File f = saver.getSelectedFile();
 					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
-					this.editor.setTitle(f.getName() + ".script");
-					this.editor.save(new File(f.getParentFile(), f.getName() + ".script"));
+					
+					if (f.getName().endsWith(".script")){
+						this.editor.setTitle(f.getName());
+						this.editor.save(new File(f.getParentFile(), f.getName()));
+					}
+					else {
+						this.editor.setTitle(f.getName() + ".script");
+						this.editor.save(new File(f.getParentFile(), f.getName() + ".script"));
+					}
 					
 					RandomAccessFile rf = null;
 					try {
