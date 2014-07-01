@@ -104,7 +104,7 @@ public class ScriptEditor extends JFrame {
 	
 	public void load(File script){
 		String format = script.getName();
-		if (!format.endsWith("script")){
+		if (!format.endsWith(".script")){
 			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
 			return;
 		}
@@ -114,8 +114,7 @@ public class ScriptEditor extends JFrame {
 	public void save(File script) {
 		RandomAccessFile raf = null;
 		try {
-			raf = new RandomAccessFile(script.getAbsolutePath() + ".script", "rw");
-			raf.write(0);
+			raf = new RandomAccessFile(script.getAbsolutePath(), "rw");
 		}
 		catch (FileNotFoundException e) {
 			e.printStackTrace();

@@ -103,8 +103,8 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				if (answer == JFileChooser.APPROVE_OPTION) {
 					File f = saver.getSelectedFile();
 					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
-					this.editor.setTitle(f.getName());
-					this.editor.save(f);
+					this.editor.setTitle(f.getName() + ".script");
+					this.editor.save(new File(f.getParentFile(), f.getName() + ".script"));
 					
 					RandomAccessFile rf = null;
 					try {
