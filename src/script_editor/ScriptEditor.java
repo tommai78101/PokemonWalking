@@ -4,26 +4,32 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import editor.FileControl;
 import editor.LevelEditor;
+import editor.Trigger;
 
 public class ScriptEditor extends JFrame {
 	public static final String TITLE = "Script Editor (Hobby)";
 	public static final int WIDTH = 600;
 	public static final int HEIGHT = 400;
 	
-	public static File LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory; 
+	public static File LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
 	
 	public LevelEditor parent;
 	public ScriptInput input;
@@ -49,12 +55,11 @@ public class ScriptEditor extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent event) {
 				
-				//TODO: 2014-6-26: Add the ability to save temp script data on the fly. Closing included.
-				
+				// TODO: 2014-6-26: Add the ability to save temp script data on the fly. Closing included.
 				
 				ScriptEditor.this.dispose();
 				// 7 is a magic number for "Script Editor" button action command. I don't like to make a new variable just for this.
-				JButton button =ScriptEditor.this.parent.fileControlPanel.buttonCache.get(Integer.toString(7));
+				JButton button = ScriptEditor.this.parent.fileControlPanel.buttonCache.get(Integer.toString(7));
 				button.setEnabled(true);
 				ScriptEditor.this.parent.scriptEditor = null;
 			}
@@ -102,19 +107,46 @@ public class ScriptEditor extends JFrame {
 		});
 	}
 	
-	public void load(File script){
+	public void load(File script) {
 		String format = script.getName();
-		if (!format.endsWith(".script")){
+		if (!format.endsWith(".script")) {
 			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
 			return;
 		}
 		System.out.println("Opened Location: " + script.getAbsolutePath());
+		BufferedReader reader = null;
+		try {
+			
+			// TODO: Loading goes here.
+			
+			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
+			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				reader.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
-
+	
 	public void save(File script) {
 		RandomAccessFile raf = null;
 		try {
 			raf = new RandomAccessFile(script.getAbsolutePath(), "rw");
+			
+			// TODO: Saving goes here.
+			
 		}
 		catch (FileNotFoundException e) {
 			e.printStackTrace();
