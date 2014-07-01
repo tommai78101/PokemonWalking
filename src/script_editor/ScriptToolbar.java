@@ -71,6 +71,59 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				break;
 			}
 			case 1: { // Save
+				RandomAccessFile raf = null;
+				try {
+					raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+					raf.readLine(); // The second line in the cache is for the Script Editor.
+					ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
+				}
+				catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+				catch (NullPointerException e) {
+					ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
+				}
+				finally {
+					try {
+						raf.close();
+					}
+					catch (IOException e) {
+					}
+				}
+				
+				JFileChooser saver = new JFileChooser();
+				saver.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				saver.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
+				saver.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
+				saver.setVisible(true);
+				int answer = saver.showSaveDialog(null);
+				if (answer == JFileChooser.APPROVE_OPTION) {
+					File f = saver.getSelectedFile();
+					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
+					this.editor.setTitle(f.getName());
+					this.editor.save(f);
+					
+					RandomAccessFile rf = null;
+					try {
+						rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+						rf.readLine();
+						rf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+					finally {
+						try {
+							rf.close();
+						}
+						catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 				break;
 			}
 			case 2: { // Open

@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -105,6 +108,29 @@ public class ScriptEditor extends JFrame {
 			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
 			return;
 		}
-		
+		System.out.println("Opened Location: " + script.getAbsolutePath());
+	}
+
+	public void save(File script) {
+		RandomAccessFile raf = null;
+		try {
+			raf = new RandomAccessFile(script.getAbsolutePath() + ".script", "rw");
+			raf.write(0);
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {
+				raf.close();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println("Saved Location: " + script.getAbsolutePath());
 	}
 }
