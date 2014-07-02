@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
 import editor.FileControl;
 import editor.LevelEditor;
@@ -70,6 +71,7 @@ public class ScriptEditor extends JFrame {
 		addingComponents();
 		
 		LAST_SAVED_DIRECTORY = parent.fileControlPanel.lastSavedDirectory;
+		ToolTipManager.sharedInstance().setInitialDelay(1);
 	}
 	
 	public void addingComponents() {
