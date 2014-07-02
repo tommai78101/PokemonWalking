@@ -19,6 +19,8 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
 import editor.Trigger;
 
@@ -32,6 +34,8 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	private JButton questionDialogue, affirmativeDialogue, negativeDialogue, speechDialogue;
 	private JTextArea scriptArea;
 	private boolean allowUpdate;
+	private int movementCounter = 0;
+	private String movementDirection = null;
 	
 	private static final String UP = "UP";
 	private static final String DOWN = "DOWN";
@@ -191,7 +195,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		return panel;
 	}
 	
-	private JPanel constructDialogues(){
+	private JPanel constructDialogues() {
 		final Insets inset = new Insets(0, 1, 0, 1);
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout(FlowLayout.LEADING));
@@ -267,8 +271,44 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	// ActionListener
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		switch (event.getActionCommand()){
+		JTextArea area = editor.scriptChanger.getScriptArea();
+		PlainDocument doc = (PlainDocument) area.getDocument();
+		switch (event.getActionCommand()) {
 			case UP: {
+				try {
+					if (doc.getLength() > 0) {
+						String str = doc.getText(doc.getLength() - 2, 1);
+						if (str.equals("U")) {
+							if (movementCounter < 9) {
+								movementCounter++;
+								doc.remove(doc.getLength() - 2, 2);
+								area.append("U" + Integer.toString(movementCounter));
+							}
+							else {
+								movementCounter = 0;
+								area.append("U" + Integer.toString(movementCounter));
+							}
+						}
+					}
+					else if (movementDirection == DOWN) {
+						if (movementCounter > 0) {
+							movementCounter--;
+							doc.remove(doc.getLength() - 2, 2);
+							area.append("U" + Integer.toString(movementCounter));
+						}
+						else {
+							doc.remove(doc.getLength() - 2, 2);
+						}
+					}
+					else if (movementDirection != UP) {
+						movementCounter = 0;
+						area.append("U" + Integer.toString(movementCounter));
+						movementDirection = UP;
+					}
+				}
+				catch (BadLocationException e) {
+					e.printStackTrace();
+				}
 				break;
 			}
 			case DOWN: {
