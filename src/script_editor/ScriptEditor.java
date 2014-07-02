@@ -28,7 +28,7 @@ import editor.Trigger;
 
 public class ScriptEditor extends JFrame {
 	public static final String TITLE = "Script Editor (Hobby)";
-	public static final int WIDTH = 600;
+	public static final int WIDTH = 700;
 	public static final int HEIGHT = 400;
 	
 	public static File LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;

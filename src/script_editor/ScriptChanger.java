@@ -2,8 +2,10 @@ package script_editor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -27,8 +29,14 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	
 	private JTextField nameField, xField, yField, idField;
 	private JButton upButton, downButton, leftButton, rightButton;
+	private JButton questionDialogue, affirmativeDialogue, negativeDialogue, speechDialogue;
 	private JTextArea scriptArea;
 	private boolean allowUpdate;
+	
+	private static final String UP = "UP";
+	private static final String DOWN = "DOWN";
+	private static final String LEFT = "LEFT";
+	private static final String RIGHT = "RIGHT";
 	
 	public ScriptChanger(ScriptEditor editor) {
 		super();
@@ -128,6 +136,14 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.anchor = GridBagConstraints.CENTER;
 		this.add(constructDirections(), c);
 		
+		c.gridx = 1;
+		c.gridy = 5;
+		c.gridwidth = 1;
+		c.weightx = 3.5;
+		c.weighty = 0.5;
+		c.anchor = GridBagConstraints.CENTER;
+		this.add(constructDialogues(), c);
+		
 		this.setBorder(BorderFactory.createTitledBorder("Trigger:"));
 		this.validate();
 	}
@@ -137,21 +153,34 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		
 		final Dimension size = new Dimension(30, 10);
+		final Insets inset = new Insets(0, 1, 0, 1);
 		
 		JPanel top = new JPanel();
 		top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
 		upButton = new JButton("Up");
+		upButton.setMargin(inset);
 		upButton.setSize(size);
+		upButton.addActionListener(this);
+		upButton.setActionCommand(UP);
 		top.add(upButton);
 		
 		JPanel across = new JPanel();
 		across.setLayout(new BoxLayout(across, BoxLayout.X_AXIS));
 		leftButton = new JButton("Left");
+		leftButton.setMargin(inset);
 		leftButton.setSize(size);
+		leftButton.addActionListener(this);
+		leftButton.setActionCommand(LEFT);
 		downButton = new JButton("Down");
+		downButton.setMargin(inset);
 		downButton.setSize(size);
+		downButton.addActionListener(this);
+		downButton.setActionCommand(DOWN);
 		rightButton = new JButton("Right");
+		rightButton.setMargin(inset);
 		rightButton.setSize(size);
+		rightButton.addActionListener(this);
+		rightButton.setActionCommand(RIGHT);
 		across.add(leftButton);
 		across.add(downButton);
 		across.add(rightButton);
@@ -159,6 +188,31 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		panel.add(top);
 		panel.add(across);
 		panel.setBorder(BorderFactory.createTitledBorder("Movements:"));
+		return panel;
+	}
+	
+	private JPanel constructDialogues(){
+		final Insets inset = new Insets(0, 1, 0, 1);
+		JPanel panel = new JPanel();
+		panel.setLayout(new FlowLayout(FlowLayout.LEADING));
+		speechDialogue = new JButton("#");
+		speechDialogue.setMargin(inset);
+		speechDialogue.setToolTipText("Speech Dialogue: A normal dialogue the player is to trigger.");
+		panel.add(speechDialogue);
+		questionDialogue = new JButton("?");
+		questionDialogue.setMargin(inset);
+		questionDialogue.setToolTipText("Question Dialogue: A question dialogue asking for the player's response to YES or NO.");
+		panel.add(questionDialogue);
+		affirmativeDialogue = new JButton("+");
+		affirmativeDialogue.setMargin(inset);
+		affirmativeDialogue.setToolTipText("Affirmative Dialogue: If a question dialogue has been asked, and the player reponded to YES, this and similar consecutive dialogues will be shown.");
+		panel.add(affirmativeDialogue);
+		negativeDialogue = new JButton("-");
+		negativeDialogue.setMargin(inset);
+		negativeDialogue.setToolTipText("Negative Dialogue: If a question dialogue has been asked, and the player reponded to NO, this and similar consecutive dialogues will be shown ");
+		panel.add(negativeDialogue);
+		panel.validate();
+		panel.setBorder(BorderFactory.createTitledBorder("Dialogues (Hover for hints):"));
 		return panel;
 	}
 	
@@ -213,6 +267,20 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	// ActionListener
 	@Override
 	public void actionPerformed(ActionEvent event) {
+		switch (event.getActionCommand()){
+			case UP: {
+				break;
+			}
+			case DOWN: {
+				break;
+			}
+			case LEFT: {
+				break;
+			}
+			case RIGHT: {
+				break;
+			}
+		}
 	}
 	
 	// DocumentListener

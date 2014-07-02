@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -38,9 +39,10 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.editor = editor;
 		this.selectedTrigger = null;
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+		this.setBorder(BorderFactory.createTitledBorder("Trigger List:"));
 		constructingList();
 		constructingButtons();
-		
+		this.revalidate();
 	}
 	
 	private void constructingList() {
@@ -50,7 +52,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.triggerList.setLayoutOrientation(JList.VERTICAL);
 		this.triggerList.setVisibleRowCount(0);
-		Dimension size = new Dimension(200, 300);
+		Dimension size = new Dimension(100, 300);
 		this.triggerList.setSize(size);
 		this.triggerList.setMinimumSize(size);
 		
