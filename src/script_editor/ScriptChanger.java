@@ -35,12 +35,49 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	private JTextArea scriptArea;
 	private boolean allowUpdate;
 	private int movementCounter = 0;
-	private String movementDirection = null;
 	
 	private static final String UP = "UP";
 	private static final String DOWN = "DOWN";
 	private static final String LEFT = "LEFT";
 	private static final String RIGHT = "RIGHT";
+	
+	private ActionListener dialogueActions = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent event) {
+			JTextArea area = editor.scriptChanger.getScriptArea();
+			PlainDocument doc = (PlainDocument) area.getDocument();
+			switch (event.getActionCommand()) {
+				case "#": {
+					if (doc.getLength() > 0)
+						area.append("\n#");
+					else
+						area.append("#");
+					break;
+				}
+				case "?": {
+					if (doc.getLength() > 0)
+						area.append("\n?");
+					else
+						area.append("?");
+					break;
+				}
+				case "+": {
+					if (doc.getLength() > 0)
+						area.append("\n+");
+					else
+						area.append("+");
+					break;
+				}
+				case "-": {
+					if (doc.getLength() > 0)
+						area.append("\n-");
+					else
+						area.append("-");
+					break;
+				}
+			}
+		}
+	};
 	
 	public ScriptChanger(ScriptEditor editor) {
 		super();
@@ -201,20 +238,31 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		panel.setLayout(new FlowLayout(FlowLayout.LEADING));
 		speechDialogue = new JButton("#");
 		speechDialogue.setMargin(inset);
-		speechDialogue.setToolTipText("Speech Dialogue: A normal dialogue the player is to trigger.");
+		speechDialogue.setToolTipText("<html><b>Speech Dialogue:</b><br/> A normal dialogue the player is to trigger. <br/><br/><b>Usage:</b><br/> #[One-line-only Sentence]<br/><br/><b>Example:</b><br/>#Hello World.</html>");
+		speechDialogue.setActionCommand("#");
+		speechDialogue.addActionListener(dialogueActions);
 		panel.add(speechDialogue);
 		questionDialogue = new JButton("?");
 		questionDialogue.setMargin(inset);
-		questionDialogue.setToolTipText("Question Dialogue: A question dialogue asking for the player's response to YES or NO.");
+		questionDialogue.setToolTipText("<html><b>Question Dialogue:</b><br/> A question dialogue asking for the player's response to YES or NO. <br/><br/><b>Usage:</b><br/>?[One-line-only Question] <br/><br/><b>Example:</b><br/>?Do you want to trade your Bulbasaur for my Pikachu?</html>");
+		questionDialogue.setActionCommand("?");
+		questionDialogue.addActionListener(dialogueActions);
 		panel.add(questionDialogue);
 		affirmativeDialogue = new JButton("+");
 		affirmativeDialogue.setMargin(inset);
-		affirmativeDialogue.setToolTipText("Affirmative Dialogue: If a question dialogue has been asked, and the player reponded to YES, this and similar consecutive dialogues will be shown.");
+		affirmativeDialogue
+				.setToolTipText("<html><b>Affirmative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to YES, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>+[One-line-only Sentence]<br/><br/><b>Example:</b><br/>+Great! Let's trade!</html>");
+		affirmativeDialogue.setActionCommand("+");
+		affirmativeDialogue.addActionListener(dialogueActions);
 		panel.add(affirmativeDialogue);
 		negativeDialogue = new JButton("-");
 		negativeDialogue.setMargin(inset);
-		negativeDialogue.setToolTipText("Negative Dialogue: If a question dialogue has been asked, and the player reponded to NO, this and similar consecutive dialogues will be shown ");
+		negativeDialogue
+				.setToolTipText("<html><b>Negative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to NO, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>-[One-line-only Sentence]<br/><br/><b>Example:</b><br/>-Aw... I thought you had one.</html>");
+		negativeDialogue.setActionCommand("-");
+		negativeDialogue.addActionListener(dialogueActions);
 		panel.add(negativeDialogue);
+		
 		panel.validate();
 		panel.setBorder(BorderFactory.createTitledBorder("Dialogues (Hover for hints):"));
 		return panel;
@@ -273,27 +321,79 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	public void actionPerformed(ActionEvent event) {
 		JTextArea area = editor.scriptChanger.getScriptArea();
 		PlainDocument doc = (PlainDocument) area.getDocument();
-		if (doc.getLength() > 0) {
-			switch (event.getActionCommand()){
+		String lastCharacter = "";
+		String lastDirection = "";
+		try {
+			lastDirection = doc.getText(area.getCaretPosition() - 2, 1);
+			lastCharacter = doc.getText(area.getCaretPosition()-1, 1);
+			System.out.println("__" + lastCharacter + "__" + lastDirection + "__");
+		}
+		catch (BadLocationException e) {
+			lastCharacter = "";
+		}
+		if (lastDirection.equals("U") || lastDirection.equals("D") || lastDirection.equals("L") || lastDirection.equals("R")) {
+			switch (event.getActionCommand()) {
 				case UP: {
-					inputChange(doc, area, "U", UP);
+					inputChange(doc, area, "U");
 					break;
 				}
 				case DOWN: {
-					inputChange(doc, area, "D", DOWN);
+					inputChange(doc, area, "D");
 					break;
 				}
 				case LEFT: {
-					inputChange(doc, area, "L", LEFT);
+					inputChange(doc, area, "L");
 					break;
 				}
 				case RIGHT: {
-					inputChange(doc, area, "R", RIGHT);
+					inputChange(doc, area, "R");
+					break;
+				}
+			}
+		}
+		else if (lastCharacter.equals("^")) {
+			switch (event.getActionCommand()) {
+				case UP: {
+					defaultInputChange(doc, area, "U");
+					break;
+				}
+				case DOWN: {
+					defaultInputChange(doc, area, "D");
+					break;
+				}
+				case LEFT: {
+					defaultInputChange(doc, area, "L");
+					break;
+				}
+				case RIGHT: {
+					defaultInputChange(doc, area, "R");
+					break;
+				}
+			}
+		}
+		else if (lastCharacter.equals("\n")) {
+			area.append("^");
+			switch (event.getActionCommand()) {
+				case UP: {
+					defaultInputChange(doc, area, "U");
+					break;
+				}
+				case DOWN: {
+					defaultInputChange(doc, area, "D");
+					break;
+				}
+				case LEFT: {
+					defaultInputChange(doc, area, "L");
+					break;
+				}
+				case RIGHT: {
+					defaultInputChange(doc, area, "R");
 					break;
 				}
 			}
 		}
 		else {
+			area.append("\n^");
 			switch (event.getActionCommand()) {
 				case UP: {
 					defaultInputChange(doc, area, "U");
@@ -315,10 +415,10 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		}
 	}
 	
-	private void inputChange(PlainDocument doc, JTextArea area, String directionToCompare, final String directionConstant){
+	private void inputChange(PlainDocument doc, JTextArea area, String directionToCompare) {
 		try {
 			String str = doc.getText(doc.getLength() - 2, 1);
-			if (str.equals(directionToCompare)){
+			if (str.equals(directionToCompare)) {
 				if (movementCounter < 9) {
 					movementCounter++;
 					doc.remove(doc.getLength() - 1, 1);
@@ -333,15 +433,13 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				movementCounter = 0;
 				area.append(directionToCompare + Integer.toString(movementCounter));
 			}
-			movementDirection = directionConstant;
 		}
 		catch (BadLocationException e) {
 			e.printStackTrace();
-			movementDirection = null;
 		}
 	}
 	
-	private void defaultInputChange(PlainDocument doc, JTextArea area, String directionToCompare){
+	private void defaultInputChange(PlainDocument doc, JTextArea area, String directionToCompare) {
 		movementCounter = 0;
 		area.append(directionToCompare + Integer.toString(movementCounter));
 	}
