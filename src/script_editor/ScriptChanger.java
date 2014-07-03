@@ -273,54 +273,77 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	public void actionPerformed(ActionEvent event) {
 		JTextArea area = editor.scriptChanger.getScriptArea();
 		PlainDocument doc = (PlainDocument) area.getDocument();
-		switch (event.getActionCommand()) {
-			case UP: {
-				try {
-					if (doc.getLength() > 0) {
-						String str = doc.getText(doc.getLength() - 2, 1);
-						if (str.equals("U")) {
-							if (movementCounter < 9) {
-								movementCounter++;
-								doc.remove(doc.getLength() - 2, 2);
-								area.append("U" + Integer.toString(movementCounter));
-							}
-							else {
-								movementCounter = 0;
-								area.append("U" + Integer.toString(movementCounter));
-							}
-						}
-					}
-					else if (movementDirection == DOWN) {
-						if (movementCounter > 0) {
-							movementCounter--;
-							doc.remove(doc.getLength() - 2, 2);
-							area.append("U" + Integer.toString(movementCounter));
-						}
-						else {
-							doc.remove(doc.getLength() - 2, 2);
-						}
-					}
-					else if (movementDirection != UP) {
-						movementCounter = 0;
-						area.append("U" + Integer.toString(movementCounter));
-						movementDirection = UP;
-					}
+		if (doc.getLength() > 0) {
+			switch (event.getActionCommand()){
+				case UP: {
+					inputChange(doc, area, "U", UP);
+					break;
 				}
-				catch (BadLocationException e) {
-					e.printStackTrace();
+				case DOWN: {
+					inputChange(doc, area, "D", DOWN);
+					break;
 				}
-				break;
-			}
-			case DOWN: {
-				break;
-			}
-			case LEFT: {
-				break;
-			}
-			case RIGHT: {
-				break;
+				case LEFT: {
+					inputChange(doc, area, "L", LEFT);
+					break;
+				}
+				case RIGHT: {
+					inputChange(doc, area, "R", RIGHT);
+					break;
+				}
 			}
 		}
+		else {
+			switch (event.getActionCommand()) {
+				case UP: {
+					defaultInputChange(doc, area, "U");
+					break;
+				}
+				case DOWN: {
+					defaultInputChange(doc, area, "D");
+					break;
+				}
+				case LEFT: {
+					defaultInputChange(doc, area, "L");
+					break;
+				}
+				case RIGHT: {
+					defaultInputChange(doc, area, "R");
+					break;
+				}
+			}
+		}
+	}
+	
+	private void inputChange(PlainDocument doc, JTextArea area, String directionToCompare, final String directionConstant){
+		try {
+			String str = doc.getText(doc.getLength() - 2, 1);
+			if (str.equals(directionToCompare)){
+				if (movementCounter < 9) {
+					movementCounter++;
+					doc.remove(doc.getLength() - 1, 1);
+					area.append(Integer.toString(movementCounter));
+				}
+				else {
+					movementCounter = 0;
+					area.append(directionToCompare + Integer.toString(movementCounter));
+				}
+			}
+			else {
+				movementCounter = 0;
+				area.append(directionToCompare + Integer.toString(movementCounter));
+			}
+			movementDirection = directionConstant;
+		}
+		catch (BadLocationException e) {
+			e.printStackTrace();
+			movementDirection = null;
+		}
+	}
+	
+	private void defaultInputChange(PlainDocument doc, JTextArea area, String directionToCompare){
+		movementCounter = 0;
+		area.append(directionToCompare + Integer.toString(movementCounter));
 	}
 	
 	// DocumentListener
