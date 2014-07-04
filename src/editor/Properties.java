@@ -7,8 +7,10 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
@@ -176,6 +178,26 @@ public class Properties extends JPanel {
 		}
 	}
 	
+	public void reloadTriggers() {
+		if (this.triggers != null) {
+			DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
+			model.removeAllElements();
+			
+			Trigger trigger = new Trigger();
+			trigger.setTriggerID((short) 0);
+			trigger.setName("Eraser");
+			model.addElement(trigger);
+			
+			JList<Trigger> list = this.editor.scriptEditor.scriptViewer.getTriggerList();
+			DefaultListModel<Trigger> scriptModel = (DefaultListModel<Trigger>) list.getModel();
+			for (int i = 0; i < scriptModel.getSize(); i++) {
+				model.addElement(scriptModel.get(i));
+			}
+			
+			this.revalidate();
+		}
+	}
+	
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
@@ -189,7 +211,7 @@ public class Properties extends JPanel {
 				this.tiles.setEnabled(false);
 				this.triggers.setEnabled(true);
 				if (editor.scriptEditor == null)
-				break;
+					break;
 		}
 		super.validate();
 	}

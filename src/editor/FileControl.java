@@ -72,6 +72,7 @@ public class FileControl extends JPanel implements ActionListener {
 				case 0: // New
 				{
 					editor.drawingBoardPanel.newImage();
+					editor.setMapAreaName("Untitled");
 					break;
 				}
 				case 1: {// Save
@@ -115,6 +116,7 @@ public class FileControl extends JPanel implements ActionListener {
 									filename = filename.substring(0, filename.length() - ".png".length());
 								FileControl.lastSavedDirectory = chooser.getCurrentDirectory();
 								ImageIO.write(img, "png", new File(FileControl.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"));
+								editor.setMapAreaName(filename);
 								
 								RandomAccessFile f = null;
 								try {
@@ -175,6 +177,7 @@ public class FileControl extends JPanel implements ActionListener {
 							this.editor.setTitle(LevelEditor.NAME_TITLE + " - " + f);
 							BufferedImage image = ImageIO.read(f);
 							editor.drawingBoardPanel.openMapImage(image);
+							editor.setMapAreaName(f.getName().substring(0, f.getName().length() - ".png".length()));
 							RandomAccessFile rf = null;
 							try {
 								rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
@@ -209,7 +212,7 @@ public class FileControl extends JPanel implements ActionListener {
 					editor.validate();
 					break;
 				}
-				case 7: {//Script editor
+				case 7: {// Script editor
 					if (editor.scriptEditor == null) {
 						editor.scriptEditor = new ScriptEditor(ScriptEditor.TITLE, this.editor);
 						button.setEnabled(false);
