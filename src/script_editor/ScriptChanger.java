@@ -11,8 +11,10 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -530,6 +532,10 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				}
 				catch (Exception e) {
 				}
+				
+				JList<Trigger> list = editor.scriptViewer.getTriggerList();
+				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) list.getModel();
+				model.setElementAt(selectedTrigger, list.getSelectedIndex());
 			}
 			if (!editor.isBeingModified()) {
 				SwingUtilities.invokeLater(new Runnable() {
@@ -566,6 +572,10 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				test = editor.scriptChanger.getScriptArea().getText();
 				if (!test.isEmpty() || !test.equals(""))
 					selectedTrigger.setScript(test);
+				
+				JList<Trigger> list = editor.scriptViewer.getTriggerList();
+				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) list.getModel();
+				model.setElementAt(selectedTrigger, list.getSelectedIndex());
 			}
 			if (!editor.isBeingModified()) {
 				SwingUtilities.invokeLater(new Runnable() {
