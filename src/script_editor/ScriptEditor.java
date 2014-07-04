@@ -28,6 +28,7 @@ import editor.LevelEditor;
 import editor.Trigger;
 
 public class ScriptEditor extends JFrame {
+	private static final long serialVersionUID = 1L;
 	public static final String TITLE = "Script Editor (Hobby)";
 	public static final int WIDTH = 700;
 	public static final int HEIGHT = 400;
@@ -71,7 +72,7 @@ public class ScriptEditor extends JFrame {
 		
 		addingComponents();
 		
-		LAST_SAVED_DIRECTORY = parent.fileControlPanel.lastSavedDirectory;
+		LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
 		ToolTipManager.sharedInstance().setInitialDelay(1);
 		this.setTitle(this.getTitle() + " - Untitled.script");
 	}
@@ -134,16 +135,16 @@ public class ScriptEditor extends JFrame {
 			Trigger trigger = null;
 			StringBuilder builder = new StringBuilder();
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("$")){
+				if (line.startsWith("$")) {
 					tokens = line.split("\\$");
 					trigger = new Trigger();
 					trigger.setTriggerID(Short.valueOf(tokens[1]));
 				}
-				else if (line.startsWith("@")){
+				else if (line.startsWith("@")) {
 					tokens = line.split("@");
 					trigger.setName(tokens[1]);
 				}
-				else if (line.startsWith("%")){
+				else if (line.startsWith("%")) {
 					trigger.setScript(builder.toString());
 					model.addElement(trigger);
 					builder.setLength(0);
@@ -168,15 +169,15 @@ public class ScriptEditor extends JFrame {
 		this.scriptViewer.revalidate();
 	}
 	
-	public boolean isBeingModified(){
+	public boolean isBeingModified() {
 		return this.modifiedFlag;
 	}
 	
-	public void setModifiedFlag(boolean value){
-		if (!value){
+	public void setModifiedFlag(boolean value) {
+		if (!value) {
 			String str = this.getTitle();
 			if (str.endsWith("*"))
-				this.setTitle(str.substring(0, str.length()-1));
+				this.setTitle(str.substring(0, str.length() - 1));
 		}
 		this.modifiedFlag = value;
 	}
