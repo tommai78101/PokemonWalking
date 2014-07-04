@@ -39,6 +39,7 @@ public class ScriptEditor extends JFrame {
 	public ScriptToolbar scriptToolbar;
 	public ScriptViewer scriptViewer;
 	public ScriptChanger scriptChanger;
+	private boolean modifiedFlag = false;
 	
 	public ScriptEditor(String title, LevelEditor parent) {
 		super(title);
@@ -72,6 +73,7 @@ public class ScriptEditor extends JFrame {
 		
 		LAST_SAVED_DIRECTORY = parent.fileControlPanel.lastSavedDirectory;
 		ToolTipManager.sharedInstance().setInitialDelay(1);
+		this.setTitle(this.getTitle() + " - Untitled.script");
 	}
 	
 	public void addingComponents() {
@@ -164,6 +166,19 @@ public class ScriptEditor extends JFrame {
 		}
 		this.scriptViewer.getTriggerList().clearSelection();
 		this.scriptViewer.revalidate();
+	}
+	
+	public boolean isBeingModified(){
+		return this.modifiedFlag;
+	}
+	
+	public void setModifiedFlag(boolean value){
+		if (!value){
+			String str = this.getTitle();
+			if (str.endsWith("*"))
+				this.setTitle(str.substring(0, str.length()-1));
+		}
+		this.modifiedFlag = value;
 	}
 	
 	public void save(File script) {

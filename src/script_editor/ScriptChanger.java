@@ -13,10 +13,12 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -325,7 +327,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		String lastDirection = "";
 		try {
 			lastDirection = doc.getText(area.getCaretPosition() - 2, 1);
-			lastCharacter = doc.getText(area.getCaretPosition()-1, 1);
+			lastCharacter = doc.getText(area.getCaretPosition() - 1, 1);
 			System.out.println("__" + lastCharacter + "__" + lastDirection + "__");
 		}
 		catch (BadLocationException e) {
@@ -455,21 +457,90 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		if (this.allowUpdate) {
 			Trigger selectedTrigger = editor.scriptViewer.getSelectedTrigger();
 			if (selectedTrigger != null) {
-				String test = editor.scriptChanger.getNameField().getText();
-				if (!test.isEmpty() || !test.equals(""))
-					selectedTrigger.setName(test);
-				test = editor.scriptChanger.getXField().getText();
-				if (!test.isEmpty() || !test.equals(""))
-					selectedTrigger.setTriggerPositionX((byte) (Integer.valueOf(test) & 0xFF));
-				test = editor.scriptChanger.getYField().getText();
-				if (!test.isEmpty() || !test.equals(""))
-					selectedTrigger.setTriggerPositionY((byte) (Integer.valueOf(test) & 0xFF));
-				test = editor.scriptChanger.getIDField().getText();
-				if (!test.isEmpty() || !test.equals(""))
-					selectedTrigger.setTriggerID((short) (Integer.valueOf(test) & 0xFFFF));
-				test = editor.scriptChanger.getScriptArea().getText();
-				if (!test.isEmpty() || !test.equals(""))
-					selectedTrigger.setScript(test);
+				String test = "";
+				
+				try {
+					test = editor.scriptChanger.getNameField().getText();
+					if (!test.isEmpty() || !test.equals(""))
+						selectedTrigger.setName(test);
+				}
+				catch (Exception e) {
+				}
+				
+				try {
+					test = editor.scriptChanger.getXField().getText();
+					if (!test.isEmpty() || !test.equals("")) {
+						int n = Integer.valueOf(test);
+						if (n > 0x0FF)
+							throw new NumberFormatException();
+						selectedTrigger.setTriggerPositionX((byte) (n & 0xFF));
+					}
+				}
+				catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~ 255.");
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							editor.scriptChanger.getXField().setText("");
+						}
+					});
+				}
+				try {
+					test = editor.scriptChanger.getYField().getText();
+					if (!test.isEmpty() || !test.equals("")) {
+						int n = Integer.valueOf(test);
+						if (n > 0x0FF)
+							throw new NumberFormatException();
+						selectedTrigger.setTriggerPositionY((byte) (n & 0xFF));
+					}
+				}
+				catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~ 255.");
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							editor.scriptChanger.getYField().setText("");
+						}
+					});
+				}
+				
+				try {
+					test = editor.scriptChanger.getIDField().getText();
+					if (!test.isEmpty() || !test.equals("")) {
+						int n = Integer.valueOf(test);
+						if (n > 0x0FFFF)
+							throw new NumberFormatException();
+						selectedTrigger.setTriggerID((short) (n & 0xFFFF));
+					}
+				}
+				catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~ 65535.");
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							editor.scriptChanger.getIDField().setText("");
+						}
+					});
+				}
+				
+				try {
+					test = editor.scriptChanger.getScriptArea().getText();
+					if (!test.isEmpty() || !test.equals(""))
+						selectedTrigger.setScript(test);
+				}
+				catch (Exception e) {
+				}
+			}
+			if (!editor.isBeingModified()) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						String str = editor.getTitle();
+						if (!str.endsWith("*"))
+							editor.setTitle(str + "*");
+						editor.setModifiedFlag(true);
+					}
+				});
 			}
 		}
 	}
@@ -477,7 +548,6 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	// DocumentListener
 	@Override
 	public void removeUpdate(DocumentEvent event) {
-		
 		if (this.allowUpdate) {
 			Trigger selectedTrigger = editor.scriptViewer.getSelectedTrigger();
 			if (selectedTrigger != null) {
@@ -496,6 +566,17 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				test = editor.scriptChanger.getScriptArea().getText();
 				if (!test.isEmpty() || !test.equals(""))
 					selectedTrigger.setScript(test);
+			}
+			if (!editor.isBeingModified()) {
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						String str = editor.getTitle();
+						if (!str.endsWith("*"))
+							editor.setTitle(str + "*");
+						editor.setModifiedFlag(true);
+					}
+				});
 			}
 		}
 	}

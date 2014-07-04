@@ -62,6 +62,8 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
 				model.clear();
 				triggerList.clearSelection();
+				editor.setModifiedFlag(false);
+				editor.setTitle("Script Editor (Hobby) - Untitled.script");
 				break;
 			}
 			case 1: { // Save
@@ -99,13 +101,14 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
 					
 					if (f.getName().endsWith(".script")){
-						this.editor.setTitle(f.getName());
+						this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
 						this.editor.save(new File(f.getParentFile(), f.getName()));
 					}
 					else {
-						this.editor.setTitle(f.getName() + ".script");
+						this.editor.setTitle("Script Editor (Hobby) - " + f.getName() + ".script");
 						this.editor.save(new File(f.getParentFile(), f.getName() + ".script"));
 					}
+					this.editor.setModifiedFlag(false);
 					
 					RandomAccessFile rf = null;
 					try {
@@ -161,8 +164,9 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				if (answer == JFileChooser.APPROVE_OPTION) {
 					File f = opener.getSelectedFile();
 					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
-					this.editor.setTitle(f.getName());
+					this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
 					this.editor.load(f);
+					this.editor.setModifiedFlag(false);
 					
 					RandomAccessFile rf = null;
 					try {
