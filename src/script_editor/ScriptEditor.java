@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -124,13 +126,25 @@ public class ScriptEditor extends JFrame {
 		System.out.println("Opened Location: " + script.getAbsolutePath());
 		BufferedReader reader = null;
 		try {
+			
 			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
-			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
-			model.clear();
+			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
+			scriptTriggerListModel.clear();
+			
+			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
+			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList.getModel();
+			editorTriggerComboModel.removeAllElements();
+			
+			Trigger trigger = new Trigger();
+			trigger.setTriggerID((short) 0);
+			trigger.setName("Eraser");
+			editorTriggerComboModel.addElement(trigger);
+			comboTriggerList.setSelectedIndex(0);
+			
 			reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)));
 			String line = null;
 			String[] tokens;
-			Trigger trigger = null;
+			trigger = null;
 			StringBuilder builder = new StringBuilder();
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("$")) {
@@ -144,7 +158,8 @@ public class ScriptEditor extends JFrame {
 				}
 				else if (line.startsWith("%")) {
 					trigger.setScript(builder.toString());
-					model.addElement(trigger);
+					scriptTriggerListModel.addElement(trigger);
+					editorTriggerComboModel.addElement(trigger);
 					builder.setLength(0);
 				}
 				else {
@@ -165,6 +180,7 @@ public class ScriptEditor extends JFrame {
 		}
 		this.scriptViewer.getTriggerList().clearSelection();
 		this.scriptViewer.revalidate();
+		this.parent.revalidate();
 	}
 	
 	public boolean isBeingModified() {

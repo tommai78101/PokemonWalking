@@ -58,6 +58,10 @@ public class Properties extends JPanel {
 		return this.selectedData;
 	}
 	
+	public JComboBox<Trigger> getTriggerList(){
+		return this.triggers;
+	}
+	
 	public Trigger getSelectedTrigger() {
 		return this.selectedTrigger;
 	}

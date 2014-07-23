@@ -9,8 +9,10 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -61,10 +63,23 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				JList<Trigger> triggerList = editor.scriptViewer.getTriggerList();
 				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
 				model.clear();
+				
+				JComboBox<Trigger> triggerComboBox = editor.parent.properties.getTriggerList();
+				DefaultComboBoxModel<Trigger> triggerComboModel = (DefaultComboBoxModel<Trigger>) triggerComboBox.getModel();
+				triggerComboModel.removeAllElements();
+				
+				Trigger trigger = new Trigger();
+				trigger.setTriggerID((short) 0);
+				trigger.setName("Eraser");
+				triggerComboModel.addElement(trigger);
+				triggerComboBox.setSelectedIndex(0);
+				
 				triggerList.clearSelection();
 				editor.setModifiedFlag(false);
 				editor.setTitle("Script Editor (Hobby) - Untitled.script");
 				editor.setScriptName("Untitled");
+				
+				editor.parent.revalidate();
 				break;
 			}
 			case 1: { // Save
