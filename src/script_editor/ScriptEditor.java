@@ -19,7 +19,6 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 
@@ -28,6 +27,7 @@ import editor.LevelEditor;
 import editor.Trigger;
 
 public class ScriptEditor extends JFrame {
+	private static final long serialVersionUID = 1L;
 	public static final String TITLE = "Script Editor (Hobby)";
 	public static final int WIDTH = 700;
 	public static final int HEIGHT = 400;
@@ -40,6 +40,7 @@ public class ScriptEditor extends JFrame {
 	public ScriptViewer scriptViewer;
 	public ScriptChanger scriptChanger;
 	private boolean modifiedFlag = false;
+	private String scriptName;
 	
 	public ScriptEditor(String title, LevelEditor parent) {
 		super(title);
@@ -71,9 +72,10 @@ public class ScriptEditor extends JFrame {
 		
 		addingComponents();
 		
-		LAST_SAVED_DIRECTORY = parent.fileControlPanel.lastSavedDirectory;
+		LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
 		ToolTipManager.sharedInstance().setInitialDelay(1);
 		this.setTitle(this.getTitle() + " - Untitled.script");
+		this.setScriptName("Untitled");
 	}
 	
 	public void addingComponents() {
@@ -122,9 +124,6 @@ public class ScriptEditor extends JFrame {
 		System.out.println("Opened Location: " + script.getAbsolutePath());
 		BufferedReader reader = null;
 		try {
-			
-			// TODO: Loading goes here.
-			
 			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
 			model.clear();
@@ -134,16 +133,16 @@ public class ScriptEditor extends JFrame {
 			Trigger trigger = null;
 			StringBuilder builder = new StringBuilder();
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("$")){
+				if (line.startsWith("$")) {
 					tokens = line.split("\\$");
 					trigger = new Trigger();
 					trigger.setTriggerID(Short.valueOf(tokens[1]));
 				}
-				else if (line.startsWith("@")){
+				else if (line.startsWith("@")) {
 					tokens = line.split("@");
 					trigger.setName(tokens[1]);
 				}
-				else if (line.startsWith("%")){
+				else if (line.startsWith("%")) {
 					trigger.setScript(builder.toString());
 					model.addElement(trigger);
 					builder.setLength(0);
@@ -168,17 +167,25 @@ public class ScriptEditor extends JFrame {
 		this.scriptViewer.revalidate();
 	}
 	
-	public boolean isBeingModified(){
+	public boolean isBeingModified() {
 		return this.modifiedFlag;
 	}
 	
-	public void setModifiedFlag(boolean value){
-		if (!value){
+	public void setScriptName(String scriptName) {
+		this.scriptName = scriptName;
+	}
+	
+	public void setModifiedFlag(boolean value) {
+		if (!value) {
 			String str = this.getTitle();
 			if (str.endsWith("*"))
-				this.setTitle(str.substring(0, str.length()-1));
+				this.setTitle(str.substring(0, str.length() - 1));
 		}
 		this.modifiedFlag = value;
+	}
+	
+	public LevelEditor getLevelEditorParent() {
+		return this.parent;
 	}
 	
 	public void save(File script) {
@@ -194,10 +201,11 @@ public class ScriptEditor extends JFrame {
 					writer.newLine();
 					writer.write("@" + t.getName().replace(" ", "_"));
 					writer.newLine();
-					JTextArea area = this.scriptChanger.getScriptArea();
-					writer.write(area.getText());
+					writer.write(t.getScript());
 					writer.newLine();
 					writer.write("%");
+					writer.newLine();
+					writer.newLine();
 					writer.newLine();
 				}
 				catch (IOException e) {

@@ -77,11 +77,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 				tick();
 				unprocessed -= 1.0;
 			}
-			render();
 			try {
+				render();
 				Thread.sleep(1);
 			}
 			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}
@@ -154,7 +158,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		});
 	}
 	
-	public void render() {
+	public void render() throws Exception {
 		BufferStrategy bs = this.getBufferStrategy();
 		if (bs == null) {
 			this.createBufferStrategy(3);

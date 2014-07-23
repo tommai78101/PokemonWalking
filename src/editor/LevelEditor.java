@@ -49,6 +49,8 @@ public class LevelEditor extends JFrame {
 	public boolean running;
 	public EditorInput input;
 	
+	private String mapAreaName;
+	
 	public LevelEditor(String name) {
 		super(name);
 		running = true;
@@ -172,7 +174,7 @@ public class LevelEditor extends JFrame {
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-			catch (NullPointerException e){
+			catch (NullPointerException e) {
 			}
 			finally {
 				try {
@@ -239,10 +241,15 @@ public class LevelEditor extends JFrame {
 	public final void initialize() {
 		EditorConstants.metadata = Metadata.Pixel_Data;
 		this.drawingBoardPanel.newImage(15, 15);
+		this.setMapAreaName("Untitled");
 	}
 	
 	public ArrayList<Data> getResourceFilePaths() {
 		return this.filepaths;
+	}
+	
+	public void setMapAreaName(String name) {
+		this.mapAreaName = name;
 	}
 	
 	public static void main(String[] args) {
