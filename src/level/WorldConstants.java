@@ -117,7 +117,7 @@ public class WorldConstants {
 //			result.add(new Area(Art.testArea4, TEST_WORLD_4));
 //			result.add(new Area(Art.testArea_debug, DEBUG));
 		}
-		else {
+		else { //Including NULL value.
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
 				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
 				result.add(new Area(entry.getKey(), entry.getValue()));
