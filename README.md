@@ -12,6 +12,8 @@ Implements the walking algorithm used in classic Pokémon G/S/C games. Also incl
 
 **MILESTONE HAS REACHED**, *ALL PRIORITIES ARE SHIFTED TO LOW!* That means I won't be working on this as active as I used to be, but it is still in development. Note that it does not mimic the walking algorithm used in Pokémon R/B/Y games (1st generation games). I also no longer put new releases here at GitHub, due to the lack of showing downloads count. For more information, please scroll to the bottom.
 
+**NEW UPDATE**: School life has now taken up 90% of my entire free time. As far as I know, my courses are time-consuming, I feared I can no longer update this project as I wanted. Sucks though, because this is a wonderful project I couldn't just put it down. Apparently, Java 2D isn't popular and welcomed at my school, so it's now disheartening for me to sponsor this and let everyone else know. But, I'll do my best to continue efforts on completing it. **/UPDATE**
+
 ===
 
 **Description:**
