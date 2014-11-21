@@ -1,4 +1,8 @@
+### DISCLAIMER:
+
 **Download links** are located near the bottom of this README. GitHub Releases are no longer supported.
+
+===
 
 ![Imgur](http://i.imgur.com/rwkiHwC.png)
 
