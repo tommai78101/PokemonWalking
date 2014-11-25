@@ -29,6 +29,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7481148146432931992L;
 	
 	private TilePropertiesPanel propertiesPanel; // Part of Control Panel
+	@SuppressWarnings("unused")
 	private String iconName; // Used to display name in the status panel of Level Editor
 	private LevelEditor editor; // reference to parent
 	private Data selectedData; // reference to selected data.

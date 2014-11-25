@@ -49,6 +49,7 @@ public class LevelEditor extends JFrame {
 	public boolean running;
 	public EditorInput input;
 	
+	@SuppressWarnings("unused")
 	private String mapAreaName;
 	
 	public LevelEditor(String name) {

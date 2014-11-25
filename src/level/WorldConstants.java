@@ -61,6 +61,7 @@ public class WorldConstants {
 	public static Boolean isModsEnabled = null;
 	
 	// Movement
+	//TODO (11/24/2014): Make map more flexible by allowing scripting files of different filenames to be loaded. Not sure where it was being loaded.
 	public static ArrayList<Script> scripts = Script.loadScript("script/scripts.txt");
 	
 	// All bitmaps

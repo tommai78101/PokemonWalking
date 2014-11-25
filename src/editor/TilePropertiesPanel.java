@@ -92,7 +92,6 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		}
 	}
 	
-	@SuppressWarnings({ "serial" })
 	public TilePropertiesPanel() {
 		super();
 		

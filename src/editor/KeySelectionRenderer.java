@@ -26,6 +26,7 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 	 *            A JComboBox object that is to use this KeySelectionRenderer.
 	 */
 	
+	@SuppressWarnings("rawtypes")
 	public KeySelectionRenderer(JComboBox box) {
 		box.setRenderer(this);
 		box.setKeySelectionManager(this);
@@ -34,6 +35,7 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 		timeFactor = (value == null ? 250L : value.longValue());
 	}
 	
+	@SuppressWarnings("rawtypes")
 	public KeySelectionRenderer(JList list) {
 		list.setCellRenderer(this);
 		
@@ -45,6 +47,7 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 	 * Implements the renderer.
 	 */
 	@Override
+	@SuppressWarnings("rawtypes")
 	public Component getListCellRendererComponent(JList list, Object item, int index, boolean isSelected, boolean hasFocus) {
 		super.getListCellRendererComponent(list, item, index, isSelected, hasFocus);
 		if (item != null) {
@@ -57,6 +60,7 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 	 * Implements the KeySelectionManager.
 	 * */
 	@Override
+	@SuppressWarnings("rawtypes")
 	public int selectionForKey(char aKey, ComboBoxModel model) {
 		this.currentTime = System.currentTimeMillis();
 		
@@ -104,6 +108,7 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 	/**
 	 * Finds the index of the item in the model that starts with the prefix.
 	 */
+	@SuppressWarnings("rawtypes")
 	private int getNextMatch(String prefix, int start, int end, ComboBoxModel model) {
 		for (int i = start; i < end; i++) {
 			Object item = model.getElementAt(i);

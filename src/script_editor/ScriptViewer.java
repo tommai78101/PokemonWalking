@@ -32,6 +32,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 	private JButton createButton;
 	private JButton removeButton;
 	private Trigger selectedTrigger;
+	@SuppressWarnings("unused")
 	private int iterator;
 	
 	public ScriptViewer(ScriptEditor editor) {

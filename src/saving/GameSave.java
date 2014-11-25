@@ -172,6 +172,7 @@ public class GameSave {
 	}
 	
 	private void generateLoadData(Game game) throws Exception {
+		//Get Player
 		Player gamePlayer = game.getPlayer();
 		
 		// Get name
@@ -258,6 +259,7 @@ public class GameSave {
 				offset += 4;
 				
 				// Currently, unknown use at the moment.
+				@SuppressWarnings("unused")
 				int sectorID = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 				offset += 4;
 				
