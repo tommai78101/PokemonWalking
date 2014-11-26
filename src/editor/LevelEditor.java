@@ -136,16 +136,29 @@ public class LevelEditor extends JFrame {
 		
 	}
 	
+	
+	/**
+	 * <p>Generates a cache file for saving the last known directory the editor knew of.</p>
+	 * 
+	 * <p>Upon initialization, the default saved directory will be the editor's file location path.</p>
+	 * 
+	 * @return Nothing.
+	 * */
 	public void createCache() {
 		File file = new File(LevelEditor.SAVED_PATH_DATA);
-		if (!file.isFile()) {
+		if (!file.exists()) {
 			RandomAccessFile f = null;
 			try {
+				//Creates a cache file that contains both the File Control's last saved directory and
+				//The script editor's last saved directory. It will be separated by two lines.
+				
+				//Made it so that it immediately saves the current editor file location upon initialization.
 				f = new RandomAccessFile(file, "rw");
 				f.seek(0);
 				f.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
-				f.writeBytes("\n");
+				f.writeBytes(System.getProperty("line.separator"));
 				f.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
+				f.writeBytes(System.getProperty("line.separator"));
 			}
 			catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -162,7 +175,11 @@ public class LevelEditor extends JFrame {
 			}
 		}
 		else {
+			//Reads in two last saved directories in the cache.
+			//If it fails, revert back to original saved directories.
 			RandomAccessFile raf = null;
+			File fileBackup1 = FileControl.lastSavedDirectory;
+			File fileBackup2 = ScriptEditor.LAST_SAVED_DIRECTORY;
 			try {
 				raf = new RandomAccessFile(file, "rw");
 				raf.seek(0);
@@ -170,12 +187,16 @@ public class LevelEditor extends JFrame {
 				ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
 			}
 			catch (FileNotFoundException e) {
-				e.printStackTrace();
+				FileControl.lastSavedDirectory =    fileBackup1;
+				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
 			}
 			catch (IOException e) {
-				e.printStackTrace();
+				FileControl.lastSavedDirectory =    fileBackup1;
+				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
 			}
 			catch (NullPointerException e) {
+				FileControl.lastSavedDirectory =    fileBackup1;
+				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
 			}
 			finally {
 				try {

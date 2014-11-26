@@ -144,17 +144,21 @@ public class FileControl extends JPanel implements ActionListener {
 					break;
 				}
 				case 2: { // Open
-				
 					RandomAccessFile raf = null;
+					String backupPath = LevelEditor.SAVED_PATH_DATA;
 					try {
 						raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
 						FileControl.lastSavedDirectory = new File(raf.readLine());
 					}
 					catch (FileNotFoundException e) {
-						e.printStackTrace();
+						FileControl.lastSavedDirectory = new File(System.getProperty("user.dir"));
 					}
 					catch (IOException e) {
-						e.printStackTrace();
+						FileControl.lastSavedDirectory = new File(System.getProperty("user.dir"));
+					}
+					catch (NullPointerException e){
+						//If nothing has been found, set the last saved directory to where the VM initialized.
+						FileControl.lastSavedDirectory = new File(System.getProperty("user.dir"));
 					}
 					finally {
 						try {

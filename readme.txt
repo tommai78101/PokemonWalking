@@ -1,0 +1,25 @@
+/ Automation
+/
+/ Entities that can walk, or run, must be required to have movements for the game
+/ to feel lively.
+/
+/ More commands to come.
+ 
+/ _: Whitespaces.
+/ @: Trigger name.
+/ ^: [Direction, Steps]. Can be chained for delaying scripted movements.
+/ $: Start of script. Always appear at beginning of script.
+/ %: Script delimiter. Always appear at end of script.
+/ #: Speech Dialogue.
+/ /: Comments. Gets ignored.
+/ ?: Question Dialogue.
+/ +: Affirmative dialogue.
+/ -: Negative dialogue
+/ [: Affirmative Action
+/ ]: Negative Action
+/ ;: Repeat Flag. If contains ';', it means it's enabled by default.
+ 
+/ DO NOT CHANGE/REMOVE THIS TRIGGER SCRIPT. THIS IS RESERVED ONLY. FOLLOW THIS FORMAT.
+$0
+@Eraser
+%
