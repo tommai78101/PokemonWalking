@@ -158,6 +158,18 @@ public class Script {
 		}
 	}
 	
+	
+	/**
+	 * <p>Loads triggers according to the script file.</p>
+	 * 
+	 * <p>The script file is a database of all triggers of a a certain map. All scripts within the file can only be triggered by that area.</p>
+	 * 
+	 * <p>Currently needs fixing and testing. Will be completed when all issues have been sorted out.</p>
+	 * 
+	 * @param filename - A String object of the file name of the SCRIPT file.
+	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located within the SCRIPT file.
+	 * 
+	 * */
 	public static ArrayList<Script> loadScript(String filename) {
 		ArrayList<Script> result = new ArrayList<Script>();
 		
