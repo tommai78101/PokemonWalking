@@ -113,7 +113,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.clearButton.setMinimumSize(size);
 		this.clearButton.setPreferredSize(size);
 		panel.add(clearButton);
-		
+		 
 		this.add(panel);
 	}
 	
