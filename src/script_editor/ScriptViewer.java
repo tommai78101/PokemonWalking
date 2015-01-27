@@ -13,6 +13,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -31,6 +32,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 	private JScrollPane scrollPane;
 	private JButton createButton;
 	private JButton removeButton;
+	private JButton clearButton;
 	private Trigger selectedTrigger;
 	@SuppressWarnings("unused")
 	private int iterator;
@@ -101,6 +103,17 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.removeButton.setPreferredSize(size);
 		panel.add(removeButton);
 		
+		panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+		
+		this.clearButton = new JButton("Clear");
+		this.clearButton.setActionCommand(Integer.toString(2));
+		this.clearButton.addActionListener(this);
+		this.clearButton.setSize(size);
+		this.clearButton.setMaximumSize(size);
+		this.clearButton.setMinimumSize(size);
+		this.clearButton.setPreferredSize(size);
+		panel.add(clearButton);
+		
 		this.add(panel);
 	}
 	
@@ -143,6 +156,12 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 					this.model.remove(index);
 				else if (!this.model.isEmpty())
 					this.model.remove(this.model.getSize() - 1);
+				break;
+			}
+			case 2: {
+				while (!this.model.isEmpty()){
+					this.model.remove(0);
+				}
 				break;
 			}
 		}
