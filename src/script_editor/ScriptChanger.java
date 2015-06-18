@@ -396,6 +396,27 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				}
 			}
 		}
+		else if (lastCharacter.equals("")){
+			area.append("^");
+			switch (event.getActionCommand()) {
+				case UP: {
+					defaultInputChange(doc, area, "U");
+					break;
+				}
+				case DOWN: {
+					defaultInputChange(doc, area, "D");
+					break;
+				}
+				case LEFT: {
+					defaultInputChange(doc, area, "L");
+					break;
+				}
+				case RIGHT: {
+					defaultInputChange(doc, area, "R");
+					break;
+				}
+			}
+		}
 		else {
 			area.append("\n^");
 			switch (event.getActionCommand()) {
