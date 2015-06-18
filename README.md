@@ -63,7 +63,7 @@ http://www.gfycat.com/ShabbySoupyDobermanpinscher
 
 ===
 
-![Imgur](http://i.imgur.com/m13jfwm.png)
+![Imgur](http://i.imgur.com/u8xYVVc.png)
 
 ### Level Editor
 
@@ -113,6 +113,28 @@ http://www.gfycat.com/WeepyUnsightlyFairybluebird
 
 http://www.gfycat.com/FamiliarUncommonIndianabat
 
+
+===
+
+![Imgur](http://i.imgur.com/6Tcdi5a.png)
+
+### Script Editor
+
+===
+
+**Abstract:**
+
+A script editor. Users can create custom scripts that controls the aspects in a map.
+
+===
+
+**Description:**
+
+This script editor is part of the level editor that comes with the game. 
+
+Its purposes is used for simple script creations, allowing the users to create custom scripts for players to interact in their custom maps. The user can save, load, and create custom scripts with the help of its graphical user interface. The interface is designed intuitively for users to quickly create scripts.
+
+Scripts are what will become Triggers and Events that the game will have in the maps. Currently, Triggers and Events are not yet completed. Stay tuned.
 
 ===
 
