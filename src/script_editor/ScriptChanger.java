@@ -30,21 +30,21 @@ import editor.Trigger;
 
 public class ScriptChanger extends JPanel implements ActionListener, DocumentListener {
 	private static final long serialVersionUID = 1L;
-	
+
 	private final ScriptEditor editor;
-	
+
 	private JTextField nameField, idField;
 	private JButton upButton, downButton, leftButton, rightButton;
 	private JButton questionDialogue, affirmativeDialogue, negativeDialogue, speechDialogue;
 	private JTextArea scriptArea;
 	private boolean allowUpdate;
 	private int movementCounter = 0;
-	
+
 	private static final String UP = "UP";
 	private static final String DOWN = "DOWN";
 	private static final String LEFT = "LEFT";
 	private static final String RIGHT = "RIGHT";
-	
+
 	private ActionListener dialogueActions = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent event) {
@@ -82,14 +82,14 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			}
 		}
 	};
-	
+
 	public ScriptChanger(ScriptEditor editor) {
 		super();
 		this.editor = editor;
-		
+
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		
+
 		// First row
 		c.gridx = 0;
 		c.gridy = 0;
@@ -98,7 +98,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("Name: "), c);
-		
+
 		c.gridx = 1;
 		c.gridy = 0;
 		c.gridwidth = 1;
@@ -107,7 +107,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((nameField = new JTextField()), c);
 		nameField.getDocument().addDocumentListener(this);
-		
+
 		// // Second row
 		// c.gridx = 0;
 		// c.gridy = 1;
@@ -143,7 +143,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		// c.fill = GridBagConstraints.HORIZONTAL;
 		// this.add((yField = new JTextField()), c);
 		// yField.getDocument().addDocumentListener(this);
-		
+
 		// Fourth row
 		c.gridx = 0;
 		c.gridy = 3;
@@ -152,7 +152,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("ID Value: "), c);
-		
+
 		c.gridx = 1;
 		c.gridy = 3;
 		c.gridwidth = 1;
@@ -161,7 +161,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((idField = new JTextField()), c);
 		idField.getDocument().addDocumentListener(this);
-		
+
 		// Empty panel for adding spaces only.
 		c.gridx = 0;
 		c.gridy = 4;
@@ -171,7 +171,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.fill = GridBagConstraints.BOTH;
 		c.anchor = GridBagConstraints.CENTER;
 		this.add(constructScripts(), c);
-		
+
 		// Fifth row (panel)
 		c.gridx = 0;
 		c.gridy = 5;
@@ -180,7 +180,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.weighty = 0.5;
 		c.anchor = GridBagConstraints.CENTER;
 		this.add(constructDirections(), c);
-		
+
 		c.gridx = 1;
 		c.gridy = 5;
 		c.gridwidth = 1;
@@ -188,18 +188,18 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.weighty = 0.5;
 		c.anchor = GridBagConstraints.CENTER;
 		this.add(constructDialogues(), c);
-		
+
 		this.setBorder(BorderFactory.createTitledBorder("Trigger:"));
 		this.validate();
 	}
-	
+
 	private JPanel constructDirections() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		
+
 		final Dimension size = new Dimension(30, 10);
 		final Insets inset = new Insets(0, 1, 0, 1);
-		
+
 		JPanel top = new JPanel();
 		top.setLayout(new BoxLayout(top, BoxLayout.X_AXIS));
 		upButton = new JButton("Up");
@@ -208,7 +208,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		upButton.addActionListener(this);
 		upButton.setActionCommand(UP);
 		top.add(upButton);
-		
+
 		JPanel across = new JPanel();
 		across.setLayout(new BoxLayout(across, BoxLayout.X_AXIS));
 		leftButton = new JButton("Left");
@@ -229,13 +229,13 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		across.add(leftButton);
 		across.add(downButton);
 		across.add(rightButton);
-		
+
 		panel.add(top);
 		panel.add(across);
 		panel.setBorder(BorderFactory.createTitledBorder("Movements:"));
 		return panel;
 	}
-	
+
 	private JPanel constructDialogues() {
 		final Insets inset = new Insets(0, 1, 0, 1);
 		JPanel panel = new JPanel();
@@ -266,12 +266,12 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		negativeDialogue.setActionCommand("-");
 		negativeDialogue.addActionListener(dialogueActions);
 		panel.add(negativeDialogue);
-		
+
 		panel.validate();
 		panel.setBorder(BorderFactory.createTitledBorder("Dialogues (Hover for hints):"));
 		return panel;
 	}
-	
+
 	private JPanel constructScripts() {
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
@@ -283,35 +283,35 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		panel.setBorder(BorderFactory.createTitledBorder("Script:"));
 		return panel;
 	}
-	
+
 	public JTextField getNameField() {
 		return this.nameField;
 	}
-	
+
 	// public JTextField getXField() {
 	// return this.xField;
 	// }
-	
+
 	// public JTextField getYField() {
 	// return this.yField;
 	// }
-	
+
 	public JTextField getIDField() {
 		return this.idField;
 	}
-	
+
 	public JTextArea getScriptArea() {
 		return this.scriptArea;
 	}
-	
+
 	public void allowFieldsToUpdate() {
 		this.allowUpdate = true;
 	}
-	
+
 	public void disallowFieldsToUpdate() {
 		this.allowUpdate = false;
 	}
-	
+
 	public void clear() {
 		nameField.setText("");
 		// xField.setText("");
@@ -319,7 +319,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		idField.setText("");
 		scriptArea.setText("");
 	}
-	
+
 	// ActionListener
 	@Override
 	public void actionPerformed(ActionEvent event) {
@@ -330,7 +330,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		try {
 			lastDirection = doc.getText(area.getCaretPosition() - 2, 1);
 			lastCharacter = doc.getText(area.getCaretPosition() - 1, 1);
-			if (lastDirection.equals("\n")){
+			if (lastDirection.equals("\n")) {
 				System.out.println("__" + lastCharacter + "__LINEBREAK__");
 			}
 			else {
@@ -423,7 +423,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			}
 		}
 	}
-	
+
 	private void inputChange(PlainDocument doc, JTextArea area, String directionToCompare) {
 		try {
 			String str = doc.getText(doc.getLength() - 2, 1);
@@ -447,17 +447,17 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void defaultInputChange(PlainDocument doc, JTextArea area, String directionToCompare) {
 		movementCounter = 0;
 		area.append(directionToCompare + Integer.toString(movementCounter));
 	}
-	
+
 	// DocumentListener
 	@Override
 	public void changedUpdate(DocumentEvent event) {
 	}
-	
+
 	// DocumentListener
 	@Override
 	public void insertUpdate(DocumentEvent event) {
@@ -465,7 +465,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			Trigger selectedTrigger = editor.scriptViewer.getSelectedTrigger();
 			if (selectedTrigger != null) {
 				String test = "";
-				
+
 				try {
 					test = editor.scriptChanger.getNameField().getText();
 					if (!test.isEmpty() || !test.equals(""))
@@ -473,7 +473,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				}
 				catch (Exception e) {
 				}
-				
+
 				// try {
 				// test = editor.scriptChanger.getXField().getText();
 				// if (!test.isEmpty() || !test.equals("")) {
@@ -510,7 +510,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				// }
 				// });
 				// }
-				
+
 				try {
 					test = editor.scriptChanger.getIDField().getText();
 					if (!test.isEmpty() || !test.equals("")) {
@@ -529,7 +529,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 						}
 					});
 				}
-				
+
 				try {
 					test = editor.scriptChanger.getScriptArea().getText();
 					if (!test.isEmpty() || !test.equals(""))
@@ -537,7 +537,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				}
 				catch (Exception e) {
 				}
-				
+
 				JList<Trigger> list = editor.scriptViewer.getTriggerList();
 				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) list.getModel();
 				model.setElementAt(selectedTrigger, list.getSelectedIndex());
@@ -555,7 +555,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			}
 		}
 	}
-	
+
 	// DocumentListener
 	@Override
 	public void removeUpdate(DocumentEvent event) {
@@ -577,7 +577,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				test = editor.scriptChanger.getScriptArea().getText();
 				if (!test.isEmpty() || !test.equals(""))
 					selectedTrigger.setScript(test);
-				
+
 				JList<Trigger> list = editor.scriptViewer.getTriggerList();
 				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) list.getModel();
 				model.setElementAt(selectedTrigger, list.getSelectedIndex());
