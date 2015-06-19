@@ -330,7 +330,12 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		try {
 			lastDirection = doc.getText(area.getCaretPosition() - 2, 1);
 			lastCharacter = doc.getText(area.getCaretPosition() - 1, 1);
-			System.out.println("__" + lastCharacter + "__" + lastDirection + "__");
+			if (lastDirection.equals("\n")){
+				System.out.println("__" + lastCharacter + "__LINEBREAK__");
+			}
+			else {
+				System.out.println("__" + lastCharacter + "__" + lastDirection + "__");
+			}
 		}
 		catch (BadLocationException e) {
 			lastCharacter = "";
@@ -375,28 +380,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				}
 			}
 		}
-		else if (lastCharacter.equals("\n")) {
-			area.append("^");
-			switch (event.getActionCommand()) {
-				case UP: {
-					defaultInputChange(doc, area, "U");
-					break;
-				}
-				case DOWN: {
-					defaultInputChange(doc, area, "D");
-					break;
-				}
-				case LEFT: {
-					defaultInputChange(doc, area, "L");
-					break;
-				}
-				case RIGHT: {
-					defaultInputChange(doc, area, "R");
-					break;
-				}
-			}
-		}
-		else if (lastCharacter.equals("")){
+		else if (lastCharacter.equals("\n") || lastCharacter.equals("")) {
 			area.append("^");
 			switch (event.getActionCommand()) {
 				case UP: {

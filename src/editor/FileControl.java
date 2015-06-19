@@ -145,7 +145,7 @@ public class FileControl extends JPanel implements ActionListener {
 				}
 				case 2: { // Open
 					RandomAccessFile raf = null;
-					String backupPath = LevelEditor.SAVED_PATH_DATA;
+					//String backupPath = LevelEditor.SAVED_PATH_DATA;
 					try {
 						raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
 						FileControl.lastSavedDirectory = new File(raf.readLine());
