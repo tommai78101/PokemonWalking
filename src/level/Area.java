@@ -23,11 +23,11 @@ public class Area {
 	private final int width;
 	private final int height;
 	private final int[] pixels;
-	
+
 	private int xPlayerPosition;
 	private int yPlayerPosition;
 	private Player player;
-	
+
 	private boolean isInWarpZone;
 	private boolean isInSectorPoint;
 	private PixelData currentPixelData;
@@ -35,16 +35,16 @@ public class Area {
 	private int sectorID;
 	// TODO: Add area type.
 	// private int areaType;
-	
+
 	private boolean displayExitArrow;
 	private boolean triggerIsBeingTriggered;
 	private TriggerData trigger;
-	
+
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
 	private final ArrayList<Obstacle> areaObstacles = new ArrayList<Obstacle>();
 	private final ArrayList<PixelData> modifiedAreaData = new ArrayList<PixelData>();
 	private final ArrayList<TriggerData> triggerDatas = new ArrayList<TriggerData>();
-	
+
 	public Area(BaseBitmap bitmap, final int areaID) {
 		int[] tempPixels = bitmap.getPixels();
 		int triggerSize = tempPixels[0];
@@ -67,7 +67,7 @@ public class Area {
 		this.height = bitmap.getHeight() - row;
 		this.pixels = new int[this.width * this.height];
 		System.arraycopy(bitmap.getPixels(), this.width * row, this.pixels, 0, this.pixels.length);
-		
+
 		for (int y = 0; y < this.height; y++) {
 			areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
@@ -78,26 +78,26 @@ public class Area {
 				areaData.get(y).add(px);
 			}
 		}
-		
+
 		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInSectorPoint = false;
 		this.displayExitArrow = false;
 		this.triggerIsBeingTriggered = false;
 	}
-	
+
 	public void setPlayer(Player player) {
 		this.player = player;
 	}
-	
+
 	public int getWidth() {
 		return this.width;
 	}
-	
+
 	public int getHeight() {
 		return this.height;
 	}
-	
+
 	/**
 	 * Updates the area.
 	 * 
@@ -107,7 +107,7 @@ public class Area {
 		// Since "setPlayer" method isn't always set, there should be checks everywhere to make sure "player" isn't null.
 		if (this.player != null) {
 			// PixelData data = null;
-			
+
 			if (this.triggerIsBeingTriggered) {
 				xPlayerPosition = player.getXInArea();
 				yPlayerPosition = player.getYInArea();
@@ -118,16 +118,16 @@ public class Area {
 			}
 			if (!this.triggerIsBeingTriggered && trigger == null && !this.player.isLockedWalking())
 				trigger = checkForTrigger(xPlayerPosition, yPlayerPosition);
-			if (!this.triggerIsBeingTriggered && trigger != null && !this.player.isLockedWalking())
+			if (!this.triggerIsBeingTriggered && trigger != null && !this.player.isLockedWalking()) {
 				this.triggerIsBeingTriggered = true;
-			if (this.triggerIsBeingTriggered && trigger != null && !this.player.isLockedWalking())
 				handleTriggerActions();
+			}
 			else if (!this.triggerIsBeingTriggered)
 				handlePlayerActions();
-			
+
 		}
 	}
-	
+
 	private void handleTriggerActions() {
 		if (!trigger.isFinished()) {
 			this.player.enableAutomaticMode();
@@ -139,7 +139,7 @@ public class Area {
 			trigger = null;
 		}
 	}
-	
+
 	private void handlePlayerActions() {
 		if (!this.player.isLockedWalking()) {
 			xPlayerPosition = player.getXInArea();
@@ -164,7 +164,7 @@ public class Area {
 			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 		}
 	}
-	
+
 	private TriggerData checkForTrigger(int playerX, int playerY) {
 		for (TriggerData t : this.triggerDatas) {
 			if (t.x == playerX && t.y == playerY && (!t.isFinished() || t.isOnRepeat())) {
@@ -174,7 +174,7 @@ public class Area {
 		}
 		return null;
 	}
-	
+
 	private void handleSurroundingTiles() {
 		this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
 		try {
@@ -198,13 +198,13 @@ public class Area {
 		catch (Exception e) {
 			this.player.stopInteraction();
 		}
-		
+
 		// Target pixel is used to determine what pixel the player is currently standing on
 		// (or what pixel the player is currently on top of).
 		this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
 		this.checkCurrentPositionDataAndSetProperties();
 	}
-	
+
 	/**
 	 * Checks the pixel data the player is currently on, and sets the tile properties according to the documentation provided. The tile the pixel data is representing determines the properties this will set, and will affect how the game interacts with the player.
 	 * 
@@ -290,7 +290,7 @@ public class Area {
 				break;
 		}
 	}
-	
+
 	/**
 	 * Checks the pixel data and sets properties according to the documentation provided. The tile the pixel data is representing determines whether it should allow or block the player from walking towards it.
 	 * 
@@ -374,7 +374,7 @@ public class Area {
 						case 0x07: // Bottom Right
 							// TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!
 							return false;
-							
+
 							// ------------------------- MOUNTAIN LEDGES ------------------------
 						case 0x0C:
 							int y = this.yPlayerPosition + yOffset;
@@ -416,6 +416,7 @@ public class Area {
 				case 0x08: // House
 					return true;
 				case 0x09: // House Door
+					// TODO (6/18/2015): Door needs to be checked for null areas. If null areas are found, default to locked doors.
 					return false;
 				case 0x0A: // Item
 					if (this.player.isInteracting())
@@ -438,7 +439,7 @@ public class Area {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * Renders the bitmap tiles based on the given pixel data.
 	 * 
@@ -465,47 +466,46 @@ public class Area {
 				data.tick();
 			}
 		}
-		
+
 		if (this.trigger != null) {
 			screen.setOffset(0, 0);
 			this.trigger.render(screen, screen.getBufferedImage().createGraphics());
 			screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
 		}
 	}
-	
+
 	// Getters/Setters
 	public int getPlayerX() {
 		return this.player.getX();
 	}
-	
+
 	public int getPlayerXInArea() {
 		return this.player.getXInArea();
 	}
-	
+
 	public void setPlayerX(int x) {
 		this.xPlayerPosition = x;
 	}
-	
+
 	public void setSectorID(int value) {
 		this.sectorID = value;
 	}
-	
+
 	public int getPlayerY() {
 		return this.player.getY();
 	}
-	
+
 	public int getPlayerYInArea() {
 		return this.player.getYInArea();
 	}
-	
+
 	public void setPlayerY(int y) {
 		this.yPlayerPosition = y;
 	}
-	
+
 	public void setDebugDefaultPosition() {
 		// When the game starts from the very beginning, the player must always start from the very first way point.
-		SET_LOOP:
-		for (ArrayList<PixelData> y : this.areaData) {
+		SET_LOOP: for (ArrayList<PixelData> y : this.areaData) {
 			for (PixelData x : y) {
 				if (((x.getColor() >> 24) & 0xFF) == 0x0D) {
 					player.setAreaPosition(x.xPosition, x.yPosition);
@@ -516,7 +516,7 @@ public class Area {
 			}
 		}
 	}
-	
+
 	/**
 	 * Sets the player's position according to the given warp point pixel data.
 	 * 
@@ -542,32 +542,32 @@ public class Area {
 				this.player.setAreaPosition(xPlayerPosition, yPlayerPosition);
 				break;
 			}
-			
+
 		}
 	}
-	
+
 	public boolean playerIsInWarpZone() {
 		return this.isInWarpZone;
 	}
-	
+
 	public void playerWentPastWarpZone() {
 		this.isInWarpZone = false;
 	}
-	
+
 	public PixelData getCurrentPixelData() {
 		// Return the pixel data the player is currently on top of.
 		return this.currentPixelData;
 		// return this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 	}
-	
+
 	public int getAreaID() {
 		return this.areaID;
 	}
-	
+
 	public boolean playerIsInConnectionPoint() {
 		return this.isInSectorPoint;
 	}
-	
+
 	public boolean playerHasLeftConnectionPoint() {
 		if (this.isInSectorPoint) {
 			if (this.player.isLockedWalking()) {
@@ -577,11 +577,11 @@ public class Area {
 		}
 		return false;
 	}
-	
+
 	public int getSectorID() {
 		return this.sectorID;
 	}
-	
+
 	/**
 	 * Obtains the tile ID of the tile being offset by the player's position.
 	 * 
@@ -604,7 +604,7 @@ public class Area {
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that the player is allowed to walk on, or when the conditions are right for the player to move on the tile.
 	 * 
@@ -625,7 +625,7 @@ public class Area {
 		}
 		return result;
 	}
-	
+
 	public int getTileColor(int xOffset, int yOffset) {
 		PixelData data;
 		try {
@@ -639,54 +639,54 @@ public class Area {
 		}
 		return 0;
 	}
-	
+
 	public void setPixelData(PixelData data, int xPosition, int yPosition) {
 		data.xPosition = xPosition;
 		data.yPosition = yPosition;
 		this.areaData.get(yPosition).set(xPosition, data);
 		this.modifiedAreaData.add(data);
 	}
-	
+
 	public void loadModifiedPixelDataList() {
 		for (PixelData px : this.modifiedAreaData) {
 			this.areaData.get(px.yPosition).set(px.xPosition, px);
 		}
 	}
-	
+
 	public ArrayList<PixelData> getModifiedPixelDataList() {
 		return this.modifiedAreaData;
 	}
-	
+
 	public PixelData getPixelData(int x, int y) {
 		return this.areaData.get(y).get(x);
 	}
-	
+
 	public ArrayList<ArrayList<PixelData>> getAllPixelDatas() {
 		return this.areaData;
 	}
-	
+
 	public boolean isDisplayingExitArrow() {
 		return this.displayExitArrow;
 	}
-	
+
 	public ArrayList<Obstacle> getObstaclesList() {
 		return this.areaObstacles;
 	}
-	
+
 	public Player getPlayer() {
 		return this.player;
 	}
-	
+
 	public TriggerData getTriggerData() {
 		return this.trigger;
 	}
-	
+
 	public boolean isBeingTriggered() {
 		return this.triggerIsBeingTriggered;
 	}
-	
+
 	// --------------------- PRIVATE METHODS ----------------------
-	
+
 	private void renderExitArrow(BaseScreen screen, int xOff, int yOff, PixelData data, int x, int y) {
 		int height = this.getHeight();
 		if (y + 1 == height && this.player.getFacing() == Player.DOWN) {
@@ -699,5 +699,5 @@ public class Area {
 		else
 			this.displayExitArrow = false;
 	}
-	
+
 }

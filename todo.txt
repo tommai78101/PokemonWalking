@@ -1,8 +1,14 @@
 By line order (Specific --> Abstract):
 
+BEFORE CONTINUING WITH THIS LIST OF TODOs:
+
+Open the project and look at the Tasks view. That contains the full list of
+things needed to be done. Contains (FIXME) and (TODO).
+
 
 TOP PRIORITY:
 	├ Must find all bugs related to bitmap tile collision properties.
+		├ Door needs to be blocking if there is no area to walk to.
 
 Add debug messages throughout the entire project. Log messages to be exact.
 Work on scripted events.
