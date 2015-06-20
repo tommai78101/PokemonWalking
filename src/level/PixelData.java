@@ -290,7 +290,7 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				// TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
 				// TODO: Create more biome bitmaps.
-				// FIXME (6/19/2015): 0x05000003 is a water tile in the level editor, but it's really not a water tile.
+				// TODO (6/19/2015): 0x05000003 is a water tile in the level editor, but it's really not a water tile.
 				this.bitmap[0] = Art.grass;
 				break;
 			case 0x06: // Stairs
@@ -325,7 +325,7 @@ public class PixelData {
 			case 0x07: { // Water
 				// Always start with the first frame of any animation.
 				// TODO: Add more water tiles with borders.
-				// TODO: (6/19/2015): Make the borders a bit more thicker. Possibly the land border near the edges of the water tiles.
+				// TODO (6/19/2015): Make the borders a bit more thicker. Possibly the land border near the edges of the water tiles.
 				switch (red) {
 					case 0x00: // Pure water, no border.
 						this.bitmap = Art.water;

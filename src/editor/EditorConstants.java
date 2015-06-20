@@ -28,49 +28,44 @@ import javax.swing.JButton;
 import abstracts.Tile;
 
 public class EditorConstants {
-	
 	// TODO: Add additional pixel data properties that can be edited/modified for the area.
-	
-	// private final ArrayList<Map.Entry<Integer, Data>> tileList;
-	// private final ArrayList<Map.Entry<Integer, String>> categories;
-	
 	private final ArrayList<Category> categories = new ArrayList<Category>();
 	private final ArrayList<Map.Entry<Integer, Data>> datas = new ArrayList<Map.Entry<Integer, Data>>();
 	private final ArrayList<Trigger> triggers = new ArrayList<Trigger>();
-	
+
 	private static final EditorConstants instance = new EditorConstants();
-	
+
 	public static final Color GRASS_GREEN = new Color(164, 231, 103);
 	public static final Color ROAD_WHITE = new Color(255, 244, 201);
 	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
-	
+
 	public static enum Tools {
 		ControlPanel, Properties
 	};
-	
+
 	public static enum Metadata {
 		Pixel_Data("Pixel Data"), Triggers("Triggers");
-		
+
 		private String name;
-		
+
 		private Metadata(String text) {
 			this.name = text;
 		}
-		
+
 		public String getName() {
 			return this.name;
 		}
 	};
-	
+
 	public static Tools chooser = Tools.ControlPanel;
 	public static Metadata metadata = Metadata.Pixel_Data;
-	
+
 	private EditorConstants() {
 		loadTilesetData();
 		loadTriggers();
 	}
-	
+
 	private void loadTilesetData() {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
@@ -147,17 +142,17 @@ public class EditorConstants {
 					data.image = new ImageIcon(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
 					data.button = new JButton(data.image) {
 						private static final long serialVersionUID = 1L;
-						
+
 						@Override
 						public Dimension getMinimumSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
 						}
-						
+
 						@Override
 						public Dimension getSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
 						}
-						
+
 						@Override
 						public Dimension getPreferredSize() {
 							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
@@ -175,7 +170,7 @@ public class EditorConstants {
 					temp.clear();
 				}
 			}
-			
+
 			Collections.sort(this.datas, new Comparator<Map.Entry<Integer, Data>>() {
 				@Override
 				public int compare(Map.Entry<Integer, Data> d1, Map.Entry<Integer, Data> d2) {
@@ -186,7 +181,7 @@ public class EditorConstants {
 					return 0;
 				}
 			});
-			
+
 			Collections.sort(this.categories, new Comparator<Category>() {
 				@Override
 				public int compare(Category d1, Category d2) {
@@ -197,13 +192,13 @@ public class EditorConstants {
 					return 0;
 				}
 			});
-			
+
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void loadTriggers() {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("script/scripts.txt")));
@@ -219,7 +214,7 @@ public class EditorConstants {
 					if (value != 0) {
 						trigger.setTriggerID((short) (value & 0xFFFF));
 					}
-					
+
 				}
 				else if (line.startsWith("@")) {
 					if (trigger != null)
@@ -235,23 +230,23 @@ public class EditorConstants {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static EditorConstants getInstance() {
 		return instance;
 	}
-	
+
 	public ArrayList<Category> getCategories() {
 		return this.categories;
 	}
-	
+
 	public ArrayList<Map.Entry<Integer, Data>> getDatas() {
 		return this.datas;
 	}
-	
+
 	public ArrayList<Trigger> getTriggers() {
 		return this.triggers;
 	}
-	
+
 	public static Data getData(int alpha, int red, int green, int blue) {
 		ArrayList<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().datas;
 		Data temp = null;

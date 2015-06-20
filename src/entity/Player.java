@@ -226,7 +226,6 @@ public class Player extends Entity {
 							if (!this.enableInteraction)
 								this.enableInteraction = true;
 						}
-						// }
 						if (this.enableInteraction) {
 							this.interactionID = dataColor;
 						}
