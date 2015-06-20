@@ -12,7 +12,10 @@ package saving;
 
 import item.ItemText;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -41,46 +44,46 @@ public class GameSave {
 	 * All saving/loading schemes use the documentation as guidelines. It will be changed in the future, as the development continues.
 	 */
 	public static final byte[] SIGNATURE = new byte[] { (byte) 137, 0x53, 0x41, 0x56, 0x20, 0x20, 0x20, 0x20 };
-	
+
 	public HeaderInfo headerInfo;
 	public PlayerInfo playerInfo;
 	public AreaInfo areaInfo;
-	
+
 	private GameSave() {
 		headerInfo = new HeaderInfo();
 		playerInfo = new PlayerInfo();
 		areaInfo = new AreaInfo();
 	}
-	
+
 	private void write(RandomAccessFile raf) throws IOException {
 		raf.seek(0);
 		headerInfo.write(raf);
 		playerInfo.write(raf);
 		areaInfo.write(raf);
 	}
-	
+
 	private void read(RandomAccessFile raf) throws IOException {
 		raf.seek(0);
 		headerInfo.read(raf);
 		playerInfo.read(raf);
 		areaInfo.read(raf);
 	}
-	
+
 	private void generateSaveData(Game game) {
 		Player gamePlayer = game.getPlayer();
 		if (this.playerInfo != null)
 			this.playerInfo.reset();
-		
+
 		// Name of the player.
 		System.arraycopy(gamePlayer.getByteName(), 0, this.playerInfo.player_name, 0, 16); // 16 is the name length limit.
 		byte[] byteArray = concatenate(PlayerInfo.NAME, gamePlayer.getByteName());
 		this.playerInfo.increment(concatenate(new byte[] { 0x0 }, byteArray));
-		
+
 		// Gender of the player.
 		System.arraycopy(gamePlayer.getByteGender(), 0, this.playerInfo.player_gender, 0, 1); // 1 is the gender boolean size.
 		byteArray = concatenate(PlayerInfo.GNDR, gamePlayer.getByteGender());
 		this.playerInfo.increment(concatenate(new byte[] { 0x0 }, byteArray));
-		
+
 		// All active submenus the player has unlocked.
 		byteArray = new byte[] {};
 		List<Map.Entry<Integer, SubMenu>> startMenuList = game.getStartMenu().getSubMenusList();
@@ -90,7 +93,7 @@ public class GameSave {
 			this.playerInfo.startMenu.add(sub.getSubMenuData());
 		}
 		this.playerInfo.increment(concatenate(new byte[] { 0x0 }, concatenate(PlayerInfo.MENU, byteArray)));
-		
+
 		// Inventory
 		byte listType = 0x1;
 		this.playerInfo.increment(concatenate(new byte[] { 0x0 }, PlayerInfo.ITEM));
@@ -117,7 +120,7 @@ public class GameSave {
 				listType++;
 			}
 		}
-		
+
 		// Current Area & Player State
 		Area currentArea = game.getWorld().getCurrentArea();
 		byte[] bufArea = ByteBuffer.allocate(4).putInt(currentArea.getAreaID()).array();
@@ -138,17 +141,17 @@ public class GameSave {
 		// Size of total AreaInfo chunk + size of AreaInfo header chunk for the two 0x0s.
 		this.areaInfo.increment(concatenate(concatenate(new byte[] { 0x0, 0x0 }, AreaInfo.AREA), byteArray));
 		bufArea = bufSector = null;
-		
+
 		byteArray = new byte[] {};
 		byteArray = concatenate(byteArray, bufX);
 		byteArray = concatenate(byteArray, bufY);
 		this.playerInfo.increment(concatenate(concatenate(new byte[] { 0x0 }, PlayerInfo.AXIS), byteArray));
 		bufX = bufY = null;
-		
+
 		// Player State
 		this.playerInfo.increment(concatenate(concatenate(new byte[] { 0x0 }, PlayerInfo.TURN), bufFacing));
 		bufFacing = null;
-		
+
 		// Area Data
 		byteArray = new byte[] {};
 		List<Area> areaList = game.getWorld().getAllAreas();
@@ -156,13 +159,7 @@ public class GameSave {
 			ArrayList<PixelData> pixelList = area.getModifiedPixelDataList();
 			if (!pixelList.isEmpty()) {
 				for (PixelData px : pixelList) {
-					byte[] pixelArray = ByteBuffer.allocate(4 * 5)
-							.putInt(area.getAreaID())
-							.putInt(area.getSectorID())
-							.putInt(px.xPosition)
-							.putInt(px.yPosition)
-							.putInt(px.getColor())
-							.array();
+					byte[] pixelArray = ByteBuffer.allocate(4 * 5).putInt(area.getAreaID()).putInt(area.getSectorID()).putInt(px.xPosition).putInt(px.yPosition).putInt(px.getColor()).array();
 					this.areaInfo.changedPixelData.add(pixelArray);
 					byteArray = concatenate(byteArray, pixelArray);
 				}
@@ -170,17 +167,17 @@ public class GameSave {
 			}
 		}
 	}
-	
+
 	private void generateLoadData(Game game) throws Exception {
-		//Get Player
+		// Get Player
 		Player gamePlayer = game.getPlayer();
-		
+
 		// Get name
 		gamePlayer.setName(new String(this.playerInfo.player_name));
-		
+
 		// Get gender
 		gamePlayer.setGender(this.playerInfo.player_gender[0] == 0x1 ? Boolean.TRUE.booleanValue() : Boolean.FALSE.booleanValue());
-		
+
 		// Get menu options.
 		if (!game.getStartMenu().getSubMenusList().isEmpty())
 			game.getStartMenu().getSubMenusList().clear();
@@ -198,7 +195,7 @@ public class GameSave {
 					break;
 			}
 		}
-		
+
 		// Get inventory items
 		Inventory inventory = game.getStartMenu().getInventory();
 		for (int k = 0; k < this.playerInfo.getAllItemsList().size(); k++) {
@@ -213,7 +210,7 @@ public class GameSave {
 				int id = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
 				offset += 4;
 				int quantity = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8) | data[offset + 3];
-				
+
 				ItemText itemText = null;
 				ArrayList<Map.Entry<ItemText, Item>> itemList = WorldConstants.items;
 				for (Map.Entry<ItemText, Item> e : itemList) {
@@ -222,12 +219,12 @@ public class GameSave {
 						break;
 					}
 				}
-				for (; quantity > 0; quantity--){
+				for (; quantity > 0; quantity--) {
 					inventory.addItem(itemText);
 				}
 			}
 		}
-		
+
 		// Get current area
 		// TODO: Probably need to set world ID first before setting the current area ID and SECTOR.
 		int currentAreaID = (this.areaInfo.current_area_id[0] & 0xFF) << 24 | (this.areaInfo.current_area_id[1] & 0xFF) << 16 | (this.areaInfo.current_area_id[2] & 0xFF) << 8 | (this.areaInfo.current_area_id[3] & 0xFF);
@@ -236,7 +233,7 @@ public class GameSave {
 			throw new Exception("There is no area set.");
 		int currentSectorID = (this.areaInfo.current_area_sector_id[0] & 0xFF) << 24 | (this.areaInfo.current_area_sector_id[1] & 0xFF) << 16 | (this.areaInfo.current_area_sector_id[2] & 0xFF) << 8 | this.areaInfo.current_area_sector_id[3] & 0xFF;
 		game.getWorld().getCurrentArea().setSectorID(currentSectorID);
-		
+
 		// Get Player Position
 		int x = (this.playerInfo.player_x[0] << 24) | (this.playerInfo.player_x[1] << 16) | (this.playerInfo.player_x[2] << 8) | this.playerInfo.player_x[3];
 		int y = (this.playerInfo.player_y[0] << 24) | (this.playerInfo.player_y[1] << 16) | (this.playerInfo.player_y[2] << 8) | this.playerInfo.player_y[3];
@@ -244,11 +241,11 @@ public class GameSave {
 		game.getWorld().getCurrentArea().setPlayerX(x);
 		game.getWorld().getCurrentArea().setPlayerY(y);
 		game.getWorld().getCurrentArea().setPlayer(game.getPlayer());
-		
+
 		// Get Player direction facing.
 		int facing = (this.playerInfo.player_facing[0] & 0xFF) << 24 | (this.playerInfo.player_facing[1] & 0xFF) << 16 | (this.playerInfo.player_facing[2] & 0xFF) << 8 | this.playerInfo.player_facing[3] & 0xFF;
 		game.getPlayer().setFacing(facing);
-		
+
 		// Get modified pixel data for all areas.
 		if (this.areaInfo.changedPixelData.size() > 0) {
 			List<Area> loadedAreas = game.getWorld().getAllAreas();
@@ -257,21 +254,20 @@ public class GameSave {
 				int offset = 0;
 				int areaID = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 				offset += 4;
-				
+
 				// Currently, unknown use at the moment.
 				@SuppressWarnings("unused")
 				int sectorID = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 				offset += 4;
-				
-				LOADED_AREA:
-				for (Area area : loadedAreas) {
+
+				LOADED_AREA: for (Area area : loadedAreas) {
 					if (areaID == area.getAreaID()) {
 						int xPixelData = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 						offset += 4;
 						int yPixelData = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 						offset += 4;
 						int color = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16 | (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
-						
+
 						PixelData pxData = new PixelData(color, xPixelData, yPixelData);
 						area.getModifiedPixelDataList().add(pxData);
 						area.loadModifiedPixelDataList();
@@ -281,9 +277,9 @@ public class GameSave {
 			}
 			game.getWorld().refresh();
 		}
-		
+
 	}
-	
+
 	public static void save(Game game, String filename) {
 		GameSave data = new GameSave();
 		data.generateSaveData(game);
@@ -309,9 +305,9 @@ public class GameSave {
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
-	
+
 	public static void load(Game game, String filename) {
 		File load = new File(filename);
 		if (load.isFile()) {
@@ -335,23 +331,91 @@ public class GameSave {
 			}
 		}
 	}
-	
+
 	/**
-	 * Checks to see if the game saved data exists in relative to where the game is located.
+	 * Checks to see if the game saved data exists in relative to where the game is located. The save data is a SAV binary format file.
 	 * 
 	 * <p>
 	 * Note that {@link java.io.File#isFile() File.isFile()} is used to check for saved data that is generated by the game. This is because the saved data file generated by the game is a <i>normal</i> file.
+	 * 
+	 * <p>
+	 * For more information on the file format, please read the documentation provided.
 	 * 
 	 * @param filename
 	 *            The file name of the saved data.
 	 * @return True, if the saved data file exists. False, if otherwise.
 	 * */
 	public static boolean check(String filename) {
-		// FIXME: Make this method checks for invalid headers before actually returning the result.
 		File save = new File(filename);
+		boolean fileIsValid = true;
+		DataInputStream dataInputStream = null;
+		try {
+			dataInputStream = new DataInputStream(new BufferedInputStream(new FileInputStream(save)));
+			byte sizeOfChunk = dataInputStream.readByte();
+			for (int i = 0; i < sizeOfChunk / 4; i++) {
+				switch (i) {
+					case 0: {
+						// Identification Code
+						byte identity = '1' & 0xFF;
+						for (int j = 0; j < 4; j++) {
+							byte byteData = dataInputStream.readByte();
+							if (j < 3)
+								continue;
+							if (byteData != identity)
+								fileIsValid = false;
+						}
+						break;
+					}
+					case 1: {
+						// Header Code
+						byte[] header = { 0x48, 0x45, 0x41, 0x44 };
+						for (int j = 0; j < 4; j++) {
+							byte byteData = dataInputStream.readByte();
+							if (byteData != header[j])
+								fileIsValid = false;
+						}
+						break;
+					}
+					case 2: {
+						// File format extension
+						byte[] format = { 0x2E, 0x53, 0x41, 0x56 };
+						for (int j = 0; j < 4; j++) {
+							byte byteData = dataInputStream.readByte();
+							if (byteData != format[j])
+								fileIsValid = false;
+						}
+						break;
+					}
+					default: {
+						fileIsValid = false;
+						break;
+					}
+				}
+			}
+			if (!fileIsValid)
+				throw new IOException("Save file is invalid.");
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		finally {
+			if (dataInputStream != null) {
+				try {
+					dataInputStream.close();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		return save.isFile();
 	}
-	
+
 	public static byte[] concatenate(byte[] first, byte[] second) {
 		byte[] result = new byte[first.length + second.length];
 		System.arraycopy(first, 0, result, 0, first.length);

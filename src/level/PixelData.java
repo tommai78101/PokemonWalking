@@ -16,7 +16,7 @@ import screen.BaseBitmap;
 public class PixelData {
 	// This class contains all of the area's pixel color, pixel's properties, pixel flags to check, etc.
 	// This object will be loaded along with other PixelData objects when loading an area.
-	
+
 	/*
 	 * Pixel data types: (Including alpha values)
 	 * 
@@ -24,7 +24,7 @@ public class PixelData {
 	 * 
 	 * Anything else: Flat grass.
 	 */
-	
+
 	// This is also the ID number for the pixel.
 	private int color;
 	// If false, it's an obstacle.
@@ -38,16 +38,16 @@ public class PixelData {
 	public BaseBitmap[] biomeBitmap;
 	public int bitmapTick;
 	public int biomeBitmapTick;
-	
+
 	// This can also be "isWayPoint".
 	private boolean isWarpZone;
 	private int targetArea;
 	private int targetSector;
 	private int groundHeight;
-	
+
 	private boolean triggerFlag;
 	private int targetMovementScriptID;
-	
+
 	public PixelData(int pixel, int x, int y) {
 		this.xPosition = x;
 		this.yPosition = y;
@@ -59,44 +59,44 @@ public class PixelData {
 		this.biomeBitmapTick = 0;
 		this.triggerFlag = false;
 		this.targetMovementScriptID = 0;
-		
+
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
 		int green = (pixel >> 8) & 0xFF;
 		int blue = pixel & 0xFF;
-		
+
 		setProperties(alpha, red, green, blue);
 		prepareBitmap(alpha, red, green, blue);
 	}
-	
+
 	public void enableTrigger() {
 		this.triggerFlag = true;
 	}
-	
+
 	public void disableTrigger() {
 		this.triggerFlag = false;
 	}
-	
+
 	public boolean hasTriggerEvent() {
 		return this.triggerFlag;
 	}
-	
+
 	public int getTargetScriptID() {
 		return this.targetMovementScriptID;
 	}
-	
+
 	public void disableWarpZone() {
 		this.isWarpZone = false;
 	}
-	
+
 	public void enableWarpZone() {
 		this.isWarpZone = true;
 	}
-	
+
 	public boolean isWarpZoneEnabled() {
 		return this.isWarpZone;
 	}
-	
+
 	/**
 	 * Sets the bitmap tile the pixel data is representing.
 	 * 
@@ -153,9 +153,9 @@ public class PixelData {
 						this.biomeBitmap[0] = Art.grass; // Forest
 						break;
 					case 0x01:
-						//TODO: Change this biome bitmap to something that represents the city even more.
+						// TODO: Change this biome bitmap to something that represents the city even more.
 						this.biomeBitmap = new BaseBitmap[1];
-						this.biomeBitmap[0] = Art.path; //City
+						this.biomeBitmap[0] = Art.path; // City
 					case 0x02:
 						this.biomeBitmap = new BaseBitmap[1];
 						this.biomeBitmap[0] = Art.mt_ground; // Mountain
@@ -163,14 +163,14 @@ public class PixelData {
 					case 0x03:
 						this.biomeBitmap = new BaseBitmap[1];
 						this.biomeBitmap[0] = Art.water[0];
-						//TODO: Add more area type biome bitmaps here to the Path. (Refer to documentation.)
+						// TODO: Add more area type biome bitmaps here to the Path. (Refer to documentation.)
 					default:
 						break;
 				}
 				break;
 			case 0x02: // Ledge
 			{
-				//TODO: Add biome bitmaps to ledge.
+				// TODO: Add biome bitmaps to ledge.
 				this.bitmap = new BaseBitmap[1];
 				switch (red) {
 					case 0x00: // Bottom
@@ -222,7 +222,7 @@ public class PixelData {
 					case 0x0F:
 						this.bitmap[0] = Art.ledge_mt_bottom_right;
 						break;
-					// ---------------------------------------------------------						
+					// ---------------------------------------------------------
 					case 0x10:
 						this.bitmap[0] = Art.ledge_inner_bottom;
 						break;
@@ -290,6 +290,7 @@ public class PixelData {
 				this.bitmap = new BaseBitmap[1];
 				// TODO: Add new bitmaps for connection points to make them blend in with the surroundings.
 				// TODO: Create more biome bitmaps.
+				// FIXME (6/19/2015): 0x05000003 is a water tile in the level editor, but it's really not a water tile.
 				this.bitmap[0] = Art.grass;
 				break;
 			case 0x06: // Stairs
@@ -324,7 +325,7 @@ public class PixelData {
 			case 0x07: { // Water
 				// Always start with the first frame of any animation.
 				// TODO: Add more water tiles with borders.
-				// FIXME: Make the borders a bit more thicker.
+				// TODO: (6/19/2015): Make the borders a bit more thicker. Possibly the land border near the edges of the water tiles.
 				switch (red) {
 					case 0x00: // Pure water, no border.
 						this.bitmap = Art.water;
@@ -359,29 +360,29 @@ public class PixelData {
 					case 0x02: // Bottom right wall
 						this.bitmap[0] = Art.house_bottom_right;
 						break;
-					case 0x03: //Center wall
-						this.bitmap[0] = Art.house_center; 
+					case 0x03: // Center wall
+						this.bitmap[0] = Art.house_center;
 						break;
-					case 0x04: //Center wall with windows in center
-						this.bitmap[0] = Art.house_center_windows_center; 
+					case 0x04: // Center wall with windows in center
+						this.bitmap[0] = Art.house_center_windows_center;
 						break;
-					case 0x05: //Center wall with windows on left
-						this.bitmap[0] = Art.house_center_windows_left; 
+					case 0x05: // Center wall with windows on left
+						this.bitmap[0] = Art.house_center_windows_left;
 						break;
-					case 0x06: //Center wall with windows on right
-						this.bitmap[0] = Art.house_center_windows_right; 
+					case 0x06: // Center wall with windows on right
+						this.bitmap[0] = Art.house_center_windows_right;
 						break;
-					case 0x07: //Left wall
-						this.bitmap[0] = Art.house_left; 
+					case 0x07: // Left wall
+						this.bitmap[0] = Art.house_left;
 						break;
-					case 0x08: //Left wall with windows on right
-						this.bitmap[0] = Art.house_left_windows_right; 
+					case 0x08: // Left wall with windows on right
+						this.bitmap[0] = Art.house_left_windows_right;
 						break;
-					case 0x09: //Right wall
-						this.bitmap[0] = Art.house_right;	
+					case 0x09: // Right wall
+						this.bitmap[0] = Art.house_right;
 						break;
-					case 0x0A: //Right wall with windows on left
-						this.bitmap[0] = Art.house_right_windows_left; 
+					case 0x0A: // Right wall with windows on left
+						this.bitmap[0] = Art.house_right_windows_left;
 						break;
 					case 0x0B: // Single Roof left
 						this.bitmap[0] = Art.changeColors(Art.house_roof_left, WorldConstants.convertToAreaColor(green));
@@ -413,9 +414,9 @@ public class PixelData {
 				this.bitmap[0] = Art.carpet_outdoors;
 				this.biomeBitmap = Art.exit_arrow;
 				break;
-			case 0x0D: //Starting position when game has initialized;
+			case 0x0D: // Starting position when game has initialized;
 				this.bitmap = new BaseBitmap[1];
-				switch (red){
+				switch (red) {
 					case 0x01:
 					default:
 						this.bitmap[0] = Art.grass;
@@ -434,7 +435,7 @@ public class PixelData {
 			this.biomeBitmap[0] = Art.grass; // By default, biome bitmap should be grass.
 		}
 	}
-	
+
 	/**
 	 * Prepares the bitmap if the color has been pre-determined.
 	 * 
@@ -450,7 +451,7 @@ public class PixelData {
 		int blue = this.color & 0xFF;
 		this.prepareBitmap(alpha, red, green, blue);
 	}
-	
+
 	/**
 	 * Sets the properties of a given pixel data. This is where the game gets the area's information on what the player should do and don't.
 	 * 
@@ -485,15 +486,18 @@ public class PixelData {
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x04: // Warp Point
-				// this.targetArea = red;
-				// FIXME: Level Editor must set target area ID to at least 1 or above.
+				if (red < 0x01) {
+					// This is error checking prevention.
+					red = 0x01;
+				}
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.isWarpZone = true;
-				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 				break;
 			case 0x05: // ACP (Refer to documentation.)
-				// this.targetArea = red;
-				// FIXME: Level Editor must set target area ID to at least 1 or above.
+				if (red < 0x01) {
+					// This is error checking prevention.
+					red = 0x01;
+				}
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.targetSector = green;
 				this.isWarpZone = false;
@@ -508,8 +512,10 @@ public class PixelData {
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 			case 0x09: // House Door
-				// this.targetArea = red;
-				// FIXME: Level Editor must set target area ID to at least 1 or above.
+				if (red < 0x01) {
+					// This is error checking prevention.
+					red = 0x01;
+				}
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				this.isWarpZone = true;
 				break;
@@ -517,37 +523,40 @@ public class PixelData {
 				break;
 			case 0x0B: // Carpets
 			case 0x0C: // Carpets
-				// FIXME: Level Editor must set target area ID to at least 1 or above.
+				if (red < 0x01) {
+					// This is error checking prevention.
+					red = 0x01;
+				}
 				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
 				break;
-			case 0x0D: //Default Starting Position
+			case 0x0D: // Default Starting Position
 				break;
 			default:
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 		}
 	}
-	
+
 	public int getColor() {
 		return this.color;
 	}
-	
+
 	// public int getParentAreaID() {
 	// return parentArea;
 	// }
-	
+
 	public int getTargetAreaID() {
 		return targetArea;
 	}
-	
+
 	public boolean[] isWalkThroughable() {
 		return this.facingsBlocked;
 	}
-	
+
 	public int getTargetSectorID() {
 		return this.targetSector;
 	}
-	
+
 	public void tick() {
 		this.bitmapTick++;
 		if (this.bitmapTick >= this.bitmap.length)
@@ -556,15 +565,15 @@ public class PixelData {
 		if (this.biomeBitmapTick >= this.biomeBitmap.length)
 			this.biomeBitmapTick = 0;
 	}
-	
+
 	public BaseBitmap getBitmap() {
 		return this.bitmap[this.bitmapTick];
 	}
-	
+
 	public int getGroundHeight() {
 		return this.groundHeight;
 	}
-	
+
 	public BaseBitmap getBiomeBitmap() {
 		return this.biomeBitmap[this.biomeBitmapTick];
 	}

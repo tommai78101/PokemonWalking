@@ -27,47 +27,47 @@ public class WorldConstants {
 	private WorldConstants() {
 		// Add/delete a map area, update everything shown below.
 	}
-	
+
 	// Area IDs
 	public static final int TEST_WORLD_1 = 0x01;
 	public static final int TEST_WORLD_2 = 0x02;
 	public static final int TEST_WORLD_3 = 0x03;
-	
+
 	// Item IDs
 	public static final int ITEM_RETURN = 0;
 	public static final int ITEM_TEST = 1;
 	public static final int ITEM_3_OPTIONS = 2;
 	public static final int ITEM_BICYCLE = 3;
-	
+
 	// Biome Colors
 	public static final int GRASS_GREEN = 0xFFA4E767;
 	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
-	
+
 	// Building Roof Colors / Main Area Color Theme
 	public static final int AREA_1_COLOR = 0xFFC495B0;
 	public static final int AREA_2_COLOR = 0xFF345CBD;
-	
+
 	// World IDs
 	public static final int OVERWORLD = 0x0A000001;
-	
+
 	// Dialogues
 	public static ArrayList<Map.Entry<NewDialogue, Integer>> signTexts = NewDialogue.loadDialogues("dialogue/dialogue.txt");
-	
+
 	// Items
-	//public static HashMap<Integer, ItemText> itemms = Item.loadItemResources("item/items.txt");
+	// public static HashMap<Integer, ItemText> itemms = Item.loadItemResources("item/items.txt");
 	public static ArrayList<Map.Entry<ItemText, Item>> items = Item.loadItems("item/items.txt");
-	
+
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
-	
+
 	// Movement
-	//TODO (11/24/2014): Make map more flexible by allowing scripting files of different filenames to be loaded. Not sure where it was being loaded.
+	// TODO (11/24/2014): Make map more flexible by allowing scripting files of different filenames to be loaded. Not sure where it was being loaded.
 	public static ArrayList<Script> scripts = Script.loadScript("script/scripts.txt");
-	public static ArrayList<Script> gameScripts = Script.loadScript("script/aas.script");
-	
+	// public static ArrayList<Script> gameScripts = Script.loadScript("script/aas.script"); // TODO (6/19/2015): Check to see why there's a need to load "aas.script".
+
 	// All bitmaps
 	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
-	
+
 	/**
 	 * Returns the area matching the given area ID value.
 	 * 
@@ -96,7 +96,7 @@ public class WorldConstants {
 		areas.add(area);
 		return area;
 	}
-	
+
 	/**
 	 * Returns all available areas defined.
 	 * 
@@ -115,11 +115,11 @@ public class WorldConstants {
 		if (WorldConstants.isModsEnabled == Boolean.FALSE) {
 			result.add(new Area(Art.testArea, TEST_WORLD_1));
 			result.add(new Area(Art.testArea2, TEST_WORLD_2));
-//			result.add(new Area(Art.testArea3, TEST_WORLD_3));
-//			result.add(new Area(Art.testArea4, TEST_WORLD_4));
-//			result.add(new Area(Art.testArea_debug, DEBUG));
+			// result.add(new Area(Art.testArea3, TEST_WORLD_3));
+			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
+			// result.add(new Area(Art.testArea_debug, DEBUG));
 		}
-		else { //Including NULL value.
+		else { // Including NULL value.
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
 				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
 				result.add(new Area(entry.getKey(), entry.getValue()));
@@ -127,7 +127,7 @@ public class WorldConstants {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Returns the area color theme of the given area ID.
 	 * 

@@ -110,7 +110,6 @@ public class OverWorld extends World {
 	public void tick() {
 		if (!this.invertBitmapColors)
 			this.player.tick();
-		// FIXME: Find a way to revert back to default settings when game save data is invalid.
 		if (this.currentArea == null)
 			this.currentArea = this.areas.get(0);
 		this.currentArea.tick();
@@ -393,8 +392,6 @@ public class OverWorld extends World {
 			player.render(screen, 0, 0);
 
 		if (this.newDialogues != null && this.newDialogues.length > 0) {
-			// FIXME: Fix this issue where switching dialogue types lead to turning off dialogue box rendering.
-			// TODO: Also, make this renderDialogBox optional for future customizable dialogues (if I can...)
 			NewDialogue.renderDialogBox(screen, 0, 6, 9, 2);
 			this.newDialogues[this.newDialoguesIterator].render(screen, screen.getBufferedImage().createGraphics());
 		}
