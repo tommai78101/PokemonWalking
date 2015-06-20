@@ -14,6 +14,10 @@
 # _: Space character placeholder.
 # *: Includes area type.
 # +: End of File.
+#
+# To add new tiles, Art.java, PixelData.java, and this data.txt
+# needs to be updated.
+#
 # Here's how it is written:
 #		% Tile Name % Alpha % Red % Green % Blue % Filepath
 
@@ -35,6 +39,8 @@
 % Top_Right                     % 02 % 05 % *  % @  % res/art/ledge/ledge_top_right.png
 % Right                         % 02 % 06 % *  % @  % res/art/ledge/ledge_right.png
 % Bottom_Right                  % 02 % 07 % *  % @  % res/art/ledge/ledge_bottom_right.png
+% Bottom_Left_Corner            % 02 % 18 % *  % @  % res/art/ledge/ledge_bottom_left_corner.png
+% Botton_Right_Corner           % 02 % 19 % *  % @  % res/art/ledge/ledge_bottom_right_corner.png
 -Mountain_Ledges                                    
 % Bottom                        % 02 % 08 % *  % @  % res/art/ledge/ledge_mt_bottom.png
 % Bottom_Left                   % 02 % 09 % *  % @  % res/art/ledge/ledge_mt_bottom_left.png

@@ -247,6 +247,13 @@ public class PixelData {
 					case 0x17:
 						this.bitmap[0] = Art.ledge_inner_bottom_right;
 						break;
+					// ---------------------------------------------------------
+					case 0x18:
+						this.bitmap[0] = Art.Ledge_bottom_left_corner;
+						break;
+					case 0x19:
+						this.bitmap[0] = Art.Ledge_bottom_right_corner;
+						break;
 				}
 				break;
 			}
