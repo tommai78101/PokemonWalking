@@ -33,6 +33,7 @@ public class Area {
 	private PixelData currentPixelData;
 	private final int areaID;
 	private int sectorID;
+	private String areaName;
 	// TODO: Add area type.
 	// private int areaType;
 
@@ -84,6 +85,12 @@ public class Area {
 		this.isInSectorPoint = false;
 		this.displayExitArrow = false;
 		this.triggerIsBeingTriggered = false;
+		this.areaName = "";
+	}
+
+	public Area(BaseBitmap bitmap, final int areaID, final String areaName) {
+		this(bitmap, areaID);
+		this.areaName = areaName;
 	}
 
 	public void setPlayer(Player player) {
@@ -96,6 +103,14 @@ public class Area {
 
 	public int getHeight() {
 		return this.height;
+	}
+
+	public void setAreaName(String name) {
+		this.areaName = name;
+	}
+
+	public String getAreaName() {
+		return this.areaName;
 	}
 
 	/**
@@ -683,6 +698,37 @@ public class Area {
 
 	public boolean isBeingTriggered() {
 		return this.triggerIsBeingTriggered;
+	}
+
+	// --------------------- OVERRIDDEN METHODS -------------------
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj != null && obj instanceof String) {
+			String str = (String) obj;
+			if (!(this.areaName.equals(str))) {
+				return false;
+			}
+			return true;
+		}
+		else if (obj != null && obj instanceof Integer) {
+			Integer BigInt = (Integer) obj;
+			if (!(this.areaID == BigInt.intValue())) {
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		byte[] bytes = this.areaName.getBytes();
+		int hash = 1;
+		for (int i = 0; i < bytes.length; i++) {
+			hash = hash * 3 + (int) bytes[i];
+		}
+		return hash;
 	}
 
 	// --------------------- PRIVATE METHODS ----------------------

@@ -12,6 +12,7 @@ package level;
 
 import item.ItemText;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.Map;
 import resources.Art;
 import resources.Mod;
 import screen.BaseBitmap;
+import screen.BaseScreen;
 import script.Script;
 import abstracts.Item;
 import dialogue.NewDialogue;
@@ -57,6 +59,10 @@ public class WorldConstants {
 	// public static HashMap<Integer, ItemText> itemms = Item.loadItemResources("item/items.txt");
 	public static ArrayList<Map.Entry<ItemText, Item>> items = Item.loadItems("item/items.txt");
 
+	// Areas
+	public static List<Area> areas = new ArrayList<Area>();
+	public static List<Area> moddedAreas = new ArrayList<Area>();
+
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
 
@@ -67,7 +73,7 @@ public class WorldConstants {
 
 	//Custom scripts
 	//This array list is made for a script + area file name. They both go together.
-	//public static ArrayList<Map.Entry<Script, String>> customScripts = new ArrayList<Map.Entry<Script, String>>();
+	public static ArrayList<Map.Entry<Script, String>> customScripts = new ArrayList<Map.Entry<Script, String>>();
 
 	// All bitmaps
 	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
@@ -88,10 +94,10 @@ public class WorldConstants {
 		Area area = null;
 		switch (areaID) {
 			case TEST_WORLD_1:
-				area = new Area(Art.testArea, TEST_WORLD_1);
+				area = new Area(Art.testArea, TEST_WORLD_1, "Test World 1");
 				break;
 			case TEST_WORLD_2:
-				area = new Area(Art.testArea2, TEST_WORLD_2);
+				area = new Area(Art.testArea2, TEST_WORLD_2, "Test World 2");
 				break;
 			default:
 				area = null;
@@ -107,7 +113,7 @@ public class WorldConstants {
 	 * @return A List<Area> object containing all available areas in specified order defined.
 	 * */
 	public static List<Area> getAllNewAreas() {
-		List<Area> result = new ArrayList<Area>();
+		//List<Area> result = new ArrayList<Area>();
 		if (WorldConstants.isModsEnabled == null) {
 			if (Mod.moddedAreas.isEmpty()) {
 				WorldConstants.isModsEnabled = Boolean.FALSE;
@@ -117,19 +123,36 @@ public class WorldConstants {
 			}
 		}
 		if (WorldConstants.isModsEnabled == Boolean.FALSE) {
-			result.add(new Area(Art.testArea, TEST_WORLD_1));
-			result.add(new Area(Art.testArea2, TEST_WORLD_2));
+			if (WorldConstants.areas.isEmpty()) {
+				WorldConstants.areas.add(new Area(Art.testArea, TEST_WORLD_1));
+				WorldConstants.areas.add(new Area(Art.testArea2, TEST_WORLD_2));
+			}
+			else {
+				WorldConstants.addNewArea(Art.testArea, TEST_WORLD_1);
+				WorldConstants.addNewArea(Art.testArea2, TEST_WORLD_2);
+			}
 			// result.add(new Area(Art.testArea3, TEST_WORLD_3));
 			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
 			// result.add(new Area(Art.testArea_debug, DEBUG));
+			return WorldConstants.areas;
 		}
 		else { // Including NULL value.
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
 				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
-				result.add(new Area(entry.getKey(), entry.getValue()));
+				WorldConstants.moddedAreas.add(new Area(entry.getKey(), entry.getValue()));
 			}
+			return WorldConstants.moddedAreas;
 		}
-		return result;
+	}
+
+	/**
+	 * Goes with the static method, "getAllNewAreas()".
+	 * 
+	 * */
+	private static void addNewArea(BaseBitmap bitmap, int areaID) {
+		if (!WorldConstants.areas.contains(areaID)) {
+			WorldConstants.areas.add(new Area(bitmap, areaID));
+		}
 	}
 
 	/**
@@ -148,5 +171,16 @@ public class WorldConstants {
 			default:
 				return 0;
 		}
+	}
+
+	/**
+	 * Load area from bitmap file.
+	 * 
+	 * */
+	public static Area loadAreaFromFile(File file, String customAreaName) {
+		BaseBitmap bitmap = BaseScreen.load(file);
+		Area area = new Area(bitmap, Mod.moddedAreas.size() + 1000);
+		area.setAreaName(customAreaName);
+		return area;
 	}
 }
