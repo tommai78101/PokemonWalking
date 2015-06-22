@@ -12,7 +12,7 @@ As long as these criterias are met, any code can be eligible for submission:
 
     public class Foo {
         int bar;
-
+        
         public Foo (int value){
             this.bar = value;    //<-------  The member, "bar", is prefixed with "this".
         }
