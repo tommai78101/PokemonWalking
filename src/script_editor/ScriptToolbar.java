@@ -27,19 +27,17 @@ import editor.Trigger;
 public class ScriptToolbar extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private final ScriptEditor editor;
-	private final String[] tags = {
-			"New", "Save", "Open", ""
-	};
+	private final String[] tags = { "New", "Save", "Open", "" };
 	private final HashMap<String, JButton> buttonCache = new HashMap<String, JButton>();
-	
+
 	public ScriptToolbar(ScriptEditor editor) {
 		super();
 		this.editor = editor;
 		this.setLayout(new GridLayout(1, tags.length));
-		
+
 		createButtons();
 	}
-	
+
 	private void createButtons() {
 		for (int i = 0; i < tags.length; i++) {
 			if (tags[i].isEmpty() || tags[i].equals("")) {
@@ -54,7 +52,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 			this.add(button);
 		}
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.valueOf(event.getActionCommand())) {
@@ -63,22 +61,23 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				JList<Trigger> triggerList = editor.scriptViewer.getTriggerList();
 				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
 				model.clear();
-				
+
 				JComboBox<Trigger> triggerComboBox = editor.parent.properties.getTriggerList();
 				DefaultComboBoxModel<Trigger> triggerComboModel = (DefaultComboBoxModel<Trigger>) triggerComboBox.getModel();
 				triggerComboModel.removeAllElements();
-				
+
 				Trigger trigger = new Trigger();
 				trigger.setTriggerID((short) 0);
 				trigger.setName("Eraser");
 				triggerComboModel.addElement(trigger);
 				triggerComboBox.setSelectedIndex(0);
-				
+
 				triggerList.clearSelection();
-				editor.setModifiedFlag(false);
-				editor.setTitle("Script Editor (Hobby) - Untitled.script");
-				editor.setScriptName("Untitled");
-				
+				this.editor.setModifiedFlag(false);
+				this.editor.setTitle("Script Editor (Hobby) - Untitled.script");
+				this.editor.setScriptName("Untitled");
+				this.editor.scriptChanger.disable();
+
 				editor.parent.revalidate();
 				break;
 			}
@@ -105,7 +104,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					catch (IOException e) {
 					}
 				}
-				
+
 				JFileChooser saver = new JFileChooser();
 				saver.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				saver.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
@@ -115,7 +114,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				if (answer == JFileChooser.APPROVE_OPTION) {
 					File f = saver.getSelectedFile();
 					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
-					
+
 					if (f.getName().endsWith(".script")) {
 						this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
 						this.editor.save(new File(f.getParentFile(), f.getName()));
@@ -127,7 +126,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 						this.editor.setScriptName(f.getName());
 					}
 					this.editor.setModifiedFlag(false);
-					
+
 					RandomAccessFile rf = null;
 					try {
 						rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
@@ -149,7 +148,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				break;
 			}
 			case 2: { // Open
-			
+
 				RandomAccessFile raf = null;
 				try {
 					raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
@@ -172,7 +171,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					catch (IOException e) {
 					}
 				}
-				
+
 				JFileChooser opener = new JFileChooser();
 				opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				opener.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
@@ -186,7 +185,8 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					this.editor.load(f);
 					this.editor.setModifiedFlag(false);
 					this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
-					
+					this.editor.scriptChanger.enable();
+
 					RandomAccessFile rf = null;
 					try {
 						rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
@@ -208,6 +208,6 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				break;
 			}
 		}
-		
+
 	}
 }
