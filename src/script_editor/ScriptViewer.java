@@ -168,6 +168,8 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				while (!this.model.isEmpty()) {
 					this.model.remove(0);
 				}
+				ScriptViewer.this.editor.scriptChanger.clear();
+				ScriptViewer.this.editor.scriptChanger.disable();
 				break;
 			}
 		}
