@@ -155,8 +155,13 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				int index = this.triggerList.getSelectedIndex();
 				if (index != -1 && !this.model.isEmpty())
 					this.model.remove(index);
-				else if (!this.model.isEmpty())
+				else if (!this.model.isEmpty()) {
 					this.model.remove(this.model.getSize() - 1);
+				}
+				if (this.model.isEmpty()) {
+					ScriptViewer.this.editor.scriptChanger.clear();
+					ScriptViewer.this.editor.scriptChanger.disable();
+				}
 				break;
 			}
 			case 2: {
