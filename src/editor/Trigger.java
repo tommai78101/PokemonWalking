@@ -1,18 +1,21 @@
 package editor;
 
-
 public class Trigger {
 	private byte x, y;
 	private short triggerID;
 	private String name;
 	private String script;
-	
+
 	private boolean[] valuesHasBeenSet = new boolean[4];
-	
+	private static final int FLAG_PositionX = 0;
+	private static final int FLAG_PositionY = 1;
+	private static final int FLAG_TriggerID = 2;
+	private static final int FLAG_TriggerScript = 3;
+
 	public Trigger() {
 		reset();
 	}
-	
+
 	public void reset() {
 		x = y = 0;
 		triggerID = 0;
@@ -20,46 +23,46 @@ public class Trigger {
 		for (int i = 0; i < valuesHasBeenSet.length; i++)
 			valuesHasBeenSet[i] = false;
 	}
-	
+
 	public int getDataValue() {
 		return (x << 24) | (y << 16) | (triggerID & 0xFFFF);
 	}
-	
+
 	public void setTriggerPositionX(byte x) {
-		this.valuesHasBeenSet[0] = true;
+		this.valuesHasBeenSet[FLAG_PositionX] = true;
 		this.x = x;
 	}
-	
+
 	public void setTriggerPositionY(byte y) {
-		this.valuesHasBeenSet[1] = true;
+		this.valuesHasBeenSet[FLAG_PositionY] = true;
 		this.y = y;
 	}
-	
+
 	public void setTriggerID(short value) {
-		this.valuesHasBeenSet[2] = true;
+		this.valuesHasBeenSet[FLAG_TriggerID] = true;
 		this.triggerID = value;
 	}
-	
-	public void setScript(String script){
+
+	public void setScript(String script) {
 		this.script = script;
 	}
-	
+
 	public boolean isPositionXSet() {
-		return this.valuesHasBeenSet[0];
+		return this.valuesHasBeenSet[FLAG_PositionX];
 	}
-	
+
 	public boolean isPositionYSet() {
-		return this.valuesHasBeenSet[1];
+		return this.valuesHasBeenSet[FLAG_PositionY];
 	}
-	
+
 	public boolean isTriggerIDSet() {
-		return this.valuesHasBeenSet[2];
+		return this.valuesHasBeenSet[FLAG_TriggerID];
 	}
-	
-	public boolean isTriggerScriptSet(){
-		return this.valuesHasBeenSet[3];
+
+	public boolean isTriggerScriptSet() {
+		return this.valuesHasBeenSet[FLAG_TriggerScript];
 	}
-	
+
 	public boolean areRequiredFieldsAllSet() {
 		boolean result = true;
 		for (int i = 0; i < 3; i++)
@@ -67,35 +70,35 @@ public class Trigger {
 				result = false;
 		return result;
 	}
-	
-	public boolean isEmptyScriptTrigger(){
+
+	public boolean isEmptyScriptTrigger() {
 		return this.valuesHasBeenSet[3];
 	}
-	
+
 	public byte getPositionX() {
 		return this.x;
 	}
-	
+
 	public byte getPositionY() {
 		return this.y;
 	}
-	
+
 	public short getTriggerID() {
 		return this.triggerID;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getName() {
 		return this.name;
 	}
-	
-	public String getScript(){
+
+	public String getScript() {
 		return this.script;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -106,7 +109,7 @@ public class Trigger {
 		result = prime * result + y;
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {

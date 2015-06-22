@@ -38,6 +38,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	private JButton questionDialogue, affirmativeDialogue, negativeDialogue, speechDialogue;
 	private JTextArea scriptArea;
 	private boolean allowUpdate;
+	private boolean isEnabled;
 	private int movementCounter = 0;
 
 	private static final String UP = "UP";
@@ -191,6 +192,8 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 
 		this.setBorder(BorderFactory.createTitledBorder("Trigger:"));
 		this.validate();
+
+		this.disable();
 	}
 
 	private JPanel constructDirections() {
@@ -318,6 +321,46 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		// yField.setText("");
 		idField.setText("");
 		scriptArea.setText("");
+	}
+
+	public void disable() {
+		this.nameField.setEnabled(false);
+		this.idField.setEnabled(false);
+
+		this.upButton.setEnabled(false);
+		this.downButton.setEnabled(false);
+		this.leftButton.setEnabled(false);
+		this.rightButton.setEnabled(false);
+
+		this.questionDialogue.setEnabled(false);
+		this.affirmativeDialogue.setEnabled(false);
+		this.negativeDialogue.setEnabled(false);
+		this.speechDialogue.setEnabled(false);
+
+		this.scriptArea.setEnabled(false);
+		this.isEnabled = false;
+	}
+
+	public void enable() {
+		this.nameField.setEnabled(true);
+		this.idField.setEnabled(true);
+
+		this.upButton.setEnabled(true);
+		this.downButton.setEnabled(true);
+		this.leftButton.setEnabled(true);
+		this.rightButton.setEnabled(true);
+
+		this.questionDialogue.setEnabled(true);
+		this.affirmativeDialogue.setEnabled(true);
+		this.negativeDialogue.setEnabled(true);
+		this.speechDialogue.setEnabled(true);
+
+		this.scriptArea.setEnabled(true);
+		this.isEnabled = true;
+	}
+
+	public boolean isEnabled() {
+		return this.isEnabled;
 	}
 
 	// ActionListener

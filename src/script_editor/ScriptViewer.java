@@ -24,9 +24,9 @@ import editor.Trigger;
 
 public class ScriptViewer extends JPanel implements ActionListener, ListSelectionListener {
 	private static final long serialVersionUID = 1L;
-	
+
 	private final ScriptEditor editor;
-	
+
 	private DefaultListModel<Trigger> model;
 	private JList<Trigger> triggerList;
 	private JScrollPane scrollPane;
@@ -36,7 +36,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 	private Trigger selectedTrigger;
 	@SuppressWarnings("unused")
 	private int iterator;
-	
+
 	public ScriptViewer(ScriptEditor editor) {
 		super();
 		this.editor = editor;
@@ -47,10 +47,10 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		constructingButtons();
 		this.revalidate();
 	}
-	
+
 	private void constructingList() {
 		this.model = new DefaultListModel<Trigger>();
-		
+
 		this.triggerList = new JList<Trigger>();
 		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.triggerList.setLayoutOrientation(JList.VERTICAL);
@@ -58,11 +58,11 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		Dimension size = new Dimension(100, 300);
 		this.triggerList.setSize(size);
 		this.triggerList.setMinimumSize(size);
-		
+
 		this.triggerList.setModel(this.model);
 		new KeySelectionRenderer(this.triggerList) {
 			private static final long serialVersionUID = 1L;
-			
+
 			@Override
 			public String getDisplayValue(Object item) {
 				Trigger t = (Trigger) item;
@@ -70,19 +70,19 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 			}
 		};
 		this.triggerList.addListSelectionListener(this);
-		
+
 		scrollPane = new JScrollPane(this.triggerList);
 		scrollPane.setSize(size);
 		scrollPane.setMinimumSize(size);
-		
+
 		scrollPane.setVisible(true);
 		this.add(scrollPane);
 	}
-	
+
 	private void constructingButtons() {
 		JPanel panel = new JPanel();
 		Dimension size = new Dimension(90, 20);
-		
+
 		this.createButton = new JButton("Create");
 		this.createButton.setActionCommand(Integer.toString(0));
 		this.createButton.addActionListener(this);
@@ -91,9 +91,9 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.createButton.setMinimumSize(size);
 		this.createButton.setPreferredSize(size);
 		panel.add(createButton);
-		
+
 		panel.add(new JSeparator(SwingConstants.HORIZONTAL));
-		
+
 		this.removeButton = new JButton("Remove");
 		this.removeButton.setActionCommand(Integer.toString(1));
 		this.removeButton.addActionListener(this);
@@ -102,9 +102,9 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.removeButton.setMinimumSize(size);
 		this.removeButton.setPreferredSize(size);
 		panel.add(removeButton);
-		
+
 		panel.add(new JSeparator(SwingConstants.HORIZONTAL));
-		
+
 		this.clearButton = new JButton("Clear");
 		this.clearButton.setActionCommand(Integer.toString(2));
 		this.clearButton.addActionListener(this);
@@ -113,27 +113,27 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.clearButton.setMinimumSize(size);
 		this.clearButton.setPreferredSize(size);
 		panel.add(clearButton);
-		
+
 		this.add(panel);
 	}
-	
+
 	public void addTrigger(Trigger t) {
 		this.model.add(0, t);
 		this.validate();
 	}
-	
+
 	public void removeTrigger() {
 		this.model.remove(this.triggerList.getSelectedIndex());
 	}
-	
+
 	public Trigger getSelectedTrigger() {
 		return this.selectedTrigger;
 	}
-	
+
 	public JList<Trigger> getTriggerList() {
 		return this.triggerList;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.valueOf(event.getActionCommand())) {
@@ -148,6 +148,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				JScrollBar vertical = scrollPane.getVerticalScrollBar();
 				vertical.setValue(vertical.getMaximum() + 1);
 				this.triggerList.setSelectedIndex(this.model.getSize() - 1);
+				this.editor.scriptChanger.enable();
 				break;
 			}
 			case 1: {// Remove button
@@ -159,7 +160,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				break;
 			}
 			case 2: {
-				while (!this.model.isEmpty()){
+				while (!this.model.isEmpty()) {
 					this.model.remove(0);
 				}
 				break;
@@ -168,7 +169,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.editor.getLevelEditorParent().properties.reloadTriggers();
 		this.triggerList.validate();
 	}
-	
+
 	@Override
 	public void valueChanged(ListSelectionEvent event) {
 		if (!event.getValueIsAdjusting()) {
@@ -183,7 +184,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 					// this.editor.scriptChanger.getYField().setText("");
 					this.editor.scriptChanger.getIDField().setText("");
 					this.editor.scriptChanger.getScriptArea().setText("");
-					
+
 					this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());
 					// this.editor.scriptChanger.getXField().setText(Integer.toString(this.selectedTrigger.getPositionX()));
 					// this.editor.scriptChanger.getYField().setText(Integer.toString(this.selectedTrigger.getPositionY()));
