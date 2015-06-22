@@ -180,119 +180,119 @@ public class Art {
 		exit_arrow = loadAnimation(screen, 10, "art/animation/arrow/arrow00");
 
 		// Dialogue
-		dialogue_next = screen.load("art/dialog/dialogue_next.png");
-		dialogue_bottom = screen.load("art/dialog/dialogue_bottom.png");
-		dialogue_bottom_left = screen.load("art/dialog/dialogue_bottom_left.png");
-		dialogue_left = screen.load("art/dialog/dialogue_left.png");
-		dialogue_top_left = screen.load("art/dialog/dialogue_top_left.png");
-		dialogue_top = screen.load("art/dialog/dialogue_top.png");
-		dialogue_top_right = screen.load("art/dialog/dialogue_top_right.png");
-		dialogue_right = screen.load("art/dialog/dialogue_right.png");
-		dialogue_bottom_right = screen.load("art/dialog/dialogue_bottom_right.png");
-		dialogue_background = screen.load("art/dialog/dialogue_bg.png");
-		dialogue_pointer = screen.load("art/dialog/dialogue_pointer.png");
+		dialogue_next = BaseScreen.load("art/dialog/dialogue_next.png");
+		dialogue_bottom = BaseScreen.load("art/dialog/dialogue_bottom.png");
+		dialogue_bottom_left = BaseScreen.load("art/dialog/dialogue_bottom_left.png");
+		dialogue_left = BaseScreen.load("art/dialog/dialogue_left.png");
+		dialogue_top_left = BaseScreen.load("art/dialog/dialogue_top_left.png");
+		dialogue_top = BaseScreen.load("art/dialog/dialogue_top.png");
+		dialogue_top_right = BaseScreen.load("art/dialog/dialogue_top_right.png");
+		dialogue_right = BaseScreen.load("art/dialog/dialogue_right.png");
+		dialogue_bottom_right = BaseScreen.load("art/dialog/dialogue_bottom_right.png");
+		dialogue_background = BaseScreen.load("art/dialog/dialogue_bg.png");
+		dialogue_pointer = BaseScreen.load("art/dialog/dialogue_pointer.png");
 
 		// Editor
-		error = screen.load("art/editor/no_png.png");
+		error = BaseScreen.load("art/editor/no_png.png");
 
 		// Floor
-		grass = screen.load("art/floor/grass.png");
-		mt_ground = screen.load("art/floor/mt_ground.png");
-		forestEntrance = screen.load("art/floor/forestEntrance.png");
-		path = screen.load("art/floor/path.png");
-		stairs_left = screen.load("art/floor/stairs_left.png");
-		stairs_top = screen.load("art/floor/stairs_top.png");
-		stairs_right = screen.load("art/floor/stairs_right.png");
-		stairs_bottom = screen.load("art/floor/stairs_bottom.png");
-		stairs_mt_left = screen.load("art/floor/stairs_mt_left.png");
-		stairs_mt_top = screen.load("art/floor/stairs_mt_top.png");
-		stairs_mt_right = screen.load("art/floor/stairs_mt_right.png");
-		stairs_mt_bottom = screen.load("art/floor/stairs_mt_bottom.png");
-		carpet_indoors = screen.load("art/floor/carpet_indoors.png");
-		carpet_outdoors = screen.load("art/floor/carpet_outdoors.png");
-		hardwood_indoors = screen.load("art/floor/hardwood_indoors.png");
-		tatami_1_indoors = screen.load("art/floor/tatami_1_indoors.png");
-		tatami_2_indoors = screen.load("art/floor/tatami_2_indoors.png");
+		grass = BaseScreen.load("art/floor/grass.png");
+		mt_ground = BaseScreen.load("art/floor/mt_ground.png");
+		forestEntrance = BaseScreen.load("art/floor/forestEntrance.png");
+		path = BaseScreen.load("art/floor/path.png");
+		stairs_left = BaseScreen.load("art/floor/stairs_left.png");
+		stairs_top = BaseScreen.load("art/floor/stairs_top.png");
+		stairs_right = BaseScreen.load("art/floor/stairs_right.png");
+		stairs_bottom = BaseScreen.load("art/floor/stairs_bottom.png");
+		stairs_mt_left = BaseScreen.load("art/floor/stairs_mt_left.png");
+		stairs_mt_top = BaseScreen.load("art/floor/stairs_mt_top.png");
+		stairs_mt_right = BaseScreen.load("art/floor/stairs_mt_right.png");
+		stairs_mt_bottom = BaseScreen.load("art/floor/stairs_mt_bottom.png");
+		carpet_indoors = BaseScreen.load("art/floor/carpet_indoors.png");
+		carpet_outdoors = BaseScreen.load("art/floor/carpet_outdoors.png");
+		hardwood_indoors = BaseScreen.load("art/floor/hardwood_indoors.png");
+		tatami_1_indoors = BaseScreen.load("art/floor/tatami_1_indoors.png");
+		tatami_2_indoors = BaseScreen.load("art/floor/tatami_2_indoors.png");
 
 		// House
-		house_door = screen.load("art/house/house_door.png");
-		house_bottom = screen.load("art/house/house_bottom.png");
-		house_bottom_left = screen.load("art/house/house_bottom_left.png");
-		house_bottom_right = screen.load("art/house/house_bottom_right.png");
-		house_center = screen.load("art/house/house_center.png");
-		house_center_windows_center = screen.load("art/house/house_center_windows_center.png");
-		house_center_windows_left = screen.load("art/house/house_center_windows_left.png");
-		house_center_windows_right = screen.load("art/house/house_center_windows_right.png");
-		house_left = screen.load("art/house/house_left.png");
-		house_left_windows_right = screen.load("art/house/house_left_windows_right.png");
-		house_right = screen.load("art/house/house_right.png");
-		house_right_windows_left = screen.load("art/house/house_right_windows_left.png");
-		house_roof_left = screen.load("art/house/house_roof_left.png");
-		house_roof_middle = screen.load("art/house/house_roof_middle.png");
-		house_roof_right = screen.load("art/house/house_roof_right.png");
+		house_door = BaseScreen.load("art/house/house_door.png");
+		house_bottom = BaseScreen.load("art/house/house_bottom.png");
+		house_bottom_left = BaseScreen.load("art/house/house_bottom_left.png");
+		house_bottom_right = BaseScreen.load("art/house/house_bottom_right.png");
+		house_center = BaseScreen.load("art/house/house_center.png");
+		house_center_windows_center = BaseScreen.load("art/house/house_center_windows_center.png");
+		house_center_windows_left = BaseScreen.load("art/house/house_center_windows_left.png");
+		house_center_windows_right = BaseScreen.load("art/house/house_center_windows_right.png");
+		house_left = BaseScreen.load("art/house/house_left.png");
+		house_left_windows_right = BaseScreen.load("art/house/house_left_windows_right.png");
+		house_right = BaseScreen.load("art/house/house_right.png");
+		house_right_windows_left = BaseScreen.load("art/house/house_right_windows_left.png");
+		house_roof_left = BaseScreen.load("art/house/house_roof_left.png");
+		house_roof_middle = BaseScreen.load("art/house/house_roof_middle.png");
+		house_roof_right = BaseScreen.load("art/house/house_roof_right.png");
 
 		// Inventory
-		inventory_gui = screen.load("art/inventory/inventory_gui.png");
-		inventory_backpack_potions = screen.load("art/inventory/backpack_potions.png");
-		inventory_backpack_keyItems = screen.load("art/inventory/backpack_keyitems.png");
-		inventory_backpack_pokeballs = screen.load("art/inventory/backpack_pokeballs.png");
-		inventory_backpack_TM_HM = screen.load("art/inventory/backpack_tm_hm.png");
-		inventory_tag_potions = screen.load("art/inventory/potions.png");
-		inventory_tag_keyItems = screen.load("art/inventory/keyitems.png");
-		inventory_tag_pokeballs = screen.load("art/inventory/pokeballs.png");
-		inventory_tag_TM_HM = screen.load("art/inventory/tm_hm.png");
+		inventory_gui = BaseScreen.load("art/inventory/inventory_gui.png");
+		inventory_backpack_potions = BaseScreen.load("art/inventory/backpack_potions.png");
+		inventory_backpack_keyItems = BaseScreen.load("art/inventory/backpack_keyitems.png");
+		inventory_backpack_pokeballs = BaseScreen.load("art/inventory/backpack_pokeballs.png");
+		inventory_backpack_TM_HM = BaseScreen.load("art/inventory/backpack_tm_hm.png");
+		inventory_tag_potions = BaseScreen.load("art/inventory/potions.png");
+		inventory_tag_keyItems = BaseScreen.load("art/inventory/keyitems.png");
+		inventory_tag_pokeballs = BaseScreen.load("art/inventory/pokeballs.png");
+		inventory_tag_TM_HM = BaseScreen.load("art/inventory/tm_hm.png");
 
 		// Ledges
-		ledge_bottom = screen.load("art/ledge/ledge_bottom.png");
-		ledge_bottom_left = screen.load("art/ledge/ledge_bottom_left.png");
-		ledge_left = screen.load("art/ledge/ledge_left.png");
-		ledge_top_left = screen.load("art/ledge/ledge_top_left.png");
-		ledge_top = screen.load("art/ledge/ledge_top.png");
-		ledge_top_right = screen.load("art/ledge/ledge_top_right.png");
-		ledge_right = screen.load("art/ledge/ledge_right.png");
-		ledge_bottom_right = screen.load("art/ledge/ledge_bottom_right.png");
-		Ledge_bottom_left_corner = screen.load("art/ledge/ledge_bottom_left_corner.png");
-		Ledge_bottom_right_corner = screen.load("art/ledge/ledge_bottom_right_corner.png");
-		ledge_mt_bottom = screen.load("art/ledge/ledge_mt_bottom.png");
-		ledge_mt_bottom_left = screen.load("art/ledge/ledge_mt_bottom_left.png");
-		ledge_mt_left = screen.load("art/ledge/ledge_mt_left.png");
-		ledge_mt_top_left = screen.load("art/ledge/ledge_mt_top_left.png");
-		ledge_mt_top = screen.load("art/ledge/ledge_mt_top.png");
-		ledge_mt_top_right = screen.load("art/ledge/ledge_mt_top_right.png");
-		ledge_mt_right = screen.load("art/ledge/ledge_mt_right.png");
-		ledge_mt_bottom_right = screen.load("art/ledge/ledge_mt_bottom_right.png");
-		ledge_inner_bottom = screen.load("art/ledge/ledge_inner_bottom.png");
-		ledge_inner_bottom_left = screen.load("art/ledge/ledge_inner_bottom_left.png");
-		ledge_inner_left = screen.load("art/ledge/ledge_inner_left.png");
-		ledge_inner_top_left = screen.load("art/ledge/ledge_inner_top_left.png");
-		ledge_inner_top = screen.load("art/ledge/ledge_inner_top.png");
-		ledge_inner_top_right = screen.load("art/ledge/ledge_inner_top_right.png");
-		ledge_inner_right = screen.load("art/ledge/ledge_inner_right.png");
-		ledge_inner_bottom_right = screen.load("art/ledge/ledge_inner_bottom_right.png");
+		ledge_bottom = BaseScreen.load("art/ledge/ledge_bottom.png");
+		ledge_bottom_left = BaseScreen.load("art/ledge/ledge_bottom_left.png");
+		ledge_left = BaseScreen.load("art/ledge/ledge_left.png");
+		ledge_top_left = BaseScreen.load("art/ledge/ledge_top_left.png");
+		ledge_top = BaseScreen.load("art/ledge/ledge_top.png");
+		ledge_top_right = BaseScreen.load("art/ledge/ledge_top_right.png");
+		ledge_right = BaseScreen.load("art/ledge/ledge_right.png");
+		ledge_bottom_right = BaseScreen.load("art/ledge/ledge_bottom_right.png");
+		Ledge_bottom_left_corner = BaseScreen.load("art/ledge/ledge_bottom_left_corner.png");
+		Ledge_bottom_right_corner = BaseScreen.load("art/ledge/ledge_bottom_right_corner.png");
+		ledge_mt_bottom = BaseScreen.load("art/ledge/ledge_mt_bottom.png");
+		ledge_mt_bottom_left = BaseScreen.load("art/ledge/ledge_mt_bottom_left.png");
+		ledge_mt_left = BaseScreen.load("art/ledge/ledge_mt_left.png");
+		ledge_mt_top_left = BaseScreen.load("art/ledge/ledge_mt_top_left.png");
+		ledge_mt_top = BaseScreen.load("art/ledge/ledge_mt_top.png");
+		ledge_mt_top_right = BaseScreen.load("art/ledge/ledge_mt_top_right.png");
+		ledge_mt_right = BaseScreen.load("art/ledge/ledge_mt_right.png");
+		ledge_mt_bottom_right = BaseScreen.load("art/ledge/ledge_mt_bottom_right.png");
+		ledge_inner_bottom = BaseScreen.load("art/ledge/ledge_inner_bottom.png");
+		ledge_inner_bottom_left = BaseScreen.load("art/ledge/ledge_inner_bottom_left.png");
+		ledge_inner_left = BaseScreen.load("art/ledge/ledge_inner_left.png");
+		ledge_inner_top_left = BaseScreen.load("art/ledge/ledge_inner_top_left.png");
+		ledge_inner_top = BaseScreen.load("art/ledge/ledge_inner_top.png");
+		ledge_inner_top_right = BaseScreen.load("art/ledge/ledge_inner_top_right.png");
+		ledge_inner_right = BaseScreen.load("art/ledge/ledge_inner_right.png");
+		ledge_inner_bottom_right = BaseScreen.load("art/ledge/ledge_inner_bottom_right.png");
 
 		// Object
-		item = screen.load("art/object/item.png");
+		item = BaseScreen.load("art/object/item.png");
 
 		// Obstacle
-		logs = screen.load("art/obstacle/logs.png");
-		planks = screen.load("art/obstacle/planks.png");
-		scaffolding_left = screen.load("art/obstacle/scaffolding_left.png");
-		scaffolding_right = screen.load("art/obstacle/scaffolding_right.png");
-		smallTree = screen.load("art/obstacle/small_tree.png");
-		sign = screen.load("art/obstacle/sign.png");
-		workbench_left = screen.load("art/obstacle/workbench_left.png");
-		workbench_right = screen.load("art/obstacle/workbench_right.png");
-		deadSmallTree = screen.load("art/obstacle/dead_small_tree.png");
+		logs = BaseScreen.load("art/obstacle/logs.png");
+		planks = BaseScreen.load("art/obstacle/planks.png");
+		scaffolding_left = BaseScreen.load("art/obstacle/scaffolding_left.png");
+		scaffolding_right = BaseScreen.load("art/obstacle/scaffolding_right.png");
+		smallTree = BaseScreen.load("art/obstacle/small_tree.png");
+		sign = BaseScreen.load("art/obstacle/sign.png");
+		workbench_left = BaseScreen.load("art/obstacle/workbench_left.png");
+		workbench_right = BaseScreen.load("art/obstacle/workbench_right.png");
+		deadSmallTree = BaseScreen.load("art/obstacle/dead_small_tree.png");
 
 		// Player, NPCs
 		player = screen.cut("art/player/player.png", 16, 16, 0, 0);
 		player_surf = screen.cut("art/player/player_surf.png", 16, 16, 0, 0);
 		player_bicycle = screen.cut("art/player/player_bicycle.png", 16, 16, 0, 0);
-		shadow = screen.load("art/player/shadow.png");
+		shadow = BaseScreen.load("art/player/shadow.png");
 
 		// Areas
-		testArea = screen.load("area/test/testArea.png");
-		testArea2 = screen.load("area/test/testArea2.png");
+		testArea = BaseScreen.load("area/test/testArea.png");
+		testArea2 = BaseScreen.load("area/test/testArea2.png");
 
 		// Miscellaneous
 		font = loadFont("font/font.ttf");
@@ -304,10 +304,10 @@ public class Art {
 		for (int i = 0; i < frames; i++) {
 			// There are 16 frames for the water.
 			if (i < 10) {
-				result[i] = screen.load(filename + "0" + String.valueOf(i) + ".png");
+				result[i] = BaseScreen.load(filename + "0" + String.valueOf(i) + ".png");
 			}
 			else {
-				result[i] = screen.load(filename + String.valueOf(i) + ".png");
+				result[i] = BaseScreen.load(filename + String.valueOf(i) + ".png");
 			}
 		}
 		return result;

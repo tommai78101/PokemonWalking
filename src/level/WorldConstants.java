@@ -65,6 +65,10 @@ public class WorldConstants {
 	public static ArrayList<Script> scripts = Script.loadScript("script/scripts.txt");
 	// public static ArrayList<Script> gameScripts = Script.loadScript("script/aas.script"); // TODO (6/19/2015): Check to see why there's a need to load "aas.script".
 
+	//Custom scripts
+	//This array list is made for a script + area file name. They both go together.
+	//public static ArrayList<Map.Entry<Script, String>> customScripts = new ArrayList<Map.Entry<Script, String>>();
+
 	// All bitmaps
 	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
 

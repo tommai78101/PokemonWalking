@@ -19,19 +19,19 @@ import javax.imageio.ImageIO;
 import level.WorldConstants;
 
 public class BaseBitmap {
-	
+
 	protected int[] pixels;
 	protected int width;
 	protected int height;
-	
+
 	private int id;
-	
+
 	public BaseBitmap(int w, int h) {
 		this.width = w;
 		this.height = h;
 		this.pixels = new int[w * h];
 	}
-	
+
 	public BaseBitmap(int w, int h, int[] p) {
 		this.width = w;
 		this.height = h;
@@ -39,18 +39,18 @@ public class BaseBitmap {
 		for (int i = 0; i < p.length; i++)
 			this.pixels[i] = p[i];
 	}
-	
+
 	public void setID(int value) {
 		this.id = value;
 	}
-	
+
 	public int getID() {
 		return this.id;
 	}
-	
-	public BaseBitmap load(String filename) {
+
+	public static BaseBitmap load(String filename) {
 		try {
-			BufferedImage image = ImageIO.read(BaseBitmap.this.getClass().getClassLoader().getResource(filename));
+			BufferedImage image = ImageIO.read(BaseBitmap.class.getClassLoader().getResource(filename));
 			System.out.println(filename);
 			return load(image);
 		}
@@ -59,8 +59,8 @@ public class BaseBitmap {
 		}
 		return null;
 	}
-	
-	public BaseBitmap load(File file) {
+
+	public static BaseBitmap load(File file) {
 		try {
 			// Prints out the bitmap filename. If there's something wrong, it won't print it out.
 			System.out.println(file.getAbsolutePath());
@@ -72,19 +72,19 @@ public class BaseBitmap {
 		}
 		return null;
 	}
-	
-	public BaseBitmap load(BufferedImage image) {
+
+	public static BaseBitmap load(BufferedImage image) {
 		if (image == null)
 			return null;
-		
+
 		int width = image.getWidth();
 		int height = image.getHeight();
-		
+
 		BaseBitmap result = new BaseBitmap(width, height, image.getRGB(0, 0, width, height, null, 0, width));
 		WorldConstants.bitmaps.add(result);
 		return result;
 	}
-	
+
 	public BaseBitmap[][] cut(String filename, int w, int h, int clipW, int clipH) {
 		try {
 			// BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
@@ -105,15 +105,15 @@ public class BaseBitmap {
 		}
 		return null;
 	}
-	
+
 	public int getWidth() {
 		return this.width;
 	}
-	
+
 	public int getHeight() {
 		return this.height;
 	}
-	
+
 	public int[] getPixels() {
 		return this.pixels;
 	}

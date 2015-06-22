@@ -28,7 +28,7 @@ public class Mod {
 	private static final String[] names = new String[] { "area", "script" };
 	public static List<Map.Entry<BaseBitmap, Integer>> moddedAreas = new ArrayList<Map.Entry<BaseBitmap, Integer>>();
 	private static boolean hasLoaded = false;
-	
+
 	private static Comparator<File> ALPHABETICAL_ORDER = new Comparator<File>() {
 		@Override
 		public int compare(File file1, File file2) {
@@ -38,11 +38,11 @@ public class Mod {
 			return (res != 0) ? res : str1.compareTo(str2);
 		}
 	};
-	
+
 	public static void resetLoading() {
 		Mod.hasLoaded = false;
 	}
-	
+
 	public static void loadModdedResources(BaseScreen screen) {
 		if (Mod.hasLoaded)
 			return;
@@ -53,7 +53,7 @@ public class Mod {
 			List<File> list = Mod.getContents(directory);
 			Collections.sort(list, ALPHABETICAL_ORDER);
 			for (File f : list) {
-				moddedAreas.add(new AbstractMap.SimpleEntry<BaseBitmap, Integer>(screen.load(f), id + 1000));
+				moddedAreas.add(new AbstractMap.SimpleEntry<BaseBitmap, Integer>(BaseScreen.load(f), id + 1000));
 				id++;
 			}
 		}
@@ -61,13 +61,13 @@ public class Mod {
 			throw new RuntimeException("Something is wrong with detecting the mod folder.");
 		Mod.hasLoaded = true;
 	}
-	
+
 	private static void initialization() {
 		File directory = new File("mod");
 		if (!directory.exists())
 			directory.mkdir();
 		if (directory.exists()) {
-			
+
 			for (int namesIterator = 0; namesIterator < names.length; namesIterator++) {
 				File folder = new File(directory.getPath() + File.separator + names[namesIterator]);
 				if (!folder.exists())
@@ -226,7 +226,7 @@ public class Mod {
 			}
 		}
 	}
-	
+
 	private static List<File> getContents(File file) {
 		List<File> results = new ArrayList<File>();
 		if (file.exists()) {
@@ -248,7 +248,7 @@ public class Mod {
 		}
 		return results;
 	}
-	
+
 	@SuppressWarnings("unused")
 	private static int getFilesCount(File file) {
 		File[] files = file.listFiles();

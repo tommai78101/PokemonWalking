@@ -72,13 +72,11 @@ public class ScriptEditor extends JFrame {
 				ScriptEditor.this.parent.scriptEditor = null;
 			}
 		});
-
 		addingComponents();
 
 		// Generates a scripting tutorial upon loading script editor. This generated file will not be persistent and the script editor will not overwrite if the file exists.
 		generateScriptingTutorial();
 
-		// TODO (11/24/2014): Change the scripting file to SCRIPT files at a later time. Function over extension.
 		LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
 		ToolTipManager.sharedInstance().setInitialDelay(1);
 		this.setTitle(this.getTitle() + " - Untitled.script");
