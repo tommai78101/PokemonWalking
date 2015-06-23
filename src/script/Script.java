@@ -309,7 +309,7 @@ public class Script {
 	public static ArrayList<Script> getAllScripts() {
 		ArrayList<Script> scripts = Script.loadScript("script/scripts.txt");
 		//ArrayList<Script> moddedScripts = Script.loadModdedScripts();
-		//scripts.addAll(moddedScripts);
+		//scripts.addAll(moddedScripts); 
 		return scripts;
 	}
 
