@@ -1,6 +1,7 @@
 package script;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class Script {
 	public int negativeIteration;
 	public Boolean questionResponse;
 	public boolean repeat;
-	
+
 	public Script() {
 		this.triggerID = 0;
 		this.moves = new ArrayList<Map.Entry<Integer, Movement>>();
@@ -37,42 +38,42 @@ public class Script {
 		this.questionResponse = null;
 		this.repeat = false;
 	}
-	
-	public Script(Script s){
+
+	public Script(Script s) {
 		//Deep copy
 		this.triggerID = s.triggerID;
-		
+
 		this.moves = new ArrayList<Map.Entry<Integer, Movement>>();
-		for (Map.Entry<Integer, Movement> e: s.moves)
+		for (Map.Entry<Integer, Movement> e : s.moves)
 			this.moves.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
-		
+
 		this.affirmativeMoves = new ArrayList<Map.Entry<Integer, Movement>>();
-		for (Map.Entry<Integer, Movement> e: s.affirmativeMoves)
+		for (Map.Entry<Integer, Movement> e : s.affirmativeMoves)
 			this.affirmativeMoves.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
-		
+
 		this.negativeMoves = new ArrayList<Map.Entry<Integer, Movement>>();
-		for (Map.Entry<Integer, Movement> e: s.negativeMoves)
+		for (Map.Entry<Integer, Movement> e : s.negativeMoves)
 			this.negativeMoves.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
-		
+
 		this.dialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
-		for (Map.Entry<Integer, NewDialogue> e: s.dialogues)
+		for (Map.Entry<Integer, NewDialogue> e : s.dialogues)
 			this.dialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
-		
+
 		this.affirmativeDialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
-		for (Map.Entry<Integer, NewDialogue> e: s.affirmativeDialogues)
+		for (Map.Entry<Integer, NewDialogue> e : s.affirmativeDialogues)
 			this.affirmativeDialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
-		
+
 		this.negativeDialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
-		for (Map.Entry<Integer, NewDialogue> e: s.negativeDialogues)
+		for (Map.Entry<Integer, NewDialogue> e : s.negativeDialogues)
 			this.negativeDialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
-		
+
 		this.iteration = s.iteration;
 		this.affirmativeIteration = s.affirmativeIteration;
 		this.negativeIteration = s.negativeIteration;
 		this.questionResponse = s.questionResponse;
 		this.repeat = s.repeat;
 	}
-	
+
 	public Movement getIteratedMoves() {
 		if (this.questionResponse == null) {
 			for (Map.Entry<Integer, Movement> entry : this.moves) {
@@ -94,7 +95,7 @@ public class Script {
 		}
 		return null;
 	}
-	
+
 	public NewDialogue getIteratedDialogues() {
 		if (this.questionResponse == null) {
 			for (Map.Entry<Integer, NewDialogue> entry : this.dialogues) {
@@ -119,19 +120,19 @@ public class Script {
 		}
 		return null;
 	}
-	
+
 	public void setAffirmativeFlag() {
 		this.questionResponse = Boolean.TRUE;
 	}
-	
+
 	public void setNegativeFlag() {
 		this.questionResponse = Boolean.FALSE;
 	}
-	
+
 	private void resetResponseFlag() {
 		this.questionResponse = null;
 	}
-	
+
 	public boolean incrementIteration() throws Exception {
 		if (this.questionResponse == null) {
 			this.iteration++;
@@ -148,7 +149,7 @@ public class Script {
 				return true;
 			return false;
 		}
-		else {  //FALSE
+		else { //FALSE
 			this.resetResponseFlag();
 			this.negativeIteration++;
 			int size = this.negativeMoves.size() + this.negativeDialogues.size();
@@ -157,24 +158,30 @@ public class Script {
 			return false;
 		}
 	}
-	
-	
+
 	/**
-	 * <p>Loads triggers according to the script file.</p>
+	 * <p>
+	 * Loads triggers according to the script file.
+	 * </p>
 	 * 
-	 * <p>The script file is a database of all triggers of a a certain map. All scripts within the file can only be triggered by that area.</p>
+	 * <p>
+	 * The script file is a database of all triggers of a a certain map. All scripts within the file can only be triggered by that area.
+	 * </p>
 	 * 
-	 * <p>Currently needs fixing and testing. Will be completed when all issues have been sorted out.</p>
+	 * <p>
+	 * Currently needs fixing and testing. Will be completed when all issues have been sorted out.
+	 * </p>
 	 * 
-	 * @param filename - A String object of the file name of the SCRIPT file.
+	 * @param filename
+	 *            - A String object of the file name of the SCRIPT file.
 	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located within the SCRIPT file.
 	 * 
 	 * */
 	public static ArrayList<Script> loadScript(String filename) {
 		ArrayList<Script> result = new ArrayList<Script>();
-		
+
 		// Scripts must contain a trigger data for Area to use, and must contain movements for Area to read.
-		
+
 		Script script = null;
 		int iteration = 0;
 		int affirmativeIteration = 0;
@@ -183,7 +190,7 @@ public class Script {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Script.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("/") || line.startsWith("@")) // Ignored tags
+				if (line.startsWith("/") || line.startsWith("@") || line.isEmpty()) // Ignored tags
 					continue;
 				else if (line.startsWith("$")) { // Start of script
 					int triggerID = Integer.valueOf(line.substring(1));
@@ -192,7 +199,7 @@ public class Script {
 							script = new Script();
 						script.triggerID = triggerID;
 					}
-					
+
 				}
 				else if (line.startsWith("^")) { // Movement
 					if (script != null) {
@@ -245,8 +252,8 @@ public class Script {
 						negativeIteration++;
 					}
 				}
-				else if (line.startsWith(";")){
-					if (script != null){
+				else if (line.startsWith(";")) {
+					if (script != null) {
 						script.repeat = true;
 					}
 				}
@@ -257,11 +264,11 @@ public class Script {
 		}
 		return result;
 	}
-	
+
 	private static void append(Movement moves, char[] list) {
 		int direction = -1;
 		int steps = -1;
-		
+
 		try {
 			for (int i = 0; i < list.length; i += 2) {
 				char d = list[i];
@@ -294,5 +301,42 @@ public class Script {
 			e.printStackTrace();
 			throw new NumberFormatException("Incorrect script syntax from \"script.txt\"");
 		}
+	}
+
+	/**
+	 * Load all default and modded scripts.
+	 * */
+	public static ArrayList<Script> getAllScripts() {
+		ArrayList<Script> scripts = Script.loadScript("script/scripts.txt");
+		//ArrayList<Script> moddedScripts = Script.loadModdedScripts();
+		//scripts.addAll(moddedScripts);
+		return scripts;
+	}
+
+	/**
+	 * Load all modded scripts.
+	 * */
+	public static ArrayList<Script> loadModdedScripts() {
+		ArrayList<Script> results = null;
+		File directory = new File("mod");
+		if (directory.isDirectory()) {
+			String[] folders = directory.list();
+			for (int i = 0; i < folders.length; i++) {
+				File file = new File(directory.getPath() + File.separator + folders[i]);
+				if (file.isDirectory() && file.getName().equals("script")) {
+					String[] scripts = file.list();
+					for (int j =0; j <scripts.length; j++){
+						String filePath = file.getPath() + File.separator + scripts[j];
+						filePath = filePath.replaceAll("\\\\", "/");
+						File something = new File(filePath);
+						
+					}
+				}
+				else {
+					continue;
+				}
+			}
+		}
+		return results;
 	}
 }

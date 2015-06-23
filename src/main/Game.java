@@ -37,13 +37,16 @@ public class Game {
 	private World overworld;
 	private final Player player;
 	private ActionItem registeredItem;
-	
+
 	public enum State {
-		GAME, PAUSED, INVENTORY, SAVE
+		GAME,
+		PAUSED,
+		INVENTORY,
+		SAVE
 	};
-	
+
 	private State state;
-	
+
 	/**
 	 * Creates the core component of the game.
 	 * 
@@ -67,7 +70,7 @@ public class Game {
 		this.subMenu = null;
 		this.state = State.GAME;
 	}
-	
+
 	/**
 	 * Handles rendered objects.
 	 * 
@@ -125,7 +128,7 @@ public class Game {
 		}
 		graphics.drawImage(MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 	}
-	
+
 	/**
 	 * Updates the game.
 	 * 
@@ -134,7 +137,7 @@ public class Game {
 	 * @return Nothing.
 	 * */
 	public void tick() {
-		
+
 		// Debugging purposes
 		if (this.player.keys.F1.keyStateDown && !(this.player.keys.F1.lastKeyState)) {
 			this.player.keys.F1.lastKeyState = true;
@@ -142,7 +145,7 @@ public class Game {
 			this.load();
 		}
 		// End debugging purposes
-		
+
 		switch (this.state) {
 			case GAME: {
 				overworld.tick();
@@ -190,14 +193,14 @@ public class Game {
 			}
 		}
 	}
-	
+
 	/**
 	 * Saves the game.
 	 * */
 	public void save() {
 		GameSave.save(this, SAVE_FILE_NAME);
 	}
-	
+
 	/**
 	 * Checks for any previous saved data.
 	 * 
@@ -206,21 +209,21 @@ public class Game {
 	public boolean checkSaveData() {
 		return GameSave.check(SAVE_FILE_NAME);
 	}
-	
+
 	/**
 	 * Currently unused.
 	 * */
 	public void load() {
 		// TODO: Load data.
 		this.screen.reload();
-		Mod.loadModdedResources(this.screen);
+		Mod.loadModdedResources();
 		WorldConstants.isModsEnabled = null;
 		player.reload();
 		this.overworld = new OverWorld(player, this);
 		this.state = State.GAME;
 		GameSave.load(this, SAVE_FILE_NAME);
 	}
-	
+
 	/**
 	 * Currently unused.
 	 * */
@@ -229,52 +232,52 @@ public class Game {
 		// this.xScroll = xCamCenter;
 		// this.yScroll = yCamCenter;
 	}
-	
+
 	/**
 	 * Currently unused. However, this is executed in the render() code.
 	 * */
 	public void setCameraRelativeToArea(int areaXPos, int areaYPos) {
 		// Not used at the moment.
-		
+
 		// cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
 		// this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
 		// this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
 	}
-	
+
 	public Player getPlayer() {
 		return this.player;
 	}
-	
+
 	public StartMenu getStartMenu() {
 		return this.startMenu;
 	}
-	
+
 	public void setState(State state) {
 		this.state = state;
 	}
-	
+
 	public BaseScreen getBaseScreen() {
 		return this.screen;
 	}
-	
+
 	public void setRegisteredItem(ActionItem item) {
 		this.registeredItem = item;
 		// TODO: Continue to handle registered item's action event.
 	}
-	
+
 	public boolean itemHasBeenRegistered(ActionItem item) {
 		if (this.registeredItem == null)
 			return false;
 		return this.registeredItem.equals(item);
-		
+
 	}
-	
+
 	public World getWorld() {
 		return this.overworld;
 	}
-	
+
 	// ---------------------------------------------- PRIVATE METHODS -------------------------------------------------
-	
+
 	private void handleActionEvent(Map.Entry<Integer, SubMenu> entry) {
 		String str = entry.getValue().getName();
 		if (str.equals(StartMenu.ITEM_NAME_INVENTORY)) {
@@ -302,7 +305,7 @@ public class Game {
 		this.startMenu.clearActionEvent();
 		this.startMenu.closeMenu();
 	}
-	
+
 	private void checkPausing() {
 		Keys keys = this.player.keys;
 		if (!keys.START.lastKeyState && keys.START.keyStateDown) {
@@ -323,7 +326,7 @@ public class Game {
 			keys.START.lastKeyState = true;
 		}
 	}
-	
+
 	private void checkUnpausing() {
 		Keys keys = this.player.keys;
 		switch (this.state) {

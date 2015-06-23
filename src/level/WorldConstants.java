@@ -12,7 +12,6 @@ package level;
 
 import item.ItemText;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import java.util.Map;
 import resources.Art;
 import resources.Mod;
 import screen.BaseBitmap;
-import screen.BaseScreen;
 import script.Script;
 import abstracts.Item;
 import dialogue.NewDialogue;
@@ -68,7 +66,7 @@ public class WorldConstants {
 
 	// Movement
 	// TODO (11/24/2014): Make map more flexible by allowing scripting files of different filenames to be loaded. Not sure where it was being loaded.
-	public static ArrayList<Script> scripts = Script.loadScript("script/scripts.txt");
+	public static ArrayList<Script> scripts = Script.getAllScripts();
 	// public static ArrayList<Script> gameScripts = Script.loadScript("script/aas.script"); // TODO (6/19/2015): Check to see why there's a need to load "aas.script".
 
 	//Custom scripts
@@ -171,16 +169,5 @@ public class WorldConstants {
 			default:
 				return 0;
 		}
-	}
-
-	/**
-	 * Load area from bitmap file.
-	 * 
-	 * */
-	public static Area loadAreaFromFile(File file, String customAreaName) {
-		BaseBitmap bitmap = BaseScreen.load(file);
-		Area area = new Area(bitmap, Mod.moddedAreas.size() + 1000);
-		area.setAreaName(customAreaName);
-		return area;
 	}
 }

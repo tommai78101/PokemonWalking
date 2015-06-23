@@ -43,10 +43,10 @@ public class Mod {
 		Mod.hasLoaded = false;
 	}
 
-	public static void loadModdedResources(BaseScreen screen) {
+	public static void loadModdedResources() {
 		if (Mod.hasLoaded)
 			return;
-		initialization();
+		Mod.initialization();
 		int id = 1;
 		File directory = new File("mod");
 		if (directory.exists()) {
@@ -67,7 +67,6 @@ public class Mod {
 		if (!directory.exists())
 			directory.mkdir();
 		if (directory.exists()) {
-
 			for (int namesIterator = 0; namesIterator < names.length; namesIterator++) {
 				File folder = new File(directory.getPath() + File.separator + names[namesIterator]);
 				if (!folder.exists())
