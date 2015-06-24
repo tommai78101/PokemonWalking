@@ -142,11 +142,11 @@ Scripts are what will become Triggers and Events that the game will have in the 
 
 | In development | Beta (Close to completion) | Complete |
 |:---:|:---:|:---:|
-| Entity Interaction | Overworld | All Movements* |
-| Ground Height Lighting | Dialogues | Ledges |
-| ??? | Level Editor | Area Warping |
-| | Triggers/Events | Stairs |
-| | ??? | Water |
+| Triggers/Events | Dialogues | All Movements* |
+| Script Editor | Level Editor | Ledges |
+| ??? | ??? | Area Warping |
+| | | Stairs |
+| | | Water |
 | | | Bitmap Animation |
 | | | Item Balls |
 | | | Inventory |
@@ -161,6 +161,7 @@ Scripts are what will become Triggers and Events that the game will have in the 
 * There may be issues with the tiles-to-tiles interaction, causing unwanted bugs.
 * There may be hidden issues I haven't seen/know of yet.
 * All items will exit out of inventory.
+* I may not have enough time to put time and effort on this project.
 
 ===
 
