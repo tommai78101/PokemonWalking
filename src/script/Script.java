@@ -2,6 +2,8 @@ package script;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -177,7 +179,7 @@ public class Script {
 	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located within the SCRIPT file.
 	 * 
 	 * */
-	public static ArrayList<Script> loadScript(String filename) {
+	public static ArrayList<Script> loadScript(String filename, boolean isModdedScript) {
 		ArrayList<Script> result = new ArrayList<Script>();
 
 		// Scripts must contain a trigger data for Area to use, and must contain movements for Area to read.
@@ -186,8 +188,14 @@ public class Script {
 		int iteration = 0;
 		int affirmativeIteration = 0;
 		int negativeIteration = 0;
+		BufferedReader reader = null;
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(Script.class.getClassLoader().getResourceAsStream(filename)));
+			if (isModdedScript){
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename))));
+			}
+			else {
+				reader = new BufferedReader(new InputStreamReader(Script.class.getClassLoader().getResourceAsStream(filename)));
+			}
 			String line;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("/") || line.startsWith("@") || line.isEmpty()) // Ignored tags
@@ -262,6 +270,16 @@ public class Script {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
+		finally {
+			if (reader != null){
+				try {
+					reader.close();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		return result;
 	}
 
@@ -307,9 +325,9 @@ public class Script {
 	 * Load all default and modded scripts.
 	 * */
 	public static ArrayList<Script> getAllScripts() {
-		ArrayList<Script> scripts = Script.loadScript("script/scripts.txt");
-		//ArrayList<Script> moddedScripts = Script.loadModdedScripts();
-		//scripts.addAll(moddedScripts); 
+		ArrayList<Script> scripts = Script.loadScript("script/scripts.txt", false);
+		ArrayList<Script> moddedScripts = Script.loadModdedScripts();
+		scripts.addAll(moddedScripts); 
 		return scripts;
 	}
 
@@ -318,22 +336,20 @@ public class Script {
 	 * */
 	public static ArrayList<Script> loadModdedScripts() {
 		ArrayList<Script> results = null;
-		File directory = new File("mod");
-		if (directory.isDirectory()) {
-			String[] folders = directory.list();
-			for (int i = 0; i < folders.length; i++) {
-				File file = new File(directory.getPath() + File.separator + folders[i]);
-				if (file.isDirectory() && file.getName().equals("script")) {
-					String[] scripts = file.list();
-					for (int j =0; j <scripts.length; j++){
-						String filePath = file.getPath() + File.separator + scripts[j];
-						filePath = filePath.replaceAll("\\\\", "/");
-						File something = new File(filePath);
-						
+		File modDirectory = new File("mod");
+		if (modDirectory.exists() && modDirectory.isDirectory()){
+			String[] folders = modDirectory.list();
+			LOOP: for (int i =0; i<folders.length; i++){
+				File directory = new File(modDirectory.getPath() + File.separator + folders[i]);
+				if (directory.exists() && directory.isDirectory() && directory.getName().equals("script")){
+					String[] scripts = directory.list();
+					for (int j = 0; j<scripts.length;j++){
+						String filePath = directory.getPath() + File.separator + scripts[j];
+						if (filePath.endsWith(".script")){
+							results = Script.loadScript(filePath, true); 
+						}
 					}
-				}
-				else {
-					continue;
+					break LOOP;
 				}
 			}
 		}
