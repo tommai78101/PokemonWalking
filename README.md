@@ -174,8 +174,8 @@ Scripts are what will become Triggers and Events that the game will have in the 
 
 | Downloads | Latest Stable Version | Link |
 |:---:|:---:|:---:|
-| Walking | v19 | http://www.thehelper.net/attachments/walking_v19-zip.18695/ |
-| Editor | v5 | http://www.thehelper.net/attachments/editor_v5-zip.18692/ |
+| Walking | v20 (6/18/2015) | http://www.thehelper.net/attachments/walking_v20-zip.18776/ |
+| Editor | v6 (6/18/2015) | http://www.thehelper.net/attachments/editor_v6-zip.18777/ |
 
 Extract the JAR file from the ZIP file after you have downloaded it. Then double-click on it to run.
 
