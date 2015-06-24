@@ -10,9 +10,13 @@
 
 package editor;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -24,11 +28,13 @@ import java.util.HashMap;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.metal.MetalFileChooserUI;
 
 import script_editor.ScriptEditor;
 import editor.EditorConstants.Metadata;
@@ -100,7 +106,53 @@ public class FileControl extends JPanel implements ActionListener {
 						}
 					}
 					
-					JFileChooser chooser = new JFileChooser();
+					final JFileChooser chooser = new JFileChooser();
+					
+					JList<Class<?>> list = findFileList(chooser);
+					LOOP_TEMP: for (MouseListener l : list.getMouseListeners()){
+						if (l.getClass().getName().indexOf("FilePane") >= 0){
+							list.removeMouseListener(l);
+							list.addMouseListener(new MouseListener(){
+								@Override
+								public void mouseClicked(MouseEvent e) {
+									if (e.getClickCount() == 1){
+										File file = chooser.getSelectedFile();
+										if (file != null){
+											MetalFileChooserUI ui = (MetalFileChooserUI) chooser.getUI();
+											ui.setFileName(file.getName());											
+										}
+									}
+									else if (e.getClickCount() == 2){
+										File file = chooser.getSelectedFile();
+										if (file != null){
+											if (file.isDirectory()){
+												chooser.setCurrentDirectory(file);
+											}
+											else if (file.isFile()){
+												chooser.setSelectedFile(file);
+											}
+											MetalFileChooserUI ui = (MetalFileChooserUI) chooser.getUI();
+											ui.setFileName(file.getName());	
+										}
+									}
+								}
+								@Override
+								public void mouseEntered(MouseEvent e) {
+								}
+								@Override
+								public void mouseExited(MouseEvent e) {
+								}
+								@Override
+								public void mousePressed(MouseEvent e) {
+								}
+								@Override
+								public void mouseReleased(MouseEvent e) {
+								}
+							});
+							break LOOP_TEMP;
+						}
+					}
+					
 					chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 					chooser.setCurrentDirectory(lastSavedDirectory);
 					chooser.setFileFilter(new FileNameExtensionFilter("PNG files", "png"));
@@ -168,7 +220,53 @@ public class FileControl extends JPanel implements ActionListener {
 						}
 					}
 					
-					JFileChooser opener = new JFileChooser();
+					final JFileChooser opener = new JFileChooser();
+					
+					JList<Class<?>> list = findFileList(opener);
+					LOOP_TEMP1: for (MouseListener l : list.getMouseListeners()){
+						if (l.getClass().getName().indexOf("FilePane") >= 0){
+							list.removeMouseListener(l);
+							list.addMouseListener(new MouseListener(){
+								@Override
+								public void mouseClicked(MouseEvent e) {
+									if (e.getClickCount() == 1){
+										File file = opener.getSelectedFile();
+										if (file != null){
+											MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
+											ui.setFileName(file.getName());											
+										}
+									}
+									else if (e.getClickCount() == 2){
+										File file = opener.getSelectedFile();
+										if (file != null){
+											if (file.isDirectory()){
+												opener.setCurrentDirectory(file);
+											}
+											else if (file.isFile()){
+												opener.setSelectedFile(file);
+											}
+											MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
+											ui.setFileName(file.getName());	
+										}
+									}
+								}
+								@Override
+								public void mouseEntered(MouseEvent e) {
+								}
+								@Override
+								public void mouseExited(MouseEvent e) {
+								}
+								@Override
+								public void mousePressed(MouseEvent e) {
+								}
+								@Override
+								public void mouseReleased(MouseEvent e) {
+								}
+							});
+							break LOOP_TEMP1;
+						}
+					}
+					
 					opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 					opener.setCurrentDirectory(FileControl.lastSavedDirectory);
 					opener.setFileFilter(new FileNameExtensionFilter("PNG files", "png"));
@@ -228,5 +326,21 @@ public class FileControl extends JPanel implements ActionListener {
 		catch (NumberFormatException e) {
 			return;
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private JList<Class<?>> findFileList(Component comp){
+		if (comp instanceof JList){
+			return (JList<Class<?>>) comp;
+		}
+		if (comp instanceof Container){
+			for (Component c : ((Container) comp).getComponents()){
+				JList<Class<?>> list = findFileList(c);
+				if (list != null){
+					return list;
+				}
+			}
+		}
+		return null;
 	}
 }

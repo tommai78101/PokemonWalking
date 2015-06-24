@@ -27,6 +27,9 @@ import script_editor.ScriptEditor;
 import abstracts.Tile;
 import editor.EditorConstants.Metadata;
 
+
+//TODO(6/23/2015): Redo reading/writing level files. This time, aim for binary files, instead of PNG bitmap files.
+
 public class LevelEditor extends JFrame {
 	private static final long serialVersionUID = -8739477187675627751L;
 	public static final int WIDTH = 160;
