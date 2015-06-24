@@ -316,7 +316,7 @@ public class Area {
 	 *            Sets the offset of the PixelData it should check by the X axis.
 	 * @param yOffset
 	 *            Sets the offset of the PixelData it should check by the Y axis.
-	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through. Returns true to allow player to walk from the player's last position to this tile. Returns false to block the player from walking from the player's last position to this tile.
+	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through. Returns true to block the player from walking from the player's last position to this tile. Returns false to allow player to walk from the player's last position to this tile. 
 	 * */
 	private boolean checkSurroundingData(int xOffset, int yOffset) {
 		PixelData data = null;
@@ -388,7 +388,10 @@ public class Area {
 						}
 						case 0x07: // Bottom Right
 							// TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!
-							return false;
+							return true;
+						case 0x18: //Inner bottom left
+						case 0x19: //Inner bottom right
+							return true;
 
 							// ------------------------- MOUNTAIN LEDGES ------------------------
 						case 0x0C:
