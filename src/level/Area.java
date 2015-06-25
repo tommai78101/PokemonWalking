@@ -122,7 +122,6 @@ public class Area {
 		// Since "setPlayer" method isn't always set, there should be checks everywhere to make sure "player" isn't null.
 		if (this.player != null) {
 			// PixelData data = null;
-
 			if (this.triggerIsBeingTriggered) {
 				xPlayerPosition = player.getXInArea();
 				yPlayerPosition = player.getYInArea();
@@ -131,15 +130,21 @@ public class Area {
 				this.currentPixelData = this.areaData.get(yPlayerPosition).get(xPlayerPosition);
 				this.checkCurrentPositionDataAndSetProperties();
 			}
-			if (!this.triggerIsBeingTriggered && trigger == null && !this.player.isLockedWalking())
-				trigger = checkForTrigger(xPlayerPosition, yPlayerPosition);
-			if (!this.triggerIsBeingTriggered && trigger != null && !this.player.isLockedWalking()) {
-				this.triggerIsBeingTriggered = true;
-				handleTriggerActions();
+			
+			if (!this.triggerIsBeingTriggered){
+				if (!this.player.isLockedWalking()){
+					if (this.trigger == null)
+						trigger = checkForTrigger(xPlayerPosition, yPlayerPosition);
+					if (this.trigger != null)
+						this.triggerIsBeingTriggered = true;
+				}
 			}
-			else if (!this.triggerIsBeingTriggered)
+			if (this.triggerIsBeingTriggered && this.trigger != null)
+				handleTriggerActions();
+			else if ((this.triggerIsBeingTriggered && this.trigger == null) || !this.triggerIsBeingTriggered){
+				this.triggerIsBeingTriggered = false;
 				handlePlayerActions();
-
+			}
 		}
 	}
 
@@ -183,7 +188,7 @@ public class Area {
 	private TriggerData checkForTrigger(int playerX, int playerY) {
 		for (TriggerData t : this.triggerDatas) {
 			if (t.x == playerX && t.y == playerY && (!t.isFinished() || t.isOnRepeat())) {
-				this.triggerIsBeingTriggered = true;
+				//this.triggerIsBeingTriggered = true;
 				return new TriggerData(t).reset();
 			}
 		}
@@ -729,7 +734,7 @@ public class Area {
 		byte[] bytes = this.areaName.getBytes();
 		int hash = 1;
 		for (int i = 0; i < bytes.length; i++) {
-			hash = hash * 3 + (int) bytes[i];
+			hash = hash * 3 + bytes[i];
 		}
 		return hash;
 	}

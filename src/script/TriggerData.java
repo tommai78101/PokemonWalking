@@ -47,7 +47,7 @@ public class TriggerData {
 			System.out.println("Scripts are empty");
 		for (Script s : WorldConstants.scripts) {
 			if (s.triggerID == (pixel & 0xFFFF)) {
-				this.script = new Script(s);
+				this.script = s;
 				if (s.repeat)
 					this.setRepeating();
 				break;
