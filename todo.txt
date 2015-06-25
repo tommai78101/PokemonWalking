@@ -2,8 +2,52 @@ By line order (Specific --> Abstract):
 
 BEFORE CONTINUING WITH THIS LIST OF TODOs:
 
-Open the project and look at the Tasks view. That contains the full list of
-things needed to be done. Contains (FIXME) and (TODO).
+Open the project and look at the Tasks view. That contains the full list othings needed to be done. Contains (FIXME) Area.javaand (TODO).
+
+
+DEBUG (NewDialogue.java): Needs testing to see if there's any problem with	NewDialogue.
+DEBUG (MainComponent.java): Uncomment this line if you feel debugging and switching window focus from IDE to game and back is nauseous.
+TODO (11/24/2014) (WorldConstants.java): Make map more flexible by allowing scripting files of different filenames to be loaded. Not sure where it was being loaded.
+TODO (6/18/2015) (Area.java): Door needs to be checked for null areas. If null areas are found, default to locked doors.
+TODO (6/19/2015) (PixelData.java): 0x05000003 is a water tile in the level editor, but it's really not a water tile.
+TODO (6/19/2015) (WorldConstants.java): Check to see why there's a need to load "aas.script".
+TODO (6/19/2015) (PixelData.java): Make the borders a bit more thicker. Possibly the land border near the edges of the water tiles.
+TODO: (2014-6-26) (ScriptEditor.java): Add the ability to save temp script data on the fly. Closing included.
+TODO (OverWorld.java): Add a method that executes according to the sector ID. 
+TODO (EditorConstants.java): Add additional pixel data properties that can be edited/modified for the area.
+TODO (Area.java): Add area type.
+TODO (PixelData.java): Add biome bitmaps to ledge.
+TODO (TriggerData.java): Add entity ID for NPCs.
+
+<More, unsorted>
+
+TODO: Add function that allows the item to be placed at.	Item.java	/PokemonWalking/src/abstracts	line 165	Java Task
+TODO: Add more area type biome bitmaps here to the Path. (Refer to documentation.)	PixelData.java	/PokemonWalking/src/level	line 166	Java Task
+TODO: Add more drawing functions that enable more controls when it comes to rendering assets.	BaseScreen.java	/PokemonWalking/src/screen	line 25	Java Task
+TODO: Add more water tiles with borders.	PixelData.java	/PokemonWalking/src/level	line 334	Java Task
+TODO: Add new bitmaps for connection points to make them blend in with the surroundings.	PixelData.java	/PokemonWalking/src/level	line 298	Java Task
+TODO: Add new inventory art for background.	Inventory.java	/PokemonWalking/src/submenu	line 186	Java Task
+TODO: Add something that detects a special boolean value in order to let the player move on water.	Area.java	/PokemonWalking/src/level	line 437	Java Task
+TODO: Add Trigger properties here.	LevelEditor.java	/PokemonWalking/src/editor	line 118	Java Task
+TODO: Area Type ID must be included.	DrawingBoard.java	/PokemonWalking/src/editor	line 194	Java Task
+TODO: Area Type ID must be included.	DrawingBoard.java	/PokemonWalking/src/editor	line 268	Java Task
+TODO: Change this biome bitmap to something that represents the city even more.	PixelData.java	/PokemonWalking/src/level	line 156	Java Task
+TODO: Continue to handle registered item's action event.	Game.java	/PokemonWalking/src/main	line 265	Java Task
+TODO: Create more biome bitmaps.	PixelData.java	/PokemonWalking/src/level	line 299	Java Task
+TODO: Dispatch event to Canvas other than Control Panel. Events must be separated from each other.	EditorInput.java	/PokemonWalking/src/editor	line 31	Java Task
+TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!	Area.java	/PokemonWalking/src/level	line 395	Java Task
+TODO: Draw exit arrow point upwards.	Area.java	/PokemonWalking/src/level	line 751	Java Task
+TODO: Fix the awkward interaction caused by so many states not working properly.	OverWorld.java	/PokemonWalking/src/level	line 136	Java Task
+TODO: Fix this checkup.	Area.java	/PokemonWalking/src/level	line 234	Java Task
+TODO: Incorporate pixel data facingsBlocked variable to this section. Currently, the facingsBlocked[] variable for each pixel data isn't used.	Area.java	/PokemonWalking/src/level	line 348	Java Task
+TODO: Load data.	Game.java	/PokemonWalking/src/main	line 217	Java Task
+TODO: Merge "Signs" with "Obstacles", as they now have similar functions.	Player.java	/PokemonWalking/src/entity	line 205	Java Task
+TODO: Move function code from Overworld, Area to here.	Obstacle.java	/PokemonWalking/src/obstacle	line 53	Java Task
+TODO: Needs to do something with this. It must not block the player, however, without special boolean value, it will always block player from advancing.	PixelData.java	/PokemonWalking/src/level	line 516	Java Task
+TODO: Probably need to set world ID first before setting the current area ID and SECTOR.	GameSave.java	/PokemonWalking/src/saving	line 229	Java Task
+TODO: Refactor the code to make it more readable and more modular than if...elses.	PixelData.java	/PokemonWalking/src/level	line 482	Java Task
+TODO(6/23/2015): Redo reading/writing level files. This time, aim for binary files, instead of PNG bitmap files.	LevelEditor.java	/PokemonWalking/src/editor	line 31	Java Task
+
 
 
 TOP PRIORITY:

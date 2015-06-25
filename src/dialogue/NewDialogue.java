@@ -227,6 +227,12 @@ public class NewDialogue {
 		}
 	}
 	
+	/**
+	 * <p>Update method for NewDialogue class.</p>
+	 * 
+	 * <p><b>WARNING</b> : The code content of this tick() method is deliberately setup and designed in such a way that it 
+	 * replicates the dialogues in Gen 1 and Gen 2 Pokémon games. May require a heavy amount of refactoring/rewriting.</p>
+	 * */
 	public void tick() {
 		int count = 0;
 		try {
@@ -400,6 +406,7 @@ public class NewDialogue {
 				}
 			}
 			else if (this.simpleSpeechFlag) {
+				//Handles only the simplest forms of dialogues.
 				if ((input.Z.keyStateDown && !(input.Z.lastKeyState) || (input.SLASH.keyStateDown && !input.SLASH.lastKeyState))) {
 					input.Z.lastKeyState = true;
 					input.SLASH.lastKeyState = true;

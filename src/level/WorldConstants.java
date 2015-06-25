@@ -131,7 +131,7 @@ public class WorldConstants {
 			}
 			// result.add(new Area(Art.testArea3, TEST_WORLD_3));
 			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
-			// result.add(new Area(Art.testArea_debug, DEBUG));
+			// result.add(new Area(Art.testArea_debug, Debug));
 			return WorldConstants.areas;
 		}
 		else { // Including NULL value.

@@ -331,9 +331,8 @@ public class MainComponent extends Canvas implements Runnable {
 		Insets inset = frame.getInsets();
 		frame.setSize(new Dimension(inset.left + inset.right + GAME_WIDTH * GAME_SCALE, inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE));
 		frame.setLocationRelativeTo(null);
-		// DEBUG: START
+		// DEBUG: Uncomment this line if you feel debugging and switching window focus from IDE to game and back is nauseous. 
 		// frame.setAlwaysOnTop(true);
-		// DEBUG: END
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.addWindowListener(game.getWindowListener());
 		frame.setVisible(true);
