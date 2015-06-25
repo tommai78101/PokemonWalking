@@ -57,7 +57,6 @@ public class TriggerData {
 	}
 	
 	public void tick(Area area, int entityX, int entityY) {
-		// TODO: Continue from here.
 		if (this.script != null) {
 			
 			moves = this.script.getIteratedMoves();
@@ -107,33 +106,33 @@ public class TriggerData {
 			else if (moves == null && dialogue != null) {
 				switch (dialogue.getDialogueType()) {
 					case NewDialogue.DIALOGUE_SPEECH:
-						if (dialogue.isDialogueCompleted() && dialogue.isScrolling()) {
-							Player.unlockMovements();
-							//dialogue.resetDialogue();
-							dialogue.tick();
-							try {
-								this.finished = !this.script.incrementIteration();
-							}
-							catch (Exception e) {
-								this.finished = true;
-								return;
-							}
-						}
-						else if (dialogue.isDialogueCompleted() && !dialogue.isScrolling()) {
-							if (!dialogue.isShowingDialog()) {
+						if (this.dialogue.isDialogueCompleted()){
+							if (this.dialogue.isScrolling()){
 								Player.unlockMovements();
-								// dialogue.resetDialogue();
-								this.dialogue = null;
+								dialogue.tick();
 								try {
 									this.finished = !this.script.incrementIteration();
 								}
 								catch (Exception e) {
 									this.finished = true;
 									return;
-								}
+								}	
 							}
-							else
-								dialogue.tick();
+							else {
+								if (!dialogue.isShowingDialog()) {
+									Player.unlockMovements();
+									this.dialogue = null;
+									try {
+										this.finished = !this.script.incrementIteration();
+									}
+									catch (Exception e) {
+										this.finished = true;
+										return;
+									}
+								}
+								else
+									dialogue.tick();
+							}
 						}
 						else if (dialogue.isDialogueTextSet() && !(dialogue.isDialogueCompleted() && dialogue.isShowingDialog())) {
 							Player.lockMovements();
