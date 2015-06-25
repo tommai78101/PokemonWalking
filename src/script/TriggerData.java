@@ -109,8 +109,8 @@ public class TriggerData {
 					case NewDialogue.DIALOGUE_SPEECH:
 						if (dialogue.isDialogueCompleted() && dialogue.isScrolling()) {
 							Player.unlockMovements();
-							// dialogue.resetDialogue();
-							this.dialogue = null;
+							//dialogue.resetDialogue();
+							dialogue.tick();
 							try {
 								this.finished = !this.script.incrementIteration();
 							}

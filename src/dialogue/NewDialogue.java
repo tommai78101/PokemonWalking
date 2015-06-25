@@ -430,7 +430,7 @@ public class NewDialogue {
 							break;
 					}
 				}
-				if (this.scrollFlag) {
+				else if (this.scrollFlag) {
 					if (this.lineIterator >= this.lines.size()) {
 						switch (this.type) {
 							case DIALOGUE_QUESTION:
