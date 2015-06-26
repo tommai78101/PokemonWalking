@@ -195,6 +195,12 @@ public class Area {
 		return null;
 	}
 
+	/**
+	 * <p>Handles the 4 surrounding tiles around the player character, in the cardinal directions of north, west, south, and east. Once the player is 
+	 * interacting with one of the tiles, the area will remember and mark the tile's interaction ID, and pass it to the OverWorld to handle.</p>
+	 * 
+	 * @return Nothing.
+	 * */
 	private void handleSurroundingTiles() {
 		this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1), checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
 		try {

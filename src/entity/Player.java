@@ -202,35 +202,29 @@ public class Player extends Entity {
 		int alpha = (dataColor >> 24) & 0xFF;
 		int red = (dataColor >> 16) & 0xFF;
 		switch (alpha) {
-		// TODO: Merge "Signs" with "Obstacles", as they now have similar functions.
 			case 0x03: {// Obstacles
-				switch (red) {
-					default:
-						// case 0x00: // Small tree
-						// case 0x01: //Logs
-						// case 0x02: //Planks
-						// case 0x03: //Scaffolding Left
-						// case 0x04: //Scaffolding Right
-						// case 0x05: //Sign
-						if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
-							this.enableInteraction = false;
-							if (Player.isMovementsLocked())
-								Player.unlockMovements();
-							break;
-						}
-						if (!movementLock) {
-							if (this.interactionID != 0) {
-								this.enableInteraction = false;
-								return;
-							}
-							if (!this.enableInteraction)
-								this.enableInteraction = true;
-						}
-						if (this.enableInteraction) {
-							this.interactionID = dataColor;
-						}
-						break;
+				// case 0x00: // Small tree
+				// case 0x01: //Logs
+				// case 0x02: //Planks
+				// case 0x03: //Scaffolding Left
+				// case 0x04: //Scaffolding Right
+				// case 0x05: //Sign
+				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
+					this.enableInteraction = false;
+					if (Player.isMovementsLocked())
+						Player.unlockMovements();
+					break;
 				}
+				if (!movementLock) {
+					if (this.interactionID != 0) {
+						this.enableInteraction = false;
+						return;
+					}
+					if (!this.enableInteraction)
+						this.enableInteraction = true;
+				}
+				if (this.enableInteraction)
+					this.interactionID = dataColor;
 				break;
 			}
 			case 0x0A: {// Item

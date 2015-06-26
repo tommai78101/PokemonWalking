@@ -132,6 +132,12 @@ public class OverWorld extends World {
 		this.handleDialogues();
 	}
 
+	/**
+	 * <p>Handles player interactions with objects in the world. When the player is interacting, it passes the interacted object's interaction ID number
+	 * to the OverWorld, where it handles the interaction ID accordingly.
+	 * </p>
+	 * 
+	 * */
 	private void handlePlayerInteractions() {
 		// TODO: Fix the awkward interaction caused by so many states not working properly.
 		int interactionID = player.getInteractionID();
