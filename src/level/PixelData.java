@@ -479,7 +479,6 @@ public class PixelData {
 	 * @return Nothing.
 	 * */
 	public void setProperties(int alpha, int red, int green, int blue) {
-		// TODO: Refactor the code to make it more readable and more modular than if...elses.
 		this.targetArea = 0;
 		this.isWarpZone = false;
 		this.groundHeight = 0;
@@ -513,7 +512,7 @@ public class PixelData {
 			case 0x06: // Stairs
 				break;
 			case 0x07: // Water
-				// TODO: Needs to do something with this. It must not block the player, however, without special boolean value, it will always block player from advancing.
+				// TODO: Needs to do something with facingsBlocked[] array. It must not block the player, however, without special boolean value, it will always block player from advancing.
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
 			case 0x08: // House
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;

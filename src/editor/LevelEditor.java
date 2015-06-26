@@ -28,7 +28,8 @@ import abstracts.Tile;
 import editor.EditorConstants.Metadata;
 
 
-//TODO(6/23/2015): Redo reading/writing level files. This time, aim for binary files, instead of PNG bitmap files.
+//TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating 
+//maps and scripts together.
 
 public class LevelEditor extends JFrame {
 	private static final long serialVersionUID = -8739477187675627751L;
