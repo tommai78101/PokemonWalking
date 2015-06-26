@@ -60,6 +60,9 @@ public class Game {
 	 * @see NewInputHandler
 	 * */
 	public Game(MainComponent main, Keys input) {
+		Mod.loadModdedResources();
+		WorldConstants.checkForMods();
+		
 		this.screen = main.getBaseScreen();
 		this.player = new Player(input);
 		this.player.setCenterCamPosition(this.screen);
@@ -69,6 +72,10 @@ public class Game {
 		this.startMenu = new StartMenu(this).initialize();
 		this.subMenu = null;
 		this.state = State.GAME;
+		
+		GameSave.load(this, SAVE_FILE_NAME);
+		this.screen.reload();
+		this.player.reload();
 	}
 
 	/**
@@ -211,9 +218,11 @@ public class Game {
 	}
 
 	/**
-	 * Currently unused.
+	 * <p>Loads the game.</p>
+	 * 
+	 * <p>Currently used for debugging purposes only. Press F1 to re-load.</p>
 	 * */
-	public void load() {
+	private void load() {
 		// TODO: Load data.
 		this.screen.reload();
 		Mod.loadModdedResources();

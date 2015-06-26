@@ -94,7 +94,6 @@ public class MainComponent extends Canvas implements Runnable {
 		// Game loading
 		// We pass the BaseScreen variable as a parameter, acting as an output.
 		game = new Game(this, keys);
-		game.load();
 		// world = new TestWorld(Art.testArea);
 		
 		// this.world.addEntity(player);

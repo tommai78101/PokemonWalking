@@ -107,12 +107,11 @@ public class WorldConstants {
 	}
 
 	/**
-	 * Returns all available areas defined.
+	 * <p>Checks to see if there exists custom maps in the "mod" folder.</p>
 	 * 
-	 * @return A List<Area> object containing all available areas in specified order defined.
+	 * @return Nothing
 	 * */
-	public static List<Area> getAllNewAreas() {
-		//List<Area> result = new ArrayList<Area>();
+	public static void checkForMods(){
 		if (WorldConstants.isModsEnabled == null) {
 			if (Mod.moddedAreas.isEmpty()) {
 				WorldConstants.isModsEnabled = Boolean.FALSE;
@@ -121,6 +120,15 @@ public class WorldConstants {
 				WorldConstants.isModsEnabled = Boolean.TRUE;
 			}
 		}
+	}
+	
+	/**
+	 * Returns all available areas defined.
+	 * 
+	 * @return A List<Area> object containing all available areas in specified order defined.
+	 * */
+	public static List<Area> getAllNewAreas() {
+		//List<Area> result = new ArrayList<Area>();
 		if (WorldConstants.isModsEnabled == Boolean.FALSE || WorldConstants.isModsEnabled == null) {
 			if (WorldConstants.areas.isEmpty()) {
 				WorldConstants.areas.add(new Area(Art.testArea, TEST_WORLD_1));
