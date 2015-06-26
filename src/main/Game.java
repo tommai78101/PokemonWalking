@@ -217,7 +217,8 @@ public class Game {
 		// TODO: Load data.
 		this.screen.reload();
 		Mod.loadModdedResources();
-		WorldConstants.isModsEnabled = null;
+		if (WorldConstants.isModsEnabled == null)
+			WorldConstants.isModsEnabled = Boolean.FALSE;
 		player.reload();
 		this.overworld = new OverWorld(player, this);
 		this.state = State.GAME;

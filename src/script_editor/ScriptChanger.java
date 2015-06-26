@@ -33,6 +33,8 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 
 	private final ScriptEditor editor;
 
+	//TODO (6/25/2015): ID Field needs to default to a number > 0. New triggers currently does not auto-set itself.
+	
 	private JTextField nameField, idField;
 	private JButton upButton, downButton, leftButton, rightButton;
 	private JButton questionDialogue, affirmativeDialogue, negativeDialogue, speechDialogue;
@@ -251,7 +253,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		panel.add(speechDialogue);
 		questionDialogue = new JButton("?");
 		questionDialogue.setMargin(inset);
-		questionDialogue.setToolTipText("<html><b>Question Dialogue:</b><br/> A question dialogue asking for the player's response to YES or NO. <br/><br/><b>Usage:</b><br/>?[One-line-only Question] <br/><br/><b>Example:</b><br/>?Do you want to trade your Bulbasaur for my Pikachu?</html>");
+		questionDialogue.setToolTipText("<html><b>Question Dialogue:</b><br/> A question dialogue asking for the player's response to YES or NO.<br/><br/><b>WARNING:</b><br/>A single question must be followed by an Affirmative and a Negative Dialogue.<br/><br/><b>Usage:</b><br/>?[One-line-only Question] <br/><br/><b>Example:</b><br/>?Do you want to trade your Bulbasaur for my Pikachu?<br/>+Great! Let's trade!<br/>-Aw... I thought you had one.</html>");
 		questionDialogue.setActionCommand("?");
 		questionDialogue.addActionListener(dialogueActions);
 		panel.add(questionDialogue);
@@ -323,6 +325,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		scriptArea.setText("");
 	}
 
+	@Override
 	public void disable() {
 		this.nameField.setEnabled(false);
 		this.idField.setEnabled(false);
@@ -341,6 +344,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.isEnabled = false;
 	}
 
+	@Override
 	public void enable() {
 		this.nameField.setEnabled(true);
 		this.idField.setEnabled(true);
@@ -359,6 +363,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.isEnabled = true;
 	}
 
+	@Override
 	public boolean isEnabled() {
 		return this.isEnabled;
 	}

@@ -58,20 +58,21 @@ public class WorldConstants {
 	public static ArrayList<Map.Entry<ItemText, Item>> items = Item.loadItems("item/items.txt");
 
 	// Areas
-	public static List<Area> areas = new ArrayList<Area>();
-	public static List<Area> moddedAreas = new ArrayList<Area>();
+	public static List<Area> areas = new ArrayList<Area>(0);
+	public static List<Area> moddedAreas = new ArrayList<Area>(0);
 
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
 
 	// Movement
 	// TODO (11/24/2014): Make map more flexible by allowing scripting files of different filenames to be loaded. Not sure where it was being loaded.
-	public static ArrayList<Script> scripts = Script.getAllScripts();
+	public static ArrayList<Script> scripts = new ArrayList<Script>(0);
+	public static ArrayList<Script> moddedScripts = new ArrayList<Script>(0);
 	// public static ArrayList<Script> gameScripts = Script.loadScript("script/aas.script"); // TODO (6/19/2015): Check to see why there's a need to load "aas.script".
 
 	//Custom scripts
 	//This array list is made for a script + area file name. They both go together.
-	public static ArrayList<Map.Entry<Script, String>> customScripts = new ArrayList<Map.Entry<Script, String>>();
+	//public static ArrayList<Map.Entry<Script, String>> customScripts = new ArrayList<Map.Entry<Script, String>>();
 
 	// All bitmaps
 	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
@@ -120,7 +121,7 @@ public class WorldConstants {
 				WorldConstants.isModsEnabled = Boolean.TRUE;
 			}
 		}
-		if (WorldConstants.isModsEnabled == Boolean.FALSE) {
+		if (WorldConstants.isModsEnabled == Boolean.FALSE || WorldConstants.isModsEnabled == null) {
 			if (WorldConstants.areas.isEmpty()) {
 				WorldConstants.areas.add(new Area(Art.testArea, TEST_WORLD_1));
 				WorldConstants.areas.add(new Area(Art.testArea2, TEST_WORLD_2));
@@ -134,12 +135,36 @@ public class WorldConstants {
 			// result.add(new Area(Art.testArea_debug, Debug));
 			return WorldConstants.areas;
 		}
-		else { // Including NULL value.
+		else {
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
 				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
 				WorldConstants.moddedAreas.add(new Area(entry.getKey(), entry.getValue()));
 			}
 			return WorldConstants.moddedAreas;
+		}
+	}
+	
+	/**
+	 * Returns all available scripts defined.
+	 * 
+	 * @return A List<Script> object containing all available scripts in specified order defined.
+	 * */
+	public static List<Script> getAllNewScripts(){
+		if (WorldConstants.isModsEnabled == null) {
+			if (Mod.moddedAreas.isEmpty()) {
+				WorldConstants.isModsEnabled = Boolean.FALSE;
+			}
+			else {
+				WorldConstants.isModsEnabled = Boolean.TRUE;
+			}
+		}
+		if (WorldConstants.isModsEnabled.booleanValue()){
+			WorldConstants.moddedScripts = Script.loadModdedScripts();
+			return WorldConstants.moddedScripts;
+		}
+		else {
+			WorldConstants.scripts = Script.loadDefaultScripts();
+			return WorldConstants.scripts;
 		}
 	}
 

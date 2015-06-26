@@ -50,6 +50,7 @@ public class GameSave {
 	public AreaInfo areaInfo;
 
 	private GameSave() {
+		//TODO (6/25/2015): Needs a way to load save data for modded map.
 		headerInfo = new HeaderInfo();
 		playerInfo = new PlayerInfo();
 		areaInfo = new AreaInfo();
@@ -309,8 +310,27 @@ public class GameSave {
 	}
 
 	public static void load(Game game, String filename) {
-		File load = new File(filename);
-		if (load.isFile()) {
+		File load = null;
+		if (WorldConstants.isModsEnabled.booleanValue()){
+			File modDirectory = new File("mod");
+			if (modDirectory.exists() && modDirectory.isDirectory()){
+				File[] files = modDirectory.listFiles();
+				NESTED_LOOP: for (File f : files){
+					if (f.getName().equals("area")){
+						File[] saves = f.listFiles();
+						for (File saveFile : saves){
+							if (saveFile.getName().equals(filename)){
+								load = saveFile;
+								break NESTED_LOOP;
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+			load = new File(filename);
+		if (load != null && load.isFile()) {
 			GameSave data = new GameSave();
 			RandomAccessFile raf = null;
 			try {

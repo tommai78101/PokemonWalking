@@ -322,15 +322,12 @@ public class Script {
 	}
 
 	/**
-	 * Load all default and modded scripts.
+	 * Load all default scripts.
 	 * */
-	public static ArrayList<Script> getAllScripts() {
-		ArrayList<Script> scripts = Script.loadScript("script/scripts.txt", false);
-		ArrayList<Script> moddedScripts = Script.loadModdedScripts();
-		scripts.addAll(moddedScripts); 
-		return scripts;
-	}
-
+	public static ArrayList<Script> loadDefaultScripts(){
+		return Script.loadScript("script/scripts.txt", false);
+	}	
+	
 	/**
 	 * Load all modded scripts.
 	 * */
@@ -346,7 +343,10 @@ public class Script {
 					for (int j = 0; j<scripts.length;j++){
 						String filePath = directory.getPath() + File.separator + scripts[j];
 						if (filePath.endsWith(".script")){
-							results = Script.loadScript(filePath, true); 
+							if (results == null)
+								results = Script.loadScript(filePath, true);
+							else
+								results.addAll(Script.loadScript(filePath, true));
 						}
 					}
 					break LOOP;

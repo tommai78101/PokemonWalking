@@ -24,6 +24,8 @@ import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
 
+//TODO (6/25/2015): Save the already-opened file without needing to open up a JFileChooser.
+
 public class ScriptToolbar extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private final ScriptEditor editor;

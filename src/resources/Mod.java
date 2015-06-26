@@ -27,6 +27,7 @@ import screen.BaseScreen;
 public class Mod {
 	private static final String[] names = new String[] { "area", "script" };
 	public static List<Map.Entry<BaseBitmap, Integer>> moddedAreas = new ArrayList<Map.Entry<BaseBitmap, Integer>>();
+//	public static List<Map.Entry<Script, Integer>> moddedScripts = new ArrayList<Map.Entry<Script, Integer>>();
 	private static boolean hasLoaded = false;
 
 	private static Comparator<File> ALPHABETICAL_ORDER = new Comparator<File>() {
@@ -47,21 +48,33 @@ public class Mod {
 		if (Mod.hasLoaded)
 			return;
 		Mod.initialization();
-		int id = 1;
 		File directory = new File("mod");
 		if (directory.exists()) {
-			List<File> list = Mod.getContents(directory);
+			List<File> list = Mod.getMapContents(directory);
 			Collections.sort(list, ALPHABETICAL_ORDER);
+			int id = 1;
 			for (File f : list) {
-				moddedAreas.add(new AbstractMap.SimpleEntry<BaseBitmap, Integer>(BaseScreen.load(f), id + 1000));
+				Mod.moddedAreas.add(new AbstractMap.SimpleEntry<BaseBitmap, Integer>(BaseScreen.load(f), id + 1000));
 				id++;
 			}
+//			ArrayList<Script> moddedScripts = Script.loadModdedScripts();
+//			id = 1;
+//			for (Script s : moddedScripts){
+//				Mod.moddedScripts.add(new AbstractMap.SimpleEntry<Script, Integer>(s, id++));
+//			}
 		}
 		else
 			throw new RuntimeException("Something is wrong with detecting the mod folder.");
 		Mod.hasLoaded = true;
 	}
 
+	/**
+	 * <p>Initializes the "mod" folder directory if the game doesn't see it. Even if the game sees 
+	 * the folder, if the contents of the folder and its sub-folders are missing, it will recreate the basic necessary
+	 * contents. This is deliberate and intentionally designed, unless re-developed.</p>
+	 * 
+	 * @return Nothing.
+	 * */
 	private static void initialization() {
 		File directory = new File("mod");
 		if (!directory.exists())
@@ -226,21 +239,21 @@ public class Mod {
 		}
 	}
 
-	private static List<File> getContents(File file) {
+	private static List<File> getMapContents(File file) {
 		List<File> results = new ArrayList<File>();
-		if (file.exists()) {
+		if (file != null && file.exists()) {
 			if (file.isDirectory()) {
 				File[] list = file.listFiles();
 				for (int i = 0; i < list.length; i++) {
-					results.addAll(getContents(list[i]));
+					results.addAll(Mod.getMapContents(list[i]));
 				}
 			}
 			else {
-				String filename = file.getPath();
-				int dotCount = filename.lastIndexOf('.');
-				int pathDotCount = Math.max(filename.lastIndexOf('/'), filename.lastIndexOf('\\'));
+				String filepath = file.getPath();
+				int dotCount = filepath.lastIndexOf('.');
+				int pathDotCount = Math.max(filepath.lastIndexOf('/'), filepath.lastIndexOf('\\'));
 				if (dotCount > pathDotCount) {
-					if (filename.substring(dotCount + 1).toLowerCase().equals("png"))
+					if (filepath.substring(dotCount + 1).toLowerCase().equals("png"))
 						results.add(file);
 				}
 			}

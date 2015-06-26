@@ -43,9 +43,8 @@ public class TriggerData {
 		this.y = (pixel >> 16) & 0xFF;
 		if (this.finished)
 			this.finished = false;
-		if (WorldConstants.scripts.isEmpty())
-			System.out.println("Scripts are empty");
-		for (Script s : WorldConstants.scripts) {
+		ArrayList<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts : WorldConstants.scripts);
+		for (Script s : scriptList) {
 			if (s.triggerID == (pixel & 0xFFFF)) {
 				this.script = s;
 				if (s.repeat)

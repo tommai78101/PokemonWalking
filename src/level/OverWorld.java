@@ -51,7 +51,8 @@ public class OverWorld extends World {
 		this.worldID = WorldConstants.OVERWORLD;
 
 		if (!this.areas.isEmpty())
-			areas.clear();
+			this.areas.clear();
+		WorldConstants.getAllNewScripts();
 		this.areas = WorldConstants.getAllNewAreas();
 
 		// Overworld properties
