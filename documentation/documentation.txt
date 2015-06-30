@@ -1078,7 +1078,11 @@ Automation Script Format:
 Entities that can walk, or run, must be required to 
 have movements for the gameto feel lively.
 
-More commands to come.
+More commands to come. There will be more 
+clarifications on what commands does what, and what 
+commands need to go with what other commands in the 
+future, once the triggering sections are fully 
+outlined and organized.
 
 _: Whitespaces.
 @: Trigger name.
@@ -1087,13 +1091,13 @@ $: Start of script. Appears at beginning of script. Uses numeric ID values as Tr
 %: Script delimiter. Always appear at end of script.
 #: Speech Dialogue.
 /: Comments. Whole line gets ignored, even if it's somewhere in the middle of the line.
-?: Question Dialogue.
+?: Question Dialogue. It must be immediately followed by both + and -. This will change.
 +: Affirmative dialogue.
 -: Negative dialogue.
 [: Affirmative Action.
 ]: Negative Action.
 ;: Repeat Flag. If contains ';', it means it's enabled by default.
-|: Limited Repetition. Default is set to unlimited repetition. Adding a number at the end represents the number of times it can be triggered before it turns itself off. This is planned to be added after the start of the script.
+|: Limited Repetition. Default is set to unlimited repetition. Adding a number at the end represents the number of times it can be triggered before it turns itself off. This is planned to be added after the start of the script. This can be optionally added or ignored.
 
 Example:
 
@@ -1102,8 +1106,8 @@ $0 ;
 %
 
 $1 |4
-@Hello Test Trigger
-#Hello World!
+@Hello_Test_Trigger
+#Hello_World!
 %
 
 -------------------------------
