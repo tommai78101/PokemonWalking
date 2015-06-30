@@ -1,8 +1,12 @@
 package script_editor;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.metal.MetalFileChooserUI;
 
 import editor.FileControl;
 import editor.LevelEditor;
@@ -107,7 +112,51 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					}
 				}
 
-				JFileChooser saver = new JFileChooser();
+				final JFileChooser saver = new JFileChooser();
+				JList<Class<?>> list = findFileList(saver);
+				LOOP_TEMP: for (MouseListener l : list.getMouseListeners()){
+					if (l.getClass().getName().indexOf("FilePane") >= 0){
+						list.removeMouseListener(l);
+						list.addMouseListener(new MouseListener(){
+							@Override
+							public void mouseClicked(MouseEvent e) {
+								if (e.getClickCount() == 1){
+									File file = saver.getSelectedFile();
+									if (file != null){
+										MetalFileChooserUI ui = (MetalFileChooserUI) saver.getUI();
+										ui.setFileName(file.getName());											
+									}
+								}
+								else if (e.getClickCount() == 2){
+									File file = saver.getSelectedFile();
+									if (file != null){
+										if (file.isDirectory()){
+											saver.setCurrentDirectory(file);
+										}
+										else if (file.isFile()){
+											saver.setSelectedFile(file);
+										}
+										MetalFileChooserUI ui = (MetalFileChooserUI) saver.getUI();
+										ui.setFileName(file.getName());	
+									}
+								}
+							}
+							@Override
+							public void mouseEntered(MouseEvent e) {
+							}
+							@Override
+							public void mouseExited(MouseEvent e) {
+							}
+							@Override
+							public void mousePressed(MouseEvent e) {
+							}
+							@Override
+							public void mouseReleased(MouseEvent e) {
+							}
+						});
+						break LOOP_TEMP;
+					}
+				}
 				saver.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				saver.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
 				saver.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
@@ -174,7 +223,51 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					}
 				}
 
-				JFileChooser opener = new JFileChooser();
+				final JFileChooser opener = new JFileChooser();
+				JList<Class<?>> list = findFileList(opener);
+				LOOP_TEMP: for (MouseListener l : list.getMouseListeners()){
+					if (l.getClass().getName().indexOf("FilePane") >= 0){
+						list.removeMouseListener(l);
+						list.addMouseListener(new MouseListener(){
+							@Override
+							public void mouseClicked(MouseEvent e) {
+								if (e.getClickCount() == 1){
+									File file = opener.getSelectedFile();
+									if (file != null){
+										MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
+										ui.setFileName(file.getName());											
+									}
+								}
+								else if (e.getClickCount() == 2){
+									File file = opener.getSelectedFile();
+									if (file != null){
+										if (file.isDirectory()){
+											opener.setCurrentDirectory(file);
+										}
+										else if (file.isFile()){
+											opener.setSelectedFile(file);
+										}
+										MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
+										ui.setFileName(file.getName());	
+									}
+								}
+							}
+							@Override
+							public void mouseEntered(MouseEvent e) {
+							}
+							@Override
+							public void mouseExited(MouseEvent e) {
+							}
+							@Override
+							public void mousePressed(MouseEvent e) {
+							}
+							@Override
+							public void mouseReleased(MouseEvent e) {
+							}
+						});
+						break LOOP_TEMP;
+					}
+				}
 				opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				opener.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
 				opener.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
@@ -210,6 +303,21 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				break;
 			}
 		}
-
+	}
+	
+	@SuppressWarnings("unchecked")
+	private JList<Class<?>> findFileList(Component comp){
+		if (comp instanceof JList){
+			return (JList<Class<?>>) comp;
+		}
+		if (comp instanceof Container){
+			for (Component c : ((Container) comp).getComponents()){
+				JList<Class<?>> list = findFileList(c);
+				if (list != null){
+					return list;
+				}
+			}
+		}
+		return null;
 	}
 }
