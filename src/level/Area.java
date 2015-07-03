@@ -26,6 +26,8 @@ public class Area {
 
 	private int xPlayerPosition;
 	private int yPlayerPosition;
+	private int oldXTriggerPosition;
+	private int oldYTriggerPosition;
 	private Player player;
 
 	private boolean isInWarpZone;
@@ -123,20 +125,26 @@ public class Area {
 		if (this.player != null) {
 			// PixelData data = null;
 			if (this.triggerIsBeingTriggered) {
-				xPlayerPosition = player.getXInArea();
-				yPlayerPosition = player.getYInArea();
-				if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0 || yPlayerPosition >= this.height)
+				this.xPlayerPosition = this.player.getXInArea();
+				this.yPlayerPosition = this.player.getYInArea();
+				if (this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width || this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height)
 					return;
-				this.currentPixelData = this.areaData.get(yPlayerPosition).get(xPlayerPosition);
+				this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 				this.checkCurrentPositionDataAndSetProperties();
 			}
 			
 			if (!this.triggerIsBeingTriggered){
 				if (!this.player.isLockedWalking()){
-					if (this.trigger == null)
-						trigger = checkForTrigger(xPlayerPosition, yPlayerPosition);
-					if (this.trigger != null)
+					if (this.trigger == null){
+						this.trigger = checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
+					}
+					if (this.trigger != null){
 						this.triggerIsBeingTriggered = true;
+					}
+				}
+				else {
+					this.oldXTriggerPosition = -1;
+					this.oldYTriggerPosition = -1;
 				}
 			}
 			if (this.triggerIsBeingTriggered && this.trigger != null)
@@ -155,6 +163,8 @@ public class Area {
 		}
 		else {
 			this.player.disableAutomaticMode();
+			this.oldXTriggerPosition = this.xPlayerPosition;
+			this.oldYTriggerPosition = this.yPlayerPosition;
 			this.triggerIsBeingTriggered = false;
 			trigger = null;
 		}
@@ -188,7 +198,8 @@ public class Area {
 	private TriggerData checkForTrigger(int playerX, int playerY) {
 		for (TriggerData t : this.triggerDatas) {
 			if (t.x == playerX && t.y == playerY && (!t.isFinished() || t.isOnRepeat())) {
-				//this.triggerIsBeingTriggered = true;
+				if (this.oldXTriggerPosition == t.x && this.oldYTriggerPosition == t.y)
+					return null;
 				return new TriggerData(t).reset();
 			}
 		}
