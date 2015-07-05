@@ -1,6 +1,6 @@
 ### DISCLAIMER:
 
-**Download links** are located near the bottom of this README. GitHub Releases are no longer supported.
+This project will be on hiatus until I finish my summer job. **Download links** are located near the bottom of this README. GitHub Releases are no longer supported.
 
 ===
 
