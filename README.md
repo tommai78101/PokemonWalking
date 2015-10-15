@@ -1,6 +1,8 @@
 ### DISCLAIMER:
 
-This project will be on hiatus until I finish my summer job. **Download links** are located near the bottom of this README. GitHub Releases are no longer supported.
+This project will be on hiatus until I finish my Master's degree in Interactive Media and Game Development. **Download links** are located near the bottom of this README. GitHub Releases are no longer supported.
+
+In the meantime, I welcome anyone to [read the documentation manual of this project here](https://github.com/tommai78101/PokemonWalking/blob/master/documentation/documentation.txt).
 
 ===
 
