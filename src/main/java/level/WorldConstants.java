@@ -181,7 +181,9 @@ public class WorldConstants {
 	 * 
 	 * */
 	private static void addNewArea(BaseBitmap bitmap, int areaID) {
-		if (!WorldConstants.areas.contains(areaID)) {
+		//Java 8 feature
+		boolean exists = WorldConstants.areas.stream().filter(chosenArea -> chosenArea.getAreaID() == areaID).findFirst().isPresent();
+		if (!exists) {
 			WorldConstants.areas.add(new Area(bitmap, areaID));
 		}
 	}
