@@ -1,6 +1,5 @@
-*.class
+# Ignore Gradle project-specific cache directory
+.gradle
 
-.git
-/res/area/test/testArea2.pdn
-/bin
-
+# Ignore Gradle build output directory
+build

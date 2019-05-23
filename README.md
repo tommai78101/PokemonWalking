@@ -1,8 +1,23 @@
 ### DISCLAIMER:
 
-This project will be on hiatus until I finish my Master's degree in Interactive Media and Game Development. **Download links** are located near the bottom of this README. GitHub Releases are no longer supported.
+**Download links** are located near the bottom of this README.
 
-In the meantime, I welcome anyone to [read the documentation manual of this project here](https://github.com/tommai78101/PokemonWalking/blob/master/documentation/documentation.txt).
+**FUTURE:** Look into GitHub releases now that Java 12 is being used.
+
+|<b>Table of Contents</b>|
+|:---|
+|<a href="https://github.com/tommai78101/PokemonWalking#pok%C3%A9mon-walking-algorithm-working-title">Pokémon Walking Algorithm</a>|
+|<a href="https://github.com/tommai78101/PokemonWalking#level-editor">Level Editor</a>| 
+|<a href="https://github.com/tommai78101/PokemonWalking#script-editor">Scripting Editor</a>| 
+
+<b>System Requirements:</b>
+<ul>
+	<li>OpenJDK 12.0.1 or newer</li>
+	<li>Visual Studio Code v1.34.0 or newer</li>
+	<li>Java Extension Pack</li>
+	<li>Gradle 5.4.1 or newer</li>
+	<li>JUnit Jupiter 5.4.2 or newer</li>
+</ul>
 
 ===
 
@@ -137,6 +152,58 @@ This script editor is part of the level editor that comes with the game.
 Its purposes is used for simple script creations, allowing the users to create custom scripts for players to interact in their custom maps. The user can save, load, and create custom scripts with the help of its graphical user interface. The interface is designed intuitively for users to quickly create scripts.
 
 Scripts are what will become Triggers and Events that the game will have in the maps. Currently, Triggers and Events are not yet completed. Stay tuned.
+
+<style>
+	p {
+		display: block;
+	}
+
+	span[mod] {
+		padding: 0 5px;
+		display: inline-block;
+		background-color: #fefefe;
+		color: #444;
+		border: 1px solid #444;
+		border-radius: 4px;
+	}
+</style>
+
+<div style="background: #efefef; padding: 10px">
+
+<b>Automation Script Guide</b>
+
+-------
+
+<b>DESCRIPTION:</b> Entities that can walk, or run, must be required to have movements for the game
+to feel lively. 
+
+<b>FUTURE:</b> More commands to come.  
+ 
+<span mod>_</span>: Whitespaces.  
+<span mod>@</span>: Trigger name.  
+<span mod>^</span>: [Direction, Steps]. Can be chained for delaying scripted movements.  
+<span mod>$</span>: Start of script. Always appear at beginning of script.  
+<span mod>%</span>: Script delimiter. Always appear at end of script.  
+<span mod>\#</span>: Speech Dialogue.  
+<span mod>\/</span>: Comments. Gets ignored.  
+<span mod>?</span>: Question Dialogue.  
+<span mod>+</span>: Affirmative dialogue.  
+<span mod>-</span>: Negative dialogue  
+<span mod>[</span>: Affirmative Action  
+<span mod>]</span>: Negative Action  
+<span mod>;</span>: Repeat Flag. If contains ';', it means it's enabled by default.  
+  
+DO NOT CHANGE\/REMOVE THIS TRIGGER SCRIPT. THIS IS RESERVED ONLY. FOLLOW THIS FORMAT.  
+  
+<b>TODO:</b> Remove the dependency of this Eraser trigger from the Level Editor.
+
+<pre><code>
+$0
+@Eraser
+%
+</code></pre>
+
+</div>
 
 ===
 
