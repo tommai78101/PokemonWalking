@@ -200,7 +200,7 @@ public class Player extends Entity {
 	 * */
 	public void interact(int dataColor) {
 		int alpha = (dataColor >> 24) & 0xFF;
-		int red = (dataColor >> 16) & 0xFF;
+		//int red = (dataColor >> 16) & 0xFF;
 		switch (alpha) {
 			case 0x03: {// Obstacles
 				// case 0x00: // Small tree
