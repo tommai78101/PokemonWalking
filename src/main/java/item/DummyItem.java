@@ -13,6 +13,8 @@ package item;
 import main.Game;
 import main.Game.State;
 import abstracts.Item;
+import entity.Player;
+import level.Area;
 
 public class DummyItem extends Item {
 	public DummyItem(Game game, String name, String description, Category category, int id) {
@@ -28,5 +30,10 @@ public class DummyItem extends Item {
 		game.getBaseScreen().setRenderingEffectTick((byte) 0x0);
 		game.setState(State.PAUSED);
 		game.getStartMenu().openMenu();
+	}
+
+	@Override
+	public void dropAt(Area area, Player player) {
+		// TODO: Continue with this action.
 	}
 }

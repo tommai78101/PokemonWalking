@@ -12,6 +12,8 @@ package item;
 
 import main.Game;
 import abstracts.Item;
+import entity.Player;
+import level.Area;
 
 public class ActionItem extends Item {
 	
@@ -43,6 +45,11 @@ public class ActionItem extends Item {
 	
 	public boolean isEnabled() {
 		return this.enabled;
+	}
+
+	@Override
+	public void dropAt(Area area, Player player) {
+		// TODO: Continue to work on this.
 	}
 	
 	@Override

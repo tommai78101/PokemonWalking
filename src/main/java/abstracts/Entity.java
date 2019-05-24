@@ -14,13 +14,13 @@ import screen.BaseBitmap;
 import screen.BaseScreen;
 
 public abstract class Entity extends Tile {
-	
 	public static final int UP = 2;
 	public static final int DOWN = 0;
 	public static final int LEFT = 1;
 	public static final int RIGHT = 3;
 	
 	public int id;
+	public int facing = 0;
 	
 	protected int xPosition;
 	protected int yPosition;
@@ -31,7 +31,6 @@ public abstract class Entity extends Tile {
 	protected BaseBitmap bitmap;
 	
 	protected String name;
-	protected Boolean gender;
 	
 	public boolean isRemoved;
 	protected byte typeId = 0;
@@ -69,11 +68,19 @@ public abstract class Entity extends Tile {
 		return result;
 	}
 	
-	public byte[] getByteGender() {
-		byte[] result = new byte[1];
-		if (gender == null)
-			gender = Boolean.TRUE; // Default gender: Male. False = Female.
-		result[0] = (byte) (gender.booleanValue() ? 0x1 : 0xFF);
-		return result;
+	/**
+	 * Gets a value that determines where the direction the entity is currently facing towards.
+	 * 
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
+	 * */
+	public int getFacing() {
+		return this.facing;
+	}
+
+	/**
+	 * Sets a value that determines where the direction the entity is currently facing towards.
+	 * */
+	public void setFacing(int value) {
+		this.facing = value;
 	}
 }

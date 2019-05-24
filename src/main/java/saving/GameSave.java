@@ -36,6 +36,7 @@ import abstracts.Item;
 import abstracts.SubMenu;
 import dialogue.StartMenu;
 import entity.Player;
+import interfaces.Gender.GenderType;
 
 public class GameSave {
 	/*
@@ -71,6 +72,8 @@ public class GameSave {
 	}
 
 	private void generateSaveData(Game game) {
+		// TODO: Save player facing direction data into the game save.
+
 		Player gamePlayer = game.getPlayer();
 		if (this.playerInfo != null)
 			this.playerInfo.reset();
@@ -80,9 +83,10 @@ public class GameSave {
 		byte[] byteArray = concatenate(PlayerInfo.NAME, gamePlayer.getByteName());
 		this.playerInfo.increment(concatenate(new byte[] { 0x0 }, byteArray));
 
-		// Gender of the player.
-		System.arraycopy(gamePlayer.getByteGender(), 0, this.playerInfo.player_gender, 0, 1); // 1 is the gender boolean size.
-		byteArray = concatenate(PlayerInfo.GNDR, gamePlayer.getByteGender());
+		// Gender of the player. Size of data is 1 byte.
+		this.playerInfo.player_gender[this.playerInfo.player_gender.length - 1] = gamePlayer.getGender().getByte();
+
+		byteArray = concatenate(PlayerInfo.GNDR, gamePlayer.getGender().getByte());
 		this.playerInfo.increment(concatenate(new byte[] { 0x0 }, byteArray));
 
 		// All active submenus the player has unlocked.
@@ -170,6 +174,8 @@ public class GameSave {
 	}
 
 	private void generateLoadData(Game game) throws Exception {
+		// TODO: Load player facing direction data from the game save.
+
 		// Get Player
 		Player gamePlayer = game.getPlayer();
 
@@ -177,7 +183,8 @@ public class GameSave {
 		gamePlayer.setName(new String(this.playerInfo.player_name));
 
 		// Get gender
-		gamePlayer.setGender(this.playerInfo.player_gender[0] == 0x1 ? Boolean.TRUE.booleanValue() : Boolean.FALSE.booleanValue());
+		byte genderByte = this.playerInfo.player_gender[0];
+		gamePlayer.setGender(GenderType.determineGender(genderByte));
 
 		// Get menu options.
 		if (!game.getStartMenu().getSubMenusList().isEmpty())
@@ -416,12 +423,14 @@ public class GameSave {
 				throw new IOException("Save file is invalid.");
 		}
 		catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return false;
+			// Expected, when no game save file is found.
+			// e.printStackTrace();
+			fileIsValid = false;
 		}
 		catch (IOException e) {
-			e.printStackTrace();
-			return false;
+			// Expected, when no game save file is found.
+			// e.printStackTrace();
+			fileIsValid = false;
 		}
 		finally {
 			if (dataInputStream != null) {
@@ -433,13 +442,20 @@ public class GameSave {
 				}
 			}
 		}
-		return save.isFile();
+		return (fileIsValid ? save.isFile() : false);
 	}
 
 	public static byte[] concatenate(byte[] first, byte[] second) {
 		byte[] result = new byte[first.length + second.length];
 		System.arraycopy(first, 0, result, 0, first.length);
 		System.arraycopy(second, 0, result, first.length, second.length);
+		return result;
+	}
+
+	public static byte[] concatenate(byte[] first, byte second) {
+		byte[] result = new byte[first.length + 1];
+		System.arraycopy(first, 0, result, 0, first.length);
+		result[result.length - 1] = second;
 		return result;
 	}
 }

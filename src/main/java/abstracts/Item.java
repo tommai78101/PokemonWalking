@@ -35,7 +35,7 @@ import screen.BaseScreen;
 import submenu.Inventory;
 import entity.Player;
 
-public abstract class Item {
+public abstract class Item implements Comparable<Item> {
 	
 	public enum Category {
 		POTIONS(0), KEYITEMS(1), POKEBALLS(2), TM_HM(3);
@@ -159,10 +159,10 @@ public abstract class Item {
 	public void drop() {
 		this.picked = false;
 	}
-	
-	public void dropAt(Area area, Player player) {
-		this.picked = false;
-		// TODO: Add function that allows the item to be placed at.
+
+	public void droppedAt(Area area, Player player) {
+		this.drop();
+		this.dropAt(area, player);
 	}
 	
 	public List<String> getAvailableCommands() {
@@ -179,7 +179,9 @@ public abstract class Item {
 			this.availableCommands.add(0, Inventory.MENU_USE);
 	}
 	
-	
+	public abstract void doAction();
+	// TODO: Add function that allows the item to be placed at.
+	public abstract void dropAt(Area area, Player player);
 	
 	@Override
 	public boolean equals(Object obj) {
@@ -211,8 +213,11 @@ public abstract class Item {
 		return result;
 	}
 	
-	public abstract void doAction();
-	
+	@Override
+	public int compareTo(Item other) {
+		return this.id - other.id;
+	}
+
 	public static HashMap<Integer, ItemText> loadItemResources(String filename) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
