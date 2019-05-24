@@ -29,4 +29,18 @@ dependencies {
 }
 
 // Define the main class for the application
-mainClassName = 'src.App'
+mainClassName = 'main.MainComponent'
+
+application {
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs << '-Xlint:deprecation'
+	options.encoding = 'UTF-8'
+}
+
+task execute(type: JavaExec) {
+	apply plugin: 'application'
+	main = 'main.MainComponent'
+	classpath = sourceSets.main.runtimeClasspath
+}
