@@ -195,7 +195,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.setBorder(BorderFactory.createTitledBorder("Trigger:"));
 		this.validate();
 
-		this.disable();
+		this.disableComponent();
 	}
 
 	private JPanel constructDirections() {
@@ -325,8 +325,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		scriptArea.setText("");
 	}
 
-	@Override
-	public void disable() {
+	public void disableComponent() {
 		this.nameField.setEnabled(false);
 		this.idField.setEnabled(false);
 
@@ -344,8 +343,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.isEnabled = false;
 	}
 
-	@Override
-	public void enable() {
+	public void enableComponent() {
 		this.nameField.setEnabled(true);
 		this.idField.setEnabled(true);
 

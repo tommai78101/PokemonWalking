@@ -27,7 +27,7 @@ public class ActionItem extends Item {
 	
 	@Override
 	public void doAction() {
-		if (enabled)
+		if (this.enabled)
 			disable();
 		else
 			enable();

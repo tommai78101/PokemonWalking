@@ -83,7 +83,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				this.editor.setModifiedFlag(false);
 				this.editor.setTitle("Script Editor (Hobby) - Untitled.script");
 				this.editor.setScriptName("Untitled");
-				this.editor.scriptChanger.disable();
+				this.editor.scriptChanger.disableComponent();
 
 				editor.parent.revalidate();
 				break;
@@ -280,7 +280,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					this.editor.load(f);
 					this.editor.setModifiedFlag(false);
 					this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
-					this.editor.scriptChanger.enable();
+					this.editor.scriptChanger.enableComponent();
 
 					RandomAccessFile rf = null;
 					try {

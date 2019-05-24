@@ -148,7 +148,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				JScrollBar vertical = scrollPane.getVerticalScrollBar();
 				vertical.setValue(vertical.getMaximum() + 1);
 				this.triggerList.setSelectedIndex(this.model.getSize() - 1);
-				this.editor.scriptChanger.enable();
+				this.editor.scriptChanger.enableComponent();
 				break;
 			}
 			case 1: {// Remove button
@@ -160,7 +160,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				}
 				if (this.model.isEmpty()) {
 					ScriptViewer.this.editor.scriptChanger.clear();
-					ScriptViewer.this.editor.scriptChanger.disable();
+					ScriptViewer.this.editor.scriptChanger.disableComponent();
 				}
 				break;
 			}
@@ -169,7 +169,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 					this.model.remove(0);
 				}
 				ScriptViewer.this.editor.scriptChanger.clear();
-				ScriptViewer.this.editor.scriptChanger.disable();
+				ScriptViewer.this.editor.scriptChanger.disableComponent();
 				break;
 			}
 		}
