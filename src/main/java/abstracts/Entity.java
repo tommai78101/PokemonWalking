@@ -18,42 +18,42 @@ public abstract class Entity extends Tile {
 	public static final int DOWN = 0;
 	public static final int LEFT = 1;
 	public static final int RIGHT = 3;
-	
+
 	public int id;
 	public int facing = 0;
-	
+
 	protected int xPosition;
 	protected int yPosition;
-	
+
 	protected int xOffset;
 	protected int yOffset;
-	
+
 	protected BaseBitmap bitmap;
-	
+
 	protected String name;
-	
+
 	public boolean isRemoved;
 	protected byte typeId = 0;
-	
+
 	// public abstract void initialize(BaseWorld world);
-	
+
 	public abstract void tick();
-	
+
 	public abstract void render(BaseScreen screen, int x, int y);
-	
+
 	public int getX() {
 		return xPosition;
 	}
-	
+
 	public int getY() {
 		return yPosition;
 	}
-	
+
 	protected void setPosition(int x, int y) {
 		this.xPosition = x;
 		this.yPosition = y;
 	}
-	
+
 	public byte[] getByteName() {
 		if (name == null)
 			name = "Joe";
@@ -67,19 +67,22 @@ public abstract class Entity extends Tile {
 		}
 		return result;
 	}
-	
+
 	/**
-	 * Gets a value that determines where the direction the entity is currently facing towards.
+	 * Gets a value that determines where the direction the entity is currently
+	 * facing towards.
 	 * 
-	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
-	 * */
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN,
+	 *         Entity.LEFT, Entity.RIGHT.
+	 */
 	public int getFacing() {
 		return this.facing;
 	}
 
 	/**
-	 * Sets a value that determines where the direction the entity is currently facing towards.
-	 * */
+	 * Sets a value that determines where the direction the entity is currently
+	 * facing towards.
+	 */
 	public void setFacing(int value) {
 		this.facing = value;
 	}

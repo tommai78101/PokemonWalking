@@ -63,257 +63,245 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.valueOf(event.getActionCommand())) {
-			case 0: {// New
-				editor.scriptChanger.clear();
-				JList<Trigger> triggerList = editor.scriptViewer.getTriggerList();
-				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
-				model.clear();
+		case 0: {// New
+			editor.scriptChanger.clear();
+			JList<Trigger> triggerList = editor.scriptViewer.getTriggerList();
+			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
+			model.clear();
 
-				JComboBox<Trigger> triggerComboBox = editor.parent.properties.getTriggerList();
-				DefaultComboBoxModel<Trigger> triggerComboModel = (DefaultComboBoxModel<Trigger>) triggerComboBox.getModel();
-				triggerComboModel.removeAllElements();
+			JComboBox<Trigger> triggerComboBox = editor.parent.properties.getTriggerList();
+			DefaultComboBoxModel<Trigger> triggerComboModel = (DefaultComboBoxModel<Trigger>) triggerComboBox
+					.getModel();
+			triggerComboModel.removeAllElements();
 
-				Trigger trigger = new Trigger();
-				trigger.setTriggerID((short) 0);
-				trigger.setName("Eraser");
-				triggerComboModel.addElement(trigger);
-				triggerComboBox.setSelectedIndex(0);
+			Trigger trigger = new Trigger();
+			trigger.setTriggerID((short) 0);
+			trigger.setName("Eraser");
+			triggerComboModel.addElement(trigger);
+			triggerComboBox.setSelectedIndex(0);
 
-				triggerList.clearSelection();
-				this.editor.setModifiedFlag(false);
-				this.editor.setTitle("Script Editor (Hobby) - Untitled.script");
-				this.editor.setScriptName("Untitled");
-				this.editor.scriptChanger.disableComponent();
+			triggerList.clearSelection();
+			this.editor.setModifiedFlag(false);
+			this.editor.setTitle("Script Editor (Hobby) - Untitled.script");
+			this.editor.setScriptName("Untitled");
+			this.editor.scriptChanger.disableComponent();
 
-				editor.parent.revalidate();
-				break;
-			}
-			case 1: { // Save
-				RandomAccessFile raf = null;
+			editor.parent.revalidate();
+			break;
+		}
+		case 1: { // Save
+			RandomAccessFile raf = null;
+			try {
+				raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+				raf.readLine(); // The second line in the cache is for the Script Editor.
+				ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (NullPointerException e) {
+				ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
+			} finally {
 				try {
-					raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
-					raf.readLine(); // The second line in the cache is for the Script Editor.
-					ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
+					raf.close();
+				} catch (IOException e) {
 				}
-				catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-				catch (NullPointerException e) {
-					ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
-				}
-				finally {
-					try {
-						raf.close();
-					}
-					catch (IOException e) {
-					}
-				}
-
-				final JFileChooser saver = new JFileChooser();
-				JList<Class<?>> list = findFileList(saver);
-				LOOP_TEMP: for (MouseListener l : list.getMouseListeners()){
-					if (l.getClass().getName().indexOf("FilePane") >= 0){
-						list.removeMouseListener(l);
-						list.addMouseListener(new MouseListener(){
-							@Override
-							public void mouseClicked(MouseEvent e) {
-								if (e.getClickCount() == 1){
-									File file = saver.getSelectedFile();
-									if (file != null){
-										MetalFileChooserUI ui = (MetalFileChooserUI) saver.getUI();
-										ui.setFileName(file.getName());											
-									}
-								}
-								else if (e.getClickCount() == 2){
-									File file = saver.getSelectedFile();
-									if (file != null){
-										if (file.isDirectory()){
-											saver.setCurrentDirectory(file);
-										}
-										else if (file.isFile()){
-											saver.setSelectedFile(file);
-										}
-										MetalFileChooserUI ui = (MetalFileChooserUI) saver.getUI();
-										ui.setFileName(file.getName());	
-									}
-								}
-							}
-							@Override
-							public void mouseEntered(MouseEvent e) {
-							}
-							@Override
-							public void mouseExited(MouseEvent e) {
-							}
-							@Override
-							public void mousePressed(MouseEvent e) {
-							}
-							@Override
-							public void mouseReleased(MouseEvent e) {
-							}
-						});
-						break LOOP_TEMP;
-					}
-				}
-				saver.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				saver.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
-				saver.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
-				saver.setVisible(true);
-				int answer = saver.showSaveDialog(null);
-				if (answer == JFileChooser.APPROVE_OPTION) {
-					File f = saver.getSelectedFile();
-					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
-
-					if (f.getName().endsWith(".script")) {
-						this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
-						this.editor.save(new File(f.getParentFile(), f.getName()));
-						this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
-					}
-					else {
-						this.editor.setTitle("Script Editor (Hobby) - " + f.getName() + ".script");
-						this.editor.save(new File(f.getParentFile(), f.getName() + ".script"));
-						this.editor.setScriptName(f.getName());
-					}
-					this.editor.setModifiedFlag(false);
-
-					RandomAccessFile rf = null;
-					try {
-						rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
-						rf.readLine();
-						rf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
-					}
-					catch (IOException e) {
-						e.printStackTrace();
-					}
-					finally {
-						try {
-							rf.close();
-						}
-						catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-				break;
 			}
-			case 2: { // Open
 
-				RandomAccessFile raf = null;
-				try {
-					raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
-					raf.readLine(); // The second line in the cache is for the Script Editor.
-					ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
-				}
-				catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-				catch (NullPointerException e) {
-					ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
-				}
-				finally {
-					try {
-						raf.close();
-					}
-					catch (IOException e) {
-					}
-				}
-
-				final JFileChooser opener = new JFileChooser();
-				JList<Class<?>> list = findFileList(opener);
-				LOOP_TEMP: for (MouseListener l : list.getMouseListeners()){
-					if (l.getClass().getName().indexOf("FilePane") >= 0){
-						list.removeMouseListener(l);
-						list.addMouseListener(new MouseListener(){
-							@Override
-							public void mouseClicked(MouseEvent e) {
-								if (e.getClickCount() == 1){
-									File file = opener.getSelectedFile();
-									if (file != null){
-										MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
-										ui.setFileName(file.getName());											
-									}
+			final JFileChooser saver = new JFileChooser();
+			JList<Class<?>> list = findFileList(saver);
+			LOOP_TEMP: for (MouseListener l : list.getMouseListeners()) {
+				if (l.getClass().getName().indexOf("FilePane") >= 0) {
+					list.removeMouseListener(l);
+					list.addMouseListener(new MouseListener() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							if (e.getClickCount() == 1) {
+								File file = saver.getSelectedFile();
+								if (file != null) {
+									MetalFileChooserUI ui = (MetalFileChooserUI) saver.getUI();
+									ui.setFileName(file.getName());
 								}
-								else if (e.getClickCount() == 2){
-									File file = opener.getSelectedFile();
-									if (file != null){
-										if (file.isDirectory()){
-											opener.setCurrentDirectory(file);
-										}
-										else if (file.isFile()){
-											opener.setSelectedFile(file);
-										}
-										MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
-										ui.setFileName(file.getName());	
+							} else if (e.getClickCount() == 2) {
+								File file = saver.getSelectedFile();
+								if (file != null) {
+									if (file.isDirectory()) {
+										saver.setCurrentDirectory(file);
+									} else if (file.isFile()) {
+										saver.setSelectedFile(file);
 									}
+									MetalFileChooserUI ui = (MetalFileChooserUI) saver.getUI();
+									ui.setFileName(file.getName());
 								}
 							}
-							@Override
-							public void mouseEntered(MouseEvent e) {
-							}
-							@Override
-							public void mouseExited(MouseEvent e) {
-							}
-							@Override
-							public void mousePressed(MouseEvent e) {
-							}
-							@Override
-							public void mouseReleased(MouseEvent e) {
-							}
-						});
-						break LOOP_TEMP;
-					}
+						}
+
+						@Override
+						public void mouseEntered(MouseEvent e) {
+						}
+
+						@Override
+						public void mouseExited(MouseEvent e) {
+						}
+
+						@Override
+						public void mousePressed(MouseEvent e) {
+						}
+
+						@Override
+						public void mouseReleased(MouseEvent e) {
+						}
+					});
+					break LOOP_TEMP;
 				}
-				opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				opener.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
-				opener.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
-				opener.setVisible(true);
-				int answer = opener.showOpenDialog(null);
-				if (answer == JFileChooser.APPROVE_OPTION) {
-					File f = opener.getSelectedFile();
-					ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
+			}
+			saver.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			saver.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
+			saver.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
+			saver.setVisible(true);
+			int answer = saver.showSaveDialog(null);
+			if (answer == JFileChooser.APPROVE_OPTION) {
+				File f = saver.getSelectedFile();
+				ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
+
+				if (f.getName().endsWith(".script")) {
 					this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
-					this.editor.load(f);
-					this.editor.setModifiedFlag(false);
+					this.editor.save(new File(f.getParentFile(), f.getName()));
 					this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
-					this.editor.scriptChanger.enableComponent();
+				} else {
+					this.editor.setTitle("Script Editor (Hobby) - " + f.getName() + ".script");
+					this.editor.save(new File(f.getParentFile(), f.getName() + ".script"));
+					this.editor.setScriptName(f.getName());
+				}
+				this.editor.setModifiedFlag(false);
 
-					RandomAccessFile rf = null;
+				RandomAccessFile rf = null;
+				try {
+					rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+					rf.readLine();
+					rf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
 					try {
-						rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
-						rf.readLine();
-						rf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
-					}
-					catch (IOException e) {
+						rf.close();
+					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					finally {
-						try {
-							rf.close();
+				}
+			}
+			break;
+		}
+		case 2: { // Open
+
+			RandomAccessFile raf = null;
+			try {
+				raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+				raf.readLine(); // The second line in the cache is for the Script Editor.
+				ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (NullPointerException e) {
+				ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
+			} finally {
+				try {
+					raf.close();
+				} catch (IOException e) {
+				}
+			}
+
+			final JFileChooser opener = new JFileChooser();
+			JList<Class<?>> list = findFileList(opener);
+			LOOP_TEMP: for (MouseListener l : list.getMouseListeners()) {
+				if (l.getClass().getName().indexOf("FilePane") >= 0) {
+					list.removeMouseListener(l);
+					list.addMouseListener(new MouseListener() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							if (e.getClickCount() == 1) {
+								File file = opener.getSelectedFile();
+								if (file != null) {
+									MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
+									ui.setFileName(file.getName());
+								}
+							} else if (e.getClickCount() == 2) {
+								File file = opener.getSelectedFile();
+								if (file != null) {
+									if (file.isDirectory()) {
+										opener.setCurrentDirectory(file);
+									} else if (file.isFile()) {
+										opener.setSelectedFile(file);
+									}
+									MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
+									ui.setFileName(file.getName());
+								}
+							}
 						}
-						catch (IOException e) {
-							e.printStackTrace();
+
+						@Override
+						public void mouseEntered(MouseEvent e) {
 						}
+
+						@Override
+						public void mouseExited(MouseEvent e) {
+						}
+
+						@Override
+						public void mousePressed(MouseEvent e) {
+						}
+
+						@Override
+						public void mouseReleased(MouseEvent e) {
+						}
+					});
+					break LOOP_TEMP;
+				}
+			}
+			opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			opener.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
+			opener.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
+			opener.setVisible(true);
+			int answer = opener.showOpenDialog(null);
+			if (answer == JFileChooser.APPROVE_OPTION) {
+				File f = opener.getSelectedFile();
+				ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
+				this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
+				this.editor.load(f);
+				this.editor.setModifiedFlag(false);
+				this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
+				this.editor.scriptChanger.enableComponent();
+
+				RandomAccessFile rf = null;
+				try {
+					rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+					rf.readLine();
+					rf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					try {
+						rf.close();
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
 				}
-				break;
 			}
+			break;
+		}
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	private JList<Class<?>> findFileList(Component comp){
-		if (comp instanceof JList){
+	private JList<Class<?>> findFileList(Component comp) {
+		if (comp instanceof JList) {
 			return (JList<Class<?>>) comp;
 		}
-		if (comp instanceof Container){
-			for (Component c : ((Container) comp).getComponents()){
+		if (comp instanceof Container) {
+			for (Component c : ((Container) comp).getComponents()) {
 				JList<Class<?>> list = findFileList(c);
-				if (list != null){
+				if (list != null) {
 					return list;
 				}
 			}

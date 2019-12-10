@@ -14,14 +14,18 @@ import abstracts.Item.Category;
 
 public class ItemText {
 	public enum Type {
-		ALL("ALL"), DUMMY("DUMMY"), ACTION("ACTION");
-		
+		// @formatter:off
+		ALL("ALL"), 
+		DUMMY("DUMMY"), 
+		ACTION("ACTION");
+		// @formatter:on
+
 		private String value;
-		
+
 		Type(String value) {
 			this.value = value;
 		}
-		
+
 		public static Type getType(String value) {
 			for (Type t : Type.values()) {
 				if (t.value.equals(value.toUpperCase()))
@@ -30,7 +34,7 @@ public class ItemText {
 			return ALL;
 		}
 	};
-	
+
 	public Type type;
 	public String itemName;
 	public String description;
@@ -41,7 +45,7 @@ public class ItemText {
 	public boolean useCommandFlag;
 	public boolean tossCommandFlag;
 	public boolean done;
-	
+
 	public ItemText() {
 		type = null;
 		itemName = null;
@@ -52,7 +56,7 @@ public class ItemText {
 		setCommandFlag = useCommandFlag = tossCommandFlag = false;
 		done = false;
 	}
-	
+
 	public boolean isComplete() {
 		return done;
 	}

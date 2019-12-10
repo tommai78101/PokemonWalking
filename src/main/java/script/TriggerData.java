@@ -16,21 +16,21 @@ public class TriggerData {
 	public int iteration;
 	private boolean finished;
 	private boolean repeat;
-	
+
 	private Movement moves;
 	private NewDialogue dialogue;
-	
+
 	// TODO: Add entity ID for NPCs.
-	
+
 	// TriggerData is for the game. Area uses TriggerData to communicate with
 	// Scripts to obtain Movements.
-	
+
 	public TriggerData() {
 		x = y = 0;
 		script = null;
 		finished = false;
 	}
-	
+
 	public TriggerData(TriggerData t) {
 		this.x = t.x;
 		this.y = t.y;
@@ -43,7 +43,8 @@ public class TriggerData {
 		this.y = (pixel >> 16) & 0xFF;
 		if (this.finished)
 			this.finished = false;
-		ArrayList<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts : WorldConstants.scripts);
+		ArrayList<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
+				: WorldConstants.scripts);
 		for (Script s : scriptList) {
 			if (s.triggerID == (pixel & 0xFFFF)) {
 				this.script = s;
@@ -54,13 +55,13 @@ public class TriggerData {
 		}
 		return this;
 	}
-	
+
 	public void tick(Area area, int entityX, int entityY) {
 		if (this.script != null) {
-			
+
 			moves = this.script.getIteratedMoves();
 			dialogue = this.script.getIteratedDialogues();
-			
+
 			if (moves != null && dialogue == null) {
 				area.getPlayer().keys.resetInputs();
 				if (area.getPlayer().isLockedWalking())
@@ -80,140 +81,129 @@ public class TriggerData {
 							area.getPlayer().forceLockWalking();
 						steps--;
 						entry.setValue(steps);
-					}
-					else {
+					} else {
 						list.remove(entry);
 						if (list.isEmpty()) {
 							moves = null;
 							try {
 								if (!this.script.incrementIteration())
 									this.finished = true;
-							}
-							catch (Exception e) {
+							} catch (Exception e) {
 								this.finished = true;
 								return;
 							}
-						}
-						else {
+						} else {
 							entry = list.get(0);
 							if (entry.getKey() != area.getPlayer().getFacing())
 								area.getPlayer().setFacing(entry.getKey());
 						}
 					}
 				}
-			}
-			else if (moves == null && dialogue != null) {
+			} else if (moves == null && dialogue != null) {
 				switch (dialogue.getDialogueType()) {
-					case NewDialogue.DIALOGUE_SPEECH:
-						if (this.dialogue.isDialogueCompleted()){
-							if (this.dialogue.isScrolling()){
+				case NewDialogue.DIALOGUE_SPEECH:
+					if (this.dialogue.isDialogueCompleted()) {
+						if (this.dialogue.isScrolling()) {
+							Player.unlockMovements();
+							dialogue.tick();
+							try {
+								this.finished = !this.script.incrementIteration();
+							} catch (Exception e) {
+								this.finished = true;
+								return;
+							}
+						} else {
+							if (!dialogue.isShowingDialog()) {
 								Player.unlockMovements();
-								dialogue.tick();
+								this.dialogue = null;
 								try {
 									this.finished = !this.script.incrementIteration();
-								}
-								catch (Exception e) {
+								} catch (Exception e) {
 									this.finished = true;
 									return;
-								}	
-							}
-							else {
-								if (!dialogue.isShowingDialog()) {
-									Player.unlockMovements();
-									this.dialogue = null;
-									try {
-										this.finished = !this.script.incrementIteration();
-									}
-									catch (Exception e) {
-										this.finished = true;
-										return;
-									}
 								}
-								else
-									dialogue.tick();
-							}
+							} else
+								dialogue.tick();
 						}
-						else if (dialogue.isDialogueTextSet() && !(dialogue.isDialogueCompleted() && dialogue.isShowingDialog())) {
+					} else if (dialogue.isDialogueTextSet()
+							&& !(dialogue.isDialogueCompleted() && dialogue.isShowingDialog())) {
+						Player.lockMovements();
+						dialogue.tick();
+					}
+					break;
+				case NewDialogue.DIALOGUE_QUESTION:
+					if (!dialogue.yesNoQuestionHasBeenAnswered()) {
+						dialogue.tick();
+						if (!Player.isMovementsLocked())
 							Player.lockMovements();
-							dialogue.tick();
+						area.getPlayer().disableAutomaticMode();
+					}
+					if (dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
+						if (Player.isMovementsLocked())
+							Player.unlockMovements();
+						area.getPlayer().enableAutomaticMode();
+						this.dialogue = null;
+						try {
+							this.finished = !this.script.incrementIteration();
+						} catch (Exception e) {
+							this.finished = true;
+							return;
 						}
-						break;
-					case NewDialogue.DIALOGUE_QUESTION:
-						if (!dialogue.yesNoQuestionHasBeenAnswered()) {
-							dialogue.tick();
-							if (!Player.isMovementsLocked())
-								Player.lockMovements();
-							area.getPlayer().disableAutomaticMode();
+						this.script.setAffirmativeFlag();
+						this.finished = false;
+					} else if (dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+						if (Player.isMovementsLocked())
+							Player.unlockMovements();
+						area.getPlayer().enableAutomaticMode();
+						this.dialogue = null;
+						try {
+							this.finished = !this.script.incrementIteration();
+						} catch (Exception e) {
+							this.finished = true;
+							return;
 						}
-						if (dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							if (Player.isMovementsLocked())
-								Player.unlockMovements();
-							area.getPlayer().enableAutomaticMode();
-							this.dialogue = null;
-							try {
-								this.finished = !this.script.incrementIteration();
-							}
-							catch (Exception e) {
-								this.finished = true;
-								return;
-							}
-							this.script.setAffirmativeFlag();
-							this.finished = false;
-						}
-						else if (dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
-							if (Player.isMovementsLocked())
-								Player.unlockMovements();
-							area.getPlayer().enableAutomaticMode();
-							this.dialogue = null;
-							try {
-								this.finished = !this.script.incrementIteration();
-							}
-							catch (Exception e) {
-								this.finished = true;
-								return;
-							}
-							this.script.setNegativeFlag();
-							this.finished = false;
-						}
-						break;
+						this.script.setNegativeFlag();
+						this.finished = false;
+					}
+					break;
 				}
 			}
-			
+
 		}
 	}
-	
-	public void setRepeating(){
+
+	public void setRepeating() {
 		this.repeat = true;
 	}
-	
-	public void stopRepeating(){
+
+	public void stopRepeating() {
 		this.repeat = false;
 	}
-	
-	public boolean isOnRepeat(){
+
+	public boolean isOnRepeat() {
 		return this.repeat;
 	}
-	
-	public TriggerData reset(){
+
+	public TriggerData reset() {
 		this.finished = false;
 		return this;
 	}
-	
+
 	public void render(BaseScreen screen, Graphics2D graphics) {
 		if (this.dialogue != null) {
 			this.dialogue.render(screen, graphics);
 		}
 	}
-	
+
 	public boolean isFinished() {
 		return finished;
 	}
-	
-	public void turnOffTrigger(){
+
+	public void turnOffTrigger() {
 		this.finished = true;
 	}
-	
-	public void turnOnTrigger(){
+
+	public void turnOnTrigger() {
 		this.finished = false;
 	}
 }

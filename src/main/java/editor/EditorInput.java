@@ -15,38 +15,38 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 public class EditorInput implements MouseListener, MouseMotionListener {
-	
+
 	public int mouseX, mouseY;
 	public int offsetX, offsetY;
 	public int oldX, oldY;
 	public int drawingX, drawingY;
-	
+
 	private boolean panning;
 	private boolean drawing;
-	
+
 	private LevelEditor editor;
-	
+
 	public EditorInput(LevelEditor editor) {
 		this.editor = editor;
-		// TODO: Dispatch event to Canvas other than Control Panel. Events must be separated from each other.
+		// TODO: Dispatch event to Canvas other than Control Panel. Events must be
+		// separated from each other.
 	}
-	
+
 	public boolean isDragging() {
 		return panning;
 	}
-	
+
 	public boolean isDrawing() {
 		return drawing;
 	}
-	
+
 	@Override
 	public void mouseDragged(MouseEvent event) {
 		int button1 = MouseEvent.BUTTON1_DOWN_MASK;
 		int button3 = MouseEvent.BUTTON3_DOWN_MASK;
 		if ((event.getModifiersEx() & (button1 | button3)) == button1) {
 			drawing = true;
-		}
-		else if ((event.getModifiersEx() & (button1 | button3)) == button3) {
+		} else if ((event.getModifiersEx() & (button1 | button3)) == button3) {
 			panning = true;
 		}
 		mouseX = event.getX();
@@ -54,14 +54,13 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		if (drawing) {
 			drawingX = mouseX;
 			drawingY = mouseY;
-		}
-		else if (panning) {
+		} else if (panning) {
 			offsetX = oldX - mouseX;
 			offsetY = oldY - mouseY;
 		}
 		editor.validate();
 	}
-	
+
 	@Override
 	public void mouseMoved(MouseEvent event) {
 		drawing = false;
@@ -69,7 +68,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		mouseY = event.getY();
 		editor.validate();
 	}
-	
+
 	@Override
 	public void mouseClicked(MouseEvent event) {
 		mouseX = event.getX();
@@ -84,7 +83,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		}
 		editor.validate();
 	}
-	
+
 	@Override
 	public void mouseEntered(MouseEvent event) {
 		drawing = false;
@@ -92,16 +91,16 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		mouseY = event.getY();
 		editor.validate();
 	}
-	
+
 	@Override
 	public void mouseExited(MouseEvent event) {
 		drawing = false;
 		mouseX = event.getX();
 		mouseY = event.getY();
 		editor.validate();
-		
+
 	}
-	
+
 	@Override
 	public void mousePressed(MouseEvent event) {
 		mouseX = event.getX();
@@ -111,26 +110,23 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 			panning = false;
 			drawingX = mouseX;
 			drawingY = mouseY;
-		}
-		else if (event.getButton() == MouseEvent.BUTTON3) {
+		} else if (event.getButton() == MouseEvent.BUTTON3) {
 			panning = true;
 			drawing = false;
 			oldX = mouseX + offsetX;
 			oldY = mouseY + offsetY;
-		}
-		else {
+		} else {
 			drawing = panning = false;
 		}
 		editor.validate();
 	}
-	
+
 	@Override
 	public void mouseReleased(MouseEvent event) {
-		if (drawing){
+		if (drawing) {
 			drawingX = event.getX();
 			drawingY = event.getY();
-		}
-		else if (panning){
+		} else if (panning) {
 			mouseX = event.getX();
 			mouseY = event.getY();
 			offsetX = oldX - mouseX;
@@ -139,9 +135,9 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		drawing = false;
 		panning = false;
 		editor.validate();
-		
+
 	}
-	
+
 	public void forceCancelDrawing() {
 		drawing = false;
 		panning = false;

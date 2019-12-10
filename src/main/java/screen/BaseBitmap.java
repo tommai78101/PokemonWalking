@@ -62,8 +62,7 @@ public class BaseBitmap {
 				}
 			}
 			return results;
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -86,8 +85,7 @@ public class BaseBitmap {
 			BufferedImage image = ImageIO.read(BaseBitmap.class.getClassLoader().getResource(filename));
 			System.out.println(filename);
 			return load(image);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -95,12 +93,12 @@ public class BaseBitmap {
 
 	public static BaseBitmap load(File file) {
 		try {
-			// Prints out the bitmap filename. If there's something wrong, it won't print it out.
+			// Prints out the bitmap filename. If there's something wrong, it won't print it
+			// out.
 			System.out.println(file.getAbsolutePath());
 			BufferedImage image = ImageIO.read(file);
 			return load(image);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;

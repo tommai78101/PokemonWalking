@@ -16,17 +16,17 @@ import entity.Player;
 import level.Area;
 
 public class ActionItem extends Item {
-	
+
 	protected boolean enabled;
-	
+
 	public ActionItem(Game game, String name, String description, Category category, int id) {
 		super(game, name, description, category, id);
 	}
-	
-	public ActionItem(Game game, ItemText text){
+
+	public ActionItem(Game game, ItemText text) {
 		super(game, text);
 	}
-	
+
 	@Override
 	public void doAction() {
 		if (this.enabled)
@@ -34,15 +34,15 @@ public class ActionItem extends Item {
 		else
 			enable();
 	}
-	
+
 	public void enable() {
 		this.enabled = true;
 	}
-	
+
 	public void disable() {
 		this.enabled = false;
 	}
-	
+
 	public boolean isEnabled() {
 		return this.enabled;
 	}
@@ -51,7 +51,7 @@ public class ActionItem extends Item {
 	public void dropAt(Area area, Player player) {
 		// TODO: Continue to work on this.
 	}
-	
+
 	@Override
 	public boolean equals(Object object) {
 		try {
@@ -63,12 +63,11 @@ public class ActionItem extends Item {
 			if ((this.name == null) ? (item.getName() != null) : !this.name.equals(item.getName()))
 				return false;
 			return true;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return false;
 		}
 	}
-	
+
 	@Override
 	public int hashCode() {
 		int hash = 3;

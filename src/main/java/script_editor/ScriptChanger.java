@@ -33,8 +33,9 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 
 	private final ScriptEditor editor;
 
-	//TODO (6/25/2015): ID Field needs to default to a number > 0. New triggers currently does not auto-set itself.
-	
+	// TODO (6/25/2015): ID Field needs to default to a number > 0. New triggers
+	// currently does not auto-set itself.
+
 	private JTextField nameField, idField;
 	private JButton upButton, downButton, leftButton, rightButton;
 	private JButton questionDialogue, affirmativeDialogue, negativeDialogue, speechDialogue;
@@ -54,34 +55,34 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			JTextArea area = editor.scriptChanger.getScriptArea();
 			PlainDocument doc = (PlainDocument) area.getDocument();
 			switch (event.getActionCommand()) {
-				case "#": {
-					if (doc.getLength() > 0)
-						area.append("\n#");
-					else
-						area.append("#");
-					break;
-				}
-				case "?": {
-					if (doc.getLength() > 0)
-						area.append("\n?");
-					else
-						area.append("?");
-					break;
-				}
-				case "+": {
-					if (doc.getLength() > 0)
-						area.append("\n+");
-					else
-						area.append("+");
-					break;
-				}
-				case "-": {
-					if (doc.getLength() > 0)
-						area.append("\n-");
-					else
-						area.append("-");
-					break;
-				}
+			case "#": {
+				if (doc.getLength() > 0)
+					area.append("\n#");
+				else
+					area.append("#");
+				break;
+			}
+			case "?": {
+				if (doc.getLength() > 0)
+					area.append("\n?");
+				else
+					area.append("?");
+				break;
+			}
+			case "+": {
+				if (doc.getLength() > 0)
+					area.append("\n+");
+				else
+					area.append("+");
+				break;
+			}
+			case "-": {
+				if (doc.getLength() > 0)
+					area.append("\n-");
+				else
+					area.append("-");
+				break;
+			}
 			}
 		}
 	};
@@ -247,27 +248,29 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		panel.setLayout(new FlowLayout(FlowLayout.LEADING));
 		speechDialogue = new JButton("#");
 		speechDialogue.setMargin(inset);
-		speechDialogue.setToolTipText("<html><b>Speech Dialogue:</b><br/> A normal dialogue the player is to trigger. <br/><br/><b>Usage:</b><br/> #[One-line-only Sentence]<br/><br/><b>Example:</b><br/>#Hello World.</html>");
+		speechDialogue.setToolTipText(
+				"<html><b>Speech Dialogue:</b><br/> A normal dialogue the player is to trigger. <br/><br/><b>Usage:</b><br/> #[One-line-only Sentence]<br/><br/><b>Example:</b><br/>#Hello World.</html>");
 		speechDialogue.setActionCommand("#");
 		speechDialogue.addActionListener(dialogueActions);
 		panel.add(speechDialogue);
 		questionDialogue = new JButton("?");
 		questionDialogue.setMargin(inset);
-		questionDialogue.setToolTipText("<html><b>Question Dialogue:</b><br/> A question dialogue asking for the player's response to YES or NO.<br/><br/><b>WARNING:</b><br/>A single question must be followed by an Affirmative and a Negative Dialogue.<br/><br/><b>Usage:</b><br/>?[One-line-only Question] <br/><br/><b>Example:</b><br/>?Do you want to trade your Bulbasaur for my Pikachu?<br/>+Great! Let's trade!<br/>-Aw... I thought you had one.</html>");
+		questionDialogue.setToolTipText(
+				"<html><b>Question Dialogue:</b><br/> A question dialogue asking for the player's response to YES or NO.<br/><br/><b>WARNING:</b><br/>A single question must be followed by an Affirmative and a Negative Dialogue.<br/><br/><b>Usage:</b><br/>?[One-line-only Question] <br/><br/><b>Example:</b><br/>?Do you want to trade your Bulbasaur for my Pikachu?<br/>+Great! Let's trade!<br/>-Aw... I thought you had one.</html>");
 		questionDialogue.setActionCommand("?");
 		questionDialogue.addActionListener(dialogueActions);
 		panel.add(questionDialogue);
 		affirmativeDialogue = new JButton("+");
 		affirmativeDialogue.setMargin(inset);
-		affirmativeDialogue
-				.setToolTipText("<html><b>Affirmative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to YES, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>+[One-line-only Sentence]<br/><br/><b>Example:</b><br/>+Great! Let's trade!</html>");
+		affirmativeDialogue.setToolTipText(
+				"<html><b>Affirmative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to YES, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>+[One-line-only Sentence]<br/><br/><b>Example:</b><br/>+Great! Let's trade!</html>");
 		affirmativeDialogue.setActionCommand("+");
 		affirmativeDialogue.addActionListener(dialogueActions);
 		panel.add(affirmativeDialogue);
 		negativeDialogue = new JButton("-");
 		negativeDialogue.setMargin(inset);
-		negativeDialogue
-				.setToolTipText("<html><b>Negative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to NO, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>-[One-line-only Sentence]<br/><br/><b>Example:</b><br/>-Aw... I thought you had one.</html>");
+		negativeDialogue.setToolTipText(
+				"<html><b>Negative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to NO, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>-[One-line-only Sentence]<br/><br/><b>Example:</b><br/>-Aw... I thought you had one.</html>");
 		negativeDialogue.setActionCommand("-");
 		negativeDialogue.addActionListener(dialogueActions);
 		panel.add(negativeDialogue);
@@ -378,94 +381,90 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			lastCharacter = doc.getText(area.getCaretPosition() - 1, 1);
 			if (lastDirection.equals("\n")) {
 				System.out.println("__" + lastCharacter + "__LINEBREAK__");
-			}
-			else {
+			} else {
 				System.out.println("__" + lastCharacter + "__" + lastDirection + "__");
 			}
-		}
-		catch (BadLocationException e) {
+		} catch (BadLocationException e) {
 			lastCharacter = "";
 		}
-		if (lastDirection.equals("U") || lastDirection.equals("D") || lastDirection.equals("L") || lastDirection.equals("R")) {
+		if (lastDirection.equals("U") || lastDirection.equals("D") || lastDirection.equals("L")
+				|| lastDirection.equals("R")) {
 			switch (event.getActionCommand()) {
-				case UP: {
-					inputChange(doc, area, "U");
-					break;
-				}
-				case DOWN: {
-					inputChange(doc, area, "D");
-					break;
-				}
-				case LEFT: {
-					inputChange(doc, area, "L");
-					break;
-				}
-				case RIGHT: {
-					inputChange(doc, area, "R");
-					break;
-				}
+			case UP: {
+				inputChange(doc, area, "U");
+				break;
 			}
-		}
-		else if (lastCharacter.equals("^")) {
+			case DOWN: {
+				inputChange(doc, area, "D");
+				break;
+			}
+			case LEFT: {
+				inputChange(doc, area, "L");
+				break;
+			}
+			case RIGHT: {
+				inputChange(doc, area, "R");
+				break;
+			}
+			}
+		} else if (lastCharacter.equals("^")) {
 			switch (event.getActionCommand()) {
-				case UP: {
-					defaultInputChange(doc, area, "U");
-					break;
-				}
-				case DOWN: {
-					defaultInputChange(doc, area, "D");
-					break;
-				}
-				case LEFT: {
-					defaultInputChange(doc, area, "L");
-					break;
-				}
-				case RIGHT: {
-					defaultInputChange(doc, area, "R");
-					break;
-				}
+			case UP: {
+				defaultInputChange(doc, area, "U");
+				break;
 			}
-		}
-		else if (lastCharacter.equals("\n") || lastCharacter.equals("")) {
+			case DOWN: {
+				defaultInputChange(doc, area, "D");
+				break;
+			}
+			case LEFT: {
+				defaultInputChange(doc, area, "L");
+				break;
+			}
+			case RIGHT: {
+				defaultInputChange(doc, area, "R");
+				break;
+			}
+			}
+		} else if (lastCharacter.equals("\n") || lastCharacter.equals("")) {
 			area.append("^");
 			switch (event.getActionCommand()) {
-				case UP: {
-					defaultInputChange(doc, area, "U");
-					break;
-				}
-				case DOWN: {
-					defaultInputChange(doc, area, "D");
-					break;
-				}
-				case LEFT: {
-					defaultInputChange(doc, area, "L");
-					break;
-				}
-				case RIGHT: {
-					defaultInputChange(doc, area, "R");
-					break;
-				}
+			case UP: {
+				defaultInputChange(doc, area, "U");
+				break;
 			}
-		}
-		else {
+			case DOWN: {
+				defaultInputChange(doc, area, "D");
+				break;
+			}
+			case LEFT: {
+				defaultInputChange(doc, area, "L");
+				break;
+			}
+			case RIGHT: {
+				defaultInputChange(doc, area, "R");
+				break;
+			}
+			}
+		} else {
 			area.append("\n^");
 			switch (event.getActionCommand()) {
-				case UP: {
-					defaultInputChange(doc, area, "U");
-					break;
-				}
-				case DOWN: {
-					defaultInputChange(doc, area, "D");
-					break;
-				}
-				case LEFT: {
-					defaultInputChange(doc, area, "L");
-					break;
-				}
-				case RIGHT: {
-					defaultInputChange(doc, area, "R");
-					break;
-				}
+			case UP: {
+				defaultInputChange(doc, area, "U");
+				break;
+			}
+			case DOWN: {
+				defaultInputChange(doc, area, "D");
+				break;
+			}
+			case LEFT: {
+				defaultInputChange(doc, area, "L");
+				break;
+			}
+			case RIGHT: {
+				defaultInputChange(doc, area, "R");
+				break;
+			}
 			}
 		}
 	}
@@ -478,18 +477,15 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 					movementCounter++;
 					doc.remove(doc.getLength() - 1, 1);
 					area.append(Integer.toString(movementCounter));
-				}
-				else {
+				} else {
 					movementCounter = 0;
 					area.append(directionToCompare + Integer.toString(movementCounter));
 				}
-			}
-			else {
+			} else {
 				movementCounter = 0;
 				area.append(directionToCompare + Integer.toString(movementCounter));
 			}
-		}
-		catch (BadLocationException e) {
+		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
 	}
@@ -516,8 +512,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 					test = editor.scriptChanger.getNameField().getText();
 					if (!test.isEmpty() || !test.equals(""))
 						selectedTrigger.setName(test);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 				}
 
 				// try {
@@ -530,7 +525,8 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				// }
 				// }
 				// catch (NumberFormatException e) {
-				// JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~ 255.");
+				// JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~
+				// 255.");
 				// SwingUtilities.invokeLater(new Runnable() {
 				// @Override
 				// public void run() {
@@ -548,7 +544,8 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				// }
 				// }
 				// catch (NumberFormatException e) {
-				// JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~ 255.");
+				// JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~
+				// 255.");
 				// SwingUtilities.invokeLater(new Runnable() {
 				// @Override
 				// public void run() {
@@ -565,9 +562,9 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 							throw new NumberFormatException();
 						selectedTrigger.setTriggerID((short) (n & 0xFFFF));
 					}
-				}
-				catch (NumberFormatException e) {
-					JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~ 65535.\n\n0 is reserved for \"Eraser\", which is used to erase triggers from the map.");
+				} catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null,
+							"Please input numbers in range 0 ~ 65535.\n\n0 is reserved for \"Eraser\", which is used to erase triggers from the map.");
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
 						public void run() {
@@ -580,8 +577,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 					test = editor.scriptChanger.getScriptArea().getText();
 					if (!test.isEmpty() || !test.equals(""))
 						selectedTrigger.setScript(test);
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 				}
 
 				JList<Trigger> list = editor.scriptViewer.getTriggerList();

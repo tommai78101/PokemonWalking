@@ -59,7 +59,8 @@ public class StartMenu {
 	}
 
 	public StartMenu initialize() {
-		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game).initialize(keys);
+		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game)
+				.initialize(keys);
 		save = (Save) new Save(ITEM_NAME_SAVE, "Save the game.", "Save the game.", this.game).initialize(keys);
 		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu", this.game);
 		this.addMenuItem(inventory);
@@ -96,8 +97,7 @@ public class StartMenu {
 		if (this.activation) {
 			prepareMenuText();
 			handleMenuSelection();
-		}
-		else if (Player.isMovementsLocked())
+		} else if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}
 
@@ -110,7 +110,8 @@ public class StartMenu {
 			this.renderMenuText(g2d);
 			this.renderMenuDescriptionText(g2d);
 			g2d.dispose();
-			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0,
+					MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		}
 	}
 
@@ -145,10 +146,13 @@ public class StartMenu {
 	 * Compares all available submenus before returning it.
 	 * 
 	 * <p>
-	 * <b>Note:</b> There's a legitimate logic error resulting in submenus having different reference values in the Java VM existing in this method. If this method doesn't do any comparison beforehand, it will result in having the JVM using the wrong but correct references.
+	 * <b>Note:</b> There's a legitimate logic error resulting in submenus having
+	 * different reference values in the Java VM existing in this method. If this
+	 * method doesn't do any comparison beforehand, it will result in having the JVM
+	 * using the wrong but correct references.
 	 * 
 	 * @return The chosen submenu that is equal to the submenu used for comparison.
-	 * */
+	 */
 	public SubMenu getSubMenu() {
 		SubMenu menu = this.items.get(this.menuCursorPosition).getValue();
 		if (menu.equals(this.inventory))
@@ -181,8 +185,7 @@ public class StartMenu {
 			if (this.menuCursorPosition > this.items.size() - 1)
 				this.menuCursorPosition = 0;
 			this.keys.down.lastKeyState = true;
-		}
-		else if (!this.keys.up.lastKeyState && this.keys.up.keyStateDown) {
+		} else if (!this.keys.up.lastKeyState && this.keys.up.keyStateDown) {
 			this.menuCursorPosition--;
 			if (this.menuCursorPosition < 0)
 				this.menuCursorPosition = this.items.size() - 1;
@@ -190,7 +193,8 @@ public class StartMenu {
 		}
 
 		// Menu input mechanism
-		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
+				&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 			this.keys.Z.lastKeyState = true;
 			this.keys.SLASH.lastKeyState = true;
 			this.actionEvent = items.get(menuCursorPosition);
@@ -203,7 +207,8 @@ public class StartMenu {
 		g.setColor(Color.black);
 		if (this.activation) {
 			for (int i = 0; i < this.items.size(); i++) {
-				g.drawString(this.items.get(i).getValue().getName(), (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16)));
+				g.drawString(this.items.get(i).getValue().getName(), (Tile.WIDTH * 6),
+						(((Tile.HEIGHT * 2 - 8) + i * 16)));
 			}
 		}
 	}
@@ -214,17 +219,18 @@ public class StartMenu {
 		try {
 			g.drawString(tokens.get(0).getKey(), 0, StartMenu.DESCRIPTION_FIRST_LINE_Y);
 			g.drawString(tokens.get(1).getKey(), 0, StartMenu.DESCRIPTION_SECOND_LINE_Y);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 		}
 	}
 
-	// ------------------------- STATIC METHODS --------------------------------------
+	// ------------------------- STATIC METHODS
+	// --------------------------------------
 
 	public static void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
-				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), ((y - 1) * Tile.HEIGHT + 8) + j * Tile.HEIGHT);
+				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH),
+						((y - 1) * Tile.HEIGHT + 8) + j * Tile.HEIGHT);
 			}
 		}
 	}

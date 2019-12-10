@@ -38,9 +38,9 @@ public class OverWorld extends World {
 	 * 
 	 * All game entities are to be loaded through this method.
 	 * 
-	 * @param Player
-	 *            Takes a Player object. The overworld then loads all related properties in respect to the Player object.
-	 * */
+	 * @param Player Takes a Player object. The overworld then loads all related
+	 *               properties in respect to the Player object.
+	 */
 	public OverWorld(Player player, Game game) {
 		// There should be a maximum number of areas available for the OverWorld.
 		// All areas defined must be placed in WorldConstants.
@@ -58,7 +58,8 @@ public class OverWorld extends World {
 		// Overworld properties
 		this.invertBitmapColors = false;
 
-		// Going to set this area as test default only. This will need to change in the future.
+		// Going to set this area as test default only. This will need to change in the
+		// future.
 		this.currentArea = this.areas.get(0);
 		this.setCurrentArea(this.areas.get(0));
 		this.currentArea.setPlayer(player);
@@ -115,7 +116,8 @@ public class OverWorld extends World {
 			this.currentArea = this.areas.get(0);
 		this.currentArea.tick();
 
-		if (this.currentArea.playerIsInWarpZone() || (this.currentArea.isDisplayingExitArrow() && this.player.isColliding())) {
+		if (this.currentArea.playerIsInWarpZone()
+				|| (this.currentArea.isDisplayingExitArrow() && this.player.isColliding())) {
 			this.handleWarpPointEvent();
 		}
 
@@ -124,7 +126,8 @@ public class OverWorld extends World {
 				if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
 					this.currentAreaSectorID = this.currentArea.getSectorID();
 					// This is where you get the latest sector id at.
-					System.out.println("Area: " + this.currentArea.getAreaID() + " Sector: " + currentArea.getSectorID());
+					System.out
+							.println("Area: " + this.currentArea.getAreaID() + " Sector: " + currentArea.getSectorID());
 				}
 			}
 		}
@@ -134,81 +137,84 @@ public class OverWorld extends World {
 	}
 
 	/**
-	 * <p>Handles player interactions with objects in the world. When the player is interacting, it passes the interacted object's interaction ID number
-	 * to the OverWorld, where it handles the interaction ID accordingly.
+	 * <p>
+	 * Handles player interactions with objects in the world. When the player is
+	 * interacting, it passes the interacted object's interaction ID number to the
+	 * OverWorld, where it handles the interaction ID accordingly.
 	 * </p>
 	 * 
-	 * */
+	 */
 	private void handlePlayerInteractions() {
-		// TODO: Fix the awkward interaction caused by so many states not working properly.
+		// TODO: Fix the awkward interaction caused by so many states not working
+		// properly.
 		int interactionID = player.getInteractionID();
 		if (this.player.isInteracting() && interactionID != 0 && !this.currentArea.isBeingTriggered()) {
 			int alpha = (interactionID >> 24) & 0xFF;
 			int red = (interactionID >> 16) & 0xFF;
 			switch (alpha) {
-				case 0x03: {// Obstacles
-					switch (red) {
-						case 0x05: {// Signs
-							int dialogueID = (interactionID & 0xFFFF);
-							SIGN_LOOP: for (Map.Entry<NewDialogue, Integer> entry : WorldConstants.signTexts) {
-								if (entry.getValue() == dialogueID) {
-									this.newDialogues = new NewDialogue[] { entry.getKey() };
-									break SIGN_LOOP;
-								}
-							}
-							break;
+			case 0x03: {// Obstacles
+				switch (red) {
+				case 0x05: {// Signs
+					int dialogueID = (interactionID & 0xFFFF);
+					SIGN_LOOP: for (Map.Entry<NewDialogue, Integer> entry : WorldConstants.signTexts) {
+						if (entry.getValue() == dialogueID) {
+							this.newDialogues = new NewDialogue[] { entry.getKey() };
+							break SIGN_LOOP;
 						}
-						default: // Other obstacles
-							ArrayList<Obstacle> list = this.currentArea.getObstaclesList();
-							OBSTACLE_LOOP: for (int i = 0; i < list.size(); i++) {
-								Obstacle obstacle = list.get(i);
-								if (obstacle.getID() != red)
-									continue;
-								this.newDialogues = obstacle.getDialogues();
-								break OBSTACLE_LOOP;
-							}
-							break;
 					}
 					break;
 				}
-				case 0x0A: {// Item
-					ItemText text = null;
-					for (Entry<ItemText, Item> entry : WorldConstants.items) {
-						if (entry.getKey().id == red) {
-							text = entry.getKey();
-							break;
-						}
-					}
-					if (this.newDialogues == null) {
-						this.newDialogues = new NewDialogue[] { NewDialogue.createText(text.itemName + " has been found.", NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_ALERT, true) };
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								PixelData data = currentArea.getCurrentPixelData();
-								switch (player.getFacing()) {
-									case Player.UP:
-										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() - 1);
-										break;
-									case Player.DOWN:
-										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() + 1);
-										break;
-									case Player.LEFT:
-										currentArea.setPixelData(data, player.getXInArea() - 1, player.getYInArea());
-										break;
-									case Player.RIGHT:
-										currentArea.setPixelData(data, player.getXInArea() + 1, player.getYInArea());
-										break;
-								}
-							}
-						}).start();
-						Inventory inventory = this.game.getStartMenu().getInventory();
-						inventory.addItem(text);
+				default: // Other obstacles
+					ArrayList<Obstacle> list = this.currentArea.getObstaclesList();
+					OBSTACLE_LOOP: for (int i = 0; i < list.size(); i++) {
+						Obstacle obstacle = list.get(i);
+						if (obstacle.getID() != red)
+							continue;
+						this.newDialogues = obstacle.getDialogues();
+						break OBSTACLE_LOOP;
 					}
 					break;
 				}
+				break;
 			}
-		}
-		else {
+			case 0x0A: {// Item
+				ItemText text = null;
+				for (Entry<ItemText, Item> entry : WorldConstants.items) {
+					if (entry.getKey().id == red) {
+						text = entry.getKey();
+						break;
+					}
+				}
+				if (this.newDialogues == null) {
+					this.newDialogues = new NewDialogue[] { NewDialogue.createText(text.itemName + " has been found.",
+							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_ALERT, true) };
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							PixelData data = currentArea.getCurrentPixelData();
+							switch (player.getFacing()) {
+							case Player.UP:
+								currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() - 1);
+								break;
+							case Player.DOWN:
+								currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() + 1);
+								break;
+							case Player.LEFT:
+								currentArea.setPixelData(data, player.getXInArea() - 1, player.getYInArea());
+								break;
+							case Player.RIGHT:
+								currentArea.setPixelData(data, player.getXInArea() + 1, player.getYInArea());
+								break;
+							}
+						}
+					}).start();
+					Inventory inventory = this.game.getStartMenu().getInventory();
+					inventory.addItem(text);
+				}
+				break;
+			}
+			}
+		} else {
 			if (this.currentArea != null && !this.currentArea.isBeingTriggered()) {
 				if (Player.isMovementsLocked())
 					Player.unlockMovements();
@@ -220,87 +226,86 @@ public class OverWorld extends World {
 		if (this.newDialogues != null) {
 			// The order is IMPORTANT!!
 			if (this.newDialogues.length == 1) {
-				if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && this.newDialogues[this.newDialoguesIterator].isScrolling()) {
+				if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted()
+						&& this.newDialogues[this.newDialoguesIterator].isScrolling()) {
 					Player.unlockMovements();
 					this.newDialogues[this.newDialoguesIterator].resetDialogue();
 					this.newDialogues = null;
 					this.newDialoguesIterator = 0;
 					this.player.stopInteraction();
-				}
-				else if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && !this.newDialogues[this.newDialoguesIterator].isScrolling()) {
+				} else if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted()
+						&& !this.newDialogues[this.newDialoguesIterator].isScrolling()) {
 					this.newDialogues[this.newDialoguesIterator].tick();
-				}
-				else if (this.newDialogues[this.newDialoguesIterator].isDialogueTextSet() && !(this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && this.newDialogues[this.newDialoguesIterator].isShowingDialog())) {
+				} else if (this.newDialogues[this.newDialoguesIterator].isDialogueTextSet()
+						&& !(this.newDialogues[this.newDialoguesIterator].isDialogueCompleted()
+								&& this.newDialogues[this.newDialoguesIterator].isShowingDialog())) {
 					Player.lockMovements();
 					this.newDialogues[this.newDialoguesIterator].tick();
 				}
-			}
-			else {
+			} else {
 				switch (this.newDialogues[this.newDialoguesIterator].getDialogueType()) {
-					case NewDialogue.DIALOGUE_SPEECH:
-						if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && this.newDialogues[this.newDialoguesIterator].isScrolling()) {
+				case NewDialogue.DIALOGUE_SPEECH:
+					if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted()
+							&& this.newDialogues[this.newDialoguesIterator].isScrolling()) {
+						Player.unlockMovements();
+						this.newDialogues[this.newDialoguesIterator].resetDialogue();
+						if (this.newDialoguesIterator < this.newDialogues.length - 1) {
+							this.newDialoguesIterator++;
+							this.handleDialogues();
+						} else {
+							this.newDialogues = null;
+							this.newDialoguesIterator = 0;
+							this.player.stopInteraction();
+						}
+					} else if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted()
+							&& !this.newDialogues[this.newDialoguesIterator].isScrolling()) {
+						if (!this.newDialogues[this.newDialoguesIterator].isShowingDialog()) {
 							Player.unlockMovements();
 							this.newDialogues[this.newDialoguesIterator].resetDialogue();
 							if (this.newDialoguesIterator < this.newDialogues.length - 1) {
 								this.newDialoguesIterator++;
 								this.handleDialogues();
-							}
-							else {
+							} else {
 								this.newDialogues = null;
 								this.newDialoguesIterator = 0;
 								this.player.stopInteraction();
 							}
-						}
-						else if (this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && !this.newDialogues[this.newDialoguesIterator].isScrolling()) {
-							if (!this.newDialogues[this.newDialoguesIterator].isShowingDialog()) {
-								Player.unlockMovements();
-								this.newDialogues[this.newDialoguesIterator].resetDialogue();
-								if (this.newDialoguesIterator < this.newDialogues.length - 1) {
-									this.newDialoguesIterator++;
-									this.handleDialogues();
-								}
-								else {
-									this.newDialogues = null;
-									this.newDialoguesIterator = 0;
-									this.player.stopInteraction();
-								}
-							}
-							else
-								this.newDialogues[this.newDialoguesIterator].tick();
-						}
-						else if (this.newDialogues[this.newDialoguesIterator].isDialogueTextSet() && !(this.newDialogues[this.newDialoguesIterator].isDialogueCompleted() && this.newDialogues[this.newDialoguesIterator].isShowingDialog())) {
+						} else
+							this.newDialogues[this.newDialoguesIterator].tick();
+					} else if (this.newDialogues[this.newDialoguesIterator].isDialogueTextSet()
+							&& !(this.newDialogues[this.newDialoguesIterator].isDialogueCompleted()
+									&& this.newDialogues[this.newDialoguesIterator].isShowingDialog())) {
+						Player.lockMovements();
+						this.newDialogues[this.newDialoguesIterator].tick();
+					}
+					break;
+				case NewDialogue.DIALOGUE_QUESTION:
+					if (!this.newDialogues[this.newDialoguesIterator].yesNoQuestionHasBeenAnswered()) {
+						this.newDialogues[this.newDialoguesIterator].tick();
+						if (!Player.isMovementsLocked())
 							Player.lockMovements();
-							this.newDialogues[this.newDialoguesIterator].tick();
-						}
-						break;
-					case NewDialogue.DIALOGUE_QUESTION:
-						if (!this.newDialogues[this.newDialoguesIterator].yesNoQuestionHasBeenAnswered()) {
-							this.newDialogues[this.newDialoguesIterator].tick();
-							if (!Player.isMovementsLocked())
-								Player.lockMovements();
-						}
-						if (this.newDialogues[this.newDialoguesIterator].getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							this.newDialogues[this.newDialoguesIterator].resetDialogue();
-							if (this.newDialoguesIterator < this.newDialogues.length - 1) {
-								this.newDialoguesIterator++;
-								this.handleDialogues();
-							}
-							else {
-								this.newDialogues[this.newDialoguesIterator].resetDialogue();
-								this.newDialogues = null;
-								this.newDialoguesIterator = 0;
-								this.player.stopInteraction();
-								Player.unlockMovements();
-							}
-						}
-						else if (this.newDialogues[this.newDialoguesIterator].getAnswerToSimpleQuestion() == Boolean.FALSE) {
+					}
+					if (this.newDialogues[this.newDialoguesIterator].getAnswerToSimpleQuestion() == Boolean.TRUE) {
+						this.newDialogues[this.newDialoguesIterator].resetDialogue();
+						if (this.newDialoguesIterator < this.newDialogues.length - 1) {
+							this.newDialoguesIterator++;
+							this.handleDialogues();
+						} else {
 							this.newDialogues[this.newDialoguesIterator].resetDialogue();
 							this.newDialogues = null;
 							this.newDialoguesIterator = 0;
 							this.player.stopInteraction();
 							Player.unlockMovements();
 						}
-						break;
+					} else if (this.newDialogues[this.newDialoguesIterator]
+							.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+						this.newDialogues[this.newDialoguesIterator].resetDialogue();
+						this.newDialogues = null;
+						this.newDialoguesIterator = 0;
+						this.player.stopInteraction();
+						Player.unlockMovements();
+					}
+					break;
 				}
 			}
 		}
@@ -341,17 +346,17 @@ public class OverWorld extends World {
 			this.invertBitmapColors = true;
 
 			switch ((data.getColor() >> 24) & 0xFF) {
-				case 0x04: // Warp point
-					this.player.forceLockWalking();
-					break;
-				case 0x09: // Door
-					this.player.tick();
-					break;
-				case 0x0B: // Carpet (Indoors)
-				case 0x0C: // Carpet (Outdoors)
-					this.player.forceLockWalking();
-					this.player.tick();
-					break;
+			case 0x04: // Warp point
+				this.player.forceLockWalking();
+				break;
+			case 0x09: // Door
+				this.player.tick();
+				break;
+			case 0x0B: // Carpet (Indoors)
+			case 0x0C: // Carpet (Outdoors)
+				this.player.forceLockWalking();
+				this.player.tick();
+				break;
 			}
 
 			this.currentArea.playerWentPastWarpZone();
@@ -363,7 +368,8 @@ public class OverWorld extends World {
 		//
 		// }
 		// // int targetAreaID = 0;
-		// // if (WorldConstants.isModsEnabled.booleanValue() && this.currentArea.getAreaID() < 1000)
+		// // if (WorldConstants.isModsEnabled.booleanValue() &&
+		// this.currentArea.getAreaID() < 1000)
 		// // targetAreaID = data.getTargetAreaID() + 1000;
 		// // else
 		// // targetAreaID = data.getTargetAreaID();
@@ -404,7 +410,8 @@ public class OverWorld extends World {
 		}
 	}
 
-	// private void renderTiles(BaseScreen screen, Area area, int xPosition, int yPosition, int xOff, int yOff) {
+	// private void renderTiles(BaseScreen screen, Area area, int xPosition, int
+	// yPosition, int xOff, int yOff) {
 	// //Unsure at the moment.
 	// // area.setPosition(xPosition, yPosition);
 	// // area.renderTiles(screen, -xOff, -yOff);

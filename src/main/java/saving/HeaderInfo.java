@@ -20,11 +20,11 @@ public class HeaderInfo extends ChunkInfo {
 	public final byte[] header_version = "0001".getBytes();
 	public final byte[] header_format = ".SAV".getBytes();
 	public final int size;
-	
+
 	public HeaderInfo() {
 		size = header_id.length + header_version.length + header_format.length;
 	}
-	
+
 	@Override
 	public void write(RandomAccessFile raf) throws IOException {
 		try {
@@ -32,12 +32,11 @@ public class HeaderInfo extends ChunkInfo {
 			raf.write(header_version);
 			raf.write(header_id);
 			raf.write(header_format);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new IOException("Error in writing file.", e);
 		}
 	}
-	
+
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		int size = raf.read();
@@ -49,10 +48,10 @@ public class HeaderInfo extends ChunkInfo {
 				if (header_version[j] != info[j]) {
 					if (header_version[j] > info[j]) {
 						olderVersion = true;
-						new RuntimeException("Incorrect header version signature. Determining its version.").printStackTrace();
+						new RuntimeException("Incorrect header version signature. Determining its version.")
+								.printStackTrace();
 						break VERSION_CHECK;
-					}
-					else
+					} else
 						throw new IOException("Unable to determine version.");
 				}
 			}
@@ -61,8 +60,7 @@ public class HeaderInfo extends ChunkInfo {
 					if (olderVersion) {
 						new RuntimeException("Incorrect header id signature. Attempting to update.").printStackTrace();
 						break ID_CHECK;
-					}
-					else
+					} else
 						throw new RuntimeException("Unknown header id signature.");
 				}
 			}
@@ -71,8 +69,7 @@ public class HeaderInfo extends ChunkInfo {
 					throw new RuntimeException("Incorrect header code signature.");
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			raf.close();
 			throw new IOException("Error in reading the data file.", e);
 		}

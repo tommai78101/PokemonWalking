@@ -22,15 +22,16 @@ import main.Keys.Key;
 public class InputHandler implements KeyListener {
 	public Map<Key, Integer> mappings = new HashMap<Key, Integer>();
 	public static final ExecutorService threadPool = Executors.newCachedThreadPool();
-	
+
 	/**
 	 * Initializes the control inputs.
 	 * 
-	 * This input handler use threads to monitor inputs that require tapping or pressing the keys.
+	 * This input handler use threads to monitor inputs that require tapping or
+	 * pressing the keys.
 	 * 
-	 * @param Keys
-	 *            An object that holds key input properties. All properties are used throughout the life cycle of this application.
-	 * */
+	 * @param Keys An object that holds key input properties. All properties are
+	 *             used throughout the life cycle of this application.
+	 */
 	public InputHandler(Keys keys) {
 		mappings.put(keys.up, KeyEvent.VK_UP);
 		mappings.put(keys.down, KeyEvent.VK_DOWN);
@@ -38,21 +39,21 @@ public class InputHandler implements KeyListener {
 		mappings.put(keys.right, KeyEvent.VK_RIGHT);
 		mappings.put(keys.Z, KeyEvent.VK_Z);
 		mappings.put(keys.X, KeyEvent.VK_X);
-		
+
 		mappings.put(keys.W, KeyEvent.VK_W);
 		mappings.put(keys.S, KeyEvent.VK_S);
 		mappings.put(keys.A, KeyEvent.VK_A);
 		mappings.put(keys.D, KeyEvent.VK_D);
 		mappings.put(keys.SLASH, KeyEvent.VK_SLASH);
 		mappings.put(keys.PERIOD, KeyEvent.VK_PERIOD);
-		
+
 		mappings.put(keys.START, KeyEvent.VK_ENTER);
-		
+
 		// Debugging purposes
 		mappings.put(keys.F1, KeyEvent.VK_F1);
-		
+
 	}
-	
+
 	@Override
 	public void keyPressed(KeyEvent event) {
 		int code = event.getKeyCode();
@@ -69,8 +70,7 @@ public class InputHandler implements KeyListener {
 						public void run() {
 							try {
 								Thread.sleep(100);
-							}
-							catch (InterruptedException e) {
+							} catch (InterruptedException e) {
 							}
 							if (key.keyStateDown) {
 								key.isPressedDown = true;
@@ -79,13 +79,12 @@ public class InputHandler implements KeyListener {
 						}
 					});
 					break;
-				}
-				else
+				} else
 					break;
 			}
 		}
 	}
-	
+
 	@Override
 	public void keyReleased(KeyEvent event) {
 		for (Key k : mappings.keySet()) {
@@ -98,7 +97,7 @@ public class InputHandler implements KeyListener {
 			}
 		}
 	}
-	
+
 	@Override
 	public void keyTyped(KeyEvent arg0) {
 		// Ignore. Used for sending Unicode character mapped as a system input.

@@ -305,8 +305,7 @@ public class Art {
 			// There are 16 frames for the water.
 			if (i < 10) {
 				result[i] = BaseScreen.load(filename + "0" + String.valueOf(i) + ".png");
-			}
-			else {
+			} else {
 				result[i] = BaseScreen.load(filename + String.valueOf(i) + ".png");
 			}
 		}
@@ -318,8 +317,7 @@ public class Art {
 		URL url = null;
 		try {
 			urls = Art.class.getClassLoader().getResources(filename);
-		}
-		catch (IOException e2) {
+		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
 		for (; urls.hasMoreElements();)
@@ -329,29 +327,22 @@ public class Art {
 		Font result = null;
 		try {
 			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
-		}
-		catch (FontFormatException e) {
+		} catch (FontFormatException e) {
 			e.printStackTrace();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 			try {
 				result = Font.createFont(Font.TRUETYPE_FONT, Art.class.getResourceAsStream(filename));
-			}
-			catch (FontFormatException e1) {
+			} catch (FontFormatException e1) {
 				e1.printStackTrace();
-			}
-			catch (IOException e1) {
+			} catch (IOException e1) {
 				e1.printStackTrace();
 				try {
 					result = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/font.ttf"));
-				}
-				catch (FontFormatException e2) {
+				} catch (FontFormatException e2) {
 					e2.printStackTrace();
-				}
-				catch (IOException e2) {
+				} catch (IOException e2) {
 					e2.printStackTrace();
 				}
 			}
@@ -371,12 +362,12 @@ public class Art {
 			int alpha = (pixels[i] >> 24) & 0xFF;
 			// May be possible this will expand in the future.
 			switch (alpha) {
-				case 0x01:
-					resultPixels[i] = 0xFF000000 | BaseScreen.lighten(color, 0.2f);
-					break;
-				default:
-					resultPixels[i] = 0xFF000000 | BaseScreen.darken(color, 0.1f);
-					break;
+			case 0x01:
+				resultPixels[i] = 0xFF000000 | BaseScreen.lighten(color, 0.2f);
+				break;
+			default:
+				resultPixels[i] = 0xFF000000 | BaseScreen.darken(color, 0.1f);
+				break;
 			}
 		}
 		return result;

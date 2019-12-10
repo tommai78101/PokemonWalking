@@ -17,7 +17,7 @@ public class Data {
 	enum DataType {
 		ALPHA, RED, GREEN, BLUE;
 	};
-	
+
 	public String name;
 	public String filepath;
 	public int editorID;
@@ -31,8 +31,8 @@ public class Data {
 	public boolean redByEditor;
 	public boolean greenByEditor;
 	public boolean blueByEditor;
-	
-	public Data(){
+
+	public Data() {
 		name = filepath = "";
 		alpha = red = green = blue = editorID = 0;
 		image = null;
@@ -40,16 +40,16 @@ public class Data {
 		areaTypeIDType = DataType.ALPHA;
 		areaTypeIncluded = alphaByEditor = redByEditor = greenByEditor = blueByEditor = false;
 	}
-	
-	public boolean compare(Data d){
+
+	public boolean compare(Data d) {
 		int dataValue1 = (this.alpha << 24) | (this.red << 16) | (this.green << 8) | this.blue;
 		int dataValue2 = (d.alpha << 24) | (d.red << 16) | (d.green << 8) | d.blue;
 		if (dataValue1 == dataValue2)
 			return true;
 		return false;
 	}
-	
-	public int getColorValue(){
+
+	public int getColorValue() {
 		return (alpha << 24) | (red << 16) | (green << 8) | blue;
 	}
 }

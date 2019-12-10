@@ -28,7 +28,7 @@ public class PlayerInfo extends ChunkInfo {
 	public final byte[] player_x = new byte[4];
 	public final byte[] player_y = new byte[4];
 	public final byte[] player_facing = new byte[4];
-	
+
 	public static final byte[] PLAY = "PLAY".getBytes(); // Player Info
 	public static final byte[] NAME = "NAME".getBytes(); // Player name.
 	public static final byte[] GNDR = "GNDR".getBytes(); // Player gender.
@@ -37,9 +37,9 @@ public class PlayerInfo extends ChunkInfo {
 	// public static final byte[] AREA = "AREA".getBytes(); //Current Area.
 	public static final byte[] AXIS = "AXIS".getBytes(); // Current Position.
 	public static final byte[] TURN = "TURN".getBytes(); // Current Direction.
-	
+
 	private int byteSize = 0;
-	
+
 	public List<ArrayList<byte[]>> getAllItemsList() {
 		List<ArrayList<byte[]>> result = new ArrayList<ArrayList<byte[]>>();
 		result.add(this.potions);
@@ -48,15 +48,15 @@ public class PlayerInfo extends ChunkInfo {
 		result.add(this.tm_hm);
 		return result;
 	}
-	
+
 	public int getByteSize() {
 		return this.byteSize;
 	}
-	
+
 	public void increment(byte[] list) {
 		this.byteSize += list.length;
 	}
-	
+
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		this.byteSize = raf.readShort();
@@ -68,7 +68,7 @@ public class PlayerInfo extends ChunkInfo {
 			if (data[i] != PLAY[i])
 				throw new IOException("Incorrect Player Info Header chunk.");
 		}
-		
+
 		// Checks for "NAME" tag.
 		byte size = data[offset++];
 		for (int i = 0; i < NAME.length; offset++, i++, size--) {
@@ -80,7 +80,7 @@ public class PlayerInfo extends ChunkInfo {
 				throw new IOException("Something is wrong with the size in NAME chunk.");
 			this.player_name[i] = data[offset];
 		}
-		
+
 		// Checks for "Gender" tag.
 		size = data[offset++];
 		for (int i = 0; i < GNDR.length; offset++, i++, size--) {
@@ -92,7 +92,7 @@ public class PlayerInfo extends ChunkInfo {
 				throw new IOException("Something is wrong with the size in GNDR chunk.");
 			this.player_gender[i] = data[offset];
 		}
-		
+
 		// Menu tag.
 		size = data[offset++];
 		for (int i = 0; i < MENU.length; offset++, i++, size--) {
@@ -113,7 +113,7 @@ public class PlayerInfo extends ChunkInfo {
 				menuName = null;
 			}
 		}
-		
+
 		// Inventory tag
 		size = data[offset++];
 		for (int i = 0; i < ITEM.length; i++, offset++, size--) {
@@ -124,17 +124,17 @@ public class PlayerInfo extends ChunkInfo {
 			if (size > 0) {
 				byte listType = data[offset++];
 				size--;
-				
+
 				int listSize = ((data[offset] << 8) | data[offset + 1]) & 0xFFFF;
 				offset += 2;
 				size -= 2;
-				
+
 				if (listSize > 0) {
 					List<byte[]> list = this.getAllItemsList().get(listType - 0x1);
 					for (int k = 0; k < listSize; k++) {
 						byte listElementSize = data[offset++];
 						size--;
-						
+
 						byte nameSize = data[offset];
 						byte[] entry = new byte[1 + nameSize + 4 + 4];
 						for (int j = 0; j < entry.length; j++, offset++, size--, listElementSize--) {
@@ -142,28 +142,29 @@ public class PlayerInfo extends ChunkInfo {
 								throw new IOException("Something is wrong with the element item size in ITEM chunk.");
 							entry[j] = data[offset];
 						}
-						
+
 						list.add(entry);
 					}
 				}
-			}
-			else
+			} else
 				break;
 		}
-		
+
 		// //Current Area tag
 		// size = data[offset++];
 		// for (int i = 0; i < AREA.length; offset++, i++, size--) {
 		// if (data[offset] != AREA[i])
 		// throw new IOException("Incorrect Player Info AREA chunk.");
 		// }
-		// for (int i = 0; i < this.player_current_area_id.length; i++, offset++, size--) {
+		// for (int i = 0; i < this.player_current_area_id.length; i++, offset++,
+		// size--) {
 		// this.player_current_area_id[i] = data[offset];
 		// }
-		// for (int i = 0; i < this.player_current_area_sector_id.length; i++, offset++, size--) {
+		// for (int i = 0; i < this.player_current_area_sector_id.length; i++, offset++,
+		// size--) {
 		// this.player_current_area_sector_id[i] = data[offset];
 		// }
-		
+
 		// Current Position tag
 		size = data[offset++];
 		for (int i = 0; i < AXIS.length; offset++, i++, size--) {
@@ -176,7 +177,7 @@ public class PlayerInfo extends ChunkInfo {
 		for (int i = 0; i < this.player_y.length; i++, offset++, size--) {
 			this.player_y[i] = data[offset];
 		}
-		
+
 		// Current Direction Facing tag
 		size = data[offset++];
 		for (int i = 0; i < TURN.length; offset++, i++, size--) {
@@ -187,28 +188,28 @@ public class PlayerInfo extends ChunkInfo {
 			this.player_facing[i] = data[offset];
 		}
 	}
-	
+
 	public void reset() {
 		this.byteSize = 0;
 	}
-	
+
 	@Override
 	public void write(RandomAccessFile raf) throws IOException {
 		// Sizes are added at the beginning of every little bit of data.
 		// Player Info Header
 		raf.writeShort(this.byteSize + PLAY.length);
 		raf.write(PLAY);
-		
+
 		// Player name.
 		raf.writeByte(player_name.length + NAME.length);
 		raf.write(NAME);
 		raf.write(player_name);
-		
+
 		// Player gender.
 		raf.writeByte(player_gender.length + GNDR.length);
 		raf.write(GNDR);
 		raf.write(player_gender);
-		
+
 		// Unlocked start menu options.
 		int size = 0;
 		for (int i = 0; i < this.startMenu.size(); i++)
@@ -220,7 +221,7 @@ public class PlayerInfo extends ChunkInfo {
 			raf.writeByte(buf.length);
 			raf.write(buf);
 		}
-		
+
 		// Inventory
 		size = 0;
 		for (int i = 0; i < 4; i++) {
@@ -230,7 +231,7 @@ public class PlayerInfo extends ChunkInfo {
 				for (int j = 0; j < this.getAllItemsList().get(i).size(); j++)
 					size += this.getAllItemsList().get(i).get(j).length + 1;
 			}
-			
+
 		}
 		raf.writeByte(size + ITEM.length);
 		raf.write(ITEM);
@@ -245,19 +246,20 @@ public class PlayerInfo extends ChunkInfo {
 				}
 			}
 		}
-		
+
 		// //Current Area Info
-		// raf.writeByte(AREA.length + player_current_area_id.length + player_current_area_sector_id.length);
+		// raf.writeByte(AREA.length + player_current_area_id.length +
+		// player_current_area_sector_id.length);
 		// raf.write(AREA);
 		// raf.write(player_current_area_id);
 		// raf.write(player_current_area_sector_id);
-		
+
 		// Current Position.
 		raf.writeByte(AXIS.length + player_x.length + player_y.length);
 		raf.write(AXIS);
 		raf.write(player_x);
 		raf.write(player_y);
-		
+
 		// Current Player Direction Facing.
 		raf.writeByte(TURN.length + player_facing.length);
 		raf.write(TURN);

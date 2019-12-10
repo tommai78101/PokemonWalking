@@ -27,7 +27,6 @@ import script_editor.ScriptEditor;
 import abstracts.Tile;
 import editor.EditorConstants.Metadata;
 
-
 //TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating 
 //maps and scripts together.
 
@@ -38,9 +37,9 @@ public class LevelEditor extends JFrame {
 	public static final int SIZE = 4;
 	public static final String NAME_TITLE = "Level Editor (Hobby)";
 	public static final String SAVED_PATH_DATA = "cache.ini";
-	
+
 	private ArrayList<Data> filepaths = new ArrayList<Data>();
-	
+
 	public ControlPanel controlPanel;
 	public FileControl fileControlPanel;
 	public DrawingBoard drawingBoardPanel;
@@ -48,14 +47,14 @@ public class LevelEditor extends JFrame {
 	public StatusPanel statusPanel;
 	public Properties properties;
 	public ScriptEditor scriptEditor;
-	
+
 	public String message;
 	public boolean running;
 	public EditorInput input;
-	
+
 	@SuppressWarnings("unused")
 	private String mapAreaName;
-	
+
 	public LevelEditor(String name) {
 		super(name);
 		running = true;
@@ -72,7 +71,7 @@ public class LevelEditor extends JFrame {
 		this.setMinimumSize(size); // Mac issue.
 		this.setMaximumSize(size); // Mac issue.
 		this.setVisible(true);
-		
+
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
@@ -85,7 +84,7 @@ public class LevelEditor extends JFrame {
 				});
 			}
 		});
-		
+
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -115,7 +114,7 @@ public class LevelEditor extends JFrame {
 					add(drawingBoardPanel, BorderLayout.CENTER);
 					drawingBoardPanel.start();
 				}
-				
+
 				// TODO: Add Trigger properties here.
 				if (properties == null) {
 					properties = new Properties(editor.LevelEditor.this);
@@ -124,7 +123,7 @@ public class LevelEditor extends JFrame {
 					add(properties, BorderLayout.EAST);
 					validate();
 				}
-				
+
 				if (statusPanel == null) {
 					statusPanel = new StatusPanel();
 					statusPanel.addMouseListener(input);
@@ -135,52 +134,54 @@ public class LevelEditor extends JFrame {
 				initialize();
 			}
 		});
-		
+
 		createCache();
-		
+
 	}
-	
-	
+
 	/**
-	 * <p>Generates a cache file for saving the last known directory the editor knew of.</p>
+	 * <p>
+	 * Generates a cache file for saving the last known directory the editor knew
+	 * of.
+	 * </p>
 	 * 
-	 * <p>Upon initialization, the default saved directory will be the editor's file location path.</p>
+	 * <p>
+	 * Upon initialization, the default saved directory will be the editor's file
+	 * location path.
+	 * </p>
 	 * 
 	 * @return Nothing.
-	 * */
+	 */
 	public void createCache() {
 		File file = new File(LevelEditor.SAVED_PATH_DATA);
 		if (!file.exists()) {
 			RandomAccessFile f = null;
 			try {
-				//Creates a cache file that contains both the File Control's last saved directory and
-				//The script editor's last saved directory. It will be separated by two lines.
-				
-				//Made it so that it immediately saves the current editor file location upon initialization.
+				// Creates a cache file that contains both the File Control's last saved
+				// directory and
+				// The script editor's last saved directory. It will be separated by two lines.
+
+				// Made it so that it immediately saves the current editor file location upon
+				// initialization.
 				f = new RandomAccessFile(file, "rw");
 				f.seek(0);
 				f.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
 				f.writeBytes(System.getProperty("line.separator"));
 				f.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
 				f.writeBytes(System.getProperty("line.separator"));
-			}
-			catch (FileNotFoundException e) {
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
-			}
-			finally {
+			} finally {
 				try {
 					f.close();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 				}
 			}
-		}
-		else {
-			//Reads in two last saved directories in the cache.
-			//If it fails, revert back to original saved directories.
+		} else {
+			// Reads in two last saved directories in the cache.
+			// If it fails, revert back to original saved directories.
 			RandomAccessFile raf = null;
 			File fileBackup1 = FileControl.lastSavedDirectory;
 			File fileBackup2 = ScriptEditor.LAST_SAVED_DIRECTORY;
@@ -189,29 +190,24 @@ public class LevelEditor extends JFrame {
 				raf.seek(0);
 				FileControl.lastSavedDirectory = new File(raf.readLine());
 				ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
-			}
-			catch (FileNotFoundException e) {
-				FileControl.lastSavedDirectory =    fileBackup1;
+			} catch (FileNotFoundException e) {
+				FileControl.lastSavedDirectory = fileBackup1;
 				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
-			}
-			catch (IOException e) {
-				FileControl.lastSavedDirectory =    fileBackup1;
+			} catch (IOException e) {
+				FileControl.lastSavedDirectory = fileBackup1;
 				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
-			}
-			catch (NullPointerException e) {
-				FileControl.lastSavedDirectory =    fileBackup1;
+			} catch (NullPointerException e) {
+				FileControl.lastSavedDirectory = fileBackup1;
 				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
-			}
-			finally {
+			} finally {
 				try {
 					raf.close();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 				}
 			}
 		}
 	}
-	
+
 	@Override
 	public void validate() {
 		super.validate();
@@ -227,29 +223,26 @@ public class LevelEditor extends JFrame {
 						int h = 0;
 						try {
 							w = (input.offsetX + input.mouseX) / Tile.WIDTH;
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							w = (input.offsetX + input.mouseX) / (WIDTH * SIZE);
 						}
 						try {
 							h = (input.offsetY + input.mouseY) / Tile.HEIGHT;
-						}
-						catch (Exception e) {
+						} catch (Exception e) {
 							h = (input.offsetY + input.mouseY) / (WIDTH * SIZE);
 						}
 						statusPanel.setMousePositionText(w, h);
-					}
-					else {
+					} else {
 						try {
-							statusPanel.setMousePositionText(input.oldX / drawingBoardPanel.getBitmapWidth(), input.oldY / drawingBoardPanel.getBitmapHeight());
-						}
-						catch (Exception e) {
+							statusPanel.setMousePositionText(input.oldX / drawingBoardPanel.getBitmapWidth(),
+									input.oldY / drawingBoardPanel.getBitmapHeight());
+						} catch (Exception e) {
 							statusPanel.setMousePositionText(0, 0);
 						}
 					}
 					statusPanel.setStatusMessageText(builder.toString());
 				}
-				
+
 				if (LevelEditor.this.controlPanel != null)
 					LevelEditor.this.controlPanel.validate();
 				if (LevelEditor.this.fileControlPanel != null)
@@ -263,21 +256,21 @@ public class LevelEditor extends JFrame {
 			}
 		});
 	}
-	
+
 	public final void initialize() {
 		EditorConstants.metadata = Metadata.Pixel_Data;
 		this.drawingBoardPanel.newImage(15, 15);
 		this.setMapAreaName("Untitled");
 	}
-	
+
 	public ArrayList<Data> getResourceFilePaths() {
 		return this.filepaths;
 	}
-	
+
 	public void setMapAreaName(String name) {
 		this.mapAreaName = name;
 	}
-	
+
 	public static void main(String[] args) {
 		new LevelEditor(LevelEditor.NAME_TITLE);
 	}

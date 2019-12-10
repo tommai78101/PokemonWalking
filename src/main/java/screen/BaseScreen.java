@@ -22,7 +22,8 @@ import resources.Mod;
 
 public class BaseScreen extends BaseBitmap {
 
-	// TODO: Add more drawing functions that enable more controls when it comes to rendering assets.
+	// TODO: Add more drawing functions that enable more controls when it comes to
+	// rendering assets.
 
 	protected BufferedImage image;
 	protected int xOffset;
@@ -68,7 +69,8 @@ public class BaseScreen extends BaseBitmap {
 	}
 
 	public void blit(BaseBitmap bitmap, int x, int y, int w, int h) {
-		// This directly blits the bitmap to the X and Y coordinates within the screen area.
+		// This directly blits the bitmap to the X and Y coordinates within the screen
+		// area.
 		// The Rect adjusts the blitting area to within the screen area.
 		if (w <= -1)
 			w = bitmap.width;
@@ -93,7 +95,8 @@ public class BaseScreen extends BaseBitmap {
 	}
 
 	public void blitBiome(BaseBitmap bitmap, int x, int y, int w, int h, PixelData data) {
-		// This directly blits the bitmap to the X and Y coordinates within the screen area.
+		// This directly blits the bitmap to the X and Y coordinates within the screen
+		// area.
 		// The Rect adjusts the blitting area to within the screen area.
 		if (w <= -1)
 			w = bitmap.width;
@@ -122,27 +125,27 @@ public class BaseScreen extends BaseBitmap {
 				// Has nothing to do with pixel data properties.
 
 				switch (alpha) {
-					case 0x0:
-						// Biome Color with a bit of speckled light/dark patches.
-						if ((tick++ % 17 < 7) && (tick++ % 21 < 2))
-							this.pixels[tgt + xx] = lighten(biomeColor, 0.07f);
-						else if ((tick++ % 23 < 4) && (tick++ % 19 < 3))
-							this.pixels[tgt + xx] = BaseScreen.darken(biomeColor, 0.07f);
-						else
-							this.pixels[tgt + xx] = biomeColor;
-						tick++;
-						if (tick > w * w)
-							tick = 0;
-						break;
-					case 0x32:
-						this.pixels[tgt + xx] = lighten(biomeColor, 0.003f);
-						break;
-					case 0x64:
-						this.pixels[tgt + xx] = lighten(biomeColor, 0.006f);
-						break;
-					default:
-						this.pixels[tgt + xx] = color;
-						break;
+				case 0x0:
+					// Biome Color with a bit of speckled light/dark patches.
+					if ((tick++ % 17 < 7) && (tick++ % 21 < 2))
+						this.pixels[tgt + xx] = lighten(biomeColor, 0.07f);
+					else if ((tick++ % 23 < 4) && (tick++ % 19 < 3))
+						this.pixels[tgt + xx] = BaseScreen.darken(biomeColor, 0.07f);
+					else
+						this.pixels[tgt + xx] = biomeColor;
+					tick++;
+					if (tick > w * w)
+						tick = 0;
+					break;
+				case 0x32:
+					this.pixels[tgt + xx] = lighten(biomeColor, 0.003f);
+					break;
+				case 0x64:
+					this.pixels[tgt + xx] = lighten(biomeColor, 0.006f);
+					break;
+				default:
+					this.pixels[tgt + xx] = color;
+					break;
 				}
 			}
 		}
@@ -189,14 +192,12 @@ public class BaseScreen extends BaseBitmap {
 				this.pixels[i] = 0xFFAAAAAA;
 			this.tick++;
 			return true;
-		}
-		else if (this.tick < 0x4) {
+		} else if (this.tick < 0x4) {
 			for (int i = 0; i < this.pixels.length; i++)
 				this.pixels[i] = 0xFFF7F7F7;
 			this.tick++;
 			return true;
-		}
-		else if (this.tick < 0x6) {
+		} else if (this.tick < 0x6) {
 			for (int i = 0; i < this.pixels.length; i++)
 				this.pixels[i] = 0xFFAAAAAA;
 			this.tick++;
@@ -220,45 +221,45 @@ public class BaseScreen extends BaseBitmap {
 	private int getBiomeBaseColor(int tileID, int red, int green, int blue) {
 		int color = WorldConstants.GRASS_GREEN;
 		switch (tileID) {
-			case 0x01: // Grass
-				switch (red) {
-					case 0x00:
-						switch (green) {
-							case 0x00:
-								break;
-							default:
-								break;
-						}
-						break;
-					case 0x01: // Mountain ground
-						for (int i = 0; i < blue; i++) {
-							color = lighten(color, 0.1f);
-						}
-						break;
-					default:
-						break;
+		case 0x01: // Grass
+			switch (red) {
+			case 0x00:
+				switch (green) {
+				case 0x00:
+					break;
+				default:
+					break;
 				}
 				break;
-			case 0x02: // Ledges
-				switch (green) {
-					case 0x00:
-						break;
-					case 0x01:
-						color = WorldConstants.MOUNTAIN_BROWN;
-						break;
-				}
-				break;
-			case 0x06: // Stairs
-				switch (green) {
-					case 0x00:
-						break;
-					case 0x01:
-						color = WorldConstants.MOUNTAIN_BROWN;
-						break;
+			case 0x01: // Mountain ground
+				for (int i = 0; i < blue; i++) {
+					color = lighten(color, 0.1f);
 				}
 				break;
 			default:
 				break;
+			}
+			break;
+		case 0x02: // Ledges
+			switch (green) {
+			case 0x00:
+				break;
+			case 0x01:
+				color = WorldConstants.MOUNTAIN_BROWN;
+				break;
+			}
+			break;
+		case 0x06: // Stairs
+			switch (green) {
+			case 0x00:
+				break;
+			case 0x01:
+				color = WorldConstants.MOUNTAIN_BROWN;
+				break;
+			}
+			break;
+		default:
+			break;
 		}
 		return color;
 	}
@@ -272,13 +273,15 @@ public class BaseScreen extends BaseBitmap {
 		int r = (color >> 16) & 0xFF;
 		int g = (color >> 8) & 0xFF;
 		int b = color & 0xFF;
-		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16 | ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
+		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16
+				| ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
 	}
 
 	public static int darken(int color, float amount) {
 		int r = (color >> 16) & 0xFF;
 		int g = (color >> 8) & 0xFF;
 		int b = color & 0xFF;
-		return 0xFF000000 | ((int) Math.min(255, r - 255 * amount) & 0xFF) << 16 | ((int) Math.min(255, g - 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b - 255 * amount) & 0xFF;
+		return 0xFF000000 | ((int) Math.min(255, r - 255 * amount) & 0xFF) << 16
+				| ((int) Math.min(255, g - 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b - 255 * amount) & 0xFF;
 	}
 }

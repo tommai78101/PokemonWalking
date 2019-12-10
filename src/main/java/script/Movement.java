@@ -5,20 +5,20 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class Movement {
-	
+
 	int iterator;
-	ArrayList<Map.Entry<Integer, Integer>> moves; //Direction, Steps
-	
+	ArrayList<Map.Entry<Integer, Integer>> moves; // Direction, Steps
+
 	public Movement() {
 		this.iterator = 0;
 		moves = new ArrayList<Map.Entry<Integer, Integer>>();
 	}
-	
+
 	public Movement(Movement movement) {
-		//Deep copy
+		// Deep copy
 		this.iterator = movement.iterator;
 		this.moves = new ArrayList<Map.Entry<Integer, Integer>>();
-		for (Map.Entry<Integer, Integer> e: movement.moves){
+		for (Map.Entry<Integer, Integer> e : movement.moves) {
 			this.moves.add(new AbstractMap.SimpleEntry<Integer, Integer>(e.getKey(), e.getValue()));
 		}
 	}
@@ -26,13 +26,13 @@ public class Movement {
 	public ArrayList<Map.Entry<Integer, Integer>> getAllMoves() {
 		return this.moves;
 	}
-	
+
 	public Map.Entry<Integer, Integer> getNextMove() {
 		Map.Entry<Integer, Integer> entry = this.moves.get(iterator);
 		iterator++;
 		return entry;
 	}
-	
+
 	public void startFromBeginning() {
 		this.iterator = 0;
 	}

@@ -28,7 +28,8 @@ import javax.swing.JButton;
 import abstracts.Tile;
 
 public class EditorConstants {
-	// TODO: Add additional pixel data properties that can be edited/modified for the area.
+	// TODO: Add additional pixel data properties that can be edited/modified for
+	// the area.
 	private final ArrayList<Category> categories = new ArrayList<Category>();
 	private final ArrayList<Map.Entry<Integer, Data>> datas = new ArrayList<Map.Entry<Integer, Data>>();
 	private final ArrayList<Trigger> triggers = new ArrayList<Trigger>();
@@ -68,7 +69,8 @@ public class EditorConstants {
 
 	private void loadTilesetData() {
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
 			String line;
 			String[] tokens;
 			int categoryID = 0;
@@ -88,8 +90,7 @@ public class EditorConstants {
 					c = new Category();
 					c.name = tokens[1];
 					c.id = categoryID++;
-				}
-				else if (line.startsWith("%")) {
+				} else if (line.startsWith("%")) {
 					Data data = new Data();
 					if (line.contains("*")) {
 						data.areaTypeIncluded = true;
@@ -139,7 +140,8 @@ public class EditorConstants {
 					data.blue = Integer.valueOf(tokens[5], 16);
 					data.filepath = tokens[6];
 					data.editorID = editorID++;
-					data.image = new ImageIcon(EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
+					data.image = new ImageIcon(
+							EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
 					data.button = new JButton(data.image) {
 						private static final long serialVersionUID = 1L;
 
@@ -163,8 +165,7 @@ public class EditorConstants {
 					data.button.setBorder(null);
 					this.datas.add(new AbstractMap.SimpleEntry<Integer, Data>(data.getColorValue(), data));
 					temp.add(data);
-				}
-				else if (line.startsWith("+")) {
+				} else if (line.startsWith("+")) {
 					c.nodes.addAll(temp);
 					this.categories.add(c);
 					temp.clear();
@@ -193,15 +194,15 @@ public class EditorConstants {
 				}
 			});
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void loadTriggers() {
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(EditorConstants.class.getClassLoader().getResourceAsStream("script/scripts.txt")));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					EditorConstants.class.getClassLoader().getResourceAsStream("script/scripts.txt")));
 			String line;
 			Trigger trigger = null;
 			while ((line = reader.readLine()) != null) {
@@ -215,18 +216,15 @@ public class EditorConstants {
 						trigger.setTriggerID((short) (value & 0xFFFF));
 					}
 
-				}
-				else if (line.startsWith("@")) {
+				} else if (line.startsWith("@")) {
 					if (trigger != null)
 						trigger.setName(line.substring(1));
-				}
-				else if (line.startsWith("%")) {
+				} else if (line.startsWith("%")) {
 					this.triggers.add(trigger);
 					trigger = null;
 				}
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -254,26 +252,26 @@ public class EditorConstants {
 			Data d = entry.getValue();
 			if (d.areaTypeIncluded) {
 				switch (d.areaTypeIDType) {
-					case ALPHA:
-						if (d.red == red && d.green == green && d.blue == blue)
-							temp = d;
-						break;
-					case RED:
-						if (d.alpha == alpha && d.green == green && d.blue == blue)
-							temp = d;
-						break;
-					case GREEN:
-						if (d.alpha == alpha && d.red == red && d.blue == blue)
-							temp = d;
-						break;
-					case BLUE:
-						if (d.alpha == alpha && d.red == red && d.green == green)
-							temp = d;
-						break;
-					default:
-						if (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue)
-							temp = d;
-						break;
+				case ALPHA:
+					if (d.red == red && d.green == green && d.blue == blue)
+						temp = d;
+					break;
+				case RED:
+					if (d.alpha == alpha && d.green == green && d.blue == blue)
+						temp = d;
+					break;
+				case GREEN:
+					if (d.alpha == alpha && d.red == red && d.blue == blue)
+						temp = d;
+					break;
+				case BLUE:
+					if (d.alpha == alpha && d.red == red && d.green == green)
+						temp = d;
+					break;
+				default:
+					if (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue)
+						temp = d;
+					break;
 				}
 			}
 		}

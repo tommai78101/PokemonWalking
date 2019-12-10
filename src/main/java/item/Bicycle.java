@@ -16,19 +16,19 @@ import main.Game.State;
 import entity.Player;
 
 public class Bicycle extends ActionItem {
-	
+
 	private static final String ENABLING_DESCRIPTION = "Get on bicycle.";
 	private static final String DISABLING_DESCRIPTION = "Get off bicycle.";
-	
+
 	public Bicycle(Game game, String name, String description, Category category) {
 		super(game, "BICYCLE", ENABLING_DESCRIPTION, Category.KEYITEMS, WorldConstants.ITEM_BICYCLE);
 	}
-	
-	public Bicycle(Game game, ItemText text){
+
+	public Bicycle(Game game, ItemText text) {
 		super(game, text);
 		this.description = ENABLING_DESCRIPTION;
 	}
-	
+
 	@Override
 	public void enable() {
 		super.enable();
@@ -45,8 +45,7 @@ public class Bicycle extends ActionItem {
 						Thread.sleep(800);
 						Player.unlockMovements();
 						player.disableAutomaticMode();
-					}
-					catch (InterruptedException e) {
+					} catch (InterruptedException e) {
 					}
 				}
 			}).start();
@@ -55,7 +54,7 @@ public class Bicycle extends ActionItem {
 			this.game.getStartMenu().closeMenu();
 		}
 	}
-	
+
 	@Override
 	public void disable() {
 		super.disable();
@@ -72,8 +71,7 @@ public class Bicycle extends ActionItem {
 						Thread.sleep(800);
 						Player.unlockMovements();
 						player.disableAutomaticMode();
-					}
-					catch (InterruptedException e) {
+					} catch (InterruptedException e) {
 					}
 				}
 			}).start();
