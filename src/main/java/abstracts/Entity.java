@@ -10,10 +10,9 @@
 
 package abstracts;
 
-import screen.BaseBitmap;
-import screen.BaseScreen;
+import interfaces.InterfaceGameObject;
 
-public abstract class Entity extends Tile {
+public abstract class Entity extends Tile implements InterfaceGameObject {
 	public static final int UP = 2;
 	public static final int DOWN = 0;
 	public static final int LEFT = 1;
@@ -28,18 +27,12 @@ public abstract class Entity extends Tile {
 	protected int xOffset;
 	protected int yOffset;
 
-	protected BaseBitmap bitmap;
-
 	protected String name;
 
 	public boolean isRemoved;
 	protected byte typeId = 0;
 
 	// public abstract void initialize(BaseWorld world);
-
-	public abstract void tick();
-
-	public abstract void render(BaseScreen screen, int x, int y);
 
 	public int getX() {
 		return xPosition;

@@ -5,6 +5,11 @@
 		}
 	],
 	"settings": {
-		"java.configuration.updateBuildConfiguration": "interactive"
+		"java.configuration.updateBuildConfiguration": "interactive",
+		"java.format.settings.url": ".vscode\\eclipse-formatter.xml",
+		"java.completion.filteredTypes" : [
+			"java.awt.List",
+			"com.sun.*"
+		]
 	}
 }

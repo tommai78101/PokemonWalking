@@ -30,7 +30,7 @@ import abstracts.SubMenu;
 import abstracts.Tile;
 import entity.Player;
 
-public class StartMenu {
+public class StartMenu extends SubMenu {
 	// Description area
 	private static final int DESCRIPTION_FIRST_LINE_Y = (Tile.HEIGHT * 8) - 8;
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 9) - 8;
@@ -59,8 +59,7 @@ public class StartMenu {
 	}
 
 	public StartMenu initialize() {
-		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game)
-				.initialize(keys);
+		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game).initialize(keys);
 		save = (Save) new Save(ITEM_NAME_SAVE, "Save the game.", "Save the game.", this.game).initialize(keys);
 		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu", this.game);
 		this.addMenuItem(inventory);
@@ -91,6 +90,7 @@ public class StartMenu {
 		}
 	}
 
+	@Override
 	public void tick() {
 		if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown) && this.activation)
 			this.activation = false;
@@ -101,6 +101,7 @@ public class StartMenu {
 			Player.unlockMovements();
 	}
 
+	@Override
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.activation) {
 			NewDialogue.renderDialogBox(output, 5, 0, 4, items.size());
@@ -110,8 +111,7 @@ public class StartMenu {
 			this.renderMenuText(g2d);
 			this.renderMenuDescriptionText(g2d);
 			g2d.dispose();
-			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0,
-					MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+			graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 		}
 	}
 
@@ -146,10 +146,8 @@ public class StartMenu {
 	 * Compares all available submenus before returning it.
 	 * 
 	 * <p>
-	 * <b>Note:</b> There's a legitimate logic error resulting in submenus having
-	 * different reference values in the Java VM existing in this method. If this
-	 * method doesn't do any comparison beforehand, it will result in having the JVM
-	 * using the wrong but correct references.
+	 * <b>Note:</b> There's a legitimate logic error resulting in submenus having different reference values in the Java VM existing in this
+	 * method. If this method doesn't do any comparison beforehand, it will result in having the JVM using the wrong but correct references.
 	 * 
 	 * @return The chosen submenu that is equal to the submenu used for comparison.
 	 */
@@ -193,8 +191,7 @@ public class StartMenu {
 		}
 
 		// Menu input mechanism
-		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
-				&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+		if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) && (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
 			this.keys.Z.lastKeyState = true;
 			this.keys.SLASH.lastKeyState = true;
 			this.actionEvent = items.get(menuCursorPosition);
@@ -207,8 +204,7 @@ public class StartMenu {
 		g.setColor(Color.black);
 		if (this.activation) {
 			for (int i = 0; i < this.items.size(); i++) {
-				g.drawString(this.items.get(i).getValue().getName(), (Tile.WIDTH * 6),
-						(((Tile.HEIGHT * 2 - 8) + i * 16)));
+				g.drawString(this.items.get(i).getValue().getName(), (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16)));
 			}
 		}
 	}
@@ -223,15 +219,19 @@ public class StartMenu {
 		}
 	}
 
-	// ------------------------- STATIC METHODS
-	// --------------------------------------
+	// ------------------------- STATIC METHODS --------------------------------------
 
 	public static void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
-				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH),
-						((y - 1) * Tile.HEIGHT + 8) + j * Tile.HEIGHT);
+				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), ((y - 1) * Tile.HEIGHT + 8) + j * Tile.HEIGHT);
 			}
 		}
+	}
+
+	@Override
+	public SubMenu initialize(Keys keys) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

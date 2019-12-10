@@ -34,11 +34,17 @@ import resources.Art;
 import screen.BaseScreen;
 import submenu.Inventory;
 import entity.Player;
+import interfaces.InterfaceItem;
 
-public abstract class Item implements Comparable<Item> {
+public abstract class Item implements Comparable<Item>, InterfaceItem {
 
 	public enum Category {
-		POTIONS(0), KEYITEMS(1), POKEBALLS(2), TM_HM(3);
+		// @formatter:off
+		POTIONS(0), 
+		KEYITEMS(1), 
+		POKEBALLS(2), 
+		TM_HM(3);
+		// @formatter:on
 
 		private int id;
 
@@ -50,8 +56,8 @@ public abstract class Item implements Comparable<Item> {
 		 * Obtains a Category enum value that matches the given ID number.
 		 * 
 		 * <p>
-		 * If there is no Category that comes after the last element, it will give the
-		 * first element, and wraps from there.
+		 * If there is no Category that comes after the last element, it will give the first element, and wraps from there.
+		 * </p>
 		 * 
 		 * @param value The ID number of the category that is to be obtained.
 		 * 
@@ -130,7 +136,8 @@ public abstract class Item implements Comparable<Item> {
 		this.id = value;
 	}
 
-	public void renderTiles(BaseScreen output, int xOffset, int yOffset) {
+	@Override
+	public void render(BaseScreen output, int xOffset, int yOffset) {
 		if (!this.picked) {
 			output.blit(Art.item, xOffset, yOffset);
 		}
@@ -221,8 +228,7 @@ public abstract class Item implements Comparable<Item> {
 
 	public static HashMap<Integer, ItemText> loadItemResources(String filename) {
 		try {
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
 			ItemText itemText = new ItemText();
 			HashMap<Integer, ItemText> result = new HashMap<Integer, ItemText>();
@@ -275,8 +281,7 @@ public abstract class Item implements Comparable<Item> {
 	public static ArrayList<Map.Entry<ItemText, Item>> loadItems(String filename) {
 		ArrayList<Map.Entry<ItemText, Item>> result = new ArrayList<Map.Entry<ItemText, Item>>();
 		try {
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
 			ItemText itemText = new ItemText();
 
@@ -341,24 +346,23 @@ public abstract class Item implements Comparable<Item> {
 	public static Item createNewItem(ItemText text) {
 		Item result = null;
 		switch (text.type) {
-		case DUMMY:
-			result = new DummyItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
-			break;
-		case ACTION:
-			switch (text.id) {
-			case WorldConstants.ITEM_BICYCLE:
-				result = new Bicycle(MainComponent.getGame(), text.itemName, text.description, text.category);
+			case DUMMY:
+				result = new DummyItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
 				break;
+			case ACTION:
+				switch (text.id) {
+					case WorldConstants.ITEM_BICYCLE:
+						result = new Bicycle(MainComponent.getGame(), text.itemName, text.description, text.category);
+						break;
+					default:
+						result = new ActionItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
+						break;
+				}
+				break;
+			case ALL:
 			default:
-				result = new ActionItem(MainComponent.getGame(), text.itemName, text.description, text.category,
-						text.id);
+				result = null;
 				break;
-			}
-			break;
-		case ALL:
-		default:
-			result = null;
-			break;
 		}
 		return result;
 	}

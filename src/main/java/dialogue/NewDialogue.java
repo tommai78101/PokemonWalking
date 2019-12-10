@@ -172,41 +172,41 @@ public class NewDialogue {
 			h = 8 - y;
 		if (showDialog) {
 			switch (this.type) {
-			case DIALOGUE_SPEECH: {
-				renderDialogBackground(output, x, y, w, h);
-				renderDialogBorderBox(output, x, y, w, h);
-				if (this.nextFlag && this.nextTick < 0x8)
-					output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
-				Graphics2D g2d = output.getBufferedImage().createGraphics();
-				renderText(g2d);
-				g2d.dispose();
-				break;
-			}
-			case DIALOGUE_QUESTION: {
-				renderDialogBackground(output, x, y, w, h);
-				renderDialogBorderBox(output, x, y, w, h);
-				if (this.simpleQuestionFlag && !this.nextFlag) {
-					renderDialogBackground(output, 7, 3, 2, 2);
-					renderDialogBorderBox(output, 7, 3, 2, 2);
-					// Offset by -3 for the Y axis.
-					output.blit(Art.dialogue_pointer, MainComponent.GAME_WIDTH - Tile.WIDTH * 3 + 8,
-							this.yesNoCursorPosition ? (Tile.HEIGHT * 4 - 3) : (Tile.HEIGHT * 5 - 3));
-				} else if (!this.simpleQuestionFlag && (this.nextFlag && this.nextTick < 0x8))
-					output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
-				Graphics2D g2d = output.getBufferedImage().createGraphics();
-				renderText(g2d);
-				renderYesNoAnswerText(g2d);
-				g2d.dispose();
-				break;
-			}
-			case DIALOGUE_ALERT: {
-				renderDialogBackground(output, x, y, w, h);
-				renderDialogBorderBox(output, x, y, w, h);
-				Graphics2D g2d = output.getBufferedImage().createGraphics();
-				renderText(g2d);
-				g2d.dispose();
-				break;
-			}
+				case DIALOGUE_SPEECH: {
+					renderDialogBackground(output, x, y, w, h);
+					renderDialogBorderBox(output, x, y, w, h);
+					if (this.nextFlag && this.nextTick < 0x8)
+						output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
+					Graphics2D g2d = output.getBufferedImage().createGraphics();
+					renderText(g2d);
+					g2d.dispose();
+					break;
+				}
+				case DIALOGUE_QUESTION: {
+					renderDialogBackground(output, x, y, w, h);
+					renderDialogBorderBox(output, x, y, w, h);
+					if (this.simpleQuestionFlag && !this.nextFlag) {
+						renderDialogBackground(output, 7, 3, 2, 2);
+						renderDialogBorderBox(output, 7, 3, 2, 2);
+						// Offset by -3 for the Y axis.
+						output.blit(Art.dialogue_pointer, MainComponent.GAME_WIDTH - Tile.WIDTH * 3 + 8,
+								this.yesNoCursorPosition ? (Tile.HEIGHT * 4 - 3) : (Tile.HEIGHT * 5 - 3));
+					} else if (!this.simpleQuestionFlag && (this.nextFlag && this.nextTick < 0x8))
+						output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
+					Graphics2D g2d = output.getBufferedImage().createGraphics();
+					renderText(g2d);
+					renderYesNoAnswerText(g2d);
+					g2d.dispose();
+					break;
+				}
+				case DIALOGUE_ALERT: {
+					renderDialogBackground(output, x, y, w, h);
+					renderDialogBorderBox(output, x, y, w, h);
+					Graphics2D g2d = output.getBufferedImage().createGraphics();
+					renderText(g2d);
+					g2d.dispose();
+					break;
+				}
 			}
 		}
 	}
@@ -255,63 +255,63 @@ public class NewDialogue {
 				tickCount = 0x0;
 		} else if (this.nextFlag) {
 			switch (this.type) {
-			case DIALOGUE_QUESTION: {
-				if (count >= this.totalDialogueLength) {
-					this.simpleQuestionFlag = true;
-					this.nextFlag = false;
-					this.scrollFlag = false;
-				} else {
+				case DIALOGUE_QUESTION: {
+					if (count >= this.totalDialogueLength) {
+						this.simpleQuestionFlag = true;
+						this.nextFlag = false;
+						this.scrollFlag = false;
+					} else {
+						this.nextTick++;
+						if (this.nextTick > 0xE)
+							this.nextTick = 0x0;
+					}
+					break;
+				}
+				case DIALOGUE_SPEECH: {
 					this.nextTick++;
 					if (this.nextTick > 0xE)
 						this.nextTick = 0x0;
+					break;
 				}
-				break;
-			}
-			case DIALOGUE_SPEECH: {
-				this.nextTick++;
-				if (this.nextTick > 0xE)
-					this.nextTick = 0x0;
-				break;
-			}
-			case DIALOGUE_ALERT: {
-				this.nextTick++;
-				if (this.nextTick > 0xE)
-					this.nextTick = 0x0;
-				break;
-			}
+				case DIALOGUE_ALERT: {
+					this.nextTick++;
+					if (this.nextTick > 0xE)
+						this.nextTick = 0x0;
+					break;
+				}
 			}
 		} else if (count >= this.totalDialogueLength) {
 			if (this.lineIterator >= this.lines.size()) {
 				switch (this.type) {
-				case DIALOGUE_QUESTION:
-					this.simpleQuestionFlag = true;
-					this.scrollFlag = false;
-					this.nextFlag = false;
-					break;
-				case DIALOGUE_SPEECH:
-					this.simpleSpeechFlag = true;
-					this.nextFlag = false;
-					break;
-				case DIALOGUE_ALERT:
-					this.simpleSpeechFlag = true;
-					this.nextFlag = false;
-					break;
+					case DIALOGUE_QUESTION:
+						this.simpleQuestionFlag = true;
+						this.scrollFlag = false;
+						this.nextFlag = false;
+						break;
+					case DIALOGUE_SPEECH:
+						this.simpleSpeechFlag = true;
+						this.nextFlag = false;
+						break;
+					case DIALOGUE_ALERT:
+						this.simpleSpeechFlag = true;
+						this.nextFlag = false;
+						break;
 				}
 			} else {
 				Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
 				this.completedLines.add(entry.getKey());
 				this.lineIterator++;
 				switch (this.type) {
-				case DIALOGUE_SPEECH:
-					this.nextFlag = true;
-					break;
-				case DIALOGUE_QUESTION:
-					this.simpleQuestionFlag = true;
-					this.nextFlag = true;
-					break;
-				case DIALOGUE_ALERT:
-					this.nextFlag = true;
-					break;
+					case DIALOGUE_SPEECH:
+						this.nextFlag = true;
+						break;
+					case DIALOGUE_QUESTION:
+						this.simpleQuestionFlag = true;
+						this.nextFlag = true;
+						break;
+					case DIALOGUE_ALERT:
+						this.nextFlag = true;
+						break;
 				}
 			}
 		}
@@ -331,20 +331,20 @@ public class NewDialogue {
 					if (this.completedLines.size() == 2) {
 						if (!this.scrollFlag) {
 							switch (this.type) {
-							case DIALOGUE_SPEECH:
-								this.nextFlag = true;
-								break;
-							case DIALOGUE_QUESTION:
-								// Must get to the end of the entire dialogue before asking for answers.
-								if (this.lineIterator >= this.lines.size()) {
-									this.simpleQuestionFlag = true;
-									this.nextFlag = false;
-								} else
+								case DIALOGUE_SPEECH:
 									this.nextFlag = true;
-								break;
-							case DIALOGUE_ALERT:
-								this.nextFlag = true;
-								break;
+									break;
+								case DIALOGUE_QUESTION:
+									// Must get to the end of the entire dialogue before asking for answers.
+									if (this.lineIterator >= this.lines.size()) {
+										this.simpleQuestionFlag = true;
+										this.nextFlag = false;
+									} else
+										this.nextFlag = true;
+									break;
+								case DIALOGUE_ALERT:
+									this.nextFlag = true;
+									break;
 							}
 						}
 					}
@@ -424,35 +424,35 @@ public class NewDialogue {
 					input.X.lastKeyState = true;
 					input.PERIOD.lastKeyState = true;
 					switch (this.type) {
-					case DIALOGUE_SPEECH:
-						this.nextFlag = false;
-						this.scrollFlag = true;
-						break;
-					case DIALOGUE_QUESTION:
-						// Must get to the end of the entire dialogue before asking questions.
-						this.simpleQuestionFlag = false;
-						this.nextFlag = false;
-						this.scrollFlag = true;
-						break;
-					case DIALOGUE_ALERT:
-						this.nextFlag = false;
-						this.scrollFlag = true;
-						break;
+						case DIALOGUE_SPEECH:
+							this.nextFlag = false;
+							this.scrollFlag = true;
+							break;
+						case DIALOGUE_QUESTION:
+							// Must get to the end of the entire dialogue before asking questions.
+							this.simpleQuestionFlag = false;
+							this.nextFlag = false;
+							this.scrollFlag = true;
+							break;
+						case DIALOGUE_ALERT:
+							this.nextFlag = false;
+							this.scrollFlag = true;
+							break;
 					}
 				} else if (this.scrollFlag) {
 					if (this.lineIterator >= this.lines.size()) {
 						switch (this.type) {
-						case DIALOGUE_QUESTION:
-							this.simpleQuestionFlag = true;
-							this.scrollFlag = false;
-							this.nextFlag = false;
-							break;
-						case DIALOGUE_SPEECH:
-							this.closeDialog();
-							return;
-						case DIALOGUE_ALERT:
-							this.closeDialog();
-							return;
+							case DIALOGUE_QUESTION:
+								this.simpleQuestionFlag = true;
+								this.scrollFlag = false;
+								this.nextFlag = false;
+								break;
+							case DIALOGUE_SPEECH:
+								this.closeDialog();
+								return;
+							case DIALOGUE_ALERT:
+								this.closeDialog();
+								return;
 						}
 					} else
 						this.scrollDistance += 8;
@@ -464,14 +464,14 @@ public class NewDialogue {
 					this.closeDialog();
 				} else {
 					switch (this.type) {
-					case DIALOGUE_SPEECH:
-					case DIALOGUE_ALERT:
-						this.nextFlag = true;
-						break;
-					case DIALOGUE_QUESTION:
-						this.simpleQuestionFlag = true;
-						this.nextFlag = false;
-						break;
+						case DIALOGUE_SPEECH:
+						case DIALOGUE_ALERT:
+							this.nextFlag = true;
+							break;
+						case DIALOGUE_QUESTION:
+							this.simpleQuestionFlag = true;
+							this.nextFlag = false;
+							break;
 					}
 				}
 			}
@@ -503,50 +503,50 @@ public class NewDialogue {
 		String string = null;
 		try {
 			switch (this.completedLines.size()) {
-			case 0:
-				// None completed.
-				string = this.lines.get(this.lineIterator).getKey();
-				if (this.subStringIterator > string.length()) {
-					g.drawString(string.substring(0, string.length()), X, Y1);
-					this.subStringIterator = this.lineLength;
-				} else
-					g.drawString(string.substring(0, this.subStringIterator), X, Y1);
-				break;
-			case 1:
-				// One line completed.
-				g.drawString(this.completedLines.get(0), X, Y1);
-				string = this.lines.get(this.lineIterator).getKey();
-				if (this.subStringIterator > string.length()) {
-					g.drawString(string.substring(0, string.length()), X, Y2);
-					this.subStringIterator = this.lineLength;
-				} else
-					g.drawString(string.substring(0, this.subStringIterator), X, Y2);
-				break;
-			case 2:
-				// Two lines completed.
-				if (!this.scrollFlag) {
+				case 0:
+					// None completed.
+					string = this.lines.get(this.lineIterator).getKey();
+					if (this.subStringIterator > string.length()) {
+						g.drawString(string.substring(0, string.length()), X, Y1);
+						this.subStringIterator = this.lineLength;
+					} else
+						g.drawString(string.substring(0, this.subStringIterator), X, Y1);
+					break;
+				case 1:
+					// One line completed.
 					g.drawString(this.completedLines.get(0), X, Y1);
-					g.drawString(this.completedLines.get(1), X, Y2);
-				} else {
-					// Time to scroll.
-					// DEBUG: Needs testing to see if there's any problem with
-					// it.
-					Graphics g_clipped = g.create();
-					g_clipped.setClip(rect.x, rect.y, rect.width, rect.height);
-					g_clipped.drawString(this.completedLines.get(0), X, Y1 - scrollDistance);
-					g_clipped.drawString(this.completedLines.get(1), X, Y2 - scrollDistance);
-					if (tickCount == 0x0) {
-						if (scrollDistance >= Y2 - Y1) {
-							this.scrollFlag = false;
-							this.scrollDistance = 0;
-							this.subStringIterator = 0;
-							this.completedLines.remove(0);
-							this.lines.get(this.lineIterator).setValue(true);
+					string = this.lines.get(this.lineIterator).getKey();
+					if (this.subStringIterator > string.length()) {
+						g.drawString(string.substring(0, string.length()), X, Y2);
+						this.subStringIterator = this.lineLength;
+					} else
+						g.drawString(string.substring(0, this.subStringIterator), X, Y2);
+					break;
+				case 2:
+					// Two lines completed.
+					if (!this.scrollFlag) {
+						g.drawString(this.completedLines.get(0), X, Y1);
+						g.drawString(this.completedLines.get(1), X, Y2);
+					} else {
+						// Time to scroll.
+						// DEBUG: Needs testing to see if there's any problem with
+						// it.
+						Graphics g_clipped = g.create();
+						g_clipped.setClip(rect.x, rect.y, rect.width, rect.height);
+						g_clipped.drawString(this.completedLines.get(0), X, Y1 - scrollDistance);
+						g_clipped.drawString(this.completedLines.get(1), X, Y2 - scrollDistance);
+						if (tickCount == 0x0) {
+							if (scrollDistance >= Y2 - Y1) {
+								this.scrollFlag = false;
+								this.scrollDistance = 0;
+								this.subStringIterator = 0;
+								this.completedLines.remove(0);
+								this.lines.get(this.lineIterator).setValue(true);
+							}
 						}
+						g_clipped.dispose();
 					}
-					g_clipped.dispose();
-				}
-				break;
+					break;
 			}
 		} catch (Exception e) {
 		}

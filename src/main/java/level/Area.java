@@ -12,14 +12,15 @@ package level;
 
 import java.util.ArrayList;
 
+import abstracts.Entity;
+import abstracts.Tile;
+import entity.Player;
 import obstacle.Obstacle;
 import screen.BaseBitmap;
 import screen.BaseScreen;
 import script.TriggerData;
-import abstracts.Tile;
-import entity.Player;
 
-public class Area {
+public class Area extends Entity {
 	private final int width;
 	private final int height;
 	private final int[] pixels;
@@ -519,7 +520,8 @@ public class Area {
 	 * @return Nothing.
 	 * 
 	 */
-	public void renderTiles(BaseScreen screen, int xOff, int yOff) {
+	@Override
+	public void render(BaseScreen screen, int xOff, int yOff) {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
@@ -795,5 +797,4 @@ public class Area {
 		} else
 			this.displayExitArrow = false;
 	}
-
 }

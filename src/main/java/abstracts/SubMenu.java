@@ -17,11 +17,12 @@ package abstracts;
 
 import java.awt.Graphics;
 
+import interfaces.InterfaceMenu;
 import main.Game;
 import main.Keys;
 import screen.BaseScreen;
 
-public abstract class SubMenu {
+public abstract class SubMenu implements InterfaceMenu {
 
 	protected boolean subMenuActivation;
 
@@ -35,6 +36,22 @@ public abstract class SubMenu {
 		this.name = name;
 		this.enabledDescription = enabled;
 		this.disabledDescription = disabled;
+		this.game = game;
+		this.subMenuActivation = false;
+	}
+
+	public SubMenu() {
+		this.name = null;
+		this.enabledDescription = "";
+		this.disabledDescription = "";
+		this.game = null;
+		this.subMenuActivation = false;
+	}
+
+	public SubMenu(Game game) {
+		this.name = null;
+		this.enabledDescription = "";
+		this.disabledDescription = "";
 		this.game = game;
 		this.subMenuActivation = false;
 	}
@@ -108,8 +125,6 @@ public abstract class SubMenu {
 	}
 
 	public abstract SubMenu initialize(Keys keys);
-
-	public abstract void tick();
 
 	public abstract void render(BaseScreen output, Graphics graphics);
 }

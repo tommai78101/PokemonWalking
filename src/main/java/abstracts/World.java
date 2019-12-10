@@ -15,10 +15,9 @@ import java.util.List;
 
 import level.Area;
 import main.Game;
-import screen.BaseScreen;
 import entity.Player;
 
-public abstract class World {
+public abstract class World extends Entity {
 	// World doesn't need to keep track of its coordinates.
 	// World should keep track of player coordinates.
 	// World should keep track of current area.
@@ -66,13 +65,6 @@ public abstract class World {
 		this.player = player;
 		this.game = game;
 		this.currentArea = null;
-	}
-
-	public void tick() {
-	}
-
-	public void render(BaseScreen output, int x, int y) {
-
 	}
 
 	// Will work on this in the future, once multi-worlds are a possibility.

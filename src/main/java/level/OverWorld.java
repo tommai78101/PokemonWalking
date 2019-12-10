@@ -376,14 +376,6 @@ public class OverWorld extends World {
 		// }
 	}
 
-	protected void renderTiles(BaseScreen screen, int x0, int y0, int x1, int y1) {
-		for (int y = y0; y < y1; y++) {
-			for (int x = x0; x < x1; x++) {
-				this.currentArea.renderTiles(screen, x, y);
-			}
-		}
-	}
-
 	@Override
 	public void render(BaseScreen screen, int xPlayerPos, int yPlayerPos) {
 		// OverWorld offsets are not set.
@@ -391,7 +383,7 @@ public class OverWorld extends World {
 
 		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
 		if (this.currentArea != null)
-			this.currentArea.renderTiles(screen, xPlayerPos, yPlayerPos);
+			this.currentArea.render(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
 
 		if (this.invertBitmapColors) {
@@ -408,24 +400,6 @@ public class OverWorld extends World {
 			NewDialogue.renderDialogBox(screen, 0, 6, 9, 2);
 			this.newDialogues[this.newDialoguesIterator].render(screen, screen.getBufferedImage().createGraphics());
 		}
-	}
-
-	// private void renderTiles(BaseScreen screen, Area area, int xPosition, int
-	// yPosition, int xOff, int yOff) {
-	// //Unsure at the moment.
-	// // area.setPosition(xPosition, yPosition);
-	// // area.renderTiles(screen, -xOff, -yOff);
-	// }
-
-	public Tile getTile(int x, int y) {
-		/*
-		 * if (pixels[y * this.width + x] != 0xFF00FF00) return new Tree();
-		 */
-		return null;
-	}
-
-	public void addTile(Tile t) {
-		// this.tiles.add(t);
 	}
 
 	// ---------------------------------------------------------------------------------------

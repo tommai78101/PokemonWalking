@@ -12,6 +12,7 @@ package screen;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.awt.Graphics;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -26,6 +27,7 @@ public class BaseScreen extends BaseBitmap {
 	// rendering assets.
 
 	protected BufferedImage image;
+	protected Graphics graphics;
 	protected int xOffset;
 	protected int yOffset;
 
@@ -37,6 +39,7 @@ public class BaseScreen extends BaseBitmap {
 		super(w, h);
 		this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		this.graphics = image.getGraphics();
 	}
 
 	public void loadResources() {
@@ -46,6 +49,10 @@ public class BaseScreen extends BaseBitmap {
 
 	public BufferedImage getBufferedImage() {
 		return image;
+	}
+
+	public Graphics getGraphics() {
+		return this.graphics;
 	}
 
 	public void clear(int color) {

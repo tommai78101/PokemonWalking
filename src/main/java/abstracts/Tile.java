@@ -10,10 +10,15 @@
 
 package abstracts;
 
-public abstract class Tile {
-	public Tile() {
-	}
+import screen.BaseBitmap;
 
+public abstract class Tile {
 	public static int WIDTH = 16;
 	public static int HEIGHT = 16;
+
+	protected BaseBitmap bitmap;
+
+	public Tile() {
+		this.bitmap = null;
+	}
 }
