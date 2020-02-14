@@ -10,21 +10,20 @@
 
 package level;
 
-import item.ItemText;
-
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import abstracts.Item;
+import abstracts.World;
+import dialogue.NewDialogue;
+import entity.Player;
+import entity.Tile;
+import item.ItemText;
 import main.Game;
 import obstacle.Obstacle;
 import screen.BaseScreen;
 import submenu.Inventory;
-import abstracts.Item;
-import abstracts.Tile;
-import abstracts.World;
-import dialogue.NewDialogue;
-import entity.Player;
 
 public class OverWorld extends World {
 	// Overworld properties.

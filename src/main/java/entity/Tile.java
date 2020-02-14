@@ -8,13 +8,12 @@
  * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
-package abstracts;
+package entity;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import screen.BaseBitmap;
 
-public abstract class ChunkInfo {
-	public abstract void read(RandomAccessFile raf) throws IOException;
-
-	public abstract void write(RandomAccessFile raf) throws IOException;
+public class Tile {
+	public static int WIDTH = 16;
+	public static int HEIGHT = 16;
+	protected BaseBitmap bitmap = null;
 }

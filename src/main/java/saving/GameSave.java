@@ -10,8 +10,6 @@
 
 package saving;
 
-import item.ItemText;
-
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
@@ -25,6 +23,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import abstracts.Item;
+import abstracts.SubMenu;
+import dialogue.StartMenu;
+import entity.Player;
+import entity.Player.GenderType;
+import item.ItemText;
 import level.Area;
 import level.PixelData;
 import level.WorldConstants;
@@ -32,11 +36,6 @@ import main.Game;
 import submenu.DummyMenu;
 import submenu.Inventory;
 import submenu.Save;
-import abstracts.Item;
-import abstracts.SubMenu;
-import dialogue.StartMenu;
-import entity.Player;
-import interfaces.Gender.GenderType;
 
 public class GameSave {
 	/*

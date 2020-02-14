@@ -84,13 +84,13 @@ public abstract class World extends Entity {
 	// }
 
 	// public void setOffset(int x, int y) {
-	// this.xOffset = x;
-	// this.yOffset = y;
+	//     this.xOffset = x;
+	//     this.yOffset = y;
 	// }
 	//
 	// public void setPosition(int x, int y) {
-	// this.xPosition = x;
-	// this.yPosition = y;
+	//     this.xPosition = x;
+	//     this.yPosition = y;
 	// }
 
 	public Area getCurrentArea() {
@@ -103,10 +103,10 @@ public abstract class World extends Entity {
 
 	public List<Area> getAllAreas() {
 		// for (int i=0; i<this.areas.size(); i++){
-		// if (this.areas.get(i).getAreaID() == this.currentArea.getAreaID()){
-		// this.areas.set(i, this.currentArea);
-		// break;
-		// }
+		//     if (this.areas.get(i).getAreaID() == this.currentArea.getAreaID()){
+		//         this.areas.set(i, this.currentArea);
+		//         break;
+		//     }
 		// }
 		return this.areas;
 	}

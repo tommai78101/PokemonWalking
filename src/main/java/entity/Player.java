@@ -15,10 +15,35 @@ import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
 import abstracts.Entity;
-import abstracts.Tile;
-import interfaces.Gender;
+import entity.Tile;
 
-public class Player extends Entity implements Gender {
+public class Player extends Entity {
+	public enum GenderType {
+		// @formatter:off
+		Nondetermined((byte) 0x7F), 
+		Male((byte) 0x1), 
+		Female((byte) 0xFF);
+		// @formatter:on
+
+		private byte typeId;
+
+		private GenderType(byte value) {
+			this.typeId = value;
+		}
+
+		public byte getByte() {
+			return this.typeId;
+		}
+
+		public static GenderType determineGender(byte value) {
+			if (value == Male.typeId)
+				return Male;
+			if (value == Female.typeId)
+				return Female;
+			return Nondetermined;
+		}
+	}
+
 	public static boolean isMovementsLocked() {
 		return movementLock;
 	}
@@ -34,7 +59,7 @@ public class Player extends Entity implements Gender {
 	public Keys keys;
 	private byte animationTick = 0;
 	private byte animationPointer = 0;
-	private Gender.GenderType gender = GenderType.Nondetermined;
+	private GenderType gender = GenderType.Nondetermined;
 
 	// These are based on the art sprite in the resource folder. The numbers are
 	// used to get elements from a 2D array.
@@ -599,12 +624,10 @@ public class Player extends Entity implements Gender {
 			jump();
 	}
 
-	@Override
 	public void setGender(GenderType value) {
 		this.gender = value;
 	}
 
-	@Override
 	public GenderType getGender() {
 		return this.gender;
 	}

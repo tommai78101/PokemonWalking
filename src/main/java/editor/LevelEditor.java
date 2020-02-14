@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import script_editor.ScriptEditor;
-import abstracts.Tile;
+import entity.Tile;
 import editor.EditorConstants.Metadata;
 
 //TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating 

@@ -15,9 +15,9 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import abstracts.ChunkInfo;
+import interfaces.InterfaceChunkInfo;
 
-public class PlayerInfo extends ChunkInfo {
+public class PlayerInfo implements InterfaceChunkInfo {
 	public final byte[] player_name = new byte[16];
 	public final byte[] player_gender = new byte[1];
 	public final ArrayList<byte[]> startMenu = new ArrayList<byte[]>();

@@ -27,7 +27,7 @@ import submenu.DummyMenu;
 import submenu.Inventory;
 import submenu.Save;
 import abstracts.SubMenu;
-import abstracts.Tile;
+import entity.Tile;
 import entity.Player;
 
 public class StartMenu extends SubMenu {

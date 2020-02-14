@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-import abstracts.Tile;
+import entity.Tile;
 
 public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for

@@ -22,7 +22,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import abstracts.Tile;
+import entity.Tile;
 import editor.EditorConstants.Tools;
 
 public class ControlPanel extends JPanel implements ActionListener {

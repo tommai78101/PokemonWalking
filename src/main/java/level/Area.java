@@ -13,8 +13,8 @@ package level;
 import java.util.ArrayList;
 
 import abstracts.Entity;
-import abstracts.Tile;
 import entity.Player;
+import entity.Tile;
 import obstacle.Obstacle;
 import screen.BaseBitmap;
 import screen.BaseScreen;

@@ -10,11 +10,6 @@
 
 package submenu;
 
-import item.ActionItem;
-import item.Bicycle;
-import item.DummyItem;
-import item.ItemText;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -24,18 +19,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import abstracts.Item;
+import abstracts.Item.Category;
+import abstracts.SubMenu;
+import dialogue.NewDialogue;
+import entity.Player;
+import entity.Tile;
+import item.ActionItem;
+import item.Bicycle;
+import item.DummyItem;
+import item.ItemText;
 import level.WorldConstants;
 import main.Game;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
-import abstracts.Item;
-import abstracts.Item.Category;
-import abstracts.SubMenu;
-import abstracts.Tile;
-import dialogue.NewDialogue;
-import entity.Player;
 
 public class Inventory extends SubMenu {
 

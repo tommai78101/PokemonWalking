@@ -10,6 +10,7 @@
 
 package abstracts;
 
+import entity.Tile;
 import interfaces.InterfaceGameObject;
 
 public abstract class Entity extends Tile implements InterfaceGameObject {

@@ -14,9 +14,9 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-import abstracts.ChunkInfo;
+import interfaces.InterfaceChunkInfo;;
 
-public class AreaInfo extends ChunkInfo {
+public class AreaInfo implements InterfaceChunkInfo {
 	public static final byte[] AREA = "AREA".getBytes(); // Current Area.
 	public static final byte[] PIXELDATA = "PXDT".getBytes(); // Changed pixels data.
 

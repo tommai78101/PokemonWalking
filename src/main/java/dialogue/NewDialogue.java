@@ -24,7 +24,7 @@ import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
-import abstracts.Tile;
+import entity.Tile;
 import entity.Player;
 
 //TODO (6/25/2015): Check to see why modded scripts still suffer from blinking dialogue boxes. Non-modded scripts are fixed.
