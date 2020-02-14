@@ -154,8 +154,8 @@ public class LevelEditor extends JFrame {
 	 */
 	public void createCache() {
 		File file = new File(LevelEditor.SAVED_PATH_DATA);
+		RandomAccessFile raf = null;
 		if (!file.exists()) {
-			RandomAccessFile f = null;
 			try {
 				// Creates a cache file that contains both the File Control's last saved
 				// directory and
@@ -163,46 +163,47 @@ public class LevelEditor extends JFrame {
 
 				// Made it so that it immediately saves the current editor file location upon
 				// initialization.
-				f = new RandomAccessFile(file, "rw");
-				f.seek(0);
-				f.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
-				f.writeBytes(System.getProperty("line.separator"));
-				f.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
-				f.writeBytes(System.getProperty("line.separator"));
+				raf = new RandomAccessFile(file, "w");
+				raf.setLength(0);
+				raf.seek(0);
+				raf.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
+				raf.writeBytes(System.getProperty("line.separator"));
+				raf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
+				raf.writeBytes(System.getProperty("line.separator"));
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
 				try {
-					f.close();
+					raf.close();
 				} catch (IOException e) {
 				}
 			}
 		} else {
 			// Reads in two last saved directories in the cache.
 			// If it fails, revert back to original saved directories.
-			RandomAccessFile raf = null;
 			File fileBackup1 = FileControl.lastSavedDirectory;
 			File fileBackup2 = ScriptEditor.LAST_SAVED_DIRECTORY;
+			boolean isCorrupted = false;
 			try {
-				raf = new RandomAccessFile(file, "rw");
+				raf = new RandomAccessFile(file, "r");
 				raf.seek(0);
-				FileControl.lastSavedDirectory = new File(raf.readLine());
-				ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
-			} catch (FileNotFoundException e) {
+				String fileControlFilePath = raf.readLine();
+				String scriptEditorFilePath = raf.readLine();
+				FileControl.lastSavedDirectory = new File(fileControlFilePath);
+				ScriptEditor.LAST_SAVED_DIRECTORY = new File(scriptEditorFilePath);
+			} catch (IOException | NullPointerException e) {
 				FileControl.lastSavedDirectory = fileBackup1;
 				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
-			} catch (IOException e) {
-				FileControl.lastSavedDirectory = fileBackup1;
-				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
-			} catch (NullPointerException e) {
-				FileControl.lastSavedDirectory = fileBackup1;
-				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
+				isCorrupted = true;
 			} finally {
 				try {
 					raf.close();
 				} catch (IOException e) {
+				}
+				if (isCorrupted) {
+					file.delete();
 				}
 			}
 		}
