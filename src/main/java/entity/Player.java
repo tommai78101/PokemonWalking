@@ -361,51 +361,58 @@ public class Player extends Entity {
 	 */
 	@Override
 	public void render(BaseScreen output, int x, int y) {
-		if (this.lockWalking && !this.lockJumping) {
-			// Walking animation
+		if (this.lockJumping) {
+			//Jumping has a higher priority than walking.
+			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
+			// Walking animation while in the air. Shouldn't jump when in water.
+			if (this.isOnBicycle)
+				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
+			else
+				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
+		}
+		else if (this.lockWalking) {
+			// Walking animation 
 			if (this.isInWater)
 				output.npcBlit(Art.player_surf[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 			else if (this.isOnBicycle)
 				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 			else
 				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
-		} else if (this.lockJumping) {
-			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
-			// Walking animation while in the air. Shouldn't jump when in water.
-			if (this.isOnBicycle)
-				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x,
-						this.yOffset + y - this.varyingJumpHeight);
-			else
-				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x,
-						this.yOffset + y - this.varyingJumpHeight);
+		}
+		else {
+			//Key press detection.
+			boolean wasdKeyPressedDown = (keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown);
+			boolean arrowKeyPressedDown = (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown);
+			boolean canUserMove = (wasdKeyPressedDown || arrowKeyPressedDown) && !Player.movementLock;
 
-		} else {
-			// Blocking animation. Possibly done to create a perfect loop.
-			if (!this.isInWater && !this.isOnBicycle) {
-				// Walking
-				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown
-						|| keys.right.isPressedDown || keys.S.isPressedDown || keys.W.isPressedDown
-						|| keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
-					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
-				else
-					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
-			} else if (this.isInWater && !this.isOnBicycle) {
-				// Surfing
-				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown
-						|| keys.right.isPressedDown || keys.S.isPressedDown || keys.W.isPressedDown
-						|| keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
+			//Player state
+			if (this.isInWater && this.isOnBicycle) {
+				//Player has entered an impossible state.
+				return;
+			}
+			
+			// Blocking animation. Animation pointer index is reset to zero, to create a perfect loop.
+			if (this.isInWater) {
+				// Surfing (has higher priority than bicycling)
+				if (canUserMove)
 					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
-			} else if (!this.isInWater && this.isOnBicycle) {
-				// Riding
-				if ((keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown
-						|| keys.right.isPressedDown || keys.S.isPressedDown || keys.W.isPressedDown
-						|| keys.A.isPressedDown || keys.D.isPressedDown) && !Player.movementLock)
+			} 
+			else if (this.isOnBicycle) {
+				// Riding (has lower priority than surfing)
+				if (canUserMove)
 					output.npcBlit(Art.player_bicycle[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_bicycle[facing][0], this.xOffset + x, this.yOffset + y);
 			}
+			else {
+				// Walking
+				if (canUserMove)
+					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+				else
+					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+			} 
 		}
 	}
 
