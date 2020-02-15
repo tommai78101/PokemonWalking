@@ -1,0 +1,19 @@
+//This specifies the project is a "Java" project, and this project has a "main" class.
+plugins {
+	id "java"
+	id "application"
+}
+
+// Enable gradle to compile source code in UTF-8 encoding.
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+//Specify the dependencies here.
+dependencies {
+	compileOnly project(":common")
+	implementation project(":game")
+}
+
+//With the plugin "application" added, we need to specify the class name where the "main" method resides in.
+mainClassName = "editor.LevelEditor"
