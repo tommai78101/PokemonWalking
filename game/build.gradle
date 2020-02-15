@@ -14,5 +14,14 @@ dependencies {
 	compileOnly project(":common")
 }
 
+//Need to get the sprites.
+sourceSets {
+	main {
+		resources {
+			srcDirs = ["../common/src/main/resources"]
+		}
+	}
+}
+
 //With the plugin "application" added, we need to specify the class name where the "main" method resides in.
 mainClassName = "main.MainComponent"
