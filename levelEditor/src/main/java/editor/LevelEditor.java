@@ -163,7 +163,7 @@ public class LevelEditor extends JFrame {
 
 				// Made it so that it immediately saves the current editor file location upon
 				// initialization.
-				raf = new RandomAccessFile(file, "w");
+				raf = new RandomAccessFile(file, "rw");
 				raf.setLength(0);
 				raf.seek(0);
 				raf.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
@@ -176,7 +176,8 @@ public class LevelEditor extends JFrame {
 				e.printStackTrace();
 			} finally {
 				try {
-					raf.close();
+					if (raf != null) 
+						raf.close();
 				} catch (IOException e) {
 				}
 			}
