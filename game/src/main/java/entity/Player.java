@@ -10,12 +10,11 @@
 
 package entity;
 
+import abstracts.Entity;
 import level.Area;
 import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
-import abstracts.Entity;
-import entity.Tile;
 
 public class Player extends Entity {
 	public enum GenderType {
@@ -91,8 +90,7 @@ public class Player extends Entity {
 	/**
 	 * Constructs a Player object in the game. This must be loaded in ONCE.
 	 * 
-	 * @param Keys Takes in the Keys object the input handler is controlling. It
-	 *             must not take in an uncontrolled Keys object.
+	 * @param Keys Takes in the Keys object the input handler is controlling. It must not take in an uncontrolled Keys object.
 	 */
 	public Player(Keys keys) {
 		this.keys = keys;
@@ -113,18 +111,18 @@ public class Player extends Entity {
 
 		if (this.xAccel == 0 && this.yAccel == 0) {
 			switch (this.facing) {
-			case UP:
-				this.yAccel--;
-				break;
-			case DOWN:
-				this.yAccel++;
-				break;
-			case LEFT:
-				this.xAccel--;
-				break;
-			case RIGHT:
-				this.xAccel++;
-				break;
+				case UP:
+					this.yAccel--;
+					break;
+				case DOWN:
+					this.yAccel++;
+					break;
+				case LEFT:
+					this.xAccel--;
+					break;
+				case RIGHT:
+					this.xAccel++;
+					break;
 			}
 		}
 	}
@@ -134,11 +132,9 @@ public class Player extends Entity {
 	}
 
 	/**
-	 * Gets a value that determines the direction the player had last been facing
-	 * towards at.
+	 * Gets a value that determines the direction the player had last been facing towards at.
 	 * 
-	 * @return An integer of one of the followings: Player.UP, Player.DOWN,
-	 *         Player.LEFT, Player.RIGHT.
+	 * @return An integer of one of the followings: Player.UP, Player.DOWN, Player.LEFT, Player.RIGHT.
 	 */
 	public int getLastFacing() {
 		return lastFacing;
@@ -171,11 +167,11 @@ public class Player extends Entity {
 		int result = (xPosition / Tile.WIDTH);
 		if (this.lockWalking)
 			switch (facing) {
-			case LEFT:
-				break;
-			case RIGHT:
-				result += 1;
-				break;
+				case LEFT:
+					break;
+				case RIGHT:
+					result += 1;
+					break;
 			}
 		return result;
 	}
@@ -185,11 +181,11 @@ public class Player extends Entity {
 		int result = (yPosition / Tile.HEIGHT);
 		if (this.lockWalking)
 			switch (facing) {
-			case UP:
-				break;
-			case DOWN:
-				result += 1;
-				break;
+				case UP:
+					break;
+				case DOWN:
+					result += 1;
+					break;
 			}
 		return result;
 	}
@@ -221,53 +217,52 @@ public class Player extends Entity {
 		int alpha = (dataColor >> 24) & 0xFF;
 		// int red = (dataColor >> 16) & 0xFF;
 		switch (alpha) {
-		case 0x03: {// Obstacles
-			// case 0x00: // Small tree
-			// case 0x01: //Logs
-			// case 0x02: //Planks
-			// case 0x03: //Scaffolding Left
-			// case 0x04: //Scaffolding Right
-			// case 0x05: //Sign
-			if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown
-					|| this.keys.PERIOD.isPressedDown) {
-				this.enableInteraction = false;
-				if (Player.isMovementsLocked())
-					Player.unlockMovements();
+			case 0x03: {// Obstacles
+				// case 0x00: // Small tree
+				// case 0x01: //Logs
+				// case 0x02: //Planks
+				// case 0x03: //Scaffolding Left
+				// case 0x04: //Scaffolding Right
+				// case 0x05: //Sign
+				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
+					this.enableInteraction = false;
+					if (Player.isMovementsLocked())
+						Player.unlockMovements();
+					break;
+				}
+				if (!movementLock) {
+					if (this.interactionID != 0) {
+						this.enableInteraction = false;
+						return;
+					}
+					if (!this.enableInteraction)
+						this.enableInteraction = true;
+				}
+				if (this.enableInteraction)
+					this.interactionID = dataColor;
 				break;
 			}
-			if (!movementLock) {
-				if (this.interactionID != 0) {
-					this.enableInteraction = false;
-					return;
+			case 0x0A: {// Item
+				// if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) &&
+				// (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)){
+				// this.keys.Z.lastKeyState = true;
+				// this.keys.SLASH.lastKeyState = true;
+				if (!movementLock) {
+					if (this.interactionID != 0) {
+						this.enableInteraction = false;
+						return;
+					}
+					if (!this.enableInteraction)
+						this.enableInteraction = true;
+					// }
 				}
-				if (!this.enableInteraction)
-					this.enableInteraction = true;
+				if (this.enableInteraction)
+					this.interactionID = dataColor;
+				break;
 			}
-			if (this.enableInteraction)
-				this.interactionID = dataColor;
-			break;
-		}
-		case 0x0A: {// Item
-			// if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) &&
-			// (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)){
-			// this.keys.Z.lastKeyState = true;
-			// this.keys.SLASH.lastKeyState = true;
-			if (!movementLock) {
-				if (this.interactionID != 0) {
-					this.enableInteraction = false;
-					return;
-				}
-				if (!this.enableInteraction)
-					this.enableInteraction = true;
-				// }
-			}
-			if (this.enableInteraction)
-				this.interactionID = dataColor;
-			break;
-		}
-		default:
-			// stopInteraction();
-			break;
+			default:
+				// stopInteraction();
+				break;
 		}
 	}
 
@@ -278,22 +273,22 @@ public class Player extends Entity {
 	public boolean isFacingAt(int x, int y) {
 		int xTgt = 0, yTgt = 0;
 		switch (this.facing) {
-		case Player.UP:
-			xTgt = this.getXInArea();
-			yTgt = this.getYInArea() - 1;
-			break;
-		case Player.DOWN:
-			xTgt = this.getXInArea();
-			yTgt = this.getYInArea() + 1;
-			break;
-		case Player.LEFT:
-			xTgt = this.getXInArea() - 1;
-			yTgt = this.getYInArea();
-			break;
-		case Player.RIGHT:
-			xTgt = this.getXInArea() + 1;
-			yTgt = this.getYInArea();
-			break;
+			case Player.UP:
+				xTgt = this.getXInArea();
+				yTgt = this.getYInArea() - 1;
+				break;
+			case Player.DOWN:
+				xTgt = this.getXInArea();
+				yTgt = this.getYInArea() + 1;
+				break;
+			case Player.LEFT:
+				xTgt = this.getXInArea() - 1;
+				yTgt = this.getYInArea();
+				break;
+			case Player.RIGHT:
+				xTgt = this.getXInArea() + 1;
+				yTgt = this.getYInArea();
+				break;
 		}
 		return ((x == xTgt) && (y == yTgt));
 	}
@@ -350,8 +345,7 @@ public class Player extends Entity {
 	}
 
 	/**
-	 * Blits the entity onto the screen, being offsetted to the left, which fits
-	 * snugly in the world grids.
+	 * Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
 	 * 
 	 * @param output Where the bitmap is to be blitted.
 	 * @param x      Pixel X offset.
@@ -362,35 +356,33 @@ public class Player extends Entity {
 	@Override
 	public void render(BaseScreen output, int x, int y) {
 		if (this.lockJumping) {
-			//Jumping has a higher priority than walking.
+			// Jumping has a higher priority than walking.
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
 			// Walking animation while in the air. Shouldn't jump when in water.
 			if (this.isOnBicycle)
 				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 			else
 				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
-		}
-		else if (this.lockWalking) {
-			// Walking animation 
+		} else if (this.lockWalking) {
+			// Walking animation
 			if (this.isInWater)
 				output.npcBlit(Art.player_surf[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 			else if (this.isOnBicycle)
 				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 			else
 				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
-		}
-		else {
-			//Key press detection.
+		} else {
+			// Key press detection.
 			boolean wasdKeyPressedDown = (keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown);
 			boolean arrowKeyPressedDown = (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown);
 			boolean canUserMove = (wasdKeyPressedDown || arrowKeyPressedDown) && !Player.movementLock;
 
-			//Player state
+			// Player state
 			if (this.isInWater && this.isOnBicycle) {
-				//Player has entered an impossible state.
+				// Player has entered an impossible state.
 				return;
 			}
-			
+
 			// Blocking animation. Animation pointer index is reset to zero, to create a perfect loop.
 			if (this.isInWater) {
 				// Surfing (has higher priority than bicycling)
@@ -398,39 +390,31 @@ public class Player extends Entity {
 					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
-			} 
-			else if (this.isOnBicycle) {
+			} else if (this.isOnBicycle) {
 				// Riding (has lower priority than surfing)
 				if (canUserMove)
 					output.npcBlit(Art.player_bicycle[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_bicycle[facing][0], this.xOffset + x, this.yOffset + y);
-			}
-			else {
+			} else {
 				// Walking
 				if (canUserMove)
 					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
-			} 
+			}
 		}
 	}
 
 	/**
-	 * Sets where each of the four directions are blocked by obstacles in front of
-	 * the player. The obstacles are in front of the player, when the player is
-	 * facing towards them. That is the time to check and see if the obstacle is
-	 * blocking the player or not.
+	 * Sets where each of the four directions are blocked by obstacles in front of the player. The obstacles are in front of the player, when
+	 * the player is facing towards them. That is the time to check and see if the obstacle is blocking the player or not.
 	 * 
-	 * @param up    If an obstacle is in front of the player when the player is
-	 *              facing towards NORTH, or UP, then up is true. False, otherwise.
-	 * @param down  If an obstacle is below of the player when the player is facing
-	 *              towards SOUTH, or DOWN, then down is true. False, otherwise.
-	 * @param left  If an obstacle is to the left of the player when the player is
-	 *              facing towards WEST, or LEFT, then left is true. False,
+	 * @param up    If an obstacle is in front of the player when the player is facing towards NORTH, or UP, then up is true. False, otherwise.
+	 * @param down  If an obstacle is below of the player when the player is facing towards SOUTH, or DOWN, then down is true. False, otherwise.
+	 * @param left  If an obstacle is to the left of the player when the player is facing towards WEST, or LEFT, then left is true. False,
 	 *              otherwise.
-	 * @param right If an obstacle is to the right of the player when the player is
-	 *              facing towards EAST, or RIGHT, then right is true. False,
+	 * @param right If an obstacle is to the right of the player when the player is facing towards EAST, or RIGHT, then right is true. False,
 	 *              otherwise.
 	 */
 	public void setAllBlockingDirections(boolean up, boolean down, boolean left, boolean right) {
@@ -441,16 +425,13 @@ public class Player extends Entity {
 	}
 
 	/**
-	 * Sets the player's current area position to the corresponding X and Y
-	 * coordinates given.
+	 * Sets the player's current area position to the corresponding X and Y coordinates given.
 	 * 
 	 * <p>
-	 * It uses the 2D Cartesian coordinates used in bitmaps. Positive X: Right.
-	 * Positive Y: Down.
+	 * It uses the 2D Cartesian coordinates used in bitmaps. Positive X: Right. Positive Y: Down.
 	 * 
 	 * <p>
-	 * <i>Note that the player's X and Y positions are overwritten by the loading
-	 * system.</i>
+	 * <i>Note that the player's X and Y positions are overwritten by the loading system.</i>
 	 * 
 	 * @param x The X coordinate the player is to be positioned at.
 	 * @param y The Y coordinate the player is to be positioned at.
@@ -463,8 +444,7 @@ public class Player extends Entity {
 	/**
 	 * Moves the Player object to the center of the screen.
 	 * 
-	 * @param BaseScreen Pans the screen immediately so that the Player object is in
-	 *                   the center of the screen.
+	 * @param BaseScreen Pans the screen immediately so that the Player object is in the center of the screen.
 	 * @return Nothing.
 	 */
 	public void setCenterCamPosition(BaseScreen screen) {
@@ -472,80 +452,71 @@ public class Player extends Entity {
 	}
 
 	/**
-	 * Locks the player into a jumping state. In this state, the Player cannot
-	 * listen to any key inputs received during the jump.
+	 * Locks the player into a jumping state. In this state, the Player cannot listen to any key inputs received during the jump.
 	 * <p>
 	 * 
-	 * Note: An example on how to determine player direction for the tile to allow
-	 * and block:
+	 * Note: An example on how to determine player direction for the tile to allow and block:
 	 * <ul>
-	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If
-	 * the tile allows the player to jump from top to bottom, the parameters, "from"
-	 * and "to" would be Player.UP and Player.DOWN respectively, which is the UP
-	 * tile at (1, 0) and DOWN tile at (1, 2). It means, the tile above X is the UP
-	 * position of X, and the tile below X is the DOWN position of X. Therefore, X
-	 * allows the player on the tile above X (the UP tile) to jump across to the
-	 * tile below X, but not the other way around.
+	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the
+	 * parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It
+	 * means, the tile above X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the
+	 * tile above X (the UP tile) to jump across to the tile below X, but not the other way around.
 	 * </ul>
 	 * 
-	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or
-	 * Player.RIGHT.
+	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or Player.RIGHT.
 	 * <p>
 	 * 
 	 * @param red   The red value of the pixel color.
 	 * @param green The green value of the pixel color.
 	 * @param blue  The blue value of the pixel color.
-	 * @param from  The player direction the tile allows the player to jump from.
-	 *              Player direction is determined from where the tile is located.
+	 * @param from  The player direction the tile allows the player to jump from. Player direction is determined from where the tile is located.
 	 *              The player direction must not be the same as the "to" parameter.
-	 * @param to    The player direction the tile allows the player to jump to.
-	 *              Player direction is determined from where the tile is located.
-	 *              The player direction must not be the same as the "from"
-	 *              parameter.
+	 * @param to    The player direction the tile allows the player to jump to. Player direction is determined from where the tile is located.
+	 *              The player direction must not be the same as the "from" parameter.
 	 * @return Nothing.
 	 */
 	public void setLockJumping(int red, int green, int blue, int from, int to) {
 		if (from == to)
 			throw new IllegalArgumentException("The parameters, from and to, must not be the same.");
 		switch (red) {
-		case 0x00: // Bottom
-			// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
-			// this.facingsBlocked[3] = true;
-			this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
-			this.facingsBlocked[UP] = false;
-			this.lockJumping = true;
-			break;
-		case 0x01: // Bottom Left
-			this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
-			break;
-		case 0x02: // Left
-			this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[UP] = true;
-			this.facingsBlocked[LEFT] = false;
-			this.lockJumping = true;
-			break;
-		case 0x03: // Top Left
-			this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
-			break;
-		case 0x04: // Top
-			this.facingsBlocked[UP] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
-			this.facingsBlocked[DOWN] = false;
-			this.lockJumping = true;
-			break;
-		case 0x05: // Top Right
-			this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
-			break;
-		case 0x06: // Right
-			this.facingsBlocked[DOWN] = this.facingsBlocked[UP] = this.facingsBlocked[LEFT] = true;
-			this.facingsBlocked[RIGHT] = false;
-			this.lockJumping = true;
-			break;
-		case 0x07: // Bottom Right
-			this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
-			break;
-		default: // Any other tiles should not cause the player to jump.
-			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
-			this.lockJumping = false;
-			break;
+			case 0x00: // Bottom
+				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
+				// this.facingsBlocked[3] = true;
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
+				this.facingsBlocked[UP] = false;
+				this.lockJumping = true;
+				break;
+			case 0x01: // Bottom Left
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
+				break;
+			case 0x02: // Left
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[UP] = true;
+				this.facingsBlocked[LEFT] = false;
+				this.lockJumping = true;
+				break;
+			case 0x03: // Top Left
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
+				break;
+			case 0x04: // Top
+				this.facingsBlocked[UP] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = true;
+				this.facingsBlocked[DOWN] = false;
+				this.lockJumping = true;
+				break;
+			case 0x05: // Top Right
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
+				break;
+			case 0x06: // Right
+				this.facingsBlocked[DOWN] = this.facingsBlocked[UP] = this.facingsBlocked[LEFT] = true;
+				this.facingsBlocked[RIGHT] = false;
+				this.lockJumping = true;
+				break;
+			case 0x07: // Bottom Right
+				this.facingsBlocked[DOWN] = this.facingsBlocked[LEFT] = this.facingsBlocked[RIGHT] = this.facingsBlocked[UP] = true;
+				break;
+			default: // Any other tiles should not cause the player to jump.
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = true;
+				this.lockJumping = false;
+				break;
 		}
 	}
 
@@ -695,9 +666,8 @@ public class Player extends Entity {
 	 * Makes adjustments to the player's position when the player is walking.
 	 * 
 	 * <p>
-	 * If the conditions are met, such as a tile has been fully moved to, it will
-	 * check to make sure the player has stopped walking, until the player wanted to
-	 * walk.
+	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the
+	 * player wanted to walk.
 	 * 
 	 * @return Nothing.
 	 */

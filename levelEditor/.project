@@ -20,4 +20,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>resources</name>
+			<type>2</type>
+			<location>D:/Documents/JavaProjects/PokemonWalking/common/src/main/resources</location>
+		</link>
+	</linkedResources>
 </projectDescription>
