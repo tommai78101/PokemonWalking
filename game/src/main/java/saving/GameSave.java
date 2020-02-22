@@ -23,11 +23,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import abstracts.Entity.GenderType;
 import abstracts.Item;
 import abstracts.SubMenu;
 import dialogue.StartMenu;
 import entity.Player;
-import entity.Player.GenderType;
 import item.ItemText;
 import level.Area;
 import level.PixelData;

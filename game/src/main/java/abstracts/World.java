@@ -13,9 +13,9 @@ package abstracts;
 import java.util.ArrayList;
 import java.util.List;
 
+import entity.Player;
 import level.Area;
 import main.Game;
-import entity.Player;
 
 public abstract class World extends Entity {
 	// World doesn't need to keep track of its coordinates.

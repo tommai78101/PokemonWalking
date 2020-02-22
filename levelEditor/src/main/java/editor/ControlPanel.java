@@ -22,8 +22,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import entity.Tile;
 import editor.EditorConstants.Tools;
+import interfaces.InterfaceTile;
 
 public class ControlPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7481148146432931992L;
@@ -63,7 +63,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 			@Override
 			public Dimension getPreferredSize() {
 				int maxWidth = 50;
-				int maxHeight = Tile.HEIGHT * 20;
+				int maxHeight = InterfaceTile.HEIGHT * 20;
 				Dimension dim = super.getPreferredSize();
 				if (dim.width > maxWidth)
 					dim.width = maxWidth;

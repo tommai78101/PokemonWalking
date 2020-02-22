@@ -10,10 +10,11 @@
 
 package abstracts;
 
-import entity.Tile;
 import interfaces.InterfaceGameObject;
+import interfaces.InterfaceTile;
+import screen.BaseBitmap;
 
-public abstract class Entity extends Tile implements InterfaceGameObject {
+public abstract class Entity implements InterfaceTile, InterfaceGameObject {
 	public static final int UP = 2;
 	public static final int DOWN = 0;
 	public static final int LEFT = 1;
@@ -27,6 +28,7 @@ public abstract class Entity extends Tile implements InterfaceGameObject {
 
 	protected int xOffset;
 	protected int yOffset;
+	protected BaseBitmap bitmap = null;
 
 	protected String name;
 
@@ -79,5 +81,35 @@ public abstract class Entity extends Tile implements InterfaceGameObject {
 	 */
 	public void setFacing(int value) {
 		this.facing = value;
+	}
+
+	/**
+	 * Entity class objects include NPC, Player, and monsters. Thus, it is
+	 * fitting for the Entity objects to include a GenderType.
+	 */
+	public enum GenderType {
+		// @formatter:off
+		Nondetermined((byte) 0x7F), 
+		Male((byte) 0x1), 
+		Female((byte) 0xFF);
+		// @formatter:on
+
+		private byte typeId;
+
+		private GenderType(byte value) {
+			this.typeId = value;
+		}
+
+		public byte getByte() {
+			return this.typeId;
+		}
+
+		public static GenderType determineGender(byte value) {
+			if (value == Male.typeId)
+				return Male;
+			if (value == Female.typeId)
+				return Female;
+			return Nondetermined;
+		}
 	}
 }

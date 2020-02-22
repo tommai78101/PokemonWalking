@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import abstracts.SubMenu;
+import entity.Player;
+import interfaces.InterfaceTile;
 import main.Game;
 import main.Keys;
 import main.MainComponent;
@@ -26,14 +29,11 @@ import screen.BaseScreen;
 import submenu.DummyMenu;
 import submenu.Inventory;
 import submenu.Save;
-import abstracts.SubMenu;
-import entity.Tile;
-import entity.Player;
 
 public class StartMenu extends SubMenu {
 	// Description area
-	private static final int DESCRIPTION_FIRST_LINE_Y = (Tile.HEIGHT * 8) - 8;
-	private static final int DESCRIPTION_SECOND_LINE_Y = (Tile.HEIGHT * 9) - 8;
+	private static final int DESCRIPTION_FIRST_LINE_Y = (InterfaceTile.HEIGHT * 8) - 8;
+	private static final int DESCRIPTION_SECOND_LINE_Y = (InterfaceTile.HEIGHT * 9) - 8;
 
 	// String constants
 	public static final String ITEM_NAME_EXIT = "EXIT";
@@ -106,7 +106,7 @@ public class StartMenu extends SubMenu {
 		if (this.activation) {
 			NewDialogue.renderDialogBox(output, 5, 0, 4, items.size());
 			StartMenu.renderDescriptionBox(output, 0, 7, 5, 3);
-			output.blit(Art.dialogue_pointer, Tile.WIDTH * 5 + 8, Tile.HEIGHT + this.menuCursorPosition * Tile.HEIGHT);
+			output.blit(Art.dialogue_pointer, InterfaceTile.WIDTH * 5 + 8, InterfaceTile.HEIGHT + this.menuCursorPosition * InterfaceTile.HEIGHT);
 			Graphics2D g2d = output.getBufferedImage().createGraphics();
 			this.renderMenuText(g2d);
 			this.renderMenuDescriptionText(g2d);
@@ -204,7 +204,7 @@ public class StartMenu extends SubMenu {
 		g.setColor(Color.black);
 		if (this.activation) {
 			for (int i = 0; i < this.items.size(); i++) {
-				g.drawString(this.items.get(i).getValue().getName(), (Tile.WIDTH * 6), (((Tile.HEIGHT * 2 - 8) + i * 16)));
+				g.drawString(this.items.get(i).getValue().getName(), (InterfaceTile.WIDTH * 6), (((InterfaceTile.HEIGHT * 2 - 8) + i * 16)));
 			}
 		}
 	}
@@ -224,7 +224,7 @@ public class StartMenu extends SubMenu {
 	public static void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
-				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH), ((y - 1) * Tile.HEIGHT + 8) + j * Tile.HEIGHT);
+				output.blit(Art.dialogue_background, (x * InterfaceTile.WIDTH) + (i * InterfaceTile.WIDTH), ((y - 1) * InterfaceTile.HEIGHT + 8) + j * InterfaceTile.HEIGHT);
 			}
 		}
 	}

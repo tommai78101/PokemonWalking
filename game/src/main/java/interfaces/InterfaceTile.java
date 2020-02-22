@@ -8,12 +8,9 @@
  * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
-package entity;
+package interfaces;
 
-import screen.BaseBitmap;
-
-public class Tile {
+public interface InterfaceTile {
 	public static int WIDTH = 16;
 	public static int HEIGHT = 16;
-	protected BaseBitmap bitmap = null;
 }

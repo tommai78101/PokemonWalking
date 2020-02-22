@@ -27,7 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import entity.Tile;
+import interfaces.InterfaceTile;
 
 public class DrawingBoard extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -47,8 +47,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 		this.editor = editor;
 		offsetX = offsetY = 0;
 
-		int w = width * Tile.WIDTH;
-		int h = height * Tile.HEIGHT;
+		int w = width * InterfaceTile.WIDTH;
+		int h = height * InterfaceTile.HEIGHT;
 		Dimension size = new Dimension(w, h);
 		this.setSize(size);
 		this.setPreferredSize(size);
@@ -103,11 +103,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 			tilesEditorID[i] = 0;
 			triggers[i] = 0;
 		}
-		image = new BufferedImage(w * Tile.WIDTH, h * Tile.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		image = new BufferedImage(w * InterfaceTile.WIDTH, h * InterfaceTile.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 		for (int j = 0; j < image.getHeight(); j++) {
 			for (int i = 0; i < image.getWidth(); i++) {
-				if (i % Tile.WIDTH == 0 || j % Tile.HEIGHT == 0)
+				if (i % InterfaceTile.WIDTH == 0 || j % InterfaceTile.HEIGHT == 0)
 					pixels[j * image.getWidth() + i] = 0;
 				else
 					pixels[j * image.getWidth() + i] = -1;
@@ -115,8 +115,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		bitmapWidth = w;
 		bitmapHeight = h;
-		offsetX = -((this.getWidth() - (w * Tile.WIDTH)) / 2);
-		offsetY = -((this.getHeight() - (h * Tile.HEIGHT)) / 2);
+		offsetX = -((this.getWidth() - (w * InterfaceTile.WIDTH)) / 2);
+		offsetY = -((this.getHeight() - (h * InterfaceTile.HEIGHT)) / 2);
 		editor.input.offsetX = offsetX;
 		editor.input.offsetY = offsetY;
 
@@ -213,8 +213,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 					} else
 						g.setColor(Color.white);
 
-					g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
-					g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+					g.fillRect(w * InterfaceTile.WIDTH, h * InterfaceTile.HEIGHT, InterfaceTile.WIDTH, InterfaceTile.HEIGHT);
+					g.drawImage(bimg, w * InterfaceTile.WIDTH, h * InterfaceTile.HEIGHT, InterfaceTile.WIDTH, InterfaceTile.HEIGHT, null);
 					g.dispose();
 
 				}
@@ -254,7 +254,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 					if ((triggers[k] & 0xFFFF) != 0) {
 						g.setColor(Color.cyan);
-						g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
+						g.fillRect(w * InterfaceTile.WIDTH, h * InterfaceTile.HEIGHT, InterfaceTile.WIDTH, InterfaceTile.HEIGHT);
 					} else {
 						// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT,
 						// Tile.WIDTH, Tile.HEIGHT, null);
@@ -284,8 +284,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 							}
 						} else
 							gD.setColor(Color.white);
-						g.fillRect(w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT);
-						g.drawImage(bimg, w * Tile.WIDTH, h * Tile.HEIGHT, Tile.WIDTH, Tile.HEIGHT, null);
+						g.fillRect(w * InterfaceTile.WIDTH, h * InterfaceTile.HEIGHT, InterfaceTile.WIDTH, InterfaceTile.HEIGHT);
+						g.drawImage(bimg, w * InterfaceTile.WIDTH, h * InterfaceTile.HEIGHT, InterfaceTile.WIDTH, InterfaceTile.HEIGHT, null);
 						g.dispose();
 					}
 					g.dispose();
@@ -342,12 +342,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 				this.mouseOnTileX = offsetX + editor.input.drawingX;
 				if (this.mouseOnTileX < 0)
 					return;
-				if (this.mouseOnTileX >= bitmapWidth * Tile.WIDTH)
+				if (this.mouseOnTileX >= bitmapWidth * InterfaceTile.WIDTH)
 					return;
 				this.mouseOnTileY = offsetY + editor.input.drawingY;
 				if (this.mouseOnTileY < 0)
 					return;
-				if (this.mouseOnTileY >= bitmapHeight * Tile.HEIGHT)
+				if (this.mouseOnTileY >= bitmapHeight * InterfaceTile.HEIGHT)
 					return;
 				Data d = editor.controlPanel.getSelectedData();
 				if (d != null) {
@@ -364,9 +364,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 			} else if (editor.input.isDrawing()) {
 				this.mouseOnTileX = editor.input.offsetX + editor.input.drawingX;
 				this.mouseOnTileY = editor.input.offsetY + editor.input.drawingY;
-				if (this.mouseOnTileX < 0 || this.mouseOnTileX >= bitmapWidth * Tile.WIDTH)
+				if (this.mouseOnTileX < 0 || this.mouseOnTileX >= bitmapWidth * InterfaceTile.WIDTH)
 					return;
-				if (this.mouseOnTileY < 0 || this.mouseOnTileY >= bitmapHeight * Tile.HEIGHT)
+				if (this.mouseOnTileY < 0 || this.mouseOnTileY >= bitmapHeight * InterfaceTile.HEIGHT)
 					return;
 				Trigger t = editor.controlPanel.getSelectedTrigger();
 				if (t != null) {
@@ -512,11 +512,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 
 	public int getMouseTileX() {
-		return this.mouseOnTileX / Tile.WIDTH;
+		return this.mouseOnTileX / InterfaceTile.WIDTH;
 	}
 
 	public int getMouseTileY() {
-		return this.mouseOnTileY / Tile.HEIGHT;
+		return this.mouseOnTileY / InterfaceTile.HEIGHT;
 	}
 
 	public int getBitmapWidth() {
@@ -644,14 +644,14 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 			// try...catch for X position
 			try {
-				w = (editor.input.offsetX + editor.input.mouseX) / Tile.WIDTH;
+				w = (editor.input.offsetX + editor.input.mouseX) / InterfaceTile.WIDTH;
 			} catch (Exception e) {
 				w = (editor.input.offsetX + editor.input.mouseX) / (LevelEditor.WIDTH * LevelEditor.SIZE);
 			}
 
 			// try catch for Y position
 			try {
-				h = (editor.input.offsetY + editor.input.mouseY) / Tile.HEIGHT;
+				h = (editor.input.offsetY + editor.input.mouseY) / InterfaceTile.HEIGHT;
 			} catch (Exception e) {
 				h = (editor.input.offsetY + editor.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);
 			}

@@ -11,38 +11,13 @@
 package entity;
 
 import abstracts.Entity;
+import interfaces.InterfaceTile;
 import level.Area;
 import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
 
 public class Player extends Entity {
-	public enum GenderType {
-		// @formatter:off
-		Nondetermined((byte) 0x7F), 
-		Male((byte) 0x1), 
-		Female((byte) 0xFF);
-		// @formatter:on
-
-		private byte typeId;
-
-		private GenderType(byte value) {
-			this.typeId = value;
-		}
-
-		public byte getByte() {
-			return this.typeId;
-		}
-
-		public static GenderType determineGender(byte value) {
-			if (value == Male.typeId)
-				return Male;
-			if (value == Female.typeId)
-				return Female;
-			return Nondetermined;
-		}
-	}
-
 	public static boolean isMovementsLocked() {
 		return movementLock;
 	}
@@ -164,7 +139,7 @@ public class Player extends Entity {
 
 	public int getXInArea() {
 		// Returns area position X.
-		int result = (xPosition / Tile.WIDTH);
+		int result = (xPosition / InterfaceTile.WIDTH);
 		if (this.lockWalking)
 			switch (facing) {
 				case LEFT:
@@ -178,7 +153,7 @@ public class Player extends Entity {
 
 	public int getYInArea() {
 		// Returns area position Y.
-		int result = (yPosition / Tile.HEIGHT);
+		int result = (yPosition / InterfaceTile.HEIGHT);
 		if (this.lockWalking)
 			switch (facing) {
 				case UP:
@@ -438,7 +413,7 @@ public class Player extends Entity {
 	 * @return Nothing.
 	 */
 	public void setAreaPosition(int x, int y) {
-		this.setPosition(x * Tile.WIDTH, y * Tile.HEIGHT);
+		this.setPosition(x * InterfaceTile.WIDTH, y * InterfaceTile.HEIGHT);
 	}
 
 	/**
@@ -448,7 +423,7 @@ public class Player extends Entity {
 	 * @return Nothing.
 	 */
 	public void setCenterCamPosition(BaseScreen screen) {
-		this.setRenderOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
+		this.setRenderOffset(screen.getWidth() / 2 - InterfaceTile.WIDTH, (screen.getHeight() - InterfaceTile.HEIGHT) / 2);
 	}
 
 	/**
@@ -698,7 +673,7 @@ public class Player extends Entity {
 			// Needs to get out of being locked to walking/jumping.
 			// Note that we cannot compare using ||, what if the player is moving in one
 			// direction? What about the other axis?
-			if ((xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0)) {
+			if ((xPosition % InterfaceTile.WIDTH == 0 && yPosition % InterfaceTile.HEIGHT == 0)) {
 				// Resets every flag that locks the player.
 				this.lockWalking = false;
 			}
@@ -761,7 +736,7 @@ public class Player extends Entity {
 			// Needs to get out of being locked to walking/jumping.
 			// Note that we cannot compare using ||, what if the player is moving in one
 			// direction? What about the other axis?
-			if ((xPosition % Tile.WIDTH == 0 && yPosition % Tile.HEIGHT == 0)) {
+			if ((xPosition % InterfaceTile.WIDTH == 0 && yPosition % InterfaceTile.HEIGHT == 0)) {
 				// Resets every flag that locks the player.
 				this.lockWalking = false;
 				this.lockJumping = false;

@@ -25,7 +25,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-import entity.Tile;
+import interfaces.InterfaceTile;
 
 public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for
@@ -147,17 +147,17 @@ public class EditorConstants {
 
 						@Override
 						public Dimension getMinimumSize() {
-							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
+							return new Dimension(InterfaceTile.WIDTH, InterfaceTile.HEIGHT);
 						}
 
 						@Override
 						public Dimension getSize() {
-							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
+							return new Dimension(InterfaceTile.WIDTH, InterfaceTile.HEIGHT);
 						}
 
 						@Override
 						public Dimension getPreferredSize() {
-							return new Dimension(Tile.WIDTH, Tile.HEIGHT);
+							return new Dimension(InterfaceTile.WIDTH, InterfaceTile.HEIGHT);
 						}
 					};
 					data.button.setAlignmentX(Component.CENTER_ALIGNMENT);

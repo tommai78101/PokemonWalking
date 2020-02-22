@@ -23,9 +23,9 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
-import script_editor.ScriptEditor;
-import entity.Tile;
 import editor.EditorConstants.Metadata;
+import interfaces.InterfaceTile;
+import script_editor.ScriptEditor;
 
 //TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating 
 //maps and scripts together.
@@ -224,12 +224,12 @@ public class LevelEditor extends JFrame {
 						int w = 0;
 						int h = 0;
 						try {
-							w = (input.offsetX + input.mouseX) / Tile.WIDTH;
+							w = (input.offsetX + input.mouseX) / InterfaceTile.WIDTH;
 						} catch (Exception e) {
 							w = (input.offsetX + input.mouseX) / (WIDTH * SIZE);
 						}
 						try {
-							h = (input.offsetY + input.mouseY) / Tile.HEIGHT;
+							h = (input.offsetY + input.mouseY) / InterfaceTile.HEIGHT;
 						} catch (Exception e) {
 							h = (input.offsetY + input.mouseY) / (WIDTH * SIZE);
 						}

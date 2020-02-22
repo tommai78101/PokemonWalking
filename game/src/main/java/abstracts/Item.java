@@ -10,11 +10,6 @@
 
 package abstracts;
 
-import item.ActionItem;
-import item.Bicycle;
-import item.DummyItem;
-import item.ItemText;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.AbstractMap;
@@ -26,6 +21,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import entity.Player;
+import interfaces.InterfaceItem;
+import item.ActionItem;
+import item.Bicycle;
+import item.DummyItem;
+import item.ItemText;
 import level.Area;
 import level.WorldConstants;
 import main.Game;
@@ -33,8 +34,6 @@ import main.MainComponent;
 import resources.Art;
 import screen.BaseScreen;
 import submenu.Inventory;
-import entity.Player;
-import interfaces.InterfaceItem;
 
 public abstract class Item implements Comparable<Item>, InterfaceItem {
 

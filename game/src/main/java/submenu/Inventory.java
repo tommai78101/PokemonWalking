@@ -24,7 +24,7 @@ import abstracts.Item.Category;
 import abstracts.SubMenu;
 import dialogue.NewDialogue;
 import entity.Player;
-import entity.Tile;
+import interfaces.InterfaceTile;
 import item.ActionItem;
 import item.Bicycle;
 import item.DummyItem;
@@ -211,24 +211,24 @@ public class Inventory extends SubMenu {
 				NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
 				renderListBox(output, 3, 1, 7, 5);
 				output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE,
-						((Tile.HEIGHT * this.arrowPosition)) + 12);
+						((InterfaceTile.HEIGHT * this.arrowPosition)) + 12);
 				switch (this.category) {
 				case POTIONS:
 				default:
 					output.blit(Art.inventory_backpack_potions, 0, 8);
-					output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_potions, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case KEYITEMS:
 					output.blit(Art.inventory_backpack_keyItems, 0, 8);
-					output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_keyItems, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case POKEBALLS:
 					output.blit(Art.inventory_backpack_pokeballs, 0, 8);
-					output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_pokeballs, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case TM_HM:
 					output.blit(Art.inventory_backpack_TM_HM, 0, 8);
-					output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_TM_HM, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				}
 				Graphics2D g2d = output.getBufferedImage().createGraphics();
@@ -241,24 +241,24 @@ public class Inventory extends SubMenu {
 				NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
 				renderListBox(output, 3, 1, 7, 5);
 				output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE,
-						((Tile.HEIGHT * this.arrowPosition)) + 12);
+						((InterfaceTile.HEIGHT * this.arrowPosition)) + 12);
 				switch (this.category) {
 				case POTIONS:
 				default:
 					output.blit(Art.inventory_backpack_potions, 0, 8);
-					output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_potions, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case KEYITEMS:
 					output.blit(Art.inventory_backpack_keyItems, 0, 8);
-					output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_keyItems, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case POKEBALLS:
 					output.blit(Art.inventory_backpack_pokeballs, 0, 8);
-					output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_pokeballs, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case TM_HM:
 					output.blit(Art.inventory_backpack_TM_HM, 0, 8);
-					output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_TM_HM, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				}
 				BufferedImage old = output.getBufferedImage();
@@ -268,7 +268,7 @@ public class Inventory extends SubMenu {
 					NewDialogue.renderDialogBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4,
 							this.selectionMenu.size() - 1);
 					output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE,
-							(12 * this.stateArrowPosition + Tile.HEIGHT * (7 - this.selectionMenu.size())) - 8);
+							(12 * this.stateArrowPosition + InterfaceTile.HEIGHT * (7 - this.selectionMenu.size())) - 8);
 					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					renderItemMenuText(list, g2d);
 				}
@@ -280,25 +280,25 @@ public class Inventory extends SubMenu {
 				NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
 				renderListBox(output, 3, 1, 7, 5);
 				output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE,
-						((Tile.HEIGHT * this.arrowPosition)) + 12);
+						((InterfaceTile.HEIGHT * this.arrowPosition)) + 12);
 				NewDialogue.renderDialogBox(output, 5, 4, 4, 1);
 				switch (this.category) {
 				case POTIONS:
 				default:
 					output.blit(Art.inventory_backpack_potions, 0, 8);
-					output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_potions, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case KEYITEMS:
 					output.blit(Art.inventory_backpack_keyItems, 0, 8);
-					output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_keyItems, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case POKEBALLS:
 					output.blit(Art.inventory_backpack_pokeballs, 0, 8);
-					output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_pokeballs, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case TM_HM:
 					output.blit(Art.inventory_backpack_TM_HM, 0, 8);
-					output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_TM_HM, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				}
 				BufferedImage old = output.getBufferedImage();
@@ -314,24 +314,24 @@ public class Inventory extends SubMenu {
 				NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
 				renderListBox(output, 3, 1, 7, 5);
 				output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE,
-						((Tile.HEIGHT * this.arrowPosition)) + 12);
+						((InterfaceTile.HEIGHT * this.arrowPosition)) + 12);
 				switch (this.category) {
 				case POTIONS:
 				default:
 					output.blit(Art.inventory_backpack_potions, 0, 8);
-					output.blit(Art.inventory_tag_potions, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_potions, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case KEYITEMS:
 					output.blit(Art.inventory_backpack_keyItems, 0, 8);
-					output.blit(Art.inventory_tag_keyItems, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_keyItems, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case POKEBALLS:
 					output.blit(Art.inventory_backpack_pokeballs, 0, 8);
-					output.blit(Art.inventory_tag_pokeballs, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_pokeballs, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				case TM_HM:
 					output.blit(Art.inventory_backpack_TM_HM, 0, 8);
-					output.blit(Art.inventory_tag_TM_HM, 0, Tile.HEIGHT * 4 + 3);
+					output.blit(Art.inventory_tag_TM_HM, 0, InterfaceTile.HEIGHT * 4 + 3);
 					break;
 				}
 				Graphics2D g2d = output.getBufferedImage().createGraphics();
@@ -709,10 +709,10 @@ public class Inventory extends SubMenu {
 			try {
 				String tossAmount = amountToToss < 10 ? "0" + Integer.toString(amountToToss)
 						: Integer.toString(amountToToss);
-				graphics.drawString(this.selectionMenu.get(0), (4 * Tile.WIDTH + (3 * (Tile.WIDTH / 2))),
-						(Tile.HEIGHT * 5 + 6));
-				graphics.drawString(tossAmount, (4 * Tile.WIDTH + ((11 - tossAmount.length()) * (Tile.WIDTH / 2))),
-						(Tile.HEIGHT * 5 + 6));
+				graphics.drawString(this.selectionMenu.get(0), (4 * InterfaceTile.WIDTH + (3 * (InterfaceTile.WIDTH / 2))),
+						(InterfaceTile.HEIGHT * 5 + 6));
+				graphics.drawString(tossAmount, (4 * InterfaceTile.WIDTH + ((11 - tossAmount.length()) * (InterfaceTile.WIDTH / 2))),
+						(InterfaceTile.HEIGHT * 5 + 6));
 			} catch (Exception e) {
 			}
 			// This needs to be separated, else if there's a problem, the latter won't
@@ -728,8 +728,8 @@ public class Inventory extends SubMenu {
 				graphics.setColor(Color.black);
 				try {
 					for (int i = 0; i < this.selectionMenu.size(); i++) {
-						graphics.drawString(this.selectionMenu.get(i), (Tile.WIDTH * 6 + 4),
-								((12 * i) + Tile.HEIGHT * (7 - this.selectionMenu.size())));
+						graphics.drawString(this.selectionMenu.get(i), (InterfaceTile.WIDTH * 6 + 4),
+								((12 * i) + InterfaceTile.HEIGHT * (7 - this.selectionMenu.size())));
 					}
 				} catch (Exception e) {
 				}
@@ -766,12 +766,12 @@ public class Inventory extends SubMenu {
 	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
-				output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (i * Tile.WIDTH),
-						(y * Tile.HEIGHT - 7) + (j * Tile.HEIGHT));
+				output.blit(Art.dialogue_background, (x * InterfaceTile.WIDTH) + (i * InterfaceTile.WIDTH),
+						(y * InterfaceTile.HEIGHT - 7) + (j * InterfaceTile.HEIGHT));
 			}
 		}
 		for (int k = 0; k < width; k++)
-			output.blit(Art.dialogue_background, (x * Tile.WIDTH) + (k * Tile.WIDTH), (height * Tile.HEIGHT));
+			output.blit(Art.dialogue_background, (x * InterfaceTile.WIDTH) + (k * InterfaceTile.WIDTH), (height * InterfaceTile.HEIGHT));
 	}
 
 	/**
@@ -807,14 +807,14 @@ public class Inventory extends SubMenu {
 						if (i >= list.size())
 							break;
 						Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
-						g.drawString(entry.getKey().getName(), 8 * (Tile.WIDTH / 2),
-								((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 3);
+						g.drawString(entry.getKey().getName(), 8 * (InterfaceTile.WIDTH / 2),
+								((InterfaceTile.HEIGHT) + (InterfaceTile.HEIGHT * i)) + 3);
 						int value = entry.getValue().intValue();
 						if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null
 								&& this.category != Category.KEYITEMS) {
 							String string = "*" + Integer.toString(value);
-							g.drawString(string, 8 * (Tile.WIDTH / 2) + ((12 - string.length()) * (Tile.WIDTH / 2)),
-									((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 4);
+							g.drawString(string, 8 * (InterfaceTile.WIDTH / 2) + ((12 - string.length()) * (InterfaceTile.WIDTH / 2)),
+									((InterfaceTile.HEIGHT) + (InterfaceTile.HEIGHT * i)) + 4);
 						}
 					}
 				} catch (Exception e) {
@@ -839,14 +839,14 @@ public class Inventory extends SubMenu {
 					if (i >= list.size())
 						break;
 					Map.Entry<Item, Integer> entry = list.get(itemListSpan + i);
-					g.drawString(entry.getKey().getName(), 8 * (Tile.WIDTH / 2),
-							((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 3);
+					g.drawString(entry.getKey().getName(), 8 * (InterfaceTile.WIDTH / 2),
+							((InterfaceTile.HEIGHT) + (InterfaceTile.HEIGHT * i)) + 3);
 					int value = entry.getValue().intValue();
 					if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null
 							&& this.category != Category.KEYITEMS) {
 						String string = "*" + Integer.toString(value);
-						g.drawString(string, 8 * (Tile.WIDTH / 2) + ((12 - string.length()) * (Tile.WIDTH / 2)),
-								((Tile.HEIGHT) + (Tile.HEIGHT * i)) + 4);
+						g.drawString(string, 8 * (InterfaceTile.WIDTH / 2) + ((12 - string.length()) * (InterfaceTile.WIDTH / 2)),
+								((InterfaceTile.HEIGHT) + (InterfaceTile.HEIGHT * i)) + 4);
 					}
 				}
 			} catch (Exception e) {

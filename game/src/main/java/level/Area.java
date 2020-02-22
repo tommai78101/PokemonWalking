@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import abstracts.Entity;
 import entity.Player;
-import entity.Tile;
+import interfaces.InterfaceTile;
 import obstacle.Obstacle;
 import screen.BaseBitmap;
 import screen.BaseScreen;
@@ -525,8 +525,8 @@ public class Area extends Entity {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
-				screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
-				screen.blitBiome(data.getBitmap(), x * Tile.WIDTH - xOff, y * Tile.HEIGHT - yOff, data);
+				screen.blitBiome(data.getBiomeBitmap(), x * InterfaceTile.WIDTH - xOff, y * InterfaceTile.HEIGHT - yOff, data);
+				screen.blitBiome(data.getBitmap(), x * InterfaceTile.WIDTH - xOff, y * InterfaceTile.HEIGHT - yOff, data);
 				if (x == this.player.getXInArea() && y == this.player.getYInArea()
 						&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
 					renderExitArrow(screen, xOff, yOff, data, x, y);
@@ -537,7 +537,7 @@ public class Area extends Entity {
 		if (this.trigger != null) {
 			screen.setOffset(0, 0);
 			this.trigger.render(screen, screen.getBufferedImage().createGraphics());
-			screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
+			screen.setOffset(screen.getWidth() / 2 - InterfaceTile.WIDTH, (screen.getHeight() - InterfaceTile.HEIGHT) / 2);
 		}
 	}
 
@@ -790,7 +790,7 @@ public class Area extends Entity {
 	private void renderExitArrow(BaseScreen screen, int xOff, int yOff, PixelData data, int x, int y) {
 		int height = this.getHeight();
 		if (y + 1 == height && this.player.getFacing() == Player.DOWN) {
-			screen.blitBiome(data.getBiomeBitmap(), x * Tile.WIDTH - xOff + 4, (y + 1) * Tile.HEIGHT - yOff + 2, data);
+			screen.blitBiome(data.getBiomeBitmap(), x * InterfaceTile.WIDTH - xOff + 4, (y + 1) * InterfaceTile.HEIGHT - yOff + 2, data);
 			this.displayExitArrow = true;
 		} else if (y == 0 && this.player.getFacing() == Player.UP) {
 			// TODO: Draw exit arrow point upwards.

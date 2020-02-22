@@ -18,7 +18,7 @@ import abstracts.Item;
 import abstracts.World;
 import dialogue.NewDialogue;
 import entity.Player;
-import entity.Tile;
+import interfaces.InterfaceTile;
 import item.ItemText;
 import main.Game;
 import obstacle.Obstacle;
@@ -380,7 +380,7 @@ public class OverWorld extends World {
 		// OverWorld offsets are not set.
 		// Setting area offsets with player positions
 
-		screen.setOffset(screen.getWidth() / 2 - Tile.WIDTH, (screen.getHeight() - Tile.HEIGHT) / 2);
+		screen.setOffset(screen.getWidth() / 2 - InterfaceTile.WIDTH, (screen.getHeight() - InterfaceTile.HEIGHT) / 2);
 		if (this.currentArea != null)
 			this.currentArea.render(screen, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
