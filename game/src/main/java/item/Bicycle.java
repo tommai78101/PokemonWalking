@@ -10,10 +10,10 @@
 
 package item;
 
+import entity.Player;
 import level.WorldConstants;
 import main.Game;
-import main.Game.State;
-import entity.Player;
+import main.StateManager.GameState;
 
 public class Bicycle extends ActionItem {
 
@@ -50,7 +50,7 @@ public class Bicycle extends ActionItem {
 				}
 			}).start();
 			this.description = DISABLING_DESCRIPTION;
-			this.game.setState(State.GAME);
+			this.game.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
 			this.game.getStartMenu().closeMenu();
 		}
 	}
@@ -76,7 +76,7 @@ public class Bicycle extends ActionItem {
 				}
 			}).start();
 			this.description = ENABLING_DESCRIPTION;
-			this.game.setState(State.GAME);
+			this.game.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
 			this.game.getStartMenu().closeMenu();
 		}
 	}

@@ -13,9 +13,9 @@ package saving;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-import interfaces.InterfaceChunkInfo;
+import interfaces.RandomFileAccessible;
 
-public class HeaderInfo implements InterfaceChunkInfo {
+public class HeaderInfo implements RandomFileAccessible {
 	public final byte[] header_id = "HEAD".getBytes();
 	public final byte[] header_version = "0001".getBytes();
 	public final byte[] header_format = ".SAV".getBytes();

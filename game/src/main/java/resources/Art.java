@@ -291,11 +291,11 @@ public class Art {
 		shadow = BaseScreen.load("art/player/shadow.png");
 
 		// Areas
-		testArea = BaseScreen.load("area/test/testArea.png");
-		testArea2 = BaseScreen.load("area/test/testArea2.png");
+		testArea = BaseScreen.load("art/area/test/testArea.png");
+		testArea2 = BaseScreen.load("art/area/test/testArea2.png");
 
 		// Miscellaneous
-		font = loadFont("font/font.ttf");
+		font = loadFont("art/font/font.ttf");
 
 	}
 

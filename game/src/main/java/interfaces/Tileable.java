@@ -10,11 +10,7 @@
 
 package interfaces;
 
-import java.io.IOException;
-import java.io.RandomAccessFile;
-
-public interface InterfaceChunkInfo {
-	public void read(RandomAccessFile raf) throws IOException;
-
-	public void write(RandomAccessFile raf) throws IOException;
+public interface Tileable {
+	public static int WIDTH = 16;
+	public static int HEIGHT = 16;
 }

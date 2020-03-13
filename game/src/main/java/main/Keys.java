@@ -13,6 +13,16 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * <p>
+ * WASD / Arrow Keys = Directional Input
+ * <p>
+ * Z / Forward Slash = Primary Action
+ * <p>
+ * X / Period = Secondary Action
+ * <p>
+ * Enter = Start Button
+ */
 public class Keys {
 	public class Key {
 		public final String name;

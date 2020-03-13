@@ -24,7 +24,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import editor.EditorConstants.Metadata;
-import interfaces.InterfaceTile;
+import interfaces.Tileable;
 import script_editor.ScriptEditor;
 
 //TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating 
@@ -224,12 +224,12 @@ public class LevelEditor extends JFrame {
 						int w = 0;
 						int h = 0;
 						try {
-							w = (input.offsetX + input.mouseX) / InterfaceTile.WIDTH;
+							w = (input.offsetX + input.mouseX) / Tileable.WIDTH;
 						} catch (Exception e) {
 							w = (input.offsetX + input.mouseX) / (WIDTH * SIZE);
 						}
 						try {
-							h = (input.offsetY + input.mouseY) / InterfaceTile.HEIGHT;
+							h = (input.offsetY + input.mouseY) / Tileable.HEIGHT;
 						} catch (Exception e) {
 							h = (input.offsetY + input.mouseY) / (WIDTH * SIZE);
 						}

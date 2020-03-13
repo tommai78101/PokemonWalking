@@ -10,11 +10,11 @@
 
 package item;
 
-import main.Game;
-import main.Game.State;
 import abstracts.Item;
 import entity.Player;
 import level.Area;
+import main.Game;
+import main.StateManager.GameState;
 
 public class DummyItem extends Item {
 	public DummyItem(Game game, String name, String description, Category category, int id) {
@@ -27,9 +27,9 @@ public class DummyItem extends Item {
 
 	@Override
 	public void doAction() {
-		game.getBaseScreen().setRenderingEffectTick((byte) 0x0);
-		game.setState(State.PAUSED);
-		game.getStartMenu().openMenu();
+		this.game.getBaseScreen().setRenderingEffectTick((byte) 0x0);
+		this.game.getStateManager().setCurrentGameState(GameState.START_MENU);
+		this.game.getStartMenu().openMenu();
 	}
 
 	@Override

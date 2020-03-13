@@ -10,14 +10,15 @@
 
 package entity;
 
-import abstracts.Entity;
-import interfaces.InterfaceTile;
+import abstracts.Character;
+import interfaces.Tileable;
 import level.Area;
+import level.PixelData;
 import main.Keys;
 import resources.Art;
 import screen.BaseScreen;
 
-public class Player extends Entity {
+public class Player extends Character {
 	public static boolean isMovementsLocked() {
 		return movementLock;
 	}
@@ -33,24 +34,23 @@ public class Player extends Entity {
 	public Keys keys;
 	private byte animationTick = 0;
 	private byte animationPointer = 0;
-	private GenderType gender = GenderType.Nondetermined;
 
 	// These are based on the art sprite in the resource folder. The numbers are
 	// used to get elements from a 2D array.
-	private int lastFacing = 0;
 	private int walking = 0;
 	private int xAccel;
 	private int yAccel;
 	private int oldXPosition;
 	private int oldYPosition;
 	private boolean lockWalking;
+	private boolean lockSprinting;
 	private boolean lockJumping;
-	private boolean[] facingsBlocked = new boolean[4];
+	private final boolean[] facingsBlocked = new boolean[4];
 	private boolean isInWater;
 	private boolean isOnBicycle;
 	private boolean isColliding;
 	private static boolean movementLock;
-	private int interactionID;
+
 	private boolean enableInteraction;
 	private boolean jumpHeightSignedFlag = false;
 	private int varyingJumpHeight = 0;
@@ -65,11 +65,13 @@ public class Player extends Entity {
 	/**
 	 * Constructs a Player object in the game. This must be loaded in ONCE.
 	 * 
-	 * @param Keys Takes in the Keys object the input handler is controlling. It must not take in an uncontrolled Keys object.
+	 * @param Keys
+	 *            Takes in the Keys object the input handler is controlling. It must not take in an uncontrolled Keys object.
 	 */
-	public Player(Keys keys) {
+	public Player(final Keys keys) {
 		this.keys = keys;
 		this.automaticMode = false;
+		this.setCharacterPlayable(true);
 	}
 
 	/**
@@ -85,7 +87,7 @@ public class Player extends Entity {
 		this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 
 		if (this.xAccel == 0 && this.yAccel == 0) {
-			switch (this.facing) {
+			switch (this.getFacing()) {
 				case UP:
 					this.yAccel--;
 					break;
@@ -102,19 +104,6 @@ public class Player extends Entity {
 		}
 	}
 
-	public int getInteractionID() {
-		return this.interactionID;
-	}
-
-	/**
-	 * Gets a value that determines the direction the player had last been facing towards at.
-	 * 
-	 * @return An integer of one of the followings: Player.UP, Player.DOWN, Player.LEFT, Player.RIGHT.
-	 */
-	public int getLastFacing() {
-		return lastFacing;
-	}
-
 	/**
 	 * Changes the player's state to Walking.
 	 */
@@ -125,13 +114,13 @@ public class Player extends Entity {
 			public void run() {
 				try {
 					Thread.sleep(250);
-				} catch (InterruptedException e) {
 				}
+				catch (final InterruptedException e) {}
 				isOnBicycle = false;
 				try {
 					Thread.sleep(250);
-				} catch (InterruptedException e) {
 				}
+				catch (final InterruptedException e) {}
 				Player.unlockMovements();
 			}
 		}).start();
@@ -139,9 +128,9 @@ public class Player extends Entity {
 
 	public int getXInArea() {
 		// Returns area position X.
-		int result = (xPosition / InterfaceTile.WIDTH);
+		int result = (xPosition / Tileable.WIDTH);
 		if (this.lockWalking)
-			switch (facing) {
+			switch (this.getFacing()) {
 				case LEFT:
 					break;
 				case RIGHT:
@@ -153,9 +142,9 @@ public class Player extends Entity {
 
 	public int getYInArea() {
 		// Returns area position Y.
-		int result = (yPosition / InterfaceTile.HEIGHT);
+		int result = (yPosition / Tileable.HEIGHT);
 		if (this.lockWalking)
-			switch (facing) {
+			switch (this.getFacing()) {
 				case UP:
 					break;
 				case DOWN:
@@ -173,12 +162,7 @@ public class Player extends Entity {
 		this.isOnBicycle = false;
 	}
 
-	public boolean hasChangedFacing() {
-		// True, if current facing has been changed.
-		return this.lastFacing != this.facing;
-	}
-
-	public void initialize(Area area) {
+	public void initialize(final Area area) {
 		area.setPlayerX(this.getXInArea());
 		area.setPlayerY(this.getYInArea());
 	}
@@ -186,13 +170,17 @@ public class Player extends Entity {
 	/**
 	 * Lets the player interact with the data tile ID.
 	 * 
-	 * @param dataColor The tile ID's full data (the color of the tile).
+	 * @param dataColor
+	 *            The tile ID's full data (the color of the tile).
 	 */
-	public void interact(int dataColor) {
-		int alpha = (dataColor >> 24) & 0xFF;
+	@Override
+	public void interact(PixelData data) {
+		final int dataColor = data.getColor();
+		final int alpha = (dataColor >> 24) & 0xFF;
 		// int red = (dataColor >> 16) & 0xFF;
 		switch (alpha) {
 			case 0x03: {// Obstacles
+				// Red color values indicate the type of obstacles to filter:
 				// case 0x00: // Small tree
 				// case 0x01: //Logs
 				// case 0x02: //Planks
@@ -205,8 +193,8 @@ public class Player extends Entity {
 						Player.unlockMovements();
 					break;
 				}
-				if (!movementLock) {
-					if (this.interactionID != 0) {
+				if (!Player.isMovementsLocked()) {
+					if (this.getInteractableID() != 0) {
 						this.enableInteraction = false;
 						return;
 					}
@@ -214,7 +202,7 @@ public class Player extends Entity {
 						this.enableInteraction = true;
 				}
 				if (this.enableInteraction)
-					this.interactionID = dataColor;
+					this.setInteractableID(dataColor);
 				break;
 			}
 			case 0x0A: {// Item
@@ -222,8 +210,8 @@ public class Player extends Entity {
 				// (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)){
 				// this.keys.Z.lastKeyState = true;
 				// this.keys.SLASH.lastKeyState = true;
-				if (!movementLock) {
-					if (this.interactionID != 0) {
+				if (!Player.isMovementsLocked()) {
+					if (this.getInteractableID() != 0) {
 						this.enableInteraction = false;
 						return;
 					}
@@ -232,7 +220,7 @@ public class Player extends Entity {
 					// }
 				}
 				if (this.enableInteraction)
-					this.interactionID = dataColor;
+					this.setInteractableID(dataColor);
 				break;
 			}
 			default:
@@ -245,9 +233,9 @@ public class Player extends Entity {
 		return this.isColliding;
 	}
 
-	public boolean isFacingAt(int x, int y) {
+	public boolean isFacingAt(final int x, final int y) {
 		int xTgt = 0, yTgt = 0;
-		switch (this.facing) {
+		switch (this.getFacing()) {
 			case Player.UP:
 				xTgt = this.getXInArea();
 				yTgt = this.getYInArea() - 1;
@@ -285,6 +273,10 @@ public class Player extends Entity {
 		return this.lockJumping;
 	}
 
+	public boolean isLockedSprinting() {
+		return this.lockSprinting;
+	}
+
 	/**
 	 * Checks to see if the player is currently locked to walking.
 	 * 
@@ -304,6 +296,209 @@ public class Player extends Entity {
 	}
 
 	/**
+	 * <p>
+	 * Handles the 4 surrounding tiles around the player character, in the cardinal directions of north, west, south, and east. Once the player is interacting with one of the tiles, the area will remember and mark the tile's interaction ID, and pass it to the OverWorld to handle.
+	 * </p>
+	 * 
+	 * @return Nothing.
+	 */
+	public void handleSurroundingTiles(Area area) {
+		boolean upDirection = this.checkSurroundingData(area, 0, -1);
+		boolean downDirection = this.checkSurroundingData(area, 0, 1);
+		boolean leftDirection = this.checkSurroundingData(area, -1, 0);
+		boolean rightDirection = this.checkSurroundingData(area, 1, 0);
+		this.setAllBlockingDirections(upDirection, downDirection, leftDirection, rightDirection);
+
+		int playerAreaX = this.getXInArea();
+		int playerAreaY = this.getYInArea();
+		
+		try {
+			if (this.isInteracting()) {
+				switch (this.getFacing()) {
+					case Player.UP:
+						this.interact(area.getPixelData(playerAreaX, playerAreaY - 1));
+						break;
+					case Player.DOWN:
+						this.interact(area.getPixelData(playerAreaX, playerAreaY + 1));
+						break;
+					case Player.LEFT:
+						this.interact(area.getPixelData(playerAreaX - 1, playerAreaY));
+						break;
+					case Player.RIGHT:
+						this.interact(area.getPixelData(playerAreaX + 1, playerAreaY));
+						break;
+				}
+			}
+		}
+		catch (Exception e) {
+			this.stopInteraction();
+		}
+		
+		// Target pixel is used to determine what pixel the player is currently standing
+		// on (or what pixel the player is currently on top of).
+		area.checkCurrentPositionDataAndSetProperties(area.getPixelData(playerAreaX, playerAreaY));
+	}
+
+	/**
+	 * Checks the pixel data and sets properties according to the documentation provided. The tile the pixel data is representing determines whether it should allow or block the player from walking towards it.
+	 * 
+	 * <p>
+	 * In other words, this is the method call that works out the collision detection/response in the game.
+	 * 
+	 * @param xOffset
+	 *            Sets the offset of the PixelData it should check by the X axis.
+	 * @param yOffset
+	 *            Sets the offset of the PixelData it should check by the Y axis.
+	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through. Returns true to block the player from walking from the player's last position to this tile. Returns false to allow player to walk from the player's last position to this tile.
+	 */
+	public boolean checkSurroundingData(Area area, int xOffset, int yOffset) {
+		PixelData data = null;
+		int playerAreaX = this.getXInArea();
+		int playerAreaY = this.getYInArea();
+		try {
+			data = area.getPixelData(playerAreaX + xOffset, playerAreaY + yOffset);
+		}
+		catch (Exception e) {
+			// This means it is out of the area boundaries.
+			data = null;
+		}
+		if (data == null)
+			return true;
+		int color = data.getColor();
+		int alpha = (color >> 24) & 0xFF;
+		int red = (color >> 16) & 0xFF;
+		// int green = (color >> 8) & 0xFF;
+		// int blue = color & 0xFF;
+		switch (alpha) {
+			case 0x01: // Paths
+				return false;
+			case 0x02: // Ledge
+			{
+				switch (red) {
+					/*
+					 * TODO: Incorporate pixel data facingsBlocked variable to this section.
+					 * Currently, the facingsBlocked[] variable for each pixel data isn't used.
+					 */
+					case 0x00: { // Bottom
+						int y = playerAreaY + yOffset;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(0, 2) >> 24) & 0xFF, 0x02, 0x03))
+							return true;
+						if (playerAreaY < y)
+							return false;
+						return true;
+					}
+					case 0x01: // Bottom Left
+						return true;
+					case 0x02: {// Left
+						int x = playerAreaX + xOffset;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(-2, 0) >> 24) & 0xFF, 0x02, 0x03))
+							return true;
+						if (playerAreaX > x)
+							return false;
+						return true;
+					}
+					case 0x03: // Top Left
+						return true;
+					case 0x04: {// Top
+						int y = playerAreaY + yOffset;
+						if (playerAreaY > y)
+							return false;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(0, -2) >> 24) & 0xFF, 0x02))
+							return true;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(-1, 0) >> 16) & 0xFF, 0x04))
+							return false;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(1, 0) >> 16) & 0xFF, 0x04))
+							return false;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(0, -2) >> 24) & 0xFF, 0x03))
+							return true;
+						return true;
+					}
+					case 0x05: // Top Right
+						return true;
+					case 0x06: { // Right
+						int x = playerAreaX + xOffset;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(2, 0) >> 24) & 0xFF, 0x02, 0x03))
+							return true;
+						if (playerAreaX < x)
+							return false;
+						return true;
+					}
+					case 0x07: // Bottom Right
+						// TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!
+						return true;
+					case 0x18: // Inner bottom left
+					case 0x19: // Inner bottom right
+						return true;
+
+					// ------------------------- MOUNTAIN LEDGES ------------------------
+					case 0x0C:
+						int y = playerAreaY + yOffset;
+						if (playerAreaY > y)
+							return false;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(-1, 0) >> 16) & 0xFF, 0x0C))
+							return false;
+						if (area.checkIfValuesAreAllowed((area.getTileColor(1, 0) >> 16) & 0xFF, 0x0C))
+							return false;
+						return true;
+					default:
+						break;
+				}
+				break;
+			}
+			case 0x03: // Obstacle
+				switch (red) {
+					default:
+						if (this.isInteracting())
+							return true;
+						if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset)) {
+							if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
+								&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+								this.startInteraction();
+								this.keys.Z.lastKeyState = true;
+								this.keys.SLASH.lastKeyState = true;
+							}
+						}
+						return true;
+				}
+			case 0x04: // Warp point
+				return false;
+			case 0x05: // Area Connection point.
+				return false;
+			case 0x06: // Stairs
+				return false;
+			case 0x07: // Water
+				// TODO: Add something that detects a special boolean value in order to let the
+				// player move on water.
+				return false;
+			case 0x08: // House
+				return true;
+			case 0x09: // House Door
+				// TODO (6/18/2015): Door needs to be checked for null areas. If null areas are
+				// found, default to locked doors.
+				return false;
+			case 0x0A: // Item
+				if (this.isInteracting())
+					return true;
+				if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset)) {
+					if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
+						&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+						this.startInteraction();
+						this.keys.Z.lastKeyState = true;
+						this.keys.SLASH.lastKeyState = true;
+					}
+				}
+				return true; // Cannot go through items on the ground.
+			case 0x0B: // Carpet (Indoors)
+			case 0x0C: // Carpet (Outdoors)
+			case 0x0D: // Default starting point.
+				return false;
+			default: // Any other type of tiles should be walkable, for no apparent reasons.
+				return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Changes the player's state to Walking.
 	 */
 	public void leavesWater() {
@@ -315,21 +510,24 @@ public class Player extends Entity {
 		this.lockWalking = false;
 		this.lockJumping = false;
 		this.enableInteraction = false;
-		this.facing = Player.DOWN;
 		this.animationTick = 0x7;
+		this.setFacing(Player.DOWN);
 	}
 
 	/**
 	 * Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
 	 * 
-	 * @param output Where the bitmap is to be blitted.
-	 * @param x      Pixel X offset.
-	 * @param y      Pixel Y offset.
+	 * @param output
+	 *            Where the bitmap is to be blitted.
+	 * @param x
+	 *            Pixel X offset.
+	 * @param y
+	 *            Pixel Y offset.
 	 * @return Nothing.
 	 * 
 	 */
 	@Override
-	public void render(BaseScreen output, int x, int y) {
+	public void render(final BaseScreen output, final int x, final int y) {
 		if (this.lockJumping) {
 			// Jumping has a higher priority than walking.
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
@@ -338,7 +536,8 @@ public class Player extends Entity {
 				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 			else
 				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
-		} else if (this.lockWalking) {
+		}
+		else if (this.lockWalking) {
 			// Walking animation
 			if (this.isInWater)
 				output.npcBlit(Art.player_surf[walking][animationPointer], this.xOffset + x, this.yOffset + y);
@@ -346,11 +545,12 @@ public class Player extends Entity {
 				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y);
 			else
 				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
-		} else {
+		}
+		else {
 			// Key press detection.
-			boolean wasdKeyPressedDown = (keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown);
-			boolean arrowKeyPressedDown = (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown);
-			boolean canUserMove = (wasdKeyPressedDown || arrowKeyPressedDown) && !Player.movementLock;
+			final boolean wasdKeyPressedDown = (keys.S.isPressedDown || keys.W.isPressedDown || keys.A.isPressedDown || keys.D.isPressedDown);
+			final boolean arrowKeyPressedDown = (keys.down.isPressedDown || keys.up.isPressedDown || keys.left.isPressedDown || keys.right.isPressedDown);
+			final boolean canUserMove = (wasdKeyPressedDown || arrowKeyPressedDown) && !Player.movementLock;
 
 			// Player state
 			if (this.isInWater && this.isOnBicycle) {
@@ -362,37 +562,40 @@ public class Player extends Entity {
 			if (this.isInWater) {
 				// Surfing (has higher priority than bicycling)
 				if (canUserMove)
-					output.npcBlit(Art.player_surf[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+					output.npcBlit(Art.player_surf[this.getFacing()][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
-					output.npcBlit(Art.player_surf[facing][0], this.xOffset + x, this.yOffset + y);
-			} else if (this.isOnBicycle) {
+					output.npcBlit(Art.player_surf[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
+			}
+			else if (this.isOnBicycle) {
 				// Riding (has lower priority than surfing)
 				if (canUserMove)
-					output.npcBlit(Art.player_bicycle[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+					output.npcBlit(Art.player_bicycle[this.getFacing()][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
-					output.npcBlit(Art.player_bicycle[facing][0], this.xOffset + x, this.yOffset + y);
-			} else {
+					output.npcBlit(Art.player_bicycle[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
+			}
+			else {
 				// Walking
 				if (canUserMove)
-					output.npcBlit(Art.player[facing][animationPointer], this.xOffset + x, this.yOffset + y);
+					output.npcBlit(Art.player[this.getFacing()][animationPointer], this.xOffset + x, this.yOffset + y);
 				else
-					output.npcBlit(Art.player[facing][0], this.xOffset + x, this.yOffset + y);
+					output.npcBlit(Art.player[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
 			}
 		}
 	}
 
 	/**
-	 * Sets where each of the four directions are blocked by obstacles in front of the player. The obstacles are in front of the player, when
-	 * the player is facing towards them. That is the time to check and see if the obstacle is blocking the player or not.
+	 * Sets where each of the four directions are blocked by obstacles in front of the player. The obstacles are in front of the player, when the player is facing towards them. That is the time to check and see if the obstacle is blocking the player or not.
 	 * 
-	 * @param up    If an obstacle is in front of the player when the player is facing towards NORTH, or UP, then up is true. False, otherwise.
-	 * @param down  If an obstacle is below of the player when the player is facing towards SOUTH, or DOWN, then down is true. False, otherwise.
-	 * @param left  If an obstacle is to the left of the player when the player is facing towards WEST, or LEFT, then left is true. False,
-	 *              otherwise.
-	 * @param right If an obstacle is to the right of the player when the player is facing towards EAST, or RIGHT, then right is true. False,
-	 *              otherwise.
+	 * @param up
+	 *            If an obstacle is in front of the player when the player is facing towards NORTH, or UP, then up is true. False, otherwise.
+	 * @param down
+	 *            If an obstacle is below of the player when the player is facing towards SOUTH, or DOWN, then down is true. False, otherwise.
+	 * @param left
+	 *            If an obstacle is to the left of the player when the player is facing towards WEST, or LEFT, then left is true. False, otherwise.
+	 * @param right
+	 *            If an obstacle is to the right of the player when the player is facing towards EAST, or RIGHT, then right is true. False, otherwise.
 	 */
-	public void setAllBlockingDirections(boolean up, boolean down, boolean left, boolean right) {
+	public void setAllBlockingDirections(final boolean up, final boolean down, final boolean left, final boolean right) {
 		this.facingsBlocked[UP] = up;
 		this.facingsBlocked[DOWN] = down;
 		this.facingsBlocked[LEFT] = left;
@@ -408,22 +611,25 @@ public class Player extends Entity {
 	 * <p>
 	 * <i>Note that the player's X and Y positions are overwritten by the loading system.</i>
 	 * 
-	 * @param x The X coordinate the player is to be positioned at.
-	 * @param y The Y coordinate the player is to be positioned at.
+	 * @param x
+	 *            The X coordinate the player is to be positioned at.
+	 * @param y
+	 *            The Y coordinate the player is to be positioned at.
 	 * @return Nothing.
 	 */
-	public void setAreaPosition(int x, int y) {
-		this.setPosition(x * InterfaceTile.WIDTH, y * InterfaceTile.HEIGHT);
+	public void setAreaPosition(final int x, final int y) {
+		this.setPosition(x * Tileable.WIDTH, y * Tileable.HEIGHT);
 	}
 
 	/**
 	 * Moves the Player object to the center of the screen.
 	 * 
-	 * @param BaseScreen Pans the screen immediately so that the Player object is in the center of the screen.
+	 * @param BaseScreen
+	 *            Pans the screen immediately so that the Player object is in the center of the screen.
 	 * @return Nothing.
 	 */
-	public void setCenterCamPosition(BaseScreen screen) {
-		this.setRenderOffset(screen.getWidth() / 2 - InterfaceTile.WIDTH, (screen.getHeight() - InterfaceTile.HEIGHT) / 2);
+	public void setCenterCamPosition(final BaseScreen screen) {
+		this.setRenderOffset(screen.getWidth() / 2 - Tileable.WIDTH, (screen.getHeight() - Tileable.HEIGHT) / 2);
 	}
 
 	/**
@@ -432,25 +638,26 @@ public class Player extends Entity {
 	 * 
 	 * Note: An example on how to determine player direction for the tile to allow and block:
 	 * <ul>
-	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the
-	 * parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It
-	 * means, the tile above X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the
-	 * tile above X (the UP tile) to jump across to the tile below X, but not the other way around.
+	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means, the tile above
+	 * X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X (the UP tile) to jump across to the tile below X, but not the other way around.
 	 * </ul>
 	 * 
 	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or Player.RIGHT.
 	 * <p>
 	 * 
-	 * @param red   The red value of the pixel color.
-	 * @param green The green value of the pixel color.
-	 * @param blue  The blue value of the pixel color.
-	 * @param from  The player direction the tile allows the player to jump from. Player direction is determined from where the tile is located.
-	 *              The player direction must not be the same as the "to" parameter.
-	 * @param to    The player direction the tile allows the player to jump to. Player direction is determined from where the tile is located.
-	 *              The player direction must not be the same as the "from" parameter.
+	 * @param red
+	 *            The red value of the pixel color.
+	 * @param green
+	 *            The green value of the pixel color.
+	 * @param blue
+	 *            The blue value of the pixel color.
+	 * @param from
+	 *            The player direction the tile allows the player to jump from. Player direction is determined from where the tile is located. The player direction must not be the same as the "to" parameter.
+	 * @param to
+	 *            The player direction the tile allows the player to jump to. Player direction is determined from where the tile is located. The player direction must not be the same as the "from" parameter.
 	 * @return Nothing.
 	 */
-	public void setLockJumping(int red, int green, int blue, int from, int to) {
+	public void setLockJumping(final int red, final int green, final int blue, final int from, final int to) {
 		if (from == to)
 			throw new IllegalArgumentException("The parameters, from and to, must not be the same.");
 		switch (red) {
@@ -495,11 +702,11 @@ public class Player extends Entity {
 		}
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
-	public void setRenderOffset(int x, int y) {
+	public void setRenderOffset(final int x, final int y) {
 		this.xOffset = x;
 		this.yOffset = y;
 	}
@@ -508,7 +715,7 @@ public class Player extends Entity {
 		if (this.enableInteraction)
 			return;
 		this.enableInteraction = true;
-		this.interactionID = 0;
+		this.setInteractableID(0);
 	}
 
 	// -------------------------------------------------------------------------------------
@@ -525,17 +732,18 @@ public class Player extends Entity {
 				public void run() {
 					try {
 						Thread.sleep(250);
-					} catch (InterruptedException e) {
 					}
-					isOnBicycle = true;
+					catch (final InterruptedException e) {}
+					Player.this.isOnBicycle = true;
 					try {
 						Thread.sleep(250);
-					} catch (InterruptedException e) {
 					}
+					catch (final InterruptedException e) {}
 					Player.unlockMovements();
 				}
 			}).start();
-		} else
+		}
+		else
 			this.warningsTriggered = true;
 	}
 
@@ -567,59 +775,63 @@ public class Player extends Entity {
 		}
 		if (!this.lockJumping) {
 			if (!this.enableInteraction) {
-				walk();
-				handleMovementCheck();
+				input();
+				handleMovement();
 				controlTick();
-			} else {
+			}
+			else {
 				stopAnimation();
 			}
-		} else
+		}
+		else
 			jump();
-	}
-
-	public void setGender(GenderType value) {
-		this.gender = value;
-	}
-
-	public GenderType getGender() {
-		return this.gender;
 	}
 
 	// ---------------------------------------------------------------------
 	// Private methods
 
-	private void checkFacing() {
+	private void checkFacingInput() {
 		if (keys.up.isTappedDown || keys.up.isPressedDown || keys.W.isTappedDown || keys.W.isPressedDown) {
-			facing = UP;
-		} else if (keys.down.isTappedDown || keys.down.isPressedDown || keys.S.isTappedDown || keys.S.isPressedDown) {
-			facing = DOWN;
-		} else if (keys.left.isTappedDown || keys.left.isPressedDown || keys.A.isTappedDown || keys.A.isPressedDown) {
-			facing = LEFT;
-		} else if (keys.right.isTappedDown || keys.right.isPressedDown || keys.D.isTappedDown || keys.D.isPressedDown) {
-			facing = RIGHT;
+			this.setFacing(Player.UP);
+		}
+		else if (keys.down.isTappedDown || keys.down.isPressedDown || keys.S.isTappedDown || keys.S.isPressedDown) {
+			this.setFacing(Player.DOWN);
+		}
+		else if (keys.left.isTappedDown || keys.left.isPressedDown || keys.A.isTappedDown || keys.A.isPressedDown) {
+			this.setFacing(Player.LEFT);
+		}
+		else if (keys.right.isTappedDown || keys.right.isPressedDown || keys.D.isTappedDown || keys.D.isPressedDown) {
+			this.setFacing(Player.RIGHT);
+		}
+		else {
+			// Do nothing with the directional facing here.
 		}
 	}
 
 	private void controlTick() {
 		if (!this.lockWalking || !this.lockJumping) {
 			animationTick++;
-			if ((this.facing == UP && this.facingsBlocked[UP])) {
+			if ((this.getFacing() == UP && this.facingsBlocked[UP])) {
 				if (animationTick >= 10) {
 					animationTick = 0;
 				}
-			} else if ((this.facing == DOWN && this.facingsBlocked[DOWN])) {
+			}
+			else if ((this.getFacing() == DOWN && this.facingsBlocked[DOWN])) {
 				if (animationTick >= 10) {
 					animationTick = 0;
 				}
-			} else if ((this.facing == LEFT && this.facingsBlocked[LEFT])) {
+			}
+			else if ((this.getFacing() == LEFT && this.facingsBlocked[LEFT])) {
 				if (animationTick >= 10) {
 					animationTick = 0;
 				}
-			} else if ((this.facing == RIGHT && this.facingsBlocked[RIGHT])) {
+			}
+			else if ((this.getFacing() == RIGHT && this.facingsBlocked[RIGHT])) {
 				if (animationTick >= 10) {
 					animationTick = 0;
 				}
-			} else {
+			}
+			else {
 				if (animationTick >= 4)
 					animationTick = 0;
 			}
@@ -632,8 +844,8 @@ public class Player extends Entity {
 	}
 
 	private void handleFacingCheck() {
-		if (this.walking != this.facing) {
-			this.walking = this.facing;
+		if (this.walking != this.getFacing()) {
+			this.walking = this.getFacing();
 		}
 	}
 
@@ -641,43 +853,22 @@ public class Player extends Entity {
 	 * Makes adjustments to the player's position when the player is walking.
 	 * 
 	 * <p>
-	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the
-	 * player wanted to walk.
+	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player wanted to walk.
 	 * 
 	 * @return Nothing.
 	 */
-	private void handleMovementCheck() {
+	private void handleMovement() {
 		// Check if player is currently locked to walking.
 		if (this.lockWalking) {
-			// When being locked to walking, facing must stay constant.
-			handleFacingCheck();
-
-			// Makes sure the acceleration stays limited to 1 pixel/tick.
-			if (xAccel > 1)
-				xAccel = 1;
-			if (xAccel < -1)
-				xAccel = -1;
-			if (yAccel > 1)
-				yAccel = 1;
-			if (yAccel < -1)
-				yAccel = -1;
-
-			if (!this.isOnBicycle && !Player.isMovementsLocked()) {
-				xPosition += xAccel * 2;
-				yPosition += yAccel * 2;
-			} else {
-				xPosition += xAccel * 4;
-				yPosition += yAccel * 4;
-			}
-
-			// Needs to get out of being locked to walking/jumping.
-			// Note that we cannot compare using ||, what if the player is moving in one
-			// direction? What about the other axis?
-			if ((xPosition % InterfaceTile.WIDTH == 0 && yPosition % InterfaceTile.HEIGHT == 0)) {
-				// Resets every flag that locks the player.
-				this.lockWalking = false;
-			}
-		} else {
+			this.walk();
+		}
+		else if (this.lockSprinting) {
+			this.sprint();
+		}
+		else if (this.isOnBicycle) {
+			this.ride();
+		}
+		else {
 			// Before we walk, check to see if the oldX and oldY are up-to-date with the
 			// latest X and Y.
 			if (this.oldXPosition != this.xPosition)
@@ -692,21 +883,22 @@ public class Player extends Entity {
 			// Check for inputs the player wants to face. Tapping in a direction turns the
 			// player around.
 			if (!movementLock)
-				checkFacing();
+				checkFacingInput();
 
 			// Now about to walk. First, check to see if there's an obstacle blocking the
 			// path.
-			if (this.facingsBlocked[this.facing]) {
+			if (this.facingsBlocked[this.getFacing()]) {
 				this.lockWalking = false;
 			}
 		}
 	}
 
-	private void jump() {
+	@Override
+	public void jump() {
 		if (this.lockJumping) {
 			// When being locked to walking, facing must stay constant.
-			if (this.walking != this.facing)
-				this.walking = this.facing;
+			if (this.walking != this.getFacing())
+				this.walking = this.getFacing();
 
 			// Also make sure it's currently not being blocked by anything (You're in the
 			// air)
@@ -736,7 +928,7 @@ public class Player extends Entity {
 			// Needs to get out of being locked to walking/jumping.
 			// Note that we cannot compare using ||, what if the player is moving in one
 			// direction? What about the other axis?
-			if ((xPosition % InterfaceTile.WIDTH == 0 && yPosition % InterfaceTile.HEIGHT == 0)) {
+			if ((xPosition % Tileable.WIDTH == 0 && yPosition % Tileable.HEIGHT == 0)) {
 				// Resets every flag that locks the player.
 				this.lockWalking = false;
 				this.lockJumping = false;
@@ -752,34 +944,37 @@ public class Player extends Entity {
 	private void pressed() {
 		xAccel = yAccel = 0;
 		if (keys.up.isPressedDown || keys.W.isPressedDown) {
-			if (facing != UP) {
-				facing = UP;
+			if (this.getFacing() != Player.UP) {
+				this.setFacing(Player.UP);
 			}
 			if (!this.facingsBlocked[UP]) {
 				this.lockWalking = true;
 				yAccel--;
 			}
-		} else if (keys.down.isPressedDown || keys.S.isPressedDown) {
-			if (facing != DOWN) {
-				facing = DOWN;
+		}
+		else if (keys.down.isPressedDown || keys.S.isPressedDown) {
+			if (this.getFacing() != Player.DOWN) {
+				this.setFacing(Player.DOWN);
 			}
-			if (!this.facingsBlocked[DOWN]) {
+			if (!this.facingsBlocked[Player.DOWN]) {
 				this.lockWalking = true;
 				yAccel++;
 			}
-		} else if (keys.left.isPressedDown || keys.A.isPressedDown) {
-			if (facing != LEFT) {
-				facing = LEFT;
+		}
+		else if (keys.left.isPressedDown || keys.A.isPressedDown) {
+			if (this.getFacing() != Player.LEFT) {
+				this.setFacing(Player.LEFT);
 			}
-			if (!this.facingsBlocked[LEFT]) {
+			if (!this.facingsBlocked[Player.LEFT]) {
 				this.lockWalking = true;
 				xAccel--;
 			}
-		} else if (keys.right.isPressedDown || keys.D.isPressedDown) {
-			if (facing != RIGHT) {
-				facing = RIGHT;
+		}
+		else if (keys.right.isPressedDown || keys.D.isPressedDown) {
+			if (this.getFacing() != Player.RIGHT) {
+				this.setFacing(Player.RIGHT);
 			}
-			if (!this.facingsBlocked[RIGHT]) {
+			if (!this.facingsBlocked[Player.RIGHT]) {
 				this.lockWalking = true;
 				xAccel++;
 			}
@@ -790,25 +985,28 @@ public class Player extends Entity {
 		animationTick = 0;
 		animationPointer = 0;
 		if (keys.up.isTappedDown || keys.W.isTappedDown) {
-			if (facing != UP) {
-				facing = UP;
+			if (this.getFacing() != Player.UP) {
+				this.setFacing(Player.UP);
 			}
-		} else if (keys.down.isTappedDown || keys.S.isTappedDown) {
-			if (facing != DOWN) {
-				facing = DOWN;
+		}
+		else if (keys.down.isTappedDown || keys.S.isTappedDown) {
+			if (this.getFacing() != Player.DOWN) {
+				this.setFacing(Player.DOWN);
 			}
-		} else if (keys.left.isTappedDown || keys.A.isTappedDown) {
-			if (facing != LEFT) {
-				facing = LEFT;
+		}
+		else if (keys.left.isTappedDown || keys.A.isTappedDown) {
+			if (this.getFacing() != Player.LEFT) {
+				this.setFacing(Player.LEFT);
 			}
-		} else if (keys.right.isTappedDown || keys.D.isTappedDown) {
-			if (facing != RIGHT) {
-				facing = RIGHT;
+		}
+		else if (keys.right.isTappedDown || keys.D.isTappedDown) {
+			if (this.getFacing() != Player.RIGHT) {
+				this.setFacing(Player.RIGHT);
 			}
 		}
 	}
 
-	private void walk() {
+	public void input() {
 		this.isColliding = false;
 		if (!this.lockWalking) {
 			if (!this.facingsBlocked[UP] && !movementLock) {
@@ -818,7 +1016,8 @@ public class Player extends Entity {
 					pressed();
 					return;
 				}
-			} else if (keys.up.isPressedDown || keys.W.isPressedDown) {
+			}
+			else if (keys.up.isPressedDown || keys.W.isPressedDown) {
 				this.isColliding = true;
 				return;
 			}
@@ -829,7 +1028,8 @@ public class Player extends Entity {
 					pressed();
 					return;
 				}
-			} else if (keys.down.isPressedDown || keys.S.isPressedDown) {
+			}
+			else if (keys.down.isPressedDown || keys.S.isPressedDown) {
 				this.isColliding = true;
 				return;
 			}
@@ -840,7 +1040,8 @@ public class Player extends Entity {
 					pressed();
 					return;
 				}
-			} else if (keys.left.isPressedDown || keys.A.isPressedDown) {
+			}
+			else if (keys.left.isPressedDown || keys.A.isPressedDown) {
 				this.isColliding = true;
 				return;
 			}
@@ -851,10 +1052,101 @@ public class Player extends Entity {
 					pressed();
 					return;
 				}
-			} else if (keys.right.isPressedDown || keys.D.isPressedDown) {
+			}
+			else if (keys.right.isPressedDown || keys.D.isPressedDown) {
 				this.isColliding = true;
 				return;
 			}
 		}
 	}
+
+	@Override
+	public void walk() {
+		// When being locked to walking, facing must stay constant.
+		handleFacingCheck();
+
+		// Makes sure the acceleration stays limited to 1 pixel/tick.
+		if (xAccel > 1)
+			xAccel = 1;
+		if (xAccel < -1)
+			xAccel = -1;
+		if (yAccel > 1)
+			yAccel = 1;
+		if (yAccel < -1)
+			yAccel = -1;
+
+		if (!this.isOnBicycle && !Player.isMovementsLocked()) {
+			xPosition += xAccel * 2;
+			yPosition += yAccel * 2;
+		}
+
+		// Needs to get out of being locked to walking/jumping.
+		// Note that we cannot compare using ||, what if the player is moving in one
+		// direction? What about the other axis?
+		if ((xPosition % Tileable.WIDTH == 0 && yPosition % Tileable.HEIGHT == 0)) {
+			// Resets every flag that locks the player.
+			this.lockWalking = false;
+		}
+	}
+
+	@Override
+	public void sprint() {
+		// When being locked to walking, facing must stay constant.
+		handleFacingCheck();
+
+		// Makes sure the acceleration stays limited to 1 pixel/tick.
+		if (xAccel > 1)
+			xAccel = 1;
+		if (xAccel < -1)
+			xAccel = -1;
+		if (yAccel > 1)
+			yAccel = 1;
+		if (yAccel < -1)
+			yAccel = -1;
+
+		if (!this.isOnBicycle && !Player.isMovementsLocked()) {
+			xPosition += xAccel * 4;
+			yPosition += yAccel * 4;
+		}
+
+		// Needs to get out of being locked to walking/jumping.
+		// Note that we cannot compare using ||, what if the player is moving in one
+		// direction? What about the other axis?
+		if ((xPosition % Tileable.WIDTH == 0 && yPosition % Tileable.HEIGHT == 0)) {
+			// Resets every flag that locks the player.
+			this.lockSprinting = false;
+		}
+	}
+
+	@Override
+	public void ride() {
+		// When being locked to walking, facing must stay constant.
+		handleFacingCheck();
+
+		// Makes sure the acceleration stays limited to 1 pixel/tick.
+		if (xAccel > 1)
+			xAccel = 1;
+		if (xAccel < -1)
+			xAccel = -1;
+		if (yAccel > 1)
+			yAccel = 1;
+		if (yAccel < -1)
+			yAccel = -1;
+
+		if (this.isOnBicycle && !Player.isMovementsLocked()) {
+			xPosition += xAccel * 8;
+			yPosition += yAccel * 8;
+		}
+
+		// Needs to get out of being locked to walking/jumping.
+		// Note that we cannot compare using ||, what if the player is moving in one
+		// direction? What about the other axis?
+		if ((xPosition % Tileable.WIDTH == 0 && yPosition % Tileable.HEIGHT == 0)) {
+			// Resets every flag that locks the player.
+			this.lockWalking = false;
+		}
+	}
+
+	@Override
+	public void swim() {}
 }

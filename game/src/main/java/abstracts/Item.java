@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import entity.Player;
-import interfaces.InterfaceItem;
+import interfaces.Renderable;
 import item.ActionItem;
 import item.Bicycle;
 import item.DummyItem;
@@ -35,7 +35,7 @@ import resources.Art;
 import screen.BaseScreen;
 import submenu.Inventory;
 
-public abstract class Item implements Comparable<Item>, InterfaceItem {
+public abstract class Item implements Comparable<Item>, Renderable {
 
 	public enum Category {
 		// @formatter:off

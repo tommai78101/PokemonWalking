@@ -10,30 +10,37 @@
 
 package abstracts;
 
-import interfaces.InterfaceGameObject;
-import interfaces.InterfaceTile;
+import interfaces.Tileable;
+import interfaces.UpdateRenderable;
+import level.PixelData;
 import screen.BaseBitmap;
 
-public abstract class Entity implements InterfaceTile, InterfaceGameObject {
-	public static final int UP = 2;
-	public static final int DOWN = 0;
-	public static final int LEFT = 1;
-	public static final int RIGHT = 3;
-
+/**
+ * Parent abstract class of all abstract classes.
+ * 
+ * Holds all basic data needed for everything Entity.
+ * 
+ * @author tlee
+ *
+ */
+public abstract class Entity implements Tileable, UpdateRenderable {
 	public int id;
-	public int facing = 0;
+	public int interactableID;
+	public boolean isRemoved;
 
+	protected byte typeId = 0;
 	protected int xPosition;
 	protected int yPosition;
 
 	protected int xOffset;
 	protected int yOffset;
 	protected BaseBitmap bitmap = null;
+	
+	protected int lastFacing = 0;
+	protected int facing = 0;
 
 	protected String name;
-
-	public boolean isRemoved;
-	protected byte typeId = 0;
+	protected PixelData pixelData;
 
 	// public abstract void initialize(BaseWorld world);
 
@@ -65,51 +72,46 @@ public abstract class Entity implements InterfaceTile, InterfaceGameObject {
 	}
 
 	/**
-	 * Gets a value that determines where the direction the entity is currently
-	 * facing towards.
+	 * Gets a value that determines where the direction the entity is currently facing towards.
 	 * 
-	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN,
-	 *         Entity.LEFT, Entity.RIGHT.
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
 	 */
 	public int getFacing() {
 		return this.facing;
 	}
 
 	/**
-	 * Sets a value that determines where the direction the entity is currently
-	 * facing towards.
+	 * Sets a value that determines where the direction the entity is currently facing towards.
 	 */
 	public void setFacing(int value) {
+		this.lastFacing = this.facing;
 		this.facing = value;
 	}
 
 	/**
-	 * Entity class objects include NPC, Player, and monsters. Thus, it is
-	 * fitting for the Entity objects to include a GenderType.
+	 * Gets a value that determines the direction the player had last been facing towards at.
+	 * 
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
 	 */
-	public enum GenderType {
-		// @formatter:off
-		Nondetermined((byte) 0x7F), 
-		Male((byte) 0x1), 
-		Female((byte) 0xFF);
-		// @formatter:on
+	public int getLastFacing() {
+		return this.lastFacing;
+	}
 
-		private byte typeId;
+	/**
+	 * Checks whether the entity object has recently changed its facing direction.
+	 * 
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
+	 */
+	public boolean hasChangedFacing() {
+		// True, if current facing has been changed.
+		return this.lastFacing != this.facing;
+	}
 
-		private GenderType(byte value) {
-			this.typeId = value;
-		}
-
-		public byte getByte() {
-			return this.typeId;
-		}
-
-		public static GenderType determineGender(byte value) {
-			if (value == Male.typeId)
-				return Male;
-			if (value == Female.typeId)
-				return Female;
-			return Nondetermined;
-		}
+	public PixelData getPixelData() {
+		return this.pixelData;
+	}
+	
+	public void setPixelData(PixelData data) {
+		this.pixelData = data;
 	}
 }

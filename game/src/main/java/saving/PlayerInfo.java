@@ -15,9 +15,9 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import interfaces.InterfaceChunkInfo;
+import interfaces.RandomFileAccessible;
 
-public class PlayerInfo implements InterfaceChunkInfo {
+public class PlayerInfo implements RandomFileAccessible {
 	public final byte[] player_name = new byte[16];
 	public final byte[] player_gender = new byte[1];
 	public final ArrayList<byte[]> startMenu = new ArrayList<byte[]>();

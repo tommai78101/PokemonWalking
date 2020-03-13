@@ -10,7 +10,11 @@
 
 package interfaces;
 
-public interface InterfaceTile {
-	public static int WIDTH = 16;
-	public static int HEIGHT = 16;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
+public interface RandomFileAccessible {
+	public void read(RandomAccessFile raf) throws IOException;
+
+	public void write(RandomAccessFile raf) throws IOException;
 }

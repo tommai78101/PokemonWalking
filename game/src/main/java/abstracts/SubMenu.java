@@ -17,12 +17,12 @@ package abstracts;
 
 import java.awt.Graphics;
 
-import interfaces.InterfaceMenu;
+import interfaces.MenuDisplayable;
 import main.Game;
 import main.Keys;
 import screen.BaseScreen;
 
-public abstract class SubMenu implements InterfaceMenu {
+public abstract class SubMenu implements MenuDisplayable {
 
 	protected boolean subMenuActivation;
 

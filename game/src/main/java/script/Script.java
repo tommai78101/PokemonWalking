@@ -9,8 +9,8 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
 
-import abstracts.Entity;
 import dialogue.NewDialogue;
+import entity.Player;
 
 public class Script {
 	public int triggerID;
@@ -28,12 +28,12 @@ public class Script {
 
 	public Script() {
 		this.triggerID = 0;
-		this.moves = new ArrayList<Map.Entry<Integer, Movement>>();
-		this.affirmativeMoves = new ArrayList<Map.Entry<Integer, Movement>>();
-		this.negativeMoves = new ArrayList<Map.Entry<Integer, Movement>>();
-		this.dialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
-		this.affirmativeDialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
-		this.negativeDialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
+		this.moves = new ArrayList<>();
+		this.affirmativeMoves = new ArrayList<>();
+		this.negativeMoves = new ArrayList<>();
+		this.dialogues = new ArrayList<>();
+		this.affirmativeDialogues = new ArrayList<>();
+		this.negativeDialogues = new ArrayList<>();
 		this.iteration = 0;
 		this.affirmativeIteration = 0;
 		this.negativeIteration = 0;
@@ -45,34 +45,34 @@ public class Script {
 		// Deep copy
 		this.triggerID = s.triggerID;
 
-		this.moves = new ArrayList<Map.Entry<Integer, Movement>>();
+		this.moves = new ArrayList<>();
 		for (Map.Entry<Integer, Movement> e : s.moves)
-			this.moves.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
+			this.moves.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
 
-		this.affirmativeMoves = new ArrayList<Map.Entry<Integer, Movement>>();
+		this.affirmativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, Movement> e : s.affirmativeMoves)
 			this.affirmativeMoves
-					.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
+					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
 
-		this.negativeMoves = new ArrayList<Map.Entry<Integer, Movement>>();
+		this.negativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, Movement> e : s.negativeMoves)
 			this.negativeMoves
-					.add(new AbstractMap.SimpleEntry<Integer, Movement>(e.getKey(), new Movement(e.getValue())));
+					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
 
-		this.dialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
+		this.dialogues = new ArrayList<>();
 		for (Map.Entry<Integer, NewDialogue> e : s.dialogues)
 			this.dialogues
-					.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
+					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new NewDialogue(e.getValue())));
 
-		this.affirmativeDialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
+		this.affirmativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, NewDialogue> e : s.affirmativeDialogues)
 			this.affirmativeDialogues
-					.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
+					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new NewDialogue(e.getValue())));
 
-		this.negativeDialogues = new ArrayList<Map.Entry<Integer, NewDialogue>>();
+		this.negativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, NewDialogue> e : s.negativeDialogues)
 			this.negativeDialogues
-					.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(e.getKey(), new NewDialogue(e.getValue())));
+					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new NewDialogue(e.getValue())));
 
 		this.iteration = s.iteration;
 		this.affirmativeIteration = s.affirmativeIteration;
@@ -181,7 +181,7 @@ public class Script {
 	 * 
 	 */
 	public static ArrayList<Script> loadScript(String filename, boolean isModdedScript) {
-		ArrayList<Script> result = new ArrayList<Script>();
+		ArrayList<Script> result = new ArrayList<>();
 
 		// Scripts must contain a trigger data for Area to use, and must contain
 		// movements for Area to read.
@@ -214,7 +214,7 @@ public class Script {
 					if (script != null) {
 						Movement moves = new Movement();
 						append(moves, line.substring(1).toCharArray());
-						script.moves.add(new AbstractMap.SimpleEntry<Integer, Movement>(iteration, moves));
+						script.moves.add(new AbstractMap.SimpleEntry<>(iteration, moves));
 						iteration++;
 					}
 				} else if (line.startsWith("%")) { // Script delimiter
@@ -226,31 +226,31 @@ public class Script {
 				} else if (line.startsWith("#")) { // speech dialogue
 					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "),
 							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
-					script.dialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(iteration, d));
+					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
 					iteration++;
 				} else if (line.startsWith("?")) { // question dialogue
 					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "),
 							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_QUESTION, true);
-					script.dialogues.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(iteration, d));
+					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
 					iteration++;
 				} else if (line.startsWith("+")) { // affirmative dialogue
 					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "),
 							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
 					script.affirmativeDialogues
-							.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(affirmativeIteration, d));
+							.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, d));
 					affirmativeIteration++;
 				} else if (line.startsWith("-")) { // negative dialogue
 					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "),
 							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
 					script.negativeDialogues
-							.add(new AbstractMap.SimpleEntry<Integer, NewDialogue>(negativeIteration, d));
+							.add(new AbstractMap.SimpleEntry<>(negativeIteration, d));
 					negativeIteration++;
 				} else if (line.startsWith("[")) { // affirmative action
 					if (script != null) {
 						Movement moves = new Movement();
 						append(moves, line.substring(1).toCharArray());
 						script.affirmativeMoves
-								.add(new AbstractMap.SimpleEntry<Integer, Movement>(affirmativeIteration, moves));
+								.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, moves));
 						affirmativeIteration++;
 					}
 				} else if (line.startsWith("]")) { // negative action
@@ -258,7 +258,7 @@ public class Script {
 						Movement moves = new Movement();
 						append(moves, line.substring(1).toCharArray());
 						script.negativeMoves
-								.add(new AbstractMap.SimpleEntry<Integer, Movement>(negativeIteration, moves));
+								.add(new AbstractMap.SimpleEntry<>(negativeIteration, moves));
 						negativeIteration++;
 					}
 				} else if (line.startsWith(";")) {
@@ -291,16 +291,16 @@ public class Script {
 				char s = list[i + 1];
 				switch (d) {
 				case 'U':
-					direction = Entity.UP;
+					direction = Player.UP;
 					break;
 				case 'D':
-					direction = Entity.DOWN;
+					direction = Player.DOWN;
 					break;
 				case 'L':
-					direction = Entity.LEFT;
+					direction = Player.LEFT;
 					break;
 				case 'R':
-					direction = Entity.RIGHT;
+					direction = Player.RIGHT;
 					break;
 				default:
 					direction = -1;
@@ -308,7 +308,7 @@ public class Script {
 				}
 				steps = Character.getNumericValue(s);
 				if (direction != -1 && steps != -1 && steps != -2 && (steps <= 9 && steps >= 0)) {
-					Map.Entry<Integer, Integer> entry = new AbstractMap.SimpleEntry<Integer, Integer>(direction, steps);
+					Map.Entry<Integer, Integer> entry = new AbstractMap.SimpleEntry<>(direction, steps);
 					moves.moves.add(entry);
 				}
 			}
@@ -322,7 +322,7 @@ public class Script {
 	 * Load all default scripts.
 	 */
 	public static ArrayList<Script> loadDefaultScripts() {
-		return Script.loadScript("script/scripts.txt", false);
+		return Script.loadScript("art/script/scripts.txt", false);
 	}
 
 	/**

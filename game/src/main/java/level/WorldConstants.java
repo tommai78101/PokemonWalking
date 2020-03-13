@@ -10,18 +10,17 @@
 
 package level;
 
-import item.ItemText;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import abstracts.Item;
+import dialogue.NewDialogue;
+import item.ItemText;
 import resources.Art;
 import resources.Mod;
 import screen.BaseBitmap;
 import script.Script;
-import abstracts.Item;
-import dialogue.NewDialogue;
 
 public class WorldConstants {
 	private WorldConstants() {
@@ -52,16 +51,16 @@ public class WorldConstants {
 
 	// Dialogues
 	public static ArrayList<Map.Entry<NewDialogue, Integer>> signTexts = NewDialogue
-			.loadDialogues("dialogue/dialogue.txt");
+			.loadDialogues("art/dialogue/dialogue.txt");
 
 	// Items
 	// public static HashMap<Integer, ItemText> itemms =
 	// Item.loadItemResources("item/items.txt");
-	public static ArrayList<Map.Entry<ItemText, Item>> items = Item.loadItems("item/items.txt");
+	public static ArrayList<Map.Entry<ItemText, Item>> items = Item.loadItems("art/item/items.txt");
 
 	// Areas
-	public static List<Area> areas = new ArrayList<Area>(0);
-	public static List<Area> moddedAreas = new ArrayList<Area>(0);
+	public static List<Area> areas = new ArrayList<>(0);
+	public static List<Area> moddedAreas = new ArrayList<>(0);
 
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
@@ -69,8 +68,8 @@ public class WorldConstants {
 	// Movement
 	// TODO (11/24/2014): Make map more flexible by allowing scripting files of
 	// different filenames to be loaded. Not sure where it was being loaded.
-	public static ArrayList<Script> scripts = new ArrayList<Script>(0);
-	public static ArrayList<Script> moddedScripts = new ArrayList<Script>(0);
+	public static ArrayList<Script> scripts = new ArrayList<>(0);
+	public static ArrayList<Script> moddedScripts = new ArrayList<>(0);
 	// public static ArrayList<Script> gameScripts =
 	// Script.loadScript("script/aas.script"); // TODO (6/19/2015): Check to see why
 	// there's a need to load "aas.script".
@@ -81,7 +80,7 @@ public class WorldConstants {
 	// ArrayList<Map.Entry<Script, String>>();
 
 	// All bitmaps
-	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
+	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<>();
 
 	/**
 	 * Returns the area matching the given area ID value.

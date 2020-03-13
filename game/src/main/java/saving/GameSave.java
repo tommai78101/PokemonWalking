@@ -22,8 +22,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import abstracts.Entity.GenderType;
+import abstracts.Character.GenderType;
 import abstracts.Item;
 import abstracts.SubMenu;
 import dialogue.StartMenu;
@@ -167,7 +168,7 @@ public class GameSave {
 		byteArray = new byte[] {};
 		List<Area> areaList = game.getWorld().getAllAreas();
 		for (Area area : areaList) {
-			ArrayList<PixelData> pixelList = area.getModifiedPixelDataList();
+			Set<PixelData> pixelList = area.getModifiedPixelDataList();
 			if (!pixelList.isEmpty()) {
 				for (PixelData px : pixelList) {
 					byte[] pixelArray = ByteBuffer.allocate(4 * 5).putInt(area.getAreaID()).putInt(area.getSectorID())

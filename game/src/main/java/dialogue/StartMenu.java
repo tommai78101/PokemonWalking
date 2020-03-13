@@ -7,7 +7,6 @@
  * 
  * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
-
 package dialogue;
 
 import java.awt.Color;
@@ -20,7 +19,7 @@ import java.util.Map;
 
 import abstracts.SubMenu;
 import entity.Player;
-import interfaces.InterfaceTile;
+import interfaces.Tileable;
 import main.Game;
 import main.Keys;
 import main.MainComponent;
@@ -32,8 +31,8 @@ import submenu.Save;
 
 public class StartMenu extends SubMenu {
 	// Description area
-	private static final int DESCRIPTION_FIRST_LINE_Y = (InterfaceTile.HEIGHT * 8) - 8;
-	private static final int DESCRIPTION_SECOND_LINE_Y = (InterfaceTile.HEIGHT * 9) - 8;
+	private static final int DESCRIPTION_FIRST_LINE_Y = (Tileable.HEIGHT * 8) - 8;
+	private static final int DESCRIPTION_SECOND_LINE_Y = (Tileable.HEIGHT * 9) - 8;
 
 	// String constants
 	public static final String ITEM_NAME_EXIT = "EXIT";
@@ -106,7 +105,7 @@ public class StartMenu extends SubMenu {
 		if (this.activation) {
 			NewDialogue.renderDialogBox(output, 5, 0, 4, items.size());
 			StartMenu.renderDescriptionBox(output, 0, 7, 5, 3);
-			output.blit(Art.dialogue_pointer, InterfaceTile.WIDTH * 5 + 8, InterfaceTile.HEIGHT + this.menuCursorPosition * InterfaceTile.HEIGHT);
+			output.blit(Art.dialogue_pointer, Tileable.WIDTH * 5 + 8, Tileable.HEIGHT + this.menuCursorPosition * Tileable.HEIGHT);
 			Graphics2D g2d = output.getBufferedImage().createGraphics();
 			this.renderMenuText(g2d);
 			this.renderMenuDescriptionText(g2d);
@@ -204,7 +203,7 @@ public class StartMenu extends SubMenu {
 		g.setColor(Color.black);
 		if (this.activation) {
 			for (int i = 0; i < this.items.size(); i++) {
-				g.drawString(this.items.get(i).getValue().getName(), (InterfaceTile.WIDTH * 6), (((InterfaceTile.HEIGHT * 2 - 8) + i * 16)));
+				g.drawString(this.items.get(i).getValue().getName(), (Tileable.WIDTH * 6), (((Tileable.HEIGHT * 2 - 8) + i * 16)));
 			}
 		}
 	}
@@ -224,7 +223,7 @@ public class StartMenu extends SubMenu {
 	public static void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
-				output.blit(Art.dialogue_background, (x * InterfaceTile.WIDTH) + (i * InterfaceTile.WIDTH), ((y - 1) * InterfaceTile.HEIGHT + 8) + j * InterfaceTile.HEIGHT);
+				output.blit(Art.dialogue_background, (x * Tileable.WIDTH) + (i * Tileable.WIDTH), ((y - 1) * Tileable.HEIGHT + 8) + j * Tileable.HEIGHT);
 			}
 		}
 	}
