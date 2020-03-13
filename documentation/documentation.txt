@@ -42,20 +42,20 @@ How to Debug.......................[PWD04]
 Metadata...........................[PWD05]
 	PixelData......................[PWD05#01]
 	Areas..........................[PWD05#02]
-		Overworld..................[PWD05#02@01]
-		Sector.....................[PWD05#02@02]
+		Overworld..................[PWD05@02#01]
+		Sector.....................[PWD05@02#02]
 	Tiles..........................[PWD05#03]
-		Empty......................[PWD05#03@00]
-		Path.......................[PWD05#03@01]
-		Ledge......................[PWD05#03@02]
-		Tree.......................[PWD05#03@03]
-		Warp Point.................[PWD05#03@04]
-		Area Connection Point......[PWD05#03@05]
-		Stairs.....................[PWD05#03@06]
-		Water......................[PWD05#03@07]
-		House......................[PWD05#03@08]
-		House Door.................[PWD05#03@09]
-		Items......................[PWD05#03@10]
+		Empty......................[PWD05@03#00]
+		Path.......................[PWD05@03#01]
+		Ledge......................[PWD05@03#02]
+		Tree.......................[PWD05@03#03]
+		Warp Point.................[PWD05@03#04]
+		Area Connection Point......[PWD05@03#05]
+		Stairs.....................[PWD05@03#06]
+		Water......................[PWD05@03#07]
+		House......................[PWD05@03#08]
+		House Door.................[PWD05@03#09]
+		Items......................[PWD05@03#10]
 Entities...........................[PWD06]
 	Player.........................[PWD06#01]
 Controls...........................[PWD07]
@@ -192,6 +192,15 @@ It was not until v7 did all the known issues have been
 fixed. Now, the developer is currently busy with the
 military service, and will update the project from time
 to time.
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+As of March 12, 2020, this project has gone through periods
+of active and inactive development cycles. There is
+continued motivation to improve the codebase, so that the
+code is more readable and more flexible, such that adding
+new features to the project wouldn't be such a mental
+exercise
 
 -------------------------------
 
@@ -330,22 +339,28 @@ not assume their information to be permanent.
 	
 	Areas [PWD05#02]
 	
-	Mentioned before, each area is created using an image editor
-	that can edit/modify alpha values. Preferrably, GIMP or
-	Paint.NET may be a good choice.
+	Mentioned before, each area is created using an image
+	editor that can edit/modify alpha values. Preferrably,
+	GIMP or Paint.NET may be a good choice.
 	
-	Due to limitations set by PixelData, the maximum theoretical
-	size of an area is 256x256. This is determined by using
-	2 bytes from a PixelData, each byte representing width and
-	height respectively. This also means that the tile's 
-	position a PixelData represents in the game can span from 
-	(0, 0) to (255, 255) in a 256x256 area.
+	Due to limitations set by PixelData, the maximum
+	theoretical size of an area is 256x256. This is
+	determined by using 2 bytes from a PixelData, each byte
+	representing width and height respectively. This also
+	means that the tile's position a PixelData represents
+	in the game can span from (0, 0) to (255, 255) in a
+	256x256 area.
 	
-	The chosen 2 bytes are, again, determined by the tile the 
-	Tile ID represents, and the area the tile is in. This goes
-	with the "Tile-specific data" that is accordance with the
-	PixelData data format.
-	
+	The chosen 2 bytes are, again, determined by the tile
+	the Tile ID represents, and the area the tile is in.
+	This goes with the "Tile-specific data" that is
+	accordance with the PixelData data format.
+
+	Character and Area have a 16:1 ratio when converting
+	Character positions to Area positions.
+
+	Area Position = Character Position * Character Tile size
+
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 		Overworld [PWD05#02@01]
@@ -390,22 +405,22 @@ not assume their information to be permanent.
 	find the tile you really wanted.
 	
 	Each tile consists of the following:
-	
-		Tile ID: 				The ID number and name of the tile.
-		Extended Tile ID: 		The ID number used in conjunction of the
-								Tile ID.
-		Tile Specific ID:		The ID number defined in relation to the
-								tile and that tile only.
-		Full Data(s): 			The full data value, listed in the order
-								of ARGB format. There can be more than
-								one specific full data, if there are a
-								certain number of different full datas,
-								it will all be listed. If there are
-								unknown number of different full datas,
-								it will be listed with variables in them.
-		Description:			Describes the properties of the tile, and
-								how to use them accordingly.
-								
+                                
+        Tile ID:                The ID number and name of the tile.
+        Extended Tile ID:       The ID number used in conjunction of the
+                                Tile ID.
+        Tile Specific ID:       The ID number defined in relation to the
+                                tile and that tile only.
+        Full Data(s):           The full data value, listed in the order
+                                of ARGB format. There can be more than
+                                one specific full data, if there are a
+                                certain number of different full datas,
+                                it will all be listed. If there are
+                                unknown number of different full datas,
+                                it will be listed with variables in them.
+        Description:            Describes the properties of the tile, and
+                                how to use them accordingly.
+                                
 	The maximum amount of tiles available in the game is 256. With
 	extended tile IDs included, the maximum amount of tiles is
 	65536.
@@ -475,9 +490,9 @@ not assume their information to be permanent.
 			given below:
 			
 				Area Type:
-				   
-					0x00 = Forest          
-					0x01 = City            
+					
+					0x00 = Forest
+					0x01 = City
 					0x02 = Mountain 
 					0x03 = Water
 					0x04 = Cavern
@@ -950,8 +965,9 @@ not assume their information to be permanent.
 		
 	Player [PWD06#01]
 
-	Currently, the Player is represented as "Joe," a 
-	character that designed in the 2nd generation 
+	Currently, the Player is represented as "Generic 
+	Male," a character that is based off of the design
+	of the main protagonist in the 2nd generation 
 	Pokémon games, Gold, Silver, and Crystal versions.
 	
 	The character design and artwork were done by hand,
@@ -959,6 +975,12 @@ not assume their information to be permanent.
 	
 	The player can access their Inventory via the start
 	menu by pressing START key.
+
+	Player positions are Area Player positions, 
+	multiplied by the Player Tile's Width and Height.
+	There is a unit of measurement conversion between
+	Area and objects extended from the "Character" class
+	object.
 
 -------------------------------
 
