@@ -42,9 +42,9 @@ public class Player extends Character {
 	private int yAccel;
 	private int oldXPosition;
 	private int oldYPosition;
-	private boolean isLockWalking;
-	private boolean lockSprinting;
-	private boolean lockJumping;
+	private boolean isLockedWalking;
+	private boolean isLockedSprinting;
+	private boolean isLockedJumping;
 	private final boolean[] isFacingBlocked = new boolean[4];
 	private boolean isInWater;
 	private boolean isOnBicycle;
@@ -83,7 +83,7 @@ public class Player extends Character {
 	 */
 	public void forceLockWalking() {
 		this.keys.resetInputs();
-		this.isLockWalking = true;
+		this.isLockedWalking = true;
 		this.isFacingBlocked[0] = this.isFacingBlocked[1] = this.isFacingBlocked[2] = this.isFacingBlocked[3] = false;
 
 		if (this.xAccel == 0 && this.yAccel == 0) {
@@ -129,7 +129,7 @@ public class Player extends Character {
 	public int getXInArea() {
 		// Returns area position X.
 		int result = (this.xPosition / Tileable.WIDTH);
-		if (this.isLockWalking)
+		if (this.isLockedWalking)
 			switch (this.getFacing()) {
 				case LEFT:
 					break;
@@ -143,7 +143,7 @@ public class Player extends Character {
 	public int getYInArea() {
 		// Returns area position Y.
 		int result = (this.yPosition / Tileable.HEIGHT);
-		if (this.isLockWalking)
+		if (this.isLockedWalking)
 			switch (this.getFacing()) {
 				case UP:
 					break;
@@ -265,11 +265,11 @@ public class Player extends Character {
 	}
 
 	public boolean isLockedJumping() {
-		return this.lockJumping;
+		return this.isLockedJumping;
 	}
 
 	public boolean isLockedSprinting() {
-		return this.lockSprinting;
+		return this.isLockedSprinting;
 	}
 
 	/**
@@ -278,7 +278,7 @@ public class Player extends Character {
 	 * @return True, if the player is walking right now. False, otherwise.
 	 */
 	public boolean isLockedWalking() {
-		return this.isLockWalking;
+		return this.isLockedWalking;
 	}
 
 	/**
@@ -498,8 +498,8 @@ public class Player extends Character {
 	}
 
 	public void reload() {
-		this.isLockWalking = false;
-		this.lockJumping = false;
+		this.isLockedWalking = false;
+		this.isLockedJumping = false;
 		this.enableInteraction = false;
 		this.animationTick = 0x7;
 		this.setFacing(Player.DOWN);
@@ -519,7 +519,7 @@ public class Player extends Character {
 	 */
 	@Override
 	public void render(final BaseScreen output, final int x, final int y) {
-		if (this.lockJumping) {
+		if (this.isLockedJumping) {
 			// Jumping has a higher priority than walking.
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
 			// Walking animation while in the air. Shouldn't jump when in water.
@@ -528,7 +528,7 @@ public class Player extends Character {
 			else
 				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 		}
-		else if (this.isLockWalking) {
+		else if (this.isLockedWalking) {
 			// Walking animation
 			if (this.isInWater)
 				output.npcBlit(Art.player_surf[walking][animationPointer], this.xOffset + x, this.yOffset + y);
@@ -679,7 +679,7 @@ public class Player extends Character {
 				// this.facingsBlocked[3] = true;
 				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = true;
 				this.isFacingBlocked[UP] = false;
-				this.lockJumping = true;
+				this.isLockedJumping = true;
 				break;
 			case 0x01: // Bottom Left
 				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = this.isFacingBlocked[UP] = true;
@@ -687,7 +687,7 @@ public class Player extends Character {
 			case 0x02: // Left
 				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[UP] = true;
 				this.isFacingBlocked[LEFT] = false;
-				this.lockJumping = true;
+				this.isLockedJumping = true;
 				break;
 			case 0x03: // Top Left
 				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = this.isFacingBlocked[UP] = true;
@@ -695,7 +695,7 @@ public class Player extends Character {
 			case 0x04: // Top
 				this.isFacingBlocked[UP] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = true;
 				this.isFacingBlocked[DOWN] = false;
-				this.lockJumping = true;
+				this.isLockedJumping = true;
 				break;
 			case 0x05: // Top Right
 				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = this.isFacingBlocked[UP] = true;
@@ -703,14 +703,14 @@ public class Player extends Character {
 			case 0x06: // Right
 				this.isFacingBlocked[DOWN] = this.isFacingBlocked[UP] = this.isFacingBlocked[LEFT] = true;
 				this.isFacingBlocked[RIGHT] = false;
-				this.lockJumping = true;
+				this.isLockedJumping = true;
 				break;
 			case 0x07: // Bottom Right
 				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = this.isFacingBlocked[UP] = true;
 				break;
 			default: // Any other tiles should not cause the player to jump.
 				this.isFacingBlocked[0] = this.isFacingBlocked[1] = this.isFacingBlocked[2] = this.isFacingBlocked[3] = true;
-				this.lockJumping = false;
+				this.isLockedJumping = false;
 				break;
 		}
 	}
@@ -786,7 +786,7 @@ public class Player extends Character {
 			this.keys.resetInputs();
 			handleFacingCheck();
 		}
-		if (!this.lockJumping) {
+		if (!this.isLockedJumping) {
 			if (!this.enableInteraction) {
 				input();
 				handleMovement();
@@ -822,7 +822,7 @@ public class Player extends Character {
 	}
 
 	private void controlTick() {
-		if (!this.isLockWalking || !this.lockJumping) {
+		if (!this.isLockedWalking || !this.isLockedJumping) {
 			animationTick++;
 			if ((this.getFacing() == UP && this.isFacingBlocked[UP])) {
 				if (animationTick >= 10) {
@@ -872,10 +872,10 @@ public class Player extends Character {
 	 */
 	private void handleMovement() {
 		// Check if player is currently locked to walking.
-		if (this.isLockWalking) {
+		if (this.isLockedWalking) {
 			this.walk();
 		}
-		else if (this.lockSprinting) {
+		else if (this.isLockedSprinting) {
 			this.sprint();
 		}
 		else if (this.isOnBicycle) {
@@ -901,14 +901,14 @@ public class Player extends Character {
 			// Now about to walk. First, check to see if there's an obstacle blocking the
 			// path.
 			if (this.isFacingBlocked[this.getFacing()]) {
-				this.isLockWalking = false;
+				this.isLockedWalking = false;
 			}
 		}
 	}
 
 	@Override
 	public void jump() {
-		if (this.lockJumping) {
+		if (this.isLockedJumping) {
 			// When being locked to walking, facing must stay constant.
 			if (this.walking != this.getFacing())
 				this.walking = this.getFacing();
@@ -943,8 +943,8 @@ public class Player extends Character {
 			// direction? What about the other axis?
 			if ((xPosition % Tileable.WIDTH == 0 && yPosition % Tileable.HEIGHT == 0)) {
 				// Resets every flag that locks the player.
-				this.isLockWalking = false;
-				this.lockJumping = false;
+				this.isLockedWalking = false;
+				this.isLockedJumping = false;
 				if (this.jumpHeightSignedFlag) {
 					this.jumpHeightSignedFlag = false;
 					this.varyingJumpHeight = 0;
@@ -961,7 +961,7 @@ public class Player extends Character {
 				this.setFacing(Player.UP);
 			}
 			if (!this.isFacingBlocked[UP]) {
-				this.isLockWalking = true;
+				this.isLockedWalking = true;
 				yAccel--;
 			}
 		}
@@ -970,7 +970,7 @@ public class Player extends Character {
 				this.setFacing(Player.DOWN);
 			}
 			if (!this.isFacingBlocked[Player.DOWN]) {
-				this.isLockWalking = true;
+				this.isLockedWalking = true;
 				yAccel++;
 			}
 		}
@@ -979,7 +979,7 @@ public class Player extends Character {
 				this.setFacing(Player.LEFT);
 			}
 			if (!this.isFacingBlocked[Player.LEFT]) {
-				this.isLockWalking = true;
+				this.isLockedWalking = true;
 				xAccel--;
 			}
 		}
@@ -988,7 +988,7 @@ public class Player extends Character {
 				this.setFacing(Player.RIGHT);
 			}
 			if (!this.isFacingBlocked[Player.RIGHT]) {
-				this.isLockWalking = true;
+				this.isLockedWalking = true;
 				xAccel++;
 			}
 		}
@@ -1021,7 +1021,7 @@ public class Player extends Character {
 
 	public void input() {
 		this.isColliding = false;
-		if (!this.isLockWalking) {
+		if (!this.isLockedWalking) {
 			if (!this.isFacingBlocked[UP] && !movementLock) {
 				if (this.keys.up.isTappedDown || this.keys.W.isTappedDown)
 					tapped();
@@ -1098,7 +1098,7 @@ public class Player extends Character {
 		// direction? What about the other axis?
 		if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
 			// Resets every flag that locks the player.
-			this.isLockWalking = false;
+			this.isLockedWalking = false;
 		}
 	}
 
@@ -1127,7 +1127,7 @@ public class Player extends Character {
 		// direction? What about the other axis?
 		if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
 			// Resets every flag that locks the player.
-			this.lockSprinting = false;
+			this.isLockedSprinting = false;
 		}
 	}
 
@@ -1156,7 +1156,7 @@ public class Player extends Character {
 		// direction? What about the other axis?
 		if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
 			// Resets every flag that locks the player.
-			this.isLockWalking = false;
+			this.isLockedWalking = false;
 		}
 	}
 
