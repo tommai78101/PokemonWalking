@@ -42,8 +42,8 @@ public class Area extends Entity {
 	// TODO: Add area type.
 	// private int areaType;
 
-	private boolean displayExitArrow;
-	private boolean triggerIsBeingTriggered;
+	private boolean isExitArrowDisplayed;
+	private boolean isTriggerBeingTriggered;
 	private TriggerData trigger;
 
 	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<>();
@@ -90,8 +90,8 @@ public class Area extends Entity {
 		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInSectorPoint = false;
-		this.displayExitArrow = false;
-		this.triggerIsBeingTriggered = false;
+		this.isExitArrowDisplayed = false;
+		this.isTriggerBeingTriggered = false;
 		this.areaName = "";
 	}
 
@@ -133,23 +133,25 @@ public class Area extends Entity {
 			return;
 
 		// PixelData data = null;
-		if (this.triggerIsBeingTriggered) {
+		if (this.isTriggerBeingTriggered) {
 			this.xPlayerPosition = this.player.getXInArea();
 			this.yPlayerPosition = this.player.getYInArea();
-			if (this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width || this.yPlayerPosition < 0
-				|| this.yPlayerPosition >= this.height)
+
+			//Do some bounds checking on the X and Y player positions.
+			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
+			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
+			if (isXOutOfBounds || isYOutOfBounds)
 				return;
+
 			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 			this.checkCurrentPositionDataAndSetProperties(this.currentPixelData);
 		}
 		else {
 			if (!this.player.isLockedWalking()) {
-				if (this.trigger == null) {
+				if (this.trigger == null)
 					this.trigger = checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
-				}
-				if (this.trigger != null) {
-					this.triggerIsBeingTriggered = true;
-				}
+				else
+					this.isTriggerBeingTriggered = true;
 			}
 			else {
 				this.oldXTriggerPosition = -1;
@@ -157,11 +159,11 @@ public class Area extends Entity {
 			}
 		}
 
-		if (this.triggerIsBeingTriggered && this.trigger != null)
-			handleTriggerActions();
-		else if ((this.triggerIsBeingTriggered && this.trigger == null) || !this.triggerIsBeingTriggered) {
-			this.triggerIsBeingTriggered = false;
-			handlePlayerActions();
+		if (this.isTriggerBeingTriggered && this.trigger != null)
+			this.handleTriggerActions();
+		else if ((this.isTriggerBeingTriggered && this.trigger == null) || !this.isTriggerBeingTriggered) {
+			this.isTriggerBeingTriggered = false;
+			this.handlePlayerActions();
 		}
 	}
 
@@ -174,32 +176,43 @@ public class Area extends Entity {
 			this.player.disableAutomaticMode();
 			this.oldXTriggerPosition = this.xPlayerPosition;
 			this.oldYTriggerPosition = this.yPlayerPosition;
-			this.triggerIsBeingTriggered = false;
+			this.isTriggerBeingTriggered = false;
 			trigger = null;
 		}
 	}
 
 	private void handlePlayerActions() {
 		if (!this.player.isLockedWalking()) {
-			xPlayerPosition = player.getXInArea();
-			yPlayerPosition = player.getYInArea();
-			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0
-				|| yPlayerPosition >= this.height)
+			//Update the area's X and Y player position from the Player object.
+			this.xPlayerPosition = this.player.getXInArea();
+			this.yPlayerPosition = this.player.getYInArea();
+
+			//Do some bounds checking on the X and Y player positions.
+			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
+			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
+			if (isXOutOfBounds || isYOutOfBounds)
 				return;
+
+			// Target pixel is used to determine what pixel the player is currently standing
+			// on (or what pixel the player is currently on top of).
 			this.player.handleSurroundingTiles(this);
+			this.checkCurrentPositionDataAndSetProperties(this.getPixelData(xPlayerPosition, yPlayerPosition));
 		}
 		else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
 			// A
 			// This goes with B. (30 lines down below.)
 			// It may be possible the player is still in the air, and hasn't done checking
-			// if the current pixel
-			// data is a ledge or not. This continues the data checking. It's required.
-			xPlayerPosition = player.getXInArea();
-			yPlayerPosition = player.getYInArea();
-			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0
-				|| yPlayerPosition >= this.height)
+			// if the current pixel data is a ledge or not. This continues the data checking. It's required.
+			this.xPlayerPosition = this.player.getXInArea();
+			this.yPlayerPosition = this.player.getYInArea();
+
+			//Do some bounds checking on the X and Y player positions.
+			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
+			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
+			if (isXOutOfBounds || isYOutOfBounds)
 				return;
-			this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+
+			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(xPlayerPosition);
 			this.checkCurrentPositionDataAndSetProperties(this.getCurrentPixelData());
 		}
 		else {
@@ -283,7 +296,6 @@ public class Area extends Entity {
 				}
 				break;
 			case 0x0B: // Carpet Indoors
-				//
 				// this.displayExitArrow = true;
 				break;
 			case 0x0C: // Carpet Outdoors
@@ -350,11 +362,13 @@ public class Area extends Entity {
 	}
 
 	public int getPlayerXInArea() {
-		return this.player.getXInArea();
+		this.xPlayerPosition = this.player.getXInArea();
+		return this.xPlayerPosition;
 	}
 
 	public void setPlayerX(int x) {
 		this.xPlayerPosition = x;
+		this.player.setAreaX(x);
 	}
 
 	public void setSectorID(int value) {
@@ -366,23 +380,25 @@ public class Area extends Entity {
 	}
 
 	public int getPlayerYInArea() {
-		return this.player.getYInArea();
+		this.yPlayerPosition = this.player.getYInArea();
+		return this.yPlayerPosition;
 	}
 
 	public void setPlayerY(int y) {
 		this.yPlayerPosition = y;
+		this.player.setAreaY(y);
 	}
 
 	public void setDebugDefaultPosition() {
 		// When the game starts from the very beginning, the player must always start
 		// from the very first way point.
-		SET_LOOP: for (ArrayList<PixelData> y : this.areaData) {
-			for (PixelData x : y) {
-				if (((x.getColor() >> 24) & 0xFF) == 0x0D) {
-					player.setAreaPosition(x.xPosition, x.yPosition);
-					setPlayerX(x.xPosition);
-					setPlayerY(x.yPosition);
-					this.currentPixelData = this.areaData.get(x.yPosition).get(x.xPosition);
+		SET_LOOP:
+		for (ArrayList<PixelData> pixelDataRow : this.areaData) {
+			for (PixelData pixelData : pixelDataRow) {
+				if (((pixelData.getColor() >> 24) & 0xFF) == 0x0D) {
+					this.setPlayerX(pixelData.xPosition);
+					this.setPlayerY(pixelData.yPosition);
+					this.currentPixelData = this.areaData.get(pixelData.yPosition).get(pixelData.xPosition);
 					break SET_LOOP;
 				}
 			}
@@ -409,9 +425,8 @@ public class Area extends Entity {
 			{
 				int green = (color >> 8) & 0xFF;
 				int blue = color & 0xFF;
-				this.xPlayerPosition = green;
-				this.yPlayerPosition = blue;
-				this.player.setAreaPosition(xPlayerPosition, yPlayerPosition);
+				this.setPlayerX(green);
+				this.setPlayerY(blue);
 				break;
 			}
 
@@ -539,7 +554,7 @@ public class Area extends Entity {
 	}
 
 	public boolean isDisplayingExitArrow() {
-		return this.displayExitArrow;
+		return this.isExitArrowDisplayed;
 	}
 
 	public ArrayList<Obstacle> getObstaclesList() {
@@ -555,7 +570,7 @@ public class Area extends Entity {
 	}
 
 	public boolean isBeingTriggered() {
-		return this.triggerIsBeingTriggered;
+		return this.isTriggerBeingTriggered;
 	}
 
 	// --------------------- OVERRIDDEN METHODS -------------------
@@ -595,12 +610,12 @@ public class Area extends Entity {
 		int height = this.getHeight();
 		if (y + 1 == height && this.player.getFacing() == Player.DOWN) {
 			screen.blitBiome(data.getBiomeBitmap(), x * Tileable.WIDTH - xOff + 4, (y + 1) * Tileable.HEIGHT - yOff + 2, data);
-			this.displayExitArrow = true;
+			this.isExitArrowDisplayed = true;
 		}
 		else if (y == 0 && this.player.getFacing() == Player.UP) {
 			// TODO: Draw exit arrow point upwards.
 		}
 		else
-			this.displayExitArrow = false;
+			this.isExitArrowDisplayed = false;
 	}
 }
