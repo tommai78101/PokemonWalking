@@ -51,7 +51,7 @@ public class Player extends Character {
 	private boolean isColliding;
 	private static boolean movementLock;
 
-	private boolean enableInteraction;
+	private boolean isInteractionEnabled;
 	private boolean jumpHeightSignedFlag = false;
 	private int varyingJumpHeight = 0;
 	private boolean automaticMode;
@@ -183,20 +183,20 @@ public class Player extends Character {
 				// case 0x04: //Scaffolding Right
 				// case 0x05: //Sign
 				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
-					this.enableInteraction = false;
+					this.isInteractionEnabled = false;
 					if (Player.isMovementsLocked())
 						Player.unlockMovements();
 					break;
 				}
 				if (!Player.isMovementsLocked()) {
 					if (this.getInteractableID() != 0) {
-						this.enableInteraction = false;
+						this.isInteractionEnabled = false;
 						return;
 					}
-					if (!this.enableInteraction)
-						this.enableInteraction = true;
+					if (!this.isInteractionEnabled)
+						this.isInteractionEnabled = true;
 				}
-				if (this.enableInteraction)
+				if (this.isInteractionEnabled)
 					this.setInteractableID(dataColor);
 				break;
 			}
@@ -207,14 +207,14 @@ public class Player extends Character {
 				// this.keys.SLASH.lastKeyState = true;
 				if (!Player.isMovementsLocked()) {
 					if (this.getInteractableID() != 0) {
-						this.enableInteraction = false;
+						this.isInteractionEnabled = false;
 						return;
 					}
-					if (!this.enableInteraction)
-						this.enableInteraction = true;
+					if (!this.isInteractionEnabled)
+						this.isInteractionEnabled = true;
 					// }
 				}
-				if (this.enableInteraction)
+				if (this.isInteractionEnabled)
 					this.setInteractableID(dataColor);
 				break;
 			}
@@ -252,7 +252,7 @@ public class Player extends Character {
 	}
 
 	public boolean isInteracting() {
-		return this.enableInteraction;
+		return this.isInteractionEnabled;
 	}
 
 	/**
@@ -500,7 +500,7 @@ public class Player extends Character {
 	public void reload() {
 		this.isLockedWalking = false;
 		this.isLockedJumping = false;
-		this.enableInteraction = false;
+		this.isInteractionEnabled = false;
 		this.animationTick = 0x7;
 		this.setFacing(Player.DOWN);
 	}
@@ -725,9 +725,9 @@ public class Player extends Character {
 	}
 
 	public void startInteraction() {
-		if (this.enableInteraction)
+		if (this.isInteractionEnabled)
 			return;
-		this.enableInteraction = true;
+		this.isInteractionEnabled = true;
 		this.setInteractableID(0);
 	}
 
@@ -766,7 +766,7 @@ public class Player extends Character {
 	}
 
 	public void stopInteraction() {
-		this.enableInteraction = false;
+		this.isInteractionEnabled = false;
 	}
 
 	public void enableAutomaticMode() {
@@ -787,7 +787,7 @@ public class Player extends Character {
 			handleFacingCheck();
 		}
 		if (!this.isLockedJumping) {
-			if (!this.enableInteraction) {
+			if (!this.isInteractionEnabled) {
 				input();
 				handleMovement();
 				controlTick();
