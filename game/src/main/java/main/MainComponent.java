@@ -46,7 +46,7 @@ public class MainComponent extends Canvas implements Runnable {
 	public static int COMPONENT_HEIGHT;
 
 	// -----------------------
-	private final Scene screen;
+	private final Scene scene;
 	private static Game game;
 	private JFrame frame;
 	// -----------------------
@@ -69,8 +69,8 @@ public class MainComponent extends Canvas implements Runnable {
 	 */
 	public MainComponent(JFrame frame) {
 		running = false;
-		screen = new Scene(GAME_WIDTH, GAME_HEIGHT);
-		screen.loadResources();
+		scene = new Scene(GAME_WIDTH, GAME_HEIGHT);
+		scene.loadResources();
 		this.frame = frame;
 	}
 
@@ -305,8 +305,8 @@ public class MainComponent extends Canvas implements Runnable {
 		return after;
 	}
 
-	public Scene getBaseScreen() {
-		return this.screen;
+	public Scene getScene() {
+		return this.scene;
 	}
 
 	// ---------------------------------
@@ -346,7 +346,7 @@ public class MainComponent extends Canvas implements Runnable {
 			)
 		);
 
-		//Set visibility must come after pack() is called.
+		//Set visibility must come after pack() and setSize() are called.
 		frame.setVisible(true);
 
 		System.out.println("Game is now starting.");

@@ -30,7 +30,7 @@ import submenu.Save;
 
 public class Game {
 	private static final String SAVE_FILE_NAME = "data.sav";
-	private final Scene screen;
+	private final Scene gameScene;
 	private final List<World> worlds;
 	private final Player player;
 	private StartMenu startMenu;
@@ -52,7 +52,7 @@ public class Game {
 	 * @see NewInputHandler
 	 */
 	public Game(MainComponent main, Keys input) {
-		this.screen = main.getBaseScreen();
+		this.gameScene = main.getScene();
 		this.worlds = new ArrayList<>();
 		this.player = new Player(input);
 
@@ -62,7 +62,7 @@ public class Game {
 	public void initialize() {
 		WorldConstants.checkForMods();
 
-		this.player.setCenterCamPosition(this.screen);
+		this.player.setCenterCamPosition(this.gameScene);
 		this.worlds.add(this.overworld);
 		this.startMenu = new StartMenu(this).initialize();
 		this.subMenu = null;
@@ -86,13 +86,13 @@ public class Game {
 		GameState state = this.stateManager.getCurrentGameState();
 		switch (state) {
 			case MAIN_GAME: {
-				screen.clear(0xA4E767);
-				overworld.render(screen, player.getX(), player.getY());
+				gameScene.clear(0xA4E767);
+				overworld.render(gameScene, player.getX(), player.getY());
 				break;
 			}
 			case START_MENU: {
-				if (screen.getRenderingEffectTick() < (byte) 0x7) {
-					screen.flashing();
+				if (gameScene.getRenderingEffectTick() < (byte) 0x7) {
+					gameScene.flashing();
 				}
 				else {
 					if (this.subMenu.equals(this.startMenu.getInventory()))
@@ -100,29 +100,29 @@ public class Game {
 					else
 						this.subMenu = this.startMenu.getSubMenu();
 					if (this.subMenu != null) {
-						this.subMenu.render(screen, graphics);
+						this.subMenu.render(gameScene, graphics);
 					}
 				}
 				break;
 			}
 			case INVENTORY: {
-				if (screen.getRenderingEffectTick() < (byte) 0x7) {
-					screen.flashing();
+				if (gameScene.getRenderingEffectTick() < (byte) 0x7) {
+					gameScene.flashing();
 				}
 				else {
-					screen.clear(0xA4E767);
-					overworld.render(screen, player.getX(), player.getY());
+					gameScene.clear(0xA4E767);
+					overworld.render(gameScene, player.getX(), player.getY());
 					if (startMenu.isActivated()) {
-						startMenu.render(screen, graphics);
+						startMenu.render(gameScene, graphics);
 					}
 				}
 				break;
 			}
 			case SAVING: {
-				screen.clear(0xA4E767);
-				overworld.render(screen, player.getX(), player.getY());
+				gameScene.clear(0xA4E767);
+				overworld.render(gameScene, player.getX(), player.getY());
 				if (this.subMenu != null) {
-					this.subMenu.render(screen, graphics);
+					this.subMenu.render(gameScene, graphics);
 				}
 				break;
 			}
@@ -131,7 +131,7 @@ public class Game {
 			}
 		}
 		graphics.drawImage(
-			MainComponent.createCompatibleBufferedImage(screen.getBufferedImage()), 0, 0,
+			MainComponent.createCompatibleBufferedImage(gameScene.getBufferedImage()), 0, 0,
 			MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null
 		);
 	}
@@ -161,7 +161,7 @@ public class Game {
 			case INVENTORY: {
 				if (!this.subMenu.isActivated()) {
 					this.stateManager.setCurrentGameState(GameState.START_MENU);
-					screen.setRenderingEffectTick((byte) 0x0);
+					gameScene.setRenderingEffectTick((byte) 0x0);
 					break;
 				}
 				this.subMenu = this.startMenu.getSubMenu();
@@ -230,7 +230,7 @@ public class Game {
 	 */
 	private void load() {
 		// TODO: Load data.
-		this.screen.reload();
+		this.gameScene.reload();
 		this.player.reload();
 		
 		Mod.loadModdedResources();
@@ -271,7 +271,7 @@ public class Game {
 	}
 
 	public Scene getBaseScreen() {
-		return this.screen;
+		return this.gameScene;
 	}
 
 	public StateManager getStateManager() {
@@ -305,7 +305,7 @@ public class Game {
 			this.subMenu = entry.getValue();
 			if (!this.subMenu.isActivated())
 				this.subMenu.enableSubMenu();
-			screen.setRenderingEffectTick((byte) 0x0);
+			gameScene.setRenderingEffectTick((byte) 0x0);
 		}
 		else if (str.equals(StartMenu.ITEM_NAME_EXIT)) {
 			this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
