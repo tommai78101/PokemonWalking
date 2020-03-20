@@ -27,7 +27,7 @@ import main.MainComponent;
 import resources.Art;
 import screen.Scene;
 
-public class StartMenu extends SubMenu {
+public class MainMenu extends SubMenu {
 	// Description area
 	private static final int DESCRIPTION_FIRST_LINE_Y = (Tileable.HEIGHT * 8) - 8;
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tileable.HEIGHT * 9) - 8;
@@ -47,7 +47,7 @@ public class StartMenu extends SubMenu {
 	private Inventory inventory;
 	private Save save;
 
-	public StartMenu(Game game) {
+	public MainMenu(Game game) {
 		this.activation = false;
 		this.menuCursorPosition = 0;
 		this.game = game;
@@ -55,7 +55,7 @@ public class StartMenu extends SubMenu {
 		this.actionEvent = null;
 	}
 
-	public StartMenu initialize() {
+	public MainMenu initialize() {
 		inventory = (Inventory) new Inventory(ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", this.game).initialize(keys);
 		save = (Save) new Save(ITEM_NAME_SAVE, "Save the game.", "Save the game.", this.game).initialize(keys);
 		SubMenu exit = new DummyMenu(ITEM_NAME_EXIT, "Close this menu", "Close this menu", this.game);
@@ -102,7 +102,7 @@ public class StartMenu extends SubMenu {
 	public void render(Scene output, Graphics graphics) {
 		if (this.activation) {
 			Dialogue.renderDialogBox(output, 5, 0, 4, items.size());
-			StartMenu.renderDescriptionBox(output, 0, 7, 5, 3);
+			MainMenu.renderDescriptionBox(output, 0, 7, 5, 3);
 			output.blit(Art.dialogue_pointer, Tileable.WIDTH * 5 + 8, Tileable.HEIGHT + this.menuCursorPosition * Tileable.HEIGHT);
 			Graphics2D g2d = output.getBufferedImage().createGraphics();
 			this.renderMenuText(g2d);
@@ -210,8 +210,8 @@ public class StartMenu extends SubMenu {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
 		try {
-			g.drawString(tokens.get(0).getKey(), 0, StartMenu.DESCRIPTION_FIRST_LINE_Y);
-			g.drawString(tokens.get(1).getKey(), 0, StartMenu.DESCRIPTION_SECOND_LINE_Y);
+			g.drawString(tokens.get(0).getKey(), 0, MainMenu.DESCRIPTION_FIRST_LINE_Y);
+			g.drawString(tokens.get(1).getKey(), 0, MainMenu.DESCRIPTION_SECOND_LINE_Y);
 		} catch (Exception e) {
 		}
 	}

@@ -22,7 +22,7 @@ import level.OverWorld;
 import level.WorldConstants;
 import main.StateManager.GameState;
 import menu.Save;
-import menu.StartMenu;
+import menu.MainMenu;
 import resources.Mod;
 import saving.GameSave;
 import screen.Scene;
@@ -32,7 +32,7 @@ public class Game {
 	private final Scene gameScene;
 	private final List<OverWorld> worlds;
 	private final Player player;
-	private StartMenu startMenu;
+	private MainMenu startMenu;
 	private SubMenu subMenu;
 	private OverWorld overworld;
 	private ActionItem registeredItem;
@@ -63,7 +63,7 @@ public class Game {
 
 		this.player.setCenterCamPosition(this.gameScene);
 		this.worlds.add(this.overworld);
-		this.startMenu = new StartMenu(this).initialize();
+		this.startMenu = new MainMenu(this).initialize();
 		this.subMenu = null;
 		this.stateManager = new StateManager();
 
@@ -265,7 +265,7 @@ public class Game {
 		return this.player;
 	}
 
-	public StartMenu getStartMenu() {
+	public MainMenu getStartMenu() {
 		return this.startMenu;
 	}
 
@@ -299,20 +299,20 @@ public class Game {
 
 	private void handleActionEvent(Map.Entry<Integer, SubMenu> entry) {
 		String str = entry.getValue().getName();
-		if (str.equals(StartMenu.ITEM_NAME_INVENTORY)) {
+		if (str.equals(MainMenu.ITEM_NAME_INVENTORY)) {
 			this.stateManager.setCurrentGameState(GameState.INVENTORY);
 			this.subMenu = entry.getValue();
 			if (!this.subMenu.isActivated())
 				this.subMenu.enableSubMenu();
 			gameScene.setRenderingEffectTick((byte) 0x0);
 		}
-		else if (str.equals(StartMenu.ITEM_NAME_EXIT)) {
+		else if (str.equals(MainMenu.ITEM_NAME_EXIT)) {
 			this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 			if (this.subMenu != null)
 				this.subMenu.disableSubMenu();
 			this.subMenu = null;
 		}
-		else if (str.equals(StartMenu.ITEM_NAME_SAVE)) {
+		else if (str.equals(MainMenu.ITEM_NAME_SAVE)) {
 			this.stateManager.setCurrentGameState(GameState.SAVING);
 			this.subMenu = entry.getValue();
 			if (!this.subMenu.isActivated())

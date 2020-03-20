@@ -36,7 +36,7 @@ import main.Game;
 import menu.DummyMenu;
 import menu.Inventory;
 import menu.Save;
-import menu.StartMenu;
+import menu.MainMenu;
 
 public class GameSave {
 	/*
@@ -200,18 +200,18 @@ public class GameSave {
 		for (int i = 0; i < this.playerInfo.startMenu.size(); i++) {
 			byte[] data = this.playerInfo.startMenu.get(i);
 			switch (new String(data)) {
-			case StartMenu.ITEM_NAME_EXIT:
+			case MainMenu.ITEM_NAME_EXIT:
 				game.getStartMenu().addMenuItem(
-						new DummyMenu(StartMenu.ITEM_NAME_EXIT, "Close this menu", "Close this menu", game));
+						new DummyMenu(MainMenu.ITEM_NAME_EXIT, "Close this menu", "Close this menu", game));
 				break;
-			case StartMenu.ITEM_NAME_INVENTORY:
+			case MainMenu.ITEM_NAME_INVENTORY:
 				game.getStartMenu().addMenuItem(
-						new Inventory(StartMenu.ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", game)
+						new Inventory(MainMenu.ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", game)
 								.initialize(game.getPlayer().keys));
 				break;
-			case StartMenu.ITEM_NAME_SAVE:
+			case MainMenu.ITEM_NAME_SAVE:
 				game.getStartMenu()
-						.addMenuItem(new Save(StartMenu.ITEM_NAME_SAVE, "Save the game.", "Save the game.", game)
+						.addMenuItem(new Save(MainMenu.ITEM_NAME_SAVE, "Save the game.", "Save the game.", game)
 								.initialize(game.getPlayer().keys));
 				break;
 			}

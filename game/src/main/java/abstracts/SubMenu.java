@@ -103,7 +103,7 @@ public abstract class SubMenu implements MenuDisplayable {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass())
+		if (getClass() != obj.getClass() || !(obj instanceof SubMenu))
 			return false;
 		SubMenu other = (SubMenu) obj;
 		if (disabledDescription == null) {
@@ -126,5 +126,6 @@ public abstract class SubMenu implements MenuDisplayable {
 
 	public abstract SubMenu initialize(Keys keys);
 
+	@Override
 	public abstract void render(Scene output, Graphics graphics);
 }
