@@ -7,7 +7,7 @@
  * 
  * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
-package dialogue;
+package menu;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import abstracts.SubMenu;
+import dialogue.Dialogue;
 import entity.Player;
 import interfaces.Tileable;
 import main.Game;
@@ -25,9 +26,6 @@ import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import screen.Scene;
-import submenu.DummyMenu;
-import submenu.Inventory;
-import submenu.Save;
 
 public class StartMenu extends SubMenu {
 	// Description area

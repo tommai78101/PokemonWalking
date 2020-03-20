@@ -27,16 +27,16 @@ import java.util.Set;
 import abstracts.Character.GenderType;
 import abstracts.Item;
 import abstracts.SubMenu;
-import dialogue.StartMenu;
 import entity.Player;
 import item.ItemText;
 import level.Area;
 import level.PixelData;
 import level.WorldConstants;
 import main.Game;
-import submenu.DummyMenu;
-import submenu.Inventory;
-import submenu.Save;
+import menu.DummyMenu;
+import menu.Inventory;
+import menu.Save;
+import menu.StartMenu;
 
 public class GameSave {
 	/*

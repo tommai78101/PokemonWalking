@@ -31,9 +31,9 @@ import level.Area;
 import level.WorldConstants;
 import main.Game;
 import main.MainComponent;
+import menu.Inventory;
 import resources.Art;
 import screen.Scene;
-import submenu.Inventory;
 
 public abstract class Item implements Comparable<Item>, Renderable {
 

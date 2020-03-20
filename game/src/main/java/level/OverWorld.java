@@ -24,8 +24,8 @@ import error.GameException;
 import interfaces.Tileable;
 import item.ItemText;
 import main.Game;
+import menu.Inventory;
 import screen.Scene;
-import submenu.Inventory;
 
 public class OverWorld extends Entity {
 	// Overworld properties.
