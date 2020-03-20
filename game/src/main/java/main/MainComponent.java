@@ -10,7 +10,6 @@
 
 package main;
 
-import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,7 +27,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import screen.Scene;
 
@@ -311,7 +309,7 @@ public class MainComponent extends Canvas implements Runnable {
 
 	public static final Keys getMainInput() {
 		return keys;
-	}
+	} 
 
 	public static final Game getGame() {
 		return game;
@@ -322,13 +320,19 @@ public class MainComponent extends Canvas implements Runnable {
 
 	public static void main(String[] args) {
 		System.out.println("Game is now loading, it will take a while.");
+		
 		JFrame frame = new JFrame(GAME_TITLE);
-		JPanel panel = new JPanel(new BorderLayout());
-		MainComponent game = new MainComponent(frame);
-		panel.add(game);
-		frame.setContentPane(panel);
-		frame.pack();
+
+		MainComponent component = new MainComponent(frame);
+		frame.getContentPane().add(component);
+		frame.setLocationRelativeTo(null);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.addWindowListener(component.getWindowListener());
 		frame.setResizable(false);
+		frame.setAlwaysOnTop(MainComponent.DebugMode);
+		frame.pack();
+
+		//Setting the frame size must come after pack() is called.
 		Insets inset = frame.getInsets();
 		frame.setSize(
 			new Dimension(
@@ -336,15 +340,11 @@ public class MainComponent extends Canvas implements Runnable {
 				inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE
 			)
 		);
-		frame.setLocationRelativeTo(null);
-		// DEBUG: Uncomment this line if you feel debugging and switching window focus
-		// from IDE to game and back is nauseous.
-		// frame.setAlwaysOnTop(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.addWindowListener(game.getWindowListener());
+
+		//Set visibility must come after pack() is called.
 		frame.setVisible(true);
 
 		System.out.println("Game is now starting.");
-		game.start();
+		component.start();
 	}
 }
