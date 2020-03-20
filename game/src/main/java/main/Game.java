@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import abstracts.SubMenu;
-import abstracts.World;
 import dialogue.StartMenu;
 import entity.Player;
 import item.ActionItem;
@@ -31,11 +30,11 @@ import submenu.Save;
 public class Game {
 	private static final String SAVE_FILE_NAME = "data.sav";
 	private final Scene gameScene;
-	private final List<World> worlds;
+	private final List<OverWorld> worlds;
 	private final Player player;
 	private StartMenu startMenu;
 	private SubMenu subMenu;
-	private World overworld;
+	private OverWorld overworld;
 	private ActionItem registeredItem;
 	private StateManager stateManager;
 
@@ -232,13 +231,13 @@ public class Game {
 		// TODO: Load data.
 		this.gameScene.reload();
 		this.player.reload();
-		
+
 		Mod.loadModdedResources();
 		if (WorldConstants.isModsEnabled == null)
 			WorldConstants.isModsEnabled = Boolean.FALSE;
 		this.overworld = new OverWorld(this.player, this);
 		GameSave.load(this, SAVE_FILE_NAME);
-		
+
 		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 	}
 
@@ -290,7 +289,7 @@ public class Game {
 
 	}
 
-	public World getWorld() {
+	public OverWorld getWorld() {
 		return this.overworld;
 	}
 
