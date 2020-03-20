@@ -74,8 +74,7 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Intializes the game and loads all required assets.
 	 * 
-	 * This method can only be run once throughout the entire application life
-	 * cycle. Otherwise, there will be errors and unexpected glitches.
+	 * This method can only be run once throughout the entire application life cycle. Otherwise, there will be errors and unexpected glitches.
 	 * 
 	 * @return Nothing.
 	 */
@@ -102,8 +101,7 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Starts the game execution.
 	 * 
-	 * After MainComponent object has been loaded, this method is used to initiate
-	 * game initialization and execution of the entire game.
+	 * After MainComponent object has been loaded, this method is used to initiate game initialization and execution of the entire game.
 	 * 
 	 * @return Nothing.
 	 */
@@ -136,7 +134,8 @@ public class MainComponent extends Canvas implements Runnable {
 		final double nsPerTick = 1000000000.0 / 30.0;
 		try {
 			init();
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			return;
 		}
@@ -178,7 +177,8 @@ public class MainComponent extends Canvas implements Runnable {
 
 			try {
 				Thread.sleep(1);
-			} catch (InterruptedException e) {
+			}
+			catch (InterruptedException e) {
 				System.out.println("Something is wrong... No response.");
 				this.requestFocus();
 			}
@@ -195,9 +195,7 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Updates the game.
 	 * 
-	 * This method is synchronized for no reason other than to avoid the main thread
-	 * from fighting from the Game Thread. It is possible that this is unnecessary.
-	 * Please provide any feedback about this.
+	 * This method is synchronized for no reason other than to avoid the main thread from fighting from the Game Thread. It is possible that this is unnecessary. Please provide any feedback about this.
 	 * 
 	 * @return Nothing.
 	 */
@@ -210,10 +208,7 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Renders the game to the screen.
 	 * 
-	 * The game uses software renderer, since it is modifying the BufferedImage
-	 * acting as a back buffer. This method is synchronized for no reason other than
-	 * to avoid the main thread from fighting from the Game Thread. It is possible
-	 * that this is unnecessary. Please provide any feedback about this.
+	 * The game uses software renderer, since it is modifying the BufferedImage acting as a back buffer. This method is synchronized for no reason other than to avoid the main thread from fighting from the Game Thread. It is possible that this is unnecessary. Please provide any feedback about this.
 	 * 
 	 * @return Nothing.
 	 */
@@ -272,25 +267,23 @@ public class MainComponent extends Canvas implements Runnable {
 	// Private methods:
 
 	/**
-	 * Creates a BufferedImage that is compatible with the graphics card the player
-	 * is currently using.
+	 * Creates a BufferedImage that is compatible with the graphics card the player is currently using.
 	 * 
-	 * The developer is unsure of its benefits. Please provide feedback if you have
-	 * any comments about this.
+	 * The developer is unsure of its benefits. Please provide feedback if you have any comments about this.
 	 * 
-	 * @param BufferedImage Takes a BufferedImage that is to make it compatible with
-	 *                      the graphics card built in the computer the game is
-	 *                      running on.
-	 * @return BufferedImage The BufferedImage used for the Graphics object to blit
-	 *         to the screen.
+	 * @param BufferedImage
+	 *            Takes a BufferedImage that is to make it compatible with the graphics card built in the computer the game is running on.
+	 * @return BufferedImage The BufferedImage used for the Graphics object to blit to the screen.
 	 */
 	public static final BufferedImage createCompatibleBufferedImage(BufferedImage image) {
 		GraphicsConfiguration gfx_config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-				.getDefaultConfiguration();
+			.getDefaultConfiguration();
 		if (image.getColorModel().equals(gfx_config.getColorModel()))
 			return image;
-		BufferedImage newImage = gfx_config.createCompatibleImage(image.getWidth(), image.getHeight(),
-				image.getTransparency());
+		BufferedImage newImage = gfx_config.createCompatibleImage(
+			image.getWidth(), image.getHeight(),
+			image.getTransparency()
+		);
 		Graphics2D graphics = (Graphics2D) newImage.getGraphics();
 		graphics.drawImage(image, 0, 0, null);
 		graphics.dispose();
@@ -337,8 +330,12 @@ public class MainComponent extends Canvas implements Runnable {
 		frame.pack();
 		frame.setResizable(false);
 		Insets inset = frame.getInsets();
-		frame.setSize(new Dimension(inset.left + inset.right + GAME_WIDTH * GAME_SCALE,
-				inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE));
+		frame.setSize(
+			new Dimension(
+				inset.left + inset.right + GAME_WIDTH * GAME_SCALE,
+				inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE
+			)
+		);
 		frame.setLocationRelativeTo(null);
 		// DEBUG: Uncomment this line if you feel debugging and switching window focus
 		// from IDE to game and back is nauseous.
