@@ -32,11 +32,16 @@ import screen.Scene;
 
 public class MainComponent extends Canvas implements Runnable {
 
+	// DEBUG: Useful for reducing the number of times to swap between the game application window and Eclipse.
+	private static final boolean DebugMode = false;
+	
 	private static final long serialVersionUID = 1L;
-	public static int GAME_WIDTH = 160;
-	public static String GAME_TITLE = "Pokémon Walking Algorithm (Hobby) by tom_mai78101";
-	public static int GAME_HEIGHT = 144;
-	public static int GAME_SCALE = 3;
+	
+	public static final String GAME_TITLE = "Pokémon Walking Algorithm (Hobby) by tom_mai78101";
+	public static final int GAME_WIDTH = 160;
+	public static final int GAME_HEIGHT = 144;
+	public static final int GAME_SCALE = 3;
+	
 	public static int COMPONENT_WIDTH;
 	public static int COMPONENT_HEIGHT;
 
@@ -309,7 +314,7 @@ public class MainComponent extends Canvas implements Runnable {
 
 	public static final Keys getMainInput() {
 		return keys;
-	} 
+	}
 
 	public static final Game getGame() {
 		return game;
