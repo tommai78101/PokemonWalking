@@ -34,7 +34,7 @@ import main.Game;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
-import screen.BaseScreen;
+import screen.Scene;
 
 public class Inventory extends SubMenu {
 
@@ -188,7 +188,7 @@ public class Inventory extends SubMenu {
 	 * Renders the Inventory to the screen.
 	 * 
 	 * <p>
-	 * Note that it doesn't render the {@link screen.BaseScreen#getBufferedImage()
+	 * Note that it doesn't render the {@link screen.Scene#getBufferedImage()
 	 * BufferedImage} to the actual {@link main.MainComponent#getBufferStrategy()
 	 * BufferStrategy}.
 	 * 
@@ -199,7 +199,7 @@ public class Inventory extends SubMenu {
 	 * @return Nothing.
 	 */
 	@Override
-	public void render(BaseScreen output, Graphics graphics) {
+	public void render(Scene output, Graphics graphics) {
 		// WARNING: Due to the way it was rendered, the most direct method of rendering
 		// is used.
 		// Do not edit the order or shorten it into multiple calls of private methods,
@@ -763,7 +763,7 @@ public class Inventory extends SubMenu {
 	 * 
 	 * @return Nothing.
 	 */
-	private void renderListBox(BaseScreen output, int x, int y, int width, int height) {
+	private void renderListBox(Scene output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
 				output.blit(Art.dialogue_background, (x * Tileable.WIDTH) + (i * Tileable.WIDTH),

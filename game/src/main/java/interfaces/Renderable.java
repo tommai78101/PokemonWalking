@@ -1,7 +1,7 @@
 package interfaces;
 
-import screen.BaseScreen;
+import screen.Scene;
 
 public interface Renderable {
-	public void render(BaseScreen screen, int offsetX, int offsetY);
+	public void render(Scene screen, int offsetX, int offsetY);
 }

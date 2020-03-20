@@ -24,7 +24,7 @@ import error.GameException;
 import interfaces.Tileable;
 import item.ItemText;
 import main.Game;
-import screen.BaseScreen;
+import screen.Scene;
 import submenu.Inventory;
 
 public class OverWorld extends World {
@@ -383,7 +383,7 @@ public class OverWorld extends World {
 	}
 
 	@Override
-	public void render(BaseScreen screen, int xPlayerPos, int yPlayerPos) {
+	public void render(Scene screen, int xPlayerPos, int yPlayerPos) {
 		// OverWorld offsets are not set.
 		// Setting area offsets with player positions
 

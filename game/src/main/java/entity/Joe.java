@@ -2,7 +2,7 @@ package entity;
 
 import abstracts.Character;
 import level.PixelData;
-import screen.BaseScreen;
+import screen.Scene;
 
 public class Joe extends Character {
 	public Joe() {
@@ -16,7 +16,7 @@ public class Joe extends Character {
 	}
 
 	@Override
-	public void render(BaseScreen screen, int offsetX, int offsetY) {
+	public void render(Scene screen, int offsetX, int offsetY) {
 		// TODO Auto-generated method stub
 
 	}

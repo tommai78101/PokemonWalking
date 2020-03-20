@@ -20,7 +20,7 @@ import java.awt.Graphics;
 import interfaces.MenuDisplayable;
 import main.Game;
 import main.Keys;
-import screen.BaseScreen;
+import screen.Scene;
 
 public abstract class SubMenu implements MenuDisplayable {
 
@@ -126,5 +126,5 @@ public abstract class SubMenu implements MenuDisplayable {
 
 	public abstract SubMenu initialize(Keys keys);
 
-	public abstract void render(BaseScreen output, Graphics graphics);
+	public abstract void render(Scene output, Graphics graphics);
 }

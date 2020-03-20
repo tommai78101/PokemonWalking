@@ -1,8 +1,8 @@
 package interfaces;
 
-import screen.BaseScreen;
+import screen.Scene;
 
 public interface UpdateRenderable {
 	public void tick();
-	public void render(BaseScreen screen, int offsetX, int offsetY);
+	public void render(Scene screen, int offsetX, int offsetY);
 }

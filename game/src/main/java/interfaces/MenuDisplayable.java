@@ -2,9 +2,9 @@ package interfaces;
 
 import java.awt.Graphics;
 
-import screen.BaseScreen;
+import screen.Scene;
 
 public interface MenuDisplayable {
 	public void tick();
-	public void render(BaseScreen screen, Graphics graphics);
+	public void render(Scene screen, Graphics graphics);
 }

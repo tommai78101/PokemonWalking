@@ -32,7 +32,7 @@ import level.WorldConstants;
 import main.Game;
 import main.MainComponent;
 import resources.Art;
-import screen.BaseScreen;
+import screen.Scene;
 import submenu.Inventory;
 
 public abstract class Item implements Comparable<Item>, Renderable {
@@ -136,7 +136,7 @@ public abstract class Item implements Comparable<Item>, Renderable {
 	}
 
 	@Override
-	public void render(BaseScreen output, int xOffset, int yOffset) {
+	public void render(Scene output, int xOffset, int yOffset) {
 		if (!this.picked) {
 			output.blit(Art.item, xOffset, yOffset);
 		}

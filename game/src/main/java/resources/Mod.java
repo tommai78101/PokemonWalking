@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import screen.BaseBitmap;
-import screen.BaseScreen;
+import screen.Scene;
 
 public class Mod {
 	private static final String[] names = new String[] { "area", "script" };
@@ -55,7 +55,7 @@ public class Mod {
 			Collections.sort(list, ALPHABETICAL_ORDER);
 			int id = 1;
 			for (File f : list) {
-				Mod.moddedAreas.add(new AbstractMap.SimpleEntry<BaseBitmap, Integer>(BaseScreen.load(f), id + 1000));
+				Mod.moddedAreas.add(new AbstractMap.SimpleEntry<BaseBitmap, Integer>(Scene.load(f), id + 1000));
 				id++;
 			}
 			// ArrayList<Script> moddedScripts = Script.loadModdedScripts();

@@ -19,7 +19,7 @@ import abstracts.Obstacle;
 import entity.Player;
 import interfaces.Tileable;
 import screen.BaseBitmap;
-import screen.BaseScreen;
+import screen.Scene;
 import script.TriggerData;
 
 public class Area extends Entity {
@@ -336,7 +336,7 @@ public class Area extends Entity {
 	 * 
 	 */
 	@Override
-	public void render(BaseScreen screen, int xOff, int yOff) {
+	public void render(Scene screen, int xOff, int yOff) {
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
@@ -606,7 +606,7 @@ public class Area extends Entity {
 
 	// --------------------- PRIVATE METHODS ----------------------
 
-	private void renderExitArrow(BaseScreen screen, int xOff, int yOff, PixelData data, int x, int y) {
+	private void renderExitArrow(Scene screen, int xOff, int yOff, PixelData data, int x, int y) {
 		int height = this.getHeight();
 		if (y + 1 == height && this.player.getFacing() == Player.DOWN) {
 			screen.blitBiome(data.getBiomeBitmap(), x * Tileable.WIDTH - xOff + 4, (y + 1) * Tileable.HEIGHT - yOff + 2, data);

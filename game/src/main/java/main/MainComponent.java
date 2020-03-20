@@ -30,7 +30,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import screen.BaseScreen;
+import screen.Scene;
 
 public class MainComponent extends Canvas implements Runnable {
 
@@ -43,14 +43,12 @@ public class MainComponent extends Canvas implements Runnable {
 	public static int COMPONENT_HEIGHT;
 
 	// -----------------------
-	private final BaseScreen screen;
+	private final Scene screen;
 	private static Game game;
 	private JFrame frame;
 	// -----------------------
 
 	private static final Keys keys = new Keys();
-	// Wrong input handler. Requires a rewrite.
-	// private InputHandler inputHandler;
 	private InputHandler inputHandler;
 
 	// -----------------------
@@ -68,7 +66,7 @@ public class MainComponent extends Canvas implements Runnable {
 	 */
 	public MainComponent(JFrame frame) {
 		running = false;
-		screen = new BaseScreen(GAME_WIDTH, GAME_HEIGHT);
+		screen = new Scene(GAME_WIDTH, GAME_HEIGHT);
 		screen.loadResources();
 		this.frame = frame;
 	}
@@ -311,7 +309,7 @@ public class MainComponent extends Canvas implements Runnable {
 		return after;
 	}
 
-	public BaseScreen getBaseScreen() {
+	public Scene getBaseScreen() {
 		return this.screen;
 	}
 

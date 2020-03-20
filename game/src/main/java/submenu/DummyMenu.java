@@ -13,7 +13,7 @@ package submenu;
 import java.awt.Graphics;
 import main.Game;
 import main.Keys;
-import screen.BaseScreen;
+import screen.Scene;
 import abstracts.SubMenu;
 
 public class DummyMenu extends SubMenu {
@@ -33,7 +33,7 @@ public class DummyMenu extends SubMenu {
 	}
 
 	@Override
-	public void render(BaseScreen output, Graphics graphics) {
+	public void render(Scene output, Graphics graphics) {
 	}
 
 }

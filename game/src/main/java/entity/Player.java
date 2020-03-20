@@ -16,7 +16,7 @@ import level.Area;
 import level.PixelData;
 import main.Keys;
 import resources.Art;
-import screen.BaseScreen;
+import screen.Scene;
 
 public class Player extends Character {
 	public static boolean isMovementsLocked() {
@@ -518,7 +518,7 @@ public class Player extends Character {
 	 * 
 	 */
 	@Override
-	public void render(final BaseScreen output, final int x, final int y) {
+	public void render(final Scene output, final int x, final int y) {
 		if (this.isLockedJumping) {
 			// Jumping has a higher priority than walking.
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
@@ -637,11 +637,11 @@ public class Player extends Character {
 	/**
 	 * Moves the Player object to the center of the screen.
 	 * 
-	 * @param BaseScreen
+	 * @param Scene
 	 *            Pans the screen immediately so that the Player object is in the center of the screen.
 	 * @return Nothing.
 	 */
-	public void setCenterCamPosition(final BaseScreen screen) {
+	public void setCenterCamPosition(final Scene screen) {
 		this.setRenderOffset(screen.getWidth() / 2 - Tileable.WIDTH, (screen.getHeight() - Tileable.HEIGHT) / 2);
 	}
 

@@ -24,7 +24,7 @@ import main.Game;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
-import screen.BaseScreen;
+import screen.Scene;
 import submenu.DummyMenu;
 import submenu.Inventory;
 import submenu.Save;
@@ -101,7 +101,7 @@ public class StartMenu extends SubMenu {
 	}
 
 	@Override
-	public void render(BaseScreen output, Graphics graphics) {
+	public void render(Scene output, Graphics graphics) {
 		if (this.activation) {
 			Dialogue.renderDialogBox(output, 5, 0, 4, items.size());
 			StartMenu.renderDescriptionBox(output, 0, 7, 5, 3);
@@ -220,7 +220,7 @@ public class StartMenu extends SubMenu {
 
 	// ------------------------- STATIC METHODS --------------------------------------
 
-	public static void renderDescriptionBox(BaseScreen output, int x, int y, int width, int height) {
+	public static void renderDescriptionBox(Scene output, int x, int y, int width, int height) {
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
 				output.blit(Art.dialogue_background, (x * Tileable.WIDTH) + (i * Tileable.WIDTH), ((y - 1) * Tileable.HEIGHT + 8) + j * Tileable.HEIGHT);

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import main.Game;
 import main.Keys;
-import screen.BaseScreen;
+import screen.Scene;
 import abstracts.SubMenu;
 import dialogue.Dialogue;
 import entity.Player;
@@ -163,7 +163,7 @@ public class Save extends SubMenu {
 	}
 
 	@Override
-	public void render(BaseScreen output, Graphics graphics) {
+	public void render(Scene output, Graphics graphics) {
 		if (this.newDialogue != null)
 			this.newDialogue.render(output, graphics);
 	}

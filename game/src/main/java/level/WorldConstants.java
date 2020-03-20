@@ -50,8 +50,7 @@ public class WorldConstants {
 	public static final int OVERWORLD = 0x0A000001;
 
 	// Dialogues
-	public static ArrayList<Map.Entry<Dialogue, Integer>> signTexts = Dialogue
-			.loadDialogues("art/dialogue/dialogue.txt");
+	public static ArrayList<Map.Entry<Dialogue, Integer>> signTexts = Dialogue.loadDialogues("art/dialogue/dialogue.txt");
 
 	// Items
 	// public static HashMap<Integer, ItemText> itemms =
@@ -85,9 +84,9 @@ public class WorldConstants {
 	/**
 	 * Returns the area matching the given area ID value.
 	 * 
-	 * @param areaID The area ID value.
-	 * @return The Area object with the matching area ID value. If no matching value
-	 *         exists, it returns null.
+	 * @param areaID
+	 *            The area ID value.
+	 * @return The Area object with the matching area ID value. If no matching value exists, it returns null.
 	 */
 	public static Area convertToArea(List<Area> areas, int areaID) {
 		for (int i = 0; i < areas.size(); i++) {
@@ -97,15 +96,15 @@ public class WorldConstants {
 		}
 		Area area = null;
 		switch (areaID) {
-		case TEST_WORLD_1:
-			area = new Area(Art.testArea, TEST_WORLD_1, "Test World 1");
-			break;
-		case TEST_WORLD_2:
-			area = new Area(Art.testArea2, TEST_WORLD_2, "Test World 2");
-			break;
-		default:
-			area = null;
-			break;
+			case TEST_WORLD_1:
+				area = new Area(Art.testArea, TEST_WORLD_1, "Test World 1");
+				break;
+			case TEST_WORLD_2:
+				area = new Area(Art.testArea2, TEST_WORLD_2, "Test World 2");
+				break;
+			default:
+				area = null;
+				break;
 		}
 		areas.add(area);
 		return area;
@@ -122,7 +121,8 @@ public class WorldConstants {
 		if (WorldConstants.isModsEnabled == null) {
 			if (Mod.moddedAreas.isEmpty()) {
 				WorldConstants.isModsEnabled = Boolean.FALSE;
-			} else {
+			}
+			else {
 				WorldConstants.isModsEnabled = Boolean.TRUE;
 			}
 		}
@@ -131,8 +131,7 @@ public class WorldConstants {
 	/**
 	 * Returns all available areas defined.
 	 * 
-	 * @return A List<Area> object containing all available areas in specified order
-	 *         defined.
+	 * @return A List<Area> object containing all available areas in specified order defined.
 	 */
 	public static List<Area> getAllNewAreas() {
 		// List<Area> result = new ArrayList<Area>();
@@ -140,7 +139,8 @@ public class WorldConstants {
 			if (WorldConstants.areas.isEmpty()) {
 				WorldConstants.areas.add(new Area(Art.testArea, TEST_WORLD_1));
 				WorldConstants.areas.add(new Area(Art.testArea2, TEST_WORLD_2));
-			} else {
+			}
+			else {
 				WorldConstants.addNewArea(Art.testArea, TEST_WORLD_1);
 				WorldConstants.addNewArea(Art.testArea2, TEST_WORLD_2);
 			}
@@ -148,7 +148,8 @@ public class WorldConstants {
 			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
 			// result.add(new Area(Art.testArea_debug, Debug));
 			return WorldConstants.areas;
-		} else {
+		}
+		else {
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
 				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
 				WorldConstants.moddedAreas.add(new Area(entry.getKey(), entry.getValue()));
@@ -160,21 +161,22 @@ public class WorldConstants {
 	/**
 	 * Returns all available scripts defined.
 	 * 
-	 * @return A List<Script> object containing all available scripts in specified
-	 *         order defined.
+	 * @return A List<Script> object containing all available scripts in specified order defined.
 	 */
 	public static List<Script> getAllNewScripts() {
 		if (WorldConstants.isModsEnabled == null) {
 			if (Mod.moddedAreas.isEmpty()) {
 				WorldConstants.isModsEnabled = Boolean.FALSE;
-			} else {
+			}
+			else {
 				WorldConstants.isModsEnabled = Boolean.TRUE;
 			}
 		}
 		if (WorldConstants.isModsEnabled.booleanValue()) {
 			WorldConstants.moddedScripts = Script.loadModdedScripts();
 			return WorldConstants.moddedScripts;
-		} else {
+		}
+		else {
 			WorldConstants.scripts = Script.loadDefaultScripts();
 			return WorldConstants.scripts;
 		}
@@ -187,7 +189,7 @@ public class WorldConstants {
 	private static void addNewArea(BaseBitmap bitmap, int areaID) {
 		// Java 8 feature
 		boolean exists = WorldConstants.areas.stream().filter(chosenArea -> chosenArea.getAreaID() == areaID)
-				.findFirst().isPresent();
+			.findFirst().isPresent();
 		if (!exists) {
 			WorldConstants.areas.add(new Area(bitmap, areaID));
 		}
@@ -196,17 +198,18 @@ public class WorldConstants {
 	/**
 	 * Returns the area color theme of the given area ID.
 	 * 
-	 * @param areaID The area ID value.
+	 * @param areaID
+	 *            The area ID value.
 	 * @return The primary area color of full opacity.
 	 */
 	public static int convertToAreaColor(int areaID) {
 		switch (areaID) {
-		case TEST_WORLD_1:
-			return AREA_1_COLOR;
-		case TEST_WORLD_2:
-			return AREA_2_COLOR;
-		default:
-			return 0;
+			case TEST_WORLD_1:
+				return AREA_1_COLOR;
+			case TEST_WORLD_2:
+				return AREA_2_COLOR;
+			default:
+				return 0;
 		}
 	}
 }

@@ -6,7 +6,7 @@ import java.util.Map;
 
 import level.Area;
 import level.WorldConstants;
-import screen.BaseScreen;
+import screen.Scene;
 import dialogue.Dialogue;
 import entity.Player;
 
@@ -189,7 +189,7 @@ public class TriggerData {
 		return this;
 	}
 
-	public void render(BaseScreen screen, Graphics2D graphics) {
+	public void render(Scene screen, Graphics2D graphics) {
 		if (this.dialogue != null) {
 			this.dialogue.render(screen, graphics);
 		}

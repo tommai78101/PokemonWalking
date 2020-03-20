@@ -26,7 +26,7 @@ public class Rect {
 		this.bottomRightCorner_Y = y + h;
 	}
 
-	public Rect adjust(BaseScreen screen) {
+	public Rect adjust(Scene screen) {
 		if (this.topLeftCorner_X < 0)
 			this.topLeftCorner_X = 0;
 		if (this.topLeftCorner_Y < 0)

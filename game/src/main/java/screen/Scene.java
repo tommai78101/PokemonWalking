@@ -21,7 +21,7 @@ import level.WorldConstants;
 import resources.Art;
 import resources.Mod;
 
-public class BaseScreen extends BaseBitmap {
+public class Scene extends BaseBitmap {
 
 	// TODO: Add more drawing functions that enable more controls when it comes to
 	// rendering assets.
@@ -35,7 +35,7 @@ public class BaseScreen extends BaseBitmap {
 
 	// private boolean cutScreen;
 
-	public BaseScreen(int w, int h) {
+	public Scene(int w, int h) {
 		super(w, h);
 		this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
@@ -137,7 +137,7 @@ public class BaseScreen extends BaseBitmap {
 					if ((tick++ % 17 < 7) && (tick++ % 21 < 2))
 						this.pixels[tgt + xx] = lighten(biomeColor, 0.07f);
 					else if ((tick++ % 23 < 4) && (tick++ % 19 < 3))
-						this.pixels[tgt + xx] = BaseScreen.darken(biomeColor, 0.07f);
+						this.pixels[tgt + xx] = Scene.darken(biomeColor, 0.07f);
 					else
 						this.pixels[tgt + xx] = biomeColor;
 					tick++;

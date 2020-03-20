@@ -25,7 +25,7 @@ import interfaces.Tileable;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
-import screen.BaseScreen;
+import screen.Scene;
 
 //TODO (6/25/2015): Check to see why modded scripts still suffer from blinking dialogue boxes. Non-modded scripts are fixed.
 
@@ -153,11 +153,11 @@ public class Dialogue {
 		return this.showDialog;
 	}
 
-	public void render(BaseScreen output, Graphics graphics) {
+	public void render(Scene output, Graphics graphics) {
 		render(output, graphics, 0, 6, 9, 2);
 	}
 
-	public void render(BaseScreen output, Graphics graphics, int x, int y, int w, int h) {
+	public void render(Scene output, Graphics graphics, int x, int y, int w, int h) {
 		if (x < 0)
 			x = 0;
 		if (x > 9)
@@ -571,7 +571,7 @@ public class Dialogue {
 		return dialogues;
 	}
 
-	public static void renderDialogBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+	public static void renderDialogBox(Scene output, int x, int y, int centerWidth, int centerHeight) {
 		output.blit(Art.dialogue_top_left, x * Tileable.WIDTH, y * Tileable.HEIGHT);
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_top, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH), y * Tileable.HEIGHT);
@@ -656,7 +656,7 @@ public class Dialogue {
 		return lines;
 	}
 
-	private static void renderDialogBackground(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+	private static void renderDialogBackground(Scene output, int x, int y, int centerWidth, int centerHeight) {
 		for (int j = 0; j < centerHeight - 1; j++) {
 			for (int i = 0; i < centerWidth - 1; i++) {
 				output.blit(Art.dialogue_background, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
@@ -665,7 +665,7 @@ public class Dialogue {
 		}
 	}
 
-	private static void renderDialogBorderBox(BaseScreen output, int x, int y, int centerWidth, int centerHeight) {
+	private static void renderDialogBorderBox(Scene output, int x, int y, int centerWidth, int centerHeight) {
 		output.blit(Art.dialogue_top_left, x * Tileable.WIDTH, y * Tileable.HEIGHT);
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_top, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH), y * Tileable.HEIGHT);

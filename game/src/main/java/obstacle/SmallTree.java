@@ -6,7 +6,7 @@ import java.util.List;
 import abstracts.Obstacle;
 import dialogue.Dialogue;
 import level.PixelData;
-import screen.BaseScreen;
+import screen.Scene;
 
 public class SmallTree extends Obstacle {
 	private PixelData pixelData;
@@ -37,7 +37,7 @@ public class SmallTree extends Obstacle {
 	}
 
 	@Override
-	public void render(BaseScreen screen, int offsetX, int offsetY) {
+	public void render(Scene screen, int offsetX, int offsetY) {
 	}
 
 }

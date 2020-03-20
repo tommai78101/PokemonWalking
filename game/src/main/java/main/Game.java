@@ -25,12 +25,12 @@ import level.WorldConstants;
 import main.StateManager.GameState;
 import resources.Mod;
 import saving.GameSave;
-import screen.BaseScreen;
+import screen.Scene;
 import submenu.Save;
 
 public class Game {
 	private static final String SAVE_FILE_NAME = "data.sav";
-	private final BaseScreen screen;
+	private final Scene screen;
 	private final List<World> worlds;
 	private final Player player;
 	private StartMenu startMenu;
@@ -44,11 +44,11 @@ public class Game {
 	 * 
 	 * All future game components are to be placed here.
 	 * 
-	 * @param BaseScreen
+	 * @param Scene
 	 *            Takes in a BaseScreen that displays all rendered graphics to the screen.
 	 * @param Keys
 	 *            Takes the Keys object the input handler receives from the player for the game to handle. The input handler must control this Keys object.
-	 * @see BaseScreen
+	 * @see Scene
 	 * @see NewInputHandler
 	 */
 	public Game(MainComponent main, Keys input) {
@@ -270,7 +270,7 @@ public class Game {
 		return this.startMenu;
 	}
 
-	public BaseScreen getBaseScreen() {
+	public Scene getBaseScreen() {
 		return this.screen;
 	}
 
