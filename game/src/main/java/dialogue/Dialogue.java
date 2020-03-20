@@ -29,7 +29,7 @@ import screen.BaseScreen;
 
 //TODO (6/25/2015): Check to see why modded scripts still suffer from blinking dialogue boxes. Non-modded scripts are fixed.
 
-public class NewDialogue {
+public class Dialogue {
 	public static final int DIALOGUE_SPEECH = 0x40;
 	public static final int DIALOGUE_QUESTION = 0x41;
 	public static final int DIALOGUE_ALERT = 0x42;
@@ -62,7 +62,7 @@ public class NewDialogue {
 	private int totalDialogueLength;
 	private int type;
 
-	private NewDialogue(Keys keys) {
+	private Dialogue(Keys keys) {
 		lines = new ArrayList<Map.Entry<String, Boolean>>();
 		completedLines = new ArrayList<String>();
 		this.subStringIterator = 0;
@@ -82,7 +82,7 @@ public class NewDialogue {
 		this.yesNoAnswerFlag = null; // Default
 	}
 
-	public NewDialogue(NewDialogue dialogue) {
+	public Dialogue(Dialogue dialogue) {
 		// Deep copy
 		this.completedLines = new ArrayList<String>();
 		for (String s : dialogue.completedLines)
@@ -553,12 +553,12 @@ public class NewDialogue {
 
 	}
 
-	public static NewDialogue createEmptyDialogue() {
-		return new NewDialogue(MainComponent.getMainInput());
+	public static Dialogue createEmptyDialogue() {
+		return new Dialogue(MainComponent.getMainInput());
 	}
 
-	public static NewDialogue createText(String dialogue, int length, int type, boolean lock) {
-		NewDialogue dialogues = new NewDialogue(MainComponent.getMainInput());
+	public static Dialogue createText(String dialogue, int length, int type, boolean lock) {
+		Dialogue dialogues = new Dialogue(MainComponent.getMainInput());
 		dialogues.lines = toLines(dialogue, length);
 		dialogues.lineLength = length;
 		dialogues.totalDialogueLength = dialogue.length();
@@ -595,15 +595,15 @@ public class NewDialogue {
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
 	}
 
-	public static ArrayList<Map.Entry<NewDialogue, Integer>> loadDialogues(String filename) {
-		ArrayList<Map.Entry<NewDialogue, Integer>> result = new ArrayList<Map.Entry<NewDialogue, Integer>>();
+	public static ArrayList<Map.Entry<Dialogue, Integer>> loadDialogues(String filename) {
+		ArrayList<Map.Entry<Dialogue, Integer>> result = new ArrayList<Map.Entry<Dialogue, Integer>>();
 		try {
 			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(NewDialogue.class.getClassLoader().getResourceAsStream(filename)));
+					new InputStreamReader(Dialogue.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
 			String[] tokens;
 			int dialogueID = 0;
-			NewDialogue temp = null;
+			Dialogue temp = null;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#")) {
 					// Dialogue ID
@@ -612,11 +612,11 @@ public class NewDialogue {
 				} else if (line.startsWith("@")) {
 					// Dialogue message
 					tokens = line.split("@");
-					temp = NewDialogue.createText(tokens[1], NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH,
+					temp = Dialogue.createText(tokens[1], Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH,
 							false);
 				} else if (line.startsWith("-")) {
 					// Dialogue delimiter
-					Map.Entry<NewDialogue, Integer> entry = new AbstractMap.SimpleEntry<NewDialogue, Integer>(temp,
+					Map.Entry<Dialogue, Integer> entry = new AbstractMap.SimpleEntry<Dialogue, Integer>(temp,
 							dialogueID);
 					result.add(entry);
 				}

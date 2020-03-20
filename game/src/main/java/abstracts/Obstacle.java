@@ -13,7 +13,7 @@ package abstracts;
 import java.util.ArrayList;
 import java.util.List;
 
-import dialogue.NewDialogue;
+import dialogue.Dialogue;
 import error.GameException;
 import interfaces.Obstructable;
 import interfaces.Unpassable;
@@ -22,8 +22,8 @@ import obstacle.SmallTree;
 import utility.DataUtils;
 
 public abstract class Obstacle extends Entity implements Unpassable, Obstructable {
-	private List<NewDialogue> dialogues;
-	private List<NewDialogue> overriddenDialogues;
+	private List<Dialogue> dialogues;
+	private List<Dialogue> overriddenDialogues;
 	private int color;
 	private int id;
 	
@@ -105,7 +105,7 @@ public abstract class Obstacle extends Entity implements Unpassable, Obstructabl
 		return this.color;
 	}
 
-	public List<NewDialogue> getDialogues() throws GameException {
+	public List<Dialogue> getDialogues() throws GameException {
 		if (!this.overriddenDialogues.isEmpty())
 			return this.overriddenDialogues;
 		if (!this.dialogues.isEmpty())
@@ -113,7 +113,7 @@ public abstract class Obstacle extends Entity implements Unpassable, Obstructabl
 		throw new GameException("This obstacle does not have any default dialogues. Perhaps this obstacle has not been initialized?");
 	}
 	
-	public void addDialogue(NewDialogue dialogue) {
+	public void addDialogue(Dialogue dialogue) {
 		this.overriddenDialogues.add(dialogue);
 	}
 	
@@ -121,7 +121,7 @@ public abstract class Obstacle extends Entity implements Unpassable, Obstructabl
 		this.overriddenDialogues.clear();
 	}
 
-	protected void initializeDialogues(List<NewDialogue> newDialogues) {
+	protected void initializeDialogues(List<Dialogue> newDialogues) {
 		this.dialogues.addAll(newDialogues);
 	}
 }

@@ -22,7 +22,7 @@ import java.util.Map;
 import abstracts.Item;
 import abstracts.Item.Category;
 import abstracts.SubMenu;
-import dialogue.NewDialogue;
+import dialogue.Dialogue;
 import entity.Player;
 import interfaces.Tileable;
 import item.ActionItem;
@@ -208,7 +208,7 @@ public class Inventory extends SubMenu {
 			switch (this.state) {
 			default: {
 				output.blit(Art.inventory_gui, 0, 0);
-				NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
+				Dialogue.renderDialogBox(output, 0, 6, 9, 2);
 				renderListBox(output, 3, 1, 7, 5);
 				output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE,
 						((Tileable.HEIGHT * this.arrowPosition)) + 12);
@@ -238,7 +238,7 @@ public class Inventory extends SubMenu {
 			}
 			case MENU: {
 				output.blit(Art.inventory_gui, 0, 0);
-				NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
+				Dialogue.renderDialogBox(output, 0, 6, 9, 2);
 				renderListBox(output, 3, 1, 7, 5);
 				output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE,
 						((Tileable.HEIGHT * this.arrowPosition)) + 12);
@@ -265,7 +265,7 @@ public class Inventory extends SubMenu {
 				Graphics2D g2d = old.createGraphics();
 				renderText(g2d);
 				if (!this.selectionMenu.isEmpty()) {
-					NewDialogue.renderDialogBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4,
+					Dialogue.renderDialogBox(output, 5, 5 - (this.selectionMenu.size() - 1), 4,
 							this.selectionMenu.size() - 1);
 					output.blit(Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE,
 							(12 * this.stateArrowPosition + Tileable.HEIGHT * (7 - this.selectionMenu.size())) - 8);
@@ -277,11 +277,11 @@ public class Inventory extends SubMenu {
 			}
 			case TOSS: {
 				output.blit(Art.inventory_gui, 0, 0);
-				NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
+				Dialogue.renderDialogBox(output, 0, 6, 9, 2);
 				renderListBox(output, 3, 1, 7, 5);
 				output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE,
 						((Tileable.HEIGHT * this.arrowPosition)) + 12);
-				NewDialogue.renderDialogBox(output, 5, 4, 4, 1);
+				Dialogue.renderDialogBox(output, 5, 4, 4, 1);
 				switch (this.category) {
 				case POTIONS:
 				default:
@@ -311,7 +311,7 @@ public class Inventory extends SubMenu {
 			}
 			case SET: {
 				output.blit(Art.inventory_gui, 0, 0);
-				NewDialogue.renderDialogBox(output, 0, 6, 9, 2);
+				Dialogue.renderDialogBox(output, 0, 6, 9, 2);
 				renderListBox(output, 3, 1, 7, 5);
 				output.blit(Art.dialogue_pointer, 18 * MainComponent.GAME_SCALE,
 						((Tileable.HEIGHT * this.arrowPosition)) + 12);
@@ -743,8 +743,8 @@ public class Inventory extends SubMenu {
 		}
 		try {
 			Map.Entry<Item, Integer> entry = list.get(itemCursor);
-			ArrayList<Map.Entry<String, Boolean>> tokens = NewDialogue.toLines(entry.getKey().getDescription(),
-					NewDialogue.MAX_STRING_LENGTH);
+			ArrayList<Map.Entry<String, Boolean>> tokens = Dialogue.toLines(entry.getKey().getDescription(),
+					Dialogue.MAX_STRING_LENGTH);
 			graphics.drawString(tokens.get(0).getKey(), 8, 144 - 32 + 7);
 			graphics.drawString(tokens.get(1).getKey(), 8, 144 - 16 + 7);
 		} catch (Exception e) {
@@ -823,8 +823,8 @@ public class Inventory extends SubMenu {
 				// render anything.
 				try {
 					Map.Entry<Item, Integer> entry = list.get(itemCursor);
-					ArrayList<Map.Entry<String, Boolean>> tokens = NewDialogue.toLines(entry.getKey().getDescription(),
-							NewDialogue.MAX_STRING_LENGTH);
+					ArrayList<Map.Entry<String, Boolean>> tokens = Dialogue.toLines(entry.getKey().getDescription(),
+							Dialogue.MAX_STRING_LENGTH);
 					g.drawString(tokens.get(0).getKey(), 8, 144 - 32 + 7);
 					g.drawString(tokens.get(1).getKey(), 8, 144 - 16 + 7);
 				} catch (Exception e) {
@@ -853,8 +853,8 @@ public class Inventory extends SubMenu {
 			}
 			try {
 				Map.Entry<Item, Integer> entry = list.get(itemCursor);
-				ArrayList<Map.Entry<String, Boolean>> tokens = NewDialogue
-						.toLines(entry.getKey().getName() + " has been registered.", NewDialogue.MAX_STRING_LENGTH);
+				ArrayList<Map.Entry<String, Boolean>> tokens = Dialogue
+						.toLines(entry.getKey().getName() + " has been registered.", Dialogue.MAX_STRING_LENGTH);
 				switch (this.set_completedLines.size()) {
 				case 0:
 					g.drawString(tokens.get(set_tokenIterator).getKey().substring(0, set_subStringIterator), 8,

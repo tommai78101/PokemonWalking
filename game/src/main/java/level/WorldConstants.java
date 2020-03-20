@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import abstracts.Item;
-import dialogue.NewDialogue;
+import dialogue.Dialogue;
 import item.ItemText;
 import resources.Art;
 import resources.Mod;
@@ -50,7 +50,7 @@ public class WorldConstants {
 	public static final int OVERWORLD = 0x0A000001;
 
 	// Dialogues
-	public static ArrayList<Map.Entry<NewDialogue, Integer>> signTexts = NewDialogue
+	public static ArrayList<Map.Entry<Dialogue, Integer>> signTexts = Dialogue
 			.loadDialogues("art/dialogue/dialogue.txt");
 
 	// Items

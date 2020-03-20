@@ -9,7 +9,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
 
-import dialogue.NewDialogue;
+import dialogue.Dialogue;
 import entity.Player;
 
 public class Script {
@@ -17,9 +17,9 @@ public class Script {
 	public ArrayList<Map.Entry<Integer, Movement>> moves;
 	public ArrayList<Map.Entry<Integer, Movement>> affirmativeMoves;
 	public ArrayList<Map.Entry<Integer, Movement>> negativeMoves;
-	public ArrayList<Map.Entry<Integer, NewDialogue>> dialogues;
-	public ArrayList<Map.Entry<Integer, NewDialogue>> affirmativeDialogues;
-	public ArrayList<Map.Entry<Integer, NewDialogue>> negativeDialogues;
+	public ArrayList<Map.Entry<Integer, Dialogue>> dialogues;
+	public ArrayList<Map.Entry<Integer, Dialogue>> affirmativeDialogues;
+	public ArrayList<Map.Entry<Integer, Dialogue>> negativeDialogues;
 	public int iteration;
 	public int affirmativeIteration;
 	public int negativeIteration;
@@ -60,19 +60,19 @@ public class Script {
 					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
 
 		this.dialogues = new ArrayList<>();
-		for (Map.Entry<Integer, NewDialogue> e : s.dialogues)
+		for (Map.Entry<Integer, Dialogue> e : s.dialogues)
 			this.dialogues
-					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new NewDialogue(e.getValue())));
+					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
 
 		this.affirmativeDialogues = new ArrayList<>();
-		for (Map.Entry<Integer, NewDialogue> e : s.affirmativeDialogues)
+		for (Map.Entry<Integer, Dialogue> e : s.affirmativeDialogues)
 			this.affirmativeDialogues
-					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new NewDialogue(e.getValue())));
+					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
 
 		this.negativeDialogues = new ArrayList<>();
-		for (Map.Entry<Integer, NewDialogue> e : s.negativeDialogues)
+		for (Map.Entry<Integer, Dialogue> e : s.negativeDialogues)
 			this.negativeDialogues
-					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new NewDialogue(e.getValue())));
+					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
 
 		this.iteration = s.iteration;
 		this.affirmativeIteration = s.affirmativeIteration;
@@ -101,21 +101,21 @@ public class Script {
 		return null;
 	}
 
-	public NewDialogue getIteratedDialogues() {
+	public Dialogue getIteratedDialogues() {
 		if (this.questionResponse == null) {
-			for (Map.Entry<Integer, NewDialogue> entry : this.dialogues) {
+			for (Map.Entry<Integer, Dialogue> entry : this.dialogues) {
 				if (entry.getKey() == this.iteration) {
 					return entry.getValue();
 				}
 			}
 		} else if (this.questionResponse == Boolean.TRUE) {
-			for (Map.Entry<Integer, NewDialogue> entry : this.affirmativeDialogues) {
+			for (Map.Entry<Integer, Dialogue> entry : this.affirmativeDialogues) {
 				if (entry.getKey() == this.affirmativeIteration) {
 					return entry.getValue();
 				}
 			}
 		} else if (this.questionResponse == Boolean.FALSE) {
-			for (Map.Entry<Integer, NewDialogue> entry : this.negativeDialogues) {
+			for (Map.Entry<Integer, Dialogue> entry : this.negativeDialogues) {
 				if (entry.getKey() == this.negativeIteration) {
 					return entry.getValue();
 				}
@@ -224,24 +224,24 @@ public class Script {
 						iteration = 0;
 					}
 				} else if (line.startsWith("#")) { // speech dialogue
-					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "),
-							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
+					Dialogue d = Dialogue.createText(line.substring(1).replace("_", " "),
+							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH, true);
 					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
 					iteration++;
 				} else if (line.startsWith("?")) { // question dialogue
-					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "),
-							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_QUESTION, true);
+					Dialogue d = Dialogue.createText(line.substring(1).replace("_", " "),
+							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_QUESTION, true);
 					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
 					iteration++;
 				} else if (line.startsWith("+")) { // affirmative dialogue
-					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "),
-							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
+					Dialogue d = Dialogue.createText(line.substring(1).replace("_", " "),
+							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH, true);
 					script.affirmativeDialogues
 							.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, d));
 					affirmativeIteration++;
 				} else if (line.startsWith("-")) { // negative dialogue
-					NewDialogue d = NewDialogue.createText(line.substring(1).replace("_", " "),
-							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_SPEECH, true);
+					Dialogue d = Dialogue.createText(line.substring(1).replace("_", " "),
+							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH, true);
 					script.negativeDialogues
 							.add(new AbstractMap.SimpleEntry<>(negativeIteration, d));
 					negativeIteration++;

@@ -18,7 +18,7 @@ import java.util.Map.Entry;
 import abstracts.Item;
 import abstracts.Obstacle;
 import abstracts.World;
-import dialogue.NewDialogue;
+import dialogue.Dialogue;
 import entity.Player;
 import error.GameException;
 import interfaces.Tileable;
@@ -31,7 +31,7 @@ public class OverWorld extends World {
 	// Overworld properties.
 	private boolean invertBitmapColors;
 	private int currentAreaSectorID;
-	private List<NewDialogue> newDialogues;
+	private List<Dialogue> newDialogues;
 	private int newDialoguesIterator;
 
 	/**
@@ -157,7 +157,7 @@ public class OverWorld extends World {
 				switch (red) {
 				case 0x05: {// Signs
 					int dialogueID = (interactionID & 0xFFFF);
-					SIGN_LOOP: for (Map.Entry<NewDialogue, Integer> entry : WorldConstants.signTexts) {
+					SIGN_LOOP: for (Map.Entry<Dialogue, Integer> entry : WorldConstants.signTexts) {
 						if (entry.getValue() == dialogueID) {
 							this.newDialogues.add(entry.getKey());
 							break SIGN_LOOP;
@@ -192,8 +192,8 @@ public class OverWorld extends World {
 					}
 				}
 				if (this.newDialogues == null) {
-					this.newDialogues.add(NewDialogue.createText(text.itemName + " has been found.",
-							NewDialogue.MAX_STRING_LENGTH, NewDialogue.DIALOGUE_ALERT, true));
+					this.newDialogues.add(Dialogue.createText(text.itemName + " has been found.",
+							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_ALERT, true));
 					new Thread(new Runnable() {
 						@Override
 						public void run() {
@@ -250,7 +250,7 @@ public class OverWorld extends World {
 				}
 			} else {
 				switch (this.newDialogues.get(this.newDialoguesIterator).getDialogueType()) {
-				case NewDialogue.DIALOGUE_SPEECH:
+				case Dialogue.DIALOGUE_SPEECH:
 					if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
 							&& this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
 						Player.unlockMovements();
@@ -285,7 +285,7 @@ public class OverWorld extends World {
 						this.newDialogues.get(this.newDialoguesIterator).tick();
 					}
 					break;
-				case NewDialogue.DIALOGUE_QUESTION:
+				case Dialogue.DIALOGUE_QUESTION:
 					if (!this.newDialogues.get(this.newDialoguesIterator).yesNoQuestionHasBeenAnswered()) {
 						this.newDialogues.get(this.newDialoguesIterator).tick();
 						if (!Player.isMovementsLocked())
@@ -403,7 +403,7 @@ public class OverWorld extends World {
 			player.render(screen, 0, 0);
 
 		if (this.newDialogues != null && this.newDialogues.size() > 0) {
-			NewDialogue.renderDialogBox(screen, 0, 6, 9, 2);
+			Dialogue.renderDialogBox(screen, 0, 6, 9, 2);
 			this.newDialogues.get(this.newDialoguesIterator).render(screen, screen.getBufferedImage().createGraphics());
 		}
 	}

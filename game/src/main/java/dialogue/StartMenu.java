@@ -103,7 +103,7 @@ public class StartMenu extends SubMenu {
 	@Override
 	public void render(BaseScreen output, Graphics graphics) {
 		if (this.activation) {
-			NewDialogue.renderDialogBox(output, 5, 0, 4, items.size());
+			Dialogue.renderDialogBox(output, 5, 0, 4, items.size());
 			StartMenu.renderDescriptionBox(output, 0, 7, 5, 3);
 			output.blit(Art.dialogue_pointer, Tileable.WIDTH * 5 + 8, Tileable.HEIGHT + this.menuCursorPosition * Tileable.HEIGHT);
 			Graphics2D g2d = output.getBufferedImage().createGraphics();
@@ -171,7 +171,7 @@ public class StartMenu extends SubMenu {
 	private void prepareMenuText() {
 		Map.Entry<Integer, SubMenu> entry = this.items.get(this.menuCursorPosition);
 		SubMenu item = entry.getValue();
-		this.tokens = NewDialogue.toLines(item.getDescription(), NewDialogue.HALF_STRING_LENGTH);
+		this.tokens = Dialogue.toLines(item.getDescription(), Dialogue.HALF_STRING_LENGTH);
 	}
 
 	private void handleMenuSelection() {

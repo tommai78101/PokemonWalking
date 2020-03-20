@@ -7,7 +7,7 @@ import java.util.Map;
 import level.Area;
 import level.WorldConstants;
 import screen.BaseScreen;
-import dialogue.NewDialogue;
+import dialogue.Dialogue;
 import entity.Player;
 
 public class TriggerData {
@@ -18,7 +18,7 @@ public class TriggerData {
 	private boolean repeat;
 
 	private Movement moves;
-	private NewDialogue dialogue;
+	private Dialogue dialogue;
 
 	// TODO: Add entity ID for NPCs.
 
@@ -101,7 +101,7 @@ public class TriggerData {
 				}
 			} else if (moves == null && dialogue != null) {
 				switch (dialogue.getDialogueType()) {
-				case NewDialogue.DIALOGUE_SPEECH:
+				case Dialogue.DIALOGUE_SPEECH:
 					if (this.dialogue.isDialogueCompleted()) {
 						if (this.dialogue.isScrolling()) {
 							Player.unlockMovements();
@@ -131,7 +131,7 @@ public class TriggerData {
 						dialogue.tick();
 					}
 					break;
-				case NewDialogue.DIALOGUE_QUESTION:
+				case Dialogue.DIALOGUE_QUESTION:
 					if (!dialogue.yesNoQuestionHasBeenAnswered()) {
 						dialogue.tick();
 						if (!Player.isMovementsLocked())

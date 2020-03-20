@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import abstracts.Obstacle;
-import dialogue.NewDialogue;
+import dialogue.Dialogue;
 import level.PixelData;
 import screen.BaseScreen;
 
@@ -15,12 +15,12 @@ public class SmallTree extends Obstacle {
 		super();
 		this.pixelData = data;
 
-		List<NewDialogue> dialogues = new ArrayList<>();
+		List<Dialogue> dialogues = new ArrayList<>();
 		dialogues.add(
-			NewDialogue.createText(
+			Dialogue.createText(
 				"This tree is born from the ground that was created 6 months ago.", 
-				NewDialogue.MAX_STRING_LENGTH,
-				NewDialogue.DIALOGUE_SPEECH, 
+				Dialogue.MAX_STRING_LENGTH,
+				Dialogue.DIALOGUE_SPEECH, 
 				false
 			)
 		);
