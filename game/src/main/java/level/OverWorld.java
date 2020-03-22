@@ -12,22 +12,17 @@ package level;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
-import abstracts.Character;
 import abstracts.Entity;
 import abstracts.Item;
 import abstracts.Obstacle;
-import dialogue.Dialogue;
 import entity.Player;
 import error.GameException;
 import interfaces.Tileable;
 import item.ItemText;
 import main.Game;
-import menu.Inventory;
 import screen.Scene;
-import utility.DialogueBuilder;
 
 public class OverWorld extends Entity {
 	// Overworld properties.
@@ -39,7 +34,6 @@ public class OverWorld extends Entity {
 
 	private boolean invertBitmapColors;
 	private int currentAreaSectorID;
-	private List<Dialogue> newDialogues;
 	private int newDialoguesIterator;
 
 	/**
@@ -79,10 +73,6 @@ public class OverWorld extends Entity {
 		// TODO: Add a method that executes according to the sector ID. Basically,
 		// it needs to tell the player that they entered a new sector.
 		// Needs a marker in the area that points to where the area connects together.
-
-		// Dialogue
-		this.newDialogues = null;
-		this.newDialoguesIterator = 0;
 	}
 
 	// Will add this in the future. Currently, the only entity is Player.
@@ -191,7 +181,7 @@ public class OverWorld extends Entity {
 		}
 
 		this.handlePlayerInteractions();
-		this.handleDialogues();
+//		this.handleDialogues();
 	}
 
 	/**
@@ -214,13 +204,13 @@ public class OverWorld extends Entity {
 					switch (red) {
 						case 0x05: {// Signs
 							int dialogueID = (interactionID & 0xFFFF);
-							SIGN_LOOP:
-							for (Map.Entry<Dialogue, Integer> entry : WorldConstants.signTexts) {
-								if (entry.getValue() == dialogueID) {
-									this.newDialogues.add(entry.getKey());
-									break SIGN_LOOP;
-								}
-							}
+//							SIGN_LOOP:
+//							for (Map.Entry<Dialogue, Integer> entry : WorldConstants.signTexts) {
+//								if (entry.getValue() == dialogueID) {
+//									this.newDialogues.add(entry.getKey());
+//									break SIGN_LOOP;
+//								}
+//							}
 							break;
 						}
 						default: // Other obstacles
@@ -230,12 +220,12 @@ public class OverWorld extends Entity {
 								Obstacle obstacle = list.get(i);
 								if (obstacle.getID() != red)
 									continue;
-								try {
-									this.newDialogues = obstacle.getDialogues();
-								}
-								catch (GameException e) {
-									throw new RuntimeException(e);
-								}
+//								try {
+//									this.newDialogues = obstacle.getDialogues();
+//								}
+//								catch (GameException e) {
+//									throw new RuntimeException(e);
+//								}
 								break OBSTACLE_LOOP;
 							}
 							break;
@@ -250,36 +240,36 @@ public class OverWorld extends Entity {
 							break;
 						}
 					}
-					if (this.newDialogues == null) {
-						this.newDialogues.add(
-							DialogueBuilder.createText(
-								text.itemName + " has been found.",
-								Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_ALERT, true
-							)
-						);
-						new Thread(new Runnable() {
-							@Override
-							public void run() {
-								PixelData data = OverWorld.this.currentArea.getCurrentPixelData();
-								switch (OverWorld.this.player.getFacing()) {
-									case Character.UP:
-										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() - 1);
-										break;
-									case Character.DOWN:
-										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() + 1);
-										break;
-									case Character.LEFT:
-										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() - 1, OverWorld.this.player.getYInArea());
-										break;
-									case Character.RIGHT:
-										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() + 1, OverWorld.this.player.getYInArea());
-										break;
-								}
-							}
-						}).start();
-						Inventory inventory = this.game.getInventory();
-						inventory.addItem(text);
-					}
+//					if (this.newDialogues == null) {
+//						this.newDialogues.add(
+//							DialogueBuilder.createText(
+//								text.itemName + " has been found.",
+//								Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_ALERT, true
+//							)
+//						);
+//						new Thread(new Runnable() {
+//							@Override
+//							public void run() {
+//								PixelData data = OverWorld.this.currentArea.getCurrentPixelData();
+//								switch (OverWorld.this.player.getFacing()) {
+//									case Character.UP:
+//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() - 1);
+//										break;
+//									case Character.DOWN:
+//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() + 1);
+//										break;
+//									case Character.LEFT:
+//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() - 1, OverWorld.this.player.getYInArea());
+//										break;
+//									case Character.RIGHT:
+//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() + 1, OverWorld.this.player.getYInArea());
+//										break;
+//								}
+//							}
+//						}).start();
+//						Inventory inventory = this.game.getInventory();
+//						inventory.addItem(text);
+//					}
 					break;
 				}
 			}
@@ -292,104 +282,104 @@ public class OverWorld extends Entity {
 		}
 	}
 
-	private void handleDialogues() {
-		if (this.newDialogues != null) {
-			// The order is IMPORTANT!!
-			if (this.newDialogues.size() == 1) {
-				if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
-					&& this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
-					Player.unlockMovements();
-					this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
-					this.newDialogues = null;
-					this.newDialoguesIterator = 0;
-					this.player.stopInteraction();
-				}
-				else if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
-					&& !this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
-					this.newDialogues.get(this.newDialoguesIterator).tick();
-				}
-				else if (this.newDialogues.get(this.newDialoguesIterator).isDialogueTextSet()
-					&& !(this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
-						&& this.newDialogues.get(this.newDialoguesIterator).isShowingDialog())) {
-					Player.lockMovements();
-					this.newDialogues.get(this.newDialoguesIterator).tick();
-				}
-			}
-			else {
-				switch (this.newDialogues.get(this.newDialoguesIterator).getDialogueType()) {
-					case Dialogue.DIALOGUE_SPEECH:
-						if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
-							&& this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
-							Player.unlockMovements();
-							this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
-							if (this.newDialoguesIterator < this.newDialogues.size() - 1) {
-								this.newDialoguesIterator++;
-								this.handleDialogues();
-							}
-							else {
-								this.newDialogues = null;
-								this.newDialoguesIterator = 0;
-								this.player.stopInteraction();
-							}
-						}
-						else if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
-							&& !this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
-							if (!this.newDialogues.get(this.newDialoguesIterator).isShowingDialog()) {
-								Player.unlockMovements();
-								this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
-								if (this.newDialoguesIterator < this.newDialogues.size() - 1) {
-									this.newDialoguesIterator++;
-									this.handleDialogues();
-								}
-								else {
-									this.newDialogues = null;
-									this.newDialoguesIterator = 0;
-									this.player.stopInteraction();
-								}
-							}
-							else
-								this.newDialogues.get(this.newDialoguesIterator).tick();
-						}
-						else if (this.newDialogues.get(this.newDialoguesIterator).isDialogueTextSet()
-							&& !(this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
-								&& this.newDialogues.get(this.newDialoguesIterator).isShowingDialog())) {
-							Player.lockMovements();
-							this.newDialogues.get(this.newDialoguesIterator).tick();
-						}
-						break;
-					case Dialogue.DIALOGUE_QUESTION:
-						if (!this.newDialogues.get(this.newDialoguesIterator).yesNoQuestionHasBeenAnswered()) {
-							this.newDialogues.get(this.newDialoguesIterator).tick();
-							if (!Player.isMovementsLocked())
-								Player.lockMovements();
-						}
-						if (this.newDialogues.get(this.newDialoguesIterator).getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
-							if (this.newDialoguesIterator < this.newDialogues.size() - 1) {
-								this.newDialoguesIterator++;
-								this.handleDialogues();
-							}
-							else {
-								this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
-								this.newDialogues = null;
-								this.newDialoguesIterator = 0;
-								this.player.stopInteraction();
-								Player.unlockMovements();
-							}
-						}
-						else if (this.newDialogues.get(this.newDialoguesIterator)
-							.getAnswerToSimpleQuestion() == Boolean.FALSE) {
-							this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
-							this.newDialogues = null;
-							this.newDialoguesIterator = 0;
-							this.player.stopInteraction();
-							Player.unlockMovements();
-						}
-						break;
-				}
-			}
-		}
-	}
+//	private void handleDialogues() {
+//		if (this.newDialogues != null) {
+//			// The order is IMPORTANT!!
+//			if (this.newDialogues.size() == 1) {
+//				if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
+//					&& this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
+//					Player.unlockMovements();
+//					this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
+//					this.newDialogues = null;
+//					this.newDialoguesIterator = 0;
+//					this.player.stopInteraction();
+//				}
+//				else if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
+//					&& !this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
+//					this.newDialogues.get(this.newDialoguesIterator).tick();
+//				}
+//				else if (this.newDialogues.get(this.newDialoguesIterator).isDialogueTextSet()
+//					&& !(this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
+//						&& this.newDialogues.get(this.newDialoguesIterator).isShowingDialog())) {
+//					Player.lockMovements();
+//					this.newDialogues.get(this.newDialoguesIterator).tick();
+//				}
+//			}
+//			else {
+//				switch (this.newDialogues.get(this.newDialoguesIterator).getDialogueType()) {
+//					case Dialogue.DIALOGUE_SPEECH:
+//						if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
+//							&& this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
+//							Player.unlockMovements();
+//							this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
+//							if (this.newDialoguesIterator < this.newDialogues.size() - 1) {
+//								this.newDialoguesIterator++;
+//								this.handleDialogues();
+//							}
+//							else {
+//								this.newDialogues = null;
+//								this.newDialoguesIterator = 0;
+//								this.player.stopInteraction();
+//							}
+//						}
+//						else if (this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
+//							&& !this.newDialogues.get(this.newDialoguesIterator).isScrolling()) {
+//							if (!this.newDialogues.get(this.newDialoguesIterator).isShowingDialog()) {
+//								Player.unlockMovements();
+//								this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
+//								if (this.newDialoguesIterator < this.newDialogues.size() - 1) {
+//									this.newDialoguesIterator++;
+//									this.handleDialogues();
+//								}
+//								else {
+//									this.newDialogues = null;
+//									this.newDialoguesIterator = 0;
+//									this.player.stopInteraction();
+//								}
+//							}
+//							else
+//								this.newDialogues.get(this.newDialoguesIterator).tick();
+//						}
+//						else if (this.newDialogues.get(this.newDialoguesIterator).isDialogueTextSet()
+//							&& !(this.newDialogues.get(this.newDialoguesIterator).isDialogueCompleted()
+//								&& this.newDialogues.get(this.newDialoguesIterator).isShowingDialog())) {
+//							Player.lockMovements();
+//							this.newDialogues.get(this.newDialoguesIterator).tick();
+//						}
+//						break;
+//					case Dialogue.DIALOGUE_QUESTION:
+//						if (!this.newDialogues.get(this.newDialoguesIterator).yesNoQuestionHasBeenAnswered()) {
+//							this.newDialogues.get(this.newDialoguesIterator).tick();
+//							if (!Player.isMovementsLocked())
+//								Player.lockMovements();
+//						}
+//						if (this.newDialogues.get(this.newDialoguesIterator).getAnswerToSimpleQuestion() == Boolean.TRUE) {
+//							this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
+//							if (this.newDialoguesIterator < this.newDialogues.size() - 1) {
+//								this.newDialoguesIterator++;
+//								this.handleDialogues();
+//							}
+//							else {
+//								this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
+//								this.newDialogues = null;
+//								this.newDialoguesIterator = 0;
+//								this.player.stopInteraction();
+//								Player.unlockMovements();
+//							}
+//						}
+//						else if (this.newDialogues.get(this.newDialoguesIterator)
+//							.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+//							this.newDialogues.get(this.newDialoguesIterator).resetDialogue();
+//							this.newDialogues = null;
+//							this.newDialoguesIterator = 0;
+//							this.player.stopInteraction();
+//							Player.unlockMovements();
+//						}
+//						break;
+//				}
+//			}
+//		}
+//	}
 
 	private void handleWarpPointEvent() {
 		boolean currentAreaFound = false;
@@ -476,11 +466,11 @@ public class OverWorld extends Entity {
 		if (screen.getRenderingEffectTick() < (byte) 0x4 || screen.getRenderingEffectTick() >= (byte) 0x7)
 			this.player.render(screen, 0, 0);
 
-		if (this.newDialogues != null && this.newDialogues.size() > 0) {
-			Dialogue dialogue = this.newDialogues.get(this.newDialoguesIterator);
-			dialogue.renderInformationBox(screen, 0, 6, 9, 2);
-			dialogue.render(screen, screen.getBufferedImage().createGraphics());
-		}
+//		if (this.newDialogues != null && this.newDialogues.size() > 0) {
+//			Dialogue dialogue = this.newDialogues.get(this.newDialoguesIterator);
+//			dialogue.renderInformationBox(screen, 0, 6, 9, 2);
+//			dialogue.render(screen, screen.getBufferedImage().createGraphics());
+//		}
 	}
 
 	// ---------------------------------------------------------------------------------------
