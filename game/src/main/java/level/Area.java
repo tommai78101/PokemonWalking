@@ -20,11 +20,12 @@ import abstracts.Entity;
 import abstracts.Obstacle;
 import entity.Player;
 import interfaces.Tileable;
+import interfaces.UpdateRenderable;
 import screen.BaseBitmap;
 import screen.Scene;
 import script.TriggerData;
 
-public class Area extends Entity {
+public class Area implements Tileable, UpdateRenderable {
 	private final int width;
 	private final int height;
 	private final int[] pixels;
@@ -49,6 +50,8 @@ public class Area extends Entity {
 	private TriggerData trigger;
 
 	private final List<List<PixelData>> areaData = new ArrayList<>();
+	private final List<Obstacle> areaObstacles = new ArrayList<>();
+	private final List<Character> areaCharacters = new ArrayList<>();
 	private final List<Entity> areaEntities = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
 	private final ArrayList<TriggerData> triggerDatas = new ArrayList<>();
@@ -80,11 +83,15 @@ public class Area extends Entity {
 			this.areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
 				int pixel = this.pixels[y * this.width + x];
-
-				if (Entity.isObstacle(pixel))
-					this.areaObstacles.add(Obstacle.build(pixel, x, y));
-
 				PixelData pixelData = new PixelData(pixel, x, y);
+
+				if (Entity.isObstacle(pixelData)) {
+					this.areaObstacles.add(Obstacle.build(pixelData, x, y));
+				}
+				if (Entity.isCharacter(pixelData)) {
+					this.areaCharacters.add(Character.build(pixelData, x, y));
+				}
+
 				this.areaData.get(y).add(pixelData);
 			}
 		}
@@ -410,7 +417,7 @@ public class Area extends Entity {
 		// When the game starts from the very beginning, the player must always start
 		// from the very first way point.
 		SET_LOOP:
-		for (ArrayList<PixelData> pixelDataRow : this.areaData) {
+		for (List<PixelData> pixelDataRow : this.areaData) {
 			for (PixelData pixelData : pixelDataRow) {
 				if (((pixelData.getColor() >> 24) & 0xFF) == 0x0D) {
 					this.setPlayerX(pixelData.xPosition);
@@ -566,7 +573,7 @@ public class Area extends Entity {
 		return this.areaData.get(y).get(x);
 	}
 
-	public ArrayList<ArrayList<PixelData>> getAllPixelDatas() {
+	public List<List<PixelData>> getAllPixelDatas() {
 		return this.areaData;
 	}
 
@@ -574,7 +581,7 @@ public class Area extends Entity {
 		return this.isExitArrowDisplayed;
 	}
 
-	public ArrayList<Obstacle> getObstaclesList() {
+	public List<Obstacle> getObstaclesList() {
 		return this.areaObstacles;
 	}
 
@@ -591,7 +598,23 @@ public class Area extends Entity {
 	}
 
 	public Entity getEntity(int x, int y) {
-		return this.areaObstacles
+		//Only obstacles and characters are entities.
+		PixelData data = this.getPixelData(x, y);
+		if (Entity.isObstacle(data)) {
+			for (Obstacle obstacle : this.areaObstacles) {
+				if (obstacle.getPixelData().equals(data)) {
+					return obstacle;
+				}
+			}
+		}
+		else if (Entity.isCharacter(data)) {
+			for (Character character : this.areaCharacters) {
+				if (character.getPixelData().equals(data)) {
+					return character;
+				}
+			}
+		}
+		return null;
 	}
 
 	// --------------------- OVERRIDDEN METHODS -------------------

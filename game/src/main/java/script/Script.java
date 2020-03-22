@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import dialogue.Dialogue;
-import entity.Player;
 import utility.DialogueBuilder;
 
 public class Script {
@@ -53,27 +52,27 @@ public class Script {
 		this.affirmativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, Movement> e : s.affirmativeMoves)
 			this.affirmativeMoves
-					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
+				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
 
 		this.negativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, Movement> e : s.negativeMoves)
 			this.negativeMoves
-					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
+				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
 
 		this.dialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.dialogues)
 			this.dialogues
-					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
+				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
 
 		this.affirmativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.affirmativeDialogues)
 			this.affirmativeDialogues
-					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
+				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
 
 		this.negativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.negativeDialogues)
 			this.negativeDialogues
-					.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
+				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
 
 		this.iteration = s.iteration;
 		this.affirmativeIteration = s.affirmativeIteration;
@@ -88,12 +87,14 @@ public class Script {
 				if (entry.getKey() == this.iteration)
 					return entry.getValue();
 			}
-		} else if (this.questionResponse == Boolean.TRUE) {
+		}
+		else if (this.questionResponse == Boolean.TRUE) {
 			for (Map.Entry<Integer, Movement> entry : this.affirmativeMoves) {
 				if (entry.getKey() == this.affirmativeIteration)
 					return entry.getValue();
 			}
-		} else if (this.questionResponse == Boolean.FALSE) {
+		}
+		else if (this.questionResponse == Boolean.FALSE) {
 			for (Map.Entry<Integer, Movement> entry : this.negativeMoves) {
 				if (entry.getKey() == this.negativeIteration)
 					return entry.getValue();
@@ -109,13 +110,15 @@ public class Script {
 					return entry.getValue();
 				}
 			}
-		} else if (this.questionResponse == Boolean.TRUE) {
+		}
+		else if (this.questionResponse == Boolean.TRUE) {
 			for (Map.Entry<Integer, Dialogue> entry : this.affirmativeDialogues) {
 				if (entry.getKey() == this.affirmativeIteration) {
 					return entry.getValue();
 				}
 			}
-		} else if (this.questionResponse == Boolean.FALSE) {
+		}
+		else if (this.questionResponse == Boolean.FALSE) {
 			for (Map.Entry<Integer, Dialogue> entry : this.negativeDialogues) {
 				if (entry.getKey() == this.negativeIteration) {
 					return entry.getValue();
@@ -144,14 +147,16 @@ public class Script {
 			if (this.iteration < size)
 				return true;
 			return false;
-		} else if (this.questionResponse == Boolean.TRUE) {
+		}
+		else if (this.questionResponse == Boolean.TRUE) {
 			this.resetResponseFlag();
 			this.affirmativeIteration++;
 			int size = this.affirmativeMoves.size() + this.affirmativeDialogues.size();
 			if (this.affirmativeIteration < size)
 				return true;
 			return false;
-		} else { // FALSE
+		}
+		else { // FALSE
 			this.resetResponseFlag();
 			this.negativeIteration++;
 			int size = this.negativeMoves.size() + this.negativeDialogues.size();
@@ -167,18 +172,16 @@ public class Script {
 	 * </p>
 	 * 
 	 * <p>
-	 * The script file is a database of all triggers of a a certain map. All scripts
-	 * within the file can only be triggered by that area.
+	 * The script file is a database of all triggers of a a certain map. All scripts within the file can only be triggered by that area.
 	 * </p>
 	 * 
 	 * <p>
-	 * Currently needs fixing and testing. Will be completed when all issues have
-	 * been sorted out.
+	 * Currently needs fixing and testing. Will be completed when all issues have been sorted out.
 	 * </p>
 	 * 
-	 * @param filename - A String object of the file name of the SCRIPT file.
-	 * @return An ArrayList<Script> object, containing all of the triggers and
-	 *         scripted events located within the SCRIPT file.
+	 * @param filename
+	 *            - A String object of the file name of the SCRIPT file.
+	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located within the SCRIPT file.
 	 * 
 	 */
 	public static ArrayList<Script> loadScript(String filename, boolean isModdedScript) {
@@ -195,9 +198,11 @@ public class Script {
 		try {
 			if (isModdedScript) {
 				reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename))));
-			} else {
+			}
+			else {
 				reader = new BufferedReader(
-						new InputStreamReader(Script.class.getClassLoader().getResourceAsStream(filename)));
+					new InputStreamReader(Script.class.getClassLoader().getResourceAsStream(filename))
+				);
 			}
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -211,70 +216,90 @@ public class Script {
 						script.triggerID = triggerID;
 					}
 
-				} else if (line.startsWith("^")) { // Movement
+				}
+				else if (line.startsWith("^")) { // Movement
 					if (script != null) {
 						Movement moves = new Movement();
-						append(moves, line.substring(1).toCharArray());
+						Script.append(moves, line.substring(1).toCharArray());
 						script.moves.add(new AbstractMap.SimpleEntry<>(iteration, moves));
 						iteration++;
 					}
-				} else if (line.startsWith("%")) { // Script delimiter
+				}
+				else if (line.startsWith("%")) { // Script delimiter
 					if (script != null) {
 						result.add(script);
 						script = null;
 						iteration = 0;
 					}
-				} else if (line.startsWith("#")) { // speech dialogue
-					Dialogue d = DialogueBuilder.createText(line.substring(1).replace("_", " "),
-							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH, true);
+				}
+				else if (line.startsWith("#")) { // speech dialogue
+					Dialogue d = DialogueBuilder.createText(
+						line.substring(1).replace("_", " "),
+						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_SPEECH, true
+					);
 					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
 					iteration++;
-				} else if (line.startsWith("?")) { // question dialogue
-					Dialogue d = DialogueBuilder.createText(line.substring(1).replace("_", " "),
-							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_QUESTION, true);
+				}
+				else if (line.startsWith("?")) { // question dialogue
+					Dialogue d = DialogueBuilder.createText(
+						line.substring(1).replace("_", " "),
+						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_QUESTION, true
+					);
 					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
 					iteration++;
-				} else if (line.startsWith("+")) { // affirmative dialogue
-					Dialogue d = DialogueBuilder.createText(line.substring(1).replace("_", " "),
-							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH, true);
+				}
+				else if (line.startsWith("+")) { // affirmative dialogue
+					Dialogue d = DialogueBuilder.createText(
+						line.substring(1).replace("_", " "),
+						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_SPEECH, true
+					);
 					script.affirmativeDialogues
-							.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, d));
+						.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, d));
 					affirmativeIteration++;
-				} else if (line.startsWith("-")) { // negative dialogue
-					Dialogue d = DialogueBuilder.createText(line.substring(1).replace("_", " "),
-							Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH, true);
+				}
+				else if (line.startsWith("-")) { // negative dialogue
+					Dialogue d = DialogueBuilder.createText(
+						line.substring(1).replace("_", " "),
+						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_SPEECH, true
+					);
 					script.negativeDialogues
-							.add(new AbstractMap.SimpleEntry<>(negativeIteration, d));
+						.add(new AbstractMap.SimpleEntry<>(negativeIteration, d));
 					negativeIteration++;
-				} else if (line.startsWith("[")) { // affirmative action
+				}
+				else if (line.startsWith("[")) { // affirmative action
 					if (script != null) {
 						Movement moves = new Movement();
-						append(moves, line.substring(1).toCharArray());
+						Script.append(moves, line.substring(1).toCharArray());
 						script.affirmativeMoves
-								.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, moves));
+							.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, moves));
 						affirmativeIteration++;
 					}
-				} else if (line.startsWith("]")) { // negative action
+				}
+				else if (line.startsWith("]")) { // negative action
 					if (script != null) {
 						Movement moves = new Movement();
-						append(moves, line.substring(1).toCharArray());
+						Script.append(moves, line.substring(1).toCharArray());
 						script.negativeMoves
-								.add(new AbstractMap.SimpleEntry<>(negativeIteration, moves));
+							.add(new AbstractMap.SimpleEntry<>(negativeIteration, moves));
 						negativeIteration++;
 					}
-				} else if (line.startsWith(";")) {
+				}
+				else if (line.startsWith(";")) {
 					if (script != null) {
 						script.repeat = true;
 					}
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			if (reader != null) {
 				try {
 					reader.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
@@ -291,21 +316,21 @@ public class Script {
 				char d = list[i];
 				char s = list[i + 1];
 				switch (d) {
-				case 'U':
-					direction = Player.UP;
-					break;
-				case 'D':
-					direction = Player.DOWN;
-					break;
-				case 'L':
-					direction = Player.LEFT;
-					break;
-				case 'R':
-					direction = Player.RIGHT;
-					break;
-				default:
-					direction = -1;
-					break;
+					case 'U':
+						direction = abstracts.Character.UP;
+						break;
+					case 'D':
+						direction = abstracts.Character.DOWN;
+						break;
+					case 'L':
+						direction = abstracts.Character.LEFT;
+						break;
+					case 'R':
+						direction = abstracts.Character.RIGHT;
+						break;
+					default:
+						direction = -1;
+						break;
 				}
 				steps = Character.getNumericValue(s);
 				if (direction != -1 && steps != -1 && steps != -2 && (steps <= 9 && steps >= 0)) {
@@ -313,7 +338,8 @@ public class Script {
 					moves.moves.add(entry);
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			throw new NumberFormatException("Incorrect script syntax from \"script.txt\"");
 		}
@@ -334,7 +360,8 @@ public class Script {
 		File modDirectory = new File("mod");
 		if (modDirectory.exists() && modDirectory.isDirectory()) {
 			String[] folders = modDirectory.list();
-			LOOP: for (int i = 0; i < folders.length; i++) {
+			LOOP:
+			for (int i = 0; i < folders.length; i++) {
 				File directory = new File(modDirectory.getPath() + File.separator + folders[i]);
 				if (directory.exists() && directory.isDirectory() && directory.getName().equals("script")) {
 					String[] scripts = directory.list();

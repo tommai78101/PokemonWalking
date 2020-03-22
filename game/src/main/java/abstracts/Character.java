@@ -2,9 +2,9 @@ package abstracts;
 
 import interfaces.CharacterActionable;
 import interfaces.Interactable;
-import interfaces.Obstructable;
+import level.PixelData;
 
-public abstract class Character extends Entity implements Interactable, CharacterActionable, Obstructable {
+public abstract class Character extends Entity implements Interactable, CharacterActionable {
 	/**
 	 * Entity class objects include NPC, Player, and monsters. Thus, it is fitting for the Entity objects to include a GenderType.
 	 */
@@ -33,13 +33,13 @@ public abstract class Character extends Entity implements Interactable, Characte
 			return Nondetermined;
 		}
 	}
-	
+
 	// These numbers correspond to the index number of the columns of the character sprite sheet.
 	public static final int UP = 2;
 	public static final int DOWN = 0;
 	public static final int LEFT = 1;
 	public static final int RIGHT = 3;
-	
+
 	private boolean isPlayable;
 	private int interactionDataColorID = 0;
 	private GenderType gender = GenderType.Nondetermined;
@@ -66,5 +66,13 @@ public abstract class Character extends Entity implements Interactable, Characte
 
 	public GenderType getGender() {
 		return this.gender;
+	}
+
+	public static Character build(int pixel, int x, int y) {
+		return null;
+	}
+
+	public static Character build(PixelData pixelData, int x, int y) {
+		return null;
 	}
 }

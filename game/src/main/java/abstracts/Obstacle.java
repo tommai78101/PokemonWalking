@@ -10,40 +10,31 @@
 
 package abstracts;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import dialogue.Dialogue;
-import error.GameException;
-import interfaces.Obstructable;
-import interfaces.Unpassable;
+import interfaces.Interactable;
 import level.PixelData;
 import obstacle.SmallTree;
-import utility.DataUtils;
 
-public abstract class Obstacle extends Entity implements Unpassable, Obstructable {
-	private List<Dialogue> dialogues;
-	private List<Dialogue> overriddenDialogues;
-	private int color;
-	private int id;
-	
-	public static boolean test(int pixelColor) {
-		return DataUtils.getAlphaData(pixelColor) == 0x03;
-	}
-	
-	public static Obstacle build(final int pixel, final int xPosition, final int yPosition) {
-		byte red = DataUtils.getRedData(pixel);
+public abstract class Obstacle extends Entity implements Interactable {
+	protected int color;
+	protected int id;
+	protected List<Dialogue> defaultDialogues;
+	protected List<Dialogue> overrideDialogues;
+
+	public static Obstacle build(final PixelData data, final int xPosition, final int yPosition) {
+		int red = data.getRed();
 		switch (red) {
 			case 0x00:
-				return new SmallTree(new PixelData(pixel, xPosition, yPosition), red);
+				return new SmallTree(data, red);
 			default:
 				return null;
 		}
 	}
-	
-	public Obstacle() {
-		this.dialogues = new ArrayList<>();
-		this.overriddenDialogues = new ArrayList<>();
+
+	public static Obstacle build(final int pixel, final int xPosition, final int yPosition) {
+		return Obstacle.build(new PixelData(pixel, xPosition, yPosition), xPosition, yPosition);
 	}
 
 //	public Obstacle(PixelData data, int id) {
@@ -105,23 +96,18 @@ public abstract class Obstacle extends Entity implements Unpassable, Obstructabl
 		return this.color;
 	}
 
-	public List<Dialogue> getDialogues() throws GameException {
-		if (!this.overriddenDialogues.isEmpty())
-			return this.overriddenDialogues;
-		if (!this.dialogues.isEmpty())
-			return this.dialogues;
-		throw new GameException("This obstacle does not have any default dialogues. Perhaps this obstacle has not been initialized?");
-	}
-	
-	public void addDialogue(Dialogue dialogue) {
-		this.overriddenDialogues.add(dialogue);
-	}
-	
-	public void clearDialogues() {
-		this.overriddenDialogues.clear();
+	public List<Dialogue> getDialogues() {
+		if (this.overrideDialogues.isEmpty()) {
+			if (this.defaultDialogues.isEmpty()) {
+				return null;
+			}
+			return this.defaultDialogues;
+		}
+		return this.overrideDialogues;
 	}
 
-	protected void initializeDialogues(List<Dialogue> newDialogues) {
-		this.dialogues.addAll(newDialogues);
+	@Override
+	public PixelData getPixelData() {
+		return this.pixelData;
 	}
 }

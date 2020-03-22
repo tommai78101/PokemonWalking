@@ -1,10 +1,9 @@
 package obstacle;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import abstracts.Entity;
+import abstracts.Item;
 import abstracts.Obstacle;
-import dialogue.Dialogue;
+import dialogue.Dialogue.Type;
 import level.PixelData;
 import screen.Scene;
 import utility.DialogueBuilder;
@@ -13,30 +12,34 @@ public class SmallTree extends Obstacle {
 	private PixelData pixelData;
 
 	public SmallTree(PixelData data, int id) {
-		super();
 		this.pixelData = data;
 
-		List<Dialogue> dialogues = new ArrayList<>();
-		dialogues.add(
+		this.defaultDialogues.add(
 			DialogueBuilder.createText(
 				"This tree is born from the ground that was created 6 months ago.",
-				Dialogue.MAX_STRING_LENGTH,
-				Dialogue.DIALOGUE_SPEECH,
-				false
+				Type.DIALOGUE_SPEECH
 			)
 		);
-		super.initializeDialogues(dialogues);
-	}
-
-	@Override
-	public PixelData getPixelData() {
-		return this.pixelData;
 	}
 
 	@Override
 	public void tick() {}
 
 	@Override
-	public void render(Scene screen, int offsetX, int offsetY) {}
+	public void render(Scene screen, int offsetX, int offsetY) {
+
+	}
+
+	@Override
+	public void interact(Entity target) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void interact(Entity target, Item item) {
+		// TODO Auto-generated method stub
+
+	}
 
 }

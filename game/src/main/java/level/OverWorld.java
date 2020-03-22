@@ -14,17 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import abstracts.Entity;
 import abstracts.Item;
 import abstracts.Obstacle;
 import entity.Player;
 import error.GameException;
 import interfaces.Tileable;
+import interfaces.UpdateRenderable;
 import item.ItemText;
 import main.Game;
 import screen.Scene;
 
-public class OverWorld extends Entity {
+public class OverWorld implements Tileable, UpdateRenderable {
 	// Overworld properties.
 	protected Player player;
 	protected Area currentArea;
@@ -214,7 +214,7 @@ public class OverWorld extends Entity {
 							break;
 						}
 						default: // Other obstacles
-							ArrayList<Obstacle> list = this.currentArea.getObstaclesList();
+							List<Obstacle> list = this.currentArea.getObstaclesList();
 							OBSTACLE_LOOP:
 							for (int i = 0; i < list.size(); i++) {
 								Obstacle obstacle = list.get(i);

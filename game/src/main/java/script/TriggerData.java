@@ -4,11 +4,11 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Map;
 
+import dialogue.Dialogue;
+import entity.Player;
 import level.Area;
 import level.WorldConstants;
 import screen.Scene;
-import dialogue.Dialogue;
-import entity.Player;
 
 public class TriggerData {
 	public int x, y;
@@ -26,9 +26,9 @@ public class TriggerData {
 	// Scripts to obtain Movements.
 
 	public TriggerData() {
-		x = y = 0;
-		script = null;
-		finished = false;
+		this.x = this.y = 0;
+		this.script = null;
+		this.finished = false;
 	}
 
 	public TriggerData(TriggerData t) {
@@ -44,7 +44,7 @@ public class TriggerData {
 		if (this.finished)
 			this.finished = false;
 		ArrayList<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
-				: WorldConstants.scripts);
+			: WorldConstants.scripts);
 		for (Script s : scriptList) {
 			if (s.triggerID == (pixel & 0xFFFF)) {
 				this.script = s;
@@ -59,15 +59,15 @@ public class TriggerData {
 	public void tick(Area area, int entityX, int entityY) {
 		if (this.script != null) {
 
-			moves = this.script.getIteratedMoves();
-			dialogue = this.script.getIteratedDialogues();
+			this.moves = this.script.getIteratedMoves();
+			this.dialogue = this.script.getIteratedDialogues();
 
-			if (moves != null && dialogue == null) {
+			if (this.moves != null && this.dialogue == null) {
 				area.getPlayer().keys.resetInputs();
 				if (area.getPlayer().isLockedWalking())
 					return;
-				ArrayList<Map.Entry<Integer, Integer>> list = moves.getAllMoves();
-				if (iteration < list.size()) {
+				ArrayList<Map.Entry<Integer, Integer>> list = this.moves.getAllMoves();
+				if (this.iteration < list.size()) {
 					Map.Entry<Integer, Integer> entry = list.get(0);
 					if (entry.getKey() != area.getPlayer().getFacing()) {
 						area.getPlayer().setFacing(entry.getKey());
@@ -81,91 +81,103 @@ public class TriggerData {
 							area.getPlayer().forceLockWalking();
 						steps--;
 						entry.setValue(steps);
-					} else {
+					}
+					else {
 						list.remove(entry);
 						if (list.isEmpty()) {
-							moves = null;
+							this.moves = null;
 							try {
 								if (!this.script.incrementIteration())
 									this.finished = true;
-							} catch (Exception e) {
+							}
+							catch (Exception e) {
 								this.finished = true;
 								return;
 							}
-						} else {
+						}
+						else {
 							entry = list.get(0);
 							if (entry.getKey() != area.getPlayer().getFacing())
 								area.getPlayer().setFacing(entry.getKey());
 						}
 					}
 				}
-			} else if (moves == null && dialogue != null) {
-				switch (dialogue.getDialogueType()) {
-				case Dialogue.DIALOGUE_SPEECH:
-					if (this.dialogue.isDialogueCompleted()) {
-						if (this.dialogue.isScrolling()) {
-							Player.unlockMovements();
-							dialogue.tick();
-							try {
-								this.finished = !this.script.incrementIteration();
-							} catch (Exception e) {
-								this.finished = true;
-								return;
-							}
-						} else {
-							if (!dialogue.isShowingDialog()) {
+			}
+			else if (this.moves == null && this.dialogue != null) {
+				switch (this.dialogue.getDialogueType()) {
+					case DIALOGUE_SPEECH:
+						if (this.dialogue.isDialogueCompleted()) {
+							if (this.dialogue.isScrolling()) {
 								Player.unlockMovements();
-								this.dialogue = null;
+								this.dialogue.tick();
 								try {
 									this.finished = !this.script.incrementIteration();
-								} catch (Exception e) {
+								}
+								catch (Exception e) {
 									this.finished = true;
 									return;
 								}
-							} else
-								dialogue.tick();
+							}
+							else {
+								if (!this.dialogue.isShowingDialog()) {
+									Player.unlockMovements();
+									this.dialogue = null;
+									try {
+										this.finished = !this.script.incrementIteration();
+									}
+									catch (Exception e) {
+										this.finished = true;
+										return;
+									}
+								}
+								else
+									this.dialogue.tick();
+							}
 						}
-					} else if (dialogue.isDialogueTextSet()
-							&& !(dialogue.isDialogueCompleted() && dialogue.isShowingDialog())) {
-						Player.lockMovements();
-						dialogue.tick();
-					}
-					break;
-				case Dialogue.DIALOGUE_QUESTION:
-					if (!dialogue.yesNoQuestionHasBeenAnswered()) {
-						dialogue.tick();
-						if (!Player.isMovementsLocked())
+						else if (this.dialogue.isDialogueTextSet()
+							&& !(this.dialogue.isDialogueCompleted() && this.dialogue.isShowingDialog())) {
 							Player.lockMovements();
-						area.getPlayer().disableAutomaticMode();
-					}
-					if (dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-						if (Player.isMovementsLocked())
-							Player.unlockMovements();
-						area.getPlayer().enableAutomaticMode();
-						this.dialogue = null;
-						try {
-							this.finished = !this.script.incrementIteration();
-						} catch (Exception e) {
-							this.finished = true;
-							return;
+							this.dialogue.tick();
 						}
-						this.script.setAffirmativeFlag();
-						this.finished = false;
-					} else if (dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
-						if (Player.isMovementsLocked())
-							Player.unlockMovements();
-						area.getPlayer().enableAutomaticMode();
-						this.dialogue = null;
-						try {
-							this.finished = !this.script.incrementIteration();
-						} catch (Exception e) {
-							this.finished = true;
-							return;
+						break;
+					case DIALOGUE_QUESTION:
+						if (!this.dialogue.yesNoQuestionHasBeenAnswered()) {
+							this.dialogue.tick();
+							if (!Player.isMovementsLocked())
+								Player.lockMovements();
+							area.getPlayer().disableAutomaticMode();
 						}
-						this.script.setNegativeFlag();
-						this.finished = false;
-					}
-					break;
+						if (this.dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
+							if (Player.isMovementsLocked())
+								Player.unlockMovements();
+							area.getPlayer().enableAutomaticMode();
+							this.dialogue = null;
+							try {
+								this.finished = !this.script.incrementIteration();
+							}
+							catch (Exception e) {
+								this.finished = true;
+								return;
+							}
+							this.script.setAffirmativeFlag();
+							this.finished = false;
+						}
+						else if (this.dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+							if (Player.isMovementsLocked())
+								Player.unlockMovements();
+							area.getPlayer().enableAutomaticMode();
+							this.dialogue = null;
+							try {
+								this.finished = !this.script.incrementIteration();
+							}
+							catch (Exception e) {
+								this.finished = true;
+								return;
+							}
+							this.script.setNegativeFlag();
+							this.finished = false;
+						}
+						break;
 				}
 			}
 
@@ -196,7 +208,7 @@ public class TriggerData {
 	}
 
 	public boolean isFinished() {
-		return finished;
+		return this.finished;
 	}
 
 	public void turnOffTrigger() {

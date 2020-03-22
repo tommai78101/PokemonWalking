@@ -7,10 +7,15 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import dialogue.Dialogue;
+import dialogue.Dialogue.Type;
 import entity.Player;
 
 public class DialogueBuilder {
-	public static Dialogue createText(String dialogue, int length, int type, boolean lock) {
+	public static Dialogue createText(String dialogue, Type type) {
+		return DialogueBuilder.createText(dialogue, dialogue.length(), type, true);
+	}
+
+	public static Dialogue createText(String dialogue, int length, Type type, boolean lock) {
 		Dialogue dialogues = new Dialogue();
 		dialogues.setLines(DialogueBuilder.toLines(dialogue, length));
 		dialogues.setLineLength(length);
@@ -44,7 +49,7 @@ public class DialogueBuilder {
 					// Dialogue message
 					tokens = line.split("@");
 					temp = DialogueBuilder.createText(
-						tokens[1], Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH,
+						tokens[1], Dialogue.MAX_STRING_LENGTH, Type.DIALOGUE_SPEECH,
 						false
 					);
 				}

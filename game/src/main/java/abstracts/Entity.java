@@ -13,6 +13,7 @@ package abstracts;
 import interfaces.Tileable;
 import interfaces.UpdateRenderable;
 import level.PixelData;
+import level.WorldConstants;
 import screen.BaseBitmap;
 
 /**
@@ -35,21 +36,22 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	protected int xOffset;
 	protected int yOffset;
 	protected BaseBitmap bitmap = null;
-	
+
 	protected int lastFacing = 0;
 	protected int facing = 0;
 
 	protected String name;
 	protected PixelData pixelData;
+	protected Event event;
 
 	// public abstract void initialize(BaseWorld world);
 
 	public int getX() {
-		return xPosition;
+		return this.xPosition;
 	}
 
 	public int getY() {
-		return yPosition;
+		return this.yPosition;
 	}
 
 	protected void setPosition(int x, int y) {
@@ -58,12 +60,12 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	}
 
 	public byte[] getByteName() {
-		if (name == null)
-			name = "Joe";
+		if (this.name == null)
+			this.name = "Joe";
 		byte[] result = new byte[16];
-		byte[] nameData = name.getBytes();
+		byte[] nameData = this.name.getBytes();
 		for (int i = 0; i < result.length; i++) {
-			if (i < name.length())
+			if (i < this.name.length())
 				result[i] = nameData[i];
 			else
 				result[i] = 0;
@@ -110,8 +112,24 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	public PixelData getPixelData() {
 		return this.pixelData;
 	}
-	
+
 	public void setPixelData(PixelData data) {
 		this.pixelData = data;
+	}
+
+	public Event getEvent() {
+		return this.event;
+	}
+
+	// ==============================================================
+	// Static helper methods
+	// ==============================================================
+
+	public static boolean isObstacle(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_OBSTACLE;
+	}
+
+	public static boolean isCharacter(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_CHARACTER;
 	}
 }

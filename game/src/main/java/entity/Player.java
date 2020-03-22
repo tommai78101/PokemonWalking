@@ -11,6 +11,8 @@
 package entity;
 
 import abstracts.Character;
+import abstracts.Entity;
+import abstracts.Item;
 import interfaces.Tileable;
 import level.Area;
 import level.PixelData;
@@ -20,15 +22,15 @@ import screen.Scene;
 
 public class Player extends Character {
 	public static boolean isMovementsLocked() {
-		return movementLock;
+		return Player.movementLock;
 	}
 
 	public static void lockMovements() {
-		movementLock = true;
+		Player.movementLock = true;
 	}
 
 	public static void unlockMovements() {
-		movementLock = false;
+		Player.movementLock = false;
 	}
 
 	public Keys keys;
@@ -116,7 +118,7 @@ public class Player extends Character {
 					Thread.sleep(250);
 				}
 				catch (final InterruptedException e) {}
-				isOnBicycle = false;
+				Player.this.isOnBicycle = false;
 				try {
 					Thread.sleep(250);
 				}
@@ -162,6 +164,11 @@ public class Player extends Character {
 		this.isOnBicycle = false;
 	}
 
+	@Override
+	public void interact(Entity entity, Item item) {
+		this.interact(entity);
+	}
+
 	/**
 	 * Lets the player interact with the data tile ID.
 	 * 
@@ -169,7 +176,8 @@ public class Player extends Character {
 	 *            The tile ID's full data (the color of the tile).
 	 */
 	@Override
-	public void interact(PixelData data) {
+	public void interact(Entity entity) {
+		PixelData data = entity.getPixelData();
 		final int dataColor = data.getColor();
 		final int alpha = (dataColor >> 24) & 0xFF;
 		// int red = (dataColor >> 16) & 0xFF;
@@ -231,19 +239,19 @@ public class Player extends Character {
 	public boolean isFacingAt(final int x, final int y) {
 		int xTgt = 0, yTgt = 0;
 		switch (this.getFacing()) {
-			case Player.UP:
+			case Character.UP:
 				xTgt = this.getXInArea();
 				yTgt = this.getYInArea() - 1;
 				break;
-			case Player.DOWN:
+			case Character.DOWN:
 				xTgt = this.getXInArea();
 				yTgt = this.getYInArea() + 1;
 				break;
-			case Player.LEFT:
+			case Character.LEFT:
 				xTgt = this.getXInArea() - 1;
 				yTgt = this.getYInArea();
 				break;
-			case Player.RIGHT:
+			case Character.RIGHT:
 				xTgt = this.getXInArea() + 1;
 				yTgt = this.getYInArea();
 				break;
@@ -309,19 +317,23 @@ public class Player extends Character {
 
 		try {
 			if (this.isInteracting()) {
+				Entity entity = null;
 				switch (this.getFacing()) {
-					case Player.UP:
-						this.interact(area.getPixelData(playerAreaX, playerAreaY - 1));
+					case Character.UP:
+						entity = area.getEntity(playerAreaX, playerAreaY - 1);
 						break;
-					case Player.DOWN:
-						this.interact(area.getPixelData(playerAreaX, playerAreaY + 1));
+					case Character.DOWN:
+						entity = area.getEntity(playerAreaX, playerAreaY + 1);
 						break;
-					case Player.LEFT:
-						this.interact(area.getPixelData(playerAreaX - 1, playerAreaY));
+					case Character.LEFT:
+						entity = area.getEntity(playerAreaX - 1, playerAreaY);
 						break;
-					case Player.RIGHT:
-						this.interact(area.getPixelData(playerAreaX + 1, playerAreaY));
+					case Character.RIGHT:
+						entity = area.getEntity(playerAreaX + 1, playerAreaY);
 						break;
+				}
+				if (entity != null) {
+					this.interact(entity);
 				}
 			}
 		}
@@ -481,7 +493,7 @@ public class Player extends Character {
 				return true; // Cannot go through items on the ground.
 			case 0x0B: // Carpet (Indoors)
 			case 0x0C: // Carpet (Outdoors)
-			case 0x0D: // Default starting point.
+			case 0x0D: // Triggers
 				return false;
 			default: // Any other type of tiles should be walkable, for no apparent reasons.
 				return false;
@@ -502,7 +514,7 @@ public class Player extends Character {
 		this.isLockedJumping = false;
 		this.isInteractionEnabled = false;
 		this.animationTick = 0x7;
-		this.setFacing(Player.DOWN);
+		this.setFacing(Character.DOWN);
 	}
 
 	/**
@@ -524,18 +536,18 @@ public class Player extends Character {
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
 			// Walking animation while in the air. Shouldn't jump when in water.
 			if (this.isOnBicycle)
-				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
+				output.npcBlit(Art.player_bicycle[this.walking][this.animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 			else
-				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
+				output.npcBlit(Art.player[this.walking][this.animationPointer], this.xOffset + x, this.yOffset + y - this.varyingJumpHeight);
 		}
 		else if (this.isLockedWalking) {
 			// Walking animation
 			if (this.isInWater)
-				output.npcBlit(Art.player_surf[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+				output.npcBlit(Art.player_surf[this.walking][this.animationPointer], this.xOffset + x, this.yOffset + y);
 			else if (this.isOnBicycle)
-				output.npcBlit(Art.player_bicycle[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+				output.npcBlit(Art.player_bicycle[this.walking][this.animationPointer], this.xOffset + x, this.yOffset + y);
 			else
-				output.npcBlit(Art.player[walking][animationPointer], this.xOffset + x, this.yOffset + y);
+				output.npcBlit(Art.player[this.walking][this.animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else {
 			// Key press detection.
@@ -553,21 +565,21 @@ public class Player extends Character {
 			if (this.isInWater) {
 				// Surfing (has higher priority than bicycling)
 				if (canUserMove)
-					output.npcBlit(Art.player_surf[this.getFacing()][animationPointer], this.xOffset + x, this.yOffset + y);
+					output.npcBlit(Art.player_surf[this.getFacing()][this.animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_surf[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
 			}
 			else if (this.isOnBicycle) {
 				// Riding (has lower priority than surfing)
 				if (canUserMove)
-					output.npcBlit(Art.player_bicycle[this.getFacing()][animationPointer], this.xOffset + x, this.yOffset + y);
+					output.npcBlit(Art.player_bicycle[this.getFacing()][this.animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player_bicycle[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
 			}
 			else {
 				// Walking
 				if (canUserMove)
-					output.npcBlit(Art.player[this.getFacing()][animationPointer], this.xOffset + x, this.yOffset + y);
+					output.npcBlit(Art.player[this.getFacing()][this.animationPointer], this.xOffset + x, this.yOffset + y);
 				else
 					output.npcBlit(Art.player[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
 			}
@@ -587,10 +599,10 @@ public class Player extends Character {
 	 *            If an obstacle is to the right of the player when the player is facing towards EAST, or RIGHT, then right is true. False, otherwise.
 	 */
 	public void setAllBlockingDirections(final boolean up, final boolean down, final boolean left, final boolean right) {
-		this.isFacingBlocked[UP] = up;
-		this.isFacingBlocked[DOWN] = down;
-		this.isFacingBlocked[LEFT] = left;
-		this.isFacingBlocked[RIGHT] = right;
+		this.isFacingBlocked[Character.UP] = up;
+		this.isFacingBlocked[Character.DOWN] = down;
+		this.isFacingBlocked[Character.LEFT] = left;
+		this.isFacingBlocked[Character.RIGHT] = right;
 	}
 
 	/**
@@ -677,36 +689,36 @@ public class Player extends Character {
 			case 0x00: // Bottom
 				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
 				// this.facingsBlocked[3] = true;
-				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = true;
-				this.isFacingBlocked[UP] = false;
+				this.isFacingBlocked[Character.DOWN] = this.isFacingBlocked[Character.LEFT] = this.isFacingBlocked[Character.RIGHT] = true;
+				this.isFacingBlocked[Character.UP] = false;
 				this.isLockedJumping = true;
 				break;
 			case 0x01: // Bottom Left
-				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = this.isFacingBlocked[UP] = true;
+				this.isFacingBlocked[Character.DOWN] = this.isFacingBlocked[Character.LEFT] = this.isFacingBlocked[Character.RIGHT] = this.isFacingBlocked[Character.UP] = true;
 				break;
 			case 0x02: // Left
-				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[UP] = true;
-				this.isFacingBlocked[LEFT] = false;
+				this.isFacingBlocked[Character.DOWN] = this.isFacingBlocked[Character.LEFT] = this.isFacingBlocked[Character.UP] = true;
+				this.isFacingBlocked[Character.LEFT] = false;
 				this.isLockedJumping = true;
 				break;
 			case 0x03: // Top Left
-				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = this.isFacingBlocked[UP] = true;
+				this.isFacingBlocked[Character.DOWN] = this.isFacingBlocked[Character.LEFT] = this.isFacingBlocked[Character.RIGHT] = this.isFacingBlocked[Character.UP] = true;
 				break;
 			case 0x04: // Top
-				this.isFacingBlocked[UP] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = true;
-				this.isFacingBlocked[DOWN] = false;
+				this.isFacingBlocked[Character.UP] = this.isFacingBlocked[Character.LEFT] = this.isFacingBlocked[Character.RIGHT] = true;
+				this.isFacingBlocked[Character.DOWN] = false;
 				this.isLockedJumping = true;
 				break;
 			case 0x05: // Top Right
-				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = this.isFacingBlocked[UP] = true;
+				this.isFacingBlocked[Character.DOWN] = this.isFacingBlocked[Character.LEFT] = this.isFacingBlocked[Character.RIGHT] = this.isFacingBlocked[Character.UP] = true;
 				break;
 			case 0x06: // Right
-				this.isFacingBlocked[DOWN] = this.isFacingBlocked[UP] = this.isFacingBlocked[LEFT] = true;
-				this.isFacingBlocked[RIGHT] = false;
+				this.isFacingBlocked[Character.DOWN] = this.isFacingBlocked[Character.UP] = this.isFacingBlocked[Character.LEFT] = true;
+				this.isFacingBlocked[Character.RIGHT] = false;
 				this.isLockedJumping = true;
 				break;
 			case 0x07: // Bottom Right
-				this.isFacingBlocked[DOWN] = this.isFacingBlocked[LEFT] = this.isFacingBlocked[RIGHT] = this.isFacingBlocked[UP] = true;
+				this.isFacingBlocked[Character.DOWN] = this.isFacingBlocked[Character.LEFT] = this.isFacingBlocked[Character.RIGHT] = this.isFacingBlocked[Character.UP] = true;
 				break;
 			default: // Any other tiles should not cause the player to jump.
 				this.isFacingBlocked[0] = this.isFacingBlocked[1] = this.isFacingBlocked[2] = this.isFacingBlocked[3] = true;
@@ -784,20 +796,20 @@ public class Player extends Character {
 	public void tick() {
 		if (this.automaticMode) {
 			this.keys.resetInputs();
-			handleFacingCheck();
+			this.handleFacingCheck();
 		}
 		if (!this.isLockedJumping) {
 			if (!this.isInteractionEnabled) {
-				input();
-				handleMovement();
-				controlTick();
+				this.input();
+				this.handleMovement();
+				this.controlTick();
 			}
 			else {
-				stopAnimation();
+				this.stopAnimation();
 			}
 		}
 		else
-			jump();
+			this.jump();
 	}
 
 	// ---------------------------------------------------------------------
@@ -805,16 +817,16 @@ public class Player extends Character {
 
 	private void checkFacingInput() {
 		if (this.keys.up.isTappedDown || this.keys.up.isPressedDown || this.keys.W.isTappedDown || this.keys.W.isPressedDown) {
-			this.setFacing(Player.UP);
+			this.setFacing(Character.UP);
 		}
 		else if (this.keys.down.isTappedDown || this.keys.down.isPressedDown || this.keys.S.isTappedDown || this.keys.S.isPressedDown) {
-			this.setFacing(Player.DOWN);
+			this.setFacing(Character.DOWN);
 		}
 		else if (this.keys.left.isTappedDown || this.keys.left.isPressedDown || this.keys.A.isTappedDown || this.keys.A.isPressedDown) {
-			this.setFacing(Player.LEFT);
+			this.setFacing(Character.LEFT);
 		}
 		else if (this.keys.right.isTappedDown || this.keys.right.isPressedDown || this.keys.D.isTappedDown || this.keys.D.isPressedDown) {
-			this.setFacing(Player.RIGHT);
+			this.setFacing(Character.RIGHT);
 		}
 		else {
 			// Do nothing with the directional facing here.
@@ -823,35 +835,35 @@ public class Player extends Character {
 
 	private void controlTick() {
 		if (!this.isLockedWalking || !this.isLockedJumping) {
-			animationTick++;
-			if ((this.getFacing() == UP && this.isFacingBlocked[UP])) {
-				if (animationTick >= 10) {
-					animationTick = 0;
+			this.animationTick++;
+			if ((this.getFacing() == Character.UP && this.isFacingBlocked[Character.UP])) {
+				if (this.animationTick >= 10) {
+					this.animationTick = 0;
 				}
 			}
-			else if ((this.getFacing() == DOWN && this.isFacingBlocked[DOWN])) {
-				if (animationTick >= 10) {
-					animationTick = 0;
+			else if ((this.getFacing() == Character.DOWN && this.isFacingBlocked[Character.DOWN])) {
+				if (this.animationTick >= 10) {
+					this.animationTick = 0;
 				}
 			}
-			else if ((this.getFacing() == LEFT && this.isFacingBlocked[LEFT])) {
-				if (animationTick >= 10) {
-					animationTick = 0;
+			else if ((this.getFacing() == Character.LEFT && this.isFacingBlocked[Character.LEFT])) {
+				if (this.animationTick >= 10) {
+					this.animationTick = 0;
 				}
 			}
-			else if ((this.getFacing() == RIGHT && this.isFacingBlocked[RIGHT])) {
-				if (animationTick >= 10) {
-					animationTick = 0;
+			else if ((this.getFacing() == Character.RIGHT && this.isFacingBlocked[Character.RIGHT])) {
+				if (this.animationTick >= 10) {
+					this.animationTick = 0;
 				}
 			}
 			else {
-				if (animationTick >= 4)
-					animationTick = 0;
+				if (this.animationTick >= 4)
+					this.animationTick = 0;
 			}
-			if (animationTick == 0) {
-				animationPointer++;
-				if (animationPointer > 3)
-					animationPointer = 0;
+			if (this.animationTick == 0) {
+				this.animationPointer++;
+				if (this.animationPointer > 3)
+					this.animationPointer = 0;
 			}
 		}
 	}
@@ -890,13 +902,13 @@ public class Player extends Character {
 				this.oldYPosition = this.yPosition;
 
 			// Reset the acceleration values, since we're not really walking.
-			xAccel = 0;
-			yAccel = 0;
+			this.xAccel = 0;
+			this.yAccel = 0;
 
 			// Check for inputs the player wants to face. Tapping in a direction turns the
 			// player around.
-			if (!movementLock)
-				checkFacingInput();
+			if (!Player.movementLock)
+				this.checkFacingInput();
 
 			// Now about to walk. First, check to see if there's an obstacle blocking the
 			// path.
@@ -918,17 +930,17 @@ public class Player extends Character {
 			this.isFacingBlocked[0] = this.isFacingBlocked[1] = this.isFacingBlocked[2] = this.isFacingBlocked[3] = false;
 
 			// Makes sure the acceleration stays limited to 1 pixel/tick.
-			if (xAccel > 1)
-				xAccel = 1;
-			if (xAccel < -1)
-				xAccel = -1;
-			if (yAccel > 1)
-				yAccel = 1;
-			if (yAccel < -1)
-				yAccel = -1;
+			if (this.xAccel > 1)
+				this.xAccel = 1;
+			if (this.xAccel < -1)
+				this.xAccel = -1;
+			if (this.yAccel > 1)
+				this.yAccel = 1;
+			if (this.yAccel < -1)
+				this.yAccel = -1;
 
-			xPosition += xAccel * 2;
-			yPosition += yAccel * 2;
+			this.xPosition += this.xAccel * 2;
+			this.yPosition += this.yAccel * 2;
 
 			// Jumping stuffs go here.
 			if (!this.jumpHeightSignedFlag)
@@ -941,7 +953,7 @@ public class Player extends Character {
 			// Needs to get out of being locked to walking/jumping.
 			// Note that we cannot compare using ||, what if the player is moving in one
 			// direction? What about the other axis?
-			if ((xPosition % Tileable.WIDTH == 0 && yPosition % Tileable.HEIGHT == 0)) {
+			if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
 				// Resets every flag that locks the player.
 				this.isLockedWalking = false;
 				this.isLockedJumping = false;
@@ -951,70 +963,70 @@ public class Player extends Character {
 				}
 			}
 		}
-		controlTick();
+		this.controlTick();
 	}
 
 	private void pressed() {
-		xAccel = yAccel = 0;
+		this.xAccel = this.yAccel = 0;
 		if (this.keys.up.isPressedDown || this.keys.W.isPressedDown) {
-			if (this.getFacing() != Player.UP) {
-				this.setFacing(Player.UP);
+			if (this.getFacing() != Character.UP) {
+				this.setFacing(Character.UP);
 			}
-			if (!this.isFacingBlocked[UP]) {
+			if (!this.isFacingBlocked[Character.UP]) {
 				this.isLockedWalking = true;
-				yAccel--;
+				this.yAccel--;
 			}
 		}
 		else if (this.keys.down.isPressedDown || this.keys.S.isPressedDown) {
-			if (this.getFacing() != Player.DOWN) {
-				this.setFacing(Player.DOWN);
+			if (this.getFacing() != Character.DOWN) {
+				this.setFacing(Character.DOWN);
 			}
-			if (!this.isFacingBlocked[Player.DOWN]) {
+			if (!this.isFacingBlocked[Character.DOWN]) {
 				this.isLockedWalking = true;
-				yAccel++;
+				this.yAccel++;
 			}
 		}
 		else if (this.keys.left.isPressedDown || this.keys.A.isPressedDown) {
-			if (this.getFacing() != Player.LEFT) {
-				this.setFacing(Player.LEFT);
+			if (this.getFacing() != Character.LEFT) {
+				this.setFacing(Character.LEFT);
 			}
-			if (!this.isFacingBlocked[Player.LEFT]) {
+			if (!this.isFacingBlocked[Character.LEFT]) {
 				this.isLockedWalking = true;
-				xAccel--;
+				this.xAccel--;
 			}
 		}
 		else if (this.keys.right.isPressedDown || this.keys.D.isPressedDown) {
-			if (this.getFacing() != Player.RIGHT) {
-				this.setFacing(Player.RIGHT);
+			if (this.getFacing() != Character.RIGHT) {
+				this.setFacing(Character.RIGHT);
 			}
-			if (!this.isFacingBlocked[Player.RIGHT]) {
+			if (!this.isFacingBlocked[Character.RIGHT]) {
 				this.isLockedWalking = true;
-				xAccel++;
+				this.xAccel++;
 			}
 		}
 	}
 
 	private void tapped() {
-		animationTick = 0;
-		animationPointer = 0;
+		this.animationTick = 0;
+		this.animationPointer = 0;
 		if (this.keys.up.isTappedDown || this.keys.W.isTappedDown) {
-			if (this.getFacing() != Player.UP) {
-				this.setFacing(Player.UP);
+			if (this.getFacing() != Character.UP) {
+				this.setFacing(Character.UP);
 			}
 		}
 		else if (this.keys.down.isTappedDown || this.keys.S.isTappedDown) {
-			if (this.getFacing() != Player.DOWN) {
-				this.setFacing(Player.DOWN);
+			if (this.getFacing() != Character.DOWN) {
+				this.setFacing(Character.DOWN);
 			}
 		}
 		else if (this.keys.left.isTappedDown || this.keys.A.isTappedDown) {
-			if (this.getFacing() != Player.LEFT) {
-				this.setFacing(Player.LEFT);
+			if (this.getFacing() != Character.LEFT) {
+				this.setFacing(Character.LEFT);
 			}
 		}
 		else if (this.keys.right.isTappedDown || this.keys.D.isTappedDown) {
-			if (this.getFacing() != Player.RIGHT) {
-				this.setFacing(Player.RIGHT);
+			if (this.getFacing() != Character.RIGHT) {
+				this.setFacing(Character.RIGHT);
 			}
 		}
 	}
@@ -1022,11 +1034,11 @@ public class Player extends Character {
 	public void input() {
 		this.isColliding = false;
 		if (!this.isLockedWalking) {
-			if (!this.isFacingBlocked[UP] && !movementLock) {
+			if (!this.isFacingBlocked[Character.UP] && !Player.movementLock) {
 				if (this.keys.up.isTappedDown || this.keys.W.isTappedDown)
-					tapped();
+					this.tapped();
 				else if (this.keys.up.isPressedDown || this.keys.W.isPressedDown) {
-					pressed();
+					this.pressed();
 					return;
 				}
 			}
@@ -1034,11 +1046,11 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
-			if (!this.isFacingBlocked[DOWN] && !movementLock) {
+			if (!this.isFacingBlocked[Character.DOWN] && !Player.movementLock) {
 				if (this.keys.down.isTappedDown || this.keys.S.isTappedDown)
-					tapped();
+					this.tapped();
 				else if (this.keys.down.isPressedDown || this.keys.S.isPressedDown) {
-					pressed();
+					this.pressed();
 					return;
 				}
 			}
@@ -1046,11 +1058,11 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
-			if (!this.isFacingBlocked[LEFT] && !movementLock) {
+			if (!this.isFacingBlocked[Character.LEFT] && !Player.movementLock) {
 				if (this.keys.left.isTappedDown || this.keys.A.isTappedDown)
-					tapped();
+					this.tapped();
 				else if (this.keys.left.isPressedDown || this.keys.A.isPressedDown) {
-					pressed();
+					this.pressed();
 					return;
 				}
 			}
@@ -1058,11 +1070,11 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
-			if (!this.isFacingBlocked[RIGHT] && !movementLock) {
+			if (!this.isFacingBlocked[Character.RIGHT] && !Player.movementLock) {
 				if (this.keys.right.isTappedDown || this.keys.D.isTappedDown)
-					tapped();
+					this.tapped();
 				else if (this.keys.right.isPressedDown || this.keys.D.isPressedDown) {
-					pressed();
+					this.pressed();
 					return;
 				}
 			}
@@ -1076,7 +1088,7 @@ public class Player extends Character {
 	@Override
 	public void walk() {
 		// When being locked to walking, facing must stay constant.
-		handleFacingCheck();
+		this.handleFacingCheck();
 
 		// Makes sure the acceleration stays limited to 1 pixel/tick.
 		if (this.xAccel > 1)
@@ -1105,7 +1117,7 @@ public class Player extends Character {
 	@Override
 	public void sprint() {
 		// When being locked to walking, facing must stay constant.
-		handleFacingCheck();
+		this.handleFacingCheck();
 
 		// Makes sure the acceleration stays limited to 1 pixel/tick.
 		if (this.xAccel > 1)
@@ -1134,7 +1146,7 @@ public class Player extends Character {
 	@Override
 	public void ride() {
 		// When being locked to walking, facing must stay constant.
-		handleFacingCheck();
+		this.handleFacingCheck();
 
 		// Makes sure the acceleration stays limited to 1 pixel/tick.
 		if (this.xAccel > 1)

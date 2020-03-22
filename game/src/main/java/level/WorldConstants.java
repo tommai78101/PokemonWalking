@@ -39,6 +39,10 @@ public class WorldConstants {
 	public static final int ITEM_3_OPTIONS = 2;
 	public static final int ITEM_BICYCLE = 3;
 
+	//Entity Types
+	public static final int ENTITY_TYPE_OBSTACLE = 0x03;
+	public static final int ENTITY_TYPE_CHARACTER = 0x08;
+
 	// Biome Colors
 	public static final int GRASS_GREEN = 0xFFA4E767;
 	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;

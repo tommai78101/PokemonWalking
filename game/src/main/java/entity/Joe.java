@@ -1,7 +1,8 @@
 package entity;
 
 import abstracts.Character;
-import level.PixelData;
+import abstracts.Entity;
+import abstracts.Item;
 import screen.Scene;
 
 public class Joe extends Character {
@@ -52,9 +53,14 @@ public class Joe extends Character {
 	}
 
 	@Override
-	public void interact(PixelData pixelData) {
+	public void interact(Entity target) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
+	@Override
+	public void interact(Entity target, Item item) {
+		// TODO Auto-generated method stub
+
+	}
 }

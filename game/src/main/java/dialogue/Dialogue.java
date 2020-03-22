@@ -28,9 +28,22 @@ import screen.Scene;
 //TODO (6/25/2015): Check to see why modded scripts still suffer from blinking dialogue boxes. Non-modded scripts are fixed.
 
 public class Dialogue {
-	public static final int DIALOGUE_SPEECH = 0x40;
-	public static final int DIALOGUE_QUESTION = 0x41;
-	public static final int DIALOGUE_ALERT = 0x42;
+	public static enum Type {
+		DIALOGUE_SPEECH(0x40),
+		DIALOGUE_QUESTION(0x41),
+		DIALOGUE_ALERT(0x42);
+
+		public final int typeValue;
+
+		Type(int value) {
+			this.typeValue = value;
+		}
+
+		@Override
+		public String toString() {
+			return Integer.toString(this.typeValue);
+		}
+	}
 
 	public static final int HALF_STRING_LENGTH = 9;
 
@@ -78,7 +91,7 @@ public class Dialogue {
 	private byte tickCount = 0x0;
 
 	private int totalDialogueLength;
-	private int type;
+	private Type type;
 
 	public Dialogue() {
 		this.lines = new ArrayList<>();
@@ -95,7 +108,7 @@ public class Dialogue {
 		this.lineIterator = 0;
 		this.input = Game.keys;
 		this.showDialog = false;
-		this.type = 0;
+		this.type = null;
 		this.yesNoCursorPosition = true;
 		this.yesNoAnswerFlag = null; // Default
 	}
@@ -136,7 +149,7 @@ public class Dialogue {
 		return this.yesNoAnswerFlag.booleanValue();
 	}
 
-	public int getDialogueType() {
+	public Type getDialogueType() {
 		return this.type;
 	}
 
@@ -339,7 +352,7 @@ public class Dialogue {
 					}
 
 					// Speeds up text speed.
-					if (this.type != Dialogue.DIALOGUE_ALERT) {
+					if (this.type != Type.DIALOGUE_ALERT) {
 						if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState))
 							|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
 							if (this.subStringIterator >= this.lineLength - 2) {
@@ -406,7 +419,7 @@ public class Dialogue {
 					}
 
 					// Speeds up text speed.
-					if (this.type != Dialogue.DIALOGUE_ALERT) {
+					if (this.type != Type.DIALOGUE_ALERT) {
 						if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState))
 							|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
 							if (this.subStringIterator >= this.lineLength - 2) {
@@ -869,11 +882,11 @@ public class Dialogue {
 		this.totalDialogueLength = totalDialogueLength;
 	}
 
-	public int getType() {
+	public Type getType() {
 		return this.type;
 	}
 
-	public void setType(int type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 
