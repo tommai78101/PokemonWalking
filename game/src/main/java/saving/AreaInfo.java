@@ -13,6 +13,7 @@ package saving;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.List;
 
 import interfaces.RandomFileAccessible;;
 
@@ -22,11 +23,11 @@ public class AreaInfo implements RandomFileAccessible {
 
 	public final byte[] current_area_id = new byte[4];
 	public final byte[] current_area_sector_id = new byte[4];
-	public final ArrayList<byte[]> changedPixelData = new ArrayList<byte[]>();
+	public final List<byte[]> changedPixelData = new ArrayList<>();
 	public int size;
 
 	public AreaInfo() {
-		size = 0;
+		this.size = 0;
 	}
 
 	@Override
@@ -39,14 +40,14 @@ public class AreaInfo implements RandomFileAccessible {
 		byte[] data = new byte[raf.readByte()];
 		raf.read(data);
 
-		for (int i = 0; i < AREA.length; offset++, i++, size--) {
-			if (data[offset] != AREA[i])
+		for (int i = 0; i < AreaInfo.AREA.length; offset++, i++, this.size--) {
+			if (data[offset] != AreaInfo.AREA[i])
 				throw new IOException("Incorrect Area Info AREA chunk.");
 		}
-		for (int i = 0; i < this.current_area_id.length; i++, offset++, size--) {
+		for (int i = 0; i < this.current_area_id.length; i++, offset++, this.size--) {
 			this.current_area_id[i] = data[offset];
 		}
-		for (int i = 0; i < this.current_area_sector_id.length; i++, offset++, size--) {
+		for (int i = 0; i < this.current_area_sector_id.length; i++, offset++, this.size--) {
 			this.current_area_sector_id[i] = data[offset];
 		}
 
@@ -59,8 +60,8 @@ public class AreaInfo implements RandomFileAccessible {
 			data = new byte[arraySize];
 			raf.read(data);
 			offset = 0;
-			for (int i = 0; i < PIXELDATA.length; i++, offset++)
-				if (data[offset] != PIXELDATA[i])
+			for (int i = 0; i < AreaInfo.PIXELDATA.length; i++, offset++)
+				if (data[offset] != AreaInfo.PIXELDATA[i])
 					throw new IOException("Incorrect Area Info PIXELDATA chunk.");
 			for (; pixelSize > 0; pixelSize--) {
 				byte[] px = new byte[4 * 5];
@@ -74,17 +75,17 @@ public class AreaInfo implements RandomFileAccessible {
 	@Override
 	public void write(RandomAccessFile raf) throws IOException {
 		// Total chunk size.
-		raf.writeByte(size);
+		raf.writeByte(this.size);
 
 		// Current Area Info
-		raf.write(AREA.length + current_area_id.length + current_area_sector_id.length);
-		raf.write(AREA);
-		raf.write(current_area_id);
-		raf.write(current_area_sector_id);
+		raf.write(AreaInfo.AREA.length + this.current_area_id.length + this.current_area_sector_id.length);
+		raf.write(AreaInfo.AREA);
+		raf.write(this.current_area_id);
+		raf.write(this.current_area_sector_id);
 
 		// Changed pixel data
-		raf.writeChar(this.changedPixelData.size() * 4 * 5 + PIXELDATA.length);
-		raf.write(PIXELDATA);
+		raf.writeChar(this.changedPixelData.size() * 4 * 5 + AreaInfo.PIXELDATA.length);
+		raf.write(AreaInfo.PIXELDATA);
 		for (byte[] b : this.changedPixelData)
 			raf.write(b);
 	}

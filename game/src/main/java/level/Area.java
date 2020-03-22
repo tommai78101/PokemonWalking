@@ -54,7 +54,7 @@ public class Area implements Tileable, UpdateRenderable {
 	private final List<Character> areaCharacters = new ArrayList<>();
 	private final List<Entity> areaEntities = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
-	private final ArrayList<TriggerData> triggerDatas = new ArrayList<>();
+	private final List<TriggerData> triggerDatas = new ArrayList<>();
 
 	public Area(BaseBitmap bitmap, final int areaID) {
 		int[] tempPixels = bitmap.getPixels();

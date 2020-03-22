@@ -20,11 +20,11 @@ import interfaces.RandomFileAccessible;
 public class PlayerInfo implements RandomFileAccessible {
 	public final byte[] player_name = new byte[16];
 	public final byte[] player_gender = new byte[1];
-	public final ArrayList<byte[]> startMenu = new ArrayList<byte[]>();
-	public final ArrayList<byte[]> potions = new ArrayList<byte[]>();
-	public final ArrayList<byte[]> keyItems = new ArrayList<byte[]>();
-	public final ArrayList<byte[]> pokéballs = new ArrayList<byte[]>();
-	public final ArrayList<byte[]> tm_hm = new ArrayList<byte[]>();
+	public final List<byte[]> startMenu = new ArrayList<>();
+	public final List<byte[]> potions = new ArrayList<>();
+	public final List<byte[]> keyItems = new ArrayList<>();
+	public final List<byte[]> pokéballs = new ArrayList<>();
+	public final List<byte[]> tm_hm = new ArrayList<>();
 	public final byte[] player_x = new byte[4];
 	public final byte[] player_y = new byte[4];
 	public final byte[] player_facing = new byte[4];
@@ -40,8 +40,8 @@ public class PlayerInfo implements RandomFileAccessible {
 
 	private int byteSize = 0;
 
-	public List<ArrayList<byte[]>> getAllItemsList() {
-		List<ArrayList<byte[]>> result = new ArrayList<ArrayList<byte[]>>();
+	public List<List<byte[]>> getAllItemsList() {
+		List<List<byte[]>> result = new ArrayList<>();
 		result.add(this.potions);
 		result.add(this.keyItems);
 		result.add(this.pokéballs);
@@ -60,19 +60,19 @@ public class PlayerInfo implements RandomFileAccessible {
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		this.byteSize = raf.readShort();
-		byte[] data = new byte[byteSize];
+		byte[] data = new byte[this.byteSize];
 		int offset = 0;
 		raf.read(data);
 		// Checks if "PLAY" tag is set.
-		for (int i = 0; i < PLAY.length; i++, offset++) {
-			if (data[i] != PLAY[i])
+		for (int i = 0; i < PlayerInfo.PLAY.length; i++, offset++) {
+			if (data[i] != PlayerInfo.PLAY[i])
 				throw new IOException("Incorrect Player Info Header chunk.");
 		}
 
 		// Checks for "NAME" tag.
 		byte size = data[offset++];
-		for (int i = 0; i < NAME.length; offset++, i++, size--) {
-			if (data[offset] != NAME[i])
+		for (int i = 0; i < PlayerInfo.NAME.length; offset++, i++, size--) {
+			if (data[offset] != PlayerInfo.NAME[i])
 				throw new IOException("Incorrect Player Info NAME chunk.");
 		}
 		for (int i = 0; i < this.player_name.length; offset++, i++, size--) {
@@ -83,8 +83,8 @@ public class PlayerInfo implements RandomFileAccessible {
 
 		// Checks for "Gender" tag.
 		size = data[offset++];
-		for (int i = 0; i < GNDR.length; offset++, i++, size--) {
-			if (data[offset] != GNDR[i])
+		for (int i = 0; i < PlayerInfo.GNDR.length; offset++, i++, size--) {
+			if (data[offset] != PlayerInfo.GNDR[i])
 				throw new IOException("Incorrect Player Info GNDR chunk.");
 		}
 		for (int i = 0; i < this.player_gender.length; offset++, i++, size--) {
@@ -95,8 +95,8 @@ public class PlayerInfo implements RandomFileAccessible {
 
 		// Menu tag.
 		size = data[offset++];
-		for (int i = 0; i < MENU.length; offset++, i++, size--) {
-			if (data[offset] != MENU[i])
+		for (int i = 0; i < PlayerInfo.MENU.length; offset++, i++, size--) {
+			if (data[offset] != PlayerInfo.MENU[i])
 				throw new IOException("Incorrect Player Info MENU chunk.");
 		}
 		byte[] menuName = null;
@@ -116,8 +116,8 @@ public class PlayerInfo implements RandomFileAccessible {
 
 		// Inventory tag
 		size = data[offset++];
-		for (int i = 0; i < ITEM.length; i++, offset++, size--) {
-			if (data[offset] != ITEM[i])
+		for (int i = 0; i < PlayerInfo.ITEM.length; i++, offset++, size--) {
+			if (data[offset] != PlayerInfo.ITEM[i])
 				throw new IOException("Incorrect Player Info ITEM chunk.");
 		}
 		for (int i = 0; i < this.getAllItemsList().size(); i++) {
@@ -146,7 +146,8 @@ public class PlayerInfo implements RandomFileAccessible {
 						list.add(entry);
 					}
 				}
-			} else
+			}
+			else
 				break;
 		}
 
@@ -167,8 +168,8 @@ public class PlayerInfo implements RandomFileAccessible {
 
 		// Current Position tag
 		size = data[offset++];
-		for (int i = 0; i < AXIS.length; offset++, i++, size--) {
-			if (data[offset] != AXIS[i])
+		for (int i = 0; i < PlayerInfo.AXIS.length; offset++, i++, size--) {
+			if (data[offset] != PlayerInfo.AXIS[i])
 				throw new IOException("Incorrect Player Info AXIS chunk.");
 		}
 		for (int i = 0; i < this.player_x.length; i++, offset++, size--) {
@@ -180,8 +181,8 @@ public class PlayerInfo implements RandomFileAccessible {
 
 		// Current Direction Facing tag
 		size = data[offset++];
-		for (int i = 0; i < TURN.length; offset++, i++, size--) {
-			if (data[offset] != TURN[i])
+		for (int i = 0; i < PlayerInfo.TURN.length; offset++, i++, size--) {
+			if (data[offset] != PlayerInfo.TURN[i])
 				throw new IOException("Incorrect Player Info TURN chunk.");
 		}
 		for (int i = 0; i < this.player_facing.length; i++, offset++, size--) {
@@ -197,27 +198,27 @@ public class PlayerInfo implements RandomFileAccessible {
 	public void write(RandomAccessFile raf) throws IOException {
 		// Sizes are added at the beginning of every little bit of data.
 		// Player Info Header
-		raf.writeShort(this.byteSize + PLAY.length);
-		raf.write(PLAY);
+		raf.writeShort(this.byteSize + PlayerInfo.PLAY.length);
+		raf.write(PlayerInfo.PLAY);
 
 		// Player name.
-		raf.writeByte(player_name.length + NAME.length);
-		raf.write(NAME);
-		raf.write(player_name);
+		raf.writeByte(this.player_name.length + PlayerInfo.NAME.length);
+		raf.write(PlayerInfo.NAME);
+		raf.write(this.player_name);
 
 		// Player gender.
-		raf.writeByte(player_gender.length + GNDR.length);
-		raf.write(GNDR);
-		raf.write(player_gender);
+		raf.writeByte(this.player_gender.length + PlayerInfo.GNDR.length);
+		raf.write(PlayerInfo.GNDR);
+		raf.write(this.player_gender);
 
 		// Unlocked start menu options.
 		int size = 0;
 		for (int i = 0; i < this.startMenu.size(); i++)
 			size += this.startMenu.get(i).length + 1;
-		raf.writeByte(size + MENU.length);
-		raf.write(MENU);
-		for (int i = 0; i < startMenu.size(); i++) {
-			byte[] buf = startMenu.get(i);
+		raf.writeByte(size + PlayerInfo.MENU.length);
+		raf.write(PlayerInfo.MENU);
+		for (int i = 0; i < this.startMenu.size(); i++) {
+			byte[] buf = this.startMenu.get(i);
 			raf.writeByte(buf.length);
 			raf.write(buf);
 		}
@@ -225,7 +226,7 @@ public class PlayerInfo implements RandomFileAccessible {
 		// Inventory
 		size = 0;
 		for (int i = 0; i < 4; i++) {
-			ArrayList<byte[]> list = this.getAllItemsList().get(i);
+			List<byte[]> list = this.getAllItemsList().get(i);
 			if (list.size() > 0) {
 				size += 3;
 				for (int j = 0; j < this.getAllItemsList().get(i).size(); j++)
@@ -233,10 +234,10 @@ public class PlayerInfo implements RandomFileAccessible {
 			}
 
 		}
-		raf.writeByte(size + ITEM.length);
-		raf.write(ITEM);
+		raf.writeByte(size + PlayerInfo.ITEM.length);
+		raf.write(PlayerInfo.ITEM);
 		for (byte listType = 0; listType < 4; listType++) {
-			ArrayList<byte[]> list = this.getAllItemsList().get(listType);
+			List<byte[]> list = this.getAllItemsList().get(listType);
 			if (list.size() > 0) {
 				raf.write(listType + 0x1);
 				raf.writeChar(list.size());
@@ -255,14 +256,14 @@ public class PlayerInfo implements RandomFileAccessible {
 		// raf.write(player_current_area_sector_id);
 
 		// Current Position.
-		raf.writeByte(AXIS.length + player_x.length + player_y.length);
-		raf.write(AXIS);
-		raf.write(player_x);
-		raf.write(player_y);
+		raf.writeByte(PlayerInfo.AXIS.length + this.player_x.length + this.player_y.length);
+		raf.write(PlayerInfo.AXIS);
+		raf.write(this.player_x);
+		raf.write(this.player_y);
 
 		// Current Player Direction Facing.
-		raf.writeByte(TURN.length + player_facing.length);
-		raf.write(TURN);
-		raf.write(player_facing);
+		raf.writeByte(PlayerInfo.TURN.length + this.player_facing.length);
+		raf.write(PlayerInfo.TURN);
+		raf.write(this.player_facing);
 	}
 }

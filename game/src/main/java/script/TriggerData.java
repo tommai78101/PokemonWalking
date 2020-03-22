@@ -2,6 +2,7 @@ package script;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import dialogue.Dialogue;
@@ -43,7 +44,7 @@ public class TriggerData {
 		this.y = (pixel >> 16) & 0xFF;
 		if (this.finished)
 			this.finished = false;
-		ArrayList<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
+		List<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
 			: WorldConstants.scripts);
 		for (Script s : scriptList) {
 			if (s.triggerID == (pixel & 0xFFFF)) {
@@ -177,6 +178,9 @@ public class TriggerData {
 							this.script.setNegativeFlag();
 							this.finished = false;
 						}
+						break;
+					case DIALOGUE_ALERT:
+					default:
 						break;
 				}
 			}

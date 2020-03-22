@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import dialogue.Dialogue;
@@ -184,8 +185,8 @@ public class Script {
 	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located within the SCRIPT file.
 	 * 
 	 */
-	public static ArrayList<Script> loadScript(String filename, boolean isModdedScript) {
-		ArrayList<Script> result = new ArrayList<>();
+	public static List<Script> loadScript(String filename, boolean isModdedScript) {
+		List<Script> result = new ArrayList<>();
 
 		// Scripts must contain a trigger data for Area to use, and must contain
 		// movements for Area to read.
@@ -348,15 +349,15 @@ public class Script {
 	/**
 	 * Load all default scripts.
 	 */
-	public static ArrayList<Script> loadDefaultScripts() {
+	public static List<Script> loadDefaultScripts() {
 		return Script.loadScript("art/script/scripts.txt", false);
 	}
 
 	/**
 	 * Load all modded scripts.
 	 */
-	public static ArrayList<Script> loadModdedScripts() {
-		ArrayList<Script> results = null;
+	public static List<Script> loadModdedScripts() {
+		List<Script> results = null;
 		File modDirectory = new File("mod");
 		if (modDirectory.exists() && modDirectory.isDirectory()) {
 			String[] folders = modDirectory.list();

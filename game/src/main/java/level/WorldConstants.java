@@ -55,12 +55,12 @@ public class WorldConstants {
 	public static final int OVERWORLD = 0x0A000001;
 
 	// Dialogues
-	public static ArrayList<Map.Entry<Dialogue, Integer>> signTexts = DialogueBuilder.loadDialogues("art/dialogue/dialogue.txt");
+	public static List<Map.Entry<Dialogue, Integer>> signTexts = DialogueBuilder.loadDialogues("art/dialogue/dialogue.txt");
 
 	// Items
 	// public static HashMap<Integer, ItemText> itemms =
 	// Item.loadItemResources("item/items.txt");
-	public static ArrayList<Map.Entry<ItemText, Item>> items = Item.loadItems("art/item/items.txt");
+	public static List<Map.Entry<ItemText, Item>> items = Item.loadItems("art/item/items.txt");
 
 	// Areas
 	public static List<Area> areas = new ArrayList<>(0);
@@ -82,8 +82,8 @@ public class WorldConstants {
 	// Movement
 	// TODO (11/24/2014): Make map more flexible by allowing scripting files of
 	// different filenames to be loaded. Not sure where it was being loaded.
-	public static ArrayList<Script> scripts = new ArrayList<>(0);
-	public static ArrayList<Script> moddedScripts = new ArrayList<>(0);
+	public static List<Script> scripts = new ArrayList<>(0);
+	public static List<Script> moddedScripts = new ArrayList<>(0);
 	// public static ArrayList<Script> gameScripts =
 	// Script.loadScript("script/aas.script"); // TODO (6/19/2015): Check to see why
 	// there's a need to load "aas.script".
@@ -94,7 +94,7 @@ public class WorldConstants {
 	// ArrayList<Map.Entry<Script, String>>();
 
 	// All bitmaps
-	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<>();
+	public static List<BaseBitmap> bitmaps = new ArrayList<>();
 
 	/**
 	 * Returns the area matching the given area ID value.

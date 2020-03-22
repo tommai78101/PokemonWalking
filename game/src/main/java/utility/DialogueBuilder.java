@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import dialogue.Dialogue;
@@ -29,8 +30,8 @@ public class DialogueBuilder {
 		return dialogues;
 	}
 
-	public static ArrayList<Map.Entry<Dialogue, Integer>> loadDialogues(String filename) {
-		ArrayList<Map.Entry<Dialogue, Integer>> result = new ArrayList<>();
+	public static List<Map.Entry<Dialogue, Integer>> loadDialogues(String filename) {
+		List<Map.Entry<Dialogue, Integer>> result = new ArrayList<>();
 		try {
 			BufferedReader reader = new BufferedReader(
 				new InputStreamReader(Dialogue.class.getClassLoader().getResourceAsStream(filename))
@@ -69,8 +70,8 @@ public class DialogueBuilder {
 		return result;
 	}
 
-	public static ArrayList<Map.Entry<String, Boolean>> toLines(String all, final int regex) {
-		ArrayList<Map.Entry<String, Boolean>> lines = new ArrayList<>();
+	public static List<Map.Entry<String, Boolean>> toLines(String all, final int regex) {
+		List<Map.Entry<String, Boolean>> lines = new ArrayList<>();
 		String[] words = all.split("\\s");
 		String line = "";
 		int length = 0;

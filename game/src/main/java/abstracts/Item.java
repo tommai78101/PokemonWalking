@@ -58,7 +58,8 @@ public abstract class Item implements Comparable<Item>, Renderable {
 		 * If there is no Category that comes after the last element, it will give the first element, and wraps from there.
 		 * </p>
 		 * 
-		 * @param value The ID number of the category that is to be obtained.
+		 * @param value
+		 *            The ID number of the category that is to be obtained.
 		 * 
 		 * @return The category that matches the given ID number.
 		 */
@@ -76,9 +77,9 @@ public abstract class Item implements Comparable<Item>, Renderable {
 		}
 
 		public int getID() {
-			return id;
+			return this.id;
 		}
-	};
+	}
 
 	protected String name;
 	protected String description;
@@ -99,24 +100,24 @@ public abstract class Item implements Comparable<Item>, Renderable {
 	private static final String ITEM_DELIMITER = ";";
 
 	public Item(Game game, String name, String description, Category category, int id) {
-		setName(name);
-		setDescription(description);
-		setCategory(category);
-		setID(id);
+		this.setName(name);
+		this.setDescription(description);
+		this.setCategory(category);
+		this.setID(id);
 		this.game = game;
 		this.picked = false;
-		availableCommands = new ArrayList<String>();
+		this.availableCommands = new ArrayList<>();
 	}
 
 	public Item(Game game, ItemText itemText) {
-		setName(itemText.itemName);
-		setDescription(itemText.description);
-		setCategory(itemText.category);
-		setID(itemText.id);
+		this.setName(itemText.itemName);
+		this.setDescription(itemText.description);
+		this.setCategory(itemText.category);
+		this.setID(itemText.id);
 		this.game = game;
 		this.picked = false;
-		availableCommands = new ArrayList<String>();
-		initializeCommands(itemText);
+		this.availableCommands = new ArrayList<>();
+		this.initializeCommands(itemText);
 	}
 
 	public void setName(String value) {
@@ -143,11 +144,11 @@ public abstract class Item implements Comparable<Item>, Renderable {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public Category getCategory() {
@@ -198,14 +199,14 @@ public abstract class Item implements Comparable<Item>, Renderable {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
 		Item other = (Item) obj;
-		if (category != other.category) {
+		if (this.category != other.category) {
 			return false;
 		}
-		if (id != other.id) {
+		if (this.id != other.id) {
 			return false;
 		}
 		return true;
@@ -215,8 +216,8 @@ public abstract class Item implements Comparable<Item>, Renderable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((category == null) ? 0 : category.hashCode());
-		result = prime * result + id;
+		result = prime * result + ((this.category == null) ? 0 : this.category.hashCode());
+		result = prime * result + this.id;
 		return result;
 	}
 
@@ -230,37 +231,48 @@ public abstract class Item implements Comparable<Item>, Renderable {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
 			ItemText itemText = new ItemText();
-			HashMap<Integer, ItemText> result = new HashMap<Integer, ItemText>();
+			HashMap<Integer, ItemText> result = new HashMap<>();
 			int id = 0;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("%")) {
 					itemText.type = ItemText.Type.getType(line.split("%")[1]);
-				} else if (line.startsWith("#")) {
+				}
+				else if (line.startsWith("#")) {
 					itemText.itemName = line.split("#")[1];
-				} else if (line.startsWith("@")) {
+				}
+				else if (line.startsWith("@")) {
 					itemText.description = line.split("@")[1];
-				} else if (line.startsWith("^")) {
+				}
+				else if (line.startsWith("^")) {
 					// '^' is a special character, therefore, one must use backslashes to get the
 					// literal form.
 					String value = line.split("\\^")[1];
-					if (value.equals(TAG_POTIONS)) {
+					if (value.equals(Item.TAG_POTIONS)) {
 						itemText.category = Category.POTIONS;
-					} else if (value.equals(TAG_KEYITEMS)) {
+					}
+					else if (value.equals(Item.TAG_KEYITEMS)) {
 						itemText.category = Category.KEYITEMS;
-					} else if (value.equals(TAG_POKEBALLS)) {
+					}
+					else if (value.equals(Item.TAG_POKEBALLS)) {
 						itemText.category = Category.POKEBALLS;
-					} else if (value.equals(TAG_TM_HM)) {
+					}
+					else if (value.equals(Item.TAG_TM_HM)) {
 						itemText.category = Category.TM_HM;
-					} else if (value.equals(TAG_ALL)) {
+					}
+					else if (value.equals(Item.TAG_ALL)) {
 						itemText.skipCheckCategory = true;
 					}
-				} else if (line.startsWith(FLAG_SET_COMMAND)) {
+				}
+				else if (line.startsWith(Item.FLAG_SET_COMMAND)) {
 					itemText.setCommandFlag = true;
-				} else if (line.startsWith(FLAG_USE_COMMAND)) {
+				}
+				else if (line.startsWith(Item.FLAG_USE_COMMAND)) {
 					itemText.useCommandFlag = true;
-				} else if (line.startsWith(FLAG_TOSS_COMMAND)) {
+				}
+				else if (line.startsWith(Item.FLAG_TOSS_COMMAND)) {
 					itemText.tossCommandFlag = true;
-				} else if (line.startsWith(ITEM_DELIMITER)) {
+				}
+				else if (line.startsWith(Item.ITEM_DELIMITER)) {
 					itemText.done = true;
 				}
 
@@ -272,13 +284,14 @@ public abstract class Item implements Comparable<Item>, Renderable {
 				}
 			}
 			return result;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return null;
 		}
 	}
 
-	public static ArrayList<Map.Entry<ItemText, Item>> loadItems(String filename) {
-		ArrayList<Map.Entry<ItemText, Item>> result = new ArrayList<Map.Entry<ItemText, Item>>();
+	public static List<Map.Entry<ItemText, Item>> loadItems(String filename) {
+		List<Map.Entry<ItemText, Item>> result = new ArrayList<>();
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
@@ -288,38 +301,49 @@ public abstract class Item implements Comparable<Item>, Renderable {
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("%")) {
 					itemText.type = ItemText.Type.getType(line.split("%")[1]);
-				} else if (line.startsWith("#")) {
+				}
+				else if (line.startsWith("#")) {
 					itemText.itemName = line.split("#")[1];
-				} else if (line.startsWith("@")) {
+				}
+				else if (line.startsWith("@")) {
 					itemText.description = line.split("@")[1];
-				} else if (line.startsWith("^")) {
+				}
+				else if (line.startsWith("^")) {
 					// '^' is a special character, therefore, one must use backslashes to get the
 					// literal form.
 					String value = line.split("\\^")[1];
-					if (value.equals(TAG_POTIONS)) {
+					if (value.equals(Item.TAG_POTIONS)) {
 						itemText.category = Category.POTIONS;
-					} else if (value.equals(TAG_KEYITEMS)) {
+					}
+					else if (value.equals(Item.TAG_KEYITEMS)) {
 						itemText.category = Category.KEYITEMS;
-					} else if (value.equals(TAG_POKEBALLS)) {
+					}
+					else if (value.equals(Item.TAG_POKEBALLS)) {
 						itemText.category = Category.POKEBALLS;
-					} else if (value.equals(TAG_TM_HM)) {
+					}
+					else if (value.equals(Item.TAG_TM_HM)) {
 						itemText.category = Category.TM_HM;
-					} else if (value.equals(TAG_ALL)) {
+					}
+					else if (value.equals(Item.TAG_ALL)) {
 						itemText.skipCheckCategory = true;
 					}
-				} else if (line.startsWith(FLAG_SET_COMMAND)) {
+				}
+				else if (line.startsWith(Item.FLAG_SET_COMMAND)) {
 					itemText.setCommandFlag = true;
-				} else if (line.startsWith(FLAG_USE_COMMAND)) {
+				}
+				else if (line.startsWith(Item.FLAG_USE_COMMAND)) {
 					itemText.useCommandFlag = true;
-				} else if (line.startsWith(FLAG_TOSS_COMMAND)) {
+				}
+				else if (line.startsWith(Item.FLAG_TOSS_COMMAND)) {
 					itemText.tossCommandFlag = true;
-				} else if (line.startsWith(ITEM_DELIMITER)) {
+				}
+				else if (line.startsWith(Item.ITEM_DELIMITER)) {
 					itemText.done = true;
 				}
 
 				if (itemText.isComplete()) {
 					itemText.id = id;
-					result.add(new AbstractMap.SimpleEntry<ItemText, Item>(itemText, createNewItem(itemText)));
+					result.add(new AbstractMap.SimpleEntry<>(itemText, Item.createNewItem(itemText)));
 					itemText = new ItemText();
 					id++;
 				}
@@ -337,7 +361,8 @@ public abstract class Item implements Comparable<Item>, Renderable {
 			});
 
 			return result;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return null;
 		}
 	}

@@ -623,7 +623,7 @@ public class Inventory extends SubMenu {
 	 * @return Nothing.
 	 */
 	public void tossItem() {
-		ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+		List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 		Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
 		if (entry.getValue() - 1 <= 0)
 			list.remove(this.itemCursor);
@@ -631,8 +631,8 @@ public class Inventory extends SubMenu {
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
 
-	public List<ArrayList<Map.Entry<Item, Integer>>> getAllItemsList() {
-		List<ArrayList<Map.Entry<Item, Integer>>> result = new ArrayList<>();
+	public List<List<Map.Entry<Item, Integer>>> getAllItemsList() {
+		List<List<Map.Entry<Item, Integer>>> result = new ArrayList<>();
 		result.add(this.potions);
 		result.add(this.keyItems);
 		result.add(this.pokéballs);
@@ -777,7 +777,7 @@ public class Inventory extends SubMenu {
 		}
 		try {
 			Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
-			ArrayList<Map.Entry<String, Boolean>> tokens = DialogueBuilder.toLines(
+			List<Map.Entry<String, Boolean>> tokens = DialogueBuilder.toLines(
 				entry.getKey().getDescription(),
 				Dialogue.MAX_STRING_LENGTH
 			);
@@ -868,7 +868,7 @@ public class Inventory extends SubMenu {
 					// render anything.
 					try {
 						Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
-						ArrayList<Map.Entry<String, Boolean>> tokens = DialogueBuilder.toLines(
+						List<Map.Entry<String, Boolean>> tokens = DialogueBuilder.toLines(
 							entry.getKey().getDescription(),
 							Dialogue.MAX_STRING_LENGTH
 						);
@@ -905,7 +905,7 @@ public class Inventory extends SubMenu {
 				catch (Exception e) {}
 				try {
 					Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
-					ArrayList<Map.Entry<String, Boolean>> tokens = DialogueBuilder.toLines(entry.getKey().getName() + " has been registered.", Dialogue.MAX_STRING_LENGTH);
+					List<Map.Entry<String, Boolean>> tokens = DialogueBuilder.toLines(entry.getKey().getName() + " has been registered.", Dialogue.MAX_STRING_LENGTH);
 					switch (this.set_completedLines.size()) {
 						case 0:
 							g.drawString(

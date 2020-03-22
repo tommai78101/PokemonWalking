@@ -16,6 +16,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import interfaces.Tileable;
@@ -55,14 +56,14 @@ public class Dialogue {
 	public static final byte CHARACTER_TICK_DELAY = 0x1;
 	public static final byte ZERO_TICK = 0x0;
 
-	private ArrayList<String> completedLines;
+	private List<String> completedLines;
 
 	@Deprecated
 	private Keys input;
 
 	private int lineIterator;
 	private int lineLength;
-	private ArrayList<Map.Entry<String, Boolean>> lines;
+	private List<Map.Entry<String, Boolean>> lines;
 
 	private boolean simpleQuestionFlag;
 	private boolean simpleSpeechFlag;
@@ -746,7 +747,7 @@ public class Dialogue {
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
 	}
 
-	public ArrayList<String> getCompletedLines() {
+	public List<String> getCompletedLines() {
 		return this.completedLines;
 	}
 
@@ -778,11 +779,11 @@ public class Dialogue {
 		this.lineLength = lineLength;
 	}
 
-	public ArrayList<Map.Entry<String, Boolean>> getLines() {
+	public List<Map.Entry<String, Boolean>> getLines() {
 		return this.lines;
 	}
 
-	public void setLines(ArrayList<Map.Entry<String, Boolean>> lines) {
+	public void setLines(List<Map.Entry<String, Boolean>> lines) {
 		this.lines = lines;
 	}
 

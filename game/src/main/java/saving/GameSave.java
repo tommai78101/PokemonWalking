@@ -18,7 +18,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -241,7 +240,7 @@ public class GameSave {
 		// Get inventory items
 		Inventory inventory = game.getInventory();
 		for (int k = 0; k < this.playerInfo.getAllItemsList().size(); k++) {
-			ArrayList<byte[]> list = this.playerInfo.getAllItemsList().get(k);
+			List<byte[]> list = this.playerInfo.getAllItemsList().get(k);
 			for (int i = 0; i < list.size(); i++) {
 				byte[] data = list.get(i);
 				byte[] name = new byte[data[0]];
@@ -255,7 +254,7 @@ public class GameSave {
 					| data[offset + 3];
 
 				ItemText itemText = null;
-				ArrayList<Map.Entry<ItemText, Item>> itemList = WorldConstants.items;
+				List<Map.Entry<ItemText, Item>> itemList = WorldConstants.items;
 				for (Map.Entry<ItemText, Item> e : itemList) {
 					if (e.getKey().id == id) {
 						itemText = e.getKey();
