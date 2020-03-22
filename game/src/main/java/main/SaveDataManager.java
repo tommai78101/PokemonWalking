@@ -27,7 +27,7 @@ public class SaveDataManager extends SubMenu {
 	private Game game;
 
 	public SaveDataManager(Game game) {
-		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_INVENTORY, SubMenu.Type.SAVE);
+		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, SubMenu.Type.SAVE);
 		this.game = game;
 		this.state = State.ASK;
 		this.newDialogue = new Dialogue();
