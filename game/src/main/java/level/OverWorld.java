@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import abstracts.Character;
 import abstracts.Entity;
 import abstracts.Item;
 import abstracts.Obstacle;
@@ -26,6 +27,7 @@ import item.ItemText;
 import main.Game;
 import menu.Inventory;
 import screen.Scene;
+import utility.DialogueBuilder;
 
 public class OverWorld extends Entity {
 	// Overworld properties.
@@ -124,7 +126,7 @@ public class OverWorld extends Entity {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + worldID;
+		result = prime * result + this.worldID;
 		return result;
 	}
 
@@ -136,11 +138,11 @@ public class OverWorld extends Entity {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass() || !(obj instanceof OverWorld)) {
+		if (this.getClass() != obj.getClass() || !(obj instanceof OverWorld)) {
 			return false;
 		}
 		OverWorld other = (OverWorld) obj;
-		if (worldID != other.worldID) {
+		if (this.worldID != other.worldID) {
 			return false;
 		}
 		return true;
@@ -183,7 +185,7 @@ public class OverWorld extends Entity {
 					this.currentAreaSectorID = this.currentArea.getSectorID();
 					// This is where you get the latest sector id at.
 					System.out
-						.println("Area: " + this.currentArea.getAreaID() + " Sector: " + currentArea.getSectorID());
+						.println("Area: " + this.currentArea.getAreaID() + " Sector: " + this.currentArea.getSectorID());
 				}
 			}
 		}
@@ -203,7 +205,7 @@ public class OverWorld extends Entity {
 	private void handlePlayerInteractions() {
 		// TODO: Fix the awkward interaction caused by so many states not working
 		// properly.
-		int interactionID = player.getInteractableID();
+		int interactionID = this.player.getInteractableID();
 		if (this.player.isInteracting() && interactionID != 0 && !this.currentArea.isBeingTriggered()) {
 			int alpha = (interactionID >> 24) & 0xFF;
 			int red = (interactionID >> 16) & 0xFF;
@@ -250,7 +252,7 @@ public class OverWorld extends Entity {
 					}
 					if (this.newDialogues == null) {
 						this.newDialogues.add(
-							Dialogue.createText(
+							DialogueBuilder.createText(
 								text.itemName + " has been found.",
 								Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_ALERT, true
 							)
@@ -258,24 +260,24 @@ public class OverWorld extends Entity {
 						new Thread(new Runnable() {
 							@Override
 							public void run() {
-								PixelData data = currentArea.getCurrentPixelData();
-								switch (player.getFacing()) {
-									case Player.UP:
-										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() - 1);
+								PixelData data = OverWorld.this.currentArea.getCurrentPixelData();
+								switch (OverWorld.this.player.getFacing()) {
+									case Character.UP:
+										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() - 1);
 										break;
-									case Player.DOWN:
-										currentArea.setPixelData(data, player.getXInArea(), player.getYInArea() + 1);
+									case Character.DOWN:
+										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() + 1);
 										break;
-									case Player.LEFT:
-										currentArea.setPixelData(data, player.getXInArea() - 1, player.getYInArea());
+									case Character.LEFT:
+										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() - 1, OverWorld.this.player.getYInArea());
 										break;
-									case Player.RIGHT:
-										currentArea.setPixelData(data, player.getXInArea() + 1, player.getYInArea());
+									case Character.RIGHT:
+										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() + 1, OverWorld.this.player.getYInArea());
 										break;
 								}
 							}
 						}).start();
-						Inventory inventory = this.game.getStartMenu().getInventory();
+						Inventory inventory = this.game.getInventory();
 						inventory.addItem(text);
 					}
 					break;
@@ -416,8 +418,8 @@ public class OverWorld extends Entity {
 				targetAreaID = data.getTargetAreaID() + 1000;
 			else
 				targetAreaID = data.getTargetAreaID();
-			this.currentArea = WorldConstants.convertToArea(areas, targetAreaID);
-			if (currentArea == null)
+			this.currentArea = WorldConstants.convertToArea(this.areas, targetAreaID);
+			if (this.currentArea == null)
 				return;
 			this.currentArea.setPlayer(this.player);
 			this.currentArea.setDefaultPosition(data);
@@ -472,11 +474,12 @@ public class OverWorld extends Entity {
 		}
 
 		if (screen.getRenderingEffectTick() < (byte) 0x4 || screen.getRenderingEffectTick() >= (byte) 0x7)
-			player.render(screen, 0, 0);
+			this.player.render(screen, 0, 0);
 
 		if (this.newDialogues != null && this.newDialogues.size() > 0) {
-			Dialogue.renderDialogBox(screen, 0, 6, 9, 2);
-			this.newDialogues.get(this.newDialoguesIterator).render(screen, screen.getBufferedImage().createGraphics());
+			Dialogue dialogue = this.newDialogues.get(this.newDialoguesIterator);
+			dialogue.renderInformationBox(screen, 0, 6, 9, 2);
+			dialogue.render(screen, screen.getBufferedImage().createGraphics());
 		}
 	}
 

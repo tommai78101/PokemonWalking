@@ -18,58 +18,27 @@ package abstracts;
 import java.awt.Graphics;
 
 import interfaces.MenuDisplayable;
-import main.Game;
-import main.Keys;
+import menu.MenuEvent;
 import screen.Scene;
 
 public abstract class SubMenu implements MenuDisplayable {
+	public enum Type {
+		UNUSED,
+		INVENTORY,
+		SAVE,
+		EXIT
+	}
 
-	protected boolean subMenuActivation;
+	protected String name;
+	protected String description;
+	protected MenuEvent menuEvent;
+	protected Type menuType;
 
-	private String name;
-	private String enabledDescription;
-	private String disabledDescription;
-	protected Game game;
-	private boolean enabled;
-
-	public SubMenu(String name, String enabled, String disabled, Game game) {
+	public SubMenu(String name, String description, Type type) {
 		this.name = name;
-		this.enabledDescription = enabled;
-		this.disabledDescription = disabled;
-		this.game = game;
-		this.subMenuActivation = false;
-	}
-
-	public SubMenu() {
-		this.name = null;
-		this.enabledDescription = "";
-		this.disabledDescription = "";
-		this.game = null;
-		this.subMenuActivation = false;
-	}
-
-	public SubMenu(Game game) {
-		this.name = null;
-		this.enabledDescription = "";
-		this.disabledDescription = "";
-		this.game = game;
-		this.subMenuActivation = false;
-	}
-
-	public boolean isActivated() {
-		return this.subMenuActivation;
-	}
-
-	public void enableSubMenu() {
-		this.subMenuActivation = true;
-	}
-
-	public void disableSubMenu() {
-		this.subMenuActivation = false;
-	}
-
-	public void toggleDescription(boolean value) {
-		this.enabled = value;
+		this.description = description;
+		this.menuType = type;
+		this.menuEvent = new MenuEvent(this, type);
 	}
 
 	public String getName() {
@@ -77,23 +46,32 @@ public abstract class SubMenu implements MenuDisplayable {
 	}
 
 	public String getDescription() {
-		if (this.enabled)
-			return this.enabledDescription;
-		else
-			return this.disabledDescription;
+		return this.description;
 	}
 
+	public Type getType() {
+		return this.menuType;
+	}
+
+	/**
+	 * For saving data.
+	 * 
+	 * @return
+	 */
 	public byte[] getSubMenuData() {
 		return this.name.getBytes();
+	}
+
+	public MenuEvent getEvent() {
+		return this.menuEvent;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((disabledDescription == null) ? 0 : disabledDescription.hashCode());
-		result = prime * result + ((enabledDescription == null) ? 0 : enabledDescription.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((this.description == null) ? 0 : this.description.hashCode());
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
 		return result;
 	}
 
@@ -103,28 +81,23 @@ public abstract class SubMenu implements MenuDisplayable {
 			return true;
 		if (obj == null)
 			return false;
-		if (getClass() != obj.getClass() || !(obj instanceof SubMenu))
+		if (this.getClass() != obj.getClass() || !(obj instanceof SubMenu))
 			return false;
 		SubMenu other = (SubMenu) obj;
-		if (disabledDescription == null) {
-			if (other.disabledDescription != null)
+		if (this.description == null) {
+			if (other.description != null)
 				return false;
-		} else if (!disabledDescription.equals(other.disabledDescription))
+		}
+		else if (!this.description.equals(other.description))
 			return false;
-		if (enabledDescription == null) {
-			if (other.enabledDescription != null)
-				return false;
-		} else if (!enabledDescription.equals(other.enabledDescription))
-			return false;
-		if (name == null) {
+		if (this.name == null) {
 			if (other.name != null)
 				return false;
-		} else if (!name.equals(other.name))
+		}
+		else if (!this.name.equals(other.name))
 			return false;
 		return true;
 	}
-
-	public abstract SubMenu initialize(Keys keys);
 
 	@Override
 	public abstract void render(Scene output, Graphics graphics);

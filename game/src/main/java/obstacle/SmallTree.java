@@ -7,6 +7,7 @@ import abstracts.Obstacle;
 import dialogue.Dialogue;
 import level.PixelData;
 import screen.Scene;
+import utility.DialogueBuilder;
 
 public class SmallTree extends Obstacle {
 	private PixelData pixelData;
@@ -17,10 +18,10 @@ public class SmallTree extends Obstacle {
 
 		List<Dialogue> dialogues = new ArrayList<>();
 		dialogues.add(
-			Dialogue.createText(
-				"This tree is born from the ground that was created 6 months ago.", 
+			DialogueBuilder.createText(
+				"This tree is born from the ground that was created 6 months ago.",
 				Dialogue.MAX_STRING_LENGTH,
-				Dialogue.DIALOGUE_SPEECH, 
+				Dialogue.DIALOGUE_SPEECH,
 				false
 			)
 		);
@@ -33,11 +34,9 @@ public class SmallTree extends Obstacle {
 	}
 
 	@Override
-	public void tick() {
-	}
+	public void tick() {}
 
 	@Override
-	public void render(Scene screen, int offsetX, int offsetY) {
-	}
+	public void render(Scene screen, int offsetX, int offsetY) {}
 
 }

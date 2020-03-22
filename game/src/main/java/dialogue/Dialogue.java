@@ -14,14 +14,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
 
-import entity.Player;
 import interfaces.Tileable;
+import main.Game;
 import main.Keys;
 import main.MainComponent;
 import resources.Art;
@@ -39,21 +37,41 @@ public class Dialogue {
 	// Dialogue max string length per line.
 	public static final int MAX_STRING_LENGTH = 18;
 
+	//Tick delays
+	public static final byte MAX_TICK_DELAY = 0xE;
+	public static final byte CHARACTER_TICK_DELAY = 0x1;
+	public static final byte ZERO_TICK = 0x0;
+
 	private ArrayList<String> completedLines;
 
+	@Deprecated
 	private Keys input;
 
 	private int lineIterator;
 	private int lineLength;
 	private ArrayList<Map.Entry<String, Boolean>> lines;
-	private boolean nextFlag;
+
 	private boolean simpleQuestionFlag;
 	private boolean simpleSpeechFlag;
-	private boolean yesNoCursorPosition;
+
+	/**
+	 * If true, displays the "down arrow" inside the dialogue box.
+	 */
+	private boolean nextFlag;
+
+	/**
+	 * If true, the dialogue is animating a scrolling animation and moving the text upwards.
+	 */
+	private boolean scrollFlag;
+
+	/**
+	 * Three states: YES, NO, NULL. NULL means the YesNo alert dialogue box does not appear.
+	 */
 	private Boolean yesNoAnswerFlag;
+	private boolean yesNoCursorPosition;
+
 	private byte nextTick;
 	private int scrollDistance;
-	private boolean scrollFlag;
 	private boolean showDialog;
 
 	private int subStringIterator;
@@ -62,9 +80,9 @@ public class Dialogue {
 	private int totalDialogueLength;
 	private int type;
 
-	private Dialogue(Keys keys) {
-		lines = new ArrayList<Map.Entry<String, Boolean>>();
-		completedLines = new ArrayList<String>();
+	public Dialogue() {
+		this.lines = new ArrayList<>();
+		this.completedLines = new ArrayList<>();
 		this.subStringIterator = 0;
 		this.lineLength = 0;
 		this.totalDialogueLength = 0;
@@ -75,7 +93,7 @@ public class Dialogue {
 		this.scrollDistance = 0;
 		this.nextTick = 0x0;
 		this.lineIterator = 0;
-		this.input = keys;
+		this.input = Game.keys;
 		this.showDialog = false;
 		this.type = 0;
 		this.yesNoCursorPosition = true;
@@ -84,7 +102,7 @@ public class Dialogue {
 
 	public Dialogue(Dialogue dialogue) {
 		// Deep copy
-		this.completedLines = new ArrayList<String>();
+		this.completedLines = new ArrayList<>();
 		for (String s : dialogue.completedLines)
 			this.completedLines.add(s);
 
@@ -92,9 +110,9 @@ public class Dialogue {
 
 		this.lineIterator = dialogue.lineIterator;
 		this.lineLength = dialogue.lineLength;
-		this.lines = new ArrayList<Map.Entry<String, Boolean>>();
+		this.lines = new ArrayList<>();
 		for (Map.Entry<String, Boolean> e : dialogue.lines)
-			this.lines.add(new AbstractMap.SimpleEntry<String, Boolean>(e.getKey(), e.getValue()));
+			this.lines.add(new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue()));
 
 		this.nextFlag = dialogue.nextFlag;
 		this.simpleQuestionFlag = dialogue.simpleQuestionFlag;
@@ -154,7 +172,7 @@ public class Dialogue {
 	}
 
 	public void render(Scene output, Graphics graphics) {
-		render(output, graphics, 0, 6, 9, 2);
+		this.render(output, graphics, 0, 6, 9, 2);
 	}
 
 	public void render(Scene output, Graphics graphics, int x, int y, int w, int h) {
@@ -170,40 +188,43 @@ public class Dialogue {
 			w = 9 - x;
 		if (y + h > 8)
 			h = 8 - y;
-		if (showDialog) {
+		if (this.showDialog) {
 			switch (this.type) {
 				case DIALOGUE_SPEECH: {
-					renderDialogBackground(output, x, y, w, h);
-					renderDialogBorderBox(output, x, y, w, h);
+					this.renderDialogBackground(output, x, y, w, h);
+					this.renderDialogBorderBox(output, x, y, w, h);
 					if (this.nextFlag && this.nextTick < 0x8)
 						output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
 					Graphics2D g2d = output.getBufferedImage().createGraphics();
-					renderText(g2d);
+					this.renderText(g2d);
 					g2d.dispose();
 					break;
 				}
 				case DIALOGUE_QUESTION: {
-					renderDialogBackground(output, x, y, w, h);
-					renderDialogBorderBox(output, x, y, w, h);
+					this.renderDialogBackground(output, x, y, w, h);
+					this.renderDialogBorderBox(output, x, y, w, h);
 					if (this.simpleQuestionFlag && !this.nextFlag) {
-						renderDialogBackground(output, 7, 3, 2, 2);
-						renderDialogBorderBox(output, 7, 3, 2, 2);
+						this.renderDialogBackground(output, 7, 3, 2, 2);
+						this.renderDialogBorderBox(output, 7, 3, 2, 2);
 						// Offset by -3 for the Y axis.
-						output.blit(Art.dialogue_pointer, MainComponent.GAME_WIDTH - Tileable.WIDTH * 3 + 8,
-								this.yesNoCursorPosition ? (Tileable.HEIGHT * 4 - 3) : (Tileable.HEIGHT * 5 - 3));
-					} else if (!this.simpleQuestionFlag && (this.nextFlag && this.nextTick < 0x8))
+						output.blit(
+							Art.dialogue_pointer, MainComponent.GAME_WIDTH - Tileable.WIDTH * 3 + 8,
+							this.yesNoCursorPosition ? (Tileable.HEIGHT * 4 - 3) : (Tileable.HEIGHT * 5 - 3)
+						);
+					}
+					else if (!this.simpleQuestionFlag && (this.nextFlag && this.nextTick < 0x8))
 						output.blit(Art.dialogue_next, MainComponent.GAME_WIDTH - 16, MainComponent.GAME_HEIGHT - 8);
 					Graphics2D g2d = output.getBufferedImage().createGraphics();
-					renderText(g2d);
-					renderYesNoAnswerText(g2d);
+					this.renderText(g2d);
+					this.renderYesNoAnswerText(g2d);
 					g2d.dispose();
 					break;
 				}
 				case DIALOGUE_ALERT: {
-					renderDialogBackground(output, x, y, w, h);
-					renderDialogBorderBox(output, x, y, w, h);
+					this.renderDialogBackground(output, x, y, w, h);
+					this.renderDialogBorderBox(output, x, y, w, h);
 					Graphics2D g2d = output.getBufferedImage().createGraphics();
-					renderText(g2d);
+					this.renderText(g2d);
 					g2d.dispose();
 					break;
 				}
@@ -222,8 +243,8 @@ public class Dialogue {
 			try {
 				g.drawString("YES", X, YES_HEIGHT);
 				g.drawString("NO", X, NO_HEIGHT);
-			} catch (Exception e) {
 			}
+			catch (Exception e) {}
 		}
 	}
 
@@ -233,196 +254,188 @@ public class Dialogue {
 	 * </p>
 	 * 
 	 * <p>
-	 * <b>WARNING</b> : The code content of this tick() method is deliberately setup
-	 * and designed in such a way that it replicates the dialogues in Gen 1 and Gen
-	 * 2 Pokémon games. May require a heavy amount of refactoring/rewriting.
+	 * <b>WARNING</b> : The code content of this tick() method is deliberately setup and designed in such a way that it replicates the dialogues in Gen 1 and Gen 2 Pokémon games. May require a heavy amount of refactoring/rewriting.
 	 * </p>
 	 */
 	public void tick() {
-		int count = 0;
-		try {
-			for (int i = 0; i < this.lineIterator; i++) {
-				count += this.lines.get(i).getKey().length();
-				if (i != this.lines.size() - 1)
-					count += 1;
-			}
-		} catch (Exception e) {
-			count = 0;
-		}
-		if (count < this.totalDialogueLength && (!this.nextFlag && !this.scrollFlag)) {
-			tickCount++;
-			if (tickCount > 0x1)
-				tickCount = 0x0;
-		} else if (this.nextFlag) {
-			switch (this.type) {
-				case DIALOGUE_QUESTION: {
-					if (count >= this.totalDialogueLength) {
-						this.simpleQuestionFlag = true;
-						this.nextFlag = false;
-						this.scrollFlag = false;
-					} else {
-						this.nextTick++;
-						if (this.nextTick > 0xE)
-							this.nextTick = 0x0;
-					}
-					break;
-				}
-				case DIALOGUE_SPEECH: {
-					this.nextTick++;
-					if (this.nextTick > 0xE)
-						this.nextTick = 0x0;
-					break;
-				}
-				case DIALOGUE_ALERT: {
-					this.nextTick++;
-					if (this.nextTick > 0xE)
-						this.nextTick = 0x0;
-					break;
-				}
-			}
-		} else if (count >= this.totalDialogueLength) {
-			if (this.lineIterator >= this.lines.size()) {
-				switch (this.type) {
-					case DIALOGUE_QUESTION:
-						this.simpleQuestionFlag = true;
-						this.scrollFlag = false;
-						this.nextFlag = false;
-						break;
-					case DIALOGUE_SPEECH:
-						this.simpleSpeechFlag = true;
-						this.nextFlag = false;
-						break;
-					case DIALOGUE_ALERT:
-						this.simpleSpeechFlag = true;
-						this.nextFlag = false;
-						break;
-				}
-			} else {
-				Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
-				this.completedLines.add(entry.getKey());
-				this.lineIterator++;
-				switch (this.type) {
-					case DIALOGUE_SPEECH:
-						this.nextFlag = true;
-						break;
-					case DIALOGUE_QUESTION:
-						this.simpleQuestionFlag = true;
-						this.nextFlag = true;
-						break;
-					case DIALOGUE_ALERT:
-						this.nextFlag = true;
-						break;
-				}
-			}
-		}
+		this.handleDialogueUpdate();
 
 		try {
+			if (this.simpleQuestionFlag) {
+				if (!this.nextFlag && !this.scrollFlag) {
+					// Making sure this doesn't trigger the "Next" arrow.
+					this.nextFlag = false;
 
-			if (!this.nextFlag && !this.simpleQuestionFlag && !this.scrollFlag) {
-				if (tickCount == 0x0) {
-					if (!this.scrollFlag)
-						this.subStringIterator++;
-					if (this.subStringIterator >= this.lineLength) {
-						this.subStringIterator %= this.lineLength;
-						Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
-						this.completedLines.add(entry.getKey());
-						this.lineIterator++;
+					if ((this.input.up.keyStateDown && !this.input.up.lastKeyState)
+						|| (this.input.W.keyStateDown && !this.input.W.lastKeyState)) {
+						this.input.up.lastKeyState = true;
+						this.input.W.lastKeyState = true;
+						// Made it consistent with Inventory's menu selection, where it doesn't wrap
+						// around.
+						this.yesNoCursorPosition = !this.yesNoCursorPosition;
 					}
-					if (this.completedLines.size() == 2) {
-						if (!this.scrollFlag) {
-							switch (this.type) {
-								case DIALOGUE_SPEECH:
-									this.nextFlag = true;
-									break;
-								case DIALOGUE_QUESTION:
-									// Must get to the end of the entire dialogue before asking for answers.
-									if (this.lineIterator >= this.lines.size()) {
-										this.simpleQuestionFlag = true;
-										this.nextFlag = false;
-									} else
+					else if ((this.input.down.keyStateDown && !this.input.down.lastKeyState)
+						|| (this.input.S.keyStateDown && !this.input.S.lastKeyState)) {
+						this.input.down.lastKeyState = true;
+						this.input.S.lastKeyState = true;
+						// Made it consistent with Inventory's menu selection, where it doesn't wrap
+						// around.
+						this.yesNoCursorPosition = !this.yesNoCursorPosition;
+					}
+					if ((this.input.Z.keyStateDown && !this.input.Z.lastKeyState)
+						|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
+						this.input.Z.lastKeyState = true;
+						this.input.SLASH.lastKeyState = true;
+						// The answer to simple questions have already been set by UP and DOWN.
+						this.yesNoAnswerFlag = this.yesNoCursorPosition;
+						this.simpleQuestionFlag = false;
+						this.closeDialog();
+					}
+					else if ((this.input.X.keyStateDown && !this.input.X.lastKeyState)
+						|| (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
+						this.input.X.lastKeyState = true;
+						this.input.PERIOD.lastKeyState = true;
+						// Always negative for cancel button.
+						this.yesNoAnswerFlag = false;
+						this.yesNoCursorPosition = false;
+						this.simpleQuestionFlag = false;
+						this.closeDialog();
+					}
+				}
+
+			}
+			else if (this.simpleSpeechFlag) {
+				if (!this.nextFlag && !this.scrollFlag) {
+					if (this.tickCount == 0x0) {
+						if (!this.scrollFlag)
+							this.subStringIterator++;
+						if (this.subStringIterator >= this.lineLength) {
+							this.subStringIterator %= this.lineLength;
+							Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
+							this.completedLines.add(entry.getKey());
+							this.lineIterator++;
+						}
+						if (this.completedLines.size() == 2) {
+							if (!this.scrollFlag) {
+								switch (this.type) {
+									case DIALOGUE_SPEECH:
 										this.nextFlag = true;
-									break;
-								case DIALOGUE_ALERT:
-									this.nextFlag = true;
-									break;
+										break;
+									case DIALOGUE_QUESTION:
+										// Must get to the end of the entire dialogue before asking for answers.
+										if (this.lineIterator >= this.lines.size()) {
+											this.simpleQuestionFlag = true;
+											this.nextFlag = false;
+										}
+										else
+											this.nextFlag = true;
+										break;
+									case DIALOGUE_ALERT:
+										this.nextFlag = true;
+										break;
+								}
+							}
+						}
+					}
+
+					// Speeds up text speed.
+					if (this.type != Dialogue.DIALOGUE_ALERT) {
+						if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState))
+							|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
+							if (this.subStringIterator >= this.lineLength - 2) {
+								this.input.Z.lastKeyState = true;
+								this.input.SLASH.lastKeyState = true;
+							}
+							else if (this.subStringIterator < this.lineLength) {
+								this.subStringIterator++;
+							}
+						}
+						else if ((this.input.X.keyStateDown && !(this.input.X.lastKeyState))
+							|| (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
+							if (this.subStringIterator < this.lineLength - 1) {
+								this.subStringIterator = this.lineLength - 1;
+								this.input.X.lastKeyState = true;
+								this.input.PERIOD.lastKeyState = true;
 							}
 						}
 					}
 				}
 
-				// Speeds up text speed.
-				if (this.type != DIALOGUE_ALERT) {
-					if ((input.Z.keyStateDown && !(input.Z.lastKeyState))
-							|| (input.SLASH.keyStateDown && !input.SLASH.lastKeyState)) {
-						if (this.subStringIterator >= this.lineLength - 2) {
-							input.Z.lastKeyState = true;
-							input.SLASH.lastKeyState = true;
-						} else if (this.subStringIterator < this.lineLength) {
+				// Handles only the simplest forms of dialogues.
+				else if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState)
+					|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState))) {
+					this.input.Z.lastKeyState = true;
+					this.input.SLASH.lastKeyState = true;
+					this.closeDialog();
+				}
+			}
+
+			//Does not belong in either Speech dialogue or Question dialogue.
+			else {
+				if (!this.nextFlag && !this.scrollFlag) {
+					if (this.tickCount == 0x0) {
+						if (!this.scrollFlag)
 							this.subStringIterator++;
+						if (this.subStringIterator >= this.lineLength) {
+							this.subStringIterator %= this.lineLength;
+							Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
+							this.completedLines.add(entry.getKey());
+							this.lineIterator++;
 						}
-					} else if ((input.X.keyStateDown && !(input.X.lastKeyState))
-							|| (input.PERIOD.keyStateDown && !input.PERIOD.lastKeyState)) {
-						if (this.subStringIterator < this.lineLength - 1) {
-							this.subStringIterator = this.lineLength - 1;
-							input.X.lastKeyState = true;
-							input.PERIOD.lastKeyState = true;
+						if (this.completedLines.size() == 2) {
+							if (!this.scrollFlag) {
+								switch (this.type) {
+									case DIALOGUE_SPEECH:
+										this.nextFlag = true;
+										break;
+									case DIALOGUE_QUESTION:
+										// Must get to the end of the entire dialogue before asking for answers.
+										if (this.lineIterator >= this.lines.size()) {
+											this.simpleQuestionFlag = true;
+											this.nextFlag = false;
+										}
+										else
+											this.nextFlag = true;
+										break;
+									case DIALOGUE_ALERT:
+										this.nextFlag = true;
+										break;
+								}
+							}
+						}
+					}
+
+					// Speeds up text speed.
+					if (this.type != Dialogue.DIALOGUE_ALERT) {
+						if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState))
+							|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
+							if (this.subStringIterator >= this.lineLength - 2) {
+								this.input.Z.lastKeyState = true;
+								this.input.SLASH.lastKeyState = true;
+							}
+							else if (this.subStringIterator < this.lineLength) {
+								this.subStringIterator++;
+							}
+						}
+						else if ((this.input.X.keyStateDown && !(this.input.X.lastKeyState))
+							|| (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
+							if (this.subStringIterator < this.lineLength - 1) {
+								this.subStringIterator = this.lineLength - 1;
+								this.input.X.lastKeyState = true;
+								this.input.PERIOD.lastKeyState = true;
+							}
 						}
 					}
 				}
-			} else if (this.simpleQuestionFlag && !this.nextFlag && !this.scrollFlag) {
-				// Making sure this doesn't trigger the "Next" arrow.
-				this.nextFlag = false;
 
-				if ((this.input.up.keyStateDown && !this.input.up.lastKeyState)
-						|| (this.input.W.keyStateDown && !this.input.W.lastKeyState)) {
-					this.input.up.lastKeyState = true;
-					this.input.W.lastKeyState = true;
-					// Made it consistent with Inventory's menu selection, where it doesn't wrap
-					// around.
-					this.yesNoCursorPosition = !this.yesNoCursorPosition;
-				} else if ((this.input.down.keyStateDown && !this.input.down.lastKeyState)
-						|| (this.input.S.keyStateDown && !this.input.S.lastKeyState)) {
-					this.input.down.lastKeyState = true;
-					this.input.S.lastKeyState = true;
-					// Made it consistent with Inventory's menu selection, where it doesn't wrap
-					// around.
-					this.yesNoCursorPosition = !this.yesNoCursorPosition;
-				}
-				if ((this.input.Z.keyStateDown && !this.input.Z.lastKeyState)
-						|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
+				if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState))
+					|| (this.input.SLASH.keyStateDown && !(this.input.SLASH.lastKeyState))
+					|| (this.input.X.keyStateDown && !(this.input.X.lastKeyState))
+					|| (this.input.PERIOD.keyStateDown && !(this.input.PERIOD.lastKeyState))) {
 					this.input.Z.lastKeyState = true;
 					this.input.SLASH.lastKeyState = true;
-					// The answer to simple questions have already been set by UP and DOWN.
-					this.yesNoAnswerFlag = this.yesNoCursorPosition;
-					this.simpleQuestionFlag = false;
-					this.closeDialog();
-				} else if ((this.input.X.keyStateDown && !this.input.X.lastKeyState)
-						|| (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
 					this.input.X.lastKeyState = true;
 					this.input.PERIOD.lastKeyState = true;
-					// Always negative for cancel button.
-					this.yesNoAnswerFlag = false;
-					this.yesNoCursorPosition = false;
-					this.simpleQuestionFlag = false;
-					this.closeDialog();
-				}
-			} else if (this.simpleSpeechFlag) {
-				// Handles only the simplest forms of dialogues.
-				if ((input.Z.keyStateDown && !(input.Z.lastKeyState)
-						|| (input.SLASH.keyStateDown && !input.SLASH.lastKeyState))) {
-					input.Z.lastKeyState = true;
-					input.SLASH.lastKeyState = true;
-					this.closeDialog();
-				}
-			} else {
-				if ((input.Z.keyStateDown && !(input.Z.lastKeyState))
-						|| (input.SLASH.keyStateDown && !(input.SLASH.lastKeyState))
-						|| (input.X.keyStateDown && !(input.X.lastKeyState))
-						|| (input.PERIOD.keyStateDown && !(input.PERIOD.lastKeyState))) {
-					input.Z.lastKeyState = true;
-					input.SLASH.lastKeyState = true;
-					input.X.lastKeyState = true;
-					input.PERIOD.lastKeyState = true;
 					switch (this.type) {
 						case DIALOGUE_SPEECH:
 							this.nextFlag = false;
@@ -439,7 +452,8 @@ public class Dialogue {
 							this.scrollFlag = true;
 							break;
 					}
-				} else if (this.scrollFlag) {
+				}
+				else if (this.scrollFlag) {
 					if (this.lineIterator >= this.lines.size()) {
 						switch (this.type) {
 							case DIALOGUE_QUESTION:
@@ -454,15 +468,18 @@ public class Dialogue {
 								this.closeDialog();
 								return;
 						}
-					} else
+					}
+					else
 						this.scrollDistance += 8;
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			if (this.lineIterator >= this.lines.size()) {
 				if (this.scrollFlag) {
 					this.closeDialog();
-				} else {
+				}
+				else {
 					switch (this.type) {
 						case DIALOGUE_SPEECH:
 						case DIALOGUE_ALERT:
@@ -509,7 +526,8 @@ public class Dialogue {
 					if (this.subStringIterator > string.length()) {
 						g.drawString(string.substring(0, string.length()), X, Y1);
 						this.subStringIterator = this.lineLength;
-					} else
+					}
+					else
 						g.drawString(string.substring(0, this.subStringIterator), X, Y1);
 					break;
 				case 1:
@@ -519,7 +537,8 @@ public class Dialogue {
 					if (this.subStringIterator > string.length()) {
 						g.drawString(string.substring(0, string.length()), X, Y2);
 						this.subStringIterator = this.lineLength;
-					} else
+					}
+					else
 						g.drawString(string.substring(0, this.subStringIterator), X, Y2);
 					break;
 				case 2:
@@ -527,16 +546,17 @@ public class Dialogue {
 					if (!this.scrollFlag) {
 						g.drawString(this.completedLines.get(0), X, Y1);
 						g.drawString(this.completedLines.get(1), X, Y2);
-					} else {
+					}
+					else {
 						// Time to scroll.
 						// DEBUG: Needs testing to see if there's any problem with
 						// it.
 						Graphics g_clipped = g.create();
 						g_clipped.setClip(rect.x, rect.y, rect.width, rect.height);
-						g_clipped.drawString(this.completedLines.get(0), X, Y1 - scrollDistance);
-						g_clipped.drawString(this.completedLines.get(1), X, Y2 - scrollDistance);
-						if (tickCount == 0x0) {
-							if (scrollDistance >= Y2 - Y1) {
+						g_clipped.drawString(this.completedLines.get(0), X, Y1 - this.scrollDistance);
+						g_clipped.drawString(this.completedLines.get(1), X, Y2 - this.scrollDistance);
+						if (this.tickCount == 0x0) {
+							if (this.scrollDistance >= Y2 - Y1) {
 								this.scrollFlag = false;
 								this.scrollDistance = 0;
 								this.subStringIterator = 0;
@@ -548,30 +568,20 @@ public class Dialogue {
 					}
 					break;
 			}
-		} catch (Exception e) {
 		}
-
+		catch (Exception e) {}
 	}
 
-	public static Dialogue createEmptyDialogue() {
-		return new Dialogue(MainComponent.getMainInput());
-	}
-
-	public static Dialogue createText(String dialogue, int length, int type, boolean lock) {
-		Dialogue dialogues = new Dialogue(MainComponent.getMainInput());
-		dialogues.lines = toLines(dialogue, length);
-		dialogues.lineLength = length;
-		dialogues.totalDialogueLength = dialogue.length();
-		dialogues.type = type;
-		dialogues.showDialog = true;
-		if (lock) {
-			if (!Player.isMovementsLocked())
-				Player.lockMovements();
-		}
-		return dialogues;
-	}
-
-	public static void renderDialogBox(Scene output, int x, int y, int centerWidth, int centerHeight) {
+	/**
+	 * This is to render the information dialogue box that will appear in the lower left corner when the Main Menu is displayed.
+	 * 
+	 * @param output
+	 * @param x
+	 * @param y
+	 * @param centerWidth
+	 * @param centerHeight
+	 */
+	public void renderInformationBox(Scene output, int x, int y, int centerWidth, int centerHeight) {
 		output.blit(Art.dialogue_top_left, x * Tileable.WIDTH, y * Tileable.HEIGHT);
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_top, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH), y * Tileable.HEIGHT);
@@ -581,91 +591,127 @@ public class Dialogue {
 		for (int j = 0; j < centerHeight - 1; j++) {
 			output.blit(Art.dialogue_left, x * Tileable.WIDTH, ((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT);
 			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(Art.dialogue_background, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
-						((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT);
+				output.blit(
+					Art.dialogue_background, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
+					((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT
+				);
 			}
 			output.blit(Art.dialogue_right, (x + centerWidth) * Tileable.WIDTH, ((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT);
 		}
 
 		output.blit(Art.dialogue_bottom_left, x * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
 		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_bottom, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
-					((y + centerHeight) * Tileable.HEIGHT));
+			output.blit(
+				Art.dialogue_bottom, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
+				((y + centerHeight) * Tileable.HEIGHT)
+			);
 		}
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
 	}
 
-	public static ArrayList<Map.Entry<Dialogue, Integer>> loadDialogues(String filename) {
-		ArrayList<Map.Entry<Dialogue, Integer>> result = new ArrayList<Map.Entry<Dialogue, Integer>>();
+	// ======================================================
+	// Private methods
+	// ======================================================
+
+	private void handleDialogueUpdate() {
+		int count = 0;
 		try {
-			BufferedReader reader = new BufferedReader(
-					new InputStreamReader(Dialogue.class.getClassLoader().getResourceAsStream(filename)));
-			String line;
-			String[] tokens;
-			int dialogueID = 0;
-			Dialogue temp = null;
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("#")) {
-					// Dialogue ID
-					tokens = line.split("#");
-					dialogueID = Integer.valueOf(tokens[1]);
-				} else if (line.startsWith("@")) {
-					// Dialogue message
-					tokens = line.split("@");
-					temp = Dialogue.createText(tokens[1], Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_SPEECH,
-							false);
-				} else if (line.startsWith("-")) {
-					// Dialogue delimiter
-					Map.Entry<Dialogue, Integer> entry = new AbstractMap.SimpleEntry<Dialogue, Integer>(temp,
-							dialogueID);
-					result.add(entry);
+			for (int i = 0; i < this.lineIterator; i++) {
+				count += this.lines.get(i).getKey().length();
+				if (i != this.lines.size() - 1)
+					count += 1;
+			}
+		}
+		catch (Exception e) {
+			count = 0;
+		}
+
+		if (this.nextFlag) {
+			switch (this.type) {
+				case DIALOGUE_QUESTION: {
+					if (count >= this.totalDialogueLength) {
+						this.simpleQuestionFlag = true;
+						this.nextFlag = false;
+						this.scrollFlag = false;
+					}
+					else {
+						this.nextTick++;
+						if (this.nextTick > Dialogue.MAX_TICK_DELAY)
+							this.nextTick = Dialogue.ZERO_TICK;
+					}
+					break;
+				}
+				case DIALOGUE_SPEECH: {
+					this.nextTick++;
+					if (this.nextTick > Dialogue.MAX_TICK_DELAY)
+						this.nextTick = Dialogue.ZERO_TICK;
+					break;
+				}
+				case DIALOGUE_ALERT: {
+					this.nextTick++;
+					if (this.nextTick > Dialogue.MAX_TICK_DELAY)
+						this.nextTick = Dialogue.ZERO_TICK;
+					break;
 				}
 			}
-		} catch (Exception e) {
-			return null;
 		}
-		return result;
-	}
-
-	public static ArrayList<Map.Entry<String, Boolean>> toLines(String all, final int regex) {
-		ArrayList<Map.Entry<String, Boolean>> lines = new ArrayList<>();
-		String[] words = all.split("\\s");
-		String line = "";
-		int length = 0;
-		for (String w : words) {
-			if (length + w.length() + 1 > regex) {
-				if (w.length() >= regex) {
-					line += w;
-					lines.add(new AbstractMap.SimpleEntry<String, Boolean>(line, false));
-					line = "";
-					continue;
+		else if (count < this.totalDialogueLength) {
+			if (!this.scrollFlag) {
+				this.tickCount++;
+				if (this.tickCount > Dialogue.CHARACTER_TICK_DELAY)
+					this.tickCount = Dialogue.ZERO_TICK;
+			}
+		}
+		else {
+			if (this.lineIterator >= this.lines.size()) {
+				switch (this.type) {
+					case DIALOGUE_QUESTION:
+						this.simpleQuestionFlag = true;
+						this.scrollFlag = false;
+						this.nextFlag = false;
+						break;
+					case DIALOGUE_SPEECH:
+						this.simpleSpeechFlag = true;
+						this.nextFlag = false;
+						break;
+					case DIALOGUE_ALERT:
+						this.simpleSpeechFlag = true;
+						this.nextFlag = false;
+						break;
 				}
-				lines.add(new AbstractMap.SimpleEntry<String, Boolean>(line, false));
-				line = "";
-				length = 0;
 			}
-			if (length > 0) {
-				line += " ";
-				length += 1;
+			else {
+				Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
+				this.completedLines.add(entry.getKey());
+				this.lineIterator++;
+				switch (this.type) {
+					case DIALOGUE_SPEECH:
+						this.nextFlag = true;
+						break;
+					case DIALOGUE_QUESTION:
+						this.simpleQuestionFlag = true;
+						this.nextFlag = true;
+						break;
+					case DIALOGUE_ALERT:
+						this.nextFlag = true;
+						break;
+				}
 			}
-			line += w;
-			length += w.length();
 		}
-		if (line.length() > 0)
-			lines.add(new AbstractMap.SimpleEntry<String, Boolean>(line, false));
-		return lines;
 	}
 
-	private static void renderDialogBackground(Scene output, int x, int y, int centerWidth, int centerHeight) {
+	private void renderDialogBackground(Scene output, int x, int y, int centerWidth, int centerHeight) {
 		for (int j = 0; j < centerHeight - 1; j++) {
 			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(Art.dialogue_background, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
-						((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT);
+				output.blit(
+					Art.dialogue_background, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
+					((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT
+				);
 			}
 		}
 	}
 
-	private static void renderDialogBorderBox(Scene output, int x, int y, int centerWidth, int centerHeight) {
+	private void renderDialogBorderBox(Scene output, int x, int y, int centerWidth, int centerHeight) {
 		output.blit(Art.dialogue_top_left, x * Tileable.WIDTH, y * Tileable.HEIGHT);
 		for (int i = 0; i < centerWidth - 1; i++) {
 			output.blit(Art.dialogue_top, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH), y * Tileable.HEIGHT);
@@ -679,10 +725,156 @@ public class Dialogue {
 
 		output.blit(Art.dialogue_bottom_left, x * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
 		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_bottom, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
-					((y + centerHeight) * Tileable.HEIGHT));
+			output.blit(
+				Art.dialogue_bottom, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
+				((y + centerHeight) * Tileable.HEIGHT)
+			);
 		}
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
+	}
+
+	public ArrayList<String> getCompletedLines() {
+		return this.completedLines;
+	}
+
+	public void setCompletedLines(ArrayList<String> completedLines) {
+		this.completedLines = completedLines;
+	}
+
+	public Keys getInput() {
+		return this.input;
+	}
+
+	public void setInput(Keys input) {
+		this.input = input;
+	}
+
+	public int getLineIterator() {
+		return this.lineIterator;
+	}
+
+	public void setLineIterator(int lineIterator) {
+		this.lineIterator = lineIterator;
+	}
+
+	public int getLineLength() {
+		return this.lineLength;
+	}
+
+	public void setLineLength(int lineLength) {
+		this.lineLength = lineLength;
+	}
+
+	public ArrayList<Map.Entry<String, Boolean>> getLines() {
+		return this.lines;
+	}
+
+	public void setLines(ArrayList<Map.Entry<String, Boolean>> lines) {
+		this.lines = lines;
+	}
+
+	public boolean isSimpleQuestionFlag() {
+		return this.simpleQuestionFlag;
+	}
+
+	public void setSimpleQuestionFlag(boolean simpleQuestionFlag) {
+		this.simpleQuestionFlag = simpleQuestionFlag;
+	}
+
+	public boolean isSimpleSpeechFlag() {
+		return this.simpleSpeechFlag;
+	}
+
+	public void setSimpleSpeechFlag(boolean simpleSpeechFlag) {
+		this.simpleSpeechFlag = simpleSpeechFlag;
+	}
+
+	public boolean isNextFlag() {
+		return this.nextFlag;
+	}
+
+	public void setNextFlag(boolean nextFlag) {
+		this.nextFlag = nextFlag;
+	}
+
+	public boolean isScrollFlag() {
+		return this.scrollFlag;
+	}
+
+	public void setScrollFlag(boolean scrollFlag) {
+		this.scrollFlag = scrollFlag;
+	}
+
+	public Boolean getYesNoAnswerFlag() {
+		return this.yesNoAnswerFlag;
+	}
+
+	public void setYesNoAnswerFlag(Boolean yesNoAnswerFlag) {
+		this.yesNoAnswerFlag = yesNoAnswerFlag;
+	}
+
+	public boolean isYesNoCursorPosition() {
+		return this.yesNoCursorPosition;
+	}
+
+	public void setYesNoCursorPosition(boolean yesNoCursorPosition) {
+		this.yesNoCursorPosition = yesNoCursorPosition;
+	}
+
+	public byte getNextTick() {
+		return this.nextTick;
+	}
+
+	public void setNextTick(byte nextTick) {
+		this.nextTick = nextTick;
+	}
+
+	public int getScrollDistance() {
+		return this.scrollDistance;
+	}
+
+	public void setScrollDistance(int scrollDistance) {
+		this.scrollDistance = scrollDistance;
+	}
+
+	public boolean isShowDialog() {
+		return this.showDialog;
+	}
+
+	public void setShowDialog(boolean showDialog) {
+		this.showDialog = showDialog;
+	}
+
+	public int getSubStringIterator() {
+		return this.subStringIterator;
+	}
+
+	public void setSubStringIterator(int subStringIterator) {
+		this.subStringIterator = subStringIterator;
+	}
+
+	public byte getTickCount() {
+		return this.tickCount;
+	}
+
+	public void setTickCount(byte tickCount) {
+		this.tickCount = tickCount;
+	}
+
+	public int getTotalDialogueLength() {
+		return this.totalDialogueLength;
+	}
+
+	public void setTotalDialogueLength(int totalDialogueLength) {
+		this.totalDialogueLength = totalDialogueLength;
+	}
+
+	public int getType() {
+		return this.type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
 	}
 
 }

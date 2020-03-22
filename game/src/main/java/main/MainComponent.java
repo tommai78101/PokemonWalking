@@ -34,14 +34,14 @@ public class MainComponent extends Canvas implements Runnable {
 
 	// DEBUG: Useful for reducing the number of times to swap between the game application window and Eclipse.
 	private static final boolean DebugMode = false;
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String GAME_TITLE = "Pokémon Walking Algorithm (Hobby) by tom_mai78101";
 	public static final int GAME_WIDTH = 160;
 	public static final int GAME_HEIGHT = 144;
 	public static final int GAME_SCALE = 3;
-	
+
 	public static int COMPONENT_WIDTH;
 	public static int COMPONENT_HEIGHT;
 
@@ -51,7 +51,6 @@ public class MainComponent extends Canvas implements Runnable {
 	private JFrame frame;
 	// -----------------------
 
-	private static final Keys keys = new Keys();
 	private InputHandler inputHandler;
 
 	// -----------------------
@@ -88,13 +87,14 @@ public class MainComponent extends Canvas implements Runnable {
 		MainComponent.COMPONENT_HEIGHT = this.getHeight();
 		MainComponent.COMPONENT_WIDTH = this.getWidth();
 
-		// Input Handling
-		inputHandler = new InputHandler(keys);
-		this.addKeyListener(inputHandler);
-
 		// Game loading
 		// We pass the BaseScreen variable as a parameter, acting as an output.
-		game = new Game(this, keys);
+		game = new Game(this);
+
+		// Input Handling
+		inputHandler = new InputHandler(Game.keys);
+		this.addKeyListener(inputHandler);
+
 		// world = new TestWorld(Art.testArea);
 
 		// this.world.addEntity(player);
@@ -312,10 +312,6 @@ public class MainComponent extends Canvas implements Runnable {
 	// ---------------------------------
 	// Other methods
 
-	public static final Keys getMainInput() {
-		return keys;
-	}
-
 	public static final Game getGame() {
 		return game;
 	}
@@ -325,7 +321,7 @@ public class MainComponent extends Canvas implements Runnable {
 
 	public static void main(String[] args) {
 		System.out.println("Game is now loading, it will take a while.");
-		
+
 		JFrame frame = new JFrame(GAME_TITLE);
 
 		MainComponent component = new MainComponent(frame);

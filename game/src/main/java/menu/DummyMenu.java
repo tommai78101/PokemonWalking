@@ -11,29 +11,21 @@
 package menu;
 
 import java.awt.Graphics;
-import main.Game;
-import main.Keys;
-import screen.Scene;
+
 import abstracts.SubMenu;
+import main.Game;
+import screen.Scene;
 
 public class DummyMenu extends SubMenu {
 
-	public DummyMenu(String name, String enabled, String disabled, Game game) {
-		super(name, enabled, disabled, game);
+	public DummyMenu(String name, String description, Game game) {
+		super(name, description, Type.UNUSED);
 	}
 
 	@Override
-	public SubMenu initialize(Keys keys) {
-		// Always return "this" back.
-		return this;
-	}
+	public void tick() {}
 
 	@Override
-	public void tick() {
-	}
-
-	@Override
-	public void render(Scene output, Graphics graphics) {
-	}
+	public void render(Scene output, Graphics graphics) {}
 
 }

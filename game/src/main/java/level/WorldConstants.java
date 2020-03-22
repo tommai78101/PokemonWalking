@@ -21,6 +21,7 @@ import resources.Art;
 import resources.Mod;
 import screen.BaseBitmap;
 import script.Script;
+import utility.DialogueBuilder;
 
 public class WorldConstants {
 	private WorldConstants() {
@@ -50,7 +51,7 @@ public class WorldConstants {
 	public static final int OVERWORLD = 0x0A000001;
 
 	// Dialogues
-	public static ArrayList<Map.Entry<Dialogue, Integer>> signTexts = Dialogue.loadDialogues("art/dialogue/dialogue.txt");
+	public static ArrayList<Map.Entry<Dialogue, Integer>> signTexts = DialogueBuilder.loadDialogues("art/dialogue/dialogue.txt");
 
 	// Items
 	// public static HashMap<Integer, ItemText> itemms =
@@ -60,6 +61,16 @@ public class WorldConstants {
 	// Areas
 	public static List<Area> areas = new ArrayList<>(0);
 	public static List<Area> moddedAreas = new ArrayList<>(0);
+
+	//Main Menu Item Names
+	public static final String MENU_ITEM_NAME_EXIT = "EXIT";
+	public static final String MENU_ITEM_NAME_INVENTORY = "PACK";
+	public static final String MENU_ITEM_NAME_SAVE = "SAVE";
+
+	//Main Menu Item Descriptions
+	public static final String MENU_ITEM_DESC_EXIT = "Exit the menu.";
+	public static final String MENU_ITEM_DESC_INVENTORY = "Open the pack.";
+	public static final String MENU_ITEM_DESC_SAVE = "Save the game.";
 
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
@@ -97,10 +108,10 @@ public class WorldConstants {
 		Area area = null;
 		switch (areaID) {
 			case TEST_WORLD_1:
-				area = new Area(Art.testArea, TEST_WORLD_1, "Test World 1");
+				area = new Area(Art.testArea, WorldConstants.TEST_WORLD_1, "Test World 1");
 				break;
 			case TEST_WORLD_2:
-				area = new Area(Art.testArea2, TEST_WORLD_2, "Test World 2");
+				area = new Area(Art.testArea2, WorldConstants.TEST_WORLD_2, "Test World 2");
 				break;
 			default:
 				area = null;
@@ -137,12 +148,12 @@ public class WorldConstants {
 		// List<Area> result = new ArrayList<Area>();
 		if (WorldConstants.isModsEnabled == Boolean.FALSE || WorldConstants.isModsEnabled == null) {
 			if (WorldConstants.areas.isEmpty()) {
-				WorldConstants.areas.add(new Area(Art.testArea, TEST_WORLD_1));
-				WorldConstants.areas.add(new Area(Art.testArea2, TEST_WORLD_2));
+				WorldConstants.areas.add(new Area(Art.testArea, WorldConstants.TEST_WORLD_1));
+				WorldConstants.areas.add(new Area(Art.testArea2, WorldConstants.TEST_WORLD_2));
 			}
 			else {
-				WorldConstants.addNewArea(Art.testArea, TEST_WORLD_1);
-				WorldConstants.addNewArea(Art.testArea2, TEST_WORLD_2);
+				WorldConstants.addNewArea(Art.testArea, WorldConstants.TEST_WORLD_1);
+				WorldConstants.addNewArea(Art.testArea2, WorldConstants.TEST_WORLD_2);
 			}
 			// result.add(new Area(Art.testArea3, TEST_WORLD_3));
 			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
@@ -205,9 +216,9 @@ public class WorldConstants {
 	public static int convertToAreaColor(int areaID) {
 		switch (areaID) {
 			case TEST_WORLD_1:
-				return AREA_1_COLOR;
+				return WorldConstants.AREA_1_COLOR;
 			case TEST_WORLD_2:
-				return AREA_2_COLOR;
+				return WorldConstants.AREA_2_COLOR;
 			default:
 				return 0;
 		}

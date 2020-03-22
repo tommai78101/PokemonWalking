@@ -13,30 +13,35 @@ package main;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import abstracts.SubMenu;
+import abstracts.SubMenu.Type;
 import entity.Player;
 import item.ActionItem;
 import level.OverWorld;
 import level.WorldConstants;
+import main.SaveDataManager.State;
 import main.StateManager.GameState;
-import menu.Save;
+import menu.Inventory;
 import menu.MainMenu;
+import menu.MenuEvent;
 import resources.Mod;
 import saving.GameSave;
 import screen.Scene;
 
 public class Game {
 	private static final String SAVE_FILE_NAME = "data.sav";
+	public static final Keys keys = new Keys();
+
 	private final Scene gameScene;
 	private final List<OverWorld> worlds;
 	private final Player player;
 	private MainMenu startMenu;
-	private SubMenu subMenu;
 	private OverWorld overworld;
 	private ActionItem registeredItem;
 	private StateManager stateManager;
+	private SaveDataManager saveManager;
+	private Inventory inventoryManager;
 
 	/**
 	 * Creates the core component of the game.
@@ -50,22 +55,19 @@ public class Game {
 	 * @see Scene
 	 * @see NewInputHandler
 	 */
-	public Game(MainComponent main, Keys input) {
-		this.gameScene = main.getScene();
-		this.worlds = new ArrayList<>();
-		this.player = new Player(input);
-
-		this.initialize();
-	}
-
-	public void initialize() {
+	public Game(MainComponent main) {
 		WorldConstants.checkForMods();
+		this.worlds = new ArrayList<>();
 
-		this.player.setCenterCamPosition(this.gameScene);
+		this.gameScene = main.getScene();
 		this.worlds.add(this.overworld);
-		this.startMenu = new MainMenu(this).initialize();
-		this.subMenu = null;
+		this.startMenu = new MainMenu();
 		this.stateManager = new StateManager();
+		this.saveManager = new SaveDataManager(this);
+		this.inventoryManager = new Inventory(this);
+		this.startMenu.initialize(this);
+		this.player = new Player(Game.keys);
+		this.player.setCenterCamPosition(this.gameScene);
 
 		this.load();
 	}
@@ -85,43 +87,40 @@ public class Game {
 		GameState state = this.stateManager.getCurrentGameState();
 		switch (state) {
 			case MAIN_GAME: {
-				gameScene.clear(0xA4E767);
-				overworld.render(gameScene, player.getX(), player.getY());
+				this.gameScene.clear(0xA4E767);
+				this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
 				break;
 			}
 			case START_MENU: {
-				if (gameScene.getRenderingEffectTick() < (byte) 0x7) {
-					gameScene.flashing();
+				if (this.gameScene.getRenderingEffectTick() < (byte) 0x7) {
+					this.gameScene.flashing();
 				}
 				else {
-					if (this.subMenu.equals(this.startMenu.getInventory()))
-						this.subMenu = this.startMenu.getInventory();
-					else
-						this.subMenu = this.startMenu.getSubMenu();
-					if (this.subMenu != null) {
-						this.subMenu.render(gameScene, graphics);
+					if (this.startMenu != null) {
+						this.startMenu.render(this.gameScene, graphics);
 					}
 				}
 				break;
 			}
 			case INVENTORY: {
-				if (gameScene.getRenderingEffectTick() < (byte) 0x7) {
-					gameScene.flashing();
+				if (this.gameScene.getRenderingEffectTick() < (byte) 0x7) {
+					this.gameScene.flashing();
 				}
 				else {
-					gameScene.clear(0xA4E767);
-					overworld.render(gameScene, player.getX(), player.getY());
-					if (startMenu.isActivated()) {
-						startMenu.render(gameScene, graphics);
+					this.gameScene.clear(0xA4E767);
+					this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
+					if (this.startMenu.isActivated()) {
+						this.startMenu.render(this.gameScene, graphics);
 					}
 				}
 				break;
 			}
 			case SAVING: {
-				gameScene.clear(0xA4E767);
-				overworld.render(gameScene, player.getX(), player.getY());
-				if (this.subMenu != null) {
-					this.subMenu.render(gameScene, graphics);
+				this.gameScene.clear(0xA4E767);
+				this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
+				SubMenu subMenu = this.startMenu.getActiveItem();
+				if (subMenu != null) {
+					subMenu.render(this.gameScene, graphics);
 				}
 				break;
 			}
@@ -130,7 +129,7 @@ public class Game {
 			}
 		}
 		graphics.drawImage(
-			MainComponent.createCompatibleBufferedImage(gameScene.getBufferedImage()), 0, 0,
+			MainComponent.createCompatibleBufferedImage(this.gameScene.getBufferedImage()), 0, 0,
 			MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null
 		);
 	}
@@ -153,37 +152,37 @@ public class Game {
 		GameState state = this.stateManager.getCurrentGameState();
 		switch (state) {
 			case MAIN_GAME: {
-				overworld.tick();
-				checkPausing();
+				this.overworld.tick();
+				this.checkPausing();
 				break;
 			}
 			case INVENTORY: {
-				if (!this.subMenu.isActivated()) {
+				SubMenu subMenu = this.startMenu.getActiveItem();
+				if (!subMenu.getType().equals(Type.INVENTORY)) {
 					this.stateManager.setCurrentGameState(GameState.START_MENU);
-					gameScene.setRenderingEffectTick((byte) 0x0);
+					this.gameScene.setRenderingEffectTick((byte) 0x0);
 					break;
 				}
-				this.subMenu = this.startMenu.getSubMenu();
-				if (!this.subMenu.isActivated())
-					this.subMenu.enableSubMenu();
-				this.subMenu.tick();
+				subMenu.tick();
 				break;
 			}
 			case START_MENU: {
-				if (startMenu.isActivated())
-					startMenu.tick();
+				if (this.startMenu.isActivated())
+					this.startMenu.tick();
 				else
-					startMenu.openMenu();
-				checkUnpausing();
-				if (startMenu.isActionEventAvailable())
-					handleActionEvent(startMenu.getActionEvent());
+					this.startMenu.openMenu();
+				this.checkUnpausing();
+				MenuEvent event = this.startMenu.getActionEvent();
+				if (event != null) {
+					this.handleActionEvent(event);
+				}
 				break;
 			}
 			case SAVING: {
-				if (!this.subMenu.isActivated()) {
-					final Save saveSubMenu = (Save) this.subMenu;
-					if (saveSubMenu.getState() == Save.State.SAVED || saveSubMenu.getState() == Save.State.ERROR) {
-						saveSubMenu.setState(Save.State.ASK);
+				SubMenu subMenu = this.startMenu.getActiveItem();
+				if (!subMenu.getType().equals(Type.SAVE)) {
+					if (this.saveManager.getState() == State.SAVED || this.saveManager.getState() == State.ERROR) {
+						this.saveManager.setState(State.ASK);
 						this.startMenu.closeMenu();
 						this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 						break;
@@ -191,9 +190,7 @@ public class Game {
 					this.stateManager.setCurrentGameState(GameState.START_MENU);
 					break;
 				}
-				if (this.subMenu != null) {
-					this.subMenu.tick();
-				}
+				subMenu.tick();
 				break;
 			}
 			default: {
@@ -206,7 +203,7 @@ public class Game {
 	 * Saves the game.
 	 */
 	public void save() {
-		GameSave.save(this, SAVE_FILE_NAME);
+		GameSave.save(this, Game.SAVE_FILE_NAME);
 	}
 
 	/**
@@ -215,7 +212,7 @@ public class Game {
 	 * @return True, if it detects previous saved data. False, otherwise.
 	 */
 	public boolean checkSaveData() {
-		return GameSave.check(SAVE_FILE_NAME);
+		return GameSave.check(Game.SAVE_FILE_NAME);
 	}
 
 	/**
@@ -236,7 +233,7 @@ public class Game {
 		if (WorldConstants.isModsEnabled == null)
 			WorldConstants.isModsEnabled = Boolean.FALSE;
 		this.overworld = new OverWorld(this.player, this);
-		GameSave.load(this, SAVE_FILE_NAME);
+		GameSave.load(this, Game.SAVE_FILE_NAME);
 
 		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 	}
@@ -293,33 +290,36 @@ public class Game {
 		return this.overworld;
 	}
 
+	public Inventory getInventory() {
+		return this.inventoryManager;
+	}
+
+	public SaveDataManager getSaveManager() {
+		return this.saveManager;
+	}
+
 	// ------------------------------------------------- 
 	// PRIVATE METHODS
 	// -------------------------------------------------
 
-	private void handleActionEvent(Map.Entry<Integer, SubMenu> entry) {
-		String str = entry.getValue().getName();
-		if (str.equals(MainMenu.ITEM_NAME_INVENTORY)) {
-			this.stateManager.setCurrentGameState(GameState.INVENTORY);
-			this.subMenu = entry.getValue();
-			if (!this.subMenu.isActivated())
-				this.subMenu.enableSubMenu();
-			gameScene.setRenderingEffectTick((byte) 0x0);
+	private void handleActionEvent(MenuEvent menuEvent) {
+		Type type = menuEvent.getType();
+		switch (type) {
+			case INVENTORY:
+				this.stateManager.setCurrentGameState(GameState.INVENTORY);
+				this.gameScene.setRenderingEffectTick((byte) 0x0);
+				break;
+			case SAVE:
+				this.stateManager.setCurrentGameState(GameState.SAVING);
+				break;
+			case EXIT:
+				this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+				this.startMenu.closeMenu();
+				break;
+			case UNUSED:
+				this.startMenu.closeMenu();
+				break;
 		}
-		else if (str.equals(MainMenu.ITEM_NAME_EXIT)) {
-			this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
-			if (this.subMenu != null)
-				this.subMenu.disableSubMenu();
-			this.subMenu = null;
-		}
-		else if (str.equals(MainMenu.ITEM_NAME_SAVE)) {
-			this.stateManager.setCurrentGameState(GameState.SAVING);
-			this.subMenu = entry.getValue();
-			if (!this.subMenu.isActivated())
-				this.subMenu.enableSubMenu();
-		}
-		this.startMenu.clearActionEvent();
-		this.startMenu.closeMenu();
 	}
 
 	private void checkPausing() {
@@ -334,8 +334,6 @@ public class Game {
 					this.stateManager.setCurrentGameState(GameState.START_MENU);
 					if (!this.startMenu.isActivated())
 						this.startMenu.openMenu();
-					if (!Player.isMovementsLocked())
-						Player.lockMovements();
 					break;
 				default:
 					break;
