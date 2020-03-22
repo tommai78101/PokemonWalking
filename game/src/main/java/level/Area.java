@@ -12,8 +12,10 @@ package level;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import abstracts.Character;
 import abstracts.Entity;
 import abstracts.Obstacle;
 import entity.Player;
@@ -46,8 +48,8 @@ public class Area extends Entity {
 	private boolean isTriggerBeingTriggered;
 	private TriggerData trigger;
 
-	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<>();
-	private final ArrayList<Obstacle> areaObstacles = new ArrayList<>();
+	private final List<List<PixelData>> areaData = new ArrayList<>();
+	private final List<Entity> areaEntities = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
 	private final ArrayList<TriggerData> triggerDatas = new ArrayList<>();
 
@@ -61,7 +63,7 @@ public class Area extends Entity {
 			int color = tempPixels[column + (bitmap.getHeight() * row)];
 			// ID must not be negative. ID = 0 is reserved.
 			if (color > 0)
-				triggerDatas.add(new TriggerData().loadTriggerData(color));
+				this.triggerDatas.add(new TriggerData().loadTriggerData(color));
 			if (column >= bitmap.getWidth()) {
 				row++;
 				column -= bitmap.getWidth();
@@ -75,15 +77,15 @@ public class Area extends Entity {
 		System.arraycopy(bitmap.getPixels(), this.width * row, this.pixels, 0, this.pixels.length);
 
 		for (int y = 0; y < this.height; y++) {
-			areaData.add(new ArrayList<PixelData>());
+			this.areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
 				int pixel = this.pixels[y * this.width + x];
 
-				if (Obstacle.test(pixel))
-					areaObstacles.add(Obstacle.build(pixel, x, y));
+				if (Entity.isObstacle(pixel))
+					this.areaObstacles.add(Obstacle.build(pixel, x, y));
 
 				PixelData pixelData = new PixelData(pixel, x, y);
-				areaData.get(y).add(pixelData);
+				this.areaData.get(y).add(pixelData);
 			}
 		}
 
@@ -149,7 +151,7 @@ public class Area extends Entity {
 		else {
 			if (!this.player.isLockedWalking()) {
 				if (this.trigger == null)
-					this.trigger = checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
+					this.trigger = this.checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
 				else
 					this.isTriggerBeingTriggered = true;
 			}
@@ -165,19 +167,24 @@ public class Area extends Entity {
 			this.isTriggerBeingTriggered = false;
 			this.handlePlayerActions();
 		}
+
+		//Area specific entities are updated at the end.
+		for (Obstacle obstacle : this.areaObstacles) {
+			obstacle.tick();
+		}
 	}
 
 	private void handleTriggerActions() {
-		if (!trigger.isFinished()) {
+		if (!this.trigger.isFinished()) {
 			this.player.enableAutomaticMode();
-			trigger.tick(this, xPlayerPosition, yPlayerPosition);
+			this.trigger.tick(this, this.xPlayerPosition, this.yPlayerPosition);
 		}
 		else {
 			this.player.disableAutomaticMode();
 			this.oldXTriggerPosition = this.xPlayerPosition;
 			this.oldYTriggerPosition = this.yPlayerPosition;
 			this.isTriggerBeingTriggered = false;
-			trigger = null;
+			this.trigger = null;
 		}
 	}
 
@@ -196,7 +203,7 @@ public class Area extends Entity {
 			// Target pixel is used to determine what pixel the player is currently standing
 			// on (or what pixel the player is currently on top of).
 			this.player.handleSurroundingTiles(this);
-			this.checkCurrentPositionDataAndSetProperties(this.getPixelData(xPlayerPosition, yPlayerPosition));
+			this.checkCurrentPositionDataAndSetProperties(this.getPixelData(this.xPlayerPosition, this.yPlayerPosition));
 		}
 		else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
 			// A
@@ -212,7 +219,7 @@ public class Area extends Entity {
 			if (isXOutOfBounds || isYOutOfBounds)
 				return;
 
-			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(xPlayerPosition);
+			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 			this.checkCurrentPositionDataAndSetProperties(this.getCurrentPixelData());
 		}
 		else {
@@ -249,24 +256,24 @@ public class Area extends Entity {
 			{
 				switch (red) {
 					case 0x00: // Bottom
-						this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
+						this.player.setLockJumping(red, green, blue, Character.UP, Character.DOWN);
 						break;
 					case 0x01: // Bottom Left
 						// this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
 						break;
 					case 0x02: // left
-						this.player.setLockJumping(red, green, blue, Player.LEFT, Player.RIGHT);
+						this.player.setLockJumping(red, green, blue, Character.LEFT, Character.RIGHT);
 						break;
 					case 0x03: // top left
 						break;
 					case 0x04: // top
 						if (this.checkIfValuesAreAllowed(this.getSurroundingTileID(0, -1), 0x01))
-							this.player.setLockJumping(red, green, blue, Player.DOWN, Player.UP);
+							this.player.setLockJumping(red, green, blue, Character.DOWN, Character.UP);
 						break;
 					case 0x05: // top right
 						break;
 					case 0x06: // right
-						this.player.setLockJumping(red, green, blue, Player.RIGHT, Player.LEFT);
+						this.player.setLockJumping(red, green, blue, Character.RIGHT, Character.LEFT);
 						break;
 					case 0x07: // bottom right
 						break;
@@ -301,11 +308,13 @@ public class Area extends Entity {
 			case 0x0C: // Carpet Outdoors
 				// this.displayExitArrow = true;
 				break;
-			case 0x0D: // Default starting position
-				this.setPixelData(
-					new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
-					this.currentPixelData.xPosition, this.currentPixelData.yPosition
-				);
+			case 0x0D: // Triggers
+				if (red == 0x00) { //Default starting Point
+					this.setPixelData(
+						new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
+						this.currentPixelData.xPosition, this.currentPixelData.yPosition
+					);
+				}
 				break;
 			default:
 				// If no special tiles, then it will keep reseting the flags.
@@ -337,6 +346,7 @@ public class Area extends Entity {
 	 */
 	@Override
 	public void render(Scene screen, int xOff, int yOff) {
+		//Rendering area background tiles.
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
@@ -344,9 +354,16 @@ public class Area extends Entity {
 				screen.blitBiome(data.getBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
 				if (x == this.player.getXInArea() && y == this.player.getYInArea()
 					&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
-					renderExitArrow(screen, xOff, yOff, data, x, y);
-				data.tick();
+					this.renderExitArrow(screen, xOff, yOff, data, x, y);
+
+				//Each time the area background tile is rendered, it also updates the bitmap tick updates.
+				data.renderTick();
 			}
+		}
+
+		//Obstacles are rendered on top of the area background tiles.
+		for (Obstacle obstacle : this.areaObstacles) {
+			obstacle.render(screen, xOff, yOff);
 		}
 
 		if (this.trigger != null) {
@@ -481,7 +498,7 @@ public class Area extends Entity {
 	public int getSurroundingTileID(int xOffset, int yOffset) {
 		PixelData data;
 		try {
-			data = this.areaData.get(yPlayerPosition + yOffset).get(xPlayerPosition + xOffset);
+			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
 		}
 		catch (Exception e) {
 			return -1;
@@ -516,7 +533,7 @@ public class Area extends Entity {
 	public int getTileColor(int xOffset, int yOffset) {
 		PixelData data;
 		try {
-			data = this.areaData.get(yPlayerPosition + yOffset).get(xPlayerPosition + xOffset);
+			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
 		}
 		catch (Exception e) {
 			return 0;
@@ -573,6 +590,10 @@ public class Area extends Entity {
 		return this.isTriggerBeingTriggered;
 	}
 
+	public Entity getEntity(int x, int y) {
+		return this.areaObstacles
+	}
+
 	// --------------------- OVERRIDDEN METHODS -------------------
 
 	@Override
@@ -608,11 +629,11 @@ public class Area extends Entity {
 
 	private void renderExitArrow(Scene screen, int xOff, int yOff, PixelData data, int x, int y) {
 		int height = this.getHeight();
-		if (y + 1 == height && this.player.getFacing() == Player.DOWN) {
+		if (y + 1 == height && this.player.getFacing() == Character.DOWN) {
 			screen.blitBiome(data.getBiomeBitmap(), x * Tileable.WIDTH - xOff + 4, (y + 1) * Tileable.HEIGHT - yOff + 2, data);
 			this.isExitArrowDisplayed = true;
 		}
-		else if (y == 0 && this.player.getFacing() == Player.UP) {
+		else if (y == 0 && this.player.getFacing() == Character.UP) {
 			// TODO: Draw exit arrow point upwards.
 		}
 		else

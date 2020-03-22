@@ -56,6 +56,9 @@ Metadata...........................[PWD05]
 		House......................[PWD05@03#08]
 		House Door.................[PWD05@03#09]
 		Items......................[PWD05@03#10]
+		Carpet (Indoors)...........[PWD05@03#11]
+		Carpet (Outdoors)..........[PWD05@03#12]
+		Triggers...................[PWD05@03#13]
 Entities...........................[PWD06]
 	Player.........................[PWD06#01]
 Controls...........................[PWD07]
@@ -363,7 +366,7 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Overworld [PWD05#02@01]
+		Overworld [PWD05@02#01]
 	
 		In order to create a convincing overworld environment, the
 		areas must be large and explorable. Near the borders of the
@@ -381,7 +384,7 @@ not assume their information to be permanent.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Sector [PWD05#02@02]
+		Sector [PWD05@02#02]
 		
 		Each area consists of sectors, which tells the game to mark
 		a section of an area a specific area of interest. This area
@@ -433,7 +436,7 @@ not assume their information to be permanent.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 
-		Empty [PWD05#03@00]
+		Empty [PWD05@03#00]
 		
 		Tile ID:
 			A: 00 - Empty
@@ -460,7 +463,7 @@ not assume their information to be permanent.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
-		Floor [PWD05#03@01]
+		Floor [PWD05@03#01]
 		
 		Tile ID:
 			A: 01 - Floor
@@ -507,7 +510,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Ledge [PWD05#03@02]
+		Ledge [PWD05@03#02]
 		
 		Tile ID:
 			A: 02 - Ledge
@@ -563,7 +566,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Obstacles [PWD05#03@03]
+		Obstacles [PWD05@03#03]
 	
 		Tile ID:
 			A: 03 - Obstacles
@@ -597,7 +600,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Warp Point [PWD05#03@04]
+		Warp Point [PWD05@03#04]
 		
 		Tile ID:
 			A: 04 - Warp Point
@@ -620,7 +623,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Area Sector Point (ASP) [PWD05#03@05]
+		Area Sector Point (ASP) [PWD05@03#05]
 		
 		Tile ID:
 			A: 05 - Area Sector Point (ASP)
@@ -652,7 +655,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Stairs [PWD05#03@06]
+		Stairs [PWD05@03#06]
 		
 		Tile ID:
 			A: 06 - Stairs
@@ -681,7 +684,7 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Water [PWD05#03@07]
+		Water [PWD05@03#07]
 		
 		Tile ID:
 			A: 07 - Water
@@ -706,7 +709,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		House [PWD05#03@08]
+		House [PWD05@03#08]
 		
 		Tile ID:
 			A: 08 - House
@@ -744,7 +747,7 @@ not assume their information to be permanent.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		House Door [PWD05#03@09]
+		House Door [PWD05@03#09]
 		
 		Tile ID:
 			A: 09 - Door
@@ -764,7 +767,7 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Items [PWD05#03@10]
+		Items [PWD05@03#10]
 		
 		Tile ID:
 			A: 0A - Item
@@ -786,7 +789,7 @@ not assume their information to be permanent.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Carpet (Indoors) [PWD05#03@11]
+		Carpet (Indoors) [PWD05@03#11]
 
 		Tile ID:
 			A: 0B - Carpet (Indoors)
@@ -807,7 +810,7 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Carpet (Outdoors) [PWD05#03@12]
+		Carpet (Outdoors) [PWD05@03#12]
 
 		Tile ID:
 			A: 0C - Carpet (Outdoors)
@@ -830,12 +833,13 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Default Starting Point [PWD05#03@13]
+		Triggers [PWD05@03#13]
 		
 		Tile ID:
 			A: 0D - Triggers
-		Extended Tile ID;
-			R: XX - Any one of all available bitmaps
+		Extended Tile ID:
+			R: 00 - Default Starting Point
+			R: XX - Any triggers or any one of all available bitmaps
 		Tile Specific ID:
 			G: GG - Script ID
 			B: BB - Script ID
@@ -844,28 +848,25 @@ not assume their information to be permanent.
 		Description:
 			(This should be used sparsingly. Useful for debugging maps.)
 			
-			This sets the default starting position for the player. If it so happens
-			that the game loads the map in such a way causing the player to be stuck,
-			then it means there is a problem with the game, the editor, or the map.
+			Default Starting Point			
 
+				This sets the default starting position for the player. If it so happens
+				that the game loads the map in such a way causing the player to be stuck,
+				then it means there is a problem with the game, the editor, or the map.
 
--------------------------------
+			All other triggers depend on the Extended Tile ID.
 
-		Triggers [PWD05#03@13]
+				Depending on how it was triggered, this tile will trigger a scripted
+				event matching the script ID.
+
+				The bitmap value determines what tile bitmap this trigger will use
+				when it is displayed on the screen. Depending on the bitmap tile
+				value, it can either be stepped on, or is blocking the player.
+
+				If the player steps on this tile, or if the player interacts with this
+				tile, it will start triggering.
 		
-		TODO: Must add a new section for it.
-
-		
-			Depending on how it was triggered, this tile will trigger a scripted
-			event matching the script ID.
-
-			The bitmap value determines what tile bitmap this trigger will use
-			when it is displayed on the screen. Depending on the bitmap tile
-			value, it can either be stepped on, or is blocking the player.
-
-			If the player steps on this tile, or if the player interacts with this
-			tile, it will start triggering.
-
+			
 -------------------------------
 
 		NPCs
@@ -920,7 +921,7 @@ not assume their information to be permanent.
 	5.		@: Dialogue. Makes tne entity interact with
 				another entity.
 
-	Syntax: @ + #: What dialogue should the entity use to
+	Syntax:		@ + #: What dialogue should the entity use to
 				interact. The number indicates the
 				dialogue ID number, specifying what dialogue
 				to use.
@@ -994,10 +995,10 @@ All of the inputs handled by the game are defined in
 the InputHandler class object. They are defined below:
 
 UP			W				Moves the player upwards.
-DOWN		S				Moves the player downwards.
-LEFT		A				Moves the player to the left.
-RIGHT		D				Moves the player to the right.
-ENTER						START BUTTON
+DOWN			S				Moves the player downwards.
+LEFT			A				Moves the player to the left.
+RIGHT			D				Moves the player to the right.
+ENTER							START BUTTON
 Z			/				The Action Button. (GameBoy equivalent of the A button.)
 X			.				The Cancel Button. (GameBoy equivalent of the B button.)
 
