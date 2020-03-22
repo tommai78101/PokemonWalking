@@ -10,6 +10,7 @@
 
 package abstracts;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import dialogue.Dialogue;
@@ -20,8 +21,8 @@ import obstacle.SmallTree;
 public abstract class Obstacle extends Entity implements Interactable {
 	protected int color;
 	protected int id;
-	protected List<Dialogue> defaultDialogues;
-	protected List<Dialogue> overrideDialogues;
+	protected List<Dialogue> defaultDialogues = new ArrayList<>();
+	protected List<Dialogue> overrideDialogues = new ArrayList<>();
 
 	public static Obstacle build(final PixelData data, final int xPosition, final int yPosition) {
 		int red = data.getRed();

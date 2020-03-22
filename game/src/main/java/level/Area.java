@@ -86,10 +86,16 @@ public class Area implements Tileable, UpdateRenderable {
 				PixelData pixelData = new PixelData(pixel, x, y);
 
 				if (Entity.isObstacle(pixelData)) {
-					this.areaObstacles.add(Obstacle.build(pixelData, x, y));
+					Obstacle entity = Obstacle.build(pixelData, x, y);
+					if (entity != null) {
+						this.areaObstacles.add(entity);
+					}
 				}
 				if (Entity.isCharacter(pixelData)) {
-					this.areaCharacters.add(Character.build(pixelData, x, y));
+					Character entity = Character.build(pixelData, x, y);
+					if (entity != null) {
+						this.areaCharacters.add(entity);
+					}
 				}
 
 				this.areaData.get(y).add(pixelData);
