@@ -20,6 +20,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.ImageIcon;
@@ -30,9 +31,9 @@ import interfaces.Tileable;
 public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for
 	// the area.
-	private final ArrayList<Category> categories = new ArrayList<Category>();
-	private final ArrayList<Map.Entry<Integer, Data>> datas = new ArrayList<Map.Entry<Integer, Data>>();
-	private final ArrayList<Trigger> triggers = new ArrayList<Trigger>();
+	private final List<Category> categories = new ArrayList<>();
+	private final List<Map.Entry<Integer, Data>> datas = new ArrayList<>();
+	private final List<Trigger> triggers = new ArrayList<>();
 
 	private static final EditorConstants instance = new EditorConstants();
 
@@ -42,11 +43,13 @@ public class EditorConstants {
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
 
 	public static enum Tools {
-		ControlPanel, Properties
-	};
+		ControlPanel,
+		Properties
+	}
 
 	public static enum Metadata {
-		Pixel_Data("Pixel Data"), Triggers("Triggers");
+		Pixel_Data("Pixel Data"),
+		Triggers("Triggers");
 
 		private String name;
 
@@ -57,26 +60,29 @@ public class EditorConstants {
 		public String getName() {
 			return this.name;
 		}
-	};
+	}
 
 	public static Tools chooser = Tools.ControlPanel;
 	public static Metadata metadata = Metadata.Pixel_Data;
 
 	private EditorConstants() {
-		loadTilesetData();
-		loadTriggers();
+		this.loadTilesetData();
+		this.loadTriggers();
 	}
 
 	private void loadTilesetData() {
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")));
+			BufferedReader reader = new BufferedReader(
+				new InputStreamReader(
+					EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")
+				)
+			);
 			String line;
 			String[] tokens;
 			int categoryID = 0;
 			int editorID = 0;
 			Category c = null;
-			ArrayList<Data> temp = new ArrayList<Data>();
+			List<Data> temp = new ArrayList<>();
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#"))
 					continue;
@@ -90,7 +96,8 @@ public class EditorConstants {
 					c = new Category();
 					c.name = tokens[1];
 					c.id = categoryID++;
-				} else if (line.startsWith("%")) {
+				}
+				else if (line.startsWith("%")) {
 					Data data = new Data();
 					if (line.contains("*")) {
 						data.areaTypeIncluded = true;
@@ -141,7 +148,8 @@ public class EditorConstants {
 					data.filepath = tokens[6];
 					data.editorID = editorID++;
 					data.image = new ImageIcon(
-							EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1]));
+						EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1])
+					);
 					data.button = new JButton(data.image) {
 						private static final long serialVersionUID = 1L;
 
@@ -163,9 +171,10 @@ public class EditorConstants {
 					data.button.setAlignmentX(Component.CENTER_ALIGNMENT);
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
-					this.datas.add(new AbstractMap.SimpleEntry<Integer, Data>(data.getColorValue(), data));
+					this.datas.add(new AbstractMap.SimpleEntry<>(data.getColorValue(), data));
 					temp.add(data);
-				} else if (line.startsWith("+")) {
+				}
+				else if (line.startsWith("+")) {
 					c.nodes.addAll(temp);
 					this.categories.add(c);
 					temp.clear();
@@ -194,15 +203,19 @@ public class EditorConstants {
 				}
 			});
 
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void loadTriggers() {
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					EditorConstants.class.getClassLoader().getResourceAsStream("script/scripts.txt")));
+			BufferedReader reader = new BufferedReader(
+				new InputStreamReader(
+					EditorConstants.class.getClassLoader().getResourceAsStream("art/script/scripts.txt")
+				)
+			);
 			String line;
 			Trigger trigger = null;
 			while ((line = reader.readLine()) != null) {
@@ -216,62 +229,65 @@ public class EditorConstants {
 						trigger.setTriggerID((short) (value & 0xFFFF));
 					}
 
-				} else if (line.startsWith("@")) {
+				}
+				else if (line.startsWith("@")) {
 					if (trigger != null)
 						trigger.setName(line.substring(1));
-				} else if (line.startsWith("%")) {
+				}
+				else if (line.startsWith("%")) {
 					this.triggers.add(trigger);
 					trigger = null;
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static EditorConstants getInstance() {
-		return instance;
+		return EditorConstants.instance;
 	}
 
-	public ArrayList<Category> getCategories() {
+	public List<Category> getCategories() {
 		return this.categories;
 	}
 
-	public ArrayList<Map.Entry<Integer, Data>> getDatas() {
+	public List<Map.Entry<Integer, Data>> getDatas() {
 		return this.datas;
 	}
 
-	public ArrayList<Trigger> getTriggers() {
+	public List<Trigger> getTriggers() {
 		return this.triggers;
 	}
 
 	public static Data getData(int alpha, int red, int green, int blue) {
-		ArrayList<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().datas;
+		List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().datas;
 		Data temp = null;
 		for (Map.Entry<Integer, Data> entry : list) {
 			Data d = entry.getValue();
 			if (d.areaTypeIncluded) {
 				switch (d.areaTypeIDType) {
-				case ALPHA:
-					if (d.red == red && d.green == green && d.blue == blue)
-						temp = d;
-					break;
-				case RED:
-					if (d.alpha == alpha && d.green == green && d.blue == blue)
-						temp = d;
-					break;
-				case GREEN:
-					if (d.alpha == alpha && d.red == red && d.blue == blue)
-						temp = d;
-					break;
-				case BLUE:
-					if (d.alpha == alpha && d.red == red && d.green == green)
-						temp = d;
-					break;
-				default:
-					if (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue)
-						temp = d;
-					break;
+					case ALPHA:
+						if (d.red == red && d.green == green && d.blue == blue)
+							temp = d;
+						break;
+					case RED:
+						if (d.alpha == alpha && d.green == green && d.blue == blue)
+							temp = d;
+						break;
+					case GREEN:
+						if (d.alpha == alpha && d.red == red && d.blue == blue)
+							temp = d;
+						break;
+					case BLUE:
+						if (d.alpha == alpha && d.red == red && d.green == green)
+							temp = d;
+						break;
+					default:
+						if (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue)
+							temp = d;
+						break;
 				}
 			}
 		}

@@ -9,8 +9,6 @@ import screen.Scene;
 import utility.DialogueBuilder;
 
 public class SmallTree extends Obstacle {
-	private PixelData pixelData;
-
 	public SmallTree(PixelData data, int id) {
 		this.pixelData = data;
 

@@ -20,6 +20,7 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JLabel;
@@ -563,7 +564,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.triggers = new int[1];
 			this.triggers[0] = 0;
 		}
-		ArrayList<Integer> list = new ArrayList<>();
+		List<Integer> list = new ArrayList<>();
 		for (int i : this.triggers) {
 			if (i != 0)
 				list.add(Integer.valueOf(i));
@@ -612,7 +613,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			}
 			for (int i = 0; i < srcTiles.length - (triggerRows * image.getWidth()); i++)
 				this.tiles[i] = srcTiles[i + (triggerRows * image.getWidth())];
-			ArrayList<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
+			List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 			for (int i = 0; i < this.tiles.length; i++) {
 				int alpha = ((this.tiles[i] >> 24) & 0xFF);
 				for (int j = 0; j < list.size(); j++) {

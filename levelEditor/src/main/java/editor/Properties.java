@@ -4,7 +4,7 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -33,23 +33,23 @@ public class Properties extends JPanel {
 		this.editor = editor;
 		this.setLayout(new GridLayout(16, 1));
 
-		loadTiles();
-		loadCategory();
-		loadTriggers();
+		this.loadTiles();
+		this.loadCategory();
+		this.loadTriggers();
 
 		JLabel label = new JLabel("Tileset Category");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(label);
-		this.add(tileCategory);
-		this.add(tiles);
+		this.add(this.tileCategory);
+		this.add(this.tiles);
 		label = new JLabel("Triggers");
 		label.setHorizontalAlignment(SwingConstants.CENTER);
 		this.add(label);
-		this.add(triggers);
+		this.add(this.triggers);
 
-		tileCategory.setSelectedIndex(0);
-		tiles.setSelectedIndex(0);
-		triggers.setSelectedIndex(0);
+		this.tileCategory.setSelectedIndex(0);
+		this.tiles.setSelectedIndex(0);
+		this.triggers.setSelectedIndex(0);
 
 		this.validate();
 	}
@@ -67,9 +67,9 @@ public class Properties extends JPanel {
 	}
 
 	private void loadCategory() {
-		tileCategory = new JComboBox<Category>();
-		tileCategory.setPreferredSize(SIZE);
-		new KeySelectionRenderer(tileCategory) {
+		this.tileCategory = new JComboBox<>();
+		this.tileCategory.setPreferredSize(Properties.SIZE);
+		new KeySelectionRenderer(this.tileCategory) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -78,27 +78,27 @@ public class Properties extends JPanel {
 				return c.name;
 			}
 		};
-		tileCategory.addItemListener(new ItemListener() {
+		this.tileCategory.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				EditorConstants.chooser = Tools.Properties;
-				editor.input.forceCancelDrawing();
+				Properties.this.editor.input.forceCancelDrawing();
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					Category c = (Category) e.getItem();
-					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) tiles.getModel();
+					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) Properties.this.tiles.getModel();
 					for (Data d : c.nodes) {
 						model.addElement(d);
 					}
 				}
 				if (e.getStateChange() == ItemEvent.DESELECTED) {
-					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) tiles.getModel();
+					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) Properties.this.tiles.getModel();
 					model.removeAllElements();
 				}
 			}
 		});
 
 		DefaultComboBoxModel<Category> model = (DefaultComboBoxModel<Category>) this.tileCategory.getModel();
-		ArrayList<Category> list = EditorConstants.getInstance().getCategories();
+		List<Category> list = EditorConstants.getInstance().getCategories();
 		int size = list.size();
 		for (int i = 0; i < size; i++) {
 			model.addElement(list.get(i));
@@ -107,9 +107,9 @@ public class Properties extends JPanel {
 	}
 
 	private void loadTiles() {
-		tiles = new JComboBox<Data>();
-		tiles.setPreferredSize(SIZE);
-		new KeySelectionRenderer(tiles) {
+		this.tiles = new JComboBox<>();
+		this.tiles.setPreferredSize(Properties.SIZE);
+		new KeySelectionRenderer(this.tiles) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -118,27 +118,27 @@ public class Properties extends JPanel {
 				return d.name;
 			}
 		};
-		tiles.addItemListener(new ItemListener() {
+		this.tiles.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				EditorConstants.chooser = Tools.Properties;
-				editor.input.forceCancelDrawing();
+				Properties.this.editor.input.forceCancelDrawing();
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					Data d = (Data) e.getItem();
 					Properties.this.selectedData = d;
-					TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+					TilePropertiesPanel panel = Properties.this.editor.controlPanel.getPropertiesPanel();
 					panel.alphaInputField.setText(Integer.toString(d.alpha));
 					panel.redInputField.setText(Integer.toString(d.red));
 					panel.greenInputField.setText(Integer.toString(d.green));
 					panel.blueInputField.setText(Integer.toString(d.blue));
-					editor.controlPanel.setSelectedData(d);
-					editor.validate();
+					Properties.this.editor.controlPanel.setSelectedData(d);
+					Properties.this.editor.validate();
 				}
 			}
 		});
 
 		Category c = EditorConstants.getInstance().getCategories().get(0);
-		DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) tiles.getModel();
+		DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) this.tiles.getModel();
 		for (Data d : c.nodes) {
 			model.addElement(d);
 		}
@@ -146,9 +146,9 @@ public class Properties extends JPanel {
 	}
 
 	private void loadTriggers() {
-		triggers = new JComboBox<Trigger>();
-		triggers.setPreferredSize(SIZE);
-		new KeySelectionRenderer(triggers) {
+		this.triggers = new JComboBox<>();
+		this.triggers.setPreferredSize(Properties.SIZE);
+		new KeySelectionRenderer(this.triggers) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -157,26 +157,26 @@ public class Properties extends JPanel {
 				return t.getName();
 			}
 		};
-		triggers.addItemListener(new ItemListener() {
+		this.triggers.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				EditorConstants.chooser = Tools.Properties;
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					Trigger t = (Trigger) e.getItem();
-					TilePropertiesPanel panel = editor.controlPanel.getPropertiesPanel();
+					TilePropertiesPanel panel = Properties.this.editor.controlPanel.getPropertiesPanel();
 					panel.alphaField.setText(Integer.toString(t.getPositionX()));
 					panel.redField.setText(Integer.toString(t.getPositionY()));
 					panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
 					panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
 					Properties.this.selectedTrigger = t;
-					editor.controlPanel.setSelectedTrigger(t);
-					editor.validate();
+					Properties.this.editor.controlPanel.setSelectedTrigger(t);
+					Properties.this.editor.validate();
 				}
 			}
 		});
 
 		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
-		ArrayList<Trigger> list = EditorConstants.getInstance().getTriggers();
+		List<Trigger> list = EditorConstants.getInstance().getTriggers();
 		for (Trigger t : list) {
 			model.addElement(t);
 		}
@@ -205,16 +205,15 @@ public class Properties extends JPanel {
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
-		case Pixel_Data:
-			this.tileCategory.setEnabled(true);
-			this.tiles.setEnabled(true);
-			this.triggers.setEnabled(false);
-			break;
-		case Triggers:
-			this.tileCategory.setEnabled(false);
-			this.tiles.setEnabled(false);
-			this.triggers.setEnabled(true);
-			if (editor.scriptEditor == null)
+			case Pixel_Data:
+				this.tileCategory.setEnabled(true);
+				this.tiles.setEnabled(true);
+				this.triggers.setEnabled(false);
+				break;
+			case Triggers:
+				this.tileCategory.setEnabled(false);
+				this.tiles.setEnabled(false);
+				this.triggers.setEnabled(true);
 				break;
 		}
 		super.validate();

@@ -47,17 +47,17 @@ public class ControlPanel extends JPanel implements ActionListener {
 
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 
-		iconsPanel = new JPanel();
-		iconsPanel.setLayout(new BoxLayout(iconsPanel, BoxLayout.Y_AXIS));
+		this.iconsPanel = new JPanel();
+		this.iconsPanel.setLayout(new BoxLayout(this.iconsPanel, BoxLayout.Y_AXIS));
 		EditorConstants constants = EditorConstants.getInstance();
 		for (Map.Entry<Integer, Data> entry : constants.getDatas()) {
 			Data d = entry.getValue();
 			d.button.setActionCommand(Integer.toString(d.editorID));
 			d.button.addActionListener(this);
-			iconsPanel.add(d.button);
+			this.iconsPanel.add(d.button);
 		}
 
-		scrollPanel = new JScrollPane(iconsPanel) {
+		this.scrollPanel = new JScrollPane(this.iconsPanel) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -74,16 +74,16 @@ public class ControlPanel extends JPanel implements ActionListener {
 
 			@Override
 			public Dimension getMaximumSize() {
-				return getPreferredSize();
+				return this.getPreferredSize();
 			}
 		};
-		scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPanel.createVerticalScrollBar();
-		scrollPanel.setVisible(true);
-		this.add(scrollPanel);
+		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		this.scrollPanel.createVerticalScrollBar();
+		this.scrollPanel.setVisible(true);
+		this.add(this.scrollPanel);
 
 		this.propertiesPanel = new TilePropertiesPanel();
-		this.add(propertiesPanel);
+		this.add(this.propertiesPanel);
 
 		this.propertiesPanel.setVisible(true);
 		this.setVisible(true);
@@ -92,50 +92,50 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (EditorConstants.metadata) {
-		case Pixel_Data: {
-			JButton button = (JButton) event.getSource();
-			int id = Integer.parseInt(button.getActionCommand());
-			Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(id);
-			Data d = entry.getValue();
-			if (d != null) {
-				this.selectedData = d;
-				this.iconName = d.name;
-				this.propertiesPanel.alphaInputField.setText(Integer.toString(d.alpha));
-				this.propertiesPanel.redInputField.setText(Integer.toString(d.red));
-				this.propertiesPanel.greenInputField.setText(Integer.toString(d.green));
-				this.propertiesPanel.blueInputField.setText(Integer.toString(d.blue));
-				EditorConstants.chooser = Tools.ControlPanel;
-
+			case Pixel_Data: {
+				JButton button = (JButton) event.getSource();
+				int id = Integer.parseInt(button.getActionCommand());
+				Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(id);
+				Data d = entry.getValue();
+				if (d != null) {
+					button.setToolTipText(d.name);
+					this.selectedData = d;
+					this.iconName = d.name;
+					this.propertiesPanel.alphaInputField.setText(Integer.toString(d.alpha));
+					this.propertiesPanel.redInputField.setText(Integer.toString(d.red));
+					this.propertiesPanel.greenInputField.setText(Integer.toString(d.green));
+					this.propertiesPanel.blueInputField.setText(Integer.toString(d.blue));
+					EditorConstants.chooser = Tools.ControlPanel;
+				}
+				this.editor.validate();
+				break;
 			}
-			editor.validate();
-			break;
-		}
-		case Triggers: {
-			this.selectedTrigger = new Trigger();
-			this.selectedTrigger.setTriggerID((short) 1);
-			this.selectedTrigger.setTriggerPositionX((byte) 0x1);
-			this.selectedTrigger.setTriggerPositionY((byte) 0x1);
-			break;
-		}
+			case Triggers: {
+				this.selectedTrigger = new Trigger();
+				this.selectedTrigger.setTriggerID((short) 1);
+				this.selectedTrigger.setTriggerPositionX((byte) 0x1);
+				this.selectedTrigger.setTriggerPositionY((byte) 0x1);
+				break;
+			}
 		}
 	}
 
 	public String getPickedEntityName() {
 		switch (EditorConstants.chooser) {
-		case ControlPanel:
-			return this.selectedData.name;
-		case Properties:
-			return this.selectedData.name;
+			case ControlPanel:
+				return this.selectedData.name;
+			case Properties:
+				return this.selectedData.name;
 		}
 		return "";
 	}
 
 	public Data getSelectedData() {
 		switch (EditorConstants.chooser) {
-		case ControlPanel:
-			return this.selectedData;
-		case Properties:
-			return editor.properties.getSelectedData();
+			case ControlPanel:
+				return this.selectedData;
+			case Properties:
+				return this.editor.properties.getSelectedData();
 		}
 		return null;
 	}
@@ -159,16 +159,16 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
-		case Pixel_Data:
-			this.iconsPanel.setVisible(true);
-			this.iconsPanel.setEnabled(true);
-			this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-			break;
-		case Triggers:
-			this.iconsPanel.setVisible(false);
-			this.iconsPanel.setEnabled(false);
-			this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-			break;
+			case Pixel_Data:
+				this.iconsPanel.setVisible(true);
+				this.iconsPanel.setEnabled(true);
+				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+				break;
+			case Triggers:
+				this.iconsPanel.setVisible(false);
+				this.iconsPanel.setEnabled(false);
+				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				break;
 		}
 		super.validate();
 		if (this.propertiesPanel != null)
