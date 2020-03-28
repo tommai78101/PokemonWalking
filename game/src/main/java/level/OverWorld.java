@@ -34,7 +34,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 
 	private boolean invertBitmapColors;
 	private int currentAreaSectorID;
-	private int newDialoguesIterator;
+//	private int newDialoguesIterator;
 
 	/**
 	 * Initializes the overworld in the game.
@@ -203,7 +203,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 				case 0x03: {// Obstacles
 					switch (red) {
 						case 0x05: {// Signs
-							int dialogueID = (interactionID & 0xFFFF);
+//							int dialogueID = (interactionID & 0xFFFF);
 //							SIGN_LOOP:
 //							for (Map.Entry<Dialogue, Integer> entry : WorldConstants.signTexts) {
 //								if (entry.getValue() == dialogueID) {
@@ -233,10 +233,10 @@ public class OverWorld implements Tileable, UpdateRenderable {
 					break;
 				}
 				case 0x0A: {// Item
-					ItemText text = null;
+//					ItemText text = null;
 					for (Entry<ItemText, Item> entry : WorldConstants.items) {
 						if (entry.getKey().id == red) {
-							text = entry.getKey();
+//							text = entry.getKey();
 							break;
 						}
 					}

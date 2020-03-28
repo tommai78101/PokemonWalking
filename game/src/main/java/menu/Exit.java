@@ -8,11 +8,8 @@ import main.StateManager.GameState;
 import screen.Scene;
 
 public class Exit extends SubMenu {
-	private Game game;
-
-	public Exit(String name, String description, Game game) {
+	public Exit(String name, String description, Game unused) {
 		super(name, description, GameState.EXIT);
-		this.game = game;
 		this.needsFlashingAnimation = false;
 		this.exitsToGame = true;
 	}

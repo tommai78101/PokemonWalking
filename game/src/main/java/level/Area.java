@@ -52,7 +52,7 @@ public class Area implements Tileable, UpdateRenderable {
 	private final List<List<PixelData>> areaData = new ArrayList<>();
 	private final List<Obstacle> areaObstacles = new ArrayList<>();
 	private final List<Character> areaCharacters = new ArrayList<>();
-	private final List<Entity> areaEntities = new ArrayList<>();
+//	private final List<Entity> areaEntities = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
 	private final List<TriggerData> triggerDatas = new ArrayList<>();
 
