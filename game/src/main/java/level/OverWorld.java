@@ -196,82 +196,87 @@ public class OverWorld implements Tileable, UpdateRenderable {
 		// TODO: Fix the awkward interaction caused by so many states not working
 		// properly.
 		int interactionID = this.player.getInteractableID();
-		if (this.player.isInteracting() && interactionID != 0 && !this.currentArea.isBeingTriggered()) {
-			int alpha = (interactionID >> 24) & 0xFF;
-			int red = (interactionID >> 16) & 0xFF;
-			switch (alpha) {
-				case 0x03: {// Obstacles
-					switch (red) {
-						case 0x05: {// Signs
-//							int dialogueID = (interactionID & 0xFFFF);
-//							SIGN_LOOP:
-//							for (Map.Entry<Dialogue, Integer> entry : WorldConstants.signTexts) {
-//								if (entry.getValue() == dialogueID) {
-//									this.newDialogues.add(entry.getKey());
-//									break SIGN_LOOP;
-//								}
-//							}
-							break;
-						}
-						default: // Other obstacles
-							List<Obstacle> list = this.currentArea.getObstaclesList();
-							OBSTACLE_LOOP:
-							for (int i = 0; i < list.size(); i++) {
-								Obstacle obstacle = list.get(i);
-								if (obstacle.getID() != red)
-									continue;
-//								try {
-//									this.newDialogues = obstacle.getDialogues();
-//								}
-//								catch (GameException e) {
-//									throw new RuntimeException(e);
-//								}
-								break OBSTACLE_LOOP;
+		if (this.player.isInteracting()) {
+			if (interactionID != 0 && !this.currentArea.isBeingTriggered()) {
+				int alpha = (interactionID >> 24) & 0xFF;
+				int red = (interactionID >> 16) & 0xFF;
+				switch (alpha) {
+					case 0x03: {// Obstacles
+						switch (red) {
+							case 0x05: {// Signs
+								//							int dialogueID = (interactionID & 0xFFFF);
+								//							SIGN_LOOP:
+								//							for (Map.Entry<Dialogue, Integer> entry : WorldConstants.signTexts) {
+								//								if (entry.getValue() == dialogueID) {
+								//									this.newDialogues.add(entry.getKey());
+								//									break SIGN_LOOP;
+								//								}
+								//							}
+								break;
 							}
-							break;
-					}
-					break;
-				}
-				case 0x0A: {// Item
-//					ItemText text = null;
-					for (Entry<ItemText, Item> entry : WorldConstants.items) {
-						if (entry.getKey().id == red) {
-//							text = entry.getKey();
-							break;
+							default: // Other obstacles
+								List<Obstacle> list = this.currentArea.getObstaclesList();
+								OBSTACLE_LOOP:
+								for (int i = 0; i < list.size(); i++) {
+									Obstacle obstacle = list.get(i);
+									if (obstacle.getID() != red)
+										continue;
+									//								try {
+									//									this.newDialogues = obstacle.getDialogues();
+									//								}
+									//								catch (GameException e) {
+									//									throw new RuntimeException(e);
+									//								}
+									break OBSTACLE_LOOP;
+								}
+								break;
 						}
+						break;
 					}
-//					if (this.newDialogues == null) {
-//						this.newDialogues.add(
-//							DialogueBuilder.createText(
-//								text.itemName + " has been found.",
-//								Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_ALERT, true
-//							)
-//						);
-//						new Thread(new Runnable() {
-//							@Override
-//							public void run() {
-//								PixelData data = OverWorld.this.currentArea.getCurrentPixelData();
-//								switch (OverWorld.this.player.getFacing()) {
-//									case Character.UP:
-//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() - 1);
-//										break;
-//									case Character.DOWN:
-//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() + 1);
-//										break;
-//									case Character.LEFT:
-//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() - 1, OverWorld.this.player.getYInArea());
-//										break;
-//									case Character.RIGHT:
-//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() + 1, OverWorld.this.player.getYInArea());
-//										break;
-//								}
-//							}
-//						}).start();
-//						Inventory inventory = this.game.getInventory();
-//						inventory.addItem(text);
-//					}
-					break;
+					case 0x0A: {// Item
+						//					ItemText text = null;
+						for (Entry<ItemText, Item> entry : WorldConstants.items) {
+							if (entry.getKey().id == red) {
+								//							text = entry.getKey();
+								break;
+							}
+						}
+						//					if (this.newDialogues == null) {
+						//						this.newDialogues.add(
+						//							DialogueBuilder.createText(
+						//								text.itemName + " has been found.",
+						//								Dialogue.MAX_STRING_LENGTH, Dialogue.DIALOGUE_ALERT, true
+						//							)
+						//						);
+						//						new Thread(new Runnable() {
+						//							@Override
+						//							public void run() {
+						//								PixelData data = OverWorld.this.currentArea.getCurrentPixelData();
+						//								switch (OverWorld.this.player.getFacing()) {
+						//									case Character.UP:
+						//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() - 1);
+						//										break;
+						//									case Character.DOWN:
+						//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea(), OverWorld.this.player.getYInArea() + 1);
+						//										break;
+						//									case Character.LEFT:
+						//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() - 1, OverWorld.this.player.getYInArea());
+						//										break;
+						//									case Character.RIGHT:
+						//										OverWorld.this.currentArea.setPixelData(data, OverWorld.this.player.getXInArea() + 1, OverWorld.this.player.getYInArea());
+						//										break;
+						//								}
+						//							}
+						//						}).start();
+						//						Inventory inventory = this.game.getInventory();
+						//						inventory.addItem(text);
+						//					}
+						break;
+					}
 				}
+			}
+			else {
+				this.player.stopInteraction();
 			}
 		}
 		else {
