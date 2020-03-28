@@ -52,6 +52,8 @@ public class MainMenu extends SubMenu {
 		super(null, null, GameState.START_MENU);
 		this.menuCursorPosition = 0;
 		this.actionEvent = null;
+		this.needsFlashingAnimation = false;
+		this.exitsToGame = true;
 	}
 
 	public MainMenu initialize(Game game) {
@@ -89,7 +91,10 @@ public class MainMenu extends SubMenu {
 
 	@Override
 	public void tick() {
-		if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown)) {
+		if (Game.keys.isStartPressed() || Game.keys.isSecondaryPressed()) {
+			Game.keys.startReceived();
+			Game.keys.secondaryReceived();
+			this.exit();
 			if (this.actionEvent != null)
 				this.actionEvent = null;
 			return;

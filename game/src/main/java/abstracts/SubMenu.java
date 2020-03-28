@@ -28,6 +28,8 @@ public abstract class SubMenu implements MenuDisplayable {
 	protected MenuEvent menuEvent;
 	protected GameState stateType;
 	protected boolean isExitingMenu;
+	protected boolean exitsToGame;
+	protected boolean needsFlashingAnimation;
 
 	public SubMenu(String name, String description, GameState type) {
 		this.name = name;
@@ -71,6 +73,24 @@ public abstract class SubMenu implements MenuDisplayable {
 
 	public void resetExitState() {
 		this.isExitingMenu = false;
+	}
+
+	/**
+	 * Should the game flash a bit when exiting the submenu?
+	 * 
+	 * @return True, if the submenu needs to show flashing animation when exiting submenu. False, if otherwise.
+	 */
+	public boolean needsFlashing() {
+		return this.needsFlashingAnimation;
+	}
+
+	/**
+	 * Does the submenu exits straight to the main game?
+	 * 
+	 * @return True, if jumping straight to the game. False, if jumping back to the main menu.
+	 */
+	public boolean exitsToGame() {
+		return this.exitsToGame;
 	}
 
 	@Override

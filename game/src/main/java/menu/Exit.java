@@ -13,6 +13,8 @@ public class Exit extends SubMenu {
 	public Exit(String name, String description, Game game) {
 		super(name, description, GameState.EXIT);
 		this.game = game;
+		this.needsFlashingAnimation = false;
+		this.exitsToGame = true;
 	}
 
 	@Override

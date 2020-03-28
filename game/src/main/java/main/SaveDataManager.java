@@ -32,6 +32,8 @@ public class SaveDataManager extends SubMenu {
 		this.game = game;
 		this.saveStatus = SaveStatus.ASK;
 		this.newDialogue = new Dialogue();
+		this.needsFlashingAnimation = false;
+		this.exitsToGame = true;
 	}
 
 	@Override
@@ -45,8 +47,7 @@ public class SaveDataManager extends SubMenu {
 						"Do you want to save the game?",
 						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_QUESTION, true
 					);
-				if (this.newDialogue.isDialogueTextSet()
-					&& !(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
+				if (this.newDialogue.isDialogueTextSet() && !(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
 					this.newDialogue.tick();
 				}
 				else {
@@ -59,6 +60,11 @@ public class SaveDataManager extends SubMenu {
 							else
 								this.saveStatus = SaveStatus.SAVING;
 							this.newDialogue.clearDialogueLines();
+						}
+						else if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+							//Save operation has been cancelled.
+							this.saveStatus = SaveStatus.SAVED;
+							this.exit();
 						}
 					}
 				}
@@ -165,8 +171,8 @@ public class SaveDataManager extends SubMenu {
 		return this.saveStatus;
 	}
 
-	public void setSaveStatus(SaveStatus status) {
-		this.saveStatus = status;
+	public void resetSaveStatus() {
+		this.saveStatus = SaveStatus.ASK;
 	}
 
 	@Override

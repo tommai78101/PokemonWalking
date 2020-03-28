@@ -112,4 +112,126 @@ public class Keys {
 	public boolean isSecondaryPressed() {
 		return (Game.keys.X.keyStateDown && !Game.keys.X.lastKeyState) || (Game.keys.PERIOD.keyStateDown && !Game.keys.PERIOD.lastKeyState);
 	}
+
+	public boolean isStartPressed() {
+		return (Game.keys.START.keyStateDown && !Game.keys.START.lastKeyState);
+	}
+
+	public boolean isDebugPressed() {
+		return (Game.keys.F1.keyStateDown && !Game.keys.F1.lastKeyState);
+	}
+
+	/**
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 */
+	public void upReceived() {
+		Game.keys.up.lastKeyState = true;
+		Game.keys.W.lastKeyState = true;
+	}
+
+	/**
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 */
+	public void downReceived() {
+		Game.keys.down.lastKeyState = true;
+		Game.keys.S.lastKeyState = true;
+	}
+
+	/**
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 */
+	public void leftReceived() {
+		Game.keys.left.lastKeyState = true;
+		Game.keys.A.lastKeyState = true;
+	}
+
+	/**
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 */
+	public void rightReceived() {
+		Game.keys.right.lastKeyState = true;
+		Game.keys.D.lastKeyState = true;
+	}
+
+	/**
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 */
+	public void primaryReceived() {
+		Game.keys.Z.lastKeyState = true;
+		Game.keys.SLASH.lastKeyState = true;
+	}
+
+	/**
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 */
+	public void secondaryReceived() {
+		Game.keys.X.lastKeyState = true;
+		Game.keys.PERIOD.lastKeyState = true;
+	}
+
+	/**
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 */
+	public void startReceived() {
+		Game.keys.START.lastKeyState = true;
+	}
+
+	/**
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 */
+	public void debugReceived() {
+		Game.keys.F1.lastKeyState = true;
+	}
+
+	public void upReleased() {
+		Game.keys.up.lastKeyState = Game.keys.up.keyStateDown;
+		Game.keys.up.keyStateDown = false;
+		Game.keys.W.lastKeyState = Game.keys.W.keyStateDown;
+		Game.keys.W.keyStateDown = false;
+	}
+
+	public void downReleased() {
+		Game.keys.down.lastKeyState = Game.keys.down.keyStateDown;
+		Game.keys.down.keyStateDown = false;
+		Game.keys.S.lastKeyState = Game.keys.S.keyStateDown;
+		Game.keys.S.keyStateDown = false;
+	}
+
+	public void leftReleased() {
+		Game.keys.left.lastKeyState = Game.keys.left.keyStateDown;
+		Game.keys.left.keyStateDown = false;
+		Game.keys.A.lastKeyState = Game.keys.A.keyStateDown;
+		Game.keys.A.keyStateDown = false;
+	}
+
+	public void rightReleased() {
+		Game.keys.right.lastKeyState = Game.keys.right.keyStateDown;
+		Game.keys.right.keyStateDown = false;
+		Game.keys.D.lastKeyState = Game.keys.D.keyStateDown;
+		Game.keys.D.keyStateDown = false;
+	}
+
+	public void primaryReleased() {
+		Game.keys.Z.lastKeyState = Game.keys.Z.keyStateDown;
+		Game.keys.Z.keyStateDown = false;
+		Game.keys.SLASH.lastKeyState = Game.keys.SLASH.keyStateDown;
+		Game.keys.SLASH.keyStateDown = false;
+	}
+
+	public void secondaryReleased() {
+		Game.keys.X.lastKeyState = Game.keys.X.keyStateDown;
+		Game.keys.X.keyStateDown = false;
+		Game.keys.PERIOD.lastKeyState = Game.keys.PERIOD.keyStateDown;
+		Game.keys.PERIOD.keyStateDown = false;
+	}
+
+	public void startReleased() {
+		Game.keys.START.lastKeyState = Game.keys.START.keyStateDown;
+		Game.keys.START.keyStateDown = false;
+	}
+
+	public void debugReleased() {
+		Game.keys.F1.lastKeyState = Game.keys.F1.keyStateDown;
+		Game.keys.F1.keyStateDown = false;
+	}
 }

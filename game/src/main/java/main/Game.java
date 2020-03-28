@@ -144,10 +144,22 @@ public class Game {
 		GameState state = this.stateManager.getCurrentGameState();
 		SubMenu subMenu = this.startMenu.getActiveItem();
 		if (subMenu != null && subMenu.isExiting()) {
-			this.stateManager.setCurrentGameState(GameState.START_MENU);
-			this.gameScene.setRenderingEffectTick((byte) 0x0);
 			this.startMenu.clearActiveItem();
+			if (subMenu.needsFlashing()) {
+				this.gameScene.setRenderingEffectTick((byte) 0x0);
+			}
+			else {
+				this.gameScene.setRenderingEffectTick((byte) 0x7);
+			}
+			if (!subMenu.exitsToGame()) {
+				this.stateManager.setCurrentGameState(GameState.START_MENU);
+			}
+			else {
+				this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+			}
 			subMenu.resetExitState();
+			subMenu = null;
+			state = this.stateManager.getCurrentGameState();
 		}
 		switch (state) {
 			case MAIN_GAME: {
@@ -155,25 +167,29 @@ public class Game {
 				this.checkPausing();
 				break;
 			}
-			case INVENTORY: {
-				subMenu.tick();
-				break;
-			}
 			case START_MENU: {
-				this.startMenu.tick();
 				if (subMenu != null) {
+					final SubMenu menu = subMenu;
 					subMenu.getEvent().trigger(() -> {
-						this.stateManager.setCurrentGameState(subMenu.getGameState());
-						this.gameScene.setRenderingEffectTick((byte) 0x0);
+						if (menu.needsFlashing()) {
+							this.gameScene.setRenderingEffectTick((byte) 0x0);
+						}
+						this.stateManager.setCurrentGameState(menu.getGameState());
 					});
 				}
+				this.startMenu.tick();
 				this.checkUnpausing();
+				break;
+			}
+			//The following cases should assume "subMenu" is not null.
+			case INVENTORY: {
+				subMenu.tick();
 				break;
 			}
 			case SAVING: {
 				if (!subMenu.getGameState().equals(GameState.SAVING)) {
 					if (this.saveManager.getSaveStatus().equals(SaveStatus.SAVED) || this.saveManager.getSaveStatus().equals(SaveStatus.ERROR)) {
-						this.saveManager.setSaveStatus(SaveStatus.ASK);
+						this.saveManager.resetSaveStatus();
 						this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 						break;
 					}
@@ -298,9 +314,9 @@ public class Game {
 	// -------------------------------------------------
 
 	private void checkPausing() {
-		Keys keys = this.player.keys;
 		GameState state = this.stateManager.getCurrentGameState();
-		if (!keys.START.lastKeyState && keys.START.keyStateDown) {
+		if (Game.keys.isStartPressed()) {
+			Game.keys.startReceived();
 			switch (state) {
 				case MAIN_GAME:
 					if (this.player.isLockedWalking() || this.player.isLockedJumping()) {
@@ -311,23 +327,18 @@ public class Game {
 				default:
 					break;
 			}
-			keys.START.lastKeyState = true;
 		}
 	}
 
 	private void checkUnpausing() {
-		Keys keys = this.player.keys;
 		GameState state = this.stateManager.getCurrentGameState();
 		switch (state) {
 			case START_MENU:
-				boolean startKeyStateDown = (!keys.START.lastKeyState && keys.START.keyStateDown);
-				boolean cancelKeyStateDown = (keys.X.keyStateDown || keys.PERIOD.keyStateDown);
-				boolean cancelLastKeyState = (!keys.X.lastKeyState || !keys.PERIOD.lastKeyState);
-				if (startKeyStateDown || (cancelKeyStateDown && cancelLastKeyState)) {
+				if (this.startMenu.isExiting()) {
+					this.startMenu.resetExitState();
 					this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 					if (Player.isMovementsLocked())
 						Player.unlockMovements();
-					keys.START.lastKeyState = true;
 				}
 				break;
 			default:
