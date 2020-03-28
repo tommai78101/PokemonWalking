@@ -396,8 +396,7 @@ public class Inventory extends SubMenu {
 	public void tick() {
 		switch (this.state) {
 			case SELECTION: {
-				if ((Game.keys.up.keyStateDown || Game.keys.W.keyStateDown)
-					&& (!Game.keys.up.lastKeyState || !Game.keys.W.lastKeyState)) {
+				if (Game.keys.isUpPressed()) {
 					if (this.itemCursor > 0) {
 						this.itemCursor--;
 						if (this.arrowPosition > 0)
@@ -406,8 +405,7 @@ public class Inventory extends SubMenu {
 					Game.keys.up.lastKeyState = true;
 					Game.keys.W.lastKeyState = true;
 				}
-				else if ((Game.keys.down.keyStateDown || Game.keys.S.keyStateDown)
-					&& (!Game.keys.down.lastKeyState || !Game.keys.S.lastKeyState)) {
+				else if (Game.keys.isDownPressed()) {
 					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					if (this.itemCursor < list.size() - 1) {
 						this.itemCursor++;
@@ -417,32 +415,28 @@ public class Inventory extends SubMenu {
 					Game.keys.down.lastKeyState = true;
 					Game.keys.S.lastKeyState = true;
 				}
-				else if ((Game.keys.left.keyStateDown || Game.keys.A.keyStateDown)
-					&& (!Game.keys.left.lastKeyState || !Game.keys.A.lastKeyState)) {
+				else if (Game.keys.isLeftPressed()) {
 					this.category = Category.getWrapped(this.category.getID() - 1);
 					this.tick = 0x0;
 					this.itemCursor = this.arrowPosition = 0;
 					Game.keys.left.lastKeyState = true;
 					Game.keys.A.lastKeyState = true;
 				}
-				else if ((Game.keys.right.keyStateDown || Game.keys.D.keyStateDown)
-					&& (!Game.keys.right.lastKeyState || !Game.keys.D.lastKeyState)) {
+				else if (Game.keys.isRightPressed()) {
 					this.category = Category.getWrapped(this.category.getID() + 1);
 					this.tick = 0x0;
 					this.itemCursor = this.arrowPosition = 0;
 					Game.keys.right.lastKeyState = true;
 					Game.keys.D.lastKeyState = true;
 				}
-				else if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown)
-					&& (!Game.keys.X.lastKeyState || !Game.keys.PERIOD.lastKeyState)) {
+				else if (Game.keys.isSecondaryPressed()) {
 					//Exiting the Inventory.
 					Game.keys.X.lastKeyState = true;
 					Game.keys.PERIOD.lastKeyState = true;
 					this.resetCursor();
 					this.exit();
 				}
-				else if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown)
-					&& (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
+				else if (Game.keys.isPrimaryPressed()) {
 					Game.keys.Z.lastKeyState = true;
 					Game.keys.SLASH.lastKeyState = true;
 
@@ -453,8 +447,10 @@ public class Inventory extends SubMenu {
 					Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
 					if (entry.getKey().getCategory() == null && entry.getValue() == Integer.MAX_VALUE) {
 						// If getCategory() returns null, it is not an item.
-						// Return option.
+
+						// Return option is selected.
 						this.resetCursor();
+						this.exit();
 						break;
 					}
 					this.state = InventoryState.MENU;
@@ -478,29 +474,25 @@ public class Inventory extends SubMenu {
 				break;
 			}
 			case MENU: {
-				if ((Game.keys.up.keyStateDown || Game.keys.W.keyStateDown)
-					&& (!Game.keys.up.lastKeyState || !Game.keys.W.lastKeyState)) {
+				if (Game.keys.isUpPressed()) {
 					Game.keys.up.lastKeyState = true;
 					Game.keys.W.lastKeyState = true;
 					if (this.stateArrowPosition > 0)
 						this.stateArrowPosition--;
 				}
-				else if ((Game.keys.down.keyStateDown || Game.keys.S.keyStateDown)
-					&& (!Game.keys.down.lastKeyState || !Game.keys.S.lastKeyState)) {
+				else if (Game.keys.isDownPressed()) {
 					Game.keys.down.lastKeyState = true;
 					Game.keys.S.lastKeyState = true;
 					if (this.stateArrowPosition < this.selectionMenu.size() - 1)
 						this.stateArrowPosition++;
 				}
-				else if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown)
-					&& (!Game.keys.X.lastKeyState || !Game.keys.PERIOD.lastKeyState)) {
+				else if (Game.keys.isSecondaryPressed()) {
 					Game.keys.X.lastKeyState = true;
 					Game.keys.PERIOD.lastKeyState = true;
 					this.state = InventoryState.SELECTION;
 					this.resetSelectionCursor();
 				}
-				else if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown)
-					&& (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
+				else if (Game.keys.isPrimaryPressed()) {
 					Game.keys.Z.lastKeyState = true;
 					Game.keys.SLASH.lastKeyState = true;
 					String command = this.selectionMenu.get(this.stateArrowPosition);
@@ -535,8 +527,7 @@ public class Inventory extends SubMenu {
 				break;
 			}
 			case TOSS: {
-				if ((Game.keys.up.keyStateDown || Game.keys.W.keyStateDown)
-					&& (!Game.keys.up.lastKeyState || !Game.keys.W.lastKeyState)) {
+				if (Game.keys.isUpPressed()) {
 					Game.keys.up.lastKeyState = true;
 					Game.keys.W.lastKeyState = true;
 					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
@@ -544,15 +535,13 @@ public class Inventory extends SubMenu {
 					if (entry.getValue() > this.amountToToss)
 						this.amountToToss++;
 				}
-				else if ((Game.keys.down.keyStateDown || Game.keys.S.keyStateDown)
-					&& (!Game.keys.down.lastKeyState || !Game.keys.S.lastKeyState)) {
+				else if (Game.keys.isDownPressed()) {
 					Game.keys.down.lastKeyState = true;
 					Game.keys.S.lastKeyState = true;
 					if (this.amountToToss > 0)
 						this.amountToToss--;
 				}
-				else if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown)
-					&& (!Game.keys.X.lastKeyState || !Game.keys.PERIOD.lastKeyState)) {
+				else if (Game.keys.isSecondaryPressed()) {
 					Game.keys.X.lastKeyState = true;
 					Game.keys.PERIOD.lastKeyState = true;
 					this.resetSelectionCursor();
@@ -574,8 +563,7 @@ public class Inventory extends SubMenu {
 						}
 					}
 				}
-				else if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown)
-					&& (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
+				else if (Game.keys.isPrimaryPressed()) {
 					Game.keys.Z.lastKeyState = true;
 					Game.keys.SLASH.lastKeyState = true;
 					for (int i = 0; i < this.amountToToss; i++) {
@@ -593,8 +581,7 @@ public class Inventory extends SubMenu {
 					this.game.setRegisteredItem(actionItem);
 				}
 				if (this.set_end) {
-					if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown)
-						&& (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
+					if (Game.keys.isPrimaryPressed()) {
 						Game.keys.Z.lastKeyState = true;
 						Game.keys.SLASH.lastKeyState = true;
 						this.resetSelectionCursor();

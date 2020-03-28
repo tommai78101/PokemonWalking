@@ -88,4 +88,28 @@ public class Keys {
 			}
 		}
 	}
+
+	public boolean isUpPressed() {
+		return (Game.keys.up.keyStateDown && !Game.keys.up.lastKeyState) || (Game.keys.W.keyStateDown && !Game.keys.W.lastKeyState);
+	}
+
+	public boolean isDownPressed() {
+		return (Game.keys.down.keyStateDown && !Game.keys.down.lastKeyState) || (Game.keys.S.keyStateDown && !Game.keys.S.lastKeyState);
+	}
+
+	public boolean isLeftPressed() {
+		return (Game.keys.left.keyStateDown && !Game.keys.left.lastKeyState) || (Game.keys.A.keyStateDown && !Game.keys.A.lastKeyState);
+	}
+
+	public boolean isRightPressed() {
+		return (Game.keys.right.keyStateDown && !Game.keys.right.lastKeyState) || (Game.keys.D.keyStateDown && !Game.keys.D.lastKeyState);
+	}
+
+	public boolean isPrimaryPressed() {
+		return (Game.keys.Z.keyStateDown && !Game.keys.Z.lastKeyState) || (Game.keys.SLASH.keyStateDown && !Game.keys.SLASH.lastKeyState);
+	}
+
+	public boolean isSecondaryPressed() {
+		return (Game.keys.X.keyStateDown && !Game.keys.X.lastKeyState) || (Game.keys.PERIOD.keyStateDown && !Game.keys.PERIOD.lastKeyState);
+	}
 }
