@@ -143,6 +143,9 @@ public class SaveDataManager extends SubMenu {
 					);
 				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
 					this.newDialogue.tick();
+				else {
+					this.exit();
+				}
 				break;
 			}
 			case ERROR: {

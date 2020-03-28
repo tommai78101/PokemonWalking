@@ -24,7 +24,9 @@ public class DummyMenu extends SubMenu {
 	}
 
 	@Override
-	public void tick() {}
+	public void tick() {
+		this.exit();
+	}
 
 	@Override
 	public void render(Scene output, Graphics graphics) {}

@@ -86,7 +86,8 @@ public class Game {
 		this.gameScene.clear(Art.COLOR_DEBUG_GREEN);
 		GameState state = this.stateManager.getCurrentGameState();
 		switch (state) {
-			case MAIN_GAME: {
+			case MAIN_GAME:
+			default: {
 				this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
 				break;
 			}
@@ -116,9 +117,6 @@ public class Game {
 				if (subMenu != null) {
 					subMenu.render(this.gameScene, graphics);
 				}
-				break;
-			}
-			default: {
 				break;
 			}
 		}
@@ -184,6 +182,11 @@ public class Game {
 				}
 				subMenu.tick();
 				break;
+			}
+			case EXIT: {
+				this.gameScene.setRenderingEffectTick((byte) 0x7);
+				this.startMenu.clearActiveItem();
+				this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 			}
 			default: {
 				break;

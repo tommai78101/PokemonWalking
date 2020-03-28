@@ -57,7 +57,7 @@ public class MainMenu extends SubMenu {
 	public MainMenu initialize(Game game) {
 		this.mainMenuDialogue = new Dialogue();
 
-		this.exitItem = new DummyMenu(WorldConstants.MENU_ITEM_NAME_EXIT, WorldConstants.MENU_ITEM_DESC_EXIT, game);
+		this.exitItem = new Exit(WorldConstants.MENU_ITEM_NAME_EXIT, WorldConstants.MENU_ITEM_DESC_EXIT, game);
 		this.addMenuItem(game.getInventory());
 		this.addMenuItem(game.getSaveManager());
 		this.addMenuItem(this.exitItem);

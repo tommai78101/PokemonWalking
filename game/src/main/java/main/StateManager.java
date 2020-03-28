@@ -10,16 +10,17 @@ public class StateManager {
 		INVENTORY,
 		CUTSCENE,
 		DIALOGUE,
-		RESERVED
+		EXIT,
+		RESERVED,
 	}
 
 	protected GameState currentGameState;
 	protected GameState previousGameState;
-	
+
 	public StateManager() {
 		this.initialize();
 	}
-	
+
 	public void initialize() {
 		this.currentGameState = GameState.LOADING;
 	}
@@ -31,7 +32,7 @@ public class StateManager {
 	}
 
 	public GameState getCurrentGameState() {
-		return currentGameState;
+		return this.currentGameState;
 	}
 
 	public void setCurrentGameState(GameState currentGameState) {
@@ -40,7 +41,7 @@ public class StateManager {
 	}
 
 	public GameState getPreviousGameState() {
-		return previousGameState;
+		return this.previousGameState;
 	}
 
 	public void setPreviousGameState(GameState previousGameState) {
