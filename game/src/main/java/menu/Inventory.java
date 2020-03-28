@@ -31,15 +31,15 @@ import item.DummyItem;
 import item.ItemText;
 import level.WorldConstants;
 import main.Game;
-import main.Keys;
 import main.MainComponent;
+import main.StateManager.GameState;
 import resources.Art;
 import screen.Scene;
 import utility.DialogueBuilder;
 
 public class Inventory extends SubMenu {
 
-	private enum State {
+	private enum InventoryState {
 		SELECTION,
 		MENU,
 		USE,
@@ -47,7 +47,6 @@ public class Inventory extends SubMenu {
 		SET
 	}
 
-	private Keys keys;
 	private final ArrayList<Map.Entry<Item, Integer>> potions;
 	private final ArrayList<Map.Entry<Item, Integer>> keyItems;
 	private final ArrayList<Map.Entry<Item, Integer>> pokéballs;
@@ -58,7 +57,7 @@ public class Inventory extends SubMenu {
 	private int itemListSpan = 0;
 	private Category category;
 	private byte tick = (byte) 0x0;
-	private State state;
+	private InventoryState state;
 	private int stateArrowPosition = 0;
 	private int amountToToss = 0;
 	private int set_tokenIterator = 0;
@@ -89,7 +88,7 @@ public class Inventory extends SubMenu {
 	 * @return Nothing. It's a constructor after all.
 	 */
 	public Inventory(Game game) {
-		super(WorldConstants.MENU_ITEM_NAME_INVENTORY, WorldConstants.MENU_ITEM_DESC_INVENTORY, Type.INVENTORY);
+		super(WorldConstants.MENU_ITEM_NAME_INVENTORY, WorldConstants.MENU_ITEM_DESC_INVENTORY, GameState.INVENTORY);
 		this.game = game;
 		this.itemCursor = 0;
 		this.potions = new ArrayList<>();
@@ -111,7 +110,7 @@ public class Inventory extends SubMenu {
 		this.TMs_HMs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.arrowPosition = 0;
 		this.category = Category.POTIONS;
-		this.state = State.SELECTION;
+		this.state = InventoryState.SELECTION;
 		this.set_completedLines = new ArrayList<>();
 		this.inventoryDialogue = new Dialogue();
 	}
@@ -375,7 +374,7 @@ public class Inventory extends SubMenu {
 		this.itemListSpan = 0;
 		this.resetSelectionCursor();
 		this.category = Category.POTIONS;
-		this.state = State.SELECTION;
+		this.state = InventoryState.SELECTION;
 	}
 
 	/**
@@ -397,53 +396,55 @@ public class Inventory extends SubMenu {
 	public void tick() {
 		switch (this.state) {
 			case SELECTION: {
-				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown)
-					&& (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
+				if ((Game.keys.up.keyStateDown || Game.keys.W.keyStateDown)
+					&& (!Game.keys.up.lastKeyState || !Game.keys.W.lastKeyState)) {
 					if (this.itemCursor > 0) {
 						this.itemCursor--;
 						if (this.arrowPosition > 0)
 							this.arrowPosition--;
 					}
-					this.keys.up.lastKeyState = true;
-					this.keys.W.lastKeyState = true;
+					Game.keys.up.lastKeyState = true;
+					Game.keys.W.lastKeyState = true;
 				}
-				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown)
-					&& (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
+				else if ((Game.keys.down.keyStateDown || Game.keys.S.keyStateDown)
+					&& (!Game.keys.down.lastKeyState || !Game.keys.S.lastKeyState)) {
 					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					if (this.itemCursor < list.size() - 1) {
 						this.itemCursor++;
 						if (this.arrowPosition < 4)
 							this.arrowPosition++;
 					}
-					this.keys.down.lastKeyState = true;
-					this.keys.S.lastKeyState = true;
+					Game.keys.down.lastKeyState = true;
+					Game.keys.S.lastKeyState = true;
 				}
-				else if ((this.keys.left.keyStateDown || this.keys.A.keyStateDown)
-					&& (!this.keys.left.lastKeyState || !this.keys.A.lastKeyState)) {
+				else if ((Game.keys.left.keyStateDown || Game.keys.A.keyStateDown)
+					&& (!Game.keys.left.lastKeyState || !Game.keys.A.lastKeyState)) {
 					this.category = Category.getWrapped(this.category.getID() - 1);
 					this.tick = 0x0;
 					this.itemCursor = this.arrowPosition = 0;
-					this.keys.left.lastKeyState = true;
-					this.keys.A.lastKeyState = true;
+					Game.keys.left.lastKeyState = true;
+					Game.keys.A.lastKeyState = true;
 				}
-				else if ((this.keys.right.keyStateDown || this.keys.D.keyStateDown)
-					&& (!this.keys.right.lastKeyState || !this.keys.D.lastKeyState)) {
+				else if ((Game.keys.right.keyStateDown || Game.keys.D.keyStateDown)
+					&& (!Game.keys.right.lastKeyState || !Game.keys.D.lastKeyState)) {
 					this.category = Category.getWrapped(this.category.getID() + 1);
 					this.tick = 0x0;
 					this.itemCursor = this.arrowPosition = 0;
-					this.keys.right.lastKeyState = true;
-					this.keys.D.lastKeyState = true;
+					Game.keys.right.lastKeyState = true;
+					Game.keys.D.lastKeyState = true;
 				}
-				else if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown)
-					&& (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
-					this.keys.X.lastKeyState = true;
-					this.keys.PERIOD.lastKeyState = true;
+				else if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown)
+					&& (!Game.keys.X.lastKeyState || !Game.keys.PERIOD.lastKeyState)) {
+					//Exiting the Inventory.
+					Game.keys.X.lastKeyState = true;
+					Game.keys.PERIOD.lastKeyState = true;
 					this.resetCursor();
+					this.exit();
 				}
-				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
-					&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-					this.keys.Z.lastKeyState = true;
-					this.keys.SLASH.lastKeyState = true;
+				else if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown)
+					&& (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
+					Game.keys.Z.lastKeyState = true;
+					Game.keys.SLASH.lastKeyState = true;
 
 					// This state is used when the player has selected an item, and wants to do
 					// something to the item.
@@ -456,7 +457,7 @@ public class Inventory extends SubMenu {
 						this.resetCursor();
 						break;
 					}
-					this.state = State.MENU;
+					this.state = InventoryState.MENU;
 					this.resetSelectionCursor();
 					if (this.selectionMenu.isEmpty()) {
 						Item item = list.get(this.itemCursor).getKey();
@@ -477,46 +478,46 @@ public class Inventory extends SubMenu {
 				break;
 			}
 			case MENU: {
-				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown)
-					&& (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
-					this.keys.up.lastKeyState = true;
-					this.keys.W.lastKeyState = true;
+				if ((Game.keys.up.keyStateDown || Game.keys.W.keyStateDown)
+					&& (!Game.keys.up.lastKeyState || !Game.keys.W.lastKeyState)) {
+					Game.keys.up.lastKeyState = true;
+					Game.keys.W.lastKeyState = true;
 					if (this.stateArrowPosition > 0)
 						this.stateArrowPosition--;
 				}
-				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown)
-					&& (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
-					this.keys.down.lastKeyState = true;
-					this.keys.S.lastKeyState = true;
+				else if ((Game.keys.down.keyStateDown || Game.keys.S.keyStateDown)
+					&& (!Game.keys.down.lastKeyState || !Game.keys.S.lastKeyState)) {
+					Game.keys.down.lastKeyState = true;
+					Game.keys.S.lastKeyState = true;
 					if (this.stateArrowPosition < this.selectionMenu.size() - 1)
 						this.stateArrowPosition++;
 				}
-				else if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown)
-					&& (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
-					this.keys.X.lastKeyState = true;
-					this.keys.PERIOD.lastKeyState = true;
-					this.state = State.SELECTION;
+				else if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown)
+					&& (!Game.keys.X.lastKeyState || !Game.keys.PERIOD.lastKeyState)) {
+					Game.keys.X.lastKeyState = true;
+					Game.keys.PERIOD.lastKeyState = true;
+					this.state = InventoryState.SELECTION;
 					this.resetSelectionCursor();
 				}
-				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
-					&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-					this.keys.Z.lastKeyState = true;
-					this.keys.SLASH.lastKeyState = true;
+				else if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown)
+					&& (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
+					Game.keys.Z.lastKeyState = true;
+					Game.keys.SLASH.lastKeyState = true;
 					String command = this.selectionMenu.get(this.stateArrowPosition);
 					if (command.equals(Inventory.MENU_CANCEL)) {
-						this.state = State.SELECTION;
+						this.state = InventoryState.SELECTION;
 						this.resetSelectionCursor();
 					}
 					else if (command.equals(Inventory.MENU_TOSS)) {
-						this.state = State.TOSS;
+						this.state = InventoryState.TOSS;
 						this.resetSelectionCursor();
 					}
 					else if (command.equals(Inventory.MENU_USE)) {
-						this.state = State.USE;
+						this.state = InventoryState.USE;
 						this.resetSelectionCursor();
 					}
 					else if (command.equals(Inventory.MENU_SET)) {
-						this.state = State.SET;
+						this.state = InventoryState.SET;
 						this.resetSelectionCursor();
 						this.set_end = false;
 						this.set_tokenIterator = 0;
@@ -534,28 +535,28 @@ public class Inventory extends SubMenu {
 				break;
 			}
 			case TOSS: {
-				if ((this.keys.up.keyStateDown || this.keys.W.keyStateDown)
-					&& (!this.keys.up.lastKeyState || !this.keys.W.lastKeyState)) {
-					this.keys.up.lastKeyState = true;
-					this.keys.W.lastKeyState = true;
+				if ((Game.keys.up.keyStateDown || Game.keys.W.keyStateDown)
+					&& (!Game.keys.up.lastKeyState || !Game.keys.W.lastKeyState)) {
+					Game.keys.up.lastKeyState = true;
+					Game.keys.W.lastKeyState = true;
 					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
 					if (entry.getValue() > this.amountToToss)
 						this.amountToToss++;
 				}
-				else if ((this.keys.down.keyStateDown || this.keys.S.keyStateDown)
-					&& (!this.keys.down.lastKeyState || !this.keys.S.lastKeyState)) {
-					this.keys.down.lastKeyState = true;
-					this.keys.S.lastKeyState = true;
+				else if ((Game.keys.down.keyStateDown || Game.keys.S.keyStateDown)
+					&& (!Game.keys.down.lastKeyState || !Game.keys.S.lastKeyState)) {
+					Game.keys.down.lastKeyState = true;
+					Game.keys.S.lastKeyState = true;
 					if (this.amountToToss > 0)
 						this.amountToToss--;
 				}
-				else if ((this.keys.X.keyStateDown || this.keys.PERIOD.keyStateDown)
-					&& (!this.keys.X.lastKeyState || !this.keys.PERIOD.lastKeyState)) {
-					this.keys.X.lastKeyState = true;
-					this.keys.PERIOD.lastKeyState = true;
+				else if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown)
+					&& (!Game.keys.X.lastKeyState || !Game.keys.PERIOD.lastKeyState)) {
+					Game.keys.X.lastKeyState = true;
+					Game.keys.PERIOD.lastKeyState = true;
 					this.resetSelectionCursor();
-					this.state = State.MENU;
+					this.state = InventoryState.MENU;
 					if (this.selectionMenu.isEmpty()) {
 						ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
 						Item item = list.get(this.itemCursor).getKey();
@@ -573,15 +574,15 @@ public class Inventory extends SubMenu {
 						}
 					}
 				}
-				else if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
-					&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-					this.keys.Z.lastKeyState = true;
-					this.keys.SLASH.lastKeyState = true;
+				else if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown)
+					&& (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
+					Game.keys.Z.lastKeyState = true;
+					Game.keys.SLASH.lastKeyState = true;
 					for (int i = 0; i < this.amountToToss; i++) {
 						this.tossItem();
 					}
 					this.resetSelectionCursor();
-					this.state = State.SELECTION;
+					this.state = InventoryState.SELECTION;
 				}
 				break;
 			}
@@ -592,12 +593,12 @@ public class Inventory extends SubMenu {
 					this.game.setRegisteredItem(actionItem);
 				}
 				if (this.set_end) {
-					if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
-						&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
-						this.keys.Z.lastKeyState = true;
-						this.keys.SLASH.lastKeyState = true;
+					if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown)
+						&& (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
+						Game.keys.Z.lastKeyState = true;
+						Game.keys.SLASH.lastKeyState = true;
 						this.resetSelectionCursor();
-						this.state = State.SELECTION;
+						this.state = InventoryState.SELECTION;
 					}
 				}
 				break;
@@ -656,7 +657,8 @@ public class Inventory extends SubMenu {
 		return this.TMs_HMs;
 	}
 
-	// ------------------------------------ PRIVATE METHODS
+	// ------------------------------------
+	// PRIVATE METHODS
 	// -----------------------------------------
 
 	/**
@@ -821,7 +823,7 @@ public class Inventory extends SubMenu {
 	 * 
 	 * @return Nothing.
 	 */
-	private void setState(State value) {
+	private void setState(InventoryState value) {
 		this.state = value;
 	}
 
@@ -949,7 +951,7 @@ public class Inventory extends SubMenu {
 										Thread.sleep(1500);
 									}
 									catch (InterruptedException e) {}
-									Inventory.this.setState(State.SELECTION);
+									Inventory.this.setState(InventoryState.SELECTION);
 									Inventory.this.set_end = true;
 									Player.unlockMovements();
 								}
@@ -977,7 +979,7 @@ public class Inventory extends SubMenu {
 									Thread.sleep(2000);
 								}
 								catch (InterruptedException e) {}
-								Inventory.this.setState(State.SELECTION);
+								Inventory.this.setState(InventoryState.SELECTION);
 								Inventory.this.set_end = true;
 								Player.unlockMovements();
 							}

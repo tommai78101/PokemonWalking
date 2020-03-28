@@ -17,27 +17,22 @@ package abstracts;
 
 import java.awt.Graphics;
 
+import event.MenuEvent;
 import interfaces.MenuDisplayable;
-import menu.MenuEvent;
+import main.StateManager.GameState;
 import screen.Scene;
 
 public abstract class SubMenu implements MenuDisplayable {
-	public enum Type {
-		UNUSED,
-		INVENTORY,
-		SAVE,
-		EXIT
-	}
-
 	protected String name;
 	protected String description;
 	protected MenuEvent menuEvent;
-	protected Type menuType;
+	protected GameState stateType;
+	protected boolean isExitingMenu;
 
-	public SubMenu(String name, String description, Type type) {
+	public SubMenu(String name, String description, GameState type) {
 		this.name = name;
 		this.description = description;
-		this.menuType = type;
+		this.stateType = type;
 		this.menuEvent = new MenuEvent(this, type);
 	}
 
@@ -49,8 +44,8 @@ public abstract class SubMenu implements MenuDisplayable {
 		return this.description;
 	}
 
-	public Type getType() {
-		return this.menuType;
+	public GameState getGameState() {
+		return this.stateType;
 	}
 
 	/**
@@ -62,8 +57,20 @@ public abstract class SubMenu implements MenuDisplayable {
 		return this.name.getBytes();
 	}
 
-	public MenuEvent getEvent() {
+	public Event getEvent() {
 		return this.menuEvent;
+	}
+
+	public boolean isExiting() {
+		return this.isExitingMenu;
+	}
+
+	public void exit() {
+		this.isExitingMenu = true;
+	}
+
+	public void resetExitState() {
+		this.isExitingMenu = false;
 	}
 
 	@Override

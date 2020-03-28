@@ -18,13 +18,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import abstracts.Event;
 import abstracts.SubMenu;
 import dialogue.Dialogue;
 import entity.Player;
+import event.MenuEvent;
 import interfaces.Tileable;
 import level.WorldConstants;
 import main.Game;
 import main.MainComponent;
+import main.StateManager.GameState;
 import resources.Art;
 import screen.Scene;
 import utility.DialogueBuilder;
@@ -36,19 +39,17 @@ public class MainMenu extends SubMenu {
 
 	private List<SubMenu> items = new ArrayList<>();
 	private SubMenu exitItem;
-	private SubMenu activeItem;
+	private SubMenu activeMenuItem;
 	private Dialogue mainMenuDialogue;
 
 	private int menuCursorPosition;
 
 	private boolean subMenuActivation;
-	private boolean activation;
 	private List<Map.Entry<String, Boolean>> tokens;
 	private MenuEvent actionEvent;
 
 	public MainMenu() {
-		super(null, null, Type.UNUSED);
-		this.activation = false;
+		super(null, null, GameState.START_MENU);
 		this.menuCursorPosition = 0;
 		this.actionEvent = null;
 	}
@@ -88,21 +89,19 @@ public class MainMenu extends SubMenu {
 
 	@Override
 	public void tick() {
-		if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown) && this.activation)
-			this.activation = false;
-		if (this.activation) {
-			this.prepareMenuText();
-			this.handleMenuSelection();
+		if ((Game.keys.X.keyStateDown || Game.keys.PERIOD.keyStateDown)) {
+			if (this.actionEvent != null)
+				this.actionEvent = null;
+			return;
 		}
-		else if (Player.isMovementsLocked())
-			Player.unlockMovements();
+		this.prepareMenuText();
+		this.handleMenuSelection();
+//		if (Player.isMovementsLocked())
+//			Player.unlockMovements();
 	}
 
 	@Override
 	public void render(Scene output, Graphics graphics) {
-		if (!this.activation) {
-			return;
-		}
 		this.mainMenuDialogue.renderInformationBox(output, 5, 0, 4, this.items.size());
 		MainMenu.renderDescriptionBox(output, 0, 7, 5, 3);
 		output.blit(Art.dialogue_pointer, Tileable.WIDTH * 5 + 8, Tileable.HEIGHT + this.menuCursorPosition * Tileable.HEIGHT);
@@ -113,25 +112,20 @@ public class MainMenu extends SubMenu {
 		graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
 	}
 
-	public MenuEvent getActionEvent() {
-		return (this.activeItem != null) ? this.activeItem.getEvent() : null;
+	@Override
+	public Event getEvent() {
+		return (this.activeMenuItem != null) ? this.activeMenuItem.getEvent() : null;
 	}
 
-	public void closeMenu() {
-		this.activation = false;
-		if (Player.isMovementsLocked())
-			Player.unlockMovements();
-	}
-
-	public void openMenu() {
-		this.activation = true;
-		if (!Player.isMovementsLocked())
-			Player.lockMovements();
-	}
-
-	public boolean isActivated() {
-		return this.activation;
-	}
+//	public void closeMenu() {
+//		if (Player.isMovementsLocked())
+//			Player.unlockMovements();
+//	}
+//
+//	public void openMenu() {
+//		if (!Player.isMovementsLocked())
+//			Player.lockMovements();
+//	}
 
 	/**
 	 * Compares all available submenus before returning it.
@@ -168,21 +162,30 @@ public class MainMenu extends SubMenu {
 		this.subMenuActivation = false;
 	}
 
-	public SubMenu getActiveItem() {
-		return this.activeItem;
-	}
-
 	public void setActiveItem(SubMenu menu) {
 		this.menuCursorPosition = 0;
 		while (!menu.equals(this.items.get(this.menuCursorPosition))) {
 			this.menuCursorPosition++;
 		}
-		this.activeItem = menu;
+		this.activeMenuItem = menu;
 	}
 
 	public void setActiveItem(int index) {
 		this.menuCursorPosition = index;
-		this.activeItem = this.items.get(index);
+		this.activeMenuItem = this.items.get(index);
+	}
+
+	public void clearActiveItem() {
+		this.activeMenuItem = null;
+	}
+
+	/**
+	 * If no active item is found, it will return null.
+	 * 
+	 * @return A SubMenu object if there exists a player-chosen submenu item. Otherwise, null.
+	 */
+	public SubMenu getActiveItem() {
+		return this.activeMenuItem;
 	}
 
 	// ------------------------- PRIVATE METHODS -----------------------------------
@@ -212,18 +215,35 @@ public class MainMenu extends SubMenu {
 		if ((Game.keys.Z.keyStateDown || Game.keys.SLASH.keyStateDown) && (!Game.keys.Z.lastKeyState || !Game.keys.SLASH.lastKeyState)) {
 			Game.keys.Z.lastKeyState = true;
 			Game.keys.SLASH.lastKeyState = true;
-			this.actionEvent = this.items.get(this.menuCursorPosition).getEvent();
-			this.activation = true;
+			this.activeMenuItem = this.items.get(this.menuCursorPosition);
+//			event.trigger(() -> {
+//				MenuEvent menuEvent = (MenuEvent) event;
+//				Type type = menuEvent.getType();
+//				switch (type) {
+//					case INVENTORY:
+//						this.stateManager.setCurrentGameState(GameState.INVENTORY);
+//						this.gameScene.setRenderingEffectTick((byte) 0x0);
+//						break;
+//					case SAVE:
+//						this.stateManager.setCurrentGameState(GameState.SAVING);
+//						break;
+//					case EXIT:
+//						this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+//						this.startMenu.closeMenu();
+//						break;
+//					case UNUSED:
+//						this.startMenu.closeMenu();
+//						break;
+//				}
+//			});
 		}
 	}
 
 	private void renderMenuText(Graphics g) {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
-		if (this.activation) {
-			for (int i = 0; i < this.items.size(); i++) {
-				g.drawString(this.items.get(i).getName(), (Tileable.WIDTH * 6), (((Tileable.HEIGHT * 2 - 8) + i * 16)));
-			}
+		for (int i = 0; i < this.items.size(); i++) {
+			g.drawString(this.items.get(i).getName(), (Tileable.WIDTH * 6), (((Tileable.HEIGHT * 2 - 8) + i * 16)));
 		}
 	}
 

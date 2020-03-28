@@ -29,7 +29,6 @@ public class DummyItem extends Item {
 	public void doAction() {
 		this.game.getBaseScreen().setRenderingEffectTick((byte) 0x0);
 		this.game.getStateManager().setCurrentGameState(GameState.START_MENU);
-		this.game.getStartMenu().openMenu();
 	}
 
 	@Override

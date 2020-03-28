@@ -44,13 +44,18 @@ public class Player extends Character {
 	private int yAccel;
 	private int oldXPosition;
 	private int oldYPosition;
+
+	//These are animation-related locks
 	private boolean isLockedWalking;
 	private boolean isLockedSprinting;
 	private boolean isLockedJumping;
+
 	private final boolean[] isFacingBlocked = new boolean[4];
 	private boolean isInWater;
 	private boolean isOnBicycle;
 	private boolean isColliding;
+
+	//This is a player character lock.
 	private static boolean movementLock;
 
 	private boolean isInteractionEnabled;

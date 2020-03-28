@@ -9,11 +9,12 @@ import abstracts.SubMenu;
 import dialogue.Dialogue;
 import entity.Player;
 import level.WorldConstants;
+import main.StateManager.GameState;
 import screen.Scene;
 import utility.DialogueBuilder;
 
 public class SaveDataManager extends SubMenu {
-	public enum State {
+	public enum SaveStatus {
 		ASK,
 		OVERWRITE,
 		SAVING,
@@ -21,15 +22,15 @@ public class SaveDataManager extends SubMenu {
 		ERROR
 	}
 
-	private State state;
+	private SaveStatus saveStatus;
 	private Dialogue newDialogue;
 	ExecutorService executor;
 	private Game game;
 
 	public SaveDataManager(Game game) {
-		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, SubMenu.Type.SAVE);
+		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, GameState.SAVING);
 		this.game = game;
-		this.state = State.ASK;
+		this.saveStatus = SaveStatus.ASK;
 		this.newDialogue = new Dialogue();
 	}
 
@@ -37,7 +38,7 @@ public class SaveDataManager extends SubMenu {
 	public void tick() {
 		if (!Player.isMovementsLocked())
 			Player.lockMovements();
-		switch (this.state) {
+		switch (this.saveStatus) {
 			case ASK: {
 				if (!this.newDialogue.isDialogueTextSet())
 					this.newDialogue = DialogueBuilder.createText(
@@ -54,9 +55,9 @@ public class SaveDataManager extends SubMenu {
 							this.newDialogue.tick();
 						if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
 							if (this.game.checkSaveData())
-								this.state = State.OVERWRITE;
+								this.saveStatus = SaveStatus.OVERWRITE;
 							else
-								this.state = State.SAVING;
+								this.saveStatus = SaveStatus.SAVING;
 							this.newDialogue.clearDialogueLines();
 						}
 					}
@@ -84,7 +85,7 @@ public class SaveDataManager extends SubMenu {
 							if (!this.newDialogue.yesNoQuestionHasBeenAnswered())
 								this.newDialogue.tick();
 							if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-								this.state = State.SAVING;
+								this.saveStatus = SaveStatus.SAVING;
 								this.newDialogue.clearDialogueLines();
 							}
 							break;
@@ -114,13 +115,13 @@ public class SaveDataManager extends SubMenu {
 						this.executor.shutdown();
 						try {
 							if (!this.executor.awaitTermination(1, TimeUnit.MINUTES)) {
-								this.state = State.ERROR;
+								this.saveStatus = SaveStatus.ERROR;
 								this.newDialogue.clearDialogueLines();
 								break;
 							}
 						}
 						catch (InterruptedException e) {
-							this.state = State.ERROR;
+							this.saveStatus = SaveStatus.ERROR;
 							this.newDialogue.clearDialogueLines();
 						}
 					}
@@ -128,7 +129,7 @@ public class SaveDataManager extends SubMenu {
 				else {
 					if (this.executor.isTerminated()) {
 						this.executor = null;
-						this.state = State.SAVED;
+						this.saveStatus = SaveStatus.SAVED;
 						this.newDialogue.clearDialogueLines();
 					}
 				}
@@ -157,12 +158,12 @@ public class SaveDataManager extends SubMenu {
 		}
 	}
 
-	public State getState() {
-		return this.state;
+	public SaveStatus getSaveStatus() {
+		return this.saveStatus;
 	}
 
-	public void setState(State state) {
-		this.state = state;
+	public void setSaveStatus(SaveStatus status) {
+		this.saveStatus = status;
 	}
 
 	@Override

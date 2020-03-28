@@ -21,12 +21,12 @@ public class Bicycle extends ActionItem {
 	private static final String DISABLING_DESCRIPTION = "Get off bicycle.";
 
 	public Bicycle(Game game, String name, String description, Category category) {
-		super(game, "BICYCLE", ENABLING_DESCRIPTION, Category.KEYITEMS, WorldConstants.ITEM_BICYCLE);
+		super(game, "BICYCLE", Bicycle.ENABLING_DESCRIPTION, Category.KEYITEMS, WorldConstants.ITEM_BICYCLE);
 	}
 
 	public Bicycle(Game game, ItemText text) {
 		super(game, text);
-		this.description = ENABLING_DESCRIPTION;
+		this.description = Bicycle.ENABLING_DESCRIPTION;
 	}
 
 	@Override
@@ -45,13 +45,12 @@ public class Bicycle extends ActionItem {
 						Thread.sleep(800);
 						Player.unlockMovements();
 						player.disableAutomaticMode();
-					} catch (InterruptedException e) {
 					}
+					catch (InterruptedException e) {}
 				}
 			}).start();
-			this.description = DISABLING_DESCRIPTION;
+			this.description = Bicycle.DISABLING_DESCRIPTION;
 			this.game.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
-			this.game.getStartMenu().closeMenu();
 		}
 	}
 
@@ -71,13 +70,12 @@ public class Bicycle extends ActionItem {
 						Thread.sleep(800);
 						Player.unlockMovements();
 						player.disableAutomaticMode();
-					} catch (InterruptedException e) {
 					}
+					catch (InterruptedException e) {}
 				}
 			}).start();
-			this.description = ENABLING_DESCRIPTION;
+			this.description = Bicycle.ENABLING_DESCRIPTION;
 			this.game.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
-			this.game.getStartMenu().closeMenu();
 		}
 	}
 }

@@ -14,12 +14,13 @@ import java.awt.Graphics;
 
 import abstracts.SubMenu;
 import main.Game;
+import main.StateManager.GameState;
 import screen.Scene;
 
 public class DummyMenu extends SubMenu {
 
 	public DummyMenu(String name, String description, Game game) {
-		super(name, description, Type.UNUSED);
+		super(name, description, GameState.RESERVED);
 	}
 
 	@Override
