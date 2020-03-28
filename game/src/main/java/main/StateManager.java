@@ -4,7 +4,7 @@ public class StateManager {
 	public enum GameState {
 		INTRO,
 		LOADING,
-		SAVING,
+		SAVE,
 		MAIN_GAME,
 		START_MENU,
 		INVENTORY,

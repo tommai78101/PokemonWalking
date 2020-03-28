@@ -21,7 +21,6 @@ import java.util.Map;
 
 import interfaces.Tileable;
 import main.Game;
-import main.Keys;
 import main.MainComponent;
 import resources.Art;
 import screen.Scene;
@@ -58,15 +57,13 @@ public class Dialogue {
 
 	private List<String> completedLines;
 
-	@Deprecated
-	private Keys input;
-
 	private int lineIterator;
 	private int lineLength;
 	private List<Map.Entry<String, Boolean>> lines;
 
 	private boolean simpleQuestionFlag;
 	private boolean simpleSpeechFlag;
+	private boolean ignoreInputsFlag;
 
 	/**
 	 * If true, displays the "down arrow" inside the dialogue box.
@@ -107,11 +104,11 @@ public class Dialogue {
 		this.scrollDistance = 0;
 		this.nextTick = 0x0;
 		this.lineIterator = 0;
-		this.input = Game.keys;
 		this.showDialog = false;
 		this.type = null;
 		this.yesNoCursorPosition = true;
 		this.yesNoAnswerFlag = null; // Default
+		this.ignoreInputsFlag = false; // Default
 	}
 
 	public Dialogue(Dialogue dialogue) {
@@ -119,8 +116,6 @@ public class Dialogue {
 		this.completedLines = new ArrayList<>();
 		for (String s : dialogue.completedLines)
 			this.completedLines.add(s);
-
-		this.input = dialogue.input;
 
 		this.lineIterator = dialogue.lineIterator;
 		this.lineLength = dialogue.lineLength;
@@ -142,6 +137,7 @@ public class Dialogue {
 		this.tickCount = dialogue.tickCount;
 		this.totalDialogueLength = dialogue.totalDialogueLength;
 		this.type = dialogue.type;
+		this.ignoreInputsFlag = false;
 	}
 
 	public Boolean getAnswerToSimpleQuestion() {
@@ -179,6 +175,10 @@ public class Dialogue {
 
 	public boolean isDialogueTextSet() {
 		return !this.lines.isEmpty();
+	}
+
+	public void setShowDialog(boolean showDialog) {
+		this.showDialog = showDialog;
 	}
 
 	public boolean isShowingDialog() {
@@ -280,35 +280,27 @@ public class Dialogue {
 					// Making sure this doesn't trigger the "Next" arrow.
 					this.nextFlag = false;
 
-					if ((this.input.up.keyStateDown && !this.input.up.lastKeyState)
-						|| (this.input.W.keyStateDown && !this.input.W.lastKeyState)) {
-						this.input.up.lastKeyState = true;
-						this.input.W.lastKeyState = true;
+					if (Game.keys.isUpPressed()) {
+						Game.keys.upReceived();
 						// Made it consistent with Inventory's menu selection, where it doesn't wrap
 						// around.
 						this.yesNoCursorPosition = !this.yesNoCursorPosition;
 					}
-					else if ((this.input.down.keyStateDown && !this.input.down.lastKeyState)
-						|| (this.input.S.keyStateDown && !this.input.S.lastKeyState)) {
-						this.input.down.lastKeyState = true;
-						this.input.S.lastKeyState = true;
+					else if (Game.keys.isDownPressed()) {
+						Game.keys.downReceived();
 						// Made it consistent with Inventory's menu selection, where it doesn't wrap
 						// around.
 						this.yesNoCursorPosition = !this.yesNoCursorPosition;
 					}
-					if ((this.input.Z.keyStateDown && !this.input.Z.lastKeyState)
-						|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
-						this.input.Z.lastKeyState = true;
-						this.input.SLASH.lastKeyState = true;
+					if (Game.keys.isPrimaryPressed()) {
+						Game.keys.primaryReceived();
 						// The answer to simple questions have already been set by UP and DOWN.
 						this.yesNoAnswerFlag = this.yesNoCursorPosition;
 						this.simpleQuestionFlag = false;
 						this.closeDialog();
 					}
-					else if ((this.input.X.keyStateDown && !this.input.X.lastKeyState)
-						|| (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
-						this.input.X.lastKeyState = true;
-						this.input.PERIOD.lastKeyState = true;
+					else if (Game.keys.isSecondaryPressed()) {
+						Game.keys.secondaryReceived();
 						// Always negative for cancel button.
 						this.yesNoAnswerFlag = false;
 						this.yesNoCursorPosition = false;
@@ -316,7 +308,6 @@ public class Dialogue {
 						this.closeDialog();
 					}
 				}
-
 			}
 			else if (this.simpleSpeechFlag) {
 				if (!this.nextFlag && !this.scrollFlag) {
@@ -354,32 +345,24 @@ public class Dialogue {
 
 					// Speeds up text speed.
 					if (this.type != Type.DIALOGUE_ALERT) {
-						if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState))
-							|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
-							if (this.subStringIterator >= this.lineLength - 2) {
-								this.input.Z.lastKeyState = true;
-								this.input.SLASH.lastKeyState = true;
-							}
-							else if (this.subStringIterator < this.lineLength) {
+						if (Game.keys.isPrimaryPressed()) {
+							Game.keys.primaryReceived();
+							if (!this.ignoreInputsFlag && this.subStringIterator < this.lineLength) {
 								this.subStringIterator++;
 							}
 						}
-						else if ((this.input.X.keyStateDown && !(this.input.X.lastKeyState))
-							|| (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
-							if (this.subStringIterator < this.lineLength - 1) {
+						else if (Game.keys.isSecondaryPressed()) {
+							Game.keys.secondaryReceived();
+							if (!this.ignoreInputsFlag && this.subStringIterator < this.lineLength - 1) {
 								this.subStringIterator = this.lineLength - 1;
-								this.input.X.lastKeyState = true;
-								this.input.PERIOD.lastKeyState = true;
 							}
 						}
 					}
 				}
 
 				// Handles only the simplest forms of dialogues.
-				else if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState)
-					|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState))) {
-					this.input.Z.lastKeyState = true;
-					this.input.SLASH.lastKeyState = true;
+				else if (Game.keys.isPrimaryPressed()) {
+					Game.keys.primaryReceived();
 					this.closeDialog();
 				}
 			}
@@ -421,35 +404,26 @@ public class Dialogue {
 
 					// Speeds up text speed.
 					if (this.type != Type.DIALOGUE_ALERT) {
-						if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState))
-							|| (this.input.SLASH.keyStateDown && !this.input.SLASH.lastKeyState)) {
-							if (this.subStringIterator >= this.lineLength - 2) {
-								this.input.Z.lastKeyState = true;
-								this.input.SLASH.lastKeyState = true;
-							}
-							else if (this.subStringIterator < this.lineLength) {
+						if (Game.keys.isPrimaryPressed()) {
+							Game.keys.primaryReceived();
+							if (!this.ignoreInputsFlag && this.subStringIterator < this.lineLength) {
 								this.subStringIterator++;
 							}
 						}
-						else if ((this.input.X.keyStateDown && !(this.input.X.lastKeyState))
-							|| (this.input.PERIOD.keyStateDown && !this.input.PERIOD.lastKeyState)) {
-							if (this.subStringIterator < this.lineLength - 1) {
+						else if (Game.keys.isSecondaryPressed()) {
+							Game.keys.secondaryReceived();
+							if (!this.ignoreInputsFlag && this.subStringIterator < this.lineLength - 1) {
 								this.subStringIterator = this.lineLength - 1;
-								this.input.X.lastKeyState = true;
-								this.input.PERIOD.lastKeyState = true;
 							}
 						}
 					}
 				}
 
-				if ((this.input.Z.keyStateDown && !(this.input.Z.lastKeyState))
-					|| (this.input.SLASH.keyStateDown && !(this.input.SLASH.lastKeyState))
-					|| (this.input.X.keyStateDown && !(this.input.X.lastKeyState))
-					|| (this.input.PERIOD.keyStateDown && !(this.input.PERIOD.lastKeyState))) {
-					this.input.Z.lastKeyState = true;
-					this.input.SLASH.lastKeyState = true;
-					this.input.X.lastKeyState = true;
-					this.input.PERIOD.lastKeyState = true;
+				if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
+					if (Game.keys.isPrimaryPressed())
+						Game.keys.primaryReceived();
+					if (Game.keys.isSecondaryPressed())
+						Game.keys.secondaryReceived();
 					switch (this.type) {
 						case DIALOGUE_SPEECH:
 							this.nextFlag = false;
@@ -637,6 +611,7 @@ public class Dialogue {
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			count = 0;
 		}
 
@@ -675,6 +650,10 @@ public class Dialogue {
 				if (this.tickCount > Dialogue.CHARACTER_TICK_DELAY)
 					this.tickCount = Dialogue.ZERO_TICK;
 			}
+//			else {
+//				//Just speed up the dialogue.
+//				this.tickCount = Dialogue.CHARACTER_TICK_DELAY;
+//			}
 		}
 		else {
 			if (this.lineIterator >= this.lines.size()) {
@@ -753,14 +732,6 @@ public class Dialogue {
 
 	public void setCompletedLines(ArrayList<String> completedLines) {
 		this.completedLines = completedLines;
-	}
-
-	public Keys getInput() {
-		return this.input;
-	}
-
-	public void setInput(Keys input) {
-		this.input = input;
 	}
 
 	public int getLineIterator() {
@@ -851,14 +822,6 @@ public class Dialogue {
 		this.scrollDistance = scrollDistance;
 	}
 
-	public boolean isShowDialog() {
-		return this.showDialog;
-	}
-
-	public void setShowDialog(boolean showDialog) {
-		this.showDialog = showDialog;
-	}
-
 	public int getSubStringIterator() {
 		return this.subStringIterator;
 	}
@@ -891,4 +854,11 @@ public class Dialogue {
 		this.type = type;
 	}
 
+	public void setIgnoreInputs(boolean flag) {
+		this.ignoreInputsFlag = flag;
+	}
+
+	public boolean getIgnoreInputs() {
+		return this.ignoreInputsFlag;
+	}
 }

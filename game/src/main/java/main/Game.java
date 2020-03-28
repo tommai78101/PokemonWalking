@@ -29,7 +29,6 @@ import saving.GameSave;
 import screen.Scene;
 
 public class Game {
-	private static final String SAVE_FILE_NAME = "data.sav";
 	public static final Keys keys = new Keys();
 
 	private final Scene gameScene;
@@ -111,7 +110,7 @@ public class Game {
 				}
 				break;
 			}
-			case SAVING: {
+			case SAVE: {
 				this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
 				SubMenu subMenu = this.startMenu.getActiveItem();
 				if (subMenu != null) {
@@ -141,26 +140,9 @@ public class Game {
 			this.load();
 		}
 		// End debugging purposes
-		GameState state = this.stateManager.getCurrentGameState();
+
+		GameState state = this.clearStartMenuStates();
 		SubMenu subMenu = this.startMenu.getActiveItem();
-		if (subMenu != null && subMenu.isExiting()) {
-			this.startMenu.clearActiveItem();
-			if (subMenu.needsFlashing()) {
-				this.gameScene.setRenderingEffectTick((byte) 0x0);
-			}
-			else {
-				this.gameScene.setRenderingEffectTick((byte) 0x7);
-			}
-			if (!subMenu.exitsToGame()) {
-				this.stateManager.setCurrentGameState(GameState.START_MENU);
-			}
-			else {
-				this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
-			}
-			subMenu.resetExitState();
-			subMenu = null;
-			state = this.stateManager.getCurrentGameState();
-		}
 		switch (state) {
 			case MAIN_GAME: {
 				this.overworld.tick();
@@ -186,44 +168,21 @@ public class Game {
 				subMenu.tick();
 				break;
 			}
-			case SAVING: {
-				if (!subMenu.getGameState().equals(GameState.SAVING)) {
-					if (this.saveManager.getSaveStatus().equals(SaveStatus.SAVED) || this.saveManager.getSaveStatus().equals(SaveStatus.ERROR)) {
-						this.saveManager.resetSaveStatus();
-						this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
-						break;
-					}
-					this.stateManager.setCurrentGameState(GameState.START_MENU);
+			case SAVE: {
+				if (this.saveManager.getSaveStatus().equals(SaveStatus.SAVE_COMPLETE) || this.saveManager.getSaveStatus().equals(SaveStatus.ERROR)) {
+					this.saveManager.resetSaveStatus();
+					this.closeMainMenu();
 					break;
 				}
 				subMenu.tick();
 				break;
 			}
-			case EXIT: {
-				this.gameScene.setRenderingEffectTick((byte) 0x7);
-				this.startMenu.clearActiveItem();
-				this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
-			}
+			case EXIT:
 			default: {
+				this.closeMainMenu();
 				break;
 			}
 		}
-	}
-
-	/**
-	 * Saves the game.
-	 */
-	public void save() {
-		GameSave.save(this, Game.SAVE_FILE_NAME);
-	}
-
-	/**
-	 * Checks for any previous saved data.
-	 * 
-	 * @return True, if it detects previous saved data. False, otherwise.
-	 */
-	public boolean checkSaveData() {
-		return GameSave.check(Game.SAVE_FILE_NAME);
 	}
 
 	/**
@@ -244,7 +203,7 @@ public class Game {
 		if (WorldConstants.isModsEnabled == null)
 			WorldConstants.isModsEnabled = Boolean.FALSE;
 		this.overworld = new OverWorld(this.player, this);
-		GameSave.load(this, Game.SAVE_FILE_NAME);
+		GameSave.load(this, SaveDataManager.SAVE_FILE_NAME);
 
 		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 	}
@@ -309,6 +268,12 @@ public class Game {
 		return this.saveManager;
 	}
 
+	public void closeMainMenu() {
+		this.gameScene.setRenderingEffectTick((byte) 0x7);
+		this.startMenu.clearActiveItem();
+		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+	}
+
 	// ------------------------------------------------- 
 	// PRIVATE METHODS
 	// -------------------------------------------------
@@ -344,5 +309,34 @@ public class Game {
 			default:
 				break;
 		}
+	}
+
+	/**
+	 * This handles clearing the main menu states, and clearing the main menu data.
+	 * 
+	 * Clearing the main menu data allows the game to reset to the main menu, without the game states being messed up because of the focus change.
+	 */
+	private GameState clearStartMenuStates() {
+		GameState state = this.stateManager.getCurrentGameState();
+		SubMenu subMenu = this.startMenu.getActiveItem();
+		if (subMenu != null && subMenu.isExiting()) {
+			this.startMenu.clearActiveItem();
+			if (subMenu.needsFlashing()) {
+				this.gameScene.setRenderingEffectTick((byte) 0x0);
+			}
+			else {
+				this.gameScene.setRenderingEffectTick((byte) 0x7);
+			}
+			if (!subMenu.exitsToGame()) {
+				this.stateManager.setCurrentGameState(GameState.START_MENU);
+			}
+			else {
+				this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+			}
+			subMenu.resetExitState();
+			subMenu = null;
+			state = this.stateManager.getCurrentGameState();
+		}
+		return state;
 	}
 }

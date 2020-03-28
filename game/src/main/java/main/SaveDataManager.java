@@ -10,15 +10,19 @@ import dialogue.Dialogue;
 import entity.Player;
 import level.WorldConstants;
 import main.StateManager.GameState;
+import saving.GameSave;
 import screen.Scene;
 import utility.DialogueBuilder;
 
 public class SaveDataManager extends SubMenu {
+	public static final String SAVE_FILE_NAME = "data.sav";
+
 	public enum SaveStatus {
 		ASK,
 		OVERWRITE,
 		SAVING,
 		SAVED,
+		SAVE_COMPLETE,
 		ERROR
 	}
 
@@ -28,7 +32,7 @@ public class SaveDataManager extends SubMenu {
 	private Game game;
 
 	public SaveDataManager(Game game) {
-		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, GameState.SAVING);
+		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, GameState.SAVE);
 		this.game = game;
 		this.saveStatus = SaveStatus.ASK;
 		this.newDialogue = new Dialogue();
@@ -42,12 +46,13 @@ public class SaveDataManager extends SubMenu {
 			Player.lockMovements();
 		switch (this.saveStatus) {
 			case ASK: {
-				if (!this.newDialogue.isDialogueTextSet())
+				if (!this.newDialogue.isDialogueTextSet()) {
 					this.newDialogue = DialogueBuilder.createText(
 						"Do you want to save the game?",
 						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_QUESTION, true
 					);
-				if (this.newDialogue.isDialogueTextSet() && !(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
+				}
+				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
 					this.newDialogue.tick();
 				}
 				else {
@@ -55,7 +60,7 @@ public class SaveDataManager extends SubMenu {
 						if (!this.newDialogue.yesNoQuestionHasBeenAnswered())
 							this.newDialogue.tick();
 						if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							if (this.game.checkSaveData())
+							if (GameSave.check(SaveDataManager.SAVE_FILE_NAME))
 								this.saveStatus = SaveStatus.OVERWRITE;
 							else
 								this.saveStatus = SaveStatus.SAVING;
@@ -63,8 +68,11 @@ public class SaveDataManager extends SubMenu {
 						}
 						else if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
 							//Save operation has been cancelled.
-							this.saveStatus = SaveStatus.SAVED;
-							this.exit();
+							this.saveStatus = SaveStatus.SAVE_COMPLETE;
+							this.newDialogue.clearDialogueLines();
+						}
+						else {
+							//Intentionally doing nothing.
 						}
 					}
 				}
@@ -106,30 +114,30 @@ public class SaveDataManager extends SubMenu {
 				if (!this.newDialogue.isDialogueTextSet())
 					this.newDialogue = DialogueBuilder.createText(
 						"Saving...", Dialogue.MAX_STRING_LENGTH,
-						Dialogue.Type.DIALOGUE_SPEECH, true
+						Dialogue.Type.DIALOGUE_SPEECH, true, true
 					);
 				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
 					this.newDialogue.tick();
-					if (this.executor == null) {
-						this.executor = Executors.newFixedThreadPool(1);
-						this.executor.execute(new Runnable() {
-							@Override
-							public void run() {
-								SaveDataManager.this.game.save();
-							}
-						});
-						this.executor.shutdown();
-						try {
-							if (!this.executor.awaitTermination(1, TimeUnit.MINUTES)) {
-								this.saveStatus = SaveStatus.ERROR;
-								this.newDialogue.clearDialogueLines();
-								break;
-							}
+				}
+				else if (this.executor == null) {
+					this.executor = Executors.newFixedThreadPool(1);
+					this.executor.execute(new Runnable() {
+						@Override
+						public void run() {
+							GameSave.save(SaveDataManager.this.game, SaveDataManager.SAVE_FILE_NAME);
 						}
-						catch (InterruptedException e) {
+					});
+					this.executor.shutdown();
+					try {
+						if (!this.executor.awaitTermination(1, TimeUnit.MINUTES)) {
 							this.saveStatus = SaveStatus.ERROR;
 							this.newDialogue.clearDialogueLines();
+							break;
 						}
+					}
+					catch (InterruptedException e) {
+						this.saveStatus = SaveStatus.ERROR;
+						this.newDialogue.clearDialogueLines();
 					}
 				}
 				else {
@@ -145,13 +153,18 @@ public class SaveDataManager extends SubMenu {
 				if (!this.newDialogue.isDialogueTextSet())
 					this.newDialogue = DialogueBuilder.createText(
 						"Saving Complete.", Dialogue.MAX_STRING_LENGTH,
-						Dialogue.Type.DIALOGUE_SPEECH, true
+						Dialogue.Type.DIALOGUE_SPEECH, true, true
 					);
 				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
 					this.newDialogue.tick();
 				else {
-					this.exit();
+					this.saveStatus = SaveStatus.SAVE_COMPLETE;
+					this.newDialogue.clearDialogueLines();
 				}
+				break;
+			}
+			case SAVE_COMPLETE: {
+				this.exitsToGame();
 				break;
 			}
 			case ERROR: {
@@ -162,6 +175,9 @@ public class SaveDataManager extends SubMenu {
 					);
 				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
 					this.newDialogue.tick();
+				else {
+					this.exit();
+				}
 				break;
 			}
 		}

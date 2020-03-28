@@ -337,6 +337,9 @@ public class GameSave {
 
 	}
 
+	/**
+	 * Saves the game.
+	 */
 	public static void save(Game game, String filename) {
 		GameSave data = new GameSave();
 		data.generateSaveData(game);

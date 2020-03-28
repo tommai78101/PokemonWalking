@@ -30,6 +30,12 @@ public class DialogueBuilder {
 		return dialogues;
 	}
 
+	public static Dialogue createText(String dialogue, int length, Type type, boolean lock, boolean ignoreInputs) {
+		Dialogue dialogues = DialogueBuilder.createText(dialogue, length, type, lock);
+		dialogues.setIgnoreInputs(ignoreInputs);
+		return dialogues;
+	}
+
 	public static List<Map.Entry<Dialogue, Integer>> loadDialogues(String filename) {
 		List<Map.Entry<Dialogue, Integer>> result = new ArrayList<>();
 		try {
