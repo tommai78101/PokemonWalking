@@ -122,6 +122,15 @@ public class Keys {
 	}
 
 	/**
+	 * Checks if any one of the Up, Down, Left, and Right button is pressed.
+	 * 
+	 * @return True, if any one of buttons is pressed. False, if otherwise.
+	 */
+	public boolean isDpadPressed() {
+		return (Game.keys.isUpPressed() || Game.keys.isDownPressed() || Game.keys.isLeftPressed() || Game.keys.isRightPressed());
+	}
+
+	/**
 	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
 	 */
 	public void upReceived() {

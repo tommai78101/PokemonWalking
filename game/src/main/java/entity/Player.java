@@ -16,6 +16,7 @@ import abstracts.Item;
 import interfaces.Tileable;
 import level.Area;
 import level.PixelData;
+import main.Game;
 import main.Keys;
 import resources.Art;
 import screen.Scene;
@@ -455,15 +456,14 @@ public class Player extends Character {
 			}
 			case 0x03: // Obstacle
 				switch (red) {
+					//Item types
 					default:
 						if (this.isInteracting())
 							return true;
 						if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset)) {
-							if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
-								&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+							if (Game.keys.isPrimaryPressed()) {
+								Game.keys.primaryReceived();
 								this.startInteraction();
-								this.keys.Z.lastKeyState = true;
-								this.keys.SLASH.lastKeyState = true;
 							}
 						}
 						return true;
@@ -488,11 +488,9 @@ public class Player extends Character {
 				if (this.isInteracting())
 					return true;
 				if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset)) {
-					if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown)
-						&& (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)) {
+					if (Game.keys.isPrimaryPressed()) {
+						Game.keys.primaryReceived();
 						this.startInteraction();
-						this.keys.Z.lastKeyState = true;
-						this.keys.SLASH.lastKeyState = true;
 					}
 				}
 				return true; // Cannot go through items on the ground.
@@ -556,9 +554,7 @@ public class Player extends Character {
 		}
 		else {
 			// Key press detection.
-			final boolean wasdKeyPressedDown = (this.keys.S.isPressedDown || this.keys.W.isPressedDown || this.keys.A.isPressedDown || this.keys.D.isPressedDown);
-			final boolean arrowKeyPressedDown = (this.keys.down.isPressedDown || this.keys.up.isPressedDown || this.keys.left.isPressedDown || this.keys.right.isPressedDown);
-			final boolean canUserMove = (wasdKeyPressedDown || arrowKeyPressedDown) && !Player.movementLock;
+			boolean canUserMove = Game.keys.isDpadPressed() && !Player.movementLock;
 
 			// Player state
 			if (this.isInWater && this.isOnBicycle) {
@@ -834,7 +830,7 @@ public class Player extends Character {
 			this.setFacing(Character.RIGHT);
 		}
 		else {
-			// Do nothing with the directional facing here.
+			// Intentionally doing nothing here.
 		}
 	}
 

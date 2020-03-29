@@ -8,7 +8,7 @@
  * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
  * */
 
-package saving;
+package data;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
