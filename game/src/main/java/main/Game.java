@@ -27,6 +27,7 @@ import menu.MainMenu;
 import resources.Art;
 import resources.Mod;
 import screen.Scene;
+import screen.Scene.FlashingType;
 
 public class Game {
 	public static final Keys keys = new Keys();
@@ -71,7 +72,7 @@ public class Game {
 	}
 
 	/**
-	 * Handles rendered objects.
+	 * Handles rendered objects and rendering effects.
 	 * 
 	 * <p>
 	 * All render() methods must be placed in here to render to the screen.
@@ -91,8 +92,8 @@ public class Game {
 				break;
 			}
 			case START_MENU: {
-				if (this.gameScene.getRenderingEffectTick() < (byte) 0x7) {
-					this.gameScene.flashing();
+				if (this.gameScene.isRenderingEffect()) {
+					this.gameScene.renderEffectFlashing(FlashingType.NORMAL);
 				}
 				else {
 					this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
@@ -101,8 +102,8 @@ public class Game {
 				break;
 			}
 			case INVENTORY: {
-				if (this.gameScene.getRenderingEffectTick() < (byte) 0x7) {
-					this.gameScene.flashing();
+				if (this.gameScene.isRenderingEffect()) {
+					this.gameScene.renderEffectFlashing(FlashingType.NORMAL);
 				}
 				else {
 					this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
@@ -141,7 +142,7 @@ public class Game {
 		}
 		// End debugging purposes
 
-		GameState state = this.clearStartMenuStates();
+		GameState state = this.prepareMainMenu();
 		SubMenu subMenu = this.startMenu.getActiveItem();
 		switch (state) {
 			case MAIN_GAME: {
@@ -196,7 +197,7 @@ public class Game {
 	 */
 	private void load() {
 		// TODO: Load data.
-		this.gameScene.reload();
+		this.gameScene.resetRenderingEffect();
 		this.player.reload();
 
 		Mod.loadModdedResources();
@@ -269,7 +270,7 @@ public class Game {
 	}
 
 	public void closeMainMenu() {
-		this.gameScene.setRenderingEffectTick((byte) 0x7);
+		this.gameScene.resetRenderingEffect();
 		this.startMenu.clearActiveItem();
 		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 	}
@@ -312,11 +313,11 @@ public class Game {
 	}
 
 	/**
-	 * This handles clearing the main menu states, and clearing the main menu data.
+	 * This handles updating the main menu states, rendering effects, and the sub menu data, all for preparations.
 	 * 
 	 * Clearing the main menu data allows the game to reset to the main menu, without the game states being messed up because of the focus change.
 	 */
-	private GameState clearStartMenuStates() {
+	private GameState prepareMainMenu() {
 		GameState state = this.stateManager.getCurrentGameState();
 		SubMenu subMenu = this.startMenu.getActiveItem();
 		if (subMenu != null && subMenu.isExiting()) {
@@ -325,7 +326,7 @@ public class Game {
 				this.gameScene.setRenderingEffectTick((byte) 0x0);
 			}
 			else {
-				this.gameScene.setRenderingEffectTick((byte) 0x7);
+				this.gameScene.resetRenderingEffect();
 			}
 			if (!subMenu.exitsToGame()) {
 				this.stateManager.setCurrentGameState(GameState.START_MENU);

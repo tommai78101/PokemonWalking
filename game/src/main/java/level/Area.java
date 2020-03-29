@@ -11,8 +11,10 @@
 package level;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import abstracts.Character;
@@ -50,26 +52,28 @@ public class Area implements Tileable, UpdateRenderable {
 	private TriggerData trigger;
 
 	private final List<List<PixelData>> areaData = new ArrayList<>();
-	private final List<Obstacle> areaObstacles = new ArrayList<>();
-	private final List<Character> areaCharacters = new ArrayList<>();
-//	private final List<Entity> areaEntities = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
-	private final List<TriggerData> triggerDatas = new ArrayList<>();
+//	private final List<Entity> areaEntities = new ArrayList<>();
+	private final Map<Map.Entry<Integer, Integer>, Obstacle> areaObstacles = new HashMap<>();
+	private final Map<Map.Entry<Integer, Integer>, Character> areaCharacters = new HashMap<>();
+	private final Map<Map.Entry<Integer, Integer>, TriggerData> triggerDatas = new HashMap<>();
 
 	public Area(BaseBitmap bitmap, final int areaID) {
 		int[] tempPixels = bitmap.getPixels();
 		int triggerSize = tempPixels[0];
 		int row = 0;
 		int column = 0;
+		int stride = bitmap.getWidth();
 		for (int i = 0; i < triggerSize; i++) {
-			column = i + 1;
-			int color = tempPixels[column + (bitmap.getHeight() * row)];
+			//The "color" is the ID.
 			// ID must not be negative. ID = 0 is reserved.
+			column = i + 1;
+			int color = tempPixels[column + (stride * row)];
 			if (color > 0)
-				this.triggerDatas.add(new TriggerData().loadTriggerData(color));
-			if (column >= bitmap.getWidth()) {
+				this.triggerDatas.put(Map.entry(column, row), new TriggerData().loadTriggerData(color));
+			if (column >= stride) {
 				row++;
-				column -= bitmap.getWidth();
+				column -= stride;
 			}
 		}
 		// We need to add the row by 1 for the last row with trailing empty trigger IDs.
@@ -88,13 +92,13 @@ public class Area implements Tileable, UpdateRenderable {
 				if (Entity.isObstacle(pixelData)) {
 					Obstacle entity = Obstacle.build(pixelData, x, y);
 					if (entity != null) {
-						this.areaObstacles.add(entity);
+						this.areaObstacles.put(Map.entry(x, y), entity);
 					}
 				}
 				if (Entity.isCharacter(pixelData)) {
 					Character entity = Character.build(pixelData, x, y);
 					if (entity != null) {
-						this.areaCharacters.add(entity);
+						this.areaCharacters.put(Map.entry(x, y), entity);
 					}
 				}
 
@@ -182,9 +186,9 @@ public class Area implements Tileable, UpdateRenderable {
 		}
 
 		//Area specific entities are updated at the end.
-		for (Obstacle obstacle : this.areaObstacles) {
+		this.areaObstacles.forEach((k, obstacle) -> {
 			obstacle.tick();
-		}
+		});
 	}
 
 	private void handleTriggerActions() {
@@ -242,12 +246,11 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	private TriggerData checkForTrigger(int playerX, int playerY) {
-		for (TriggerData t : this.triggerDatas) {
-			if (t.x == playerX && t.y == playerY && (!t.isFinished() || t.isOnRepeat())) {
-				if (this.oldXTriggerPosition == t.x && this.oldYTriggerPosition == t.y)
-					return null;
-				return new TriggerData(t).reset();
-			}
+		TriggerData data = this.triggerDatas.get(Map.entry(playerX, playerY));
+		if (data != null && (!data.isFinished() || data.isOnRepeat())) {
+			if (this.oldXTriggerPosition == data.x && this.oldYTriggerPosition == data.y)
+				return null;
+			return data.reset();
 		}
 		return null;
 	}
@@ -375,9 +378,9 @@ public class Area implements Tileable, UpdateRenderable {
 		}
 
 		//Obstacles are rendered on top of the area background tiles.
-		for (Obstacle obstacle : this.areaObstacles) {
+		this.areaObstacles.forEach((k, obstacle) -> {
 			obstacle.render(screen, xOff, yOff);
-		}
+		});
 
 		if (this.trigger != null) {
 			screen.setOffset(0, 0);
@@ -587,7 +590,7 @@ public class Area implements Tileable, UpdateRenderable {
 		return this.isExitArrowDisplayed;
 	}
 
-	public List<Obstacle> getObstaclesList() {
+	public Map<Map.Entry<Integer, Integer>, Obstacle> getObstaclesList() {
 		return this.areaObstacles;
 	}
 
@@ -607,17 +610,15 @@ public class Area implements Tileable, UpdateRenderable {
 		//Only obstacles and characters are entities.
 		PixelData data = this.getPixelData(x, y);
 		if (Entity.isObstacle(data)) {
-			for (Obstacle obstacle : this.areaObstacles) {
-				if (obstacle.getPixelData().equals(data)) {
-					return obstacle;
-				}
+			Obstacle obstacle = this.areaObstacles.get(Map.entry(x, y));
+			if (obstacle.getPixelData().equals(data)) {
+				return obstacle;
 			}
 		}
 		else if (Entity.isCharacter(data)) {
-			for (Character character : this.areaCharacters) {
-				if (character.getPixelData().equals(data)) {
-					return character;
-				}
+			Character character = this.areaCharacters.get(Map.entry(x, y));
+			if (character.getPixelData().equals(data)) {
+				return character;
 			}
 		}
 		return null;

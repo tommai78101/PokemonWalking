@@ -10,9 +10,9 @@
 
 package screen;
 
+import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.awt.Graphics;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -22,6 +22,10 @@ import resources.Art;
 import resources.Mod;
 
 public class Scene extends BaseBitmap {
+	public enum FlashingType {
+		NORMAL,
+		BURST
+	}
 
 	// TODO: Add more drawing functions that enable more controls when it comes to
 	// rendering assets.
@@ -31,15 +35,16 @@ public class Scene extends BaseBitmap {
 	protected int xOffset;
 	protected int yOffset;
 
-	private byte tick = 0x7;
+	private static final byte MAX_TICK_LIMIT = 0x7;
+	private byte tick = Scene.MAX_TICK_LIMIT;
 
 	// private boolean cutScreen;
 
 	public Scene(int w, int h) {
 		super(w, h);
 		this.image = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-		this.pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-		this.graphics = image.getGraphics();
+		this.pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
+		this.graphics = this.image.getGraphics();
 	}
 
 	public void loadResources() {
@@ -48,7 +53,7 @@ public class Scene extends BaseBitmap {
 	}
 
 	public BufferedImage getBufferedImage() {
-		return image;
+		return this.image;
 	}
 
 	public Graphics getGraphics() {
@@ -56,7 +61,7 @@ public class Scene extends BaseBitmap {
 	}
 
 	public void clear(int color) {
-		Arrays.fill(pixels, color);
+		Arrays.fill(this.pixels, color);
 	}
 
 	public void blit(BaseBitmap bitmap, int x, int y) {
@@ -117,7 +122,7 @@ public class Scene extends BaseBitmap {
 		int red = (dataColor >> 16) & 0xFF;
 		int green = (dataColor >> 8) & 0xFF;
 		int blue = dataColor & 0xFF;
-		int biomeColor = getBiomeBaseColor(tileID, red, green, blue);
+		int biomeColor = this.getBiomeBaseColor(tileID, red, green, blue);
 		int tick = 0;
 
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
@@ -132,27 +137,27 @@ public class Scene extends BaseBitmap {
 				// Has nothing to do with pixel data properties.
 
 				switch (alpha) {
-				case 0x0:
-					// Biome Color with a bit of speckled light/dark patches.
-					if ((tick++ % 17 < 7) && (tick++ % 21 < 2))
-						this.pixels[tgt + xx] = lighten(biomeColor, 0.07f);
-					else if ((tick++ % 23 < 4) && (tick++ % 19 < 3))
-						this.pixels[tgt + xx] = Scene.darken(biomeColor, 0.07f);
-					else
-						this.pixels[tgt + xx] = biomeColor;
-					tick++;
-					if (tick > w * w)
-						tick = 0;
-					break;
-				case 0x32:
-					this.pixels[tgt + xx] = lighten(biomeColor, 0.003f);
-					break;
-				case 0x64:
-					this.pixels[tgt + xx] = lighten(biomeColor, 0.006f);
-					break;
-				default:
-					this.pixels[tgt + xx] = color;
-					break;
+					case 0x0:
+						// Biome Color with a bit of speckled light/dark patches.
+						if ((tick++ % 17 < 7) && (tick++ % 21 < 2))
+							this.pixels[tgt + xx] = Scene.lighten(biomeColor, 0.07f);
+						else if ((tick++ % 23 < 4) && (tick++ % 19 < 3))
+							this.pixels[tgt + xx] = Scene.darken(biomeColor, 0.07f);
+						else
+							this.pixels[tgt + xx] = biomeColor;
+						tick++;
+						if (tick > w * w)
+							tick = 0;
+						break;
+					case 0x32:
+						this.pixels[tgt + xx] = Scene.lighten(biomeColor, 0.003f);
+						break;
+					case 0x64:
+						this.pixels[tgt + xx] = Scene.lighten(biomeColor, 0.006f);
+						break;
+					default:
+						this.pixels[tgt + xx] = color;
+						break;
 				}
 			}
 		}
@@ -164,16 +169,16 @@ public class Scene extends BaseBitmap {
 	}
 
 	public void createStaticNoise(Random r) {
-		for (int p = 0; p < pixels.length; p++)
-			pixels[p] = r.nextInt();
+		for (int p = 0; p < this.pixels.length; p++)
+			this.pixels[p] = r.nextInt();
 	}
 
 	public int getXOffset() {
-		return xOffset;
+		return this.xOffset;
 	}
 
 	public int getYOffset() {
-		return yOffset;
+		return this.yOffset;
 	}
 
 	public boolean invert() {
@@ -189,29 +194,46 @@ public class Scene extends BaseBitmap {
 			this.tick++;
 			return true;
 		}
-		this.tick = 0x7;
+		this.tick = Scene.MAX_TICK_LIMIT;
 		return false;
 	}
 
-	public boolean flashing() {
-		if (this.tick < 0x2) {
-			for (int i = 0; i < this.pixels.length; i++)
-				this.pixels[i] = 0xFFAAAAAA;
-			this.tick++;
-			return true;
-		} else if (this.tick < 0x4) {
-			for (int i = 0; i < this.pixels.length; i++)
-				this.pixels[i] = 0xFFF7F7F7;
-			this.tick++;
-			return true;
-		} else if (this.tick < 0x6) {
-			for (int i = 0; i < this.pixels.length; i++)
-				this.pixels[i] = 0xFFAAAAAA;
-			this.tick++;
-			return true;
+	public boolean renderEffectFlashing(FlashingType speed) {
+		switch (speed) {
+			case NORMAL:
+			default: {
+				if (this.tick < Scene.MAX_TICK_LIMIT) {
+					for (int i = 0; i < this.pixels.length; i++)
+						this.pixels[i] = 0xFFFFFFFF;
+					this.tick++;
+					return true;
+				}
+				this.tick = Scene.MAX_TICK_LIMIT;
+				return false;
+			}
+			case BURST: {
+				if (this.tick < 0x2) {
+					for (int i = 0; i < this.pixels.length; i++)
+						this.pixels[i] = 0xFFAAAAAA;
+					this.tick++;
+					return true;
+				}
+				else if (this.tick < 0x4) {
+					for (int i = 0; i < this.pixels.length; i++)
+						this.pixels[i] = 0xFFF7F7F7;
+					this.tick++;
+					return true;
+				}
+				else if (this.tick < 0x6) {
+					for (int i = 0; i < this.pixels.length; i++)
+						this.pixels[i] = 0xFFAAAAAA;
+					this.tick++;
+					return true;
+				}
+				this.tick = Scene.MAX_TICK_LIMIT;
+				return false;
+			}
 		}
-		this.tick = 0x7;
-		return false;
 	}
 
 	public void setRenderingEffectTick(byte value) {
@@ -222,58 +244,65 @@ public class Scene extends BaseBitmap {
 		return this.tick;
 	}
 
+	public boolean isRenderingEffect() {
+		return (this.tick < Scene.MAX_TICK_LIMIT);
+	}
+
+	public void resetRenderingEffect() {
+		this.tick = Scene.MAX_TICK_LIMIT;
+	}
+
 	// -------------------------------------------
 	// Private methods
 
 	private int getBiomeBaseColor(int tileID, int red, int green, int blue) {
 		int color = WorldConstants.GRASS_GREEN;
 		switch (tileID) {
-		case 0x01: // Grass
-			switch (red) {
-			case 0x00:
-				switch (green) {
-				case 0x00:
-					break;
-				default:
-					break;
+			case 0x01: // Grass
+				switch (red) {
+					case 0x00:
+						switch (green) {
+							case 0x00:
+								break;
+							default:
+								break;
+						}
+						break;
+					case 0x01: // Mountain ground
+						for (int i = 0; i < blue; i++) {
+							color = Scene.lighten(color, 0.1f);
+						}
+						break;
+					default:
+						break;
 				}
 				break;
-			case 0x01: // Mountain ground
-				for (int i = 0; i < blue; i++) {
-					color = lighten(color, 0.1f);
+			case 0x02: // Ledges
+				switch (green) {
+					case 0x00:
+						break;
+					case 0x01:
+						color = WorldConstants.MOUNTAIN_BROWN;
+						break;
+				}
+				break;
+			case 0x06: // Stairs
+				switch (green) {
+					case 0x00:
+						break;
+					case 0x01:
+						color = WorldConstants.MOUNTAIN_BROWN;
+						break;
 				}
 				break;
 			default:
 				break;
-			}
-			break;
-		case 0x02: // Ledges
-			switch (green) {
-			case 0x00:
-				break;
-			case 0x01:
-				color = WorldConstants.MOUNTAIN_BROWN;
-				break;
-			}
-			break;
-		case 0x06: // Stairs
-			switch (green) {
-			case 0x00:
-				break;
-			case 0x01:
-				color = WorldConstants.MOUNTAIN_BROWN;
-				break;
-			}
-			break;
-		default:
-			break;
 		}
 		return color;
 	}
 
-	public void reload() {
-		this.tick = 0x7;
-	}
+	// -------------------------------------------
+	// Public static methods
 
 	public static int lighten(int color, float amount) {
 		// int a = (color >> 24) & 0xFF;
@@ -281,7 +310,7 @@ public class Scene extends BaseBitmap {
 		int g = (color >> 8) & 0xFF;
 		int b = color & 0xFF;
 		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16
-				| ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
+			| ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
 	}
 
 	public static int darken(int color, float amount) {
@@ -289,6 +318,6 @@ public class Scene extends BaseBitmap {
 		int g = (color >> 8) & 0xFF;
 		int b = color & 0xFF;
 		return 0xFF000000 | ((int) Math.min(255, r - 255 * amount) & 0xFF) << 16
-				| ((int) Math.min(255, g - 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b - 255 * amount) & 0xFF;
+			| ((int) Math.min(255, g - 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b - 255 * amount) & 0xFF;
 	}
 }
