@@ -368,6 +368,8 @@ public class Area implements Tileable, UpdateRenderable {
 				PixelData data = this.areaData.get(y).get(x);
 				screen.blitBiome(data.getBiomeBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
 				screen.blitBiome(data.getBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
+
+				//This is for rendering exit arrows when you are in front of the exit/entrance doors.
 				if (x == this.player.getXInArea() && y == this.player.getYInArea()
 					&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
 					this.renderExitArrow(screen, xOff, yOff, data, x, y);
