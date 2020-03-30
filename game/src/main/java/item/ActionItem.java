@@ -10,11 +10,17 @@
 
 package item;
 
-import main.Game;
 import abstracts.Item;
 import entity.Player;
 import level.Area;
+import main.Game;
 
+/**
+ * Any base implementations of the abstract class object, Item, will need to implement or devise a way to create Dialogues associated with that item object.
+ * 
+ * @author tlee
+ *
+ */
 public class ActionItem extends Item {
 
 	protected boolean enabled;
@@ -27,14 +33,6 @@ public class ActionItem extends Item {
 		super(game, text);
 	}
 
-	@Override
-	public void doAction() {
-		if (this.enabled)
-			disable();
-		else
-			enable();
-	}
-
 	public void enable() {
 		this.enabled = true;
 	}
@@ -45,6 +43,14 @@ public class ActionItem extends Item {
 
 	public boolean isEnabled() {
 		return this.enabled;
+	}
+
+	@Override
+	public void doAction() {
+		if (this.enabled)
+			this.disable();
+		else
+			this.enable();
 	}
 
 	@Override
@@ -63,7 +69,8 @@ public class ActionItem extends Item {
 			if ((this.name == null) ? (item.getName() != null) : !this.name.equals(item.getName()))
 				return false;
 			return true;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			return false;
 		}
 	}

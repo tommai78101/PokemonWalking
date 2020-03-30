@@ -27,7 +27,7 @@ public class SaveDataManager extends SubMenu {
 	}
 
 	private SaveStatus saveStatus;
-	private Dialogue newDialogue;
+	private Dialogue saveDialogue;
 	ExecutorService executor;
 	private Game game;
 
@@ -35,7 +35,7 @@ public class SaveDataManager extends SubMenu {
 		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, GameState.SAVE);
 		this.game = game;
 		this.saveStatus = SaveStatus.ASK;
-		this.newDialogue = new Dialogue();
+		this.saveDialogue = new Dialogue();
 		this.needsFlashingAnimation = false;
 		this.exitsToGame = true;
 	}
@@ -46,30 +46,30 @@ public class SaveDataManager extends SubMenu {
 			Player.lockMovements();
 		switch (this.saveStatus) {
 			case ASK: {
-				if (!this.newDialogue.isDialogueTextSet()) {
-					this.newDialogue = DialogueBuilder.createText(
+				if (!this.saveDialogue.isDialogueTextSet()) {
+					this.saveDialogue = DialogueBuilder.createText(
 						"Do you want to save the game?",
-						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_QUESTION, true
+						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
 					);
 				}
-				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
-					this.newDialogue.tick();
+				if (!(this.saveDialogue.isDialogueCompleted() && this.saveDialogue.isShowingDialog())) {
+					this.saveDialogue.tick();
 				}
 				else {
-					if (this.newDialogue.getDialogueType() == Dialogue.Type.DIALOGUE_QUESTION) {
-						if (!this.newDialogue.yesNoQuestionHasBeenAnswered())
-							this.newDialogue.tick();
-						if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
+					if (this.saveDialogue.getDialogueType() == Dialogue.DialogueType.QUESTION) {
+						if (!this.saveDialogue.yesNoQuestionHasBeenAnswered())
+							this.saveDialogue.tick();
+						if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
 							if (GameSave.check(SaveDataManager.SAVE_FILE_NAME))
 								this.saveStatus = SaveStatus.OVERWRITE;
 							else
 								this.saveStatus = SaveStatus.SAVING;
-							this.newDialogue.clearDialogueLines();
+							this.saveDialogue.clearDialogueLines();
 						}
-						else if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+						else if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
 							//Save operation has been cancelled.
 							this.saveStatus = SaveStatus.SAVE_COMPLETE;
-							this.newDialogue.clearDialogueLines();
+							this.saveDialogue.clearDialogueLines();
 						}
 						else {
 							//Intentionally doing nothing.
@@ -79,31 +79,31 @@ public class SaveDataManager extends SubMenu {
 				break;
 			}
 			case OVERWRITE: {
-				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = DialogueBuilder.createText(
+				if (!this.saveDialogue.isDialogueTextSet())
+					this.saveDialogue = DialogueBuilder.createText(
 						"There is already an old save file.",
-						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_SPEECH, true
+						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
-				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
-					this.newDialogue.tick();
+				if (!(this.saveDialogue.isDialogueCompleted() && this.saveDialogue.isShowingDialog())) {
+					this.saveDialogue.tick();
 				}
 				else {
-					switch (this.newDialogue.getDialogueType()) {
-						case DIALOGUE_SPEECH:
-							this.newDialogue = DialogueBuilder.createText(
+					switch (this.saveDialogue.getDialogueType()) {
+						case SPEECH:
+							this.saveDialogue = DialogueBuilder.createText(
 								"Do you want to overwrite it?",
-								Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_QUESTION, true
+								Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
 							);
 							break;
-						case DIALOGUE_QUESTION:
-							if (!this.newDialogue.yesNoQuestionHasBeenAnswered())
-								this.newDialogue.tick();
-							if (this.newDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
+						case QUESTION:
+							if (!this.saveDialogue.yesNoQuestionHasBeenAnswered())
+								this.saveDialogue.tick();
+							if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
 								this.saveStatus = SaveStatus.SAVING;
-								this.newDialogue.clearDialogueLines();
+								this.saveDialogue.clearDialogueLines();
 							}
 							break;
-						case DIALOGUE_ALERT:
+						case ALERT:
 						default:
 							break;
 					}
@@ -111,13 +111,13 @@ public class SaveDataManager extends SubMenu {
 				break;
 			}
 			case SAVING: {
-				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = DialogueBuilder.createText(
+				if (!this.saveDialogue.isDialogueTextSet())
+					this.saveDialogue = DialogueBuilder.createText(
 						"Saving...", Dialogue.MAX_STRING_LENGTH,
-						Dialogue.Type.DIALOGUE_SPEECH, true, true
+						Dialogue.DialogueType.SPEECH, true, true
 					);
-				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog())) {
-					this.newDialogue.tick();
+				if (!(this.saveDialogue.isDialogueCompleted() && this.saveDialogue.isShowingDialog())) {
+					this.saveDialogue.tick();
 				}
 				else if (this.executor == null) {
 					this.executor = Executors.newFixedThreadPool(1);
@@ -131,35 +131,35 @@ public class SaveDataManager extends SubMenu {
 					try {
 						if (!this.executor.awaitTermination(1, TimeUnit.MINUTES)) {
 							this.saveStatus = SaveStatus.ERROR;
-							this.newDialogue.clearDialogueLines();
+							this.saveDialogue.clearDialogueLines();
 							break;
 						}
 					}
 					catch (InterruptedException e) {
 						this.saveStatus = SaveStatus.ERROR;
-						this.newDialogue.clearDialogueLines();
+						this.saveDialogue.clearDialogueLines();
 					}
 				}
 				else {
 					if (this.executor.isTerminated()) {
 						this.executor = null;
 						this.saveStatus = SaveStatus.SAVED;
-						this.newDialogue.clearDialogueLines();
+						this.saveDialogue.clearDialogueLines();
 					}
 				}
 				break;
 			}
 			case SAVED: {
-				if (!this.newDialogue.isDialogueTextSet())
-					this.newDialogue = DialogueBuilder.createText(
+				if (!this.saveDialogue.isDialogueTextSet())
+					this.saveDialogue = DialogueBuilder.createText(
 						"Saving Complete.", Dialogue.MAX_STRING_LENGTH,
-						Dialogue.Type.DIALOGUE_SPEECH, true, true
+						Dialogue.DialogueType.SPEECH, true, true
 					);
-				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
-					this.newDialogue.tick();
+				if (!(this.saveDialogue.isDialogueCompleted() && this.saveDialogue.isShowingDialog()))
+					this.saveDialogue.tick();
 				else {
 					this.saveStatus = SaveStatus.SAVE_COMPLETE;
-					this.newDialogue.clearDialogueLines();
+					this.saveDialogue.clearDialogueLines();
 				}
 				break;
 			}
@@ -168,13 +168,13 @@ public class SaveDataManager extends SubMenu {
 				break;
 			}
 			case ERROR: {
-				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
-					this.newDialogue = DialogueBuilder.createText(
+				if (!(this.saveDialogue.isDialogueCompleted() && this.saveDialogue.isShowingDialog()))
+					this.saveDialogue = DialogueBuilder.createText(
 						"I am ERROR.", Dialogue.MAX_STRING_LENGTH,
-						Dialogue.Type.DIALOGUE_SPEECH, true
+						Dialogue.DialogueType.SPEECH, true
 					);
-				if (!(this.newDialogue.isDialogueCompleted() && this.newDialogue.isShowingDialog()))
-					this.newDialogue.tick();
+				if (!(this.saveDialogue.isDialogueCompleted() && this.saveDialogue.isShowingDialog()))
+					this.saveDialogue.tick();
 				else {
 					this.exit();
 				}
@@ -193,7 +193,7 @@ public class SaveDataManager extends SubMenu {
 
 	@Override
 	public void render(Scene output, Graphics graphics) {
-		if (this.newDialogue != null)
-			this.newDialogue.render(output, graphics);
+		if (this.saveDialogue != null)
+			this.saveDialogue.render(output, graphics);
 	}
 }

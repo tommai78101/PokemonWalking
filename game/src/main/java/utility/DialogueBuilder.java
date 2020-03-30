@@ -8,15 +8,15 @@ import java.util.List;
 import java.util.Map;
 
 import dialogue.Dialogue;
-import dialogue.Dialogue.Type;
+import dialogue.Dialogue.DialogueType;
 import entity.Player;
 
 public class DialogueBuilder {
-	public static Dialogue createText(String dialogue, Type type) {
+	public static Dialogue createText(String dialogue, DialogueType type) {
 		return DialogueBuilder.createText(dialogue, dialogue.length(), type, true);
 	}
 
-	public static Dialogue createText(String dialogue, int length, Type type, boolean lock) {
+	public static Dialogue createText(String dialogue, int length, DialogueType type, boolean lock) {
 		Dialogue dialogues = new Dialogue();
 		dialogues.setLines(DialogueBuilder.toLines(dialogue, length));
 		dialogues.setLineLength(length);
@@ -30,7 +30,7 @@ public class DialogueBuilder {
 		return dialogues;
 	}
 
-	public static Dialogue createText(String dialogue, int length, Type type, boolean lock, boolean ignoreInputs) {
+	public static Dialogue createText(String dialogue, int length, DialogueType type, boolean lock, boolean ignoreInputs) {
 		Dialogue dialogues = DialogueBuilder.createText(dialogue, length, type, lock);
 		dialogues.setIgnoreInputs(ignoreInputs);
 		return dialogues;
@@ -56,7 +56,7 @@ public class DialogueBuilder {
 					// Dialogue message
 					tokens = line.split("@");
 					temp = DialogueBuilder.createText(
-						tokens[1], Dialogue.MAX_STRING_LENGTH, Type.DIALOGUE_SPEECH,
+						tokens[1], Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH,
 						false
 					);
 				}

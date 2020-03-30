@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import dialogue.Dialogue;
+import dialogue.Dialogue.DialogueType;
 import entity.Player;
 import interfaces.Renderable;
 import item.ActionItem;
@@ -34,7 +36,14 @@ import main.MainComponent;
 import menu.Inventory;
 import resources.Art;
 import screen.Scene;
+import utility.DialogueBuilder;
 
+/**
+ * Any base implementations of the abstract class object, Item, will need to implement or devise a way to create Dialogues associated with that item object.
+ * 
+ * @author tlee
+ *
+ */
 public abstract class Item implements Comparable<Item>, Renderable {
 
 	public enum Category {
@@ -88,6 +97,7 @@ public abstract class Item implements Comparable<Item>, Renderable {
 	protected boolean picked;
 	protected int id;
 	protected List<String> availableCommands;
+	protected final List<Dialogue> dialogues;
 
 	private static final String TAG_POTIONS = "POTIONS";
 	private static final String TAG_KEYITEMS = "KEYITEMS";
@@ -107,6 +117,7 @@ public abstract class Item implements Comparable<Item>, Renderable {
 		this.game = game;
 		this.picked = false;
 		this.availableCommands = new ArrayList<>();
+		this.dialogues = new ArrayList<>();
 	}
 
 	public Item(Game game, ItemText itemText) {
@@ -118,6 +129,7 @@ public abstract class Item implements Comparable<Item>, Renderable {
 		this.picked = false;
 		this.availableCommands = new ArrayList<>();
 		this.initializeCommands(itemText);
+		this.dialogues = new ArrayList<>();
 	}
 
 	public void setName(String value) {
@@ -134,13 +146,6 @@ public abstract class Item implements Comparable<Item>, Renderable {
 
 	public void setID(int value) {
 		this.id = value;
-	}
-
-	@Override
-	public void render(Scene output, int xOffset, int yOffset) {
-		if (!this.picked) {
-			output.blit(Art.item, xOffset, yOffset);
-		}
 	}
 
 	public String getName() {
@@ -176,6 +181,13 @@ public abstract class Item implements Comparable<Item>, Renderable {
 		return this.availableCommands;
 	}
 
+	public final List<Dialogue> getDialogues() {
+		if (this.dialogues.isEmpty()) {
+			this.dialogues.add(DialogueBuilder.createText("Error: Dialogue not found.", DialogueType.SPEECH));
+		}
+		return this.dialogues;
+	}
+
 	public void initializeCommands(ItemText itemText) {
 		this.availableCommands.add(0, Inventory.MENU_CANCEL);
 		if (itemText.tossCommandFlag)
@@ -190,6 +202,13 @@ public abstract class Item implements Comparable<Item>, Renderable {
 
 	// TODO: Add function that allows the item to be placed at.
 	public abstract void dropAt(Area area, Player player);
+
+	@Override
+	public void render(Scene output, int xOffset, int yOffset) {
+		if (!this.picked) {
+			output.blit(Art.item, xOffset, yOffset);
+		}
+	}
 
 	@Override
 	public boolean equals(Object obj) {

@@ -14,7 +14,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,14 +27,16 @@ import screen.Scene;
 //TODO (6/25/2015): Check to see why modded scripts still suffer from blinking dialogue boxes. Non-modded scripts are fixed.
 
 public class Dialogue {
-	public static enum Type {
-		DIALOGUE_SPEECH(0x40),
-		DIALOGUE_QUESTION(0x41),
-		DIALOGUE_ALERT(0x42);
+	//The type value is tied to how the data bits are parsed from the game data.
+	//TODO(Thompson): Need to uncover the valid range, and whether we can actually determine arbitrary values instead?
+	public static enum DialogueType {
+		SPEECH(0x40),
+		QUESTION(0x41),
+		ALERT(0x42);
 
 		public final int typeValue;
 
-		Type(int value) {
+		DialogueType(int value) {
 			this.typeValue = value;
 		}
 
@@ -89,7 +90,7 @@ public class Dialogue {
 	private byte tickCount = 0x0;
 
 	private int totalDialogueLength;
-	private Type type;
+	private DialogueType type;
 
 	public Dialogue() {
 		this.lines = new ArrayList<>();
@@ -121,7 +122,7 @@ public class Dialogue {
 		this.lineLength = dialogue.lineLength;
 		this.lines = new ArrayList<>();
 		for (Map.Entry<String, Boolean> e : dialogue.lines)
-			this.lines.add(new AbstractMap.SimpleEntry<>(e.getKey(), e.getValue()));
+			this.lines.add(e);
 
 		this.nextFlag = dialogue.nextFlag;
 		this.simpleQuestionFlag = dialogue.simpleQuestionFlag;
@@ -146,7 +147,7 @@ public class Dialogue {
 		return this.yesNoAnswerFlag.booleanValue();
 	}
 
-	public Type getDialogueType() {
+	public DialogueType getDialogueType() {
 		return this.type;
 	}
 
@@ -173,6 +174,11 @@ public class Dialogue {
 		this.completedLines.clear();
 	}
 
+	/**
+	 * Checks if the dialogues were set / not cleared away.
+	 * 
+	 * @return
+	 */
 	public boolean isDialogueTextSet() {
 		return !this.lines.isEmpty();
 	}
@@ -204,7 +210,7 @@ public class Dialogue {
 			h = 8 - y;
 		if (this.showDialog) {
 			switch (this.type) {
-				case DIALOGUE_SPEECH: {
+				case SPEECH: {
 					this.renderDialogBackground(output, x, y, w, h);
 					this.renderDialogBorderBox(output, x, y, w, h);
 					if (this.nextFlag && this.nextTick < 0x8)
@@ -214,7 +220,7 @@ public class Dialogue {
 					g2d.dispose();
 					break;
 				}
-				case DIALOGUE_QUESTION: {
+				case QUESTION: {
 					this.renderDialogBackground(output, x, y, w, h);
 					this.renderDialogBorderBox(output, x, y, w, h);
 					if (this.simpleQuestionFlag && !this.nextFlag) {
@@ -234,7 +240,7 @@ public class Dialogue {
 					g2d.dispose();
 					break;
 				}
-				case DIALOGUE_ALERT: {
+				case ALERT: {
 					this.renderDialogBackground(output, x, y, w, h);
 					this.renderDialogBorderBox(output, x, y, w, h);
 					Graphics2D g2d = output.getBufferedImage().createGraphics();
@@ -323,10 +329,10 @@ public class Dialogue {
 						if (this.completedLines.size() == 2) {
 							if (!this.scrollFlag) {
 								switch (this.type) {
-									case DIALOGUE_SPEECH:
+									case SPEECH:
 										this.nextFlag = true;
 										break;
-									case DIALOGUE_QUESTION:
+									case QUESTION:
 										// Must get to the end of the entire dialogue before asking for answers.
 										if (this.lineIterator >= this.lines.size()) {
 											this.simpleQuestionFlag = true;
@@ -335,7 +341,7 @@ public class Dialogue {
 										else
 											this.nextFlag = true;
 										break;
-									case DIALOGUE_ALERT:
+									case ALERT:
 										this.nextFlag = true;
 										break;
 								}
@@ -344,7 +350,7 @@ public class Dialogue {
 					}
 
 					// Speeds up text speed.
-					if (this.type != Type.DIALOGUE_ALERT) {
+					if (this.type != DialogueType.ALERT) {
 						if (Game.keys.isPrimaryPressed()) {
 							Game.keys.primaryReceived();
 							if (!this.ignoreInputsFlag && this.subStringIterator < this.lineLength) {
@@ -382,10 +388,10 @@ public class Dialogue {
 						if (this.completedLines.size() == 2) {
 							if (!this.scrollFlag) {
 								switch (this.type) {
-									case DIALOGUE_SPEECH:
+									case SPEECH:
 										this.nextFlag = true;
 										break;
-									case DIALOGUE_QUESTION:
+									case QUESTION:
 										// Must get to the end of the entire dialogue before asking for answers.
 										if (this.lineIterator >= this.lines.size()) {
 											this.simpleQuestionFlag = true;
@@ -394,7 +400,7 @@ public class Dialogue {
 										else
 											this.nextFlag = true;
 										break;
-									case DIALOGUE_ALERT:
+									case ALERT:
 										this.nextFlag = true;
 										break;
 								}
@@ -403,7 +409,7 @@ public class Dialogue {
 					}
 
 					// Speeds up text speed.
-					if (this.type != Type.DIALOGUE_ALERT) {
+					if (this.type != DialogueType.ALERT) {
 						if (Game.keys.isPrimaryPressed()) {
 							Game.keys.primaryReceived();
 							if (!this.ignoreInputsFlag && this.subStringIterator < this.lineLength) {
@@ -425,17 +431,17 @@ public class Dialogue {
 					if (Game.keys.isSecondaryPressed())
 						Game.keys.secondaryReceived();
 					switch (this.type) {
-						case DIALOGUE_SPEECH:
+						case SPEECH:
 							this.nextFlag = false;
 							this.scrollFlag = true;
 							break;
-						case DIALOGUE_QUESTION:
+						case QUESTION:
 							// Must get to the end of the entire dialogue before asking questions.
 							this.simpleQuestionFlag = false;
 							this.nextFlag = false;
 							this.scrollFlag = true;
 							break;
-						case DIALOGUE_ALERT:
+						case ALERT:
 							this.nextFlag = false;
 							this.scrollFlag = true;
 							break;
@@ -444,15 +450,15 @@ public class Dialogue {
 				else if (this.scrollFlag) {
 					if (this.lineIterator >= this.lines.size()) {
 						switch (this.type) {
-							case DIALOGUE_QUESTION:
+							case QUESTION:
 								this.simpleQuestionFlag = true;
 								this.scrollFlag = false;
 								this.nextFlag = false;
 								break;
-							case DIALOGUE_SPEECH:
+							case SPEECH:
 								this.closeDialog();
 								return;
-							case DIALOGUE_ALERT:
+							case ALERT:
 								this.closeDialog();
 								return;
 						}
@@ -469,11 +475,11 @@ public class Dialogue {
 				}
 				else {
 					switch (this.type) {
-						case DIALOGUE_SPEECH:
-						case DIALOGUE_ALERT:
+						case SPEECH:
+						case ALERT:
 							this.nextFlag = true;
 							break;
-						case DIALOGUE_QUESTION:
+						case QUESTION:
 							this.simpleQuestionFlag = true;
 							this.nextFlag = false;
 							break;
@@ -491,6 +497,9 @@ public class Dialogue {
 		this.showDialog = false;
 	}
 
+	/**
+	 * Clears dialogues and unsets the dialogue flag.
+	 */
 	public void clearDialogueLines() {
 		if (!this.lines.isEmpty())
 			this.lines.clear();
@@ -617,7 +626,7 @@ public class Dialogue {
 
 		if (this.nextFlag) {
 			switch (this.type) {
-				case DIALOGUE_QUESTION: {
+				case QUESTION: {
 					if (count >= this.totalDialogueLength) {
 						this.simpleQuestionFlag = true;
 						this.nextFlag = false;
@@ -630,13 +639,13 @@ public class Dialogue {
 					}
 					break;
 				}
-				case DIALOGUE_SPEECH: {
+				case SPEECH: {
 					this.nextTick++;
 					if (this.nextTick > Dialogue.MAX_TICK_DELAY)
 						this.nextTick = Dialogue.ZERO_TICK;
 					break;
 				}
-				case DIALOGUE_ALERT: {
+				case ALERT: {
 					this.nextTick++;
 					if (this.nextTick > Dialogue.MAX_TICK_DELAY)
 						this.nextTick = Dialogue.ZERO_TICK;
@@ -658,16 +667,16 @@ public class Dialogue {
 		else {
 			if (this.lineIterator >= this.lines.size()) {
 				switch (this.type) {
-					case DIALOGUE_QUESTION:
+					case QUESTION:
 						this.simpleQuestionFlag = true;
 						this.scrollFlag = false;
 						this.nextFlag = false;
 						break;
-					case DIALOGUE_SPEECH:
+					case SPEECH:
 						this.simpleSpeechFlag = true;
 						this.nextFlag = false;
 						break;
-					case DIALOGUE_ALERT:
+					case ALERT:
 						this.simpleSpeechFlag = true;
 						this.nextFlag = false;
 						break;
@@ -678,14 +687,14 @@ public class Dialogue {
 				this.completedLines.add(entry.getKey());
 				this.lineIterator++;
 				switch (this.type) {
-					case DIALOGUE_SPEECH:
+					case SPEECH:
 						this.nextFlag = true;
 						break;
-					case DIALOGUE_QUESTION:
+					case QUESTION:
 						this.simpleQuestionFlag = true;
 						this.nextFlag = true;
 						break;
-					case DIALOGUE_ALERT:
+					case ALERT:
 						this.nextFlag = true;
 						break;
 				}
@@ -846,11 +855,11 @@ public class Dialogue {
 		this.totalDialogueLength = totalDialogueLength;
 	}
 
-	public Type getType() {
+	public DialogueType getType() {
 		return this.type;
 	}
 
-	public void setType(Type type) {
+	public void setType(DialogueType type) {
 		this.type = type;
 	}
 

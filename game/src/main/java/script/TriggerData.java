@@ -106,7 +106,7 @@ public class TriggerData {
 			}
 			else if (this.moves == null && this.dialogue != null) {
 				switch (this.dialogue.getDialogueType()) {
-					case DIALOGUE_SPEECH:
+					case SPEECH:
 						if (this.dialogue.isDialogueCompleted()) {
 							if (this.dialogue.isScrolling()) {
 								Player.unlockMovements();
@@ -141,7 +141,7 @@ public class TriggerData {
 							this.dialogue.tick();
 						}
 						break;
-					case DIALOGUE_QUESTION:
+					case QUESTION:
 						if (!this.dialogue.yesNoQuestionHasBeenAnswered()) {
 							this.dialogue.tick();
 							if (!Player.isMovementsLocked())
@@ -179,7 +179,7 @@ public class TriggerData {
 							this.finished = false;
 						}
 						break;
-					case DIALOGUE_ALERT:
+					case ALERT:
 					default:
 						break;
 				}

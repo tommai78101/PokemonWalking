@@ -236,7 +236,7 @@ public class Script {
 				else if (line.startsWith("#")) { // speech dialogue
 					Dialogue d = DialogueBuilder.createText(
 						line.substring(1).replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_SPEECH, true
+						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
 					iteration++;
@@ -244,7 +244,7 @@ public class Script {
 				else if (line.startsWith("?")) { // question dialogue
 					Dialogue d = DialogueBuilder.createText(
 						line.substring(1).replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_QUESTION, true
+						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
 					);
 					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
 					iteration++;
@@ -252,7 +252,7 @@ public class Script {
 				else if (line.startsWith("+")) { // affirmative dialogue
 					Dialogue d = DialogueBuilder.createText(
 						line.substring(1).replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_SPEECH, true
+						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.affirmativeDialogues
 						.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, d));
@@ -261,7 +261,7 @@ public class Script {
 				else if (line.startsWith("-")) { // negative dialogue
 					Dialogue d = DialogueBuilder.createText(
 						line.substring(1).replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.Type.DIALOGUE_SPEECH, true
+						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.negativeDialogues
 						.add(new AbstractMap.SimpleEntry<>(negativeIteration, d));

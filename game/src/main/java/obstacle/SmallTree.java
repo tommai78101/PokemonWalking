@@ -3,7 +3,7 @@ package obstacle;
 import abstracts.Entity;
 import abstracts.Item;
 import abstracts.Obstacle;
-import dialogue.Dialogue.Type;
+import dialogue.Dialogue.DialogueType;
 import level.PixelData;
 import screen.Scene;
 import utility.DialogueBuilder;
@@ -15,7 +15,7 @@ public class SmallTree extends Obstacle {
 		this.defaultDialogues.add(
 			DialogueBuilder.createText(
 				"This tree is born from the ground that was created 6 months ago.",
-				Type.DIALOGUE_SPEECH
+				DialogueType.SPEECH
 			)
 		);
 	}
