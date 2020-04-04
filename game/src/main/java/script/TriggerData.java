@@ -135,7 +135,7 @@ public class TriggerData {
 									this.dialogue.tick();
 							}
 						}
-						else if (this.dialogue.isDialogueTextSet()
+						else if (this.dialogue.isReady()
 							&& !(this.dialogue.isDialogueCompleted() && this.dialogue.isShowingDialog())) {
 							Player.lockMovements();
 							this.dialogue.tick();

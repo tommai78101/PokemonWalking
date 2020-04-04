@@ -1,5 +1,7 @@
 package entity;
 
+import java.awt.Graphics;
+
 import abstracts.Character;
 import abstracts.Entity;
 import abstracts.Item;
@@ -17,7 +19,7 @@ public class Joe extends Character {
 	}
 
 	@Override
-	public void render(Scene screen, int offsetX, int offsetY) {
+	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
 		// TODO Auto-generated method stub
 
 	}

@@ -88,7 +88,7 @@ public class Game {
 		switch (state) {
 			case MAIN_GAME:
 			default: {
-				this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
+				this.overworld.render(this.gameScene, graphics, this.player.getX(), this.player.getY());
 				break;
 			}
 			case START_MENU: {
@@ -96,7 +96,7 @@ public class Game {
 					this.gameScene.renderEffectFlashing(FlashingType.NORMAL);
 				}
 				else {
-					this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
+					this.overworld.render(this.gameScene, graphics, this.player.getX(), this.player.getY());
 					this.startMenu.render(this.gameScene, graphics);
 				}
 				break;
@@ -106,13 +106,13 @@ public class Game {
 					this.gameScene.renderEffectFlashing(FlashingType.NORMAL);
 				}
 				else {
-					this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
+					this.overworld.render(this.gameScene, graphics, this.player.getX(), this.player.getY());
 					this.inventoryManager.render(this.gameScene, graphics);
 				}
 				break;
 			}
 			case SAVE: {
-				this.overworld.render(this.gameScene, this.player.getX(), this.player.getY());
+				this.overworld.render(this.gameScene, graphics, this.player.getX(), this.player.getY());
 				SubMenu subMenu = this.startMenu.getActiveItem();
 				if (subMenu != null) {
 					subMenu.render(this.gameScene, graphics);

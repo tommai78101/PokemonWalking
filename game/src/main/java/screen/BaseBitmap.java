@@ -17,6 +17,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import level.WorldConstants;
+import utility.Debug;
 
 public class BaseBitmap {
 
@@ -62,7 +63,8 @@ public class BaseBitmap {
 				}
 			}
 			return results;
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -83,9 +85,10 @@ public class BaseBitmap {
 	public static BaseBitmap load(String filename) {
 		try {
 			BufferedImage image = ImageIO.read(BaseBitmap.class.getClassLoader().getResource(filename));
-			System.out.println(filename);
-			return load(image);
-		} catch (IOException e) {
+			Debug.log(filename);
+			return BaseBitmap.load(image);
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -95,10 +98,11 @@ public class BaseBitmap {
 		try {
 			// Prints out the bitmap filename. If there's something wrong, it won't print it
 			// out.
-			System.out.println(file.getAbsolutePath());
+			Debug.log(file.getAbsolutePath());
 			BufferedImage image = ImageIO.read(file);
-			return load(image);
-		} catch (IOException e) {
+			return BaseBitmap.load(image);
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;

@@ -10,6 +10,7 @@
 
 package abstracts;
 
+import entity.Player;
 import interfaces.Tileable;
 import interfaces.UpdateRenderable;
 import level.PixelData;
@@ -28,6 +29,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	public int id;
 	public int interactableID;
 	public boolean isRemoved;
+	protected boolean isInteracting;
 
 	protected byte typeId = 0;
 	protected int xPosition;
@@ -119,6 +121,22 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 
 	public Event getEvent() {
 		return this.event;
+	}
+
+	public void setInteractingState(boolean value) {
+		this.isInteracting = value;
+		if (value) {
+			if (!Player.isMovementsLocked())
+				Player.lockMovements();
+		}
+		else {
+			if (Player.isMovementsLocked())
+				Player.unlockMovements();
+		}
+	}
+
+	public boolean getInteractingState() {
+		return this.isInteracting;
 	}
 
 	// ==============================================================

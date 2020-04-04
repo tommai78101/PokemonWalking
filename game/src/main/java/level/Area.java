@@ -10,6 +10,7 @@
 
 package level;
 
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -361,7 +362,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 * 
 	 */
 	@Override
-	public void render(Scene screen, int xOff, int yOff) {
+	public void render(Scene screen, Graphics graphics, int xOff, int yOff) {
 		//Rendering area background tiles.
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
@@ -379,9 +380,9 @@ public class Area implements Tileable, UpdateRenderable {
 			}
 		}
 
-		//Obstacles are rendered on top of the area background tiles.
+		//Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach((k, obstacle) -> {
-			obstacle.render(screen, xOff, yOff);
+			obstacle.renderDialogue(screen, graphics);
 		});
 
 		if (this.trigger != null) {
@@ -613,14 +614,20 @@ public class Area implements Tileable, UpdateRenderable {
 		PixelData data = this.getPixelData(x, y);
 		if (Entity.isObstacle(data)) {
 			Obstacle obstacle = this.areaObstacles.get(Map.entry(x, y));
-			if (obstacle.getPixelData().equals(data)) {
+			if (obstacle != null && obstacle.getPixelData().equals(data)) {
 				return obstacle;
+			}
+			else {
+				throw new NullPointerException("The obstacle shouldn't be null.");
 			}
 		}
 		else if (Entity.isCharacter(data)) {
 			Character character = this.areaCharacters.get(Map.entry(x, y));
-			if (character.getPixelData().equals(data)) {
+			if (character != null && character.getPixelData().equals(data)) {
 				return character;
+			}
+			else {
+				throw new NullPointerException("The character shouldn't be null.");
 			}
 		}
 		return null;

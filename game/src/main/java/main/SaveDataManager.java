@@ -46,7 +46,7 @@ public class SaveDataManager extends SubMenu {
 			Player.lockMovements();
 		switch (this.saveStatus) {
 			case ASK: {
-				if (!this.saveDialogue.isDialogueTextSet()) {
+				if (!this.saveDialogue.isReady()) {
 					this.saveDialogue = DialogueBuilder.createText(
 						"Do you want to save the game?",
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
@@ -56,30 +56,28 @@ public class SaveDataManager extends SubMenu {
 					this.saveDialogue.tick();
 				}
 				else {
-					if (this.saveDialogue.getDialogueType() == Dialogue.DialogueType.QUESTION) {
-						if (!this.saveDialogue.yesNoQuestionHasBeenAnswered())
-							this.saveDialogue.tick();
-						if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							if (GameSave.check(SaveDataManager.SAVE_FILE_NAME))
-								this.saveStatus = SaveStatus.OVERWRITE;
-							else
-								this.saveStatus = SaveStatus.SAVING;
-							this.saveDialogue.clearDialogueLines();
-						}
-						else if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
-							//Save operation has been cancelled.
-							this.saveStatus = SaveStatus.SAVE_COMPLETE;
-							this.saveDialogue.clearDialogueLines();
-						}
-						else {
-							//Intentionally doing nothing.
-						}
+					if (!this.saveDialogue.yesNoQuestionHasBeenAnswered())
+						this.saveDialogue.tick();
+					if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
+						if (GameSave.check(SaveDataManager.SAVE_FILE_NAME))
+							this.saveStatus = SaveStatus.OVERWRITE;
+						else
+							this.saveStatus = SaveStatus.SAVING;
+						this.saveDialogue.clearDialogueLines();
+					}
+					else if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+						//Save operation has been cancelled.
+						this.saveStatus = SaveStatus.SAVE_COMPLETE;
+						this.saveDialogue.clearDialogueLines();
+					}
+					else {
+						//Intentionally doing nothing.
 					}
 				}
 				break;
 			}
 			case OVERWRITE: {
-				if (!this.saveDialogue.isDialogueTextSet())
+				if (!this.saveDialogue.isReady())
 					this.saveDialogue = DialogueBuilder.createText(
 						"There is already an old save file.",
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
@@ -111,7 +109,7 @@ public class SaveDataManager extends SubMenu {
 				break;
 			}
 			case SAVING: {
-				if (!this.saveDialogue.isDialogueTextSet())
+				if (!this.saveDialogue.isReady())
 					this.saveDialogue = DialogueBuilder.createText(
 						"Saving...", Dialogue.MAX_STRING_LENGTH,
 						Dialogue.DialogueType.SPEECH, true, true
@@ -150,7 +148,7 @@ public class SaveDataManager extends SubMenu {
 				break;
 			}
 			case SAVED: {
-				if (!this.saveDialogue.isDialogueTextSet())
+				if (!this.saveDialogue.isReady())
 					this.saveDialogue = DialogueBuilder.createText(
 						"Saving Complete.", Dialogue.MAX_STRING_LENGTH,
 						Dialogue.DialogueType.SPEECH, true, true

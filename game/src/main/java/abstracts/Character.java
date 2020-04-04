@@ -3,6 +3,7 @@ package abstracts;
 import interfaces.CharacterActionable;
 import interfaces.Interactable;
 import level.PixelData;
+import utility.Debug;
 
 public abstract class Character extends Entity implements Interactable, CharacterActionable {
 	/**
@@ -52,10 +53,12 @@ public abstract class Character extends Entity implements Interactable, Characte
 		return this.isPlayable;
 	}
 
+	@Deprecated
 	public int getInteractableID() {
 		return this.interactionDataColorID;
 	}
 
+	@Deprecated
 	public void setInteractableID(int dataColor) {
 		this.interactionDataColorID = dataColor;
 	}
@@ -73,6 +76,7 @@ public abstract class Character extends Entity implements Interactable, Characte
 	}
 
 	public static Character build(PixelData pixelData, int x, int y) {
+		Debug.error("Unknown character at position [" + x + "," + y + "] found.");
 		return null;
 	}
 }

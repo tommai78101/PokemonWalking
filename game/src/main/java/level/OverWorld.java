@@ -10,6 +10,7 @@
 
 package level;
 
+import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import interfaces.Tileable;
 import interfaces.UpdateRenderable;
 import main.Game;
 import screen.Scene;
+import utility.Debug;
 
 public class OverWorld implements Tileable, UpdateRenderable {
 	// Overworld properties.
@@ -170,7 +172,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 				if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
 					this.currentAreaSectorID = this.currentArea.getSectorID();
 					// This is where you get the latest sector id at.
-					System.out.println("Area: " + this.currentArea.getAreaID() + " Sector: " + this.currentArea.getSectorID());
+					Debug.log("Area: " + this.currentArea.getAreaID() + " Sector: " + this.currentArea.getSectorID());
 				}
 			}
 		}
@@ -453,13 +455,13 @@ public class OverWorld implements Tileable, UpdateRenderable {
 	}
 
 	@Override
-	public void render(Scene screen, int xPlayerPos, int yPlayerPos) {
+	public void render(Scene screen, Graphics graphics, int xPlayerPos, int yPlayerPos) {
 		// OverWorld offsets are not set.
 		// Setting area offsets with player positions
 
 		screen.setOffset(screen.getWidth() / 2 - Tileable.WIDTH, (screen.getHeight() - Tileable.HEIGHT) / 2);
 		if (this.currentArea != null)
-			this.currentArea.render(screen, xPlayerPos, yPlayerPos);
+			this.currentArea.render(screen, graphics, xPlayerPos, yPlayerPos);
 		screen.setOffset(0, 0);
 
 		if (this.invertBitmapColors) {
@@ -470,7 +472,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 		}
 
 		if (screen.getRenderingEffectTick() < (byte) 0x4 || screen.getRenderingEffectTick() >= (byte) 0x7)
-			this.player.render(screen, 0, 0);
+			this.player.render(screen, graphics, 0, 0);
 
 //		if (this.newDialogues != null && this.newDialogues.size() > 0) {
 //			Dialogue dialogue = this.newDialogues.get(this.newDialoguesIterator);

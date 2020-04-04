@@ -10,14 +10,14 @@ import level.PixelData;
 import screen.Scene;
 import utility.DialogueBuilder;
 
-public class SmallTree extends Obstacle {
-	public SmallTree(PixelData data, int id) {
+@Deprecated
+public class ProgrammerArtTable extends Obstacle {
+	public ProgrammerArtTable(PixelData data, int id) {
 		this.pixelData = data;
 
 		this.defaultDialogues.add(
 			DialogueBuilder.createText(
-				"This tree is born from the ground that was created 6 months ago.",
-				DialogueType.SPEECH
+				"This is programmer art.", DialogueType.SPEECH
 			)
 		);
 	}

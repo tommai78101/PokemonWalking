@@ -179,7 +179,7 @@ public class Dialogue {
 	 * 
 	 * @return
 	 */
-	public boolean isDialogueTextSet() {
+	public boolean isReady() {
 		return !this.lines.isEmpty();
 	}
 

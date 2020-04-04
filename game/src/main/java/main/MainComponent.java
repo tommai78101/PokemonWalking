@@ -27,8 +27,10 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import screen.Scene;
+import utility.Debug;
 
 public class MainComponent extends Canvas implements Runnable {
 
@@ -67,9 +69,9 @@ public class MainComponent extends Canvas implements Runnable {
 	 * 
 	 */
 	public MainComponent(JFrame frame) {
-		running = false;
-		scene = new Scene(GAME_WIDTH, GAME_HEIGHT);
-		scene.loadResources();
+		this.running = false;
+		this.scene = new Scene(MainComponent.GAME_WIDTH, MainComponent.GAME_HEIGHT);
+		this.scene.loadResources();
 		this.frame = frame;
 	}
 
@@ -89,11 +91,11 @@ public class MainComponent extends Canvas implements Runnable {
 
 		// Game loading
 		// We pass the BaseScreen variable as a parameter, acting as an output.
-		game = new Game(this);
+		MainComponent.game = new Game(this);
 
 		// Input Handling
-		inputHandler = new InputHandler(Game.keys);
-		this.addKeyListener(inputHandler);
+		this.inputHandler = new InputHandler(Game.keys);
+		this.addKeyListener(this.inputHandler);
 
 		// world = new TestWorld(Art.testArea);
 
@@ -109,7 +111,7 @@ public class MainComponent extends Canvas implements Runnable {
 	 * @return Nothing.
 	 */
 	public void start() {
-		running = true;
+		this.running = true;
 		Thread thread = new Thread(this);
 		thread.setName("Game Loop Thread");
 		thread.start();
@@ -123,7 +125,7 @@ public class MainComponent extends Canvas implements Runnable {
 	 * @return Nothing.
 	 */
 	public void stop() {
-		running = false;
+		this.running = false;
 	}
 
 	@Override
@@ -136,14 +138,14 @@ public class MainComponent extends Canvas implements Runnable {
 		// boolean shouldRender = false;
 		final double nsPerTick = 1000000000.0 / 30.0;
 		try {
-			init();
+			this.init();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 			return;
 		}
 
-		while (running) {
+		while (this.running) {
 			// For debugging, this is disabled.
 			// shouldRender = false;
 			long now = System.nanoTime();
@@ -169,8 +171,8 @@ public class MainComponent extends Canvas implements Runnable {
 
 			for (int i = 0; i < toTick; i++) {
 				tick--;
-				tick();
-				render();
+				this.tick();
+				this.render();
 				frames++;
 				// For debugging, this is disabled.
 				// shouldRender = true;
@@ -182,13 +184,13 @@ public class MainComponent extends Canvas implements Runnable {
 				Thread.sleep(1);
 			}
 			catch (InterruptedException e) {
-				System.out.println("Something is wrong... No response.");
+				Debug.error("Something is wrong... No response.");
 				this.requestFocus();
 			}
 
 			if (System.currentTimeMillis() - lastTimer > 1000) {
 				lastTimer += 1000;
-				MainComponent.this.frame.setTitle(GAME_TITLE + " - FPS: " + Integer.toString(frames));
+				MainComponent.this.frame.setTitle(MainComponent.GAME_TITLE + " - FPS: " + Integer.toString(frames));
 				frames = 0;
 			}
 		}
@@ -205,7 +207,7 @@ public class MainComponent extends Canvas implements Runnable {
 	public synchronized void tick() {
 		// keys.tick();
 		// world.tick();
-		game.tick();
+		MainComponent.game.tick();
 	}
 
 	/**
@@ -239,8 +241,8 @@ public class MainComponent extends Canvas implements Runnable {
 		// }
 
 		// game.setScrollOffset(GAME_WIDTH / 2, (GAME_HEIGHT + Tile.HEIGHT) / 2);
-		game.setCameraRelativeToArea(GAME_WIDTH / 2, GAME_HEIGHT / 2);
-		game.render(g);
+		MainComponent.game.setCameraRelativeToArea(MainComponent.GAME_WIDTH / 2, MainComponent.GAME_HEIGHT / 2);
+		MainComponent.game.render(g);
 
 		// Key input debugging only.
 		// debugKeys(g, 0, 30);
@@ -299,7 +301,7 @@ public class MainComponent extends Canvas implements Runnable {
 		int h = before.getHeight();
 		BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		AffineTransform at = new AffineTransform();
-		at.scale(GAME_SCALE, GAME_SCALE);
+		at.scale(MainComponent.GAME_SCALE, MainComponent.GAME_SCALE);
 		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
 		after = scaleOp.filter(before, after);
 		return after;
@@ -313,21 +315,21 @@ public class MainComponent extends Canvas implements Runnable {
 	// Other methods
 
 	public static final Game getGame() {
-		return game;
+		return MainComponent.game;
 	}
 
 	// ---------------------------------
 	// Main execution method
 
 	public static void main(String[] args) {
-		System.out.println("Game is now loading, it will take a while.");
+		Debug.log("Game is now loading, it will take a while.");
 
-		JFrame frame = new JFrame(GAME_TITLE);
+		JFrame frame = new JFrame(MainComponent.GAME_TITLE);
 
 		MainComponent component = new MainComponent(frame);
 		frame.getContentPane().add(component);
 		frame.setLocationRelativeTo(null);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		frame.addWindowListener(component.getWindowListener());
 		frame.setResizable(false);
 		frame.setAlwaysOnTop(MainComponent.DebugMode);
@@ -337,15 +339,15 @@ public class MainComponent extends Canvas implements Runnable {
 		Insets inset = frame.getInsets();
 		frame.setSize(
 			new Dimension(
-				inset.left + inset.right + GAME_WIDTH * GAME_SCALE,
-				inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE
+				inset.left + inset.right + MainComponent.GAME_WIDTH * MainComponent.GAME_SCALE,
+				inset.top + inset.bottom + MainComponent.GAME_HEIGHT * MainComponent.GAME_SCALE
 			)
 		);
 
 		//Set visibility must come after pack() and setSize() are called.
 		frame.setVisible(true);
 
-		System.out.println("Game is now starting.");
+		Debug.log("Game is now starting.");
 		component.start();
 	}
 }

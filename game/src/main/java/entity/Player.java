@@ -10,6 +10,8 @@
 
 package entity;
 
+import java.awt.Graphics;
+
 import abstracts.Character;
 import abstracts.Entity;
 import abstracts.Item;
@@ -35,6 +37,7 @@ public class Player extends Character {
 	}
 
 	public Keys keys;
+	private Entity interactingEntity = null;
 	private byte animationTick = 0;
 	private byte animationPointer = 0;
 
@@ -344,6 +347,7 @@ public class Player extends Character {
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			this.stopInteraction();
 		}
 	}
@@ -463,7 +467,8 @@ public class Player extends Character {
 						if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset)) {
 							if (Game.keys.isPrimaryPressed()) {
 								Game.keys.primaryReceived();
-								this.startInteraction();
+								Entity entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
+								this.startInteraction(entity);
 							}
 						}
 						return true;
@@ -490,7 +495,8 @@ public class Player extends Character {
 				if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset)) {
 					if (Game.keys.isPrimaryPressed()) {
 						Game.keys.primaryReceived();
-						this.startInteraction();
+						Entity entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
+						this.startInteraction(entity);
 					}
 				}
 				return true; // Cannot go through items on the ground.
@@ -533,7 +539,7 @@ public class Player extends Character {
 	 * 
 	 */
 	@Override
-	public void render(final Scene output, final int x, final int y) {
+	public void render(final Scene output, final Graphics graphics, final int x, final int y) {
 		if (this.isLockedJumping) {
 			// Jumping has a higher priority than walking.
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
@@ -737,11 +743,12 @@ public class Player extends Character {
 		this.yOffset = y;
 	}
 
-	public void startInteraction() {
+	public void startInteraction(Entity entity) {
 		if (this.isInteractionEnabled)
 			return;
 		this.isInteractionEnabled = true;
-		this.setInteractableID(0);
+		this.interactingEntity = entity;
+		this.interactingEntity.setInteractingState(true);
 	}
 
 	// -------------------------------------------------------------------------------------
@@ -780,6 +787,8 @@ public class Player extends Character {
 
 	public void stopInteraction() {
 		this.isInteractionEnabled = false;
+		this.interactingEntity.setInteractingState(false);
+		this.interactingEntity = null;
 	}
 
 	public void enableAutomaticMode() {

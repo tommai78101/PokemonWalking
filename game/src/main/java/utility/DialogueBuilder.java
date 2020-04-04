@@ -13,9 +13,18 @@ import entity.Player;
 
 public class DialogueBuilder {
 	public static Dialogue createText(String dialogue, DialogueType type) {
-		return DialogueBuilder.createText(dialogue, dialogue.length(), type, true);
+		return DialogueBuilder.createText(dialogue, Dialogue.MAX_STRING_LENGTH, type, true);
 	}
 
+	/**
+	 * 
+	 * @param dialogue
+	 * @param length
+	 *            - The max length of 1 line in the in-game dialogue box.
+	 * @param type
+	 * @param lock
+	 * @return
+	 */
 	public static Dialogue createText(String dialogue, int length, DialogueType type, boolean lock) {
 		Dialogue dialogues = new Dialogue();
 		dialogues.setLines(DialogueBuilder.toLines(dialogue, length));

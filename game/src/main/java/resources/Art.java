@@ -21,6 +21,7 @@ import java.util.Enumeration;
 import main.MainComponent;
 import screen.BaseBitmap;
 import screen.Scene;
+import utility.Debug;
 
 public class Art {
 
@@ -362,7 +363,7 @@ public class Art {
 		}
 		if (result != null) {
 			ge.registerFont(result);
-			System.out.println(filename);
+			Debug.log(filename);
 		}
 		return result.deriveFont(Font.PLAIN, 8f * MainComponent.GAME_SCALE);
 	}
