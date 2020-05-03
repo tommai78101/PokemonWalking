@@ -59,6 +59,7 @@ Metadata...........................[PWD05]
 		Carpet (Indoors)...........[PWD05@03#11]
 		Carpet (Outdoors)..........[PWD05@03#12]
 		Triggers...................[PWD05@03#13]
+		Characters/NPCs............[PWD05@03#14]
 Entities...........................[PWD06]
 	Player.........................[PWD06#01]
 Controls...........................[PWD07]
@@ -869,11 +870,43 @@ not assume their information to be permanent.
 			
 -------------------------------
 
-		NPCs
+		Characters/NPCs [PWD05@03#14]
 		
-		* Don't know how they are to be placed on a map.
-		* Don't know how to control them via AI.
-		* Need to have its own animation.
+		Tile ID:
+			A: 0E - Characters category
+		Extended Tile ID:
+			R: XX - Character Unique ID
+		Tile Specific ID:
+			G: GG - Script ID
+			B: BB - Reserved miscellaneous data 
+		Full Data:
+			0E XX GG BB
+		Description:
+			Characters/NPCs will be part of this group.
+			
+			Since some Characters/NPCs will not have fixed positions and fixed
+			directional facings, it make sense to assign character unique IDs within
+			the game to differentiate each character. The game should be able to
+			handle and trigger the characters/NPCs the player will interact with,
+			based only on the character's unique ID value.
+			
+			A hard limitation is, there is a max total of 256 unique characters/NPCs
+			in the game. You cannot exceed this number. It is allowed to re-use
+			characters/NPCs in some game scenarios.
+			
+			Script IDs are assigned to characters/NPCs. They can be assigned to common
+			scripts that all characters/NPCs can use or trigger, or they can have their
+			own, unique scripts be assigned. 
+			
+			Reserved data can be used in many ways, such as keeping track of game
+			progression, the number of times the character/NPC has been interacted with,
+			scripts related data storage, and many more. Not all characters/NPCs will
+			use this data.
+			
+		Notes:
+			* Map placements to be determined on a map.
+			* AI controlled movements can be by game or by scripts.
+			* Need to have its own animation.
 			
 -------------------------------
 

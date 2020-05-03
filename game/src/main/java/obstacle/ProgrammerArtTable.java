@@ -37,7 +37,7 @@ public class ProgrammerArtTable extends Obstacle {
 	@Override
 	public void tick() {
 		// TODO Auto-generated method stub
-
+		this.setInteractingState(false);
 	}
 
 	@Override

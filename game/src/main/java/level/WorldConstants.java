@@ -41,7 +41,7 @@ public class WorldConstants {
 
 	//Entity Types
 	public static final int ENTITY_TYPE_OBSTACLE = 0x03;
-	public static final int ENTITY_TYPE_CHARACTER = 0x08;
+	public static final int ENTITY_TYPE_CHARACTER = 0x0E;
 
 	// Biome Colors
 	public static final int GRASS_GREEN = 0xFFA4E767;
