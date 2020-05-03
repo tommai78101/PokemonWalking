@@ -29,7 +29,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	public int id;
 	public int interactableID;
 	public boolean isRemoved;
-	protected boolean isInteracting;
+	protected boolean interactingState;
 
 	protected byte typeId = 0;
 	protected int xPosition;
@@ -124,7 +124,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	}
 
 	public void setInteractingState(boolean value) {
-		this.isInteracting = value;
+		this.interactingState = value;
 		if (value) {
 			if (!Player.isMovementsLocked())
 				Player.lockMovements();
@@ -135,8 +135,8 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		}
 	}
 
-	public boolean getInteractingState() {
-		return this.isInteracting;
+	public boolean isInteracting() {
+		return this.interactingState;
 	}
 
 	// ==============================================================
@@ -149,5 +149,9 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 
 	public static boolean isCharacter(PixelData data) {
 		return data.getAlpha() == WorldConstants.ENTITY_TYPE_CHARACTER;
+	}
+
+	public static boolean isItem(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_ITEM;
 	}
 }

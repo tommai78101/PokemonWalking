@@ -44,7 +44,7 @@ import utility.DialogueBuilder;
  * @author tlee
  *
  */
-public abstract class Item implements Comparable<Item>, Renderable {
+public abstract class Item extends Entity implements Comparable<Item>, Renderable {
 
 	public enum Category {
 		// @formatter:off

@@ -15,6 +15,7 @@ import java.awt.Graphics;
 import abstracts.Character;
 import abstracts.Entity;
 import abstracts.Item;
+import abstracts.Obstacle;
 import interfaces.Tileable;
 import level.Area;
 import level.PixelData;
@@ -22,6 +23,7 @@ import main.Game;
 import main.Keys;
 import resources.Art;
 import screen.Scene;
+import utility.Debug;
 
 public class Player extends Character {
 	public static boolean isMovementsLocked() {
@@ -189,54 +191,48 @@ public class Player extends Character {
 		PixelData data = entity.getPixelData();
 		final int dataColor = data.getColor();
 		final int alpha = (dataColor >> 24) & 0xFF;
-		// int red = (dataColor >> 16) & 0xFF;
 		switch (alpha) {
 			case 0x03: {// Obstacles
 				// Red color values indicate the type of obstacles to filter:
-				// case 0x00: // Small tree
-				// case 0x01: //Logs
-				// case 0x02: //Planks
-				// case 0x03: //Scaffolding Left
-				// case 0x04: //Scaffolding Right
-				// case 0x05: //Sign
-				if (this.keys.X.isTappedDown || this.keys.X.isPressedDown || this.keys.PERIOD.isTappedDown || this.keys.PERIOD.isPressedDown) {
-					this.isInteractionEnabled = false;
-					if (Player.isMovementsLocked())
-						Player.unlockMovements();
+				// int red = (dataColor >> 16) & 0xFF;
+				// switch (red) {
+				// 		case 0x00: // Small tree
+				// 		case 0x01: //Logs
+				// 		case 0x02: //Planks
+				// 		case 0x03: //Scaffolding Left
+				// 		case 0x04: //Scaffolding Right
+				// 		case 0x05: //Sign
+				// }
+				if (!(entity instanceof Obstacle)) {
+					Debug.error("This shouldn't be happening. Obstacle is not an instanceof Entity.");
 					break;
 				}
-				if (!Player.isMovementsLocked()) {
-					if (this.getInteractableID() != 0) {
-						this.isInteractionEnabled = false;
-						return;
-					}
-					if (!this.isInteractionEnabled)
-						this.isInteractionEnabled = true;
+				if (this.isInteracting() && entity.isInteracting()) {
+					this.startInteraction(entity);
 				}
-				if (this.isInteractionEnabled)
-					this.setInteractableID(dataColor);
+				else {
+					this.stopInteraction();
+				}
 				break;
 			}
 			case 0x0A: {// Item
-				// if ((this.keys.Z.keyStateDown || this.keys.SLASH.keyStateDown) &&
-				// (!this.keys.Z.lastKeyState || !this.keys.SLASH.lastKeyState)){
-				// this.keys.Z.lastKeyState = true;
-				// this.keys.SLASH.lastKeyState = true;
-				if (!Player.isMovementsLocked()) {
-					if (this.getInteractableID() != 0) {
-						this.isInteractionEnabled = false;
-						return;
-					}
-					if (!this.isInteractionEnabled)
-						this.isInteractionEnabled = true;
-					// }
+				if (!(entity instanceof Item)) {
+					Debug.error("This shouldn't be happening. Item is not an instanceof Entity.");
+					break;
 				}
-				if (this.isInteractionEnabled)
-					this.setInteractableID(dataColor);
+				if (this.isInteracting() && entity.isInteracting()) {
+					this.startInteraction(entity);
+				}
+				else {
+					this.stopInteraction();
+				}
 				break;
 			}
 			default:
-				// stopInteraction();
+				//Stop the player from interacting with anything.
+				if (this.isInteracting()) {
+					this.stopInteraction();
+				}
 				break;
 		}
 	}
@@ -268,6 +264,7 @@ public class Player extends Character {
 		return ((x == xTgt) && (y == yTgt));
 	}
 
+	@Override
 	public boolean isInteracting() {
 		return this.isInteractionEnabled;
 	}

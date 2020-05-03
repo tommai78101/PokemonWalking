@@ -10,11 +10,14 @@
 
 package item;
 
+import java.awt.Graphics;
+
 import abstracts.Item;
 import entity.Player;
 import level.Area;
 import main.Game;
 import main.StateManager.GameState;
+import screen.Scene;
 
 public class DummyItem extends Item {
 	public DummyItem(Game game, String name, String description, Category category, int id) {
@@ -34,5 +37,15 @@ public class DummyItem extends Item {
 	@Override
 	public void dropAt(Area area, Player player) {
 		// TODO: Continue with this action.
+	}
+
+	@Override
+	public void tick() {
+		return;
+	}
+
+	@Override
+	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
+		return;
 	}
 }

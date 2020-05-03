@@ -20,6 +20,7 @@ import java.util.Set;
 
 import abstracts.Character;
 import abstracts.Entity;
+import abstracts.Item;
 import abstracts.Obstacle;
 import entity.Player;
 import interfaces.Tileable;
@@ -54,9 +55,11 @@ public class Area implements Tileable, UpdateRenderable {
 
 	private final List<List<PixelData>> areaData = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
-//	private final List<Entity> areaEntities = new ArrayList<>();
+
+	// Area data hash maps.
 	private final Map<Map.Entry<Integer, Integer>, Obstacle> areaObstacles = new HashMap<>();
 	private final Map<Map.Entry<Integer, Integer>, Character> areaCharacters = new HashMap<>();
+	private final Map<Map.Entry<Integer, Integer>, Item> areaItems = new HashMap<>();
 	private final Map<Map.Entry<Integer, Integer>, TriggerData> triggerDatas = new HashMap<>();
 
 	public Area(BaseBitmap bitmap, final int areaID) {
@@ -628,6 +631,15 @@ public class Area implements Tileable, UpdateRenderable {
 			}
 			else {
 				throw new NullPointerException("The character shouldn't be null.");
+			}
+		}
+		else if (Entity.isItem(data)) {
+			Item item = this.areaItems.get(Map.entry(x, y));
+			if (item != null && item.getPixelData().equals(data)) {
+				return item;
+			}
+			else {
+				throw new NullPointerException("The item shouldn't be null.");
 			}
 		}
 		return null;

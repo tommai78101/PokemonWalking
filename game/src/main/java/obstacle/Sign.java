@@ -40,7 +40,7 @@ public class Sign extends Obstacle {
 
 	@Override
 	public void tick() {
-		if (this.isInteracting) {
+		if (this.interactingState) {
 			this.setInteractingState(true);
 			Dialogue currentDialogue = this.getCurrentDialogue();
 			if (currentDialogue == null || !currentDialogue.isReady()) {
@@ -50,9 +50,12 @@ public class Sign extends Obstacle {
 			}
 			if (!currentDialogue.isDialogueCompleted()) {
 				currentDialogue.tick();
+				Debug.log("Sign is ticking.");
 			}
 			else {
+				Debug.log("Sign is no longer ticking.");
 				if (Game.keys.isPrimaryPressed()) {
+					Debug.log("Primary keys are pressed.");
 					Game.keys.primaryReceived();
 					this.setInteractingState(false);
 					this.endDialogue();
@@ -64,7 +67,7 @@ public class Sign extends Obstacle {
 
 	@Override
 	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
-		if (this.isInteracting) {
+		if (this.interactingState) {
 			Dialogue currentDialogue = this.getCurrentDialogue();
 			if (currentDialogue != null)
 				currentDialogue.render(screen, graphics);
