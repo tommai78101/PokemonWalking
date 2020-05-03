@@ -191,6 +191,8 @@ public class Player extends Character {
 		PixelData data = entity.getPixelData();
 		final int dataColor = data.getColor();
 		final int alpha = (dataColor >> 24) & 0xFF;
+
+		// Entity pixel data identification check.
 		switch (alpha) {
 			case 0x03: {// Obstacles
 				// Red color values indicate the type of obstacles to filter:
@@ -207,24 +209,12 @@ public class Player extends Character {
 					Debug.error("This shouldn't be happening. Obstacle is not an instanceof Entity.");
 					break;
 				}
-				if (this.isInteracting() && entity.isInteracting()) {
-					this.startInteraction(entity);
-				}
-				else {
-					this.stopInteraction();
-				}
 				break;
 			}
 			case 0x0A: {// Item
 				if (!(entity instanceof Item)) {
 					Debug.error("This shouldn't be happening. Item is not an instanceof Entity.");
 					break;
-				}
-				if (this.isInteracting() && entity.isInteracting()) {
-					this.startInteraction(entity);
-				}
-				else {
-					this.stopInteraction();
 				}
 				break;
 			}
@@ -233,7 +223,15 @@ public class Player extends Character {
 				if (this.isInteracting()) {
 					this.stopInteraction();
 				}
-				break;
+				return;
+		}
+
+		//Common player-entity interaction code logic.
+		if (this.isInteracting() && entity.isInteracting()) {
+			this.startInteraction(entity);
+		}
+		else {
+			this.stopInteraction();
 		}
 	}
 
