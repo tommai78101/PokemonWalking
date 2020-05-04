@@ -410,6 +410,17 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	}
 
 	public static Item build(PixelData pixelData, int x, int y) {
-		return null;
+		//Assume the pixel data is of type Item.
+		Item item = null;
+
+		// Using unique item IDs to determine the item type to use.
+		int red = pixelData.getRed();
+		// TODO(Thompson): Figure out how to assign items from the Area map based on PixelData.
+		switch (red) {
+			default:
+				break;
+		}
+
+		return item;
 	}
 }
