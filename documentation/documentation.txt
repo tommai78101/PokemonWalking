@@ -1,28 +1,28 @@
 ﻿/**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE. 
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY! 
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 Pokémon Walking - Documentation
 
 Changelogs:
-r12: Added Triggers section and to clarify a bit more on how scripting is done.
-r11: Changing the Abstract a bit to reflect upon latest roadmap. Adding roadmaps.
-r10: Merged Signs with Obstacles. Removed stuffs.
-r9: Added File Formats, Control Schemes.
-r8: Added items.
-r7: Changing some of the info below.
-r6: Added more tiles.
-r5: Added a beginner's section, "How to Debug."
-r4: Added new tiles to the Tiles section.
-r3: Finished the draft.
-r2: Added the history.
-r1: First draft - using GameFaqs format.
+	r14: Updated Item data structure.
+	r13: Added Characters/NPCs section. 
+	r12: Added Triggers section and to clarify a bit more on how scripting is done.
+	r11: Changing the Abstract a bit to reflect upon latest roadmap. Adding roadmaps.
+	r10: Merged Signs with Obstacles. Removed stuffs.
+	r09: Added File Formats, Control Schemes.
+	r08: Added items.
+	r07: Changing some of the info below.
+	r06: Added more tiles.
+	r05: Added a beginner's section, "How to Debug."
+	r04: Added new tiles to the Tiles section.
+	r03: Finished the draft.
+	r02: Added the history.
+	r01: First draft - using GameFaqs format.
 
 -------------------------------
 
@@ -771,14 +771,14 @@ not assume their information to be permanent.
 		Items [PWD05@03#10]
 		
 		Tile ID:
-			A: 0A - Item
+			A: 0A - Items
 		Extended Tile ID:
-			R: XX - Specific Item.
+			R: XX - Item Unique ID.
 		Tile Specific ID:
 			G: OO - Object Types.
-			B: NN - Not used.
+			B: BB - Reserved miscellaneous data.
 		Full Data(s):
-			0B XX OO NN
+			0B XX OO BB
 		Description:
 			An object that can be picked up and be used by the player. The object
 			itself can block a player's path, therefore, it can also act as an 
@@ -787,6 +787,19 @@ not assume their information to be permanent.
 			Object Type determines whether or not the items can be picked up or 
 			can be moved around. By default, Values 00 is for items only. 
 			Anything else would be object types that would be moved around.
+			
+			There is a hard limitation of 256 unique items in the game. 
+			
+			Certain items, such as key items, 1-time-use-only items, and really
+			rare items, can use the reserved miscellaneous bytes to add additional
+			information.
+			
+		Note:
+			The max total of unique item IDs of 256 may change, depending on where
+			the game will go towards. It is also likely we can split the Blue byte
+			into 2 nibbles (4 bits each), so that the bits group, "RRB" can have
+			4,096 unique items in total, and the final nibble bits group "B" will 
+			be reserved to store additional information.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

@@ -1,12 +1,10 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package abstracts;
 
@@ -30,6 +28,7 @@ import item.Bicycle;
 import item.DummyItem;
 import item.ItemText;
 import level.Area;
+import level.PixelData;
 import level.WorldConstants;
 import main.Game;
 import main.MainComponent;
@@ -408,5 +407,9 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 				break;
 		}
 		return result;
+	}
+
+	public static Item build(PixelData pixelData, int x, int y) {
+		return null;
 	}
 }
