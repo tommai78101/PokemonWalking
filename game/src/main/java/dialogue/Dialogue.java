@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import interfaces.Tileable;
+import common.Tileable;
 import main.Game;
 import main.MainComponent;
 import resources.Art;

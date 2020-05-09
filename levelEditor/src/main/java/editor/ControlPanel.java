@@ -20,8 +20,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import common.Tileable;
 import editor.EditorConstants.Tools;
-import interfaces.Tileable;
 
 public class ControlPanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7481148146432931992L;
@@ -50,6 +50,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 		EditorConstants constants = EditorConstants.getInstance();
 		for (Map.Entry<Integer, Data> entry : constants.getDatas()) {
 			Data d = entry.getValue();
+			if (d.name.equals("Select"))
+				continue;
 			d.button.setActionCommand(Integer.toString(d.editorID));
 			d.button.addActionListener(this);
 			this.iconsPanel.add(d.button);
@@ -103,6 +105,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 					this.propertiesPanel.redInputField.setText(Integer.toString(d.red));
 					this.propertiesPanel.greenInputField.setText(Integer.toString(d.green));
 					this.propertiesPanel.blueInputField.setText(Integer.toString(d.blue));
+					this.editor.properties.setDataAsSelected(d);
 					EditorConstants.chooser = Tools.ControlPanel;
 				}
 				this.editor.validate();

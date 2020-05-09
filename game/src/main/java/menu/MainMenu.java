@@ -19,10 +19,10 @@ import java.util.stream.IntStream;
 
 import abstracts.Event;
 import abstracts.SubMenu;
+import common.Tileable;
 import dialogue.Dialogue;
 import entity.Player;
 import event.MenuEvent;
-import interfaces.Tileable;
 import level.WorldConstants;
 import main.Game;
 import main.MainComponent;

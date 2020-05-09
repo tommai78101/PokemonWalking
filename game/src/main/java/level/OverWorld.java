@@ -12,9 +12,9 @@ import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 
+import common.Tileable;
 import entity.Player;
 import error.GameException;
-import interfaces.Tileable;
 import interfaces.UpdateRenderable;
 import main.Game;
 import screen.Scene;

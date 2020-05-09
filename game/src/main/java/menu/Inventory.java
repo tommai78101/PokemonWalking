@@ -20,10 +20,10 @@ import java.util.Map;
 
 import abstracts.Item;
 import abstracts.Item.Category;
+import common.Tileable;
 import abstracts.SubMenu;
 import dialogue.Dialogue;
 import entity.Player;
-import interfaces.Tileable;
 import item.ActionItem;
 import item.Bicycle;
 import item.DummyItem;

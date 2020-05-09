@@ -6,7 +6,7 @@
  * All rights copyrighted to The Pokémon Company and Nintendo. 
  */
 
-package interfaces;
+package common;
 
 public interface Tileable {
 	public static int WIDTH = 16;

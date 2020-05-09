@@ -8,8 +8,8 @@
 
 package abstracts;
 
+import common.Tileable;
 import entity.Player;
-import interfaces.Tileable;
 import interfaces.UpdateRenderable;
 import level.PixelData;
 import level.WorldConstants;

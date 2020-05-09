@@ -26,7 +26,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import interfaces.Tileable;
+import common.Tileable;
 
 public class DrawingBoard extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -363,9 +363,20 @@ public class DrawingBoard extends Canvas implements Runnable {
 						return;
 					if (this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
-					Data d = this.editor.controlPanel.getSelectedData();
-					if (d != null && !d.name.equals("Select")) {
-						this.setDataProperties(d);
+					Data selectedData = this.editor.controlPanel.getSelectedData();
+					if (selectedData != null) {
+						if (selectedData.name.equals("Select")) {
+							this.editor.controlPanel.setSelectedData(selectedData);
+
+							// NOTE(Thompson): Do not set the control panel's selected data to the picked data.
+							Data tilePickerData = this.getSelectedDataProperties();
+
+							// Overwrite the Mouse Select data with the new data from the DrawingBoard.
+							this.editor.controlPanel.getPropertiesPanel().setDataProperties(tilePickerData);
+						}
+						else {
+							this.setDataProperties(selectedData);
+						}
 					}
 					this.editor.validate();
 				}
@@ -400,41 +411,54 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
-	private void setDataProperties(Data d) {
-		switch (d.alpha) {
-			case 0x02: {
-				TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-				int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-				Data temp = null;
-				for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
-					if (panel.dataValue == entry.getKey()) {
-						temp = entry.getValue();
-						break;
-					}
-				}
-				if (temp != null) {
-					this.tiles[i] = panel.dataValue;
-					this.tilesEditorID[i] = temp.editorID;
-				}
-				else {
-					this.tiles[i] = (d.alpha << 24) | (d.red << 16) | panel.dataValue & 0xFFFF;
-					this.tilesEditorID[i] = d.editorID;
-				}
+	/**
+	 * There are two places where selected data may come in.<br/>
+	 * - From the argument parameter.<br/>
+	 * - From the ControlPanel object's "dataValue" property.<br/>
+	 * <p>
+	 * The "selectedData" will always get priority. It will be used to fetch the correct Data object
+	 * from a lookup list.
+	 * <p>
+	 * The ControlPanel's dataValue gathers the user's modified data values, then inserts it into the
+	 * data value of the "data object from the lookup list".
+	 * 
+	 * @param selectedData
+	 */
+	public void setDataProperties(Data selectedData) {
+		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+		int tileIndex = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
+
+		// Search for the data from the actual collection of game data we have loaded in.
+		Data data = null;
+		int tempColorValue = selectedData.getColorValue();
+		List<Map.Entry<Integer, Data>> dataList = EditorConstants.getInstance().getDatas();
+		for (Map.Entry<Integer, Data> entry : dataList) {
+			if (tempColorValue == entry.getKey()) {
+				data = entry.getValue();
+				break;
+			}
+		}
+
+		// NOTE(Thompson): The case statements are not in order. Code logic > ordering sequence.
+		switch (data.alpha) {
+			case 0x01: // Sand
+			case 0x02: { // Grass
+				// Data Properties panel can edit reserved miscellaneous data for that tile.
+				this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | panel.dataValue & 0xFFFF;
+				this.tilesEditorID[tileIndex] = data.editorID;
 				break;
 			}
 			case 0x03: {
-				switch (d.red) {
+				switch (data.red) {
 					case 0x05: { // Sign
-						TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
 						int green = (panel.dataValue >> 8) & 0xFF;
 						int blue = (panel.dataValue & 0xFF);
-						int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-						this.tiles[i] = (d.alpha << 24) | (d.red << 16) | (green << 8) | blue;
-						this.tilesEditorID[i] = d.editorID;
+						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
+						this.tilesEditorID[tileIndex] = data.editorID;
 						break;
 					}
 					default: {
-						this.defaultTileProperties(d);
+						this.defaultTileProperties(data);
 						break;
 					}
 				}
@@ -445,46 +469,40 @@ public class DrawingBoard extends Canvas implements Runnable {
 			case 0x09: // Door
 			case 0x0B: // Carpet
 			case 0x0C: { // Carpet
-				this.manualInputTileProperties(d);
+				this.manualInputTileProperties(data);
 				break;
 			}
 			case 0x08: { // House
-				switch (d.red) {
+				switch (data.red) {
 					case 0x0B: // Left roof
 					case 0x0C: // Middle roof
 					case 0x0D: {// Right roof
-						TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-						int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-						this.tiles[i] = (d.alpha << 24) | (d.red << 16) | panel.dataValue & 0xFFFF;
-						this.tilesEditorID[i] = d.editorID;
+						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | panel.dataValue & 0xFFFF;
+						this.tilesEditorID[tileIndex] = data.editorID;
 						break;
 					}
 					default:
-						this.defaultTileProperties(d);
+						this.defaultTileProperties(data);
 						break;
 				}
 				break;
 			}
 			case 0x0A: { // Items
-				TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-				int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-				this.tiles[i] = (d.alpha << 24) | panel.dataValue & 0xFFFFFF;
-				this.tilesEditorID[i] = d.editorID;
+				this.tiles[tileIndex] = (data.alpha << 24) | panel.dataValue & 0xFFFFFF;
+				this.tilesEditorID[tileIndex] = data.editorID;
 				break;
 			}
 			case 0x0D: { // Triggers
-				switch (d.red) {
-					case 0x00: { //Default starting location.
-						int green = d.green;
-						int blue = d.blue;
-						if (d.greenByEditor)
+				switch (data.red) {
+					case 0x00: { // Default starting location.
+						int green = data.green;
+						int blue = data.blue;
+						if (data.greenByEditor)
 							green = this.getMouseTileX();
-						if (d.blueByEditor)
+						if (data.blueByEditor)
 							blue = this.getMouseTileY();
-						int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-						this.tiles[i] = (d.alpha << 24) | (d.red << 16) | (green << 8) | blue;
-						this.tilesEditorID[i] = d.editorID;
-						TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
+						this.tilesEditorID[tileIndex] = data.editorID;
 						panel.greenInputField.setText(Integer.toString(green));
 						panel.blueInputField.setText(Integer.toString(blue));
 						panel.greenField.setText(Integer.toString(green));
@@ -498,10 +516,29 @@ public class DrawingBoard extends Canvas implements Runnable {
 				break;
 			}
 			default: {
-				this.defaultTileProperties(d);
+				this.defaultTileProperties(data);
 				break;
 			}
 		}
+	}
+
+	public Data getSelectedDataProperties() {
+		Data data = new Data();
+
+		int tileIndex = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
+		data.setColorValue(this.tiles[tileIndex]);
+		data.editorID = this.tilesEditorID[tileIndex];
+
+		String greenText = Integer.toString(data.green);
+		String blueText = Integer.toString(data.blue);
+		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+		panel.greenInputField.setText(greenText);
+		panel.blueInputField.setText(blueText);
+		panel.greenField.setText(greenText);
+		panel.blueField.setText(blueText);
+		panel.validate();
+
+		return data;
 	}
 
 	private void defaultTileProperties(Data d) {

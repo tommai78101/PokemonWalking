@@ -24,7 +24,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-import interfaces.Tileable;
+import common.Tileable;
 
 public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for
@@ -88,12 +88,11 @@ public class EditorConstants {
 					tokens = line.replace("\\W", "").replace("_", " ").split("-");
 					if (!temp.isEmpty() && c != null) {
 						c.nodes.addAll(temp);
+						categoryID = c.setIdByData(temp.get(0));
 						this.categories.add(c);
 						temp.clear();
 					}
-					c = new Category();
-					c.name = tokens[1];
-					c.id = categoryID++;
+					c = new Category(tokens[1], categoryID);
 				}
 				else if (line.startsWith("%")) {
 					Data data = new Data();

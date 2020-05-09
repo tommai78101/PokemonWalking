@@ -14,7 +14,7 @@ import abstracts.Character;
 import abstracts.Entity;
 import abstracts.Item;
 import abstracts.Obstacle;
-import interfaces.Tileable;
+import common.Tileable;
 import level.Area;
 import level.PixelData;
 import main.Game;

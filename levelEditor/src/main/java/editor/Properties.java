@@ -202,6 +202,32 @@ public class Properties extends JPanel {
 		}
 	}
 
+	public void setDataAsSelected(Data data) {
+		DefaultComboBoxModel<Category> categoryModel = (DefaultComboBoxModel<Category>) this.tileCategory.getModel();
+		DefaultComboBoxModel<Data> tilesModel = (DefaultComboBoxModel<Data>) this.tiles.getModel();
+
+		int categorySize = categoryModel.getSize();
+
+		// Tiles Category
+		nested:
+		for (int i = 0; i < categorySize; i++) {
+			Category category = categoryModel.getElementAt(i);
+			if (category.matchesData(data)) {
+				// Tiles
+				int tilesSize = category.nodes.size();
+				for (int j = 0; j < tilesSize; j++) {
+					Data tilesData = category.nodes.get(j);
+					if (tilesData.compare(data)) {
+						// Do all of this in 1 go.
+						categoryModel.setSelectedItem(category);
+						tilesModel.setSelectedItem(tilesData);
+						break nested;
+					}
+				}
+			}
+		}
+	}
+
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {

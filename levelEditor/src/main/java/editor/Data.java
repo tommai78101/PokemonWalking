@@ -13,8 +13,11 @@ import javax.swing.JButton;
 
 public class Data {
 	enum DataType {
-		ALPHA, RED, GREEN, BLUE;
-	};
+		ALPHA,
+		RED,
+		GREEN,
+		BLUE;
+	}
 
 	public String name;
 	public String filepath;
@@ -31,12 +34,12 @@ public class Data {
 	public boolean blueByEditor;
 
 	public Data() {
-		name = filepath = "";
-		alpha = red = green = blue = editorID = 0;
-		image = null;
-		button = null;
-		areaTypeIDType = DataType.ALPHA;
-		areaTypeIncluded = alphaByEditor = redByEditor = greenByEditor = blueByEditor = false;
+		this.name = this.filepath = "";
+		this.alpha = this.red = this.green = this.blue = this.editorID = 0;
+		this.image = null;
+		this.button = null;
+		this.areaTypeIDType = DataType.ALPHA;
+		this.areaTypeIncluded = this.alphaByEditor = this.redByEditor = this.greenByEditor = this.blueByEditor = false;
 	}
 
 	public boolean compare(Data d) {
@@ -48,6 +51,17 @@ public class Data {
 	}
 
 	public int getColorValue() {
-		return (alpha << 24) | (red << 16) | (green << 8) | blue;
+		return (this.alpha << 24) | (this.red << 16) | (this.green << 8) | this.blue;
+	}
+
+	public void setColorValue(int value) {
+		final int alphaMask = 0xFF000000;
+		final int redMask = 0xFF0000;
+		final int greenMask = 0xFF00;
+		final int blueMask = 0xFF;
+		this.alpha = (value & alphaMask) >> 24;
+		this.red = (value & redMask) >> 16;
+		this.green = (value & greenMask) >> 8;
+		this.blue = (value & blueMask);
 	}
 }
