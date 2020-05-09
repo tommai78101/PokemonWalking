@@ -1,16 +1,17 @@
 package editor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Category {
 	public int id;
 	public String name;
-	public ArrayList<Data> nodes;
-	public ArrayList<Trigger> triggers;
+	public List<Data> nodes;
+	public List<Trigger> triggers;
 
 	public Category() {
-		this.nodes = new ArrayList<Data>();
-		this.triggers = new ArrayList<Trigger>();
+		this.nodes = new ArrayList<>();
+		this.triggers = new ArrayList<>();
 	}
 
 	public void add(Data data) {

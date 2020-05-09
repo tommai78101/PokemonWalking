@@ -21,8 +21,10 @@
 # Here's how it is written:
 #		% Tile Name % Alpha % Red % Green % Blue % Filepath
 
--Eraser
-% Empty                         % 00 % 00 % 00 %00 % res/art/editor/no_png.png
+
+-Mouse
+% Select                        % 00 % 00 % 00 %00 % res/art/editor/no_png.png
+% Eraser                        % 00 % 00 % 00 %00 % res/art/editor/no_png.png
 -Floor_Path
 % Grass                         % 01 % 00 % @  % @  % res/art/floor/grass.png 
 % Dirt                          % 01 % 01 % @  % @  % res/art/floor/mt_ground.png

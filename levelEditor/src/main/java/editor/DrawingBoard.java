@@ -364,7 +364,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					if (this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
 					Data d = this.editor.controlPanel.getSelectedData();
-					if (d != null) {
+					if (d != null && !d.name.equals("Select")) {
 						this.setDataProperties(d);
 					}
 					this.editor.validate();

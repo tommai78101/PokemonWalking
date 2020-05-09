@@ -100,6 +100,7 @@ public class Properties extends JPanel {
 		DefaultComboBoxModel<Category> model = (DefaultComboBoxModel<Category>) this.tileCategory.getModel();
 		List<Category> list = EditorConstants.getInstance().getCategories();
 		int size = list.size();
+		model.removeAllElements();
 		for (int i = 0; i < size; i++) {
 			model.addElement(list.get(i));
 		}
@@ -139,10 +140,9 @@ public class Properties extends JPanel {
 
 		Category c = EditorConstants.getInstance().getCategories().get(0);
 		DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) this.tiles.getModel();
-		for (Data d : c.nodes) {
-			model.addElement(d);
-		}
-
+		// No need to add all of the data elements into this model. Rather, remove all of them, so the
+		// Category can load the Tile model elements in.
+		model.removeAllElements();
 	}
 
 	private void loadTriggers() {
