@@ -55,13 +55,9 @@ public class Data {
 	}
 
 	public void setColorValue(int value) {
-		final int alphaMask = 0xFF000000;
-		final int redMask = 0xFF0000;
-		final int greenMask = 0xFF00;
-		final int blueMask = 0xFF;
-		this.alpha = (value & alphaMask) >> 24;
-		this.red = (value & redMask) >> 16;
-		this.green = (value & greenMask) >> 8;
-		this.blue = (value & blueMask);
+		this.alpha = (value & 0xFF000000) >> 24;
+		this.red = (value & 0xFF0000) >> 16;
+		this.green = (value & 0xFF00) >> 8;
+		this.blue = (value & 0xFF);
 	}
 }
