@@ -623,7 +623,7 @@ public class PixelData {
 	// Static helper methods
 	// =================================================
 
-	public static int createPixelColor(byte alpha, byte red, byte green, byte blue) {
+	public static int create(byte alpha, byte red, byte green, byte blue) {
 		return (alpha << 24) | (red << 16) | (green << 8) | blue;
 	}
 
@@ -645,5 +645,9 @@ public class PixelData {
 
 	public static byte getByteData(int pixelColor, int bitShift) {
 		return (byte) ((pixelColor >> bitShift) & 0xFF);
+	}
+
+	public static PixelData make(int pixelColor) {
+		return new PixelData(pixelColor, -1, -1);
 	}
 }

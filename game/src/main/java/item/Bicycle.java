@@ -9,6 +9,7 @@
 package item;
 
 import entity.Player;
+import level.PixelData;
 import level.WorldConstants;
 import main.Game;
 import main.StateManager.GameState;
@@ -20,6 +21,10 @@ public class Bicycle extends ActionItem {
 
 	public Bicycle(Game game, String name, String description, Category category) {
 		super(game, "BICYCLE", Bicycle.ENABLING_DESCRIPTION, Category.KEYITEMS, WorldConstants.ITEM_BICYCLE);
+	}
+
+	public Bicycle(Game game, PixelData pixelData) {
+		super(game, "BICYCLE", "Ride bike.", Category.KEYITEMS, pixelData.getRed());
 	}
 
 	public Bicycle(Game game, ItemText text) {

@@ -104,7 +104,7 @@ public class Area implements Tileable, UpdateRenderable {
 					}
 				}
 				if (Entity.isItem(pixelData)) {
-					Item entity = Item.build(pixelData, x, y);
+					Item entity = Item.build(pixelData);
 					if (entity != null) {
 						this.areaItems.put(Map.entry(x, y), entity);
 					}

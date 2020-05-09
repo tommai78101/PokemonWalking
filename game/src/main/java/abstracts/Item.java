@@ -8,28 +8,17 @@
 
 package abstracts;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import dialogue.Dialogue;
 import dialogue.Dialogue.DialogueType;
 import entity.Player;
 import interfaces.Renderable;
-import item.ActionItem;
 import item.Bicycle;
-import item.DummyItem;
 import item.ItemText;
 import level.Area;
 import level.PixelData;
-import level.WorldConstants;
 import main.Game;
 import main.MainComponent;
 import menu.Inventory;
@@ -97,16 +86,6 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	protected int id;
 	protected List<String> availableCommands;
 	protected final List<Dialogue> dialogues;
-
-	private static final String TAG_POTIONS = "POTIONS";
-	private static final String TAG_KEYITEMS = "KEYITEMS";
-	private static final String TAG_POKEBALLS = "POKEBALLS";
-	private static final String TAG_TM_HM = "TM_HM";
-	private static final String TAG_ALL = "ALL";
-	private static final String FLAG_SET_COMMAND = "$";
-	private static final String FLAG_USE_COMMAND = "!";
-	private static final String FLAG_TOSS_COMMAND = "&";
-	private static final String ITEM_DELIMITER = ";";
 
 	public Item(Game game, String name, String description, Category category, int id) {
 		this.setName(name);
@@ -244,183 +223,27 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		return this.id - other.id;
 	}
 
-	public static HashMap<Integer, ItemText> loadItemResources(String filename) {
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
-			String line;
-			ItemText itemText = new ItemText();
-			HashMap<Integer, ItemText> result = new HashMap<>();
-			int id = 0;
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("%")) {
-					itemText.type = ItemText.Type.getType(line.split("%")[1]);
-				}
-				else if (line.startsWith("#")) {
-					itemText.itemName = line.split("#")[1];
-				}
-				else if (line.startsWith("@")) {
-					itemText.description = line.split("@")[1];
-				}
-				else if (line.startsWith("^")) {
-					// '^' is a special character, therefore, one must use backslashes to get the
-					// literal form.
-					String value = line.split("\\^")[1];
-					if (value.equals(Item.TAG_POTIONS)) {
-						itemText.category = Category.POTIONS;
-					}
-					else if (value.equals(Item.TAG_KEYITEMS)) {
-						itemText.category = Category.KEYITEMS;
-					}
-					else if (value.equals(Item.TAG_POKEBALLS)) {
-						itemText.category = Category.POKEBALLS;
-					}
-					else if (value.equals(Item.TAG_TM_HM)) {
-						itemText.category = Category.TM_HM;
-					}
-					else if (value.equals(Item.TAG_ALL)) {
-						itemText.skipCheckCategory = true;
-					}
-				}
-				else if (line.startsWith(Item.FLAG_SET_COMMAND)) {
-					itemText.setCommandFlag = true;
-				}
-				else if (line.startsWith(Item.FLAG_USE_COMMAND)) {
-					itemText.useCommandFlag = true;
-				}
-				else if (line.startsWith(Item.FLAG_TOSS_COMMAND)) {
-					itemText.tossCommandFlag = true;
-				}
-				else if (line.startsWith(Item.ITEM_DELIMITER)) {
-					itemText.done = true;
-				}
-
-				if (itemText.isComplete()) {
-					itemText.id = id;
-					result.put(id, itemText);
-					itemText = new ItemText();
-					id++;
-				}
-			}
-			return result;
-		}
-		catch (Exception e) {
-			return null;
-		}
-	}
-
-	public static List<Map.Entry<ItemText, Item>> loadItems(String filename) {
-		List<Map.Entry<ItemText, Item>> result = new ArrayList<>();
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
-			String line;
-			ItemText itemText = new ItemText();
-
-			int id = 0;
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("%")) {
-					itemText.type = ItemText.Type.getType(line.split("%")[1]);
-				}
-				else if (line.startsWith("#")) {
-					itemText.itemName = line.split("#")[1];
-				}
-				else if (line.startsWith("@")) {
-					itemText.description = line.split("@")[1];
-				}
-				else if (line.startsWith("^")) {
-					// '^' is a special character, therefore, one must use backslashes to get the
-					// literal form.
-					String value = line.split("\\^")[1];
-					if (value.equals(Item.TAG_POTIONS)) {
-						itemText.category = Category.POTIONS;
-					}
-					else if (value.equals(Item.TAG_KEYITEMS)) {
-						itemText.category = Category.KEYITEMS;
-					}
-					else if (value.equals(Item.TAG_POKEBALLS)) {
-						itemText.category = Category.POKEBALLS;
-					}
-					else if (value.equals(Item.TAG_TM_HM)) {
-						itemText.category = Category.TM_HM;
-					}
-					else if (value.equals(Item.TAG_ALL)) {
-						itemText.skipCheckCategory = true;
-					}
-				}
-				else if (line.startsWith(Item.FLAG_SET_COMMAND)) {
-					itemText.setCommandFlag = true;
-				}
-				else if (line.startsWith(Item.FLAG_USE_COMMAND)) {
-					itemText.useCommandFlag = true;
-				}
-				else if (line.startsWith(Item.FLAG_TOSS_COMMAND)) {
-					itemText.tossCommandFlag = true;
-				}
-				else if (line.startsWith(Item.ITEM_DELIMITER)) {
-					itemText.done = true;
-				}
-
-				if (itemText.isComplete()) {
-					itemText.id = id;
-					result.add(new AbstractMap.SimpleEntry<>(itemText, Item.createNewItem(itemText)));
-					itemText = new ItemText();
-					id++;
-				}
-			}
-
-			Collections.sort(result, new Comparator<Map.Entry<ItemText, Item>>() {
-				@Override
-				public int compare(Entry<ItemText, Item> e1, Entry<ItemText, Item> e2) {
-					if (e1.getKey().id < e2.getKey().id)
-						return -1;
-					if (e1.getKey().id > e2.getKey().id)
-						return 1;
-					return 0;
-				}
-			});
-
-			return result;
-		}
-		catch (Exception e) {
-			return null;
-		}
-	}
-
-	public static Item createNewItem(ItemText text) {
-		Item result = null;
-		switch (text.type) {
-			case DUMMY:
-				result = new DummyItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
-				break;
-			case ACTION:
-				switch (text.id) {
-					case WorldConstants.ITEM_BICYCLE:
-						result = new Bicycle(MainComponent.getGame(), text.itemName, text.description, text.category);
-						break;
-					default:
-						result = new ActionItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
-						break;
-				}
-				break;
-			case ALL:
-			default:
-				result = null;
-				break;
-		}
-		return result;
-	}
-
-	public static Item build(PixelData pixelData, int x, int y) {
+	public static Item build(PixelData pixelData) {
 		//Assume the pixel data is of type Item.
 		Item item = null;
 
 		// Using unique item IDs to determine the item type to use.
 		int red = pixelData.getRed();
+		int blue = pixelData.getBlue();
 		// TODO(Thompson): Figure out how to assign items from the Area map based on PixelData.
+		//Red - Item Unique ID
 		switch (red) {
+			case 0x03: {// Bicycle
+				//Key item check
+				if (blue == 0x01) {
+					//This is a key item.
+					item = new Bicycle(MainComponent.getGame(), pixelData);
+				}
+				break;
+			}
 			default:
 				break;
 		}
-
 		return item;
 	}
 }

@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +46,10 @@ public class Inventory extends SubMenu {
 		SET
 	}
 
-	private final ArrayList<Map.Entry<Item, Integer>> potions;
-	private final ArrayList<Map.Entry<Item, Integer>> keyItems;
-	private final ArrayList<Map.Entry<Item, Integer>> pokéballs;
-	private final ArrayList<Map.Entry<Item, Integer>> TMs_HMs;
+	private final List<Map.Entry<Item, Integer>> potions;
+	private final List<Map.Entry<Item, Integer>> keyItems;
+	private final List<Map.Entry<Item, Integer>> pokéballs;
+	private final List<Map.Entry<Item, Integer>> TMs_HMs;
 	private final ArrayList<String> selectionMenu;
 	private int itemCursor;
 	private int arrowPosition;
@@ -94,14 +95,7 @@ public class Inventory extends SubMenu {
 		this.pokéballs = new ArrayList<>();
 		this.TMs_HMs = new ArrayList<>();
 		this.selectionMenu = new ArrayList<>();
-		ItemText itemText = null;
-		for (Map.Entry<ItemText, Item> e : WorldConstants.items) {
-			if (e.getKey().id == WorldConstants.ITEM_RETURN) {
-				itemText = e.getKey();
-				break;
-			}
-		}
-		Item returnExit = new DummyItem(game, itemText.itemName, itemText.description, null, 0);
+		Item returnExit = new DummyItem(game, "RETURN", "Close inventory.", null, 0);
 		this.potions.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.keyItems.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.pokéballs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
@@ -115,6 +109,37 @@ public class Inventory extends SubMenu {
 		this.exitsToGame = false;
 	}
 
+	public void addItem(Item item) {
+		List<Map.Entry<Item, Integer>> categoryList = this.getItemCategoryList(item);
+		switch (item.getCategory()) {
+			case KEYITEMS: {
+				//De-duplicate any key items
+				for (Iterator<Map.Entry<Item, Integer>> it = categoryList.iterator(); it.hasNext();) {
+					Map.Entry<Item, Integer> entry = it.next();
+					int count = entry.getValue().intValue();
+					if (count > 1 || count < 0 || entry.getKey().equals(item)) {
+						it.remove();
+					}
+				}
+
+				//Add the key item.
+				categoryList.add(Map.entry(item, 1));
+				break;
+			}
+			case POKEBALLS:
+			case POTIONS:
+			case TM_HM: {
+				for (Map.Entry<Item, Integer> entry : categoryList) {
+					if (entry.getKey().equals(item)) {
+						entry.setValue(entry.getValue() + 1);
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+
 	/**
 	 * Adds an item with its text description into the Inventory, being categorized into its relevant "pocket" of the player's bag.
 	 * 
@@ -126,7 +151,7 @@ public class Inventory extends SubMenu {
 	 */
 	public void addItem(ItemText itemText) {
 		boolean heldItemExists = false;
-		ArrayList<Map.Entry<Item, Integer>> list = this.getItemCategoryList(itemText);
+		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(itemText);
 		CHECK_LOOP:
 		for (int i = 0; i < list.size(); i++) {
 			Map.Entry<Item, Integer> entry = list.get(i);
@@ -286,7 +311,7 @@ public class Inventory extends SubMenu {
 						Art.dialogue_pointer, 30 * MainComponent.GAME_SCALE,
 						(12 * this.stateArrowPosition + Tileable.HEIGHT * (7 - this.selectionMenu.size())) - 8
 					);
-					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					this.renderItemMenuText(list, g2d);
 				}
 				g2d.dispose();
@@ -323,7 +348,7 @@ public class Inventory extends SubMenu {
 				BufferedImage old = output.getBufferedImage();
 				Graphics2D g2d = old.createGraphics();
 				this.renderText(g2d);
-				ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+				List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 				this.renderItemMenuText(list, g2d);
 				g2d.dispose();
 				break;
@@ -406,7 +431,7 @@ public class Inventory extends SubMenu {
 				}
 				else if (Game.keys.isDownPressed()) {
 					Game.keys.downReceived();
-					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					if (this.itemCursor < list.size() - 1) {
 						this.itemCursor++;
 						if (this.arrowPosition < 4)
@@ -438,7 +463,7 @@ public class Inventory extends SubMenu {
 					// This state is used when the player has selected an item, and wants to do
 					// something to the item.
 					// Example, using the item, tossing the item, etc.
-					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
 					if (entry.getKey().getCategory() == null && entry.getValue() == Integer.MAX_VALUE) {
 						// If getCategory() returns null, it is not an item.
@@ -511,7 +536,7 @@ public class Inventory extends SubMenu {
 				break;
 			}
 			case USE: {
-				ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+				List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 				Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
 				entry.getKey().doAction();
 				this.resetCursor();
@@ -520,7 +545,7 @@ public class Inventory extends SubMenu {
 			case TOSS: {
 				if (Game.keys.isUpPressed()) {
 					Game.keys.upReceived();
-					ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+					List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 					Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
 					if (entry.getValue() > this.amountToToss)
 						this.amountToToss++;
@@ -535,7 +560,7 @@ public class Inventory extends SubMenu {
 					this.resetSelectionCursor();
 					this.state = InventoryState.MENU;
 					if (this.selectionMenu.isEmpty()) {
-						ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+						List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 						Item item = list.get(this.itemCursor).getKey();
 						if (item != null && list.get(this.itemCursor).getValue() != Integer.MAX_VALUE) {
 							switch (item.getCategory()) {
@@ -614,19 +639,19 @@ public class Inventory extends SubMenu {
 		return result;
 	}
 
-	public ArrayList<Map.Entry<Item, Integer>> getPotions() {
+	public List<Map.Entry<Item, Integer>> getPotions() {
 		return this.potions;
 	}
 
-	public ArrayList<Map.Entry<Item, Integer>> getKeyItems() {
+	public List<Map.Entry<Item, Integer>> getKeyItems() {
 		return this.keyItems;
 	}
 
-	public ArrayList<Map.Entry<Item, Integer>> getPokeballs() {
+	public List<Map.Entry<Item, Integer>> getPokeballs() {
 		return this.pokéballs;
 	}
 
-	public ArrayList<Map.Entry<Item, Integer>> getTM_HM() {
+	public List<Map.Entry<Item, Integer>> getTM_HM() {
 		return this.TMs_HMs;
 	}
 
@@ -639,9 +664,35 @@ public class Inventory extends SubMenu {
 	 * 
 	 * @return A list of all the items and their corresponding amount of the items that the player is currently browsing in.
 	 */
-	private ArrayList<Map.Entry<Item, Integer>> getCurrentList() {
-		ArrayList<Map.Entry<Item, Integer>> result = null;
+	private List<Map.Entry<Item, Integer>> getCurrentList() {
+		List<Map.Entry<Item, Integer>> result = null;
 		switch (this.category) {
+			case POTIONS:
+				result = this.potions;
+				break;
+			case KEYITEMS:
+				result = this.keyItems;
+				break;
+			case POKEBALLS:
+				result = this.pokéballs;
+				break;
+			case TM_HM:
+				result = this.TMs_HMs;
+				break;
+		}
+		return result;
+	}
+
+	/**
+	 * Obtains the list of items of the category the item belongs to in the Inventory.
+	 * 
+	 * @param itemText
+	 *            The ItemText object that holds information for obtaining the list of items that it belongs to.
+	 * @return A list of all the items and their corresponding amount of the items that the targeted item belongs to.
+	 */
+	private List<Map.Entry<Item, Integer>> getItemCategoryList(ItemText itemText) {
+		List<Map.Entry<Item, Integer>> result = null;
+		switch (itemText.category) {
 			case POTIONS:
 				result = this.potions;
 				break;
@@ -665,9 +716,9 @@ public class Inventory extends SubMenu {
 	 *            The target item that is used to get the list of items that the targeted item belongs to.
 	 * @return A list of all the items and their corresponding amount of the items that the targeted item belongs to.
 	 */
-	private ArrayList<Map.Entry<Item, Integer>> getItemCategoryList(ItemText itemText) {
-		ArrayList<Map.Entry<Item, Integer>> result = null;
-		switch (itemText.category) {
+	private List<Map.Entry<Item, Integer>> getItemCategoryList(Item item) {
+		List<Map.Entry<Item, Integer>> result = null;
+		switch (item.getCategory()) {
 			case POTIONS:
 				result = this.potions;
 				break;
@@ -814,7 +865,7 @@ public class Inventory extends SubMenu {
 	private void renderText(Graphics g) {
 		g.setFont(Art.font.deriveFont(8f));
 		g.setColor(Color.black);
-		ArrayList<Map.Entry<Item, Integer>> list = this.getCurrentList();
+		List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 		switch (this.state) {
 			default: {
 				if (this.tick >= (byte) 0x4) {

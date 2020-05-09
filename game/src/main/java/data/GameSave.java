@@ -25,7 +25,6 @@ import abstracts.Character.GenderType;
 import abstracts.Item;
 import abstracts.SubMenu;
 import entity.Player;
-import item.ItemText;
 import level.Area;
 import level.PixelData;
 import level.WorldConstants;
@@ -251,6 +250,7 @@ public class GameSave {
 				int quantity = (data[offset] << 24) | (data[offset + 1] << 16) | (data[offset + 2] << 8)
 					| data[offset + 3];
 
+				/*
 				ItemText itemText = null;
 				List<Map.Entry<ItemText, Item>> itemList = WorldConstants.items;
 				for (Map.Entry<ItemText, Item> e : itemList) {
@@ -259,8 +259,10 @@ public class GameSave {
 						break;
 					}
 				}
+				*/
+				Item item = Item.build(PixelData.make(id));
 				for (; quantity > 0; quantity--) {
-					inventory.addItem(itemText);
+					inventory.addItem(item);
 				}
 			}
 		}

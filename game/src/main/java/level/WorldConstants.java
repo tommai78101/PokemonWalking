@@ -12,9 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import abstracts.Item;
 import dialogue.Dialogue;
-import item.ItemText;
 import resources.Art;
 import resources.Mod;
 import screen.BaseBitmap;
@@ -56,10 +54,10 @@ public class WorldConstants {
 	// Dialogues
 	public static List<Map.Entry<Dialogue, Integer>> signTexts = DialogueBuilder.loadDialogues("art/dialogue/dialogue.txt");
 
+	//NOTE(Thompson): We're going to start building items instead of loading items from script files.
 	// Items
-	// public static HashMap<Integer, ItemText> itemms =
-	// Item.loadItemResources("item/items.txt");
-	public static List<Map.Entry<ItemText, Item>> items = Item.loadItems("art/item/items.txt");
+	// public static HashMap<Integer, ItemText> itemms = Item.loadItemResources("item/items.txt");
+	// public static List<Map.Entry<ItemText, Item>> items = ItemBuilder.loadItems("art/item/items.txt");
 
 	// Areas
 	public static List<Area> areas = new ArrayList<>(0);

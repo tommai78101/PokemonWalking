@@ -9,19 +9,28 @@
 // !: Item with "USE" command.
 // &: Item with "TOSS" command.
 
-%DUMMY
-#RETURN
-@Return to menu.
-^ALL
-;
+// Example 1:
+//
+//     %DUMMY
+//     #RETURN
+//     @Return to menu.
+//     ^ALL
+//     ;
+
+// Example 2:
+//
+//     %ACTION
+//     #BICYCLE
+//     ^KEYITEMS
+//     !
+//     $
+//     ;
 
 %DUMMY
 #TEST
 @When used, it returns to menu.
 ^KEYITEMS
-!
-&
-;
+[SET,USE];
 
 %DUMMY
 #3_OPTIONS
