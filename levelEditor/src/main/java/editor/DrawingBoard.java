@@ -14,6 +14,8 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -40,11 +42,24 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
+	private boolean mouseInsideDrawingBoardCheck = false;
 
 	public DrawingBoard(final LevelEditor editor, int width, int height) {
 		super();
 		this.editor = editor;
 		this.offsetX = this.offsetY = 0;
+
+		this.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				DrawingBoard.this.mouseInsideDrawingBoardCheck = true;
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				DrawingBoard.this.mouseInsideDrawingBoardCheck = false;
+			}
+		});
 
 		int w = width * Tileable.WIDTH;
 		int h = height * Tileable.HEIGHT;
@@ -352,16 +367,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 					this.offsetX = this.editor.input.offsetX;
 					this.offsetY = this.editor.input.offsetY;
 				}
-				else if (this.editor.input.isDrawing()) {
+				else if (this.isMouseInDrawingBoard() && this.editor.input.isDrawing()) {
 					this.mouseOnTileX = this.offsetX + this.editor.input.drawingX;
-					if (this.mouseOnTileX < 0)
-						return;
-					if (this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH)
-						return;
 					this.mouseOnTileY = this.offsetY + this.editor.input.drawingY;
-					if (this.mouseOnTileY < 0)
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH)
 						return;
-					if (this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
+					if (this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
 					Data selectedData = this.editor.controlPanel.getSelectedData();
 					if (selectedData != null) {
@@ -387,7 +398,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					this.offsetX = this.editor.input.offsetX;
 					this.offsetY = this.editor.input.offsetY;
 				}
-				else if (this.editor.input.isDrawing()) {
+				else if (this.isMouseInDrawingBoard() && this.editor.input.isDrawing()) {
 					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
 					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH)
@@ -630,6 +641,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 	public boolean hasBitmap() {
 		return (this.bitmapHeight * this.bitmapWidth != 0);
+	}
+
+	public boolean isMouseInDrawingBoard() {
+		return this.mouseInsideDrawingBoardCheck;
 	}
 
 	public void openMapImage(BufferedImage image) {
