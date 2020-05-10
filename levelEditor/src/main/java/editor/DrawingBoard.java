@@ -186,9 +186,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			case Pixel_Data: {
 				if (this.tilesEditorID != null) {
 					for (int j = 0; j < this.tilesEditorID.length; j++) {
-						if (this.bitmapWidth <= 0)
-							break;
-						if (this.bitmapHeight <= 0)
+						if (this.bitmapWidth <= 0 || this.bitmapHeight <= 0)
 							break;
 						int w = j % this.bitmapWidth;
 						int h = j / this.bitmapWidth;
