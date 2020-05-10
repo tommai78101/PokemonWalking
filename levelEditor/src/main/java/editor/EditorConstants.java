@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -96,24 +97,41 @@ public class EditorConstants {
 				}
 				else if (line.startsWith("%")) {
 					Data data = new Data();
+					// In the art/editor/data.txt, we use the last bit of data, the area type inclusion flag '*', to
+					// filter and specify which area type the tileset belongs in.
+
 					if (line.contains("*")) {
 						data.areaTypeIncluded = true;
-						Data.DataType type = Data.DataType.BLUE;
+						// By default, the data type specified as NULL, means the alpha, red, green, and blue values are
+						// used for data integrity checks.
+						Data.DataType type = null;
 						short i = 0;
 						byte count = 0;
 						while (line.charAt(i) != '*') {
 							if (line.charAt(i) == '%') {
 								count++;
-								if (count == 2)
-									type = Data.DataType.ALPHA;
-								else if (count == 3)
-									type = Data.DataType.RED;
-								else if (count == 4)
-									type = Data.DataType.GREEN;
-								else if (count == 5)
-									type = Data.DataType.BLUE;
-								else if (count >= 7)
-									type = Data.DataType.BLUE;
+								switch (count) {
+									case 2:
+										// If data type is ALPHA, we only need to data integrity check red, green, and blue values.
+										type = Data.DataType.ALPHA;
+										break;
+									case 3:
+										// If data type is RED, we only need to data integrity check alpha, green, and blue values.
+										type = Data.DataType.RED;
+										break;
+									case 4:
+										// If data type is GREEN, we only need to data integrity check alpha, red, and blue values.
+										type = Data.DataType.GREEN;
+										break;
+									case 5:
+										// If data type is BLUE, we only need to data integrity check alpha, red, and green values.
+										type = Data.DataType.BLUE;
+										break;
+									default:
+										// Data integrity check all values.
+										type = Data.DataType.NONE;
+										break;
+								}
 							}
 							i++;
 						}
@@ -179,6 +197,7 @@ public class EditorConstants {
 			}
 
 			Collections.sort(this.datas, new Comparator<Map.Entry<Integer, Data>>() {
+
 				@Override
 				public int compare(Map.Entry<Integer, Data> d1, Map.Entry<Integer, Data> d2) {
 					if (d1.getValue().editorID < d2.getValue().editorID)
@@ -201,7 +220,10 @@ public class EditorConstants {
 			});
 
 		}
-		catch (Exception e) {
+		catch (
+
+			Exception e
+		) {
 			e.printStackTrace();
 		}
 	}
@@ -259,38 +281,32 @@ public class EditorConstants {
 	}
 
 	public static Data getData(int alpha, int red, int green, int blue) {
-		List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().datas;
-		Data temp = null;
-		for (Map.Entry<Integer, Data> entry : list) {
+		List<Map.Entry<Integer, Data>> dataList = EditorConstants.getInstance().datas.stream().filter(entry -> {
 			Data d = entry.getValue();
 			if (d.areaTypeIncluded) {
+				// Area type ID is value used in the data value. We want to exclude this when doing comparison
+				// checks. Data integrity checks is done here.
 				switch (d.areaTypeIDType) {
 					case ALPHA:
-						if (d.red == red && d.green == green && d.blue == blue)
-							temp = d;
-						break;
+						return (d.red == red && d.green == green && d.blue == blue);
 					case RED:
-						if (d.alpha == alpha && d.green == green && d.blue == blue)
-							temp = d;
-						break;
+						return (d.alpha == alpha && d.green == green && d.blue == blue);
 					case GREEN:
-						if (d.alpha == alpha && d.red == red && d.blue == blue)
-							temp = d;
-						break;
+						return (d.alpha == alpha && d.red == red && d.blue == blue);
 					case BLUE:
-						if (d.alpha == alpha && d.red == red && d.green == green)
-							temp = d;
-						break;
+						return (d.alpha == alpha && d.red == red && d.green == green);
+					case NONE:
 					default:
-						if (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue)
-							temp = d;
-						break;
+						return (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue);
 				}
 			}
-		}
-		if (temp != null)
-			return temp;
-		return EditorConstants.getInstance().getDatas().get(0).getValue();
+			else {
+				return (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue);
+			}
+		}).collect(Collectors.toList());
+		if (dataList.isEmpty())
+			return EditorConstants.getInstance().getDatas().get(0).getValue();
+		return dataList.get(0).getValue();
 	}
 
 	public static Data getData(int colorValue) {

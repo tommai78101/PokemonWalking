@@ -216,6 +216,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 						gB.dispose();
 
 						if (data.areaTypeIncluded) {
+							// If the area type is included with the Data object, we can add some biome colors.
+							// By default, we set the biome colors based on ALPHA value.
+							// When area type of NONE is used, the BLUE value determines the biome colors.
 							switch (data.areaTypeIDType) {
 								case ALPHA:
 								default:
@@ -228,6 +231,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 									this.setBiomeTile((this.tiles[j] >> 8) & 0xFF, g);
 									break;
 								case BLUE:
+								case NONE:
 									this.setBiomeTile(this.tiles[j] & 0xFF, g);
 									break;
 							}

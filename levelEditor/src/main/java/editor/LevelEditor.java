@@ -160,13 +160,15 @@ public class LevelEditor extends JFrame {
 
 				// Made it so that it immediately saves the current editor file location upon
 				// initialization.
+				String lineSeparator = System.getProperty("line.separator");
 				raf = new RandomAccessFile(file, "rw");
 				raf.setLength(0);
 				raf.seek(0);
 				raf.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
-				raf.writeBytes(System.getProperty("line.separator"));
+				raf.writeBytes(lineSeparator);
+				raf.writeBytes(lineSeparator);
 				raf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
-				raf.writeBytes(System.getProperty("line.separator"));
+				raf.writeBytes(lineSeparator);
 			}
 			catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -192,6 +194,8 @@ public class LevelEditor extends JFrame {
 				raf = new RandomAccessFile(file, "r");
 				raf.seek(0);
 				String fileControlFilePath = raf.readLine();
+				// Skipping an extra newline.
+				raf.readLine();
 				String scriptEditorFilePath = raf.readLine();
 				FileControl.lastSavedDirectory = new File(fileControlFilePath);
 				ScriptEditor.LAST_SAVED_DIRECTORY = new File(scriptEditorFilePath);

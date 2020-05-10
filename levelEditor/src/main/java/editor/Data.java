@@ -16,7 +16,8 @@ public class Data {
 		ALPHA,
 		RED,
 		GREEN,
-		BLUE;
+		BLUE,
+		NONE;
 	}
 
 	public String name;
