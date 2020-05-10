@@ -43,7 +43,6 @@ public class LevelEditor extends JFrame {
 	public ControlPanel controlPanel;
 	public FileControl fileControlPanel;
 	public DrawingBoard drawingBoardPanel;
-	public TilePropertiesPanel propertiesPanel;
 	public StatusPanel statusPanel;
 	public Properties properties;
 	public ScriptEditor scriptEditor;

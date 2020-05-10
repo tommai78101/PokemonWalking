@@ -32,6 +32,8 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public CustomJTextField blueInputField;
 
 	public int dataValue;
+	public Data selectData;
+	public ControlPanel panel;
 
 	public JLabel tileID, extendedTileID, tileSpecificID, fullDataInput;
 
@@ -90,8 +92,10 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		}
 	}
 
-	public TilePropertiesPanel() {
+	public TilePropertiesPanel(ControlPanel controlPanel) {
 		super();
+
+		this.panel = controlPanel;
 
 		this.tileID = new CustomJLabel("Tile ID:");
 		this.extendedTileID = new CustomJLabel("Ext. ID:");
@@ -202,6 +206,11 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.redInputField.setText("");
 		this.greenInputField.setText("");
 		this.blueInputField.setText("");
+		this.selectData = null;
+	}
+
+	public void clearSelectedData() {
+		this.selectData = null;
 	}
 
 	/**
@@ -214,6 +223,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.redInputField.setText(Integer.toString(selectedData.red));
 		this.greenInputField.setText(Integer.toString(selectedData.green));
 		this.blueInputField.setText(Integer.toString(selectedData.blue));
+		this.selectData = this.panel.getEditor().properties.getSelectedData();
 	}
 
 	@Override
@@ -224,6 +234,11 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			byte g = (byte) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
 			byte b = (byte) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
+
+			if (this.selectData != null && this.selectData.name.equals("Select")) {
+				Data editedData = EditorConstants.getData(this.dataValue);
+				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
+			}
 		}
 		catch (Exception e) {
 			this.dataValue = 0;
@@ -238,6 +253,11 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			byte g = (byte) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
 			byte b = (byte) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
+
+			if (this.selectData != null && this.selectData.name.equals("Select")) {
+				Data editedData = EditorConstants.getData(this.dataValue);
+				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
+			}
 		}
 		catch (Exception e) {
 			this.dataValue = 0;
@@ -252,6 +272,11 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			byte g = (byte) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
 			byte b = (byte) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
+
+			if (this.selectData != null && this.selectData.name.equals("Select")) {
+				Data editedData = EditorConstants.getData(this.dataValue);
+				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
+			}
 		}
 		catch (Exception e) {
 			this.dataValue = 0;

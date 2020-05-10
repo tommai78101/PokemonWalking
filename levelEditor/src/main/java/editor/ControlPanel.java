@@ -82,7 +82,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 		this.scrollPanel.setVisible(true);
 		this.add(this.scrollPanel);
 
-		this.propertiesPanel = new TilePropertiesPanel();
+		this.propertiesPanel = new TilePropertiesPanel(this);
 		this.add(this.propertiesPanel);
 
 		this.propertiesPanel.setVisible(true);
@@ -101,11 +101,11 @@ public class ControlPanel extends JPanel implements ActionListener {
 					button.setToolTipText(d.name);
 					this.selectedData = d;
 					this.iconName = d.name;
+					this.editor.properties.setDataAsSelected(d);
 					this.propertiesPanel.alphaInputField.setText(Integer.toString(d.alpha));
 					this.propertiesPanel.redInputField.setText(Integer.toString(d.red));
 					this.propertiesPanel.greenInputField.setText(Integer.toString(d.green));
 					this.propertiesPanel.blueInputField.setText(Integer.toString(d.blue));
-					this.editor.properties.setDataAsSelected(d);
 					EditorConstants.chooser = Tools.ControlPanel;
 				}
 				this.editor.validate();
@@ -155,6 +155,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 
 	public TilePropertiesPanel getPropertiesPanel() {
 		return this.propertiesPanel;
+	}
+
+	public LevelEditor getEditor() {
+		return this.editor;
 	}
 
 	@Override

@@ -292,4 +292,12 @@ public class EditorConstants {
 			return temp;
 		return EditorConstants.getInstance().getDatas().get(0).getValue();
 	}
+
+	public static Data getData(int colorValue) {
+		int alpha = (colorValue & 0xFF000000) >> 24;
+		int red = (colorValue & 0xFF0000) >> 16;
+		int green = (colorValue & 0xFF00) >> 8;
+		int blue = (colorValue & 0xFF);
+		return EditorConstants.getData(alpha, red, green, blue);
+	}
 }

@@ -205,7 +205,6 @@ public class Properties extends JPanel {
 	public void setDataAsSelected(Data data) {
 		DefaultComboBoxModel<Category> categoryModel = (DefaultComboBoxModel<Category>) this.tileCategory.getModel();
 		DefaultComboBoxModel<Data> tilesModel = (DefaultComboBoxModel<Data>) this.tiles.getModel();
-
 		int categorySize = categoryModel.getSize();
 
 		// Tiles Category
@@ -219,6 +218,7 @@ public class Properties extends JPanel {
 					Data tilesData = category.nodes.get(j);
 					if (tilesData.compare(data)) {
 						// Do all of this in 1 go.
+						this.editor.controlPanel.getPropertiesPanel().clearSelectedData();
 						categoryModel.setSelectedItem(category);
 						tilesModel.setSelectedItem(tilesData);
 						break nested;
