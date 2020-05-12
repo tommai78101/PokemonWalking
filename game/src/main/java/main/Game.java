@@ -15,7 +15,7 @@ import java.util.List;
 import abstracts.SubMenu;
 import data.GameSave;
 import entity.Player;
-import item.ActionItem;
+import item.KeyItem;
 import level.OverWorld;
 import level.WorldConstants;
 import main.SaveDataManager.SaveStatus;
@@ -35,7 +35,7 @@ public class Game {
 	private final Player player;
 	private MainMenu startMenu;
 	private OverWorld overworld;
-	private ActionItem registeredItem;
+	private KeyItem registeredItem;
 	private StateManager stateManager;
 	private SaveDataManager saveManager;
 	private Inventory inventoryManager;
@@ -48,7 +48,8 @@ public class Game {
 	 * @param Scene
 	 *            Takes in a BaseScreen that displays all rendered graphics to the screen.
 	 * @param Keys
-	 *            Takes the Keys object the input handler receives from the player for the game to handle. The input handler must control this Keys object.
+	 *            Takes the Keys object the input handler receives from the player for the game to
+	 *            handle. The input handler must control this Keys object.
 	 * @see Scene
 	 * @see NewInputHandler
 	 */
@@ -63,8 +64,7 @@ public class Game {
 		this.saveManager = new SaveDataManager(this);
 		this.inventoryManager = new Inventory(this);
 		this.startMenu.initialize(this);
-		this.player = new Player(Game.keys);
-		this.player.setCenterCamPosition(this.gameScene);
+		this.player = new Player(this);
 
 		this.load();
 	}
@@ -76,7 +76,8 @@ public class Game {
 	 * All render() methods must be placed in here to render to the screen.
 	 * 
 	 * <p>
-	 * Methods placed in here are to be separated by game states, and depending on the game states, they are to be called when necessary.
+	 * Methods placed in here are to be separated by game states, and depending on the game states, they
+	 * are to be called when necessary.
 	 * 
 	 * @return Nothing.
 	 */
@@ -162,7 +163,7 @@ public class Game {
 				this.checkUnpausing();
 				break;
 			}
-			//The following cases should assume "subMenu" is not null.
+			// The following cases should assume "subMenu" is not null.
 			case INVENTORY: {
 				subMenu.tick();
 				break;
@@ -243,12 +244,12 @@ public class Game {
 		return this.stateManager;
 	}
 
-	public void setRegisteredItem(ActionItem item) {
+	public void setRegisteredItem(KeyItem item) {
 		this.registeredItem = item;
 		// TODO: Continue to handle registered item's action event.
 	}
 
-	public boolean itemHasBeenRegistered(ActionItem item) {
+	public boolean itemHasBeenRegistered(KeyItem item) {
 		if (this.registeredItem == null)
 			return false;
 		return this.registeredItem.equals(item);
@@ -273,7 +274,7 @@ public class Game {
 		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 	}
 
-	// ------------------------------------------------- 
+	// -------------------------------------------------
 	// PRIVATE METHODS
 	// -------------------------------------------------
 
@@ -311,9 +312,11 @@ public class Game {
 	}
 
 	/**
-	 * This handles updating the main menu states, rendering effects, and the sub menu data, all for preparations.
+	 * This handles updating the main menu states, rendering effects, and the sub menu data, all for
+	 * preparations.
 	 * 
-	 * Clearing the main menu data allows the game to reset to the main menu, without the game states being messed up because of the focus change.
+	 * Clearing the main menu data allows the game to reset to the main menu, without the game states
+	 * being messed up because of the focus change.
 	 */
 	private GameState prepareMainMenu() {
 		GameState state = this.stateManager.getCurrentGameState();

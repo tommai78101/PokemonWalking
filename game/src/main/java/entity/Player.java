@@ -19,6 +19,7 @@ import level.Area;
 import level.PixelData;
 import main.Game;
 import main.Keys;
+import menu.Inventory;
 import resources.Art;
 import screen.Scene;
 import utility.Debug;
@@ -40,6 +41,7 @@ public class Player extends Character {
 	private Entity interactingEntity = null;
 	private byte animationTick = 0;
 	private byte animationPointer = 0;
+	private Inventory inventory;
 
 	// These are based on the art sprite in the resource folder. The numbers are
 	// used to get elements from a 2D array.
@@ -49,7 +51,7 @@ public class Player extends Character {
 	private int oldXPosition;
 	private int oldYPosition;
 
-	//These are animation-related locks
+	// These are animation-related locks
 	private boolean isLockedWalking;
 	private boolean isLockedSprinting;
 	private boolean isLockedJumping;
@@ -59,7 +61,7 @@ public class Player extends Character {
 	private boolean isOnBicycle;
 	private boolean isColliding;
 
-	//This is a player character lock.
+	// This is a player character lock.
 	private static boolean movementLock;
 
 	private boolean isInteractionEnabled;
@@ -77,12 +79,15 @@ public class Player extends Character {
 	 * Constructs a Player object in the game. This must be loaded in ONCE.
 	 * 
 	 * @param Keys
-	 *            Takes in the Keys object the input handler is controlling. It must not take in an uncontrolled Keys object.
+	 *            Takes in the Keys object the input handler is controlling. It must not take in an
+	 *            uncontrolled Keys object.
 	 */
-	public Player(final Keys keys) {
-		this.keys = keys;
+	public Player(Game game) {
+		this.keys = Game.keys;
 		this.automaticMode = false;
 		this.setCharacterPlayable(true);
+		this.setCenterCamPosition(game.getBaseScreen());
+		this.setInventory(game.getInventory());
 	}
 
 	/**
@@ -196,16 +201,24 @@ public class Player extends Character {
 				// Red color values indicate the type of obstacles to filter:
 				// int red = (dataColor >> 16) & 0xFF;
 				// switch (red) {
-				// 		case 0x00: // Small tree
-				// 		case 0x01: //Logs
-				// 		case 0x02: //Planks
-				// 		case 0x03: //Scaffolding Left
-				// 		case 0x04: //Scaffolding Right
-				// 		case 0x05: //Sign
+				// case 0x00: // Small tree
+				// case 0x01: //Logs
+				// case 0x02: //Planks
+				// case 0x03: //Scaffolding Left
+				// case 0x04: //Scaffolding Right
+				// case 0x05: //Sign
 				// }
 				if (!(entity instanceof Obstacle)) {
 					Debug.error("This shouldn't be happening. Obstacle is not an instanceof Entity.");
 					break;
+				}
+
+				// Common player-obstacle interaction code logic.
+				if (this.isInteracting() && entity.isInteracting()) {
+					this.startInteraction(entity);
+				}
+				else {
+					this.stopInteraction();
 				}
 				break;
 			}
@@ -214,22 +227,30 @@ public class Player extends Character {
 					Debug.error("This shouldn't be happening. Item is not an instanceof Entity.");
 					break;
 				}
+				Item item = (Item) entity;
+
+				// Common player-item interaction code logic.
+				if (this.isInteracting() && item.isInteracting()) {
+					this.startInteraction(item);
+					if (!item.isPickedUp()) {
+						this.inventory.addItem(item);
+						item.pick();
+					}
+					else {
+						this.stopInteraction();
+					}
+				}
+				else {
+					this.stopInteraction();
+				}
 				break;
 			}
 			default:
-				//Stop the player from interacting with anything.
+				// Stop the player from interacting with anything.
 				if (this.isInteracting()) {
 					this.stopInteraction();
 				}
 				return;
-		}
-
-		//Common player-entity interaction code logic.
-		if (this.isInteracting() && entity.isInteracting()) {
-			this.startInteraction(entity);
-		}
-		else {
-			this.stopInteraction();
 		}
 	}
 
@@ -302,7 +323,9 @@ public class Player extends Character {
 
 	/**
 	 * <p>
-	 * Handles the 4 surrounding tiles around the player character, in the cardinal directions of north, west, south, and east. Once the player is interacting with one of the tiles, the area will remember and mark the tile's interaction ID, and pass it to the OverWorld to handle.
+	 * Handles the 4 surrounding tiles around the player character, in the cardinal directions of north,
+	 * west, south, and east. Once the player is interacting with one of the tiles, the area will
+	 * remember and mark the tile's interaction ID, and pass it to the OverWorld to handle.
 	 * </p>
 	 * 
 	 * @return Nothing.
@@ -346,16 +369,22 @@ public class Player extends Character {
 	}
 
 	/**
-	 * Checks the pixel data and sets properties according to the documentation provided. The tile the pixel data is representing determines whether it should allow or block the player from walking towards it.
+	 * Checks the pixel data and sets properties according to the documentation provided. The tile the
+	 * pixel data is representing determines whether it should allow or block the player from walking
+	 * towards it.
 	 * 
 	 * <p>
-	 * In other words, this is the method call that works out the collision detection/response in the game.
+	 * In other words, this is the method call that works out the collision detection/response in the
+	 * game.
 	 * 
 	 * @param xOffset
 	 *            Sets the offset of the PixelData it should check by the X axis.
 	 * @param yOffset
 	 *            Sets the offset of the PixelData it should check by the Y axis.
-	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump through. Returns true to block the player from walking from the player's last position to this tile. Returns false to allow player to walk from the player's last position to this tile.
+	 * @return The value determining if this PixelData is to block or allow the player to pass/walk/jump
+	 *         through. Returns true to block the player from walking from the player's last position to
+	 *         this tile. Returns false to allow player to walk from the player's last position to this
+	 *         tile.
 	 */
 	public boolean checkSurroundingData(Area area, int xOffset, int yOffset) {
 		PixelData data = null;
@@ -453,8 +482,10 @@ public class Player extends Character {
 			}
 			case 0x03: // Obstacle
 				switch (red) {
-					//Item types
+					// Item types
 					default:
+						if (data.isHidden())
+							return false;
 						if (this.isInteracting())
 							return true;
 						if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset)) {
@@ -483,6 +514,8 @@ public class Player extends Character {
 				// found, default to locked doors.
 				return false;
 			case 0x0A: // Item
+				if (data.isHidden())
+					return false;
 				if (this.isInteracting())
 					return true;
 				if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset)) {
@@ -520,7 +553,8 @@ public class Player extends Character {
 	}
 
 	/**
-	 * Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world grids.
+	 * Blits the entity onto the screen, being offsetted to the left, which fits snugly in the world
+	 * grids.
 	 * 
 	 * @param output
 	 *            Where the bitmap is to be blitted.
@@ -533,6 +567,9 @@ public class Player extends Character {
 	 */
 	@Override
 	public void render(final Scene output, final Graphics graphics, final int x, final int y) {
+		// Key press detection. (It's short-circuited via inputs first, before checking the lock.)
+		boolean canUserMove = Game.keys.isDpadPressed() && !Player.movementLock;
+
 		if (this.isLockedJumping) {
 			// Jumping has a higher priority than walking.
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
@@ -552,10 +589,9 @@ public class Player extends Character {
 				output.npcBlit(Art.player[this.walking][this.animationPointer], this.xOffset + x, this.yOffset + y);
 		}
 		else {
-			// Key press detection.
-			boolean canUserMove = Game.keys.isDpadPressed() && !Player.movementLock;
+			// Idle animation. Best for rendering things when the character is not moving.
 
-			// Player state
+			// Check for player state's validity.
 			if (this.isInWater && this.isOnBicycle) {
 				// Player has entered an impossible state.
 				return;
@@ -583,20 +619,32 @@ public class Player extends Character {
 				else
 					output.npcBlit(Art.player[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
 			}
+
+			// Interacting with another entity.
+			if (this.isInteractionEnabled) {
+				// Dialogues can be rendered at this point here.
+				this.interactingEntity.render(output, graphics, x, y);
+			}
 		}
 	}
 
 	/**
-	 * Sets where each of the four directions are blocked by obstacles in front of the player. The obstacles are in front of the player, when the player is facing towards them. That is the time to check and see if the obstacle is blocking the player or not.
+	 * Sets where each of the four directions are blocked by obstacles in front of the player. The
+	 * obstacles are in front of the player, when the player is facing towards them. That is the time to
+	 * check and see if the obstacle is blocking the player or not.
 	 * 
 	 * @param up
-	 *            If an obstacle is in front of the player when the player is facing towards NORTH, or UP, then up is true. False, otherwise.
+	 *            If an obstacle is in front of the player when the player is facing towards NORTH, or
+	 *            UP, then up is true. False, otherwise.
 	 * @param down
-	 *            If an obstacle is below of the player when the player is facing towards SOUTH, or DOWN, then down is true. False, otherwise.
+	 *            If an obstacle is below of the player when the player is facing towards SOUTH, or
+	 *            DOWN, then down is true. False, otherwise.
 	 * @param left
-	 *            If an obstacle is to the left of the player when the player is facing towards WEST, or LEFT, then left is true. False, otherwise.
+	 *            If an obstacle is to the left of the player when the player is facing towards WEST, or
+	 *            LEFT, then left is true. False, otherwise.
 	 * @param right
-	 *            If an obstacle is to the right of the player when the player is facing towards EAST, or RIGHT, then right is true. False, otherwise.
+	 *            If an obstacle is to the right of the player when the player is facing towards EAST,
+	 *            or RIGHT, then right is true. False, otherwise.
 	 */
 	public void setAllBlockingDirections(final boolean up, final boolean down, final boolean left, final boolean right) {
 		this.isFacingBlocked[Character.UP] = up;
@@ -658,13 +706,18 @@ public class Player extends Character {
 	}
 
 	/**
-	 * Locks the player into a jumping state. In this state, the Player cannot listen to any key inputs received during the jump.
+	 * Locks the player into a jumping state. In this state, the Player cannot listen to any key inputs
+	 * received during the jump.
 	 * <p>
 	 * 
 	 * Note: An example on how to determine player direction for the tile to allow and block:
 	 * <ul>
-	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the player to jump from top to bottom, the parameters, "from" and "to" would be Player.UP and Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means, the tile above
-	 * X is the UP position of X, and the tile below X is the DOWN position of X. Therefore, X allows the player on the tile above X (the UP tile) to jump across to the tile below X, but not the other way around.
+	 * Let's say the tile, X, is located at (1, 1), if using bitmap coordinates. If the tile allows the
+	 * player to jump from top to bottom, the parameters, "from" and "to" would be Player.UP and
+	 * Player.DOWN respectively, which is the UP tile at (1, 0) and DOWN tile at (1, 2). It means, the
+	 * tile above X is the UP position of X, and the tile below X is the DOWN position of X. Therefore,
+	 * X allows the player on the tile above X (the UP tile) to jump across to the tile below X, but not
+	 * the other way around.
 	 * </ul>
 	 * 
 	 * Parameters must be either Player.UP, Player.DOWN, Player.LEFT, or Player.RIGHT.
@@ -677,9 +730,13 @@ public class Player extends Character {
 	 * @param blue
 	 *            The blue value of the pixel color.
 	 * @param from
-	 *            The player direction the tile allows the player to jump from. Player direction is determined from where the tile is located. The player direction must not be the same as the "to" parameter.
+	 *            The player direction the tile allows the player to jump from. Player direction is
+	 *            determined from where the tile is located. The player direction must not be the same
+	 *            as the "to" parameter.
 	 * @param to
-	 *            The player direction the tile allows the player to jump to. Player direction is determined from where the tile is located. The player direction must not be the same as the "from" parameter.
+	 *            The player direction the tile allows the player to jump to. Player direction is
+	 *            determined from where the tile is located. The player direction must not be the same
+	 *            as the "from" parameter.
 	 * @return Nothing.
 	 */
 	public void setLockJumping(final int red, final int green, final int blue, final int from, final int to) {
@@ -881,7 +938,8 @@ public class Player extends Character {
 	 * Makes adjustments to the player's position when the player is walking.
 	 * 
 	 * <p>
-	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the player has stopped walking, until the player wanted to walk.
+	 * If the conditions are met, such as a tile has been fully moved to, it will check to make sure the
+	 * player has stopped walking, until the player wanted to walk.
 	 * 
 	 * @return Nothing.
 	 */
@@ -1086,6 +1144,13 @@ public class Player extends Character {
 				return;
 			}
 		}
+	}
+
+	/**
+	 * @param inventoryManager
+	 */
+	public void setInventory(Inventory inventoryManager) {
+		this.inventory = inventoryManager;
 	}
 
 	@Override

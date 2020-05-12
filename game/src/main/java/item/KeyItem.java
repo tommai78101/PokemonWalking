@@ -7,30 +7,28 @@
  */
 package item;
 
-import java.awt.Graphics;
-
 import abstracts.Item;
 import entity.Player;
 import level.Area;
 import main.Game;
-import screen.Scene;
 
 /**
- * Any base implementations of the abstract class object, Item, will need to implement or devise a way to create Dialogues associated with that item object.
+ * Any base implementations of the abstract class object, Item, will need to implement or devise a
+ * way to create Dialogues associated with that item object.
  * 
  * @author tlee
  *
  */
-public class ActionItem extends Item {
+public class KeyItem extends Item {
 
 	protected boolean enabled;
 
-	public ActionItem(Game game, String name, String description, Category category, int id) {
-		super(game, name, description, category, id);
+	public KeyItem(String name, String description, Category category, int id) {
+		super(name, description, category, id);
 	}
 
-	public ActionItem(Game game, ItemText text) {
-		super(game, text);
+	public KeyItem(ItemText text) {
+		super(text);
 	}
 
 	public void enable() {
@@ -46,7 +44,12 @@ public class ActionItem extends Item {
 	}
 
 	@Override
-	public void doAction() {
+	public boolean canBeTossed() {
+		return false;
+	}
+
+	@Override
+	public void doAction(Game game) {
 		if (this.enabled)
 			this.disable();
 		else
@@ -80,15 +83,5 @@ public class ActionItem extends Item {
 		int hash = 3;
 		hash = 53 * hash + ((this.name != null) ? this.name.hashCode() : 0);
 		return hash;
-	}
-
-	@Override
-	public void tick() {
-		return;
-	}
-
-	@Override
-	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
-		return;
 	}
 }

@@ -32,7 +32,8 @@ import utility.Debug;
 
 public class MainComponent extends Canvas implements Runnable {
 
-	// DEBUG: Useful for reducing the number of times to swap between the game application window and Eclipse.
+	// DEBUG: Useful for reducing the number of times to swap between the game application window and
+	// Eclipse.
 	private static final boolean DebugMode = false;
 
 	private static final long serialVersionUID = 1L;
@@ -76,7 +77,8 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Intializes the game and loads all required assets.
 	 * 
-	 * This method can only be run once throughout the entire application life cycle. Otherwise, there will be errors and unexpected glitches.
+	 * This method can only be run once throughout the entire application life cycle. Otherwise, there
+	 * will be errors and unexpected glitches.
 	 * 
 	 * @return Nothing.
 	 */
@@ -104,7 +106,8 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Starts the game execution.
 	 * 
-	 * After MainComponent object has been loaded, this method is used to initiate game initialization and execution of the entire game.
+	 * After MainComponent object has been loaded, this method is used to initiate game initialization
+	 * and execution of the entire game.
 	 * 
 	 * @return Nothing.
 	 */
@@ -198,7 +201,8 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Updates the game.
 	 * 
-	 * This method is synchronized for no reason other than to avoid the main thread from fighting from the Game Thread. It is possible that this is unnecessary. Please provide any feedback about this.
+	 * This method is synchronized for no reason other than to avoid the main thread from fighting from
+	 * the Game Thread. It is possible that this is unnecessary. Please provide any feedback about this.
 	 * 
 	 * @return Nothing.
 	 */
@@ -211,7 +215,9 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Renders the game to the screen.
 	 * 
-	 * The game uses software renderer, since it is modifying the BufferedImage acting as a back buffer. This method is synchronized for no reason other than to avoid the main thread from fighting from the Game Thread. It is possible that this is unnecessary. Please provide any feedback about this.
+	 * The game uses software renderer, since it is modifying the BufferedImage acting as a back buffer.
+	 * This method is synchronized for no reason other than to avoid the main thread from fighting from
+	 * the Game Thread. It is possible that this is unnecessary. Please provide any feedback about this.
 	 * 
 	 * @return Nothing.
 	 */
@@ -272,10 +278,12 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Creates a BufferedImage that is compatible with the graphics card the player is currently using.
 	 * 
-	 * The developer is unsure of its benefits. Please provide feedback if you have any comments about this.
+	 * The developer is unsure of its benefits. Please provide feedback if you have any comments about
+	 * this.
 	 * 
 	 * @param BufferedImage
-	 *            Takes a BufferedImage that is to make it compatible with the graphics card built in the computer the game is running on.
+	 *            Takes a BufferedImage that is to make it compatible with the graphics card built in
+	 *            the computer the game is running on.
 	 * @return BufferedImage The BufferedImage used for the Graphics object to blit to the screen.
 	 */
 	public static final BufferedImage createCompatibleBufferedImage(BufferedImage image) {
@@ -310,13 +318,6 @@ public class MainComponent extends Canvas implements Runnable {
 	}
 
 	// ---------------------------------
-	// Other methods
-
-	public static final Game getGame() {
-		return MainComponent.game;
-	}
-
-	// ---------------------------------
 	// Main execution method
 
 	public static void main(String[] args) {
@@ -333,7 +334,7 @@ public class MainComponent extends Canvas implements Runnable {
 		frame.setAlwaysOnTop(MainComponent.DebugMode);
 		frame.pack();
 
-		//Setting the frame size must come after pack() is called.
+		// Setting the frame size must come after pack() is called.
 		Insets inset = frame.getInsets();
 		frame.setSize(
 			new Dimension(
@@ -342,7 +343,7 @@ public class MainComponent extends Canvas implements Runnable {
 			)
 		);
 
-		//Set visibility must come after pack() and setSize() are called.
+		// Set visibility must come after pack() and setSize() are called.
 		frame.setVisible(true);
 
 		Debug.log("Game is now starting.");

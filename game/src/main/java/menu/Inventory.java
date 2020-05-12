@@ -20,20 +20,22 @@ import java.util.Map;
 
 import abstracts.Item;
 import abstracts.Item.Category;
-import common.Tileable;
 import abstracts.SubMenu;
+import common.Tileable;
 import dialogue.Dialogue;
 import entity.Player;
-import item.ActionItem;
 import item.Bicycle;
 import item.DummyItem;
 import item.ItemText;
+import item.KeyItem;
 import level.WorldConstants;
 import main.Game;
 import main.MainComponent;
+import main.StateManager;
 import main.StateManager.GameState;
 import resources.Art;
 import screen.Scene;
+import utility.Debug;
 import utility.DialogueBuilder;
 
 public class Inventory extends SubMenu {
@@ -83,7 +85,8 @@ public class Inventory extends SubMenu {
 	 * @param disabled
 	 *            The description that is to be shown when the submenu is deactivated/disabled.
 	 * @param game
-	 *            The Game object that controls most of the actions/events the player has done when managing/using the Inventory.
+	 *            The Game object that controls most of the actions/events the player has done when
+	 *            managing/using the Inventory.
 	 * @return Nothing. It's a constructor after all.
 	 */
 	public Inventory(Game game) {
@@ -95,7 +98,7 @@ public class Inventory extends SubMenu {
 		this.pokéballs = new ArrayList<>();
 		this.TMs_HMs = new ArrayList<>();
 		this.selectionMenu = new ArrayList<>();
-		Item returnExit = new DummyItem(game, "RETURN", "Close inventory.", null, 0);
+		Item returnExit = new DummyItem("RETURN", "Close inventory.", null, 0);
 		this.potions.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.keyItems.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.pokéballs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
@@ -113,7 +116,7 @@ public class Inventory extends SubMenu {
 		List<Map.Entry<Item, Integer>> categoryList = this.getItemCategoryList(item);
 		switch (item.getCategory()) {
 			case KEYITEMS: {
-				//De-duplicate any key items
+				// De-duplicate any key items
 				for (Iterator<Map.Entry<Item, Integer>> it = categoryList.iterator(); it.hasNext();) {
 					Map.Entry<Item, Integer> entry = it.next();
 					int count = entry.getValue().intValue();
@@ -122,7 +125,7 @@ public class Inventory extends SubMenu {
 					}
 				}
 
-				//Add the key item.
+				// Add the key item.
 				categoryList.add(Map.entry(item, 1));
 				break;
 			}
@@ -141,7 +144,8 @@ public class Inventory extends SubMenu {
 	}
 
 	/**
-	 * Adds an item with its text description into the Inventory, being categorized into its relevant "pocket" of the player's bag.
+	 * Adds an item with its text description into the Inventory, being categorized into its relevant
+	 * "pocket" of the player's bag.
 	 * 
 	 * @param itemText
 	 *            The item description of the item that is to be added into the Inventory.
@@ -178,19 +182,19 @@ public class Inventory extends SubMenu {
 			Item item = null;
 			switch (itemText.type) {
 				case DUMMY:
-					item = new DummyItem(this.game, itemText);
+					item = new DummyItem(itemText);
 					list.add(0, new AbstractMap.SimpleEntry<>(item, 1));
 					break;
 				case ACTION: {
 					// Action items must have ID, else it would be a dummy item.
 					switch (itemText.id) {
 						case WorldConstants.ITEM_BICYCLE:
-							item = new Bicycle(this.game, itemText);
+							item = new Bicycle(itemText);
 							list.add(0, new AbstractMap.SimpleEntry<>(item, 1));
 							break;
 						default:
 							// Dummy item creation.
-							item = new DummyItem(this.game, itemText);
+							item = new DummyItem(itemText);
 							list.add(0, new AbstractMap.SimpleEntry<>(item, 1));
 							break;
 					}
@@ -204,6 +208,37 @@ public class Inventory extends SubMenu {
 		}
 	}
 
+	public void removeItem(Item item) {
+		if (item.getCategory() == Category.KEYITEMS)
+			// Cannot remove key items, therefore, this does nothing.
+			return;
+
+		List<Map.Entry<Item, Integer>> categoryList = this.getItemCategoryList(item);
+		switch (item.getCategory()) {
+			case KEYITEMS: {
+				Debug.error("Removing Key Items - This is impossible to reach here.");
+				break;
+			}
+			case POKEBALLS:
+			case POTIONS:
+			case TM_HM: {
+				for (Iterator<Map.Entry<Item, Integer>> it = categoryList.iterator(); it.hasNext();) {
+					Map.Entry<Item, Integer> entry = it.next();
+					if (entry.getKey().equals(item)) {
+						if (entry.getValue() - 1 <= 0) {
+							it.remove();
+						}
+						else {
+							entry.setValue(entry.getValue() - 1);
+						}
+						break;
+					}
+				}
+				break;
+			}
+		}
+	}
+
 	/**
 	 * Initializes the Inventory with the inputs.
 	 * 
@@ -214,23 +249,25 @@ public class Inventory extends SubMenu {
 	 *            The input keys the player is using.
 	 * @return Itself.
 	 */
-//	@Override
-//	public SubMenu initialize(Keys keys) {
-//		// TODO: Add new inventory art for background.
-//		this.keys = keys;
-//		return Inventory.this;
-//	}
+// @Override
+// public SubMenu initialize(Keys keys) {
+// // TODO: Add new inventory art for background.
+// this.keys = keys;
+// return Inventory.this;
+// }
 
 	/**
 	 * Renders the Inventory to the screen.
 	 * 
 	 * <p>
-	 * Note that it doesn't render the {@link screen.Scene#getBufferedImage() BufferedImage} to the actual {@link main.MainComponent#getBufferStrategy() BufferStrategy}.
+	 * Note that it doesn't render the {@link screen.Scene#getBufferedImage() BufferedImage} to the
+	 * actual {@link main.MainComponent#getBufferStrategy() BufferStrategy}.
 	 * 
 	 * @param output
 	 *            The display that is to be rendered.
 	 * @param graphics
-	 *            The Graphics object that the main component creates using {@link java.awt.Canvas#getBufferStrategy() BufferStrategy} object.
+	 *            The Graphics object that the main component creates using
+	 *            {@link java.awt.Canvas#getBufferStrategy() BufferStrategy} object.
 	 * @return Nothing.
 	 */
 	@Override
@@ -403,7 +440,8 @@ public class Inventory extends SubMenu {
 	}
 
 	/**
-	 * Resets the position of the pointer and delete the selection menu commands of the item that the player is allowed to do.
+	 * Resets the position of the pointer and delete the selection menu commands of the item that the
+	 * player is allowed to do.
 	 * 
 	 * @return Nothing.
 	 */
@@ -453,7 +491,7 @@ public class Inventory extends SubMenu {
 				else if (Game.keys.isSecondaryPressed()) {
 					Game.keys.secondaryReceived();
 
-					//Exiting the Inventory.
+					// Exiting the Inventory.
 					this.resetCursor();
 					this.exit();
 				}
@@ -538,7 +576,7 @@ public class Inventory extends SubMenu {
 			case USE: {
 				List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 				Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
-				entry.getKey().doAction();
+				entry.getKey().doAction(this.game);
 				this.resetCursor();
 				break;
 			}
@@ -588,7 +626,7 @@ public class Inventory extends SubMenu {
 			}
 			case SET: {
 				Map.Entry<Item, Integer> entry = this.getCurrentList().get(this.itemCursor);
-				ActionItem actionItem = (ActionItem) entry.getKey();
+				KeyItem actionItem = (KeyItem) entry.getKey();
 				if (!this.game.itemHasBeenRegistered(actionItem)) {
 					this.game.setRegisteredItem(actionItem);
 				}
@@ -655,6 +693,14 @@ public class Inventory extends SubMenu {
 		return this.TMs_HMs;
 	}
 
+	public Player getPlayer() {
+		return this.game.getPlayer();
+	}
+
+	public StateManager getStateManager() {
+		return this.game.getStateManager();
+	}
+
 	// ------------------------------------
 	// PRIVATE METHODS
 	// -----------------------------------------
@@ -662,7 +708,8 @@ public class Inventory extends SubMenu {
 	/**
 	 * Obtains the list of items the player is currently browsing in the Inventory.
 	 * 
-	 * @return A list of all the items and their corresponding amount of the items that the player is currently browsing in.
+	 * @return A list of all the items and their corresponding amount of the items that the player is
+	 *         currently browsing in.
 	 */
 	private List<Map.Entry<Item, Integer>> getCurrentList() {
 		List<Map.Entry<Item, Integer>> result = null;
@@ -687,8 +734,10 @@ public class Inventory extends SubMenu {
 	 * Obtains the list of items of the category the item belongs to in the Inventory.
 	 * 
 	 * @param itemText
-	 *            The ItemText object that holds information for obtaining the list of items that it belongs to.
-	 * @return A list of all the items and their corresponding amount of the items that the targeted item belongs to.
+	 *            The ItemText object that holds information for obtaining the list of items that it
+	 *            belongs to.
+	 * @return A list of all the items and their corresponding amount of the items that the targeted
+	 *         item belongs to.
 	 */
 	private List<Map.Entry<Item, Integer>> getItemCategoryList(ItemText itemText) {
 		List<Map.Entry<Item, Integer>> result = null;
@@ -713,8 +762,10 @@ public class Inventory extends SubMenu {
 	 * Obtains the list of items of the category the item belongs to in the Inventory.
 	 * 
 	 * @param item
-	 *            The target item that is used to get the list of items that the targeted item belongs to.
-	 * @return A list of all the items and their corresponding amount of the items that the targeted item belongs to.
+	 *            The target item that is used to get the list of items that the targeted item belongs
+	 *            to.
+	 * @return A list of all the items and their corresponding amount of the items that the targeted
+	 *         item belongs to.
 	 */
 	private List<Map.Entry<Item, Integer>> getItemCategoryList(Item item) {
 		List<Map.Entry<Item, Integer>> result = null;
@@ -814,7 +865,8 @@ public class Inventory extends SubMenu {
 	}
 
 	/**
-	 * Renders the background of the Inventory, which its rendering area is where the list of items are to be drawn on top of.
+	 * Renders the background of the Inventory, which its rendering area is where the list of items are
+	 * to be drawn on top of.
 	 * 
 	 * @param output
 	 *            The screen that the game used to draw for the player to see.
@@ -858,7 +910,9 @@ public class Inventory extends SubMenu {
 	 * Does not draw text for the dialogues.
 	 * 
 	 * @param g
-	 *            The Graphics object that is passed to draw the text messages. It can be a Graphics object that is created from a BufferedImage, or a Graphics object that is created from a BufferStrategy().
+	 *            The Graphics object that is passed to draw the text messages. It can be a Graphics
+	 *            object that is created from a BufferedImage, or a Graphics object that is created from
+	 *            a BufferStrategy().
 	 * 
 	 * @return Nothing.
 	 */

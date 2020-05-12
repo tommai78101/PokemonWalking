@@ -67,7 +67,7 @@ public class Area implements Tileable, UpdateRenderable {
 		int column = 0;
 		int stride = bitmap.getWidth();
 		for (int i = 0; i < triggerSize; i++) {
-			//The "color" is the ID.
+			// The "color" is the ID.
 			// ID must not be negative. ID = 0 is reserved.
 			column = i + 1;
 			int color = tempPixels[column + (stride * row)];
@@ -164,7 +164,7 @@ public class Area implements Tileable, UpdateRenderable {
 			this.xPlayerPosition = this.player.getXInArea();
 			this.yPlayerPosition = this.player.getYInArea();
 
-			//Do some bounds checking on the X and Y player positions.
+			// Do some bounds checking on the X and Y player positions.
 			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
 			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
 			if (isXOutOfBounds || isYOutOfBounds)
@@ -193,9 +193,9 @@ public class Area implements Tileable, UpdateRenderable {
 			this.handlePlayerActions();
 		}
 
-		//Area specific entities are updated at the end.
-		this.areaObstacles.forEach((k, obstacle) -> {
-			obstacle.tick();
+		// Area specific entities are updated at the end.
+		this.areaObstacles.forEach((key, obstacleValue) -> {
+			obstacleValue.tick();
 		});
 	}
 
@@ -215,11 +215,11 @@ public class Area implements Tileable, UpdateRenderable {
 
 	private void handlePlayerActions() {
 		if (!this.player.isLockedWalking()) {
-			//Update the area's X and Y player position from the Player object.
+			// Update the area's X and Y player position from the Player object.
 			this.xPlayerPosition = this.player.getXInArea();
 			this.yPlayerPosition = this.player.getYInArea();
 
-			//Do some bounds checking on the X and Y player positions.
+			// Do some bounds checking on the X and Y player positions.
 			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
 			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
 			if (isXOutOfBounds || isYOutOfBounds)
@@ -238,7 +238,7 @@ public class Area implements Tileable, UpdateRenderable {
 			this.xPlayerPosition = this.player.getXInArea();
 			this.yPlayerPosition = this.player.getYInArea();
 
-			//Do some bounds checking on the X and Y player positions.
+			// Do some bounds checking on the X and Y player positions.
 			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
 			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
 			if (isXOutOfBounds || isYOutOfBounds)
@@ -264,7 +264,9 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	/**
-	 * Checks the pixel data the player is currently on, and sets the tile properties according to the documentation provided. The tile the pixel data is representing determines the properties this will set, and will affect how the game interacts with the player.
+	 * Checks the pixel data the player is currently on, and sets the tile properties according to the
+	 * documentation provided. The tile the pixel data is representing determines the properties this
+	 * will set, and will affect how the game interacts with the player.
 	 * 
 	 * @return Nothing.
 	 */
@@ -333,7 +335,7 @@ public class Area implements Tileable, UpdateRenderable {
 				// this.displayExitArrow = true;
 				break;
 			case 0x0D: // Triggers
-				if (red == 0x00) { //Default starting Point
+				if (red == 0x00) { // Default starting Point
 					this.setPixelData(
 						new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
 						this.currentPixelData.xPosition, this.currentPixelData.yPosition
@@ -357,37 +359,44 @@ public class Area implements Tileable, UpdateRenderable {
 	 * Renders the bitmap tiles based on the given pixel data.
 	 * 
 	 * <p>
-	 * Note that this is where the bitmap animation works by updating the bitmap after it has been rendered to the screen.
+	 * Note that this is where the bitmap animation works by updating the bitmap after it has been
+	 * rendered to the screen.
 	 * 
 	 * @param screen
 	 *            The screen display where the bitmaps are to output to.
 	 * @param xOff
-	 *            The X offset based on the player's X position in absolute world coordinates. The absolute world coordinates mean the precise X position on the Canvas.
+	 *            The X offset based on the player's X position in absolute world coordinates. The
+	 *            absolute world coordinates mean the precise X position on the Canvas.
 	 * @param yOff
-	 *            The Y offset based on the player's Y position in absolute world coordinates. The absolute world coordinates mean the precise Y position on the Canvas.
+	 *            The Y offset based on the player's Y position in absolute world coordinates. The
+	 *            absolute world coordinates mean the precise Y position on the Canvas.
 	 * @return Nothing.
 	 * 
 	 */
 	@Override
 	public void render(Scene screen, Graphics graphics, int xOff, int yOff) {
-		//Rendering area background tiles.
+		// Rendering area background tiles.
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
 				screen.blitBiome(data.getBiomeBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
-				screen.blitBiome(data.getBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
 
-				//This is for rendering exit arrows when you are in front of the exit/entrance doors.
+				// We do not render the pixel data if the pixel data is hidden from view.
+				if (!data.isHidden()) {
+					screen.blitBiome(data.getBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
+				}
+
+				// This is for rendering exit arrows when you are in front of the exit/entrance doors.
 				if (x == this.player.getXInArea() && y == this.player.getYInArea()
 					&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
 					this.renderExitArrow(screen, xOff, yOff, data, x, y);
 
-				//Each time the area background tile is rendered, it also updates the bitmap tick updates.
+				// Each time the area background tile is rendered, it also updates the bitmap tick updates.
 				data.renderTick();
 			}
 		}
 
-		//Obstacle dialogues are rendered on top of the area background tiles.
+		// Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach((k, obstacle) -> {
 			obstacle.renderDialogue(screen, graphics);
 		});
@@ -536,13 +545,19 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	/**
-	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that the player is allowed to walk on, or when the conditions are right for the player to move on the tile.
+	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that
+	 * the player is allowed to walk on, or when the conditions are right for the player to move on the
+	 * tile.
 	 * 
 	 * @param targetIDToCompare
-	 *            The target tile ID used to test and see if it's allowable for the player to move/walk on. Use getSurroundingTileID() to fetch the target tile ID.
+	 *            The target tile ID used to test and see if it's allowable for the player to move/walk
+	 *            on. Use getSurroundingTileID() to fetch the target tile ID.
 	 * @param multipleTileIDs
-	 *            The many tile IDs that are to be compared to the target tile ID to see if the target tile ID is one of the allowed tile IDs. You may use as many tile IDs for comparison as you wished.
-	 * @return True, if the target tile ID is one of the many tile IDs that's allowable. False, if none of the tile IDs match the target tile ID.
+	 *            The many tile IDs that are to be compared to the target tile ID to see if the target
+	 *            tile ID is one of the allowed tile IDs. You may use as many tile IDs for comparison as
+	 *            you wished.
+	 * @return True, if the target tile ID is one of the many tile IDs that's allowable. False, if none
+	 *         of the tile IDs match the target tile ID.
 	 * 
 	 */
 	public boolean checkIfValuesAreAllowed(int targetIDToCompare, int... multipleTileIDs) {
@@ -617,7 +632,7 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	public Entity getEntity(int x, int y) {
-		//Only obstacles and characters are entities.
+		// Only obstacles and characters are entities.
 		PixelData data = this.getPixelData(x, y);
 		if (Entity.isObstacle(data)) {
 			Obstacle obstacle = this.areaObstacles.get(Map.entry(x, y));

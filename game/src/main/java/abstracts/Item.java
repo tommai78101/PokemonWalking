@@ -8,7 +8,9 @@
 
 package abstracts;
 
+import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 
 import dialogue.Dialogue;
@@ -20,26 +22,28 @@ import item.ItemText;
 import level.Area;
 import level.PixelData;
 import main.Game;
-import main.MainComponent;
 import menu.Inventory;
 import resources.Art;
 import screen.Scene;
 import utility.DialogueBuilder;
 
 /**
- * Any base implementations of the abstract class object, Item, will need to implement or devise a way to create Dialogues associated with that item object.
+ * Any base implementations of the abstract class object, Item, will need to implement or devise a
+ * way to create Dialogues associated with that item object.
  * 
  * @author tlee
  *
  */
 public abstract class Item extends Entity implements Comparable<Item>, Renderable {
 
+	protected static Inventory inventory;
+
 	public enum Category {
 		// @formatter:off
-		POTIONS(0), 
-		KEYITEMS(1), 
-		POKEBALLS(2), 
-		TM_HM(3);
+		POTIONS(0x00), 
+		KEYITEMS(0x01), 
+		POKEBALLS(0x02), 
+		TM_HM(0x03);
 		// @formatter:on
 
 		private int id;
@@ -52,7 +56,8 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		 * Obtains a Category enum value that matches the given ID number.
 		 * 
 		 * <p>
-		 * If there is no Category that comes after the last element, it will give the first element, and wraps from there.
+		 * If there is no Category that comes after the last element, it will give the first element, and
+		 * wraps from there.
 		 * </p>
 		 * 
 		 * @param value
@@ -79,42 +84,57 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	}
 
 	protected String name;
+	protected String dialogueName;
 	protected String description;
-	protected Game game;
 	protected Category category;
 	protected boolean picked;
 	protected int id;
 	protected List<String> availableCommands;
-	protected final List<Dialogue> dialogues;
+	protected Dialogue pickedDialogue;
+	protected Dialogue tossedDialogue;
 
-	public Item(Game game, String name, String description, Category category, int id) {
+	private boolean afterItemActionOccurred = false;
+
+	public Item(String name, String description, Category category, int id) {
 		this.setName(name);
 		this.setDescription(description);
 		this.setCategory(category);
 		this.setID(id);
-		this.game = game;
 		this.picked = false;
 		this.availableCommands = new ArrayList<>();
-		this.dialogues = new ArrayList<>();
+
+		try (Formatter formatter = new Formatter()) {
+			formatter.format("%-1" + (Dialogue.HALF_STRING_LENGTH - name.length()) + "s", name);
+			this.dialogueName = formatter.toString();
+		}
 	}
 
-	public Item(Game game, ItemText itemText) {
+	public Item(ItemText itemText) {
 		this.setName(itemText.itemName);
 		this.setDescription(itemText.description);
 		this.setCategory(itemText.category);
 		this.setID(itemText.id);
-		this.game = game;
 		this.picked = false;
 		this.availableCommands = new ArrayList<>();
 		this.initializeCommands(itemText);
-		this.dialogues = new ArrayList<>();
+
+		try (Formatter formatter = new Formatter()) {
+			formatter.format("%-1" + (Dialogue.HALF_STRING_LENGTH - itemText.itemName.length()) + "s", itemText.itemName);
+			this.dialogueName = formatter.toString();
+		}
 	}
 
 	public void setName(String value) {
+		if (value == null || value.isBlank() || value.isEmpty()) {
+			value = "UnknownItem";
+		}
 		this.name = value;
 	}
 
 	public void setDescription(String value) {
+		if (value == null || value.isBlank() || value.isEmpty()) {
+			value = "Unknown Item was found.";
+		}
 		this.description = value;
 	}
 
@@ -128,6 +148,16 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 	public String getName() {
 		return this.name;
+	}
+
+	/**
+	 * This returns the item's name, with extra padded whitespace. This name fills up the entire row of
+	 * the dialogue box.
+	 * 
+	 * @return
+	 */
+	public String getDialogueName() {
+		return this.dialogueName;
 	}
 
 	public String getDescription() {
@@ -144,10 +174,77 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 	public void pick() {
 		this.picked = true;
+		this.hide();
+
+		this.afterItemActionOccurred = true;
+		if (this.pickedDialogue == null || !this.pickedDialogue.isReady()) {
+			this.pickedDialogue = DialogueBuilder.createText(
+				// Intentionally setting the first row of the dialogue to be only the item name, then the second
+				// sentence to be a fixed sized sentence.
+				this.getDialogueName() + "has been found.",
+				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
+			);
+			this.pickedDialogue.setShowDialog(true);
+		}
+		if (!(this.pickedDialogue.isDialogueCompleted() && this.pickedDialogue.isShowingDialog())) {
+			this.pickedDialogue.tick();
+		}
+		// We want the player to interact with the dialogue for the final time, before dismissing it.
+		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
+			this.afterItemActionOccurred = false;
+			this.pickedDialogue.clearDialogueLines();
+			this.pickedDialogue.setShowDialog(false);
+
+			// We need to completely remove the item out from the area world.
+		}
 	}
 
 	public void drop() {
 		this.picked = false;
+		this.reveal();
+
+		this.afterItemActionOccurred = true;
+		if (this.tossedDialogue == null || !this.tossedDialogue.isReady()) {
+			this.tossedDialogue = DialogueBuilder.createText(
+				// Intentionally setting the first row of the dialogue to be only the item name, then the second
+				// sentence to be a fixed sized sentence.
+				this.getDialogueName() + "was tossed away.",
+				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
+			);
+			this.tossedDialogue.setShowDialog(true);
+		}
+		if (!(this.tossedDialogue.isDialogueCompleted() && this.tossedDialogue.isShowingDialog())) {
+			this.tossedDialogue.tick();
+		}
+		// We want the player to interact with the dialogue for the final time, before dismissing it.
+		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
+			this.afterItemActionOccurred = false;
+			this.tossedDialogue.clearDialogueLines();
+			this.tossedDialogue.setShowDialog(false);
+		}
+	}
+
+	public void hide() {
+		this.getPixelData().hide();
+	}
+
+	public void reveal() {
+		this.getPixelData().reveal();
+	}
+
+	/**
+	 * Checks whether this item can be tossed away or sold in the PokeMart.
+	 * 
+	 * This can also be used to check whether the item is a Key Item or not.
+	 * 
+	 * @return True always for any item that is not a Key Item. False if the item is a Key Item.
+	 */
+	public boolean canBeTossed() {
+		return true;
+	}
+
+	public boolean isPickedUp() {
+		return !this.afterItemActionOccurred && (this.picked);
 	}
 
 	public void droppedAt(Area area, Player player) {
@@ -157,13 +254,6 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 	public List<String> getAvailableCommands() {
 		return this.availableCommands;
-	}
-
-	public final List<Dialogue> getDialogues() {
-		if (this.dialogues.isEmpty()) {
-			this.dialogues.add(DialogueBuilder.createText("Error: Dialogue not found.", DialogueType.SPEECH));
-		}
-		return this.dialogues;
 	}
 
 	public void initializeCommands(ItemText itemText) {
@@ -176,15 +266,27 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 			this.availableCommands.add(0, Inventory.MENU_USE);
 	}
 
-	public abstract void doAction();
+	public abstract void doAction(Game game);
 
 	// TODO: Add function that allows the item to be placed at.
 	public abstract void dropAt(Area area, Player player);
 
 	@Override
-	public void render(Scene output, int xOffset, int yOffset) {
+	public void tick() {
+		// Items rarely have update ticks.
+		return;
+	}
+
+	@Override
+	public void render(Scene output, Graphics graphics, int xOffset, int yOffset) {
 		if (!this.picked) {
 			output.blit(Art.item, xOffset, yOffset);
+		}
+		if (this.afterItemActionOccurred) {
+			if (this.pickedDialogue.isReady())
+				this.pickedDialogue.render(output, graphics);
+			else if (this.tossedDialogue.isReady())
+				this.tossedDialogue.render(output, graphics);
 		}
 	}
 
@@ -224,20 +326,20 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	}
 
 	public static Item build(PixelData pixelData) {
-		//Assume the pixel data is of type Item.
+		// Assume the pixel data is of type Item.
 		Item item = null;
 
 		// Using unique item IDs to determine the item type to use.
 		int red = pixelData.getRed();
 		int blue = pixelData.getBlue();
 		// TODO(Thompson): Figure out how to assign items from the Area map based on PixelData.
-		//Red - Item Unique ID
+		// Red - Item Unique ID
 		switch (red) {
 			case 0x03: {// Bicycle
-				//Key item check
+				// Key item check
 				if (blue == 0x01) {
-					//This is a key item.
-					item = new Bicycle(MainComponent.getGame(), pixelData);
+					// This is a key item.
+					item = new Bicycle(pixelData);
 				}
 				break;
 			}
@@ -245,5 +347,9 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 				break;
 		}
 		return item;
+	}
+
+	public static void setInventory(Inventory inventory) {
+		Item.inventory = inventory;
 	}
 }

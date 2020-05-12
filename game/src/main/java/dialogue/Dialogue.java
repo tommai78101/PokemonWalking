@@ -25,8 +25,9 @@ import screen.Scene;
 //TODO (6/25/2015): Check to see why modded scripts still suffer from blinking dialogue boxes. Non-modded scripts are fixed.
 
 public class Dialogue {
-	//The type value is tied to how the data bits are parsed from the game data.
-	//TODO(Thompson): Need to uncover the valid range, and whether we can actually determine arbitrary values instead?
+	// The type value is tied to how the data bits are parsed from the game data.
+	// TODO(Thompson): Need to uncover the valid range, and whether we can actually determine arbitrary
+	// values instead?
 	public static enum DialogueType {
 		SPEECH(0x40),
 		QUESTION(0x41),
@@ -49,7 +50,7 @@ public class Dialogue {
 	// Dialogue max string length per line.
 	public static final int MAX_STRING_LENGTH = 18;
 
-	//Tick delays
+	// Tick delays
 	public static final byte MAX_TICK_DELAY = 0xE;
 	public static final byte CHARACTER_TICK_DELAY = 0x1;
 	public static final byte ZERO_TICK = 0x0;
@@ -272,7 +273,9 @@ public class Dialogue {
 	 * </p>
 	 * 
 	 * <p>
-	 * <b>WARNING</b> : The code content of this tick() method is deliberately setup and designed in such a way that it replicates the dialogues in Gen 1 and Gen 2 Pokémon games. May require a heavy amount of refactoring/rewriting.
+	 * <b>WARNING</b> : The code content of this tick() method is deliberately setup and designed in
+	 * such a way that it replicates the dialogues in Gen 1 and Gen 2 Pokémon games. May require a heavy
+	 * amount of refactoring/rewriting.
 	 * </p>
 	 */
 	public void tick() {
@@ -371,7 +374,7 @@ public class Dialogue {
 				}
 			}
 
-			//Does not belong in either Speech dialogue or Question dialogue.
+			// Does not belong in either Speech dialogue or Question dialogue.
 			else {
 				if (!this.nextFlag && !this.scrollFlag) {
 					if (this.tickCount == 0x0) {
@@ -568,7 +571,8 @@ public class Dialogue {
 	}
 
 	/**
-	 * This is to render the information dialogue box that will appear in the lower left corner when the Main Menu is displayed.
+	 * This is to render the information dialogue box that will appear in the lower left corner when the
+	 * Main Menu is displayed.
 	 * 
 	 * @param output
 	 * @param x
@@ -602,6 +606,18 @@ public class Dialogue {
 			);
 		}
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
+	}
+
+	/**
+	 * This is to render the information dialogue box that will appear in the lower left corner when the
+	 * Main Menu is displayed.
+	 * 
+	 * This method uses the default X, Y, center width, and center height values.
+	 * 
+	 * @param output
+	 */
+	public void renderInformationBox(Scene output) {
+		this.renderInformationBox(output, 0, 6, 9, 2);
 	}
 
 	// ======================================================
@@ -657,10 +673,10 @@ public class Dialogue {
 				if (this.tickCount > Dialogue.CHARACTER_TICK_DELAY)
 					this.tickCount = Dialogue.ZERO_TICK;
 			}
-//			else {
-//				//Just speed up the dialogue.
-//				this.tickCount = Dialogue.CHARACTER_TICK_DELAY;
-//			}
+// else {
+// //Just speed up the dialogue.
+// this.tickCount = Dialogue.CHARACTER_TICK_DELAY;
+// }
 		}
 		else {
 			if (this.lineIterator >= this.lines.size()) {

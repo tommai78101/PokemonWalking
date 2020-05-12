@@ -13,12 +13,11 @@ import java.util.Map.Entry;
 
 import abstracts.Item;
 import abstracts.Item.Category;
-import item.ActionItem;
 import item.Bicycle;
 import item.DummyItem;
 import item.ItemText;
+import item.KeyItem;
 import level.WorldConstants;
-import main.MainComponent;
 
 public class ItemBuilder {
 
@@ -129,7 +128,7 @@ public class ItemBuilder {
 							itemText.skipCheckCategory = true;
 							break;
 						default:
-							//Intentionally doing nothing.
+							// Intentionally doing nothing.
 							break;
 					}
 				}
@@ -248,15 +247,15 @@ public class ItemBuilder {
 		Item result = null;
 		switch (text.type) {
 			case DUMMY:
-				result = new DummyItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
+				result = new DummyItem(text.itemName, text.description, text.category, text.id);
 				break;
 			case ACTION:
 				switch (text.id) {
 					case WorldConstants.ITEM_BICYCLE:
-						result = new Bicycle(MainComponent.getGame(), text.itemName, text.description, text.category);
+						result = new Bicycle(text.itemName, text.description, text.category);
 						break;
 					default:
-						result = new ActionItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
+						result = new KeyItem(text.itemName, text.description, text.category, text.id);
 						break;
 				}
 				break;

@@ -8,34 +8,41 @@
 
 package item;
 
+import abstracts.Item;
 import entity.Player;
 import level.PixelData;
 import level.WorldConstants;
-import main.Game;
 import main.StateManager.GameState;
 
-public class Bicycle extends ActionItem {
+public class Bicycle extends KeyItem {
 
 	private static final String ENABLING_DESCRIPTION = "Get on bicycle.";
 	private static final String DISABLING_DESCRIPTION = "Get off bicycle.";
 
-	public Bicycle(Game game, String name, String description, Category category) {
-		super(game, "BICYCLE", Bicycle.ENABLING_DESCRIPTION, Category.KEYITEMS, WorldConstants.ITEM_BICYCLE);
+	public Bicycle(String name, String description, Category category) {
+		super("BICYCLE", Bicycle.ENABLING_DESCRIPTION, Category.KEYITEMS, WorldConstants.ITEM_BICYCLE);
 	}
 
-	public Bicycle(Game game, PixelData pixelData) {
-		super(game, "BICYCLE", "Ride bike.", Category.KEYITEMS, pixelData.getRed());
+	/**
+	 * The correct constructor format to use. (May 10, 2020)
+	 * 
+	 * @param game
+	 * @param pixelData
+	 */
+	public Bicycle(PixelData pixelData) {
+		super("BICYCLE", "Ride bike.", Category.KEYITEMS, pixelData.getRed());
+		this.pixelData = pixelData;
 	}
 
-	public Bicycle(Game game, ItemText text) {
-		super(game, text);
+	public Bicycle(ItemText text) {
+		super(text);
 		this.description = Bicycle.ENABLING_DESCRIPTION;
 	}
 
 	@Override
 	public void enable() {
 		super.enable();
-		final Player player = this.game.getPlayer();
+		final Player player = Item.inventory.getPlayer();
 		if (!player.isRidingBicycle()) {
 			Player.lockMovements();
 			player.enableAutomaticMode();
@@ -53,14 +60,14 @@ public class Bicycle extends ActionItem {
 				}
 			}).start();
 			this.description = Bicycle.DISABLING_DESCRIPTION;
-			this.game.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
+			Item.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
 		}
 	}
 
 	@Override
 	public void disable() {
 		super.disable();
-		final Player player = this.game.getPlayer();
+		final Player player = Item.inventory.getPlayer();
 		if (player.isRidingBicycle()) {
 			Player.lockMovements();
 			player.enableAutomaticMode();
@@ -78,7 +85,7 @@ public class Bicycle extends ActionItem {
 				}
 			}).start();
 			this.description = Bicycle.ENABLING_DESCRIPTION;
-			this.game.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
+			Item.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
 		}
 	}
 }

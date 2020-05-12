@@ -47,6 +47,7 @@ public class PixelData {
 	private int groundHeight;
 
 	private boolean triggerFlag;
+	private boolean hidden;
 	private int targetMovementScriptID;
 
 	public PixelData(int pixel, int x, int y) {
@@ -60,6 +61,7 @@ public class PixelData {
 		this.biomeBitmapTick = 0;
 		this.triggerFlag = false;
 		this.targetMovementScriptID = 0;
+		this.hidden = false;
 
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
@@ -102,14 +104,19 @@ public class PixelData {
 	 * Sets the bitmap tile the pixel data is representing.
 	 * 
 	 * <p>
-	 * When setting the bitmap, first it must set the bitmap to something other than null. Since the bitmap variable holds an array, it takes in at least 1 bitmap pre-loaded by the Art class. Then, once the bitmap is set, it must break all the way outside of the nested switch conditions, otherwise,
-	 * setting bitmaps will overwrite correct data with incorrect data.
+	 * When setting the bitmap, first it must set the bitmap to something other than null. Since the
+	 * bitmap variable holds an array, it takes in at least 1 bitmap pre-loaded by the Art class. Then,
+	 * once the bitmap is set, it must break all the way outside of the nested switch conditions,
+	 * otherwise, setting bitmaps will overwrite correct data with incorrect data.
 	 * 
 	 * <p>
-	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error bitmap, which when loaded into the game, the game will not crash, and the developers/players can tell where the bitmap loading has gone wrong.
+	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error bitmap, which when loaded
+	 * into the game, the game will not crash, and the developers/players can tell where the bitmap
+	 * loading has gone wrong.
 	 * 
 	 * <p>
-	 * If the bitmap is an animated bitmap, the Art class will load the animated bitmap into an array. The next step would be to just pass the array to this bitmap.
+	 * If the bitmap is an animated bitmap, the Art class will load the animated bitmap into an array.
+	 * The next step would be to just pass the array to this bitmap.
 	 * 
 	 * @param alpha
 	 *            The alpha value of the pixel data's color.
@@ -466,7 +473,8 @@ public class PixelData {
 	}
 
 	/**
-	 * Sets the properties of a given pixel data. This is where the game gets the area's information on what the player should do and don't.
+	 * Sets the properties of a given pixel data. This is where the game gets the area's information on
+	 * what the player should do and don't.
 	 * 
 	 * <p>
 	 * Some of the features are currently unused. Especially collision detection.
@@ -561,6 +569,18 @@ public class PixelData {
 	// public int getParentAreaID() {
 	// return parentArea;
 	// }
+
+	public void hide() {
+		this.hidden = true;
+	}
+
+	public void reveal() {
+		this.hidden = false;
+	}
+
+	public boolean isHidden() {
+		return this.hidden;
+	}
 
 	public int getTargetAreaID() {
 		return this.targetArea;
