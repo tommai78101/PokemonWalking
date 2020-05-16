@@ -15,7 +15,7 @@ import abstracts.Item;
 import abstracts.Item.Category;
 import item.Bicycle;
 import item.DummyItem;
-import item.ItemText;
+import item.ModdedItem;
 import item.KeyItem;
 import level.WorldConstants;
 
@@ -89,16 +89,16 @@ public class ItemBuilder {
 	private static final String FLAG_TOSS_COMMAND = "&";
 	private static final String ITEM_DELIMITER = ";";
 
-	public static HashMap<Integer, ItemText> loadItemResources(String filename) {
+	public static HashMap<Integer, ModdedItem> loadItemResources(String filename) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
-			ItemText itemText = new ItemText();
-			HashMap<Integer, ItemText> result = new HashMap<>();
+			ModdedItem itemText = new ModdedItem();
+			HashMap<Integer, ModdedItem> result = new HashMap<>();
 			int id = 0;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("%")) {
-					itemText.type = ItemText.Type.getType(line.split("%")[1]);
+					itemText.type = ModdedItem.Type.getType(line.split("%")[1]);
 				}
 				else if (line.startsWith("#")) {
 					itemText.itemName = line.split("#")[1];
@@ -155,7 +155,7 @@ public class ItemBuilder {
 				if (itemText.isComplete()) {
 					itemText.id = id;
 					result.put(id, itemText);
-					itemText = new ItemText();
+					itemText = new ModdedItem();
 					id++;
 				}
 			}
@@ -166,17 +166,17 @@ public class ItemBuilder {
 		}
 	}
 
-	public static List<Map.Entry<ItemText, Item>> loadItems(String filename) {
-		List<Map.Entry<ItemText, Item>> result = new ArrayList<>();
+	public static List<Map.Entry<ModdedItem, Item>> loadItems(String filename) {
+		List<Map.Entry<ModdedItem, Item>> result = new ArrayList<>();
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
 			String line;
-			ItemText itemText = new ItemText();
+			ModdedItem itemText = new ModdedItem();
 
 			int id = 0;
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("%")) {
-					itemText.type = ItemText.Type.getType(line.split("%")[1]);
+					itemText.type = ModdedItem.Type.getType(line.split("%")[1]);
 				}
 				else if (line.startsWith("#")) {
 					itemText.itemName = line.split("#")[1];
@@ -220,14 +220,14 @@ public class ItemBuilder {
 				if (itemText.isComplete()) {
 					itemText.id = id;
 					result.add(new AbstractMap.SimpleEntry<>(itemText, ItemBuilder.createNewItem(itemText)));
-					itemText = new ItemText();
+					itemText = new ModdedItem();
 					id++;
 				}
 			}
 
-			Collections.sort(result, new Comparator<Map.Entry<ItemText, Item>>() {
+			Collections.sort(result, new Comparator<Map.Entry<ModdedItem, Item>>() {
 				@Override
-				public int compare(Entry<ItemText, Item> e1, Entry<ItemText, Item> e2) {
+				public int compare(Entry<ModdedItem, Item> e1, Entry<ModdedItem, Item> e2) {
 					if (e1.getKey().id < e2.getKey().id)
 						return -1;
 					if (e1.getKey().id > e2.getKey().id)
@@ -243,7 +243,7 @@ public class ItemBuilder {
 		}
 	}
 
-	public static Item createNewItem(ItemText text) {
+	public static Item createNewItem(ModdedItem text) {
 		Item result = null;
 		switch (text.type) {
 			case DUMMY:

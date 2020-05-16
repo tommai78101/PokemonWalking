@@ -10,7 +10,13 @@ package item;
 
 import abstracts.Item.Category;
 
-public class ItemText {
+/**
+ * This class is dedicated for loading item data externally. This will be used to load modded items
+ * from user-created mods.
+ * 
+ * @author tlee
+ */
+public class ModdedItem {
 	public enum Type {
 		// @formatter:off
 		ALL("ALL"), 
@@ -31,7 +37,7 @@ public class ItemText {
 			}
 			return ALL;
 		}
-	};
+	}
 
 	public Type type;
 	public String itemName;
@@ -44,18 +50,18 @@ public class ItemText {
 	public boolean tossCommandFlag;
 	public boolean done;
 
-	public ItemText() {
-		type = null;
-		itemName = null;
-		description = null;
-		category = null;
-		id = -1;
-		skipCheckCategory = false;
-		setCommandFlag = useCommandFlag = tossCommandFlag = false;
-		done = false;
+	public ModdedItem() {
+		this.type = null;
+		this.itemName = null;
+		this.description = null;
+		this.category = null;
+		this.id = -1;
+		this.skipCheckCategory = false;
+		this.setCommandFlag = this.useCommandFlag = this.tossCommandFlag = false;
+		this.done = false;
 	}
 
 	public boolean isComplete() {
-		return done;
+		return this.done;
 	}
 }

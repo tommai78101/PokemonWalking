@@ -34,7 +34,7 @@ public class Bicycle extends KeyItem {
 		this.pixelData = pixelData;
 	}
 
-	public Bicycle(ItemText text) {
+	public Bicycle(ModdedItem text) {
 		super(text);
 		this.description = Bicycle.ENABLING_DESCRIPTION;
 	}

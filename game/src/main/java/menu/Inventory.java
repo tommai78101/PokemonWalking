@@ -26,7 +26,7 @@ import dialogue.Dialogue;
 import entity.Player;
 import item.Bicycle;
 import item.DummyItem;
-import item.ItemText;
+import item.ModdedItem;
 import item.KeyItem;
 import level.WorldConstants;
 import main.Game;
@@ -52,7 +52,7 @@ public class Inventory extends SubMenu {
 	private final List<Map.Entry<Item, Integer>> keyItems;
 	private final List<Map.Entry<Item, Integer>> pokéballs;
 	private final List<Map.Entry<Item, Integer>> TMs_HMs;
-	private final ArrayList<String> selectionMenu;
+	private final List<String> selectionMenu;
 	private int itemCursor;
 	private int arrowPosition;
 	private int itemListSpan = 0;
@@ -64,7 +64,7 @@ public class Inventory extends SubMenu {
 	private int set_tokenIterator = 0;
 	private boolean set_end;
 	private int set_subStringIterator = 0;
-	private final ArrayList<String> set_completedLines;
+	private final List<String> set_completedLines;
 	private Thread inventoryDialogueThread;
 	private Dialogue inventoryDialogue;
 
@@ -153,7 +153,7 @@ public class Inventory extends SubMenu {
 	 *            The item object that is to be added into the Inventory.
 	 * @return Nothing.
 	 */
-	public void addItem(ItemText itemText) {
+	public void addItem(ModdedItem itemText) {
 		boolean heldItemExists = false;
 		List<Map.Entry<Item, Integer>> list = this.getItemCategoryList(itemText);
 		CHECK_LOOP:
@@ -458,6 +458,7 @@ public class Inventory extends SubMenu {
 	@Override
 	public void tick() {
 		switch (this.state) {
+			// This state is when the player is selecting from the list of items in the Inventory.
 			case SELECTION: {
 				if (Game.keys.isUpPressed()) {
 					Game.keys.upReceived();
@@ -531,6 +532,8 @@ public class Inventory extends SubMenu {
 				}
 				break;
 			}
+			// This state is when the player is interacting with the menu after selecting an item from the list
+			// of items.
 			case MENU: {
 				if (Game.keys.isUpPressed()) {
 					Game.keys.upReceived();
@@ -573,6 +576,7 @@ public class Inventory extends SubMenu {
 				}
 				break;
 			}
+			// This is the state when the player chooses the USE menu action.
 			case USE: {
 				List<Map.Entry<Item, Integer>> list = this.getCurrentList();
 				Map.Entry<Item, Integer> entry = list.get(this.itemCursor);
@@ -580,6 +584,7 @@ public class Inventory extends SubMenu {
 				this.resetCursor();
 				break;
 			}
+			// This is the state when the player chooses the TOSS menu action.
 			case TOSS: {
 				if (Game.keys.isUpPressed()) {
 					Game.keys.upReceived();
@@ -624,6 +629,7 @@ public class Inventory extends SubMenu {
 				}
 				break;
 			}
+			// This is the state when the players chooses the SET menu action.
 			case SET: {
 				Map.Entry<Item, Integer> entry = this.getCurrentList().get(this.itemCursor);
 				KeyItem actionItem = (KeyItem) entry.getKey();
@@ -739,7 +745,7 @@ public class Inventory extends SubMenu {
 	 * @return A list of all the items and their corresponding amount of the items that the targeted
 	 *         item belongs to.
 	 */
-	private List<Map.Entry<Item, Integer>> getItemCategoryList(ItemText itemText) {
+	private List<Map.Entry<Item, Integer>> getItemCategoryList(ModdedItem itemText) {
 		List<Map.Entry<Item, Integer>> result = null;
 		switch (itemText.category) {
 			case POTIONS:

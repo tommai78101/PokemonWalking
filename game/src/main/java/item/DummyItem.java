@@ -19,7 +19,7 @@ public class DummyItem extends Item {
 		super(name, description, category, id);
 	}
 
-	public DummyItem(ItemText text) {
+	public DummyItem(ModdedItem text) {
 		super(text);
 	}
 

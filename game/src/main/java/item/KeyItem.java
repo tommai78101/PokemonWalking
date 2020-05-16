@@ -7,10 +7,14 @@
  */
 package item;
 
+import java.util.Arrays;
+import java.util.List;
+
 import abstracts.Item;
 import entity.Player;
 import level.Area;
 import main.Game;
+import menu.Inventory;
 
 /**
  * Any base implementations of the abstract class object, Item, will need to implement or devise a
@@ -27,7 +31,7 @@ public class KeyItem extends Item {
 		super(name, description, category, id);
 	}
 
-	public KeyItem(ItemText text) {
+	public KeyItem(ModdedItem text) {
 		super(text);
 	}
 
@@ -83,5 +87,10 @@ public class KeyItem extends Item {
 		int hash = 3;
 		hash = 53 * hash + ((this.name != null) ? this.name.hashCode() : 0);
 		return hash;
+	}
+
+	@Override
+	public List<String> getAvailableCommands() {
+		return Arrays.asList(Inventory.MENU_USE, Inventory.MENU_SET, Inventory.MENU_CANCEL);
 	}
 }

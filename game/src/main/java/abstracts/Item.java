@@ -18,7 +18,7 @@ import dialogue.Dialogue.DialogueType;
 import entity.Player;
 import interfaces.Renderable;
 import item.Bicycle;
-import item.ItemText;
+import item.ModdedItem;
 import level.Area;
 import level.PixelData;
 import main.Game;
@@ -101,6 +101,9 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.setCategory(category);
 		this.setID(id);
 		this.picked = false;
+
+		// We do not preload available commands from in-game data. This is handled automatically by the
+		// subclasses of Item.
 		this.availableCommands = new ArrayList<>();
 
 		try (Formatter formatter = new Formatter()) {
@@ -109,7 +112,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		}
 	}
 
-	public Item(ItemText itemText) {
+	public Item(ModdedItem itemText) {
 		this.setName(itemText.itemName);
 		this.setDescription(itemText.description);
 		this.setCategory(itemText.category);
@@ -252,11 +255,16 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.dropAt(area, player);
 	}
 
+	/**
+	 * Items must provide a default available commands to the Inventory menu dialogue.
+	 * <p>
+	 * More specific items can provide additional available commands to the Inventory menu.
+	 */
 	public List<String> getAvailableCommands() {
 		return this.availableCommands;
 	}
 
-	public void initializeCommands(ItemText itemText) {
+	public void initializeCommands(ModdedItem itemText) {
 		this.availableCommands.add(0, Inventory.MENU_CANCEL);
 		if (itemText.tossCommandFlag)
 			this.availableCommands.add(0, Inventory.MENU_TOSS);
