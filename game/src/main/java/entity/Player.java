@@ -851,6 +851,10 @@ public class Player extends Character {
 		this.automaticMode = false;
 	}
 
+	public boolean isInAutomaticMode() {
+		return this.automaticMode;
+	}
+
 	// ---------------------------------------------------------------------
 	// Override methods
 
