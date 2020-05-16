@@ -8,7 +8,6 @@
 
 package item;
 
-import abstracts.Item;
 import entity.Player;
 import level.PixelData;
 import level.WorldConstants;
@@ -42,7 +41,7 @@ public class Bicycle extends KeyItem {
 	@Override
 	public void enable() {
 		super.enable();
-		final Player player = Item.inventory.getPlayer();
+		final Player player = this.inventory.getPlayer();
 		if (!player.isRidingBicycle()) {
 			Player.lockMovements();
 			player.enableAutomaticMode();
@@ -60,14 +59,14 @@ public class Bicycle extends KeyItem {
 				}
 			}).start();
 			this.description = Bicycle.DISABLING_DESCRIPTION;
-			Item.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
+			this.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
 		}
 	}
 
 	@Override
 	public void disable() {
 		super.disable();
-		final Player player = Item.inventory.getPlayer();
+		final Player player = this.inventory.getPlayer();
 		if (player.isRidingBicycle()) {
 			Player.lockMovements();
 			player.enableAutomaticMode();
@@ -85,7 +84,7 @@ public class Bicycle extends KeyItem {
 				}
 			}).start();
 			this.description = Bicycle.ENABLING_DESCRIPTION;
-			Item.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
+			this.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
 		}
 	}
 }

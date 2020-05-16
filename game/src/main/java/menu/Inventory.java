@@ -26,8 +26,8 @@ import dialogue.Dialogue;
 import entity.Player;
 import item.Bicycle;
 import item.DummyItem;
-import item.ModdedItem;
 import item.KeyItem;
+import item.ModdedItem;
 import level.WorldConstants;
 import main.Game;
 import main.MainComponent;
@@ -126,17 +126,24 @@ public class Inventory extends SubMenu {
 				}
 
 				// Add the key item.
+				item.setInventory(this);
 				categoryList.add(Map.entry(item, 1));
 				break;
 			}
 			case POKEBALLS:
 			case POTIONS:
 			case TM_HM: {
+				boolean hasAdded = false;
 				for (Map.Entry<Item, Integer> entry : categoryList) {
 					if (entry.getKey().equals(item)) {
 						entry.setValue(entry.getValue() + 1);
+						hasAdded = true;
 						break;
 					}
+				}
+				if (!hasAdded) {
+					item.setInventory(this);
+					categoryList.add(Map.entry(item, 1));
 				}
 				break;
 			}

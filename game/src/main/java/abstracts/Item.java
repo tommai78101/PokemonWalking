@@ -36,8 +36,6 @@ import utility.DialogueBuilder;
  */
 public abstract class Item extends Entity implements Comparable<Item>, Renderable {
 
-	protected static Inventory inventory;
-
 	public enum Category {
 		// @formatter:off
 		POTIONS(0x00), 
@@ -92,6 +90,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	protected List<String> availableCommands;
 	protected Dialogue pickedDialogue;
 	protected Dialogue tossedDialogue;
+	protected Inventory inventory;
 
 	private boolean afterItemActionOccurred = false;
 
@@ -274,6 +273,10 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 			this.availableCommands.add(0, Inventory.MENU_USE);
 	}
 
+	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
+	}
+
 	public abstract void doAction(Game game);
 
 	// TODO: Add function that allows the item to be placed at.
@@ -355,9 +358,5 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 				break;
 		}
 		return item;
-	}
-
-	public static void setInventory(Inventory inventory) {
-		Item.inventory = inventory;
 	}
 }
