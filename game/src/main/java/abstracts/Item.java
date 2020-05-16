@@ -104,7 +104,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.availableCommands = new ArrayList<>();
 
 		try (Formatter formatter = new Formatter()) {
-			formatter.format("%-1" + (Dialogue.HALF_STRING_LENGTH - name.length()) + "s", name);
+			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", name);
 			this.dialogueName = formatter.toString();
 		}
 	}
@@ -119,7 +119,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.initializeCommands(itemText);
 
 		try (Formatter formatter = new Formatter()) {
-			formatter.format("%-1" + (Dialogue.HALF_STRING_LENGTH - itemText.itemName.length()) + "s", itemText.itemName);
+			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", itemText.itemName);
 			this.dialogueName = formatter.toString();
 		}
 	}

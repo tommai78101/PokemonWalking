@@ -233,6 +233,8 @@ public class Player extends Character {
 				if (this.isInteracting() && item.isInteracting()) {
 					this.startInteraction(item);
 					if (!item.isPickedUp()) {
+						// Order of operations is important here. Add item first, before picking the item up.
+						// Picking up the item will disable the item, and the item cannot be added afterwards.
 						this.inventory.addItem(item);
 						item.pick();
 					}
