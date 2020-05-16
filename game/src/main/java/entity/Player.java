@@ -952,13 +952,13 @@ public class Player extends Character {
 	private void handleMovement() {
 		// Check if player is currently locked to walking.
 		if (this.isLockedWalking) {
-			this.walk();
+			if (this.isOnBicycle)
+				this.ride();
+			else
+				this.walk();
 		}
 		else if (this.isLockedSprinting) {
 			this.sprint();
-		}
-		else if (this.isOnBicycle) {
-			this.ride();
 		}
 		else {
 			// Before we walk, check to see if the oldX and oldY are up-to-date with the
