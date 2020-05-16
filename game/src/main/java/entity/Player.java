@@ -1097,6 +1097,7 @@ public class Player extends Character {
 	public void input() {
 		this.isColliding = false;
 		if (!this.isLockedWalking) {
+			// Up
 			if (!this.isFacingBlocked[Character.UP] && !Player.movementLock) {
 				if (this.keys.up.isTappedDown || this.keys.W.isTappedDown)
 					this.tapped();
@@ -1109,6 +1110,8 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
+
+			// Down
 			if (!this.isFacingBlocked[Character.DOWN] && !Player.movementLock) {
 				if (this.keys.down.isTappedDown || this.keys.S.isTappedDown)
 					this.tapped();
@@ -1121,6 +1124,8 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
+
+			// Left
 			if (!this.isFacingBlocked[Character.LEFT] && !Player.movementLock) {
 				if (this.keys.left.isTappedDown || this.keys.A.isTappedDown)
 					this.tapped();
@@ -1133,6 +1138,8 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
+
+			// Right
 			if (!this.isFacingBlocked[Character.RIGHT] && !Player.movementLock) {
 				if (this.keys.right.isTappedDown || this.keys.D.isTappedDown)
 					this.tapped();

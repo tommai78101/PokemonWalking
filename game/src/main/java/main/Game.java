@@ -284,7 +284,7 @@ public class Game {
 			Game.keys.startReceived();
 			switch (state) {
 				case MAIN_GAME:
-					if (this.player.isLockedWalking() || this.player.isLockedJumping()) {
+					if (this.player.isLockedWalking() || this.player.isLockedJumping() || this.player.isInteracting()) {
 						break;
 					}
 					this.stateManager.setCurrentGameState(GameState.START_MENU);
