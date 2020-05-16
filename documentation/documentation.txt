@@ -66,9 +66,10 @@ Controls...........................[PWD07]
 	Walking Algorithm..............[PWD07#01]
 File Format........................[PWD08]
 Triggers...........................[PWD09]
-Contributors.......................[PWD10]
-Terms of License...................[PWD11]
-Credits............................[PWD12]
+Dialogues..........................[PWD10]
+Contributors.......................[PWD11]
+Terms of License...................[PWD12]
+Credits............................[PWD13]
 
 
 
@@ -1181,13 +1182,42 @@ $1 |4
 
 -------------------------------
 
-Contributors [PWD10]
+Dialogues [PWD10]
+
+Dialogues are text speech bubbles in the game. Any text displayed inside a white
+rectangle box with a border around it is considered to be a dialogue. Even a
+simple YES/NO text bubble is considered as a dialogue.
+
+There are 2 types of dialogues, a full-width dialogue and a half-width dialogue.
+The full-width dialogue is the default dialogue normally used when a player is
+interacting with an entity. The half-width dialogue is used when the player
+is in the Start Menu, and when the player is reading the item descriptions.
+
+The game renders the dialogue by rendering each character per 8 in-game ticks.
+
+The max size of the full-width dialogue text row is 18 characters long. The max
+size of the half-width dialogue text row is 9 characters long. For both types of
+dialogues, there are 2 rows in total that can be shown on the screen. 
+
+For any dialogue text that exceeds the max size, there will be a dialogue scroll
+arrow telling the player to continue the dialogue interaction. Once the player
+engages in the dialogue interaction to scroll the text, the 2 rows of the dialogue
+text is scrolled up, then the dialogue text continues until the end of the
+dialogue has been reached.
+
+Whenever a dialogue text contains 2 whitespaces, it is considered to be a "line
+break". When displaying a dialogue notifying the player an item has been picked
+up, the line breaks are added after the item's name.
+
+-------------------------------
+
+Contributors [PWD11]
 
 Developer - tom_mai78101
 
 -------------------------------
 
-Terms of License [PWD11]
+Terms of License [PWD12]
 
 This entire project is Apache Licensed. For more
 information, please read the terms and regulations
@@ -1195,6 +1225,6 @@ of the license file in the root of the project folder.
 
 -------------------------------
 
-Credits [PWD12]
+Credits [PWD13]
 
 Author - tom_mai78101

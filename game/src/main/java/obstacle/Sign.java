@@ -10,7 +10,6 @@ import dialogue.Dialogue.DialogueType;
 import level.PixelData;
 import main.Game;
 import screen.Scene;
-import utility.Debug;
 import utility.DialogueBuilder;
 
 public class Sign extends Obstacle {
@@ -46,21 +45,16 @@ public class Sign extends Obstacle {
 			Dialogue currentDialogue = this.getCurrentDialogue();
 			if (currentDialogue == null || !currentDialogue.isReady()) {
 				this.setInteractingState(false);
-				Debug.log("Sign no longer interacting.");
 				return;
 			}
 			if (!currentDialogue.isDialogueCompleted()) {
 				currentDialogue.tick();
-				Debug.log("Sign is ticking.");
 			}
 			else {
-				Debug.log("Sign is no longer ticking.");
 				if (Game.keys.isPrimaryPressed()) {
-					Debug.log("Primary keys are pressed.");
 					Game.keys.primaryReceived();
 					this.setInteractingState(false);
 					this.endDialogue();
-					Debug.log("Sign interacted");
 				}
 			}
 		}

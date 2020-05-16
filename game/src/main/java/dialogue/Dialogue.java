@@ -319,8 +319,16 @@ public class Dialogue {
 			else if (this.simpleSpeechFlag) {
 				if (!this.nextFlag && !this.scrollFlag) {
 					if (this.tickCount == 0x0) {
+						// If the dialogue is not set to start scrolling, continue to increment the subStringIterator.
 						if (!this.scrollFlag)
 							this.subStringIterator++;
+
+						// Checks if the subStringIterator has encountered more than 2 whitespaces
+						if (this.isLineBreak(this.subStringIterator)) {
+							// We jump straight to the end of the line.
+							this.subStringIterator = this.lineLength;
+						}
+
 						if (this.subStringIterator >= this.lineLength) {
 							this.subStringIterator %= this.lineLength;
 							Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
@@ -380,6 +388,13 @@ public class Dialogue {
 					if (this.tickCount == 0x0) {
 						if (!this.scrollFlag)
 							this.subStringIterator++;
+
+						// Checks if the subStringIterator has encountered more than 2 whitespaces
+						if (this.isLineBreak(this.subStringIterator)) {
+							// We jump straight to the end of the line.
+							this.subStringIterator = this.lineLength;
+						}
+
 						if (this.subStringIterator >= this.lineLength) {
 							this.subStringIterator %= this.lineLength;
 							Map.Entry<String, Boolean> entry = this.lines.get(this.lineIterator);
@@ -883,5 +898,35 @@ public class Dialogue {
 
 	public boolean getIgnoreInputs() {
 		return this.ignoreInputsFlag;
+	}
+
+	public String getCurrentLine() {
+		Map.Entry<String, Boolean> entry = this.getLines().get(this.lineIterator);
+		return entry.getKey();
+	}
+
+	/**
+	 * This checks to see if there is a line break in the dialogue.
+	 * <p>
+	 * A line break is defined to be "two whitespaces inside the dialogue's line".
+	 * 
+	 * @param subStringIterator
+	 *            - The string iterator marking where the game must render text to, on the current line.
+	 * @return
+	 */
+	public boolean isLineBreak(int subStringIterator) {
+		String currentLine = this.getCurrentLine();
+		try {
+			char previousChar = currentLine.charAt(subStringIterator - 1);
+			char currentChar = currentLine.charAt(subStringIterator);
+			if (previousChar == ' ' && currentChar == ' ') {
+				return true;
+			}
+		}
+		catch (IndexOutOfBoundsException e) {
+			// The substring iterator is at position 0, or it is at the end of the current line.
+			// We do actually expect an exception to be thrown.
+		}
+		return false;
 	}
 }
