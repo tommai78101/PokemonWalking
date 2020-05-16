@@ -87,6 +87,38 @@ public class Keys {
 		}
 	}
 
+	public boolean isUpTapped() {
+		return (Game.keys.up.isTappedDown && !Game.keys.up.lastKeyState) || (Game.keys.W.isTappedDown && !Game.keys.W.lastKeyState);
+	}
+
+	public boolean isDownTapped() {
+		return (Game.keys.down.isTappedDown && !Game.keys.down.lastKeyState) || (Game.keys.S.isTappedDown && !Game.keys.S.lastKeyState);
+	}
+
+	public boolean isLeftTapped() {
+		return (Game.keys.left.isTappedDown && !Game.keys.left.lastKeyState) || (Game.keys.A.isTappedDown && !Game.keys.A.lastKeyState);
+	}
+
+	public boolean isRightTapped() {
+		return (Game.keys.right.isTappedDown && !Game.keys.right.lastKeyState) || (Game.keys.D.isTappedDown && !Game.keys.D.lastKeyState);
+	}
+
+	public boolean isUpTyped() {
+		return (Game.keys.up.isPressedDown && !Game.keys.up.lastKeyState) || (Game.keys.W.isPressedDown && !Game.keys.W.lastKeyState);
+	}
+
+	public boolean isDownTyped() {
+		return (Game.keys.down.isPressedDown && !Game.keys.down.lastKeyState) || (Game.keys.S.isPressedDown && !Game.keys.S.lastKeyState);
+	}
+
+	public boolean isLeftTyped() {
+		return (Game.keys.left.isPressedDown && !Game.keys.left.lastKeyState) || (Game.keys.A.isPressedDown && !Game.keys.A.lastKeyState);
+	}
+
+	public boolean isRightTyped() {
+		return (Game.keys.right.isPressedDown && !Game.keys.right.lastKeyState) || (Game.keys.D.isPressedDown && !Game.keys.D.lastKeyState);
+	}
+
 	public boolean isUpPressed() {
 		return (Game.keys.up.keyStateDown && !Game.keys.up.lastKeyState) || (Game.keys.W.keyStateDown && !Game.keys.W.lastKeyState);
 	}
@@ -129,7 +161,8 @@ public class Keys {
 	}
 
 	/**
-	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue
+	 * telling me this button has been pressed down."
 	 */
 	public void upReceived() {
 		Game.keys.up.lastKeyState = true;
@@ -137,7 +170,8 @@ public class Keys {
 	}
 
 	/**
-	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue
+	 * telling me this button has been pressed down."
 	 */
 	public void downReceived() {
 		Game.keys.down.lastKeyState = true;
@@ -145,7 +179,8 @@ public class Keys {
 	}
 
 	/**
-	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue
+	 * telling me this button has been pressed down."
 	 */
 	public void leftReceived() {
 		Game.keys.left.lastKeyState = true;
@@ -153,7 +188,8 @@ public class Keys {
 	}
 
 	/**
-	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue
+	 * telling me this button has been pressed down."
 	 */
 	public void rightReceived() {
 		Game.keys.right.lastKeyState = true;
@@ -161,7 +197,8 @@ public class Keys {
 	}
 
 	/**
-	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue
+	 * telling me this button has been pressed down."
 	 */
 	public void primaryReceived() {
 		Game.keys.Z.lastKeyState = true;
@@ -169,7 +206,8 @@ public class Keys {
 	}
 
 	/**
-	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue
+	 * telling me this button has been pressed down."
 	 */
 	public void secondaryReceived() {
 		Game.keys.X.lastKeyState = true;
@@ -177,14 +215,16 @@ public class Keys {
 	}
 
 	/**
-	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue
+	 * telling me this button has been pressed down."
 	 */
 	public void startReceived() {
 		Game.keys.START.lastKeyState = true;
 	}
 
 	/**
-	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue telling me this button has been pressed down."
+	 * Game's way of saying to the InputHandler that "it has received this event, no need to continue
+	 * telling me this button has been pressed down."
 	 */
 	public void debugReceived() {
 		Game.keys.F1.lastKeyState = true;
