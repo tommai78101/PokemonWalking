@@ -26,6 +26,7 @@ public class PlayerInfo implements RandomFileAccessible {
 	public final byte[] player_x = new byte[4];
 	public final byte[] player_y = new byte[4];
 	public final byte[] player_facing = new byte[4];
+	public final byte[] player_walking_state = new byte[1];
 
 	public static final byte[] PLAY = "PLAY".getBytes(); // Player Info
 	public static final byte[] NAME = "NAME".getBytes(); // Player name.
@@ -35,6 +36,11 @@ public class PlayerInfo implements RandomFileAccessible {
 	// public static final byte[] AREA = "AREA".getBytes(); //Current Area.
 	public static final byte[] AXIS = "AXIS".getBytes(); // Current Position.
 	public static final byte[] TURN = "TURN".getBytes(); // Current Direction.
+	public static final byte[] WALK = "WALK".getBytes(); // Current walking state (Riding bike, swimming, or idling).
+
+	public static final byte WalkState_IDLE = 0x00;
+	public static final byte WalkState_SWIM = 0x01;
+	public static final byte WalkState_RIDE = 0x02;
 
 	private int byteSize = 0;
 
@@ -61,6 +67,7 @@ public class PlayerInfo implements RandomFileAccessible {
 		byte[] data = new byte[this.byteSize];
 		int offset = 0;
 		raf.read(data);
+
 		// Checks if "PLAY" tag is set.
 		for (int i = 0; i < PlayerInfo.PLAY.length; i++, offset++) {
 			if (data[i] != PlayerInfo.PLAY[i])
@@ -140,7 +147,6 @@ public class PlayerInfo implements RandomFileAccessible {
 								throw new IOException("Something is wrong with the element item size in ITEM chunk.");
 							entry[j] = data[offset];
 						}
-
 						list.add(entry);
 					}
 				}
@@ -149,20 +155,20 @@ public class PlayerInfo implements RandomFileAccessible {
 				break;
 		}
 
-		// //Current Area tag
-		// size = data[offset++];
-		// for (int i = 0; i < AREA.length; offset++, i++, size--) {
-		// if (data[offset] != AREA[i])
-		// throw new IOException("Incorrect Player Info AREA chunk.");
-		// }
-		// for (int i = 0; i < this.player_current_area_id.length; i++, offset++,
-		// size--) {
-		// this.player_current_area_id[i] = data[offset];
-		// }
-		// for (int i = 0; i < this.player_current_area_sector_id.length; i++, offset++,
-		// size--) {
-		// this.player_current_area_sector_id[i] = data[offset];
-		// }
+		// Current Area tag
+		/*
+		size = data[offset++];
+		for (int i = 0; i < AREA.length; offset++, i++, size--) {
+			if (data[offset] != AREA[i])
+				throw new IOException("Incorrect Player Info AREA chunk.");
+		}
+		for (int i = 0; i < this.player_current_area_id.length; i++, offset++, size--) {
+			this.player_current_area_id[i] = data[offset];
+		}
+		for (int i = 0; i < this.player_current_area_sector_id.length; i++, offset++, size--) {
+			this.player_current_area_sector_id[i] = data[offset];
+		}
+		*/
 
 		// Current Position tag
 		size = data[offset++];
@@ -185,6 +191,16 @@ public class PlayerInfo implements RandomFileAccessible {
 		}
 		for (int i = 0; i < this.player_facing.length; i++, offset++, size--) {
 			this.player_facing[i] = data[offset];
+		}
+
+		// Current walking state
+		size = data[offset++];
+		for (int i = 0; i < PlayerInfo.WALK.length; offset++, i++, size--) {
+			if (data[offset] != PlayerInfo.WALK[i])
+				throw new IOException("Incorrect Player Info WALK chunk.");
+		}
+		for (int i = 0; i < this.player_walking_state.length; i++, offset++, size--) {
+			this.player_walking_state[i] = data[offset];
 		}
 	}
 
@@ -220,7 +236,6 @@ public class PlayerInfo implements RandomFileAccessible {
 			raf.writeByte(buf.length);
 			raf.write(buf);
 		}
-
 		// Inventory
 		size = 0;
 		for (int i = 0; i < 4; i++) {
@@ -230,7 +245,6 @@ public class PlayerInfo implements RandomFileAccessible {
 				for (int j = 0; j < this.getAllItemsList().get(i).size(); j++)
 					size += this.getAllItemsList().get(i).get(j).length + 1;
 			}
-
 		}
 		raf.writeByte(size + PlayerInfo.ITEM.length);
 		raf.write(PlayerInfo.ITEM);
@@ -245,7 +259,6 @@ public class PlayerInfo implements RandomFileAccessible {
 				}
 			}
 		}
-
 		// //Current Area Info
 		// raf.writeByte(AREA.length + player_current_area_id.length +
 		// player_current_area_sector_id.length);
@@ -263,5 +276,10 @@ public class PlayerInfo implements RandomFileAccessible {
 		raf.writeByte(PlayerInfo.TURN.length + this.player_facing.length);
 		raf.write(PlayerInfo.TURN);
 		raf.write(this.player_facing);
+
+		// Current Player walking state.
+		raf.writeByte(PlayerInfo.WALK.length + this.player_walking_state.length);
+		raf.write(PlayerInfo.WALK);
+		raf.write(this.player_walking_state);
 	}
 }

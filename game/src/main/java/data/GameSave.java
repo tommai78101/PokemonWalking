@@ -26,6 +26,7 @@ import abstracts.Item;
 import abstracts.SubMenu;
 import entity.Player;
 import level.Area;
+import level.OverWorld;
 import level.PixelData;
 import level.WorldConstants;
 import main.Game;
@@ -75,8 +76,7 @@ public class GameSave {
 			this.playerInfo.reset();
 
 		// Name of the player.
-		System.arraycopy(gamePlayer.getByteName(), 0, this.playerInfo.player_name, 0, 16); // 16 is the name length
-																							// limit.
+		System.arraycopy(gamePlayer.getByteName(), 0, this.playerInfo.player_name, 0, 16); // 16 is the name length limit.
 		byte[] byteArray = GameSave.concatenate(PlayerInfo.NAME, gamePlayer.getByteName());
 		this.playerInfo.increment(GameSave.concatenate(new byte[] {
 			0x0
@@ -84,8 +84,18 @@ public class GameSave {
 
 		// Gender of the player. Size of data is 1 byte.
 		this.playerInfo.player_gender[this.playerInfo.player_gender.length - 1] = gamePlayer.getGender().getByte();
-
 		byteArray = GameSave.concatenate(PlayerInfo.GNDR, gamePlayer.getGender().getByte());
+		this.playerInfo.increment(GameSave.concatenate(new byte[] {
+			0x0
+		}, byteArray));
+
+		// Player Walking State
+		byte walkingState = PlayerInfo.WalkState_IDLE;
+		if (gamePlayer.isRidingBicycle())
+			walkingState = PlayerInfo.WalkState_RIDE;
+		else if (gamePlayer.isInWater())
+			walkingState = PlayerInfo.WalkState_SWIM;
+		byteArray = GameSave.concatenate(PlayerInfo.WALK, walkingState);
 		this.playerInfo.increment(GameSave.concatenate(new byte[] {
 			0x0
 		}, byteArray));
@@ -141,18 +151,34 @@ public class GameSave {
 		}
 		// Current Area & Player State
 		Area currentArea = game.getWorld().getCurrentArea();
+
+		// Determining player walking state
+		byte gamePlayerWalkingState = PlayerInfo.WalkState_IDLE;
+		if (gamePlayer.isRidingBicycle())
+			gamePlayerWalkingState = PlayerInfo.WalkState_RIDE;
+		else if (gamePlayer.isInWater())
+			gamePlayerWalkingState = PlayerInfo.WalkState_SWIM;
+
 		byte[] bufArea = ByteBuffer.allocate(4).putInt(currentArea.getAreaID()).array();
 		byte[] bufSector = ByteBuffer.allocate(4).putInt(currentArea.getSectorID()).array();
 		byte[] bufX = ByteBuffer.allocate(4).putInt(currentArea.getPlayerXInArea()).array();
 		byte[] bufY = ByteBuffer.allocate(4).putInt(currentArea.getPlayerYInArea()).array();
 		byte[] bufFacing = ByteBuffer.allocate(4).putInt(gamePlayer.getFacing()).array();
-		for (int i = 0; i < 4; i++) {
+
+		// Incrementing 4 bytes for each integer.
+		int i = 0;
+		for (; i < 4; i++) {
 			this.areaInfo.current_area_id[i] = bufArea[i];
 			this.areaInfo.current_area_sector_id[i] = bufSector[i];
 			this.playerInfo.player_x[i] = bufX[i];
 			this.playerInfo.player_y[i] = bufY[i];
 			this.playerInfo.player_facing[i] = bufFacing[i];
 		}
+
+		// Incrementing 1 byte for each byte.
+		byte[] bufWalkState = ByteBuffer.allocate(1).put(gamePlayerWalkingState).array();
+		this.playerInfo.player_walking_state[0] = bufWalkState[0];
+
 		byteArray = new byte[] {};
 		byteArray = GameSave.concatenate(byteArray, bufArea);
 		byteArray = GameSave.concatenate(byteArray, bufSector);
@@ -208,6 +234,7 @@ public class GameSave {
 
 		// Get Player
 		Player gamePlayer = game.getPlayer();
+		OverWorld gameWorld = game.getWorld();
 
 		// Get name
 		gamePlayer.setName(new String(this.playerInfo.player_name));
@@ -281,29 +308,38 @@ public class GameSave {
 		int currentAreaID = (this.areaInfo.current_area_id[0] & 0xFF) << 24
 			| (this.areaInfo.current_area_id[1] & 0xFF) << 16 | (this.areaInfo.current_area_id[2] & 0xFF) << 8
 			| (this.areaInfo.current_area_id[3] & 0xFF);
-		game.getWorld().setCurrentArea(WorldConstants.convertToArea(game.getWorld().getAllAreas(), currentAreaID));
-		if (game.getWorld().getCurrentArea() == null)
+		gameWorld.setCurrentArea(WorldConstants.convertToArea(game.getWorld().getAllAreas(), currentAreaID));
+		if (gameWorld.getCurrentArea() == null)
 			throw new Exception("There is no area set.");
 		int currentSectorID = (this.areaInfo.current_area_sector_id[0] & 0xFF) << 24
 			| (this.areaInfo.current_area_sector_id[1] & 0xFF) << 16
 			| (this.areaInfo.current_area_sector_id[2] & 0xFF) << 8
 			| this.areaInfo.current_area_sector_id[3] & 0xFF;
-		game.getWorld().getCurrentArea().setSectorID(currentSectorID);
+		gameWorld.getCurrentArea().setSectorID(currentSectorID);
 
 		// Get Player Position
 		int x = (this.playerInfo.player_x[0] << 24) | (this.playerInfo.player_x[1] << 16)
 			| (this.playerInfo.player_x[2] << 8) | this.playerInfo.player_x[3];
 		int y = (this.playerInfo.player_y[0] << 24) | (this.playerInfo.player_y[1] << 16)
 			| (this.playerInfo.player_y[2] << 8) | this.playerInfo.player_y[3];
-		game.getPlayer().setAreaPosition(x, y);
-		game.getWorld().getCurrentArea().setPlayerX(x);
-		game.getWorld().getCurrentArea().setPlayerY(y);
-		game.getWorld().getCurrentArea().setPlayer(game.getPlayer());
+		gamePlayer.setAreaPosition(x, y);
+		gameWorld.getCurrentArea().setPlayerX(x);
+		gameWorld.getCurrentArea().setPlayerY(y);
+		gameWorld.getCurrentArea().setPlayer(gamePlayer);
 
 		// Get Player direction facing.
 		int facing = (this.playerInfo.player_facing[0] & 0xFF) << 24 | (this.playerInfo.player_facing[1] & 0xFF) << 16
 			| (this.playerInfo.player_facing[2] & 0xFF) << 8 | this.playerInfo.player_facing[3] & 0xFF;
-		game.getPlayer().setFacing(facing);
+		gamePlayer.setFacing(facing);
+
+		// Get Player walking state
+		byte walkingState = (byte) (this.playerInfo.player_walking_state[0] & 0xFF);
+		if (walkingState == PlayerInfo.WalkState_SWIM)
+			gamePlayer.goesInWater();
+		else if (walkingState == PlayerInfo.WalkState_RIDE)
+			gamePlayer.hopsOnBike();
+		else
+			gamePlayer.startsWalking();
 
 		// Get modified pixel data for all areas.
 		if (this.areaInfo.changedPixelData.size() > 0) {
@@ -346,7 +382,7 @@ public class GameSave {
 					}
 				}
 			}
-			game.getWorld().refresh();
+			gameWorld.refresh();
 		}
 	}
 

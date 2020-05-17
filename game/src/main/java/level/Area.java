@@ -345,7 +345,7 @@ public class Area implements Tileable, UpdateRenderable {
 				}
 				// This is to check to see if player has left the water.
 				if (this.player.isInWater())
-					this.player.leavesWater();
+					this.player.startsWalking();
 				break;
 		}
 	}

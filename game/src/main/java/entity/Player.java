@@ -175,6 +175,16 @@ public class Player extends Character {
 	public void goesInWater() {
 		this.isInWater = true;
 		this.isOnBicycle = false;
+		this.isSprinting = false;
+	}
+
+	/**
+	 * Changes the player's state to Riding.
+	 */
+	public void hopsOnBike() {
+		this.isInWater = false;
+		this.isOnBicycle = true;
+		this.isSprinting = false;
 	}
 
 	/**
@@ -544,9 +554,10 @@ public class Player extends Character {
 	/**
 	 * Changes the player's state to Walking.
 	 */
-	public void leavesWater() {
+	public void startsWalking() {
 		this.isInWater = false;
 		this.isOnBicycle = false;
+		this.isSprinting = false;
 	}
 
 	public void reload() {
