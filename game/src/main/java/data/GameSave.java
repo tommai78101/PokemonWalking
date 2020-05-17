@@ -117,8 +117,8 @@ public class GameSave {
 					byteArray,
 					ByteBuffer.allocate(2).putChar((char) ((itemList.size() - 1) & 0xFFFF)).array()
 				); // How many
-																																				// items in
-																																				// a list?
+					// items in
+					// a list?
 				byteArray = GameSave.concatenate(byteArray, ByteBuffer.allocate(1).put((byte) itemList.size()).array()); // ItemInfo
 				// size.
 				byte[] itemInfo = null;
@@ -139,7 +139,6 @@ public class GameSave {
 				listType++;
 			}
 		}
-
 		// Current Area & Player State
 		Area currentArea = game.getWorld().getCurrentArea();
 		byte[] bufArea = ByteBuffer.allocate(4).putInt(currentArea.getAreaID()).array();
@@ -185,8 +184,15 @@ public class GameSave {
 			Set<PixelData> pixelList = area.getModifiedPixelDataList();
 			if (!pixelList.isEmpty()) {
 				for (PixelData px : pixelList) {
-					byte[] pixelArray = ByteBuffer.allocate(4 * 5).putInt(area.getAreaID()).putInt(area.getSectorID())
-						.putInt(px.xPosition).putInt(px.yPosition).putInt(px.getColor()).array();
+					byte[] pixelArray = ByteBuffer
+						.allocate(4 * 5 + 1)
+						.putInt(area.getAreaID())
+						.putInt(area.getSectorID())
+						.putInt(px.xPosition)
+						.putInt(px.yPosition)
+						.putInt(px.getColor())
+						.put(px.isHidden() ? (byte) 0x01 : (byte) 0x00)
+						.array();
 					this.areaInfo.changedPixelData.add(pixelArray);
 					byteArray = GameSave.concatenate(byteArray, pixelArray);
 				}
@@ -211,28 +217,31 @@ public class GameSave {
 		gamePlayer.setGender(GenderType.determineGender(genderByte));
 
 		// Get menu options.
-		// Determine what stage the player is at via the game, not via storing the information as part of the game save.
-//		if (!game.getStartMenu().getSubMenusList().isEmpty())
-//			game.getStartMenu().getSubMenusList().clear();
-//		for (int i = 0; i < this.playerInfo.startMenu.size(); i++) {
-//			byte[] data = this.playerInfo.startMenu.get(i);
-//			switch (new String(data)) {
-//				case MainMenu.ITEM_NAME_EXIT:
-//					break;
-//				case MainMenu.ITEM_NAME_INVENTORY:
-//					game.getStartMenu().addMenuItem(
-//						new Inventory(MainMenu.ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", game)
-//							.initialize(game.getPlayer().keys)
-//					);
-//					break;
-//				case MainMenu.ITEM_NAME_SAVE:
-//					game.getStartMenu()
-//						.addMenuItem(new Save(MainMenu.ITEM_NAME_SAVE, "Save the game.", "Save the game.", game)
-//							.initialize(game.getPlayer().keys)
-//						);
-//					break;
-//			}
-//		}
+		// Determine what stage the player is at via the game, not via storing the information as part of
+		// the game save.
+		/*
+		if (!game.getStartMenu().getSubMenusList().isEmpty())
+			game.getStartMenu().getSubMenusList().clear();
+		for (int i = 0; i < this.playerInfo.startMenu.size(); i++) {
+			byte[] data = this.playerInfo.startMenu.get(i);
+			switch (new String(data)) {
+				case MainMenu.ITEM_NAME_EXIT:
+					break;
+				case MainMenu.ITEM_NAME_INVENTORY:
+					game.getStartMenu().addMenuItem(
+						new Inventory(MainMenu.ITEM_NAME_INVENTORY, "Open the bag.", "Open the bag.", game)
+							.initialize(game.getPlayer().keys)
+					);
+					break;
+				case MainMenu.ITEM_NAME_SAVE:
+					game.getStartMenu()
+						.addMenuItem(new Save(MainMenu.ITEM_NAME_SAVE, "Save the game.", "Save the game.", game)
+							.initialize(game.getPlayer().keys)
+						);
+					break;
+			}
+		}
+		*/
 
 		// Get inventory items
 		Inventory inventory = game.getInventory();
@@ -266,7 +275,6 @@ public class GameSave {
 				}
 			}
 		}
-
 		// Get current area
 		// TODO: Probably need to set world ID first before setting the current area ID
 		// and SECTOR.
@@ -315,7 +323,9 @@ public class GameSave {
 
 				LOADED_AREA:
 				for (Area area : loadedAreas) {
+					// If the area is to be loaded matches the data save file...
 					if (areaID == area.getAreaID()) {
+						// Grab the pixel data.
 						int xPixelData = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16
 							| (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
 						offset += 4;
@@ -324,8 +334,12 @@ public class GameSave {
 						offset += 4;
 						int color = (data[offset] & 0xFF) << 24 | (data[offset + 1] & 0xFF) << 16
 							| (data[offset + 2] & 0xFF) << 8 | data[offset + 3] & 0xFF;
+						offset += 4;
+						boolean isHidden = (data[offset] == 0x01);
 
 						PixelData pxData = new PixelData(color, xPixelData, yPixelData);
+						if (isHidden)
+							pxData.hide();
 						area.getModifiedPixelDataList().add(pxData);
 						area.loadModifiedPixelDataList();
 						break LOADED_AREA;
@@ -334,7 +348,6 @@ public class GameSave {
 			}
 			game.getWorld().refresh();
 		}
-
 	}
 
 	/**
@@ -365,7 +378,6 @@ public class GameSave {
 				e.printStackTrace();
 			}
 		}
-
 	}
 
 	public static void load(Game game, String filename) {
@@ -413,10 +425,13 @@ public class GameSave {
 	}
 
 	/**
-	 * Checks to see if the game saved data exists in relative to where the game is located. The save data is a SAV binary format file.
+	 * Checks to see if the game saved data exists in relative to where the game is located. The save
+	 * data is a SAV binary format file.
 	 * 
 	 * <p>
-	 * Note that {@link java.io.File#isFile() File.isFile()} is used to check for saved data that is generated by the game. This is because the saved data file generated by the game is a <i>normal</i> file.
+	 * Note that {@link java.io.File#isFile() File.isFile()} is used to check for saved data that is
+	 * generated by the game. This is because the saved data file generated by the game is a
+	 * <i>normal</i> file.
 	 * 
 	 * <p>
 	 * For more information on the file format, please read the documentation provided.

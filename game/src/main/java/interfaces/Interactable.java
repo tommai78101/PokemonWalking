@@ -1,10 +1,8 @@
 package interfaces;
 
 import abstracts.Entity;
-import abstracts.Item;
+import level.Area;
 
 public interface Interactable {
-	void interact(Entity target);
-
-	void interact(Entity target, Item item);
+	void interact(Area area, Entity target);
 }

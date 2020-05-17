@@ -101,7 +101,6 @@ public class Player extends Character {
 		this.keys.resetInputs();
 		this.isLockedWalking = true;
 		this.isFacingBlocked[0] = this.isFacingBlocked[1] = this.isFacingBlocked[2] = this.isFacingBlocked[3] = false;
-
 		if (this.xAccel == 0 && this.yAccel == 0) {
 			switch (this.getFacing()) {
 				case UP:
@@ -178,11 +177,6 @@ public class Player extends Character {
 		this.isOnBicycle = false;
 	}
 
-	@Override
-	public void interact(Entity entity, Item item) {
-		this.interact(entity);
-	}
-
 	/**
 	 * Lets the player interact with the data tile ID.
 	 * 
@@ -190,29 +184,31 @@ public class Player extends Character {
 	 *            The tile ID's full data (the color of the tile).
 	 */
 	@Override
-	public void interact(Entity entity) {
+	public void interact(Area area, Entity entity) {
 		PixelData data = entity.getPixelData();
 		final int dataColor = data.getColor();
 		final int alpha = (dataColor >> 24) & 0xFF;
 
 		// Entity pixel data identification check.
 		switch (alpha) {
-			case 0x03: {// Obstacles
+			case 0x03: {
+				// Obstacles
 				// Red color values indicate the type of obstacles to filter:
-				// int red = (dataColor >> 16) & 0xFF;
-				// switch (red) {
-				// case 0x00: // Small tree
-				// case 0x01: //Logs
-				// case 0x02: //Planks
-				// case 0x03: //Scaffolding Left
-				// case 0x04: //Scaffolding Right
-				// case 0x05: //Sign
-				// }
+				/*
+				int red = (dataColor >> 16) & 0xFF;
+				switch (red) {
+					case 0x00: // Small tree
+					case 0x01: // Logs
+					case 0x02: // Planks
+					case 0x03: // Scaffolding Left
+					case 0x04: // Scaffolding Right
+					case 0x05: // Sign
+				}
+				*/
 				if (!(entity instanceof Obstacle)) {
 					Debug.error("This shouldn't be happening. Obstacle is not an instanceof Entity.");
 					break;
 				}
-
 				// Common player-obstacle interaction code logic.
 				if (this.isInteracting() && entity.isInteracting()) {
 					this.startInteraction(entity);
@@ -233,10 +229,13 @@ public class Player extends Character {
 				if (this.isInteracting() && item.isInteracting()) {
 					this.startInteraction(item);
 					if (!item.isPickedUp()) {
-						// Order of operations is important here. Add item first, before picking the item up.
-						// Picking up the item will disable the item, and the item cannot be added afterwards.
-						this.inventory.addItem(item);
+						// Order of operations is important here. Pick the item up, then check if the item has finished
+						// being picked up, then add the item and set the changed pixel data in the area once detected.
 						item.pick();
+						if (item.isFinishedPickingUp()) {
+							this.inventory.addItem(item);
+							area.updateItem(item);
+						}
 					}
 					else {
 						this.stopInteraction();
@@ -346,7 +345,6 @@ public class Player extends Character {
 
 		int playerAreaX = this.getXInArea();
 		int playerAreaY = this.getYInArea();
-
 		try {
 			if (this.isInteracting()) {
 				Entity entity = null;
@@ -365,12 +363,12 @@ public class Player extends Character {
 						break;
 				}
 				if (entity != null) {
-					this.interact(entity);
+					this.interact(area, entity);
 				}
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			Debug.error("Encountered an error while handling surrounding tiles.", e);
 			this.stopInteraction();
 		}
 	}
@@ -576,7 +574,6 @@ public class Player extends Character {
 	public void render(final Scene output, final Graphics graphics, final int x, final int y) {
 		// Key press detection. (It's short-circuited via inputs first, before checking the lock.)
 		boolean canUserMove = Game.keys.isDpadPressed() && !Player.movementLock;
-
 		if (this.isLockedJumping) {
 			// Jumping has a higher priority than walking.
 			output.blit(Art.shadow, this.xOffset + x, this.yOffset + y + 4);
@@ -603,7 +600,6 @@ public class Player extends Character {
 				// Player has entered an impossible state.
 				return;
 			}
-
 			// Blocking animation. Animation pointer index is reset to zero, to create a perfect loop.
 			if (this.isInWater) {
 				// Surfing (has higher priority than bicycling)
@@ -626,7 +622,6 @@ public class Player extends Character {
 				else
 					output.npcBlit(Art.player[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
 			}
-
 			// Interacting with another entity.
 			if (this.isInteractionEnabled) {
 				// Dialogues can be rendered at this point here.
@@ -1119,7 +1114,6 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
-
 			// Down
 			if (!this.isFacingBlocked[Character.DOWN] && !Player.movementLock) {
 				if (this.keys.down.isTappedDown || this.keys.S.isTappedDown)
@@ -1133,7 +1127,6 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
-
 			// Left
 			if (!this.isFacingBlocked[Character.LEFT] && !Player.movementLock) {
 				if (this.keys.left.isTappedDown || this.keys.A.isTappedDown)
@@ -1147,7 +1140,6 @@ public class Player extends Character {
 				this.isColliding = true;
 				return;
 			}
-
 			// Right
 			if (!this.isFacingBlocked[Character.RIGHT] && !Player.movementLock) {
 				if (this.keys.right.isTappedDown || this.keys.D.isTappedDown)
@@ -1185,12 +1177,10 @@ public class Player extends Character {
 			this.yAccel = 1;
 		if (this.yAccel < -1)
 			this.yAccel = -1;
-
 		if (!this.isOnBicycle && !Player.isMovementsLocked()) {
 			this.xPosition += this.xAccel * 2;
 			this.yPosition += this.yAccel * 2;
 		}
-
 		// Needs to get out of being locked to walking/jumping.
 		// Note that we cannot compare using ||, what if the player is moving in one
 		// direction? What about the other axis?
@@ -1214,12 +1204,10 @@ public class Player extends Character {
 			this.yAccel = 1;
 		if (this.yAccel < -1)
 			this.yAccel = -1;
-
 		if (!this.isOnBicycle && !Player.isMovementsLocked()) {
 			this.xPosition += this.xAccel * 4;
 			this.yPosition += this.yAccel * 4;
 		}
-
 		// Needs to get out of being locked to walking/jumping.
 		// Note that we cannot compare using ||, what if the player is moving in one
 		// direction? What about the other axis?
@@ -1243,12 +1231,10 @@ public class Player extends Character {
 			this.yAccel = 1;
 		if (this.yAccel < -1)
 			this.yAccel = -1;
-
 		if (this.isOnBicycle && !Player.isMovementsLocked()) {
 			this.xPosition += this.xAccel * 8;
 			this.yPosition += this.yAccel * 8;
 		}
-
 		// Needs to get out of being locked to walking/jumping.
 		// Note that we cannot compare using ||, what if the player is moving in one
 		// direction? What about the other axis?

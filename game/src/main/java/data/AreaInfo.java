@@ -18,6 +18,7 @@ import interfaces.RandomFileAccessible;;
 public class AreaInfo implements RandomFileAccessible {
 	public static final byte[] AREA = "AREA".getBytes(); // Current Area.
 	public static final byte[] PIXELDATA = "PXDT".getBytes(); // Changed pixels data.
+	public static final int PixelDataByteSize = (4 * 5 + 1);
 
 	public final byte[] current_area_id = new byte[4];
 	public final byte[] current_area_sector_id = new byte[4];
@@ -48,11 +49,10 @@ public class AreaInfo implements RandomFileAccessible {
 		for (int i = 0; i < this.current_area_sector_id.length; i++, offset++, this.size--) {
 			this.current_area_sector_id[i] = data[offset];
 		}
-
 		// Changed pixel data
 
 		int arraySize = raf.readChar();
-		int pixelSize = (arraySize - 4) / 20;
+		int pixelSize = (arraySize - 4) / AreaInfo.PixelDataByteSize;
 
 		if (pixelSize > 0) {
 			data = new byte[arraySize];
@@ -62,7 +62,7 @@ public class AreaInfo implements RandomFileAccessible {
 				if (data[offset] != AreaInfo.PIXELDATA[i])
 					throw new IOException("Incorrect Area Info PIXELDATA chunk.");
 			for (; pixelSize > 0; pixelSize--) {
-				byte[] px = new byte[4 * 5];
+				byte[] px = new byte[AreaInfo.PixelDataByteSize];
 				for (int i = 0; i < px.length; i++, offset++)
 					px[i] = data[offset];
 				this.changedPixelData.add(px);
@@ -82,7 +82,7 @@ public class AreaInfo implements RandomFileAccessible {
 		raf.write(this.current_area_sector_id);
 
 		// Changed pixel data
-		raf.writeChar(this.changedPixelData.size() * 4 * 5 + AreaInfo.PIXELDATA.length);
+		raf.writeChar(this.changedPixelData.size() * AreaInfo.PixelDataByteSize + AreaInfo.PIXELDATA.length);
 		raf.write(AreaInfo.PIXELDATA);
 		for (byte[] b : this.changedPixelData)
 			raf.write(b);

@@ -109,11 +109,9 @@ public class Area implements Tileable, UpdateRenderable {
 						this.areaItems.put(Map.entry(x, y), entity);
 					}
 				}
-
 				this.areaData.get(y).add(pixelData);
 			}
 		}
-
 		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInSectorPoint = false;
@@ -185,7 +183,6 @@ public class Area implements Tileable, UpdateRenderable {
 				this.oldYTriggerPosition = -1;
 			}
 		}
-
 		if (this.isTriggerBeingTriggered && this.trigger != null)
 			this.handleTriggerActions();
 		else if ((this.isTriggerBeingTriggered && this.trigger == null) || !this.isTriggerBeingTriggered) {
@@ -231,8 +228,6 @@ public class Area implements Tileable, UpdateRenderable {
 			this.checkCurrentPositionDataAndSetProperties(this.getPixelData(this.xPlayerPosition, this.yPlayerPosition));
 		}
 		else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
-			// A
-			// This goes with B. (30 lines down below.)
 			// It may be possible the player is still in the air, and hasn't done checking
 			// if the current pixel data is a ledge or not. This continues the data checking. It's required.
 			this.xPlayerPosition = this.player.getXInArea();
@@ -385,7 +380,6 @@ public class Area implements Tileable, UpdateRenderable {
 				if (!data.isHidden()) {
 					screen.blitBiome(data.getBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
 				}
-
 				// This is for rendering exit arrows when you are in front of the exit/entrance doors.
 				if (x == this.player.getXInArea() && y == this.player.getYInArea()
 					&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
@@ -395,7 +389,6 @@ public class Area implements Tileable, UpdateRenderable {
 				data.renderTick();
 			}
 		}
-
 		// Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach((k, obstacle) -> {
 			obstacle.renderDialogue(screen, graphics);
@@ -481,7 +474,6 @@ public class Area implements Tileable, UpdateRenderable {
 				this.setPlayerY(blue);
 				break;
 			}
-
 		}
 	}
 
@@ -589,6 +581,12 @@ public class Area implements Tileable, UpdateRenderable {
 		data.xPosition = xPosition;
 		data.yPosition = yPosition;
 		this.areaData.get(yPosition).set(xPosition, data);
+		this.modifiedAreaData.add(data);
+	}
+
+	public void updateItem(Item item) {
+		PixelData data = item.getPixelData();
+		this.areaData.get(data.yPosition).set(data.xPosition, data);
 		this.modifiedAreaData.add(data);
 	}
 

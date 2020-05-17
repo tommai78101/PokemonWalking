@@ -3,9 +3,9 @@ package obstacle;
 import java.awt.Graphics;
 
 import abstracts.Entity;
-import abstracts.Item;
 import abstracts.Obstacle;
 import dialogue.Dialogue.DialogueType;
+import level.Area;
 import level.PixelData;
 import screen.Scene;
 import utility.DialogueBuilder;
@@ -23,27 +23,18 @@ public class SmallDeadTree extends Obstacle {
 	}
 
 	@Override
-	public void interact(Entity target) {
+	public void interact(Area area, Entity target) {
 		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void interact(Entity target, Item item) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void tick() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
 		// TODO Auto-generated method stub
-
 	}
 
 }

@@ -4,7 +4,7 @@ import java.awt.Graphics;
 
 import abstracts.Character;
 import abstracts.Entity;
-import abstracts.Item;
+import level.Area;
 import screen.Scene;
 
 public class Joe extends Character {
@@ -15,54 +15,40 @@ public class Joe extends Character {
 	@Override
 	public void tick() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void walk() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void sprint() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void jump() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void ride() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void swim() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
-	public void interact(Entity target) {
+	public void interact(Area area, Entity target) {
 		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void interact(Entity target, Item item) {
-		// TODO Auto-generated method stub
-
 	}
 }

@@ -245,8 +245,28 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		return true;
 	}
 
+	/**
+	 * Two conditions must be satisfied before claiming the item has been properly picked up.<br/>
+	 * <ol>
+	 * <li>The action to initiate "picking up" has been triggered.
+	 * <li>The event "after picking up" has finished triggering.
+	 * </ol>
+	 * The conditional check has a short-circuited condition where if the "after picking up" event is
+	 * currently triggered, the item is still not properly picked up.
+	 * 
+	 * @return True if the item has been properly picked up. False, if otherwise.
+	 */
 	public boolean isPickedUp() {
 		return !this.afterItemActionOccurred && (this.picked);
+	}
+
+	/**
+	 * This checks if the event, "after picking up" has finished triggering.
+	 * 
+	 * @return True if the item has finished triggering the "after picked up" event.
+	 */
+	public boolean isFinishedPickingUp() {
+		return !this.afterItemActionOccurred;
 	}
 
 	public void droppedAt(Area area, Player player) {

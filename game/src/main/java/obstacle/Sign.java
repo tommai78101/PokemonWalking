@@ -3,10 +3,10 @@ package obstacle;
 import java.awt.Graphics;
 
 import abstracts.Entity;
-import abstracts.Item;
 import abstracts.Obstacle;
 import dialogue.Dialogue;
 import dialogue.Dialogue.DialogueType;
+import level.Area;
 import level.PixelData;
 import main.Game;
 import screen.Scene;
@@ -26,16 +26,9 @@ public class Sign extends Obstacle {
 	}
 
 	@Override
-	public void interact(Entity target) {
+	public void interact(Area area, Entity target) {
 		// TODO Auto-generated method stub
 		System.err.println("Sign is interacting.");
-
-	}
-
-	@Override
-	public void interact(Entity target, Item item) {
-		// TODO Auto-generzated method stub
-		System.err.println("Sign with item is interacting.");
 	}
 
 	@Override
