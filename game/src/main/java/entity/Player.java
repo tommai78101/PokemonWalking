@@ -53,12 +53,12 @@ public class Player extends Character {
 
 	// These are animation-related locks
 	private boolean isLockedWalking;
-	private boolean isLockedSprinting;
 	private boolean isLockedJumping;
 
 	private final boolean[] isFacingBlocked = new boolean[4];
 	private boolean isInWater;
 	private boolean isOnBicycle;
+	private boolean isSprinting;
 	private boolean isColliding;
 
 	// This is a player character lock.
@@ -301,10 +301,6 @@ public class Player extends Character {
 		return this.isLockedJumping;
 	}
 
-	public boolean isLockedSprinting() {
-		return this.isLockedSprinting;
-	}
-
 	/**
 	 * Checks to see if the player is currently locked to walking.
 	 * 
@@ -321,6 +317,15 @@ public class Player extends Character {
 	 */
 	public boolean isRidingBicycle() {
 		return this.isOnBicycle;
+	}
+
+	/**
+	 * Returns the player's state (Running or not running).
+	 * 
+	 * @return True, if player is running/sprinting. False, if player is not.
+	 */
+	public boolean isSprinting() {
+		return this.isSprinting;
 	}
 
 	/**
@@ -952,13 +957,13 @@ public class Player extends Character {
 	private void handleMovement() {
 		// Check if player is currently locked to walking.
 		if (this.isLockedWalking) {
+			// Order of operations, the fastest goes first.
 			if (this.isOnBicycle)
 				this.ride();
+			else if (this.isSprinting)
+				this.sprint();
 			else
 				this.walk();
-		}
-		else if (this.isLockedSprinting) {
-			this.sprint();
 		}
 		else {
 			// Before we walk, check to see if the oldX and oldY are up-to-date with the
@@ -1220,7 +1225,7 @@ public class Player extends Character {
 		// direction? What about the other axis?
 		if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
 			// Resets every flag that locks the player.
-			this.isLockedSprinting = false;
+			this.isLockedWalking = false;
 		}
 	}
 
