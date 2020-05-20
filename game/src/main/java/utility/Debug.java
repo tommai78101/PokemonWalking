@@ -12,7 +12,7 @@ public class Debug {
 	}
 
 	public static void error(String msg, Exception e) {
-		StackTraceElement element = e.getStackTrace()[1];
+		StackTraceElement element = e.getStackTrace()[0];
 		Debug.error(msg);
 		Debug.error(element.getClassName() + ":" + element.getLineNumber() + "\t- " + e.getLocalizedMessage());
 	}
