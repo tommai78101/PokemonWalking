@@ -9,7 +9,6 @@
 package main;
 
 import java.awt.Graphics;
-import java.util.ArrayList;
 import java.util.List;
 
 import abstracts.SubMenu;
@@ -18,7 +17,6 @@ import entity.Player;
 import item.KeyItem;
 import level.OverWorld;
 import level.WorldConstants;
-import main.SaveDataManager.SaveStatus;
 import main.StateManager.GameState;
 import menu.Inventory;
 import menu.MainMenu;
@@ -54,9 +52,21 @@ public class Game {
 	 * @see NewInputHandler
 	 */
 	public Game(MainComponent main) {
+		this.worlds = null;
+		this.gameScene = null;
+		this.startMenu = null;
+		this.stateManager = null;
+		this.saveManager = null;
+		this.inventoryManager = null;
+		this.player = null;
+
+		GameSave.saveExperimental(this, "testData.sav");
+		GameSave.loadExperimental(this, "testData.sav");
+
+		/*
 		WorldConstants.checkForMods();
 		this.worlds = new ArrayList<>();
-
+		
 		this.gameScene = main.getScene();
 		this.worlds.add(this.overworld);
 		this.startMenu = new MainMenu();
@@ -65,8 +75,9 @@ public class Game {
 		this.inventoryManager = new Inventory(this);
 		this.startMenu.initialize(this);
 		this.player = new Player(this);
-
+		
 		this.load();
+		*/
 	}
 
 	/**
@@ -133,6 +144,7 @@ public class Game {
 	 * @return Nothing.
 	 */
 	public void tick() {
+		/*
 		// Debugging purposes
 		if (this.player.keys.F1.keyStateDown && !(this.player.keys.F1.lastKeyState)) {
 			this.player.keys.F1.lastKeyState = true;
@@ -140,7 +152,7 @@ public class Game {
 			this.load();
 		}
 		// End debugging purposes
-
+		
 		GameState state = this.prepareMainMenu();
 		SubMenu subMenu = this.startMenu.getActiveItem();
 		switch (state) {
@@ -183,6 +195,7 @@ public class Game {
 				break;
 			}
 		}
+		*/
 	}
 
 	/**
@@ -253,7 +266,6 @@ public class Game {
 		if (this.registeredItem == null)
 			return false;
 		return this.registeredItem.equals(item);
-
 	}
 
 	public OverWorld getWorld() {

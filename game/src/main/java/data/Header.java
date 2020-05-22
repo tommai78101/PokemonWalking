@@ -69,7 +69,7 @@ public class Header extends Chunk {
 	public int getSize() {
 		int size = this.name.length;
 		size += this.currentDate.length;
-		// Byte size of the current date size.
+		// Byte size of the current date length. (byte)
 		size += 1;
 		return size;
 	}

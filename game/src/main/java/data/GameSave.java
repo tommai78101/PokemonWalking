@@ -31,6 +31,7 @@ import level.PixelData;
 import level.WorldConstants;
 import main.Game;
 import menu.Inventory;
+import utility.Debug;
 
 public class GameSave {
 	/*
@@ -416,6 +417,20 @@ public class GameSave {
 		}
 	}
 
+	public static void saveExperimental(Game game, String filename) {
+		File file = new File(filename);
+		try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+			// Delete or clear out the file.
+			raf.setLength(0);
+			raf.seek(0);
+			SaveChunk save = new SaveChunk();
+			save.write(game, raf);
+		}
+		catch (IOException e) {
+			Debug.error("Failed to save in experimental feature.", e);
+		}
+	}
+
 	public static void load(Game game, String filename) {
 		File load = null;
 		if (WorldConstants.isModsEnabled.booleanValue()) {
@@ -457,6 +472,20 @@ public class GameSave {
 					e.printStackTrace();
 				}
 			}
+		}
+	}
+
+	public static void loadExperimental(Game game, String filename) {
+		File file = new File(filename);
+		try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+			SaveChunk save = new SaveChunk();
+			save.read(game, raf);
+		}
+		catch (FileNotFoundException e) {
+			Debug.error("File cannot be found in experimental feature.", e);
+		}
+		catch (IOException e) {
+			Debug.error("Fail to load in experimental feature.", e);
 		}
 	}
 

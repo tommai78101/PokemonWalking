@@ -51,6 +51,7 @@ public class SaveChunk extends Chunk {
 
 	@Override
 	public void write(Game game, RandomAccessFile raf) throws IOException {
+		// We include the save chunk data size bytes count here. (short)
 		raf.writeShort(this.getSize());
 		raf.write(this.name);
 		raf.write(this.version);
@@ -65,6 +66,8 @@ public class SaveChunk extends Chunk {
 		size += this.version.length;
 		for (Chunk chunk : this.chunks) {
 			size += chunk.getSize();
+			// Chunk size bytes count. (short)
+			size += 2;
 		}
 		return size;
 	}
