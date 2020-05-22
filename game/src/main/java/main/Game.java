@@ -9,6 +9,7 @@
 package main;
 
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.List;
 
 import abstracts.SubMenu;
@@ -52,21 +53,9 @@ public class Game {
 	 * @see NewInputHandler
 	 */
 	public Game(MainComponent main) {
-		this.worlds = null;
-		this.gameScene = null;
-		this.startMenu = null;
-		this.stateManager = null;
-		this.saveManager = null;
-		this.inventoryManager = null;
-		this.player = null;
-
-		GameSave.saveExperimental(this, "testData.sav");
-		GameSave.loadExperimental(this, "testData.sav");
-
-		/*
 		WorldConstants.checkForMods();
 		this.worlds = new ArrayList<>();
-		
+
 		this.gameScene = main.getScene();
 		this.worlds.add(this.overworld);
 		this.startMenu = new MainMenu();
@@ -75,9 +64,11 @@ public class Game {
 		this.inventoryManager = new Inventory(this);
 		this.startMenu.initialize(this);
 		this.player = new Player(this);
-		
+
 		this.load();
-		*/
+
+		GameSave.saveExperimental(this, "testData.sav");
+		GameSave.loadExperimental(this, "testData.sav");
 	}
 
 	/**

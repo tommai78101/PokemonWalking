@@ -23,6 +23,8 @@ public class SaveChunk extends Chunk {
 		this.name = SaveChunk.SaveData;
 		this.version = SaveChunk.SaveVersion;
 		this.chunks.add(new Header());
+		this.chunks.add(new AreaChunk());
+		this.chunks.add(new PixelDataArrayChunk());
 	}
 
 	@Override
