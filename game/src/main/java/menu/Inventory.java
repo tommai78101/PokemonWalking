@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -98,7 +99,10 @@ public class Inventory extends SubMenu {
 		this.pokéballs = new ArrayList<>();
 		this.TMs_HMs = new ArrayList<>();
 		this.selectionMenu = new ArrayList<>();
+		
 		Item returnExit = new DummyItem("RETURN", "Close inventory.", null, 0);
+		returnExit.setReturnMenu(true);
+		
 		this.potions.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.keyItems.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.pokéballs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
@@ -681,12 +685,39 @@ public class Inventory extends SubMenu {
 			entry.setValue(entry.getValue().intValue() - 1);
 	}
 
+	/**
+	 * List given in order:
+	 * <p>
+	 * Potions -> KeyItems -> Pokéballs -> TMs_HMs.
+	 * 
+	 * @return
+	 */
 	public List<List<Map.Entry<Item, Integer>>> getAllItemsList() {
 		List<List<Map.Entry<Item, Integer>>> result = new ArrayList<>();
 		result.add(this.potions);
 		result.add(this.keyItems);
 		result.add(this.pokéballs);
 		result.add(this.TMs_HMs);
+		return result;
+	}
+
+	/**
+	 * List given in any order, so as long as the key strings match:
+	 * <ul>
+	 * <li>Potions
+	 * <li>KeyItems
+	 * <li>Pokéballs
+	 * <li>TMs_HMs.
+	 * </ul>
+	 * 
+	 * @return
+	 */
+	public Map<Category, List<Map.Entry<Item, Integer>>> getAllMappedItemsList() {
+		Map<Category, List<Map.Entry<Item, Integer>>> result = new HashMap<>();
+		result.put(Category.POTIONS, this.potions);
+		result.put(Category.KEYITEMS, this.keyItems);
+		result.put(Category.POKEBALLS, this.pokéballs);
+		result.put(Category.TM_HM, this.TMs_HMs);
 		return result;
 	}
 
@@ -1082,6 +1113,5 @@ public class Inventory extends SubMenu {
 				}
 			}
 		}
-
 	}
 }

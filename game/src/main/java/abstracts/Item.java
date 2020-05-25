@@ -18,6 +18,7 @@ import dialogue.Dialogue.DialogueType;
 import entity.Player;
 import interfaces.Renderable;
 import item.Bicycle;
+import item.DummyItem;
 import item.ModdedItem;
 import level.Area;
 import level.PixelData;
@@ -38,16 +39,20 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 	public enum Category {
 		// @formatter:off
-		POTIONS(0x00), 
-		KEYITEMS(0x01), 
-		POKEBALLS(0x02), 
-		TM_HM(0x03);
+		POTIONS(0x00, "Potions"), 
+		KEYITEMS(0x01, "KeyItems"), 
+		POKEBALLS(0x02, "Pokéballs"), 
+		TM_HM(0x03, "TMs_HMs");
 		// @formatter:on
 
+		private byte categoryByte;
 		private int id;
+		private String keyString;
 
-		private Category(int value) {
+		private Category(int value, String key) {
 			this.id = value;
+			this.categoryByte = (byte) value;
+			this.keyString = key;
 		}
 
 		/**
@@ -79,6 +84,33 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		public int getID() {
 			return this.id;
 		}
+
+		public byte getByte() {
+			return this.categoryByte;
+		}
+
+		public String getKey() {
+			return this.keyString;
+		}
+
+		/**
+		 * Returns the correct Category enum value. Otherwise, returns null if no Category matches the
+		 * value.
+		 * 
+		 * @param value
+		 * @return
+		 */
+		public static Category convert(byte value) {
+			if (value == POTIONS.getByte())
+				return POTIONS;
+			if (value == KEYITEMS.getByte())
+				return KEYITEMS;
+			if (value == POKEBALLS.getByte())
+				return POKEBALLS;
+			if (value == TM_HM.getByte())
+				return TM_HM;
+			return null;
+		}
 	}
 
 	protected String name;
@@ -86,6 +118,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	protected String description;
 	protected Category category;
 	protected boolean picked;
+	protected boolean isReturnMenuFlag;
 	protected int id;
 	protected List<String> availableCommands;
 	protected Dialogue pickedDialogue;
@@ -272,6 +305,21 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	public void droppedAt(Area area, Player player) {
 		this.drop();
 		this.dropAt(area, player);
+	}
+
+	/**
+	 * Returns true, only if the item is a DummyItem, and the item itself is a menu item, "RETURN".
+	 * False, if otherwise.
+	 * 
+	 * @return
+	 */
+	public boolean isReturnMenu() {
+		boolean isDummy = this instanceof DummyItem;
+		return isDummy && this.isReturnMenuFlag;
+	}
+
+	public void setReturnMenu(boolean value) {
+		this.isReturnMenuFlag = value;
 	}
 
 	/**

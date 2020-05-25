@@ -66,12 +66,12 @@ public class SaveDataManager extends SubMenu {
 						this.saveDialogue.clearDialogueLines();
 					}
 					else if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
-						//Save operation has been cancelled.
+						// Save operation has been cancelled.
 						this.saveStatus = SaveStatus.SAVE_COMPLETE;
 						this.saveDialogue.clearDialogueLines();
 					}
 					else {
-						//Intentionally doing nothing.
+						// Intentionally doing nothing.
 					}
 				}
 				break;
@@ -122,7 +122,8 @@ public class SaveDataManager extends SubMenu {
 					this.executor.execute(new Runnable() {
 						@Override
 						public void run() {
-							GameSave.save(SaveDataManager.this.game, SaveDataManager.SAVE_FILE_NAME);
+							// GameSave.save(SaveDataManager.this.game, SaveDataManager.SAVE_FILE_NAME);
+							GameSave.saveExperimental(SaveDataManager.this.game, SaveDataManager.SAVE_FILE_NAME);
 						}
 					});
 					this.executor.shutdown();

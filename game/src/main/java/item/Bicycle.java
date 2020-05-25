@@ -31,6 +31,7 @@ public class Bicycle extends KeyItem {
 	public Bicycle(PixelData pixelData) {
 		super("BICYCLE", "Ride bike.", Category.KEYITEMS, pixelData.getRed());
 		this.pixelData = pixelData;
+		this.pixelData.setAsItem(true);
 	}
 
 	public Bicycle(ModdedItem text) {

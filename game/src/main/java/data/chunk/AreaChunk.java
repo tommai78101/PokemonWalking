@@ -1,8 +1,9 @@
-package data;
+package data.chunk;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import abstracts.Chunk;
 import level.Area;
 import level.OverWorld;
 import level.WorldConstants;

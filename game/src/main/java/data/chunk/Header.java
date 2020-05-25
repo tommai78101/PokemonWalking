@@ -1,4 +1,4 @@
-package data;
+package data.chunk;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import abstracts.Chunk;
 import main.Game;
 
 /**

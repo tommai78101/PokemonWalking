@@ -48,6 +48,7 @@ public class PixelData {
 
 	private boolean triggerFlag;
 	private boolean hidden;
+	private boolean isItem;
 	private int targetMovementScriptID;
 
 	public PixelData(int pixel, int x, int y) {
@@ -61,6 +62,27 @@ public class PixelData {
 		this.biomeBitmapTick = 0;
 		this.triggerFlag = false;
 		this.targetMovementScriptID = 0;
+		this.hidden = false;
+		this.isItem = false;
+
+		int alpha = (pixel >> 24) & 0xFF;
+		int red = (pixel >> 16) & 0xFF;
+		int green = (pixel >> 8) & 0xFF;
+		int blue = pixel & 0xFF;
+
+		this.setProperties(alpha, red, green, blue);
+		this.prepareBitmap(alpha, red, green, blue);
+	}
+
+	public PixelData(int pixel) {
+		this.color = pixel;
+		this.xPosition = -1;
+		this.yPosition = -1;
+		this.targetArea = -1;
+		this.targetSector = -1;
+		this.groundHeight = 0;
+		this.bitmapTick = 0;
+		this.isItem = false;
 		this.hidden = false;
 
 		int alpha = (pixel >> 24) & 0xFF;
@@ -98,6 +120,14 @@ public class PixelData {
 
 	public boolean isWarpZoneEnabled() {
 		return this.isWarpZone;
+	}
+
+	public boolean isItem() {
+		return this.isItem;
+	}
+
+	public void setAsItem(boolean value) {
+		this.isItem = value;
 	}
 
 	/**

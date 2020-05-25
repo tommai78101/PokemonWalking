@@ -1,7 +1,7 @@
 /**
  * 
  */
-package data;
+package data.chunk;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import abstracts.Chunk;
 import level.Area;
 import level.PixelData;
 import main.Game;
@@ -50,9 +51,6 @@ public class PixelDataArrayChunk extends Chunk {
 			PixelDataChunk dataChunk = new PixelDataChunk();
 			dataChunk.read(game, raf);
 		}
-
-		// Load all modified pixel data after finished reading the pixel data chunks.
-		game.getWorld().getAllAreas().forEach(area -> area.loadModifiedPixelDataList());
 	}
 
 	@Override

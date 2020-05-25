@@ -1,4 +1,4 @@
-package data;
+package abstracts;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

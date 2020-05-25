@@ -1,10 +1,11 @@
-package data;
+package data.chunk;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import abstracts.Chunk;
 import main.Game;
 
 /**
@@ -25,6 +26,7 @@ public class SaveChunk extends Chunk {
 		this.chunks.add(new Header());
 		this.chunks.add(new AreaChunk());
 		this.chunks.add(new PixelDataArrayChunk());
+		this.chunks.add(new PlayerChunk());
 	}
 
 	@Override

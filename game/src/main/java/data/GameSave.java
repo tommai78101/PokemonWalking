@@ -24,6 +24,7 @@ import java.util.Set;
 import abstracts.Character.GenderType;
 import abstracts.Item;
 import abstracts.SubMenu;
+import data.chunk.SaveChunk;
 import entity.Player;
 import level.Area;
 import level.OverWorld;
@@ -480,6 +481,9 @@ public class GameSave {
 		try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
 			SaveChunk save = new SaveChunk();
 			save.read(game, raf);
+
+			// Load all modified pixel data after finished reading the pixel data chunks.
+			game.getWorld().refresh();
 		}
 		catch (FileNotFoundException e) {
 			Debug.error("File cannot be found in experimental feature.", e);

@@ -18,6 +18,7 @@ import entity.Player;
 import item.KeyItem;
 import level.OverWorld;
 import level.WorldConstants;
+import main.SaveDataManager.SaveStatus;
 import main.StateManager.GameState;
 import menu.Inventory;
 import menu.MainMenu;
@@ -66,9 +67,6 @@ public class Game {
 		this.player = new Player(this);
 
 		this.load();
-
-		GameSave.saveExperimental(this, "testData.sav");
-		GameSave.loadExperimental(this, "testData.sav");
 	}
 
 	/**
@@ -135,7 +133,6 @@ public class Game {
 	 * @return Nothing.
 	 */
 	public void tick() {
-		/*
 		// Debugging purposes
 		if (this.player.keys.F1.keyStateDown && !(this.player.keys.F1.lastKeyState)) {
 			this.player.keys.F1.lastKeyState = true;
@@ -143,7 +140,7 @@ public class Game {
 			this.load();
 		}
 		// End debugging purposes
-		
+
 		GameState state = this.prepareMainMenu();
 		SubMenu subMenu = this.startMenu.getActiveItem();
 		switch (state) {
@@ -186,7 +183,6 @@ public class Game {
 				break;
 			}
 		}
-		*/
 	}
 
 	/**
@@ -207,7 +203,8 @@ public class Game {
 		if (WorldConstants.isModsEnabled == null)
 			WorldConstants.isModsEnabled = Boolean.FALSE;
 		this.overworld = new OverWorld(this.player, this);
-		GameSave.load(this, SaveDataManager.SAVE_FILE_NAME);
+		// GameSave.load(this, SaveDataManager.SAVE_FILE_NAME);
+		GameSave.loadExperimental(this, SaveDataManager.SAVE_FILE_NAME);
 
 		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 	}
