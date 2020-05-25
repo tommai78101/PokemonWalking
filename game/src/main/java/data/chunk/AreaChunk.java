@@ -29,10 +29,7 @@ public class AreaChunk extends Chunk {
 
 	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
-		int size = this.getSize();
-		if (size != raf.readShort()) {
-			throw new IOException("Unmatched area chunk size.");
-		}
+		int rafSize = raf.readShort();
 
 		for (byte b : AreaChunk.AREA) {
 			if (b != raf.readByte()) {
@@ -47,6 +44,12 @@ public class AreaChunk extends Chunk {
 			throw new IOException("Unmatched area data.");
 		}
 		gameWorld.setCurrentArea(area);
+
+		// Check chunk size at the last step.
+		int size = this.getSize();
+		if (size != rafSize) {
+			throw new IOException("Unmatched area chunk size.");
+		}
 	}
 
 	@Override

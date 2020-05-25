@@ -29,11 +29,7 @@ public class Header extends Chunk {
 
 	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
-		// Easy authentication.
-		int size = this.getSize();
-		if (size != raf.readShort()) {
-			throw new IOException("Incorrect header chunk size.");
-		}
+		short rafSize = raf.readShort();
 
 		for (byte b : Header.ChunkName) {
 			if (b != raf.readByte()) {
@@ -52,6 +48,12 @@ public class Header extends Chunk {
 		}
 		catch (DateTimeParseException e) {
 			throw new IOException("Failed to parse and read system date time.", e);
+		}
+
+		// Easy authentication.
+		int size = this.getSize();
+		if (size != rafSize) {
+			throw new IOException("Incorrect header chunk size.");
 		}
 	}
 

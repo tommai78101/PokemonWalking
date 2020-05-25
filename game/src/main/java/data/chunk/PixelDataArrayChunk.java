@@ -34,10 +34,10 @@ public class PixelDataArrayChunk extends Chunk {
 
 	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
-		int size = this.getSize();
-		if (size != raf.readShort()) {
-			throw new IOException("Incorrect pixel data array size.");
-		}
+		// Prepare data
+		this.chunks.clear();
+
+		short rafSize = raf.readShort();
 
 		for (byte b : PixelDataArrayChunk.PIXELDATA) {
 			if (b != raf.readByte()) {
@@ -50,6 +50,13 @@ public class PixelDataArrayChunk extends Chunk {
 		for (short i = 0; i < this.areaDataSize; i++) {
 			PixelDataChunk dataChunk = new PixelDataChunk();
 			dataChunk.read(game, raf);
+			this.chunks.add(dataChunk);
+		}
+
+		// Check the chunk size at the last step
+		int size = this.getSize();
+		if (size != rafSize) {
+			throw new IOException("Incorrect pixel data array size.");
 		}
 	}
 
@@ -85,6 +92,7 @@ public class PixelDataArrayChunk extends Chunk {
 		int size = this.name.length;
 		// Area data size bytes count. (short)
 		size += 2;
+
 		for (Chunk chunk : this.chunks) {
 			// No need to add additional bytes count for each chunk's sizes.
 			size += chunk.getSize();

@@ -26,15 +26,12 @@ public class SaveChunk extends Chunk {
 		this.chunks.add(new Header());
 		this.chunks.add(new AreaChunk());
 		this.chunks.add(new PixelDataArrayChunk());
-		this.chunks.add(new PlayerChunk());
+		// this.chunks.add(new PlayerChunk());
 	}
 
 	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
-		int size = this.getSize();
-		if (size != raf.readShort()) {
-			throw new IOException("Incorrect save chunk size.");
-		}
+		short rafSize = raf.readShort();
 
 		for (byte b : SaveChunk.SaveData) {
 			if (b != raf.readByte()) {
@@ -51,12 +48,20 @@ public class SaveChunk extends Chunk {
 		for (Chunk chunk : this.chunks) {
 			chunk.read(game, raf);
 		}
+
+		// Check size at the last step
+		int size = this.getSize();
+		if (size != rafSize) {
+			throw new IOException("Incorrect save chunk size.");
+		}
 	}
 
 	@Override
 	public void write(Game game, RandomAccessFile raf) throws IOException {
 		// We include the save chunk data size bytes count here. (short)
-		raf.writeShort(this.getSize());
+		int size = this.getSize();
+
+		raf.writeShort(size);
 		raf.write(this.name);
 		raf.write(this.version);
 		for (Chunk chunk : this.chunks) {

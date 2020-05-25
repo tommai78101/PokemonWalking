@@ -93,10 +93,7 @@ public class PlayerChunk extends Chunk {
 		Player player = game.getPlayer();
 		OverWorld world = game.getWorld();
 
-		int size = this.getSize();
-		if (size != raf.readShort()) {
-			throw new IOException("Unmatched player chunk size.");
-		}
+		short rafSize = raf.readShort();
 
 		for (byte b : PlayerChunk.ChunkTag) {
 			if (b != raf.readByte()) {
@@ -142,6 +139,12 @@ public class PlayerChunk extends Chunk {
 				chunk.setCategory(Category.convert(listCategory));
 				chunk.read(game, raf);
 			}
+		}
+
+		// Check chunk size at the last step.
+		int size = this.getSize();
+		if (size != rafSize) {
+			throw new IOException("Unmatched player chunk size.");
 		}
 	}
 
@@ -209,9 +212,9 @@ public class PlayerChunk extends Chunk {
 
 		Category[] values = Category.values();
 		for (Category c : values) {
-			// Item list size
+			// Item list size (short)
 			size += 2;
-			// Item list category type
+			// Item list category type (byte)
 			size += 1;
 
 			// Item chunk size.
@@ -219,6 +222,8 @@ public class PlayerChunk extends Chunk {
 			for (int i = 0; i < listSize; i++) {
 				InventoryItemChunk chunk = new InventoryItemChunk();
 				size += chunk.getSize();
+				// Chunk size (short)
+				size += 2;
 			}
 		}
 
