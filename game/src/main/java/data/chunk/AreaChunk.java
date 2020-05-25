@@ -46,7 +46,7 @@ public class AreaChunk extends Chunk {
 		gameWorld.setCurrentArea(area);
 
 		// Check chunk size at the last step.
-		int size = this.getSize();
+		int size = this.getSize(game);
 		if (size != rafSize) {
 			throw new IOException("Unmatched area chunk size.");
 		}
@@ -57,13 +57,13 @@ public class AreaChunk extends Chunk {
 		OverWorld gameWorld = game.getWorld();
 		this.currentAreaID = gameWorld.getCurrentArea().getAreaID();
 
-		raf.writeShort(this.getSize());
+		raf.writeShort(this.getSize(game));
 		raf.write(AreaChunk.AREA);
 		raf.writeInt(this.currentAreaID);
 	}
 
 	@Override
-	public int getSize() {
+	public int getSize(Game game) {
 		int size = this.name.length;
 		// Current area ID bytes count. (int)
 		size += 4;

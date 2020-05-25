@@ -51,7 +51,7 @@ public class Header extends Chunk {
 		}
 
 		// Easy authentication.
-		int size = this.getSize();
+		int size = this.getSize(game);
 		if (size != rafSize) {
 			throw new IOException("Incorrect header chunk size.");
 		}
@@ -62,14 +62,14 @@ public class Header extends Chunk {
 		// Always obtain the current date and time before writing data.
 		this.currentDate = Header.dateFormat.format(ZonedDateTime.now()).getBytes();
 
-		raf.writeShort(this.getSize());
+		raf.writeShort(this.getSize(game));
 		raf.write(this.name);
 		raf.writeByte(this.currentDate.length);
 		raf.write(this.currentDate);
 	}
 
 	@Override
-	public int getSize() {
+	public int getSize(Game game) {
 		int size = this.name.length;
 		size += this.currentDate.length;
 		// Byte size of the current date length. (byte)

@@ -142,7 +142,7 @@ public class PlayerChunk extends Chunk {
 		}
 
 		// Check chunk size at the last step.
-		int size = this.getSize();
+		int size = this.getSize(game);
 		if (size != rafSize) {
 			throw new IOException("Unmatched player chunk size.");
 		}
@@ -155,7 +155,7 @@ public class PlayerChunk extends Chunk {
 		Area currentArea = world.getCurrentArea();
 		Inventory inventory = game.getInventory();
 
-		raf.writeShort(this.getSize());
+		raf.writeShort(this.getSize(game));
 		raf.write(PlayerChunk.ChunkTag);
 		raf.writeByte(player.getGender().getByte());
 		raf.writeInt(currentArea.getPlayerXInArea());
@@ -198,7 +198,7 @@ public class PlayerChunk extends Chunk {
 	}
 
 	@Override
-	public int getSize() {
+	public int getSize(Game game) {
 		// Chunk tag name
 		int size = PlayerChunk.ChunkTag.length;
 		// Gender (byte)
@@ -221,7 +221,7 @@ public class PlayerChunk extends Chunk {
 			int listSize = this.chunkCounter.get(c);
 			for (int i = 0; i < listSize; i++) {
 				InventoryItemChunk chunk = new InventoryItemChunk();
-				size += chunk.getSize();
+				size += chunk.getSize(game);
 				// Chunk size (short)
 				size += 2;
 			}

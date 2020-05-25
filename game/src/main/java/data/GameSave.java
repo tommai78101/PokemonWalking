@@ -478,18 +478,20 @@ public class GameSave {
 
 	public static void loadExperimental(Game game, String filename) {
 		File file = new File(filename);
-		try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
-			SaveChunk save = new SaveChunk();
-			save.read(game, raf);
+		if (file.exists() && file.length() > 0) {
+			try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+				SaveChunk save = new SaveChunk();
+				save.read(game, raf);
 
-			// Load all modified pixel data after finished reading the pixel data chunks.
-			game.getWorld().refresh();
-		}
-		catch (FileNotFoundException e) {
-			Debug.error("File cannot be found in experimental feature.", e);
-		}
-		catch (IOException e) {
-			Debug.error("Fail to load in experimental feature.", e);
+				// Load all modified pixel data after finished reading the pixel data chunks.
+				game.getWorld().refresh();
+			}
+			catch (FileNotFoundException e) {
+				Debug.error("File cannot be found in experimental feature.", e);
+			}
+			catch (IOException e) {
+				Debug.error("Fail to load in experimental feature.", e);
+			}
 		}
 	}
 

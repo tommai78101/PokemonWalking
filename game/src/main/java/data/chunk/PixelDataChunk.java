@@ -103,7 +103,7 @@ public class PixelDataChunk extends Chunk {
 	}
 
 	@Override
-	public int getSize() {
+	public int getSize(Game game) {
 		// This chunk has a fixed data size.
 		return (4 * 4) + 1;
 	}

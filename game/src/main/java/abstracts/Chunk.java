@@ -39,7 +39,7 @@ public abstract class Chunk {
 	 * 
 	 * @return An integer. This data type is accepted for RandomAccessFile to write as short data.
 	 */
-	public abstract int getSize();
+	public abstract int getSize(Game game);
 
 	public static byte[] combine(byte[] first, byte[] second) {
 		byte[] result = new byte[first.length + second.length];

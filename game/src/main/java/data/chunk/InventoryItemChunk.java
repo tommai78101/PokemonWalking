@@ -71,7 +71,7 @@ public class InventoryItemChunk extends Chunk {
 	}
 
 	@Override
-	public int getSize() {
+	public int getSize(Game game) {
 		// Category byte id. (byte)
 		int size = 1;
 		// Item unique id value. (int)

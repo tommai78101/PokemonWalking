@@ -27,6 +27,9 @@ public class PixelDataArrayChunk extends Chunk {
 	private short areaDataSize;
 	private List<Chunk> chunks = new ArrayList<>();
 
+	// Game related information. Not to be used in data chunks. Denoted with "p_".
+	private List<Area> p_areas = new ArrayList<>();
+
 	public PixelDataArrayChunk() {
 		this.name = PixelDataArrayChunk.PIXELDATA;
 		this.areaDataSize = 0;
@@ -35,6 +38,7 @@ public class PixelDataArrayChunk extends Chunk {
 	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
 		// Prepare data
+		this.p_areas = game.getWorld().getAllAreas();
 		this.chunks.clear();
 
 		short rafSize = raf.readShort();
@@ -54,7 +58,7 @@ public class PixelDataArrayChunk extends Chunk {
 		}
 
 		// Check the chunk size at the last step
-		int size = this.getSize();
+		int size = this.getSize(game);
 		if (size != rafSize) {
 			throw new IOException("Incorrect pixel data array size.");
 		}
@@ -62,9 +66,11 @@ public class PixelDataArrayChunk extends Chunk {
 
 	@Override
 	public void write(Game game, RandomAccessFile raf) throws IOException {
+		// Prepare
+		this.p_areas = game.getWorld().getAllAreas();
+
 		// Set how many changed pixel data info were created in the game.
-		List<Area> areas = game.getWorld().getAllAreas();
-		for (Area area : areas) {
+		for (Area area : this.p_areas) {
 			Set<PixelData> pixelDataSet = area.getModifiedPixelDataList();
 			for (PixelData data : pixelDataSet) {
 				PixelDataChunk dataChunk = new PixelDataChunk();
@@ -79,7 +85,7 @@ public class PixelDataArrayChunk extends Chunk {
 		this.areaDataSize = (short) this.chunks.size();
 
 		// We include the save chunk data size bytes count here. (short)
-		raf.writeShort(this.getSize());
+		raf.writeShort(this.getSize(game));
 		raf.write(this.name);
 		raf.writeShort(this.areaDataSize);
 		for (Chunk chunk : this.chunks) {
@@ -88,14 +94,18 @@ public class PixelDataArrayChunk extends Chunk {
 	}
 
 	@Override
-	public int getSize() {
+	public int getSize(Game game) {
 		int size = this.name.length;
 		// Area data size bytes count. (short)
 		size += 2;
 
-		for (Chunk chunk : this.chunks) {
-			// No need to add additional bytes count for each chunk's sizes.
-			size += chunk.getSize();
+		this.p_areas = game.getWorld().getAllAreas();
+		for (Area area : this.p_areas) {
+			int dataSetSize = area.getModifiedPixelDataList().size();
+			for (int i = 0; i < dataSetSize; i++) {
+				PixelDataChunk chunk = new PixelDataChunk();
+				size += chunk.getSize(game);
+			}
 		}
 		return size;
 	}
