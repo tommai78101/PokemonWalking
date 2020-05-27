@@ -5,7 +5,6 @@ package data.chunk;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,9 +68,6 @@ public class PlayerChunk extends Chunk {
 	private byte facingDirection;
 	private byte walkingState;
 
-	// Item chunks tally
-	Map<Category, Integer> chunkCounter = new HashMap<>();
-
 	public PlayerChunk() {
 		this.playerName = null;
 		this.gender = (byte) 0x0;
@@ -79,12 +75,6 @@ public class PlayerChunk extends Chunk {
 		this.yPosition = -1;
 		this.facingDirection = (byte) 0x0;
 		this.walkingState = (byte) 0x0;
-
-		// Initializing the chunk counter
-		this.chunkCounter.put(Category.POTIONS, 0);
-		this.chunkCounter.put(Category.KEYITEMS, 0);
-		this.chunkCounter.put(Category.POKEBALLS, 0);
-		this.chunkCounter.put(Category.TM_HM, 0);
 	}
 
 	@Override
@@ -181,8 +171,6 @@ public class PlayerChunk extends Chunk {
 
 			// Write the size of the list into the data.
 			int listSize = list.size();
-			this.chunkCounter.put(category, listSize);
-
 			raf.writeShort(listSize);
 			raf.writeByte(category.getByte());
 
@@ -199,6 +187,10 @@ public class PlayerChunk extends Chunk {
 
 	@Override
 	public int getSize(Game game) {
+		// Prepare
+		Inventory inventory = game.getInventory();
+		Map<Category, List<Map.Entry<Item, Integer>>> mappedItems = inventory.getAllMappedItemsList();
+
 		// Chunk tag name
 		int size = PlayerChunk.ChunkTag.length;
 		// Gender (byte)
@@ -218,12 +210,12 @@ public class PlayerChunk extends Chunk {
 			size += 1;
 
 			// Item chunk size.
-			int listSize = this.chunkCounter.get(c);
+			List<Map.Entry<Item, Integer>> items = mappedItems.get(c);
+			items = items.stream().filter(e -> !e.getKey().isReturnMenu()).collect(Collectors.toList());
+			int listSize = items.size();
 			for (int i = 0; i < listSize; i++) {
 				InventoryItemChunk chunk = new InventoryItemChunk();
 				size += chunk.getSize(game);
-				// Chunk size (short)
-				size += 2;
 			}
 		}
 
