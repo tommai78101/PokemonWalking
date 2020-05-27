@@ -6,7 +6,7 @@
  * All rights copyrighted to The Pokémon Company and Nintendo. 
  */
 
-package data;
+package data.mod;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
