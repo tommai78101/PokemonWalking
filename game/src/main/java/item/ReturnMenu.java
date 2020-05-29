@@ -14,12 +14,12 @@ import level.Area;
 import main.Game;
 import main.StateManager.GameState;
 
-public class DummyItem extends Item {
-	public DummyItem(String name, String description, Category category, int id) {
+public class ReturnMenu extends Item {
+	public ReturnMenu(String name, String description, Category category, int id) {
 		super(name, description, category, id);
 	}
 
-	public DummyItem(ModdedItem text) {
+	public ReturnMenu(ModdedItem text) {
 		super(text);
 	}
 
@@ -31,6 +31,6 @@ public class DummyItem extends Item {
 
 	@Override
 	public void dropAt(Area area, Player player) {
-		// TODO: Continue with this action.
+		// Left intentionally blank.
 	}
 }

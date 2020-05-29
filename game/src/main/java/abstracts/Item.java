@@ -18,7 +18,7 @@ import dialogue.Dialogue.DialogueType;
 import entity.Player;
 import interfaces.Renderable;
 import item.Bicycle;
-import item.DummyItem;
+import item.ReturnMenu;
 import item.ModdedItem;
 import level.Area;
 import level.PixelData;
@@ -314,7 +314,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	 * @return
 	 */
 	public boolean isReturnMenu() {
-		boolean isDummy = this instanceof DummyItem;
+		boolean isDummy = this instanceof ReturnMenu;
 		return isDummy && this.isReturnMenuFlag;
 	}
 

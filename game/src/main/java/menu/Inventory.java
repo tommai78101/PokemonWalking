@@ -26,9 +26,9 @@ import common.Tileable;
 import dialogue.Dialogue;
 import entity.Player;
 import item.Bicycle;
-import item.DummyItem;
 import item.KeyItem;
 import item.ModdedItem;
+import item.ReturnMenu;
 import level.WorldConstants;
 import main.Game;
 import main.MainComponent;
@@ -99,10 +99,10 @@ public class Inventory extends SubMenu {
 		this.pokéballs = new ArrayList<>();
 		this.TMs_HMs = new ArrayList<>();
 		this.selectionMenu = new ArrayList<>();
-		
-		Item returnExit = new DummyItem("RETURN", "Close inventory.", null, 0);
+
+		Item returnExit = new ReturnMenu("RETURN", "Close inventory.", null, 0);
 		returnExit.setReturnMenu(true);
-		
+
 		this.potions.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.keyItems.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.pokéballs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
@@ -123,8 +123,11 @@ public class Inventory extends SubMenu {
 				// De-duplicate any key items
 				for (Iterator<Map.Entry<Item, Integer>> it = categoryList.iterator(); it.hasNext();) {
 					Map.Entry<Item, Integer> entry = it.next();
+					Item entryItem = entry.getKey();
+					if (entryItem.isReturnMenu())
+						continue;
 					int count = entry.getValue().intValue();
-					if (count > 1 || count < 0 || entry.getKey().equals(item)) {
+					if (count > 1 || count < 0 || entryItem.equals(item)) {
 						it.remove();
 					}
 				}
@@ -139,7 +142,10 @@ public class Inventory extends SubMenu {
 			case TM_HM: {
 				boolean hasAdded = false;
 				for (Map.Entry<Item, Integer> entry : categoryList) {
-					if (entry.getKey().equals(item)) {
+					Item entryItem = entry.getKey();
+					if (entryItem.isReturnMenu())
+						continue;
+					if (entryItem.equals(item)) {
 						entry.setValue(entry.getValue() + 1);
 						hasAdded = true;
 						break;
@@ -193,7 +199,7 @@ public class Inventory extends SubMenu {
 			Item item = null;
 			switch (itemText.type) {
 				case DUMMY:
-					item = new DummyItem(itemText);
+					item = new ReturnMenu(itemText);
 					list.add(0, new AbstractMap.SimpleEntry<>(item, 1));
 					break;
 				case ACTION: {
@@ -205,7 +211,7 @@ public class Inventory extends SubMenu {
 							break;
 						default:
 							// Dummy item creation.
-							item = new DummyItem(itemText);
+							item = new ReturnMenu(itemText);
 							list.add(0, new AbstractMap.SimpleEntry<>(item, 1));
 							break;
 					}
@@ -220,6 +226,10 @@ public class Inventory extends SubMenu {
 	}
 
 	public void removeItem(Item item) {
+		// If the item is a "Return" menu, we do not remove it.
+		if (item.isReturnMenu())
+			return;
+
 		if (item.getCategory() == Category.KEYITEMS)
 			// Cannot remove key items, therefore, this does nothing.
 			return;
@@ -745,7 +755,7 @@ public class Inventory extends SubMenu {
 		return this.game.getStateManager();
 	}
 
-	// ------------------------------------
+	// -----------------------------------------
 	// PRIVATE METHODS
 	// -----------------------------------------
 

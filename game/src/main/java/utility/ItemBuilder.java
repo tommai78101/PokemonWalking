@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 import abstracts.Item;
 import abstracts.Item.Category;
 import item.Bicycle;
-import item.DummyItem;
+import item.ReturnMenu;
 import item.ModdedItem;
 import item.KeyItem;
 import level.WorldConstants;
@@ -247,7 +247,7 @@ public class ItemBuilder {
 		Item result = null;
 		switch (text.type) {
 			case DUMMY:
-				result = new DummyItem(text.itemName, text.description, text.category, text.id);
+				result = new ReturnMenu(text.itemName, text.description, text.category, text.id);
 				break;
 			case ACTION:
 				switch (text.id) {
