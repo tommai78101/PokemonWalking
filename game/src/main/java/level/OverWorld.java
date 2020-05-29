@@ -113,6 +113,12 @@ public class OverWorld implements Tileable, UpdateRenderable {
 		return this.areas;
 	}
 
+	public void reloadAllAreas() {
+		for (Area area : this.areas) {
+			area.loadModifiedPixelDataList();
+		}
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
