@@ -10,6 +10,7 @@ import level.Area;
 import level.PixelData;
 import main.Game;
 import screen.Scene;
+import utility.Debug;
 import utility.DialogueBuilder;
 
 public class Sign extends Obstacle {
@@ -27,8 +28,7 @@ public class Sign extends Obstacle {
 
 	@Override
 	public void interact(Area area, Entity target) {
-		// TODO Auto-generated method stub
-		System.err.println("Sign is interacting.");
+		Debug.error("Sign is not allowed to interact with other entities. It should only be interacted with.");
 	}
 
 	@Override
