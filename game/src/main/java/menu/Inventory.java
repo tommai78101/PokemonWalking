@@ -117,6 +117,7 @@ public class Inventory extends SubMenu {
 	}
 
 	public void addItem(Item item) {
+		Map.Entry<Item, Integer> returnItem = null;
 		List<Map.Entry<Item, Integer>> categoryList = this.getItemCategoryList(item);
 		switch (item.getCategory()) {
 			case KEYITEMS: {
@@ -124,8 +125,10 @@ public class Inventory extends SubMenu {
 				for (Iterator<Map.Entry<Item, Integer>> it = categoryList.iterator(); it.hasNext();) {
 					Map.Entry<Item, Integer> entry = it.next();
 					Item entryItem = entry.getKey();
-					if (entryItem.isReturnMenu())
+					if (entryItem.isReturnMenu()) {
+						returnItem = entry;
 						continue;
+					}
 					int count = entry.getValue().intValue();
 					if (count > 1 || count < 0 || entryItem.equals(item)) {
 						it.remove();
@@ -143,8 +146,10 @@ public class Inventory extends SubMenu {
 				boolean hasAdded = false;
 				for (Map.Entry<Item, Integer> entry : categoryList) {
 					Item entryItem = entry.getKey();
-					if (entryItem.isReturnMenu())
+					if (entryItem.isReturnMenu()) {
+						returnItem = entry;
 						continue;
+					}
 					if (entryItem.equals(item)) {
 						entry.setValue(entry.getValue() + 1);
 						hasAdded = true;
@@ -158,6 +163,11 @@ public class Inventory extends SubMenu {
 				break;
 			}
 		}
+
+		// In order to maintain the order of items, and always put the RETURN menu at the very end, we need
+		// to remove the RETURN from the list, then re-add the item back in.
+		categoryList.remove(returnItem);
+		categoryList.add(returnItem);
 	}
 
 	/**
