@@ -1,7 +1,8 @@
 package utility;
 
 public class Debug {
-	public static final int MinimumStringLength = 17;
+	public static final int MinimumStringLength = 24;
+	public static final int TabLength = 8;
 
 	private static String createString(String msg) {
 		StackTraceElement element = new Throwable().getStackTrace()[2];
@@ -10,7 +11,7 @@ public class Debug {
 		int length = className.length();
 		while (length < Debug.MinimumStringLength) {
 			tabs = tabs.concat("\t");
-			length += 4;
+			length += Debug.TabLength;
 		}
 		return className + tabs + "- " + msg;
 	}
