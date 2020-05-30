@@ -3,14 +3,16 @@ package script;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import dialogue.Dialogue;
+import utility.Debug;
 import utility.DialogueBuilder;
 
 public class Script {
@@ -48,32 +50,32 @@ public class Script {
 
 		this.moves = new ArrayList<>();
 		for (Map.Entry<Integer, MovementData> e : s.moves)
-			this.moves.add(new AbstractMap.SimpleEntry<>(e.getKey(), new MovementData(e.getValue())));
+			this.moves.add(Map.entry(e.getKey(), new MovementData(e.getValue())));
 
 		this.affirmativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, MovementData> e : s.affirmativeMoves)
 			this.affirmativeMoves
-				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new MovementData(e.getValue())));
+				.add(Map.entry(e.getKey(), new MovementData(e.getValue())));
 
 		this.negativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, MovementData> e : s.negativeMoves)
 			this.negativeMoves
-				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new MovementData(e.getValue())));
+				.add(Map.entry(e.getKey(), new MovementData(e.getValue())));
 
 		this.dialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.dialogues)
 			this.dialogues
-				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
+				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
 		this.affirmativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.affirmativeDialogues)
 			this.affirmativeDialogues
-				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
+				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
 		this.negativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.negativeDialogues)
 			this.negativeDialogues
-				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Dialogue(e.getValue())));
+				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
 		this.iteration = s.iteration;
 		this.affirmativeIteration = s.affirmativeIteration;
@@ -168,18 +170,12 @@ public class Script {
 	}
 
 	/**
-	 * <p>
 	 * Loads triggers according to the script file.
-	 * </p>
-	 * 
 	 * <p>
 	 * The script file is a database of all triggers of a a certain map. All scripts within the file can
 	 * only be triggered by that area.
-	 * </p>
-	 * 
 	 * <p>
 	 * Currently needs fixing and testing. Will be completed when all issues have been sorted out.
-	 * </p>
 	 * 
 	 * @param filename
 	 *            - A String object of the file name of the SCRIPT file.
@@ -197,97 +193,127 @@ public class Script {
 		int iteration = 0;
 		int affirmativeIteration = 0;
 		int negativeIteration = 0;
-		BufferedReader reader = null;
+		InputStream inputStream = null;
+
+		// Check if the file is a modded script file, or a default script file.
 		try {
 			if (isModdedScript) {
-				reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename))));
+				inputStream = new FileInputStream(new File(filename));
 			}
 			else {
-				reader = new BufferedReader(
-					new InputStreamReader(Script.class.getClassLoader().getResourceAsStream(filename))
-				);
+				inputStream = Script.class.getClassLoader().getResourceAsStream(filename);
 			}
+		}
+		catch (FileNotFoundException e) {
+			Debug.error("Unable to locate " + (isModdedScript ? "modded" : "default") + " script input file.", e);
+		}
+
+		// Try-with-resource
+		try (
+			InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+			BufferedReader reader = new BufferedReader(inputStreamReader)
+		) {
 			String line;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("/") || line.startsWith("@") || line.isEmpty()) // Ignored tags
+				// Ignored tags
+				if (line.startsWith("/") || line.startsWith("@") || line.isEmpty())
 					continue;
-				else if (line.startsWith("$")) { // Start of script
+
+				// Start of script
+				else if (line.startsWith("$") || Script.startsWithIgnoreCase(line, "BeginScript")) {
 					int triggerID = Integer.valueOf(line.substring(1));
 					if (triggerID > 0) {
 						if (script == null)
 							script = new Script();
 						script.triggerID = triggerID;
 					}
-
 				}
-				else if (line.startsWith("^")) { // Movement
+
+				// Movement Data
+				else if (line.startsWith("^") || Script.startsWithIgnoreCase(line, "PathData")) {
 					if (script != null) {
 						MovementData moves = new MovementData();
 						Script.append(moves, line.substring(1).toCharArray());
-						script.moves.add(new AbstractMap.SimpleEntry<>(iteration, moves));
+						script.moves.add(Map.entry(iteration, moves));
 						iteration++;
 					}
 				}
-				else if (line.startsWith("%")) { // Script delimiter
+
+				// Script delimiter
+				else if (line.startsWith("%") || Script.startsWithIgnoreCase(line, "EndScript")) {
 					if (script != null) {
 						result.add(script);
 						script = null;
 						iteration = 0;
 					}
 				}
-				else if (line.startsWith("#")) { // speech dialogue
+
+				// Speech dialogue
+				else if (line.startsWith("#") || Script.startsWithIgnoreCase(line, "Speech")) {
 					Dialogue d = DialogueBuilder.createText(
 						line.substring(1).replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
-					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
+					script.dialogues.add(Map.entry(iteration, d));
 					iteration++;
 				}
-				else if (line.startsWith("?")) { // question dialogue
+
+				// Question dialogue
+				else if (line.startsWith("?") || Script.startsWithIgnoreCase(line, "Question")) {
 					Dialogue d = DialogueBuilder.createText(
 						line.substring(1).replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
 					);
-					script.dialogues.add(new AbstractMap.SimpleEntry<>(iteration, d));
+					script.dialogues.add(Map.entry(iteration, d));
 					iteration++;
 				}
-				else if (line.startsWith("+")) { // affirmative dialogue
+
+				// Affirmative Response dialogue
+				else if (line.startsWith("+") || Script.startsWithIgnoreCase(line, "Affirm")) {
 					Dialogue d = DialogueBuilder.createText(
 						line.substring(1).replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.affirmativeDialogues
-						.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, d));
+						.add(Map.entry(affirmativeIteration, d));
 					affirmativeIteration++;
 				}
-				else if (line.startsWith("-")) { // negative dialogue
+
+				// Negative Response dialogue
+				else if (line.startsWith("-") || Script.startsWithIgnoreCase(line, "Reject")) {
 					Dialogue d = DialogueBuilder.createText(
 						line.substring(1).replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.negativeDialogues
-						.add(new AbstractMap.SimpleEntry<>(negativeIteration, d));
+						.add(Map.entry(negativeIteration, d));
 					negativeIteration++;
 				}
-				else if (line.startsWith("[")) { // affirmative action
+
+				// Affirmative Response action
+				else if (line.startsWith("[") || Script.startsWithIgnoreCase(line, "Confirm")) {
 					if (script != null) {
 						MovementData moves = new MovementData();
 						Script.append(moves, line.substring(1).toCharArray());
 						script.affirmativeMoves
-							.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, moves));
+							.add(Map.entry(affirmativeIteration, moves));
 						affirmativeIteration++;
 					}
 				}
-				else if (line.startsWith("]")) { // negative action
+
+				// Negative Response action
+				else if (line.startsWith("]") || Script.startsWithIgnoreCase(line, "Deny")) {
 					if (script != null) {
 						MovementData moves = new MovementData();
 						Script.append(moves, line.substring(1).toCharArray());
 						script.negativeMoves
-							.add(new AbstractMap.SimpleEntry<>(negativeIteration, moves));
+							.add(Map.entry(negativeIteration, moves));
 						negativeIteration++;
 					}
 				}
-				else if (line.startsWith(";")) { // Is a Repeating Trigger
+
+				// Is a Repeating Trigger
+				else if (line.startsWith(";") || Script.startsWithIgnoreCase(line, "Repeatable") || Script.startsWithIgnoreCase(line, "Repeat")) {
 					if (script != null) {
 						script.repeat = true;
 					}
@@ -295,17 +321,15 @@ public class Script {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			Debug.error("Script loading error: ", e);
 		}
-		finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+
+		// Closing the input stream.
+		try {
+			inputStream.close();
+		}
+		catch (IOException e) {
+			Debug.error("Unable to close input stream.", e);
 		}
 		return result;
 	}
@@ -337,7 +361,7 @@ public class Script {
 				}
 				steps = Character.getNumericValue(s);
 				if (direction != -1 && steps != -1 && steps != -2 && (steps <= 9 && steps >= 0)) {
-					Map.Entry<Integer, Integer> entry = new AbstractMap.SimpleEntry<>(direction, steps);
+					Map.Entry<Integer, Integer> entry = Map.entry(direction, steps);
 					moves.moves.add(entry);
 				}
 			}
@@ -347,6 +371,10 @@ public class Script {
 			throw new NumberFormatException("Incorrect script syntax from \"script.txt\"");
 		}
 	}
+
+	// -------------------------------------------------------------
+	// Static Methods
+	// -------------------------------------------------------------
 
 	/**
 	 * Load all default scripts.
@@ -382,5 +410,22 @@ public class Script {
 			}
 		}
 		return results;
+	}
+
+	/**
+	 * Compares the prefix of the specified line to see if it matches the prefix, case-insensitive.
+	 * 
+	 * @param line
+	 *            The full line from the script file.
+	 * @param prefix
+	 *            The subset of the full line.
+	 * @return True if the prefix starts at the beginning the specified line. False, if otherwise.
+	 */
+	public static boolean startsWithIgnoreCase(String line, String prefix) {
+		if (line == null || prefix == null)
+			return (line == null && prefix == null);
+		if (prefix.length() > line.length())
+			return false;
+		return line.regionMatches(true, 0, prefix, 0, prefix.length());
 	}
 }

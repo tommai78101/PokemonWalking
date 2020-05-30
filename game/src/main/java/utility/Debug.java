@@ -14,6 +14,6 @@ public class Debug {
 	public static void error(String msg, Exception e) {
 		StackTraceElement element = e.getStackTrace()[0];
 		Debug.error(msg);
-		Debug.error(element.getClassName() + ":" + element.getLineNumber() + "\t- " + e.getLocalizedMessage());
+		System.err.println(element.getClassName() + ":" + element.getLineNumber() + "\t- " + e.getLocalizedMessage());
 	}
 }
