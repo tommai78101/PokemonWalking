@@ -34,6 +34,7 @@ import level.OverWorld;
 import level.PixelData;
 import level.WorldConstants;
 import main.Game;
+import main.SaveDataManager;
 import menu.Inventory;
 import utility.Debug;
 
@@ -132,8 +133,8 @@ public class GameSave {
 					byteArray,
 					ByteBuffer.allocate(2).putChar((char) ((itemList.size() - 1) & 0xFFFF)).array()
 				); // How many
-					// items in
-					// a list?
+					 // items in
+					 // a list?
 				byteArray = GameSave.concatenate(byteArray, ByteBuffer.allocate(1).put((byte) itemList.size()).array()); // ItemInfo
 				// size.
 				byte[] itemInfo = null;
@@ -510,12 +511,15 @@ public class GameSave {
 	 * <p>
 	 * For more information on the file format, please read the documentation provided.
 	 * 
-	 * @param filename
-	 *            The file name of the saved data.
 	 * @return True, if the saved data file exists. False, if otherwise.
 	 */
-	public static boolean check(String filename) {
-		File save = new File(filename);
+	public static boolean checkSaveData() {
+		File save;
+		if (WorldConstants.isModsEnabled.booleanValue())
+			save = new File(SaveDataManager.MODDED_SAVE_FILE_NAME);
+		else
+			save = new File(SaveDataManager.SAVE_FILE_NAME);
+
 		boolean fileIsValid = true;
 		DataInputStream dataInputStream = null;
 		try {

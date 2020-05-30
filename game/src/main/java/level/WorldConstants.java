@@ -35,7 +35,7 @@ public class WorldConstants {
 	public static final int ITEM_3_OPTIONS = 2;
 	public static final int ITEM_BICYCLE = 3;
 
-	//Entity Types
+	// Entity Types
 	public static final int ENTITY_TYPE_OBSTACLE = 0x03;
 	public static final int ENTITY_TYPE_CHARACTER = 0x0E;
 	public static final int ENTITY_TYPE_ITEM = 0x0A;
@@ -54,21 +54,22 @@ public class WorldConstants {
 	// Dialogues
 	public static List<Map.Entry<Dialogue, Integer>> signTexts = DialogueBuilder.loadDialogues("art/dialogue/dialogue.txt");
 
-	//NOTE(Thompson): We're going to start building items instead of loading items from script files.
+	// NOTE(Thompson): We're going to start building items instead of loading items from script files.
 	// Items
 	// public static HashMap<Integer, ItemText> itemms = Item.loadItemResources("item/items.txt");
-	// public static List<Map.Entry<ItemText, Item>> items = ItemBuilder.loadItems("art/item/items.txt");
+	// public static List<Map.Entry<ItemText, Item>> items =
+	// ItemBuilder.loadItems("art/item/items.txt");
 
 	// Areas
 	public static List<Area> areas = new ArrayList<>(0);
 	public static List<Area> moddedAreas = new ArrayList<>(0);
 
-	//Main Menu Item Names
+	// Main Menu Item Names
 	public static final String MENU_ITEM_NAME_EXIT = "EXIT";
 	public static final String MENU_ITEM_NAME_INVENTORY = "PACK";
 	public static final String MENU_ITEM_NAME_SAVE = "SAVE";
 
-	//Main Menu Item Descriptions
+	// Main Menu Item Descriptions
 	public static final String MENU_ITEM_DESC_EXIT = "Exit the menu.";
 	public static final String MENU_ITEM_DESC_INVENTORY = "Open the pack.";
 	public static final String MENU_ITEM_DESC_SAVE = "Save the game.";
@@ -98,7 +99,8 @@ public class WorldConstants {
 	 * 
 	 * @param areaID
 	 *            The area ID value.
-	 * @return The Area object with the matching area ID value. If no matching value exists, it returns null.
+	 * @return The Area object with the matching area ID value. If no matching value exists, it returns
+	 *         null.
 	 */
 	public static Area convertToArea(List<Area> areas, int areaID) {
 		for (int i = 0; i < areas.size(); i++) {
@@ -185,7 +187,7 @@ public class WorldConstants {
 			}
 		}
 		if (WorldConstants.isModsEnabled.booleanValue()) {
-			WorldConstants.moddedScripts = Script.loadModdedScripts();
+			WorldConstants.moddedScripts = Script.loadModdedScriptsNew();
 			return WorldConstants.moddedScripts;
 		}
 		else {
@@ -200,8 +202,10 @@ public class WorldConstants {
 	 */
 	private static void addNewArea(BaseBitmap bitmap, int areaID) {
 		// Java 8 feature
-		boolean exists = WorldConstants.areas.stream().filter(chosenArea -> chosenArea.getAreaID() == areaID)
-			.findFirst().isPresent();
+		boolean exists = WorldConstants.areas.stream()
+			.filter(chosenArea -> chosenArea.getAreaID() == areaID)
+			.findFirst()
+			.isPresent();
 		if (!exists) {
 			WorldConstants.areas.add(new Area(bitmap, areaID));
 		}

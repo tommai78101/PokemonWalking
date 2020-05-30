@@ -26,7 +26,7 @@ $0
 
 
 / Turn around after seeing things.
-$1
+BeginScript 1
 @Avoiding_Event
 #Something is not right around here.
 #I should probably move away from this place.

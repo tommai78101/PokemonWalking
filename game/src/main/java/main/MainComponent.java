@@ -287,7 +287,8 @@ public class MainComponent extends Canvas implements Runnable {
 	 * @return BufferedImage The BufferedImage used for the Graphics object to blit to the screen.
 	 */
 	public static final BufferedImage createCompatibleBufferedImage(BufferedImage image) {
-		GraphicsConfiguration gfx_config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
+		GraphicsConfiguration gfx_config = GraphicsEnvironment.getLocalGraphicsEnvironment()
+			.getDefaultScreenDevice()
 			.getDefaultConfiguration();
 		if (image.getColorModel().equals(gfx_config.getColorModel()))
 			return image;

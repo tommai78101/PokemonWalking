@@ -10,12 +10,64 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import dialogue.Dialogue;
 import utility.Debug;
 import utility.DialogueBuilder;
 
 public class Script {
+	private enum ScriptTag {
+		ScriptName("@"),
+		Comment("/"),
+		BeginScript("$"),
+		PathData("^"),
+		EndScript("%"),
+		Speech("#"),
+		Question("?"),
+		Affirm("+"),
+		Reject("-"),
+		Confirm("["),
+		Deny("]"),
+		Repeat(";"),
+		Repeatable(";");
+
+		private String symbol;
+
+		private ScriptTag(String sym) {
+			this.symbol = sym;
+		}
+
+		/**
+		 * Checks if the line starts with either the symbol representation, or the tag name.
+		 * 
+		 * @param line
+		 * @return True if either the symbol or the tag name matches. False, if otherwise.
+		 */
+		public boolean beginsAt(String line) {
+			if (line == null || line.isEmpty() || line.isBlank())
+				return false;
+			if (line.length() < this.name().length())
+				return line.startsWith(this.symbol);
+			return line.regionMatches(true, 0, this.name(), 0, this.name().length());
+		}
+
+		/**
+		 * Replaces the first occurrence of the tag name with the equivalent symbol representation.
+		 * <p>
+		 * Otherwise, if the line already has the symbol representation, then it does nothing.
+		 * 
+		 * @param line
+		 * @return The replaced line.
+		 */
+		public String replace(String line) {
+			if (line.startsWith(this.symbol))
+				return line;
+			return line.replaceFirst(Pattern.quote(this.name()), Matcher.quoteReplacement(this.symbol));
+		}
+	}
+
 	public int triggerID;
 	public ArrayList<Map.Entry<Integer, MovementData>> moves;
 	public ArrayList<Map.Entry<Integer, MovementData>> affirmativeMoves;
@@ -216,12 +268,13 @@ public class Script {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				// Ignored tags
-				if (line.startsWith("/") || line.startsWith("@") || line.isEmpty())
+				if (ScriptTag.Comment.beginsAt(line) || ScriptTag.ScriptName.beginsAt(line) || line.startsWith(" ") || line.isEmpty())
 					continue;
 
 				// Start of script
-				else if (line.startsWith("$") || Script.startsWithIgnoreCase(line, "BeginScript")) {
-					int triggerID = Integer.valueOf(line.substring(1));
+				else if (ScriptTag.BeginScript.beginsAt(line)) {
+					line = ScriptTag.BeginScript.replace(line);
+					int triggerID = Integer.valueOf(line.substring(1).trim());
 					if (triggerID > 0) {
 						if (script == null)
 							script = new Script();
@@ -230,17 +283,18 @@ public class Script {
 				}
 
 				// Movement Data
-				else if (line.startsWith("^") || Script.startsWithIgnoreCase(line, "PathData")) {
+				else if (ScriptTag.PathData.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						Script.append(moves, line.substring(1).toCharArray());
+						line = ScriptTag.PathData.replace(line);
+						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.moves.add(Map.entry(iteration, moves));
 						iteration++;
 					}
 				}
 
 				// Script delimiter
-				else if (line.startsWith("%") || Script.startsWithIgnoreCase(line, "EndScript")) {
+				else if (ScriptTag.EndScript.beginsAt(line)) {
 					if (script != null) {
 						result.add(script);
 						script = null;
@@ -249,9 +303,10 @@ public class Script {
 				}
 
 				// Speech dialogue
-				else if (line.startsWith("#") || Script.startsWithIgnoreCase(line, "Speech")) {
+				else if (ScriptTag.Speech.beginsAt(line)) {
+					line = ScriptTag.Speech.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).replace("_", " "),
+						line.substring(1).trim().replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.dialogues.add(Map.entry(iteration, d));
@@ -259,9 +314,10 @@ public class Script {
 				}
 
 				// Question dialogue
-				else if (line.startsWith("?") || Script.startsWithIgnoreCase(line, "Question")) {
+				else if (ScriptTag.Question.beginsAt(line)) {
+					line = ScriptTag.Question.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).replace("_", " "),
+						line.substring(1).trim().replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
 					);
 					script.dialogues.add(Map.entry(iteration, d));
@@ -269,9 +325,10 @@ public class Script {
 				}
 
 				// Affirmative Response dialogue
-				else if (line.startsWith("+") || Script.startsWithIgnoreCase(line, "Affirm")) {
+				else if (ScriptTag.Affirm.beginsAt(line)) {
+					line = ScriptTag.Affirm.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).replace("_", " "),
+						line.substring(1).trim().replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.affirmativeDialogues
@@ -280,9 +337,10 @@ public class Script {
 				}
 
 				// Negative Response dialogue
-				else if (line.startsWith("-") || Script.startsWithIgnoreCase(line, "Reject")) {
+				else if (ScriptTag.Reject.beginsAt(line)) {
+					line = ScriptTag.Reject.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).replace("_", " "),
+						line.substring(1).trim().replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.negativeDialogues
@@ -291,10 +349,11 @@ public class Script {
 				}
 
 				// Affirmative Response action
-				else if (line.startsWith("[") || Script.startsWithIgnoreCase(line, "Confirm")) {
+				else if (ScriptTag.Confirm.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						Script.append(moves, line.substring(1).toCharArray());
+						line = ScriptTag.Confirm.replace(line);
+						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.affirmativeMoves
 							.add(Map.entry(affirmativeIteration, moves));
 						affirmativeIteration++;
@@ -302,10 +361,11 @@ public class Script {
 				}
 
 				// Negative Response action
-				else if (line.startsWith("]") || Script.startsWithIgnoreCase(line, "Deny")) {
+				else if (ScriptTag.Deny.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						Script.append(moves, line.substring(1).toCharArray());
+						line = ScriptTag.Deny.replace(line);
+						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.negativeMoves
 							.add(Map.entry(negativeIteration, moves));
 						negativeIteration++;
@@ -313,7 +373,7 @@ public class Script {
 				}
 
 				// Is a Repeating Trigger
-				else if (line.startsWith(";") || Script.startsWithIgnoreCase(line, "Repeatable") || Script.startsWithIgnoreCase(line, "Repeat")) {
+				else if (ScriptTag.Repeat.beginsAt(line) || ScriptTag.Repeatable.beginsAt(line)) {
 					if (script != null) {
 						script.repeat = true;
 					}
@@ -413,19 +473,24 @@ public class Script {
 	}
 
 	/**
-	 * Compares the prefix of the specified line to see if it matches the prefix, case-insensitive.
+	 * Better way to load all modded scripts. Must return a non-null list of scripts.
+	 * <p>
+	 * If null is returned, OverWorld class will fail to instantiate.
 	 * 
-	 * @param line
-	 *            The full line from the script file.
-	 * @param prefix
-	 *            The subset of the full line.
-	 * @return True if the prefix starts at the beginning the specified line. False, if otherwise.
+	 * @return A list of Script objects.
 	 */
-	public static boolean startsWithIgnoreCase(String line, String prefix) {
-		if (line == null || prefix == null)
-			return (line == null && prefix == null);
-		if (prefix.length() > line.length())
-			return false;
-		return line.regionMatches(true, 0, prefix, 0, prefix.length());
+	public static List<Script> loadModdedScriptsNew() {
+		List<Script> results = new ArrayList<>();
+		File modDirectory = new File("mod" + File.pathSeparator + "script");
+		if (modDirectory.exists() && modDirectory.isDirectory()) {
+			String[] scripts = modDirectory.list();
+			for (int i = 0; i < scripts.length; i++) {
+				String scriptFile = scripts[i];
+				if (scriptFile.endsWith(".script")) {
+					results.addAll(Script.loadScript(modDirectory.getPath() + File.separator + scriptFile, true));
+				}
+			}
+		}
+		return results;
 	}
 }

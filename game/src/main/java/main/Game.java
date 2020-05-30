@@ -26,6 +26,7 @@ import resources.Art;
 import resources.Mod;
 import screen.Scene;
 import screen.Scene.FlashingType;
+import utility.Debug;
 
 public class Game {
 	public static final Keys keys = new Keys();
@@ -206,9 +207,15 @@ public class Game {
 		this.overworld.reloadAllAreas();
 
 		// GameSave.load(this, SaveDataManager.SAVE_FILE_NAME);
-		GameSave.loadExperimental(this, SaveDataManager.SAVE_FILE_NAME);
+		if (WorldConstants.isModsEnabled.booleanValue())
+			GameSave.loadExperimental(this, SaveDataManager.MODDED_SAVE_FILE_NAME);
+		else
+			GameSave.loadExperimental(this, SaveDataManager.SAVE_FILE_NAME);
 
 		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+
+		if (WorldConstants.isModsEnabled.booleanValue())
+			Debug.log("Loading custom modded game world.");
 	}
 
 	/**

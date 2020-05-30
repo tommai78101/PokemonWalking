@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Graphics;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ import utility.DialogueBuilder;
 
 public class SaveDataManager extends SubMenu {
 	public static final String SAVE_FILE_NAME = "data.sav";
+	public static final String MODDED_SAVE_FILE_NAME = "mod" + File.separator + "data.sav";
 
 	public enum SaveStatus {
 		ASK,
@@ -59,7 +61,7 @@ public class SaveDataManager extends SubMenu {
 					if (!this.saveDialogue.yesNoQuestionHasBeenAnswered())
 						this.saveDialogue.tick();
 					if (this.saveDialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-						if (GameSave.check(SaveDataManager.SAVE_FILE_NAME))
+						if (GameSave.checkSaveData())
 							this.saveStatus = SaveStatus.OVERWRITE;
 						else
 							this.saveStatus = SaveStatus.SAVING;
@@ -123,7 +125,10 @@ public class SaveDataManager extends SubMenu {
 						@Override
 						public void run() {
 							// GameSave.save(SaveDataManager.this.game, SaveDataManager.SAVE_FILE_NAME);
-							GameSave.saveExperimental(SaveDataManager.this.game, SaveDataManager.SAVE_FILE_NAME);
+							if (WorldConstants.isModsEnabled.booleanValue())
+								GameSave.saveExperimental(SaveDataManager.this.game, SaveDataManager.MODDED_SAVE_FILE_NAME);
+							else
+								GameSave.saveExperimental(SaveDataManager.this.game, SaveDataManager.SAVE_FILE_NAME);
 						}
 					});
 					this.executor.shutdown();
