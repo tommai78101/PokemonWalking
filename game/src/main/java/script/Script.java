@@ -15,9 +15,9 @@ import utility.DialogueBuilder;
 
 public class Script {
 	public int triggerID;
-	public ArrayList<Map.Entry<Integer, Movement>> moves;
-	public ArrayList<Map.Entry<Integer, Movement>> affirmativeMoves;
-	public ArrayList<Map.Entry<Integer, Movement>> negativeMoves;
+	public ArrayList<Map.Entry<Integer, MovementData>> moves;
+	public ArrayList<Map.Entry<Integer, MovementData>> affirmativeMoves;
+	public ArrayList<Map.Entry<Integer, MovementData>> negativeMoves;
 	public ArrayList<Map.Entry<Integer, Dialogue>> dialogues;
 	public ArrayList<Map.Entry<Integer, Dialogue>> affirmativeDialogues;
 	public ArrayList<Map.Entry<Integer, Dialogue>> negativeDialogues;
@@ -47,18 +47,18 @@ public class Script {
 		this.triggerID = s.triggerID;
 
 		this.moves = new ArrayList<>();
-		for (Map.Entry<Integer, Movement> e : s.moves)
-			this.moves.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
+		for (Map.Entry<Integer, MovementData> e : s.moves)
+			this.moves.add(new AbstractMap.SimpleEntry<>(e.getKey(), new MovementData(e.getValue())));
 
 		this.affirmativeMoves = new ArrayList<>();
-		for (Map.Entry<Integer, Movement> e : s.affirmativeMoves)
+		for (Map.Entry<Integer, MovementData> e : s.affirmativeMoves)
 			this.affirmativeMoves
-				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
+				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new MovementData(e.getValue())));
 
 		this.negativeMoves = new ArrayList<>();
-		for (Map.Entry<Integer, Movement> e : s.negativeMoves)
+		for (Map.Entry<Integer, MovementData> e : s.negativeMoves)
 			this.negativeMoves
-				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new Movement(e.getValue())));
+				.add(new AbstractMap.SimpleEntry<>(e.getKey(), new MovementData(e.getValue())));
 
 		this.dialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.dialogues)
@@ -82,21 +82,21 @@ public class Script {
 		this.repeat = s.repeat;
 	}
 
-	public Movement getIteratedMoves() {
+	public MovementData getIteratedMoves() {
 		if (this.questionResponse == null) {
-			for (Map.Entry<Integer, Movement> entry : this.moves) {
+			for (Map.Entry<Integer, MovementData> entry : this.moves) {
 				if (entry.getKey() == this.iteration)
 					return entry.getValue();
 			}
 		}
 		else if (this.questionResponse == Boolean.TRUE) {
-			for (Map.Entry<Integer, Movement> entry : this.affirmativeMoves) {
+			for (Map.Entry<Integer, MovementData> entry : this.affirmativeMoves) {
 				if (entry.getKey() == this.affirmativeIteration)
 					return entry.getValue();
 			}
 		}
 		else if (this.questionResponse == Boolean.FALSE) {
-			for (Map.Entry<Integer, Movement> entry : this.negativeMoves) {
+			for (Map.Entry<Integer, MovementData> entry : this.negativeMoves) {
 				if (entry.getKey() == this.negativeIteration)
 					return entry.getValue();
 			}
@@ -173,7 +173,8 @@ public class Script {
 	 * </p>
 	 * 
 	 * <p>
-	 * The script file is a database of all triggers of a a certain map. All scripts within the file can only be triggered by that area.
+	 * The script file is a database of all triggers of a a certain map. All scripts within the file can
+	 * only be triggered by that area.
 	 * </p>
 	 * 
 	 * <p>
@@ -182,7 +183,8 @@ public class Script {
 	 * 
 	 * @param filename
 	 *            - A String object of the file name of the SCRIPT file.
-	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located within the SCRIPT file.
+	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located
+	 *         within the SCRIPT file.
 	 * 
 	 */
 	public static List<Script> loadScript(String filename, boolean isModdedScript) {
@@ -220,7 +222,7 @@ public class Script {
 				}
 				else if (line.startsWith("^")) { // Movement
 					if (script != null) {
-						Movement moves = new Movement();
+						MovementData moves = new MovementData();
 						Script.append(moves, line.substring(1).toCharArray());
 						script.moves.add(new AbstractMap.SimpleEntry<>(iteration, moves));
 						iteration++;
@@ -269,7 +271,7 @@ public class Script {
 				}
 				else if (line.startsWith("[")) { // affirmative action
 					if (script != null) {
-						Movement moves = new Movement();
+						MovementData moves = new MovementData();
 						Script.append(moves, line.substring(1).toCharArray());
 						script.affirmativeMoves
 							.add(new AbstractMap.SimpleEntry<>(affirmativeIteration, moves));
@@ -278,14 +280,14 @@ public class Script {
 				}
 				else if (line.startsWith("]")) { // negative action
 					if (script != null) {
-						Movement moves = new Movement();
+						MovementData moves = new MovementData();
 						Script.append(moves, line.substring(1).toCharArray());
 						script.negativeMoves
 							.add(new AbstractMap.SimpleEntry<>(negativeIteration, moves));
 						negativeIteration++;
 					}
 				}
-				else if (line.startsWith(";")) {
+				else if (line.startsWith(";")) { // Is a Repeating Trigger
 					if (script != null) {
 						script.repeat = true;
 					}
@@ -308,7 +310,7 @@ public class Script {
 		return result;
 	}
 
-	private static void append(Movement moves, char[] list) {
+	private static void append(MovementData moves, char[] list) {
 		int direction = -1;
 		int steps = -1;
 

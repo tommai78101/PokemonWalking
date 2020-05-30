@@ -65,6 +65,7 @@ Entities...........................[PWD06]
 Controls...........................[PWD07]
 	Walking Algorithm..............[PWD07#01]
 File Format........................[PWD08]
+	Legacy File Format.............[PWD08#01]
 Triggers...........................[PWD09]
 Dialogues..........................[PWD10]
 Contributors.......................[PWD11]
@@ -880,7 +881,31 @@ not assume their information to be permanent.
 
 				If the player steps on this tile, or if the player interacts with this
 				tile, it will start triggering.
-		
+
+			How it works:
+
+				You have a trigger script writen in either the default data file 
+				"art/script/scripts.txt", or by adding to "mod/script/scripts.txt".
+				In this file, it only contains information about the trigger script
+				data, but it should not contain any information about what location
+				the trigger script should execute in the Area map.
+
+				The Area map is what decides on which trigger script to execute,
+				based on where the triggering pixel data is located in the Area map.
+
+				The triggering pixel data, called TriggerData, stores these data:
+				- The X position.
+				- The Y position.
+				- The Trigger ID
+
+				When the player or NPC lands on the X and Y position, the trigger
+				will activate and execute the trigger script associated with the
+				Trigger ID value, however many times the player or NPC lands on
+				the tile.
+
+				It is up to the trigger script data that controls whether it
+				should execute this many times, handle dialogues, or trigger
+				scripted cinematic movements, called MovementData.
 			
 -------------------------------
 
@@ -1059,6 +1084,8 @@ X			.				The Cancel Button. (GameBoy equivalent of the B button.)
 
 File Format [PWD08]
 
+The current file format used is version 0002.
+
 The data file format is used to structure saved
 data that the game is able to read/write/modify
 easily. 
@@ -1068,6 +1095,43 @@ tree structure hierarchy for storing relevant
 data bits as the game progresses. The file 
 format will expand further as the game includes
 more features that require persistent data.
+
+The new file format is based off of packet
+wrappers, which encapsulates data with the
+following information for each encapsulated
+wrapper
+
+[short SIZE][4 bytes PACKET_NAME][N bytes DATA]
+
+Where, for each tag:
+
+- SIZE: Refers to the total size of the packet, 
+minus the 2 bytes used to store the data size.
+In other words, it's the length of the packet.
+- PACKET_NAME: Refers to the 4-bytes long storing
+text data of the name of the packet.
+- DATA: Refers to the packet data. It can be N
+bytes long, where N is a positive non-zero number.
+
+These packets are called "Data Chunks" or "Chunks"
+in the source code. The file format system was
+updated to be able to easily add new information
+and packet data when necessary.
+
+We can extend a plain old Java object, or called
+"POJO", from the base class called "Chunk". This
+handles reading, writing, and fetching the chunk
+size. These operations must be overridden in the
+newly extended POJOs.
+
+-  -  -  -  -  -  -  -  -  -  -
+
+Legacy File Format [PWD08#01]
+
+This is the old file format, used in version 0001.
+
+Most of the information is similar to the current
+file format version, mentioned above.
 
 The order of the file format tree hierarchy is
 determined by the last date of creation. Anything

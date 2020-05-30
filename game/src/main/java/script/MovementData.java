@@ -4,17 +4,17 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class Movement {
+public class MovementData {
 
 	int iterator;
 	ArrayList<Map.Entry<Integer, Integer>> moves; // Direction, Steps
 
-	public Movement() {
+	public MovementData() {
 		this.iterator = 0;
 		moves = new ArrayList<Map.Entry<Integer, Integer>>();
 	}
 
-	public Movement(Movement movement) {
+	public MovementData(MovementData movement) {
 		// Deep copy
 		this.iterator = movement.iterator;
 		this.moves = new ArrayList<Map.Entry<Integer, Integer>>();

@@ -18,7 +18,7 @@ public class TriggerData {
 	private boolean finished;
 	private boolean repeat;
 
-	private Movement moves;
+	private MovementData moves;
 	private Dialogue dialogue;
 
 	// TODO: Add entity ID for NPCs.
