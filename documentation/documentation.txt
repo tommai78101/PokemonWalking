@@ -1,28 +1,28 @@
 ﻿/**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE. 
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY! 
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 Pokémon Walking - Documentation
 
 Changelogs:
-r12: Added Triggers section and to clarify a bit more on how scripting is done.
-r11: Changing the Abstract a bit to reflect upon latest roadmap. Adding roadmaps.
-r10: Merged Signs with Obstacles. Removed stuffs.
-r9: Added File Formats, Control Schemes.
-r8: Added items.
-r7: Changing some of the info below.
-r6: Added more tiles.
-r5: Added a beginner's section, "How to Debug."
-r4: Added new tiles to the Tiles section.
-r3: Finished the draft.
-r2: Added the history.
-r1: First draft - using GameFaqs format.
+	r14: Updated Item data structure.
+	r13: Added Characters/NPCs section. 
+	r12: Added Triggers section and to clarify a bit more on how scripting is done.
+	r11: Changing the Abstract a bit to reflect upon latest roadmap. Adding roadmaps.
+	r10: Merged Signs with Obstacles. Removed stuffs.
+	r09: Added File Formats, Control Schemes.
+	r08: Added items.
+	r07: Changing some of the info below.
+	r06: Added more tiles.
+	r05: Added a beginner's section, "How to Debug."
+	r04: Added new tiles to the Tiles section.
+	r03: Finished the draft.
+	r02: Added the history.
+	r01: First draft - using GameFaqs format.
 
 -------------------------------
 
@@ -42,29 +42,35 @@ How to Debug.......................[PWD04]
 Metadata...........................[PWD05]
 	PixelData......................[PWD05#01]
 	Areas..........................[PWD05#02]
-		Overworld..................[PWD05#02@01]
-		Sector.....................[PWD05#02@02]
+		Overworld..................[PWD05@02#01]
+		Sector.....................[PWD05@02#02]
 	Tiles..........................[PWD05#03]
-		Empty......................[PWD05#03@00]
-		Path.......................[PWD05#03@01]
-		Ledge......................[PWD05#03@02]
-		Tree.......................[PWD05#03@03]
-		Warp Point.................[PWD05#03@04]
-		Area Connection Point......[PWD05#03@05]
-		Stairs.....................[PWD05#03@06]
-		Water......................[PWD05#03@07]
-		House......................[PWD05#03@08]
-		House Door.................[PWD05#03@09]
-		Items......................[PWD05#03@10]
+		Empty......................[PWD05@03#00]
+		Path.......................[PWD05@03#01]
+		Ledge......................[PWD05@03#02]
+		Tree.......................[PWD05@03#03]
+		Warp Point.................[PWD05@03#04]
+		Area Connection Point......[PWD05@03#05]
+		Stairs.....................[PWD05@03#06]
+		Water......................[PWD05@03#07]
+		House......................[PWD05@03#08]
+		House Door.................[PWD05@03#09]
+		Items......................[PWD05@03#10]
+		Carpet (Indoors)...........[PWD05@03#11]
+		Carpet (Outdoors)..........[PWD05@03#12]
+		Triggers...................[PWD05@03#13]
+		Characters/NPCs............[PWD05@03#14]
 Entities...........................[PWD06]
 	Player.........................[PWD06#01]
 Controls...........................[PWD07]
 	Walking Algorithm..............[PWD07#01]
 File Format........................[PWD08]
+	Legacy File Format.............[PWD08#01]
 Triggers...........................[PWD09]
-Contributors.......................[PWD10]
-Terms of License...................[PWD11]
-Credits............................[PWD12]
+Dialogues..........................[PWD10]
+Contributors.......................[PWD11]
+Terms of License...................[PWD12]
+Credits............................[PWD13]
 
 
 
@@ -192,6 +198,15 @@ It was not until v7 did all the known issues have been
 fixed. Now, the developer is currently busy with the
 military service, and will update the project from time
 to time.
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+As of March 12, 2020, this project has gone through periods
+of active and inactive development cycles. There is
+continued motivation to improve the codebase, so that the
+code is more readable and more flexible, such that adding
+new features to the project wouldn't be such a mental
+exercise
 
 -------------------------------
 
@@ -330,25 +345,31 @@ not assume their information to be permanent.
 	
 	Areas [PWD05#02]
 	
-	Mentioned before, each area is created using an image editor
-	that can edit/modify alpha values. Preferrably, GIMP or
-	Paint.NET may be a good choice.
+	Mentioned before, each area is created using an image
+	editor that can edit/modify alpha values. Preferrably,
+	GIMP or Paint.NET may be a good choice.
 	
-	Due to limitations set by PixelData, the maximum theoretical
-	size of an area is 256x256. This is determined by using
-	2 bytes from a PixelData, each byte representing width and
-	height respectively. This also means that the tile's 
-	position a PixelData represents in the game can span from 
-	(0, 0) to (255, 255) in a 256x256 area.
+	Due to limitations set by PixelData, the maximum
+	theoretical size of an area is 256x256. This is
+	determined by using 2 bytes from a PixelData, each byte
+	representing width and height respectively. This also
+	means that the tile's position a PixelData represents
+	in the game can span from (0, 0) to (255, 255) in a
+	256x256 area.
 	
-	The chosen 2 bytes are, again, determined by the tile the 
-	Tile ID represents, and the area the tile is in. This goes
-	with the "Tile-specific data" that is accordance with the
-	PixelData data format.
-	
+	The chosen 2 bytes are, again, determined by the tile
+	the Tile ID represents, and the area the tile is in.
+	This goes with the "Tile-specific data" that is
+	accordance with the PixelData data format.
+
+	Character and Area have a 16:1 ratio when converting
+	Character positions to Area positions.
+
+	Area Position = Character Position * Character Tile size
+
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Overworld [PWD05#02@01]
+		Overworld [PWD05@02#01]
 	
 		In order to create a convincing overworld environment, the
 		areas must be large and explorable. Near the borders of the
@@ -366,7 +387,7 @@ not assume their information to be permanent.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Sector [PWD05#02@02]
+		Sector [PWD05@02#02]
 		
 		Each area consists of sectors, which tells the game to mark
 		a section of an area a specific area of interest. This area
@@ -390,22 +411,22 @@ not assume their information to be permanent.
 	find the tile you really wanted.
 	
 	Each tile consists of the following:
-	
-		Tile ID: 				The ID number and name of the tile.
-		Extended Tile ID: 		The ID number used in conjunction of the
-								Tile ID.
-		Tile Specific ID:		The ID number defined in relation to the
-								tile and that tile only.
-		Full Data(s): 			The full data value, listed in the order
-								of ARGB format. There can be more than
-								one specific full data, if there are a
-								certain number of different full datas,
-								it will all be listed. If there are
-								unknown number of different full datas,
-								it will be listed with variables in them.
-		Description:			Describes the properties of the tile, and
-								how to use them accordingly.
-								
+                                
+        Tile ID:                The ID number and name of the tile.
+        Extended Tile ID:       The ID number used in conjunction of the
+                                Tile ID.
+        Tile Specific ID:       The ID number defined in relation to the
+                                tile and that tile only.
+        Full Data(s):           The full data value, listed in the order
+                                of ARGB format. There can be more than
+                                one specific full data, if there are a
+                                certain number of different full datas,
+                                it will all be listed. If there are
+                                unknown number of different full datas,
+                                it will be listed with variables in them.
+        Description:            Describes the properties of the tile, and
+                                how to use them accordingly.
+                                
 	The maximum amount of tiles available in the game is 256. With
 	extended tile IDs included, the maximum amount of tiles is
 	65536.
@@ -418,7 +439,7 @@ not assume their information to be permanent.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 
-		Empty [PWD05#03@00]
+		Empty [PWD05@03#00]
 		
 		Tile ID:
 			A: 00 - Empty
@@ -445,7 +466,7 @@ not assume their information to be permanent.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
-		Floor [PWD05#03@01]
+		Floor [PWD05@03#01]
 		
 		Tile ID:
 			A: 01 - Floor
@@ -475,9 +496,9 @@ not assume their information to be permanent.
 			given below:
 			
 				Area Type:
-				   
-					0x00 = Forest          
-					0x01 = City            
+					
+					0x00 = Forest
+					0x01 = City
 					0x02 = Mountain 
 					0x03 = Water
 					0x04 = Cavern
@@ -492,7 +513,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Ledge [PWD05#03@02]
+		Ledge [PWD05@03#02]
 		
 		Tile ID:
 			A: 02 - Ledge
@@ -548,7 +569,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Obstacles [PWD05#03@03]
+		Obstacles [PWD05@03#03]
 	
 		Tile ID:
 			A: 03 - Obstacles
@@ -582,7 +603,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Warp Point [PWD05#03@04]
+		Warp Point [PWD05@03#04]
 		
 		Tile ID:
 			A: 04 - Warp Point
@@ -605,7 +626,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Area Sector Point (ASP) [PWD05#03@05]
+		Area Sector Point (ASP) [PWD05@03#05]
 		
 		Tile ID:
 			A: 05 - Area Sector Point (ASP)
@@ -637,7 +658,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Stairs [PWD05#03@06]
+		Stairs [PWD05@03#06]
 		
 		Tile ID:
 			A: 06 - Stairs
@@ -666,7 +687,7 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Water [PWD05#03@07]
+		Water [PWD05@03#07]
 		
 		Tile ID:
 			A: 07 - Water
@@ -691,7 +712,7 @@ not assume their information to be permanent.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		House [PWD05#03@08]
+		House [PWD05@03#08]
 		
 		Tile ID:
 			A: 08 - House
@@ -729,7 +750,7 @@ not assume their information to be permanent.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		House Door [PWD05#03@09]
+		House Door [PWD05@03#09]
 		
 		Tile ID:
 			A: 09 - Door
@@ -749,17 +770,17 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Items [PWD05#03@10]
+		Items [PWD05@03#10]
 		
 		Tile ID:
-			A: 0A - Item
+			A: 0A - Items
 		Extended Tile ID:
-			R: XX - Specific Item.
+			R: XX - Item Unique ID.
 		Tile Specific ID:
 			G: OO - Object Types.
-			B: NN - Not used.
+			B: BB - Reserved miscellaneous data.
 		Full Data(s):
-			0B XX OO NN
+			0B XX OO BB
 		Description:
 			An object that can be picked up and be used by the player. The object
 			itself can block a player's path, therefore, it can also act as an 
@@ -768,10 +789,23 @@ not assume their information to be permanent.
 			Object Type determines whether or not the items can be picked up or 
 			can be moved around. By default, Values 00 is for items only. 
 			Anything else would be object types that would be moved around.
+			
+			There is a hard limitation of 256 unique items in the game. 
+			
+			Certain items, such as key items, 1-time-use-only items, and really
+			rare items, can use the reserved miscellaneous bytes to add additional
+			information.
+			
+		Note:
+			The max total of unique item IDs of 256 may change, depending on where
+			the game will go towards. It is also likely we can split the Blue byte
+			into 2 nibbles (4 bits each), so that the bits group, "RRB" can have
+			4,096 unique items in total, and the final nibble bits group "B" will 
+			be reserved to store additional information.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Carpet (Indoors) [PWD05#03@11]
+		Carpet (Indoors) [PWD05@03#11]
 
 		Tile ID:
 			A: 0B - Carpet (Indoors)
@@ -792,7 +826,7 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Carpet (Outdoors) [PWD05#03@12]
+		Carpet (Outdoors) [PWD05@03#12]
 
 		Tile ID:
 			A: 0C - Carpet (Outdoors)
@@ -815,12 +849,13 @@ not assume their information to be permanent.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-		Default Starting Point [PWD05#03@13]
+		Triggers [PWD05@03#13]
 		
 		Tile ID:
 			A: 0D - Triggers
-		Extended Tile ID;
-			R: XX - Any one of all available bitmaps
+		Extended Tile ID:
+			R: 00 - Default Starting Point
+			R: XX - Any triggers or any one of all available bitmaps
 		Tile Specific ID:
 			G: GG - Script ID
 			B: BB - Script ID
@@ -829,35 +864,88 @@ not assume their information to be permanent.
 		Description:
 			(This should be used sparsingly. Useful for debugging maps.)
 			
-			This sets the default starting position for the player. If it so happens
-			that the game loads the map in such a way causing the player to be stuck,
-			then it means there is a problem with the game, the editor, or the map.
+			Default Starting Point			
 
+				This sets the default starting position for the player. If it so happens
+				that the game loads the map in such a way causing the player to be stuck,
+				then it means there is a problem with the game, the editor, or the map.
 
+			All other triggers depend on the Extended Tile ID.
+
+				Depending on how it was triggered, this tile will trigger a scripted
+				event matching the script ID.
+
+				The bitmap value determines what tile bitmap this trigger will use
+				when it is displayed on the screen. Depending on the bitmap tile
+				value, it can either be stepped on, or is blocking the player.
+
+				If the player steps on this tile, or if the player interacts with this
+				tile, it will start triggering.
+
+			How it works:
+
+				You have a trigger script writen in either the default data file 
+				"art/script/scripts.txt", or by adding to "mod/script/scripts.txt".
+				In this file, it only contains information about the trigger script
+				data, but it should not contain any information about what location
+				the trigger script should execute in the Area map.
+
+				The Area map is what decides on which trigger script to execute,
+				based on where the triggering pixel data is located in the Area map.
+
+				The triggering pixel data, called TriggerData, stores these data:
+				- The X position.
+				- The Y position.
+				- The Trigger ID
+
+				When the player or NPC lands on the X and Y position, the trigger
+				will activate and execute the trigger script associated with the
+				Trigger ID value, however many times the player or NPC lands on
+				the tile.
+
+				It is up to the trigger script data that controls whether it
+				should execute this many times, handle dialogues, or trigger
+				scripted cinematic movements, called MovementData.
+			
 -------------------------------
 
-		Triggers [PWD05#03@13]
+		Characters/NPCs [PWD05@03#14]
 		
-		TODO: Must add a new section for it.
-
-		
-			Depending on how it was triggered, this tile will trigger a scripted
-			event matching the script ID.
-
-			The bitmap value determines what tile bitmap this trigger will use
-			when it is displayed on the screen. Depending on the bitmap tile
-			value, it can either be stepped on, or is blocking the player.
-
-			If the player steps on this tile, or if the player interacts with this
-			tile, it will start triggering.
-
--------------------------------
-
-		NPCs
-		
-		* Don't know how they are to be placed on a map.
-		* Don't know how to control them via AI.
-		* Need to have its own animation.
+		Tile ID:
+			A: 0E - Characters category
+		Extended Tile ID:
+			R: XX - Character Unique ID
+		Tile Specific ID:
+			G: GG - Script ID
+			B: BB - Reserved miscellaneous data 
+		Full Data:
+			0E XX GG BB
+		Description:
+			Characters/NPCs will be part of this group.
+			
+			Since some Characters/NPCs will not have fixed positions and fixed
+			directional facings, it make sense to assign character unique IDs within
+			the game to differentiate each character. The game should be able to
+			handle and trigger the characters/NPCs the player will interact with,
+			based only on the character's unique ID value.
+			
+			A hard limitation is, there is a max total of 256 unique characters/NPCs
+			in the game. You cannot exceed this number. It is allowed to re-use
+			characters/NPCs in some game scenarios.
+			
+			Script IDs are assigned to characters/NPCs. They can be assigned to common
+			scripts that all characters/NPCs can use or trigger, or they can have their
+			own, unique scripts be assigned. 
+			
+			Reserved data can be used in many ways, such as keeping track of game
+			progression, the number of times the character/NPC has been interacted with,
+			scripts related data storage, and many more. Not all characters/NPCs will
+			use this data.
+			
+		Notes:
+			* Map placements to be determined on a map.
+			* AI controlled movements can be by game or by scripts.
+			* Need to have its own animation.
 			
 -------------------------------
 
@@ -905,7 +993,7 @@ not assume their information to be permanent.
 	5.		@: Dialogue. Makes tne entity interact with
 				another entity.
 
-	Syntax: @ + #: What dialogue should the entity use to
+	Syntax:		@ + #: What dialogue should the entity use to
 				interact. The number indicates the
 				dialogue ID number, specifying what dialogue
 				to use.
@@ -950,8 +1038,9 @@ not assume their information to be permanent.
 		
 	Player [PWD06#01]
 
-	Currently, the Player is represented as "Joe," a 
-	character that designed in the 2nd generation 
+	Currently, the Player is represented as "Generic 
+	Male," a character that is based off of the design
+	of the main protagonist in the 2nd generation 
 	Pokémon games, Gold, Silver, and Crystal versions.
 	
 	The character design and artwork were done by hand,
@@ -959,6 +1048,12 @@ not assume their information to be permanent.
 	
 	The player can access their Inventory via the start
 	menu by pressing START key.
+
+	Player positions are Area Player positions, 
+	multiplied by the Player Tile's Width and Height.
+	There is a unit of measurement conversion between
+	Area and objects extended from the "Character" class
+	object.
 
 -------------------------------
 
@@ -972,10 +1067,10 @@ All of the inputs handled by the game are defined in
 the InputHandler class object. They are defined below:
 
 UP			W				Moves the player upwards.
-DOWN		S				Moves the player downwards.
-LEFT		A				Moves the player to the left.
-RIGHT		D				Moves the player to the right.
-ENTER						START BUTTON
+DOWN			S				Moves the player downwards.
+LEFT			A				Moves the player to the left.
+RIGHT			D				Moves the player to the right.
+ENTER							START BUTTON
 Z			/				The Action Button. (GameBoy equivalent of the A button.)
 X			.				The Cancel Button. (GameBoy equivalent of the B button.)
 
@@ -989,6 +1084,8 @@ X			.				The Cancel Button. (GameBoy equivalent of the B button.)
 
 File Format [PWD08]
 
+The current file format used is version 0002.
+
 The data file format is used to structure saved
 data that the game is able to read/write/modify
 easily. 
@@ -998,6 +1095,43 @@ tree structure hierarchy for storing relevant
 data bits as the game progresses. The file 
 format will expand further as the game includes
 more features that require persistent data.
+
+The new file format is based off of packet
+wrappers, which encapsulates data with the
+following information for each encapsulated
+wrapper
+
+[short SIZE][4 bytes PACKET_NAME][N bytes DATA]
+
+Where, for each tag:
+
+- SIZE: Refers to the total size of the packet, 
+minus the 2 bytes used to store the data size.
+In other words, it's the length of the packet.
+- PACKET_NAME: Refers to the 4-bytes long storing
+text data of the name of the packet.
+- DATA: Refers to the packet data. It can be N
+bytes long, where N is a positive non-zero number.
+
+These packets are called "Data Chunks" or "Chunks"
+in the source code. The file format system was
+updated to be able to easily add new information
+and packet data when necessary.
+
+We can extend a plain old Java object, or called
+"POJO", from the base class called "Chunk". This
+handles reading, writing, and fetching the chunk
+size. These operations must be overridden in the
+newly extended POJOs.
+
+-  -  -  -  -  -  -  -  -  -  -
+
+Legacy File Format [PWD08#01]
+
+This is the old file format, used in version 0001.
+
+Most of the information is similar to the current
+file format version, mentioned above.
 
 The order of the file format tree hierarchy is
 determined by the last date of creation. Anything
@@ -1112,13 +1246,42 @@ $1 |4
 
 -------------------------------
 
-Contributors [PWD10]
+Dialogues [PWD10]
+
+Dialogues are text speech bubbles in the game. Any text displayed inside a white
+rectangle box with a border around it is considered to be a dialogue. Even a
+simple YES/NO text bubble is considered as a dialogue.
+
+There are 2 types of dialogues, a full-width dialogue and a half-width dialogue.
+The full-width dialogue is the default dialogue normally used when a player is
+interacting with an entity. The half-width dialogue is used when the player
+is in the Start Menu, and when the player is reading the item descriptions.
+
+The game renders the dialogue by rendering each character per 8 in-game ticks.
+
+The max size of the full-width dialogue text row is 18 characters long. The max
+size of the half-width dialogue text row is 9 characters long. For both types of
+dialogues, there are 2 rows in total that can be shown on the screen. 
+
+For any dialogue text that exceeds the max size, there will be a dialogue scroll
+arrow telling the player to continue the dialogue interaction. Once the player
+engages in the dialogue interaction to scroll the text, the 2 rows of the dialogue
+text is scrolled up, then the dialogue text continues until the end of the
+dialogue has been reached.
+
+Whenever a dialogue text contains 2 whitespaces, it is considered to be a "line
+break". When displaying a dialogue notifying the player an item has been picked
+up, the line breaks are added after the item's name.
+
+-------------------------------
+
+Contributors [PWD11]
 
 Developer - tom_mai78101
 
 -------------------------------
 
-Terms of License [PWD11]
+Terms of License [PWD12]
 
 This entire project is Apache Licensed. For more
 information, please read the terms and regulations
@@ -1126,6 +1289,6 @@ of the license file in the root of the project folder.
 
 -------------------------------
 
-Credits [PWD12]
+Credits [PWD13]
 
 Author - tom_mai78101

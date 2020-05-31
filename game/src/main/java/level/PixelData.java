@@ -1,12 +1,10 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package level;
 
@@ -49,6 +47,8 @@ public class PixelData {
 	private int groundHeight;
 
 	private boolean triggerFlag;
+	private boolean hidden;
+	private boolean isItem;
 	private int targetMovementScriptID;
 
 	public PixelData(int pixel, int x, int y) {
@@ -62,14 +62,36 @@ public class PixelData {
 		this.biomeBitmapTick = 0;
 		this.triggerFlag = false;
 		this.targetMovementScriptID = 0;
+		this.hidden = false;
+		this.isItem = false;
 
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
 		int green = (pixel >> 8) & 0xFF;
 		int blue = pixel & 0xFF;
 
-		setProperties(alpha, red, green, blue);
-		prepareBitmap(alpha, red, green, blue);
+		this.setProperties(alpha, red, green, blue);
+		this.prepareBitmap(alpha, red, green, blue);
+	}
+
+	public PixelData(int pixel) {
+		this.color = pixel;
+		this.xPosition = -1;
+		this.yPosition = -1;
+		this.targetArea = -1;
+		this.targetSector = -1;
+		this.groundHeight = 0;
+		this.bitmapTick = 0;
+		this.isItem = false;
+		this.hidden = false;
+
+		int alpha = (pixel >> 24) & 0xFF;
+		int red = (pixel >> 16) & 0xFF;
+		int green = (pixel >> 8) & 0xFF;
+		int blue = pixel & 0xFF;
+
+		this.setProperties(alpha, red, green, blue);
+		this.prepareBitmap(alpha, red, green, blue);
 	}
 
 	public void enableTrigger() {
@@ -100,349 +122,359 @@ public class PixelData {
 		return this.isWarpZone;
 	}
 
+	public boolean isItem() {
+		return this.isItem;
+	}
+
+	public void setAsItem(boolean value) {
+		this.isItem = value;
+	}
+
 	/**
 	 * Sets the bitmap tile the pixel data is representing.
 	 * 
 	 * <p>
-	 * When setting the bitmap, first it must set the bitmap to something other than
-	 * null. Since the bitmap variable holds an array, it takes in at least 1 bitmap
-	 * pre-loaded by the Art class. Then, once the bitmap is set, it must break all
-	 * the way outside of the nested switch conditions, otherwise, setting bitmaps
-	 * will overwrite correct data with incorrect data.
+	 * When setting the bitmap, first it must set the bitmap to something other than null. Since the
+	 * bitmap variable holds an array, it takes in at least 1 bitmap pre-loaded by the Art class. Then,
+	 * once the bitmap is set, it must break all the way outside of the nested switch conditions,
+	 * otherwise, setting bitmaps will overwrite correct data with incorrect data.
 	 * 
 	 * <p>
-	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error
-	 * bitmap, which when loaded into the game, the game will not crash, and the
-	 * developers/players can tell where the bitmap loading has gone wrong.
+	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error bitmap, which when loaded
+	 * into the game, the game will not crash, and the developers/players can tell where the bitmap
+	 * loading has gone wrong.
 	 * 
 	 * <p>
-	 * If the bitmap is an animated bitmap, the Art class will load the animated
-	 * bitmap into an array. The next step would be to just pass the array to this
-	 * bitmap.
+	 * If the bitmap is an animated bitmap, the Art class will load the animated bitmap into an array.
+	 * The next step would be to just pass the array to this bitmap.
 	 * 
-	 * @param alpha The alpha value of the pixel data's color.
-	 * @param red   The red value of the pixel data's color.
-	 * @param green The green value of the pixel data's color.
-	 * @param blue  The blue value of the pixel data's color.
+	 * @param alpha
+	 *            The alpha value of the pixel data's color.
+	 * @param red
+	 *            The red value of the pixel data's color.
+	 * @param green
+	 *            The green value of the pixel data's color.
+	 * @param blue
+	 *            The blue value of the pixel data's color.
 	 * @return Nothing.
 	 */
 	public void prepareBitmap(int alpha, int red, int green, int blue) {
 		switch (alpha) {
-		case 0x01: // Path
-			this.bitmap = new BaseBitmap[1];
-			// Tile Type
-			switch (red) {
-			case 0x00: // Grass Path
+			case 0x01: // Path
+				this.bitmap = new BaseBitmap[1];
+				// Tile Type
+				switch (red) {
+					case 0x00: // Grass Path
+						this.bitmap[0] = Art.grass;
+						break;
+					case 0x01: // Mountain Ground Path
+						this.bitmap[0] = Art.mt_ground;
+						break;
+					case 0x02: // Road Path
+						this.bitmap[0] = Art.path;
+						break;
+					case 0x03: // Hardwood Floor (Indoors)
+						this.bitmap[0] = Art.hardwood_indoors;
+						break;
+					case 0x04: // Tatami Floor Type 1 (Indoors)
+						this.bitmap[0] = Art.tatami_1_indoors;
+						break;
+					case 0x05: // Tatami Floor Type 2 (Indoors)
+						this.bitmap[0] = Art.tatami_2_indoors;
+						break;
+					default:
+						break;
+				}
+				switch (green) { // Area Type
+					case 0x00:
+						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap[0] = Art.grass; // Forest
+						break;
+					case 0x01:
+						// TODO: Change this biome bitmap to something that represents the city even
+						// more.
+						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap[0] = Art.path; // City
+					case 0x02:
+						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap[0] = Art.mt_ground; // Mountain
+						break;
+					case 0x03:
+						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap[0] = Art.water[0];
+						// TODO: Add more area type biome bitmaps here to the Path. (Refer to
+						// documentation.)
+					default:
+						break;
+				}
+				break;
+			case 0x02: // Ledge
+			{
+				// TODO: Add biome bitmaps to ledge.
+				this.bitmap = new BaseBitmap[1];
+				switch (red) {
+					case 0x00: // Bottom
+						this.bitmap[0] = Art.ledge_bottom;
+						break;
+					case 0x01: // Bottom left
+						this.bitmap[0] = Art.ledge_bottom_left;
+						break;
+					case 0x02: // Right
+						this.bitmap[0] = Art.ledge_left;
+						break;
+					case 0x03: // Top Left
+						this.bitmap[0] = Art.ledge_top_left;
+						break;
+					case 0x04: // Top
+						this.bitmap[0] = Art.ledge_top;
+						break;
+					case 0x05: // Top Right
+						this.bitmap[0] = Art.ledge_top_right;
+						break;
+					case 0x06: // Left
+						this.bitmap[0] = Art.ledge_right;
+						break;
+					case 0x07: // Bottom Right
+						this.bitmap[0] = Art.ledge_bottom_right;
+						break;
+					// ---------------------------------------------------------
+					case 0x08:
+						this.bitmap[0] = Art.ledge_mt_bottom;
+						break;
+					case 0x09:
+						this.bitmap[0] = Art.ledge_mt_bottom_left;
+						break;
+					case 0x0A:
+						this.bitmap[0] = Art.ledge_mt_left;
+						break;
+					case 0x0B:
+						this.bitmap[0] = Art.ledge_mt_top_left;
+						break;
+					case 0x0C:
+						this.bitmap[0] = Art.ledge_mt_top;
+						break;
+					case 0x0D:
+						this.bitmap[0] = Art.ledge_mt_top_right;
+						break;
+					case 0x0E:
+						this.bitmap[0] = Art.ledge_mt_right;
+						break;
+					case 0x0F:
+						this.bitmap[0] = Art.ledge_mt_bottom_right;
+						break;
+					// ---------------------------------------------------------
+					case 0x10:
+						this.bitmap[0] = Art.ledge_inner_bottom;
+						break;
+					case 0x11:
+						this.bitmap[0] = Art.ledge_inner_bottom_left;
+						break;
+					case 0x12:
+						this.bitmap[0] = Art.ledge_inner_left;
+						break;
+					case 0x13:
+						this.bitmap[0] = Art.ledge_inner_top_left;
+						break;
+					case 0x14:
+						this.bitmap[0] = Art.ledge_inner_top;
+						break;
+					case 0x15:
+						this.bitmap[0] = Art.ledge_inner_top_right;
+						break;
+					case 0x16:
+						this.bitmap[0] = Art.ledge_inner_right;
+						break;
+					case 0x17:
+						this.bitmap[0] = Art.ledge_inner_bottom_right;
+						break;
+					// ---------------------------------------------------------
+					case 0x18:
+						this.bitmap[0] = Art.Ledge_bottom_left_corner;
+						break;
+					case 0x19:
+						this.bitmap[0] = Art.Ledge_bottom_right_corner;
+						break;
+				}
+				break;
+			}
+			case 0x03: // Obstacles
+				this.bitmap = new BaseBitmap[1];
+				switch (red) {
+					case 0x00: // Small Tree
+						this.bitmap[0] = Art.smallTree;
+						break;
+					case 0x01: // Logs
+						this.bitmap[0] = Art.logs;
+						break;
+					case 0x02: // Planks
+						this.bitmap[0] = Art.planks;
+						break;
+					case 0x03: // Scaffolding (Left)
+						this.bitmap[0] = Art.scaffolding_left;
+						break;
+					case 0x04: // Scaffolding (Right)
+						this.bitmap[0] = Art.scaffolding_right;
+						break;
+					case 0x05: // Sign
+						this.bitmap[0] = Art.sign;
+						break;
+					case 0x06: // Workbench Left
+						this.bitmap[0] = Art.workbench_left;
+						break;
+					case 0x07: // Workbench Right
+						this.bitmap[0] = Art.workbench_right;
+						break;
+					case 0x08: // Dead small tree
+						this.bitmap[0] = Art.deadSmallTree;
+						break;
+				}
+				break;
+			case 0x04: // Warp point (Refer to documentation for flaws.)
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.forestEntrance;
+				break;
+			case 0x05: // Area Sector Point (Refer to documentation.)
+				this.bitmap = new BaseBitmap[1];
+				// TODO: Add new bitmaps for connection points to make them blend in with the
+				// surroundings.
+				// TODO: Create more biome bitmaps.
+				// TODO (6/19/2015): 0x05000003 is a water tile in the level editor, but it's
+				// really not a water tile.
 				this.bitmap[0] = Art.grass;
 				break;
-			case 0x01: // Mountain Ground Path
-				this.bitmap[0] = Art.mt_ground;
+			case 0x06: // Stairs
+				this.bitmap = new BaseBitmap[1];
+				switch (red) {
+					case 0x00:
+						this.bitmap[0] = Art.stairs_bottom;
+						break;
+					case 0x01:
+						this.bitmap[0] = Art.stairs_left;
+						break;
+					case 0x02:
+						this.bitmap[0] = Art.stairs_top;
+						break;
+					case 0x03:
+						this.bitmap[0] = Art.stairs_right;
+						break;
+					case 0x04:
+						this.bitmap[0] = Art.stairs_mt_bottom;
+						break;
+					case 0x05:
+						this.bitmap[0] = Art.stairs_mt_left;
+						break;
+					case 0x06:
+						this.bitmap[0] = Art.stairs_mt_top;
+						break;
+					case 0x07:
+						this.bitmap[0] = Art.stairs_mt_right;
+						break;
+				}
 				break;
-			case 0x02: // Road Path
-				this.bitmap[0] = Art.path;
-				break;
-			case 0x03: // Hardwood Floor (Indoors)
-				this.bitmap[0] = Art.hardwood_indoors;
-				break;
-			case 0x04: // Tatami Floor Type 1 (Indoors)
-				this.bitmap[0] = Art.tatami_1_indoors;
-				break;
-			case 0x05: // Tatami Floor Type 2 (Indoors)
-				this.bitmap[0] = Art.tatami_2_indoors;
-				break;
-			default:
-				break;
-			}
-			switch (green) { // Area Type
-			case 0x00:
-				this.biomeBitmap = new BaseBitmap[1];
-				this.biomeBitmap[0] = Art.grass; // Forest
-				break;
-			case 0x01:
-				// TODO: Change this biome bitmap to something that represents the city even
-				// more.
-				this.biomeBitmap = new BaseBitmap[1];
-				this.biomeBitmap[0] = Art.path; // City
-			case 0x02:
-				this.biomeBitmap = new BaseBitmap[1];
-				this.biomeBitmap[0] = Art.mt_ground; // Mountain
-				break;
-			case 0x03:
-				this.biomeBitmap = new BaseBitmap[1];
-				this.biomeBitmap[0] = Art.water[0];
-				// TODO: Add more area type biome bitmaps here to the Path. (Refer to
-				// documentation.)
-			default:
-				break;
-			}
-			break;
-		case 0x02: // Ledge
-		{
-			// TODO: Add biome bitmaps to ledge.
-			this.bitmap = new BaseBitmap[1];
-			switch (red) {
-			case 0x00: // Bottom
-				this.bitmap[0] = Art.ledge_bottom;
-				break;
-			case 0x01: // Bottom left
-				this.bitmap[0] = Art.ledge_bottom_left;
-				break;
-			case 0x02: // Right
-				this.bitmap[0] = Art.ledge_left;
-				break;
-			case 0x03: // Top Left
-				this.bitmap[0] = Art.ledge_top_left;
-				break;
-			case 0x04: // Top
-				this.bitmap[0] = Art.ledge_top;
-				break;
-			case 0x05: // Top Right
-				this.bitmap[0] = Art.ledge_top_right;
-				break;
-			case 0x06: // Left
-				this.bitmap[0] = Art.ledge_right;
-				break;
-			case 0x07: // Bottom Right
-				this.bitmap[0] = Art.ledge_bottom_right;
-				break;
-			// ---------------------------------------------------------
-			case 0x08:
-				this.bitmap[0] = Art.ledge_mt_bottom;
-				break;
-			case 0x09:
-				this.bitmap[0] = Art.ledge_mt_bottom_left;
-				break;
-			case 0x0A:
-				this.bitmap[0] = Art.ledge_mt_left;
-				break;
-			case 0x0B:
-				this.bitmap[0] = Art.ledge_mt_top_left;
-				break;
-			case 0x0C:
-				this.bitmap[0] = Art.ledge_mt_top;
-				break;
-			case 0x0D:
-				this.bitmap[0] = Art.ledge_mt_top_right;
-				break;
-			case 0x0E:
-				this.bitmap[0] = Art.ledge_mt_right;
-				break;
-			case 0x0F:
-				this.bitmap[0] = Art.ledge_mt_bottom_right;
-				break;
-			// ---------------------------------------------------------
-			case 0x10:
-				this.bitmap[0] = Art.ledge_inner_bottom;
-				break;
-			case 0x11:
-				this.bitmap[0] = Art.ledge_inner_bottom_left;
-				break;
-			case 0x12:
-				this.bitmap[0] = Art.ledge_inner_left;
-				break;
-			case 0x13:
-				this.bitmap[0] = Art.ledge_inner_top_left;
-				break;
-			case 0x14:
-				this.bitmap[0] = Art.ledge_inner_top;
-				break;
-			case 0x15:
-				this.bitmap[0] = Art.ledge_inner_top_right;
-				break;
-			case 0x16:
-				this.bitmap[0] = Art.ledge_inner_right;
-				break;
-			case 0x17:
-				this.bitmap[0] = Art.ledge_inner_bottom_right;
-				break;
-			// ---------------------------------------------------------
-			case 0x18:
-				this.bitmap[0] = Art.Ledge_bottom_left_corner;
-				break;
-			case 0x19:
-				this.bitmap[0] = Art.Ledge_bottom_right_corner;
+			case 0x07: { // Water
+				// Always start with the first frame of any animation.
+				// TODO: Add more water tiles with borders.
+				// TODO (6/19/2015): Make the borders a bit more thicker. Possibly the land
+				// border near the edges of the water tiles.
+				switch (red) {
+					case 0x00: // Pure water, no border.
+						this.bitmap = Art.water;
+						break;
+					case 0x01: // Left Border
+						this.bitmap = Art.water_left;
+						break;
+					case 0x02: // Top Left Border
+						this.bitmap = Art.water_top_left;
+						break;
+					case 0x03: // Top Border
+						this.bitmap = Art.water_top;
+						break;
+					case 0x04: // Top Right Border
+						this.bitmap = Art.water_top_right;
+						break;
+					case 0x05: // Right Border
+						this.bitmap = Art.water_right;
+						break;
+				}
 				break;
 			}
-			break;
-		}
-		case 0x03: // Obstacles
-			this.bitmap = new BaseBitmap[1];
-			switch (red) {
-			case 0x00: // Small Tree
-				this.bitmap[0] = Art.smallTree;
+			case 0x08: // House
+				this.bitmap = new BaseBitmap[1];
+				switch (red) { // House related tiles. Way too many to list them orderly.
+					case 0x00: // Bottom wall
+						this.bitmap[0] = Art.house_bottom;
+						break;
+					case 0x01: // Bottom left wall
+						this.bitmap[0] = Art.house_bottom_left;
+						break;
+					case 0x02: // Bottom right wall
+						this.bitmap[0] = Art.house_bottom_right;
+						break;
+					case 0x03: // Center wall
+						this.bitmap[0] = Art.house_center;
+						break;
+					case 0x04: // Center wall with windows in center
+						this.bitmap[0] = Art.house_center_windows_center;
+						break;
+					case 0x05: // Center wall with windows on left
+						this.bitmap[0] = Art.house_center_windows_left;
+						break;
+					case 0x06: // Center wall with windows on right
+						this.bitmap[0] = Art.house_center_windows_right;
+						break;
+					case 0x07: // Left wall
+						this.bitmap[0] = Art.house_left;
+						break;
+					case 0x08: // Left wall with windows on right
+						this.bitmap[0] = Art.house_left_windows_right;
+						break;
+					case 0x09: // Right wall
+						this.bitmap[0] = Art.house_right;
+						break;
+					case 0x0A: // Right wall with windows on left
+						this.bitmap[0] = Art.house_right_windows_left;
+						break;
+					case 0x0B: // Single Roof left
+						this.bitmap[0] = Art.changeColors(Art.house_roof_left, WorldConstants.convertToAreaColor(green));
+						// this.bitmap[0] = Art.house_roof_left;
+						break;
+					case 0x0C: // Single Roof middle
+						this.bitmap[0] = Art.changeColors(Art.house_roof_middle, WorldConstants.convertToAreaColor(green));
+						break;
+					case 0x0D: // Single Roof right
+						this.bitmap[0] = Art.changeColors(Art.house_roof_right, WorldConstants.convertToAreaColor(green));
+						break;
+				}
 				break;
-			case 0x01: // Logs
-				this.bitmap[0] = Art.logs;
+			case 0x09: // House Door
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.house_door;
 				break;
-			case 0x02: // Planks
-				this.bitmap[0] = Art.planks;
+			case 0x0A: // Item
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.item;
 				break;
-			case 0x03: // Scaffolding (Left)
-				this.bitmap[0] = Art.scaffolding_left;
+			case 0x0B: // Carpet Floor (Indoors)
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.carpet_indoors;
+				this.biomeBitmap = Art.exit_arrow;
 				break;
-			case 0x04: // Scaffolding (Right)
-				this.bitmap[0] = Art.scaffolding_right;
+			case 0x0C: // Carpet Floors (Outdoors)
+				this.bitmap = new BaseBitmap[1];
+				this.bitmap[0] = Art.carpet_outdoors;
+				this.biomeBitmap = Art.exit_arrow;
 				break;
-			case 0x05: // Sign
-				this.bitmap[0] = Art.sign;
+			case 0x0D: // Starting position when game has initialized;
+				this.bitmap = new BaseBitmap[1];
+				switch (red) {
+					case 0x01:
+					default:
+						this.bitmap[0] = Art.grass;
+						break;
+				}
 				break;
-			case 0x06: // Workbench Left
-				this.bitmap[0] = Art.workbench_left;
+			default: // Any other type of tiles.
 				break;
-			case 0x07: // Workbench Right
-				this.bitmap[0] = Art.workbench_right;
-				break;
-			case 0x08: // Dead small tree
-				this.bitmap[0] = Art.deadSmallTree;
-				break;
-			}
-			break;
-		case 0x04: // Warp point (Refer to documentation for flaws.)
-			this.bitmap = new BaseBitmap[1];
-			this.bitmap[0] = Art.forestEntrance;
-			break;
-		case 0x05: // Area Sector Point (Refer to documentation.)
-			this.bitmap = new BaseBitmap[1];
-			// TODO: Add new bitmaps for connection points to make them blend in with the
-			// surroundings.
-			// TODO: Create more biome bitmaps.
-			// TODO (6/19/2015): 0x05000003 is a water tile in the level editor, but it's
-			// really not a water tile.
-			this.bitmap[0] = Art.grass;
-			break;
-		case 0x06: // Stairs
-			this.bitmap = new BaseBitmap[1];
-			switch (red) {
-			case 0x00:
-				this.bitmap[0] = Art.stairs_bottom;
-				break;
-			case 0x01:
-				this.bitmap[0] = Art.stairs_left;
-				break;
-			case 0x02:
-				this.bitmap[0] = Art.stairs_top;
-				break;
-			case 0x03:
-				this.bitmap[0] = Art.stairs_right;
-				break;
-			case 0x04:
-				this.bitmap[0] = Art.stairs_mt_bottom;
-				break;
-			case 0x05:
-				this.bitmap[0] = Art.stairs_mt_left;
-				break;
-			case 0x06:
-				this.bitmap[0] = Art.stairs_mt_top;
-				break;
-			case 0x07:
-				this.bitmap[0] = Art.stairs_mt_right;
-				break;
-			}
-			break;
-		case 0x07: { // Water
-			// Always start with the first frame of any animation.
-			// TODO: Add more water tiles with borders.
-			// TODO (6/19/2015): Make the borders a bit more thicker. Possibly the land
-			// border near the edges of the water tiles.
-			switch (red) {
-			case 0x00: // Pure water, no border.
-				this.bitmap = Art.water;
-				break;
-			case 0x01: // Left Border
-				this.bitmap = Art.water_left;
-				break;
-			case 0x02: // Top Left Border
-				this.bitmap = Art.water_top_left;
-				break;
-			case 0x03: // Top Border
-				this.bitmap = Art.water_top;
-				break;
-			case 0x04: // Top Right Border
-				this.bitmap = Art.water_top_right;
-				break;
-			case 0x05: // Right Border
-				this.bitmap = Art.water_right;
-				break;
-			}
-			break;
-		}
-		case 0x08: // House
-			this.bitmap = new BaseBitmap[1];
-			switch (red) { // House related tiles. Way too many to list them orderly.
-			case 0x00: // Bottom wall
-				this.bitmap[0] = Art.house_bottom;
-				break;
-			case 0x01: // Bottom left wall
-				this.bitmap[0] = Art.house_bottom_left;
-				break;
-			case 0x02: // Bottom right wall
-				this.bitmap[0] = Art.house_bottom_right;
-				break;
-			case 0x03: // Center wall
-				this.bitmap[0] = Art.house_center;
-				break;
-			case 0x04: // Center wall with windows in center
-				this.bitmap[0] = Art.house_center_windows_center;
-				break;
-			case 0x05: // Center wall with windows on left
-				this.bitmap[0] = Art.house_center_windows_left;
-				break;
-			case 0x06: // Center wall with windows on right
-				this.bitmap[0] = Art.house_center_windows_right;
-				break;
-			case 0x07: // Left wall
-				this.bitmap[0] = Art.house_left;
-				break;
-			case 0x08: // Left wall with windows on right
-				this.bitmap[0] = Art.house_left_windows_right;
-				break;
-			case 0x09: // Right wall
-				this.bitmap[0] = Art.house_right;
-				break;
-			case 0x0A: // Right wall with windows on left
-				this.bitmap[0] = Art.house_right_windows_left;
-				break;
-			case 0x0B: // Single Roof left
-				this.bitmap[0] = Art.changeColors(Art.house_roof_left, WorldConstants.convertToAreaColor(green));
-				// this.bitmap[0] = Art.house_roof_left;
-				break;
-			case 0x0C: // Single Roof middle
-				this.bitmap[0] = Art.changeColors(Art.house_roof_middle, WorldConstants.convertToAreaColor(green));
-				break;
-			case 0x0D: // Single Roof right
-				this.bitmap[0] = Art.changeColors(Art.house_roof_right, WorldConstants.convertToAreaColor(green));
-				break;
-			}
-			break;
-		case 0x09: // House Door
-			this.bitmap = new BaseBitmap[1];
-			this.bitmap[0] = Art.house_door;
-			break;
-		case 0x0A: // Item
-			this.bitmap = new BaseBitmap[1];
-			this.bitmap[0] = Art.item;
-			break;
-		case 0x0B: // Carpet Floor (Indoors)
-			this.bitmap = new BaseBitmap[1];
-			this.bitmap[0] = Art.carpet_indoors;
-			this.biomeBitmap = Art.exit_arrow;
-			break;
-		case 0x0C: // Carpet Floors (Outdoors)
-			this.bitmap = new BaseBitmap[1];
-			this.bitmap[0] = Art.carpet_outdoors;
-			this.biomeBitmap = Art.exit_arrow;
-			break;
-		case 0x0D: // Starting position when game has initialized;
-			this.bitmap = new BaseBitmap[1];
-			switch (red) {
-			case 0x01:
-			default:
-				this.bitmap[0] = Art.grass;
-				break;
-			}
-			break;
-		default: // Any other type of tiles.
-			break;
 		}
 		if (this.bitmap == null) {
 			this.bitmap = new BaseBitmap[1];
@@ -471,20 +503,23 @@ public class PixelData {
 	}
 
 	/**
-	 * Sets the properties of a given pixel data. This is where the game gets the
-	 * area's information on what the player should do and don't.
+	 * Sets the properties of a given pixel data. This is where the game gets the area's information on
+	 * what the player should do and don't.
 	 * 
 	 * <p>
 	 * Some of the features are currently unused. Especially collision detection.
 	 * 
 	 * <p>
-	 * Only the ones that set target areas, warp zone areas, etc. are the ones being
-	 * used.
+	 * Only the ones that set target areas, warp zone areas, etc. are the ones being used.
 	 * 
-	 * @param alpha The alpha value of the pixel data's color.
-	 * @param red   The red value of the pixel data's color.
-	 * @param green The green value of the pixel data's color.
-	 * @param blue  The blue value of the pixel data's color.
+	 * @param alpha
+	 *            The alpha value of the pixel data's color.
+	 * @param red
+	 *            The red value of the pixel data's color.
+	 * @param green
+	 *            The green value of the pixel data's color.
+	 * @param blue
+	 *            The blue value of the pixel data's color.
 	 * @return Nothing.
 	 */
 	public void setProperties(int alpha, int red, int green, int blue) {
@@ -492,68 +527,68 @@ public class PixelData {
 		this.isWarpZone = false;
 		this.groundHeight = 0;
 		switch (alpha) {
-		case 0x01: // Grass
-			this.groundHeight = blue;
-			break;
-		case 0x02: // Ledges
-			break;
-		case 0x03: // Obstacles
-			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-			break;
-		case 0x04: // Warp Point
-			if (red < 0x01) {
-				// This is error checking prevention.
-				red = 0x01;
-			}
-			this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
-			this.isWarpZone = true;
-			break;
-		case 0x05: // ACP (Refer to documentation.)
-			if (red < 0x01) {
-				// This is error checking prevention.
-				red = 0x01;
-			}
-			this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
-			this.targetSector = green;
-			this.isWarpZone = false;
-			// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
-			// this.facingsBlocked[3] = true;
-			break;
-		case 0x06: // Stairs
-			break;
-		case 0x07: // Water
-			// TODO: Needs to do something with facingsBlocked[] array. It must not block
-			// the player, however, without special boolean value, it will always block
-			// player from advancing.
-			// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
-			// this.facingsBlocked[3] = true;
-		case 0x08: // House
-			// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
-			// this.facingsBlocked[3] = false;
-			break;
-		case 0x09: // House Door
-			if (red < 0x01) {
-				// This is error checking prevention.
-				red = 0x01;
-			}
-			this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
-			this.isWarpZone = true;
-			break;
-		case 0x0A: // Item
-			break;
-		case 0x0B: // Carpets
-		case 0x0C: // Carpets
-			if (red < 0x01) {
-				// This is error checking prevention.
-				red = 0x01;
-			}
-			this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
-			break;
-		case 0x0D: // Default Starting Position
-			break;
-		default:
-			this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
-			break;
+			case 0x01: // Grass
+				this.groundHeight = blue;
+				break;
+			case 0x02: // Ledges
+				break;
+			case 0x03: // Obstacles
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				break;
+			case 0x04: // Warp Point
+				if (red < 0x01) {
+					// This is error checking prevention.
+					red = 0x01;
+				}
+				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
+				this.isWarpZone = true;
+				break;
+			case 0x05: // ACP (Refer to documentation.)
+				if (red < 0x01) {
+					// This is error checking prevention.
+					red = 0x01;
+				}
+				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
+				this.targetSector = green;
+				this.isWarpZone = false;
+				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
+				// this.facingsBlocked[3] = true;
+				break;
+			case 0x06: // Stairs
+				break;
+			case 0x07: // Water
+				// TODO: Needs to do something with facingsBlocked[] array. It must not block
+				// the player, however, without special boolean value, it will always block
+				// player from advancing.
+				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
+				// this.facingsBlocked[3] = true;
+			case 0x08: // House
+				// this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] =
+				// this.facingsBlocked[3] = false;
+				break;
+			case 0x09: // House Door
+				if (red < 0x01) {
+					// This is error checking prevention.
+					red = 0x01;
+				}
+				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
+				this.isWarpZone = true;
+				break;
+			case 0x0A: // Item
+				break;
+			case 0x0B: // Carpets
+			case 0x0C: // Carpets
+				if (red < 0x01) {
+					// This is error checking prevention.
+					red = 0x01;
+				}
+				this.targetArea = WorldConstants.isModsEnabled.booleanValue() ? red + 1001 : red;
+				break;
+			case 0x0D: // Default Starting Position
+				break;
+			default:
+				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
+				break;
 		}
 	}
 
@@ -565,8 +600,20 @@ public class PixelData {
 	// return parentArea;
 	// }
 
+	public void hide() {
+		this.hidden = true;
+	}
+
+	public void reveal() {
+		this.hidden = false;
+	}
+
+	public boolean isHidden() {
+		return this.hidden;
+	}
+
 	public int getTargetAreaID() {
-		return targetArea;
+		return this.targetArea;
 	}
 
 	public boolean[] isWalkThroughable() {
@@ -577,7 +624,7 @@ public class PixelData {
 		return this.targetSector;
 	}
 
-	public void tick() {
+	public void renderTick() {
 		this.bitmapTick++;
 		if (this.bitmapTick >= this.bitmap.length)
 			this.bitmapTick = 0;
@@ -596,5 +643,61 @@ public class PixelData {
 
 	public BaseBitmap getBiomeBitmap() {
 		return this.biomeBitmap[this.biomeBitmapTick];
+	}
+
+	public int getAlpha() {
+		return (this.color >> 24) & 0xFF;
+	}
+
+	public int getRed() {
+		return (this.color >> 16) & 0xFF;
+	}
+
+	public int getGreen() {
+		return (this.color >> 8) & 0xFF;
+	}
+
+	public int getBlue() {
+		return this.color & 0xFF;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof PixelData))
+			return false;
+		PixelData objData = (PixelData) obj;
+		return this.color == objData.color;
+	}
+
+	// =================================================
+	// Static helper methods
+	// =================================================
+
+	public static int create(byte alpha, byte red, byte green, byte blue) {
+		return (alpha << 24) | (red << 16) | (green << 8) | blue;
+	}
+
+	public static byte getAlphaData(int pixelColor) {
+		return (byte) ((pixelColor >> 24) & 0xFF);
+	}
+
+	public static byte getRedData(int pixelColor) {
+		return (byte) ((pixelColor >> 16) & 0xFF);
+	}
+
+	public static byte getGreenData(int pixelColor) {
+		return (byte) ((pixelColor >> 8) & 0xFF);
+	}
+
+	public static byte getBlueData(int pixelColor) {
+		return (byte) (pixelColor & 0xFF);
+	}
+
+	public static byte getByteData(int pixelColor, int bitShift) {
+		return (byte) ((pixelColor >> bitShift) & 0xFF);
+	}
+
+	public static PixelData make(int pixelColor) {
+		return new PixelData(pixelColor, -1, -1);
 	}
 }

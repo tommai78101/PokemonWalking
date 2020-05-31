@@ -62,7 +62,6 @@ public class ScriptEditor extends JFrame {
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent event) {
-
 				// TODO: 2014-6-26: Add the ability to save temp script data on the fly. Closing
 				// included.
 
@@ -100,35 +99,50 @@ public class ScriptEditor extends JFrame {
 		if (!file.exists()) {
 			// There are many different ways you can do to write data to files. This is one
 			// of them.
-			String[] tutorialLines = new String[] { "/ Automation", "/",
-					"/ Entities that can walk, or run, must be required to have movements for the game",
-					"/ to feel lively.", "/", "/ More commands to come.", " ", "/ _: Whitespaces.",
-					"/ @: Trigger name.", "/ ^: [Direction, Steps]. Can be chained for delaying scripted movements.",
-					"/ $: Start of script. Always appear at beginning of script.",
-					"/ %: Script delimiter. Always appear at end of script.", "/ #: Speech Dialogue.",
-					"/ /: Comments. Gets ignored.", "/ ?: Question Dialogue.", "/ +: Affirmative dialogue.",
-					"/ -: Negative dialogue", "/ [: Affirmative Action", "/ ]: Negative Action",
-					"/ ;: Repeat Flag. If contains ';', it means it's enabled by default.", " ",
-					"/ DO NOT CHANGE/REMOVE THIS TRIGGER SCRIPT. THIS IS RESERVED ONLY. FOLLOW THIS FORMAT.", "$0",
-					"@Eraser", "%" };
+			// @formatter:off
+			String[] tutorialLines = new String[] {
+				"/ This is an automated content generation.", 
+				" ",
+				"/ Entities that can walk, or run, must be required to have movements for the game",
+				"/ to feel lively.", 
+				" ",
+				"/ You can either use the corresponding symbols or tag names when adding new scripts.",
+				" ",
+				"/ More commands will be added.", 
+				" ", 
+				"/ /: Comments. Gets ignored.",
+				"/ _: Whitespaces.",
+				"/ @: Trigger name.",
+				" ",
+				"/ Tag names are wrapped inside < > angle brackets. Similar tags are comma-separated.",
+				" ",
+				"/ ^ <PathData>: [Direction, Steps]. Can be chained for delaying scripted movements.",
+				"/ $ <BeginScript>: Start of script. Always appear at beginning of script.",
+				"/ % <EndScript>: Script delimiter. Always appear at end of script.", 
+				"/ # <Speech>: Speech Dialogue.",
+				"/ ? <Question>: Question Dialogue.", 
+				"/ + <Affirm>: Affirmative dialogue.",
+				"/ - <Reject>: Negative dialogue", 
+				"/ [ <Confirm>: Affirmative Action", 
+				"/ ] <Deny>: Negative Action",
+				"/ ; <Repeat, Repeatable>: Repeat Flag. If contains ';', it means it's enabled by default.", 
+				" ",
+				"/ DO NOT CHANGE/REMOVE THIS TRIGGER SCRIPT. THIS IS RESERVED ONLY. FOLLOW THIS FORMAT.", 
+				"$0",
+				"@Eraser", 
+				"%"
+			};
+			// @formatter:on
 
-			BufferedWriter writer = null;
-			try {
-				writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("readme.txt"), "utf-8"));
+			try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("readme.txt"), "utf-8"))){
 				for (int i = 0; i < tutorialLines.length; i++) {
 					writer.write(tutorialLines[i]);
 					writer.newLine();
 				}
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				JOptionPane.showMessageDialog(null, e.getMessage());
 				e.printStackTrace();
-			} finally {
-				try {
-					writer.close();
-				} catch (IOException e) {
-					JOptionPane.showMessageDialog(null, e.getMessage());
-					e.printStackTrace();
-				}
 			}
 		}
 	}
@@ -178,14 +192,14 @@ public class ScriptEditor extends JFrame {
 	 * </p>
 	 * 
 	 * <p>
-	 * This method may require double-checking in the codes, just to be very sure
-	 * that it is absolutely working as intended. Reason for this is that this
-	 * method is used as a guideline for loading custom scripts into the game
-	 * itself.
+	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
+	 * working as intended. Reason for this is that this method is used as a guideline for loading
+	 * custom scripts into the game itself.
 	 * </p>
 	 * 
-	 * @param script - Takes in a SCRIPT file object, which is the scripting file
-	 *               the game and the script editor uses.
+	 * @param script
+	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
+	 *            editor uses.
 	 * @return Nothing.
 	 */
 	public void load(File script) {
@@ -203,7 +217,7 @@ public class ScriptEditor extends JFrame {
 
 			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
 			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
-					.getModel();
+				.getModel();
 			editorTriggerComboModel.removeAllElements();
 
 			Trigger trigger = new Trigger();
@@ -222,32 +236,42 @@ public class ScriptEditor extends JFrame {
 					tokens = line.split("\\$");
 					trigger = new Trigger();
 					trigger.setTriggerID(Short.valueOf(tokens[1]));
-				} else if (line.startsWith("@")) {
+				}
+				else if (line.startsWith("@")) {
 					tokens = line.split("@");
 					trigger.setName(tokens[1]);
-				} else if (line.startsWith("%")) {
+				}
+				else if (line.startsWith("%")) {
 					trigger.setScript(builder.toString());
 					scriptTriggerListModel.addElement(trigger);
 					editorTriggerComboModel.addElement(trigger);
 					builder.setLength(0);
-				} else if (line.startsWith("#")) {
+				}
+				else if (line.startsWith("#")) {
 					// Dialogue
-				} else if (line.startsWith("?")) {
+				}
+				else if (line.startsWith("?")) {
 					// Question Mark
-				} else if (line.startsWith("+")) {
+				}
+				else if (line.startsWith("+")) {
 					// Affirmative Answer
-				} else if (line.startsWith("-")) {
+				}
+				else if (line.startsWith("-")) {
 					// Negative Answer
-				} else {
+				}
+				else {
 					builder.append(line).append("\n");
 				}
 			}
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			try {
 				reader.close();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
@@ -305,18 +329,22 @@ public class ScriptEditor extends JFrame {
 					writer.newLine();
 					writer.newLine();
 					writer.newLine();
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
-		} finally {
+		}
+		finally {
 			try {
 				writer.flush();
 				writer.close();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				e.printStackTrace();
 			}
 		}

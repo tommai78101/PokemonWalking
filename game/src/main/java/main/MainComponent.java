@@ -1,16 +1,13 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package main;
 
-import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,29 +25,33 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.WindowConstants;
 
-import screen.BaseScreen;
+import screen.Scene;
+import utility.Debug;
 
 public class MainComponent extends Canvas implements Runnable {
 
+	// DEBUG: Useful for reducing the number of times to swap between the game application window and
+	// Eclipse.
+	private static final boolean DebugMode = false;
+
 	private static final long serialVersionUID = 1L;
-	public static int GAME_WIDTH = 160;
-	public static String GAME_TITLE = "Pokémon Walking Algorithm (Hobby) by tom_mai78101";
-	public static int GAME_HEIGHT = 144;
-	public static int GAME_SCALE = 3;
+
+	public static final String GAME_TITLE = "Pokémon Walking Algorithm (Hobby) by tom_mai78101";
+	public static final int GAME_WIDTH = 160;
+	public static final int GAME_HEIGHT = 144;
+	public static final int GAME_SCALE = 3;
+
 	public static int COMPONENT_WIDTH;
 	public static int COMPONENT_HEIGHT;
 
 	// -----------------------
-	private final BaseScreen screen;
+	private final Scene scene;
 	private static Game game;
 	private JFrame frame;
 	// -----------------------
 
-	private static final Keys keys = new Keys();
-	// Wrong input handler. Requires a rewrite.
-	// private InputHandler inputHandler;
 	private InputHandler inputHandler;
 
 	// -----------------------
@@ -67,17 +68,17 @@ public class MainComponent extends Canvas implements Runnable {
 	 * 
 	 */
 	public MainComponent(JFrame frame) {
-		running = false;
-		screen = new BaseScreen(GAME_WIDTH, GAME_HEIGHT);
-		screen.loadResources();
+		this.running = false;
+		this.scene = new Scene(MainComponent.GAME_WIDTH, MainComponent.GAME_HEIGHT);
+		this.scene.loadResources();
 		this.frame = frame;
 	}
 
 	/**
 	 * Intializes the game and loads all required assets.
 	 * 
-	 * This method can only be run once throughout the entire application life
-	 * cycle. Otherwise, there will be errors and unexpected glitches.
+	 * This method can only be run once throughout the entire application life cycle. Otherwise, there
+	 * will be errors and unexpected glitches.
 	 * 
 	 * @return Nothing.
 	 */
@@ -88,13 +89,14 @@ public class MainComponent extends Canvas implements Runnable {
 		MainComponent.COMPONENT_HEIGHT = this.getHeight();
 		MainComponent.COMPONENT_WIDTH = this.getWidth();
 
-		// Input Handling
-		inputHandler = new InputHandler(keys);
-		this.addKeyListener(inputHandler);
-
 		// Game loading
 		// We pass the BaseScreen variable as a parameter, acting as an output.
-		game = new Game(this, keys);
+		MainComponent.game = new Game(this);
+
+		// Input Handling
+		this.inputHandler = new InputHandler(Game.keys);
+		this.addKeyListener(this.inputHandler);
+
 		// world = new TestWorld(Art.testArea);
 
 		// this.world.addEntity(player);
@@ -104,13 +106,13 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Starts the game execution.
 	 * 
-	 * After MainComponent object has been loaded, this method is used to initiate
-	 * game initialization and execution of the entire game.
+	 * After MainComponent object has been loaded, this method is used to initiate game initialization
+	 * and execution of the entire game.
 	 * 
 	 * @return Nothing.
 	 */
 	public void start() {
-		running = true;
+		this.running = true;
 		Thread thread = new Thread(this);
 		thread.setName("Game Loop Thread");
 		thread.start();
@@ -124,7 +126,7 @@ public class MainComponent extends Canvas implements Runnable {
 	 * @return Nothing.
 	 */
 	public void stop() {
-		running = false;
+		this.running = false;
 	}
 
 	@Override
@@ -137,13 +139,14 @@ public class MainComponent extends Canvas implements Runnable {
 		// boolean shouldRender = false;
 		final double nsPerTick = 1000000000.0 / 30.0;
 		try {
-			init();
-		} catch (Exception e) {
+			this.init();
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			return;
 		}
 
-		while (running) {
+		while (this.running) {
 			// For debugging, this is disabled.
 			// shouldRender = false;
 			long now = System.nanoTime();
@@ -169,8 +172,8 @@ public class MainComponent extends Canvas implements Runnable {
 
 			for (int i = 0; i < toTick; i++) {
 				tick--;
-				tick();
-				render();
+				this.tick();
+				this.render();
 				frames++;
 				// For debugging, this is disabled.
 				// shouldRender = true;
@@ -180,14 +183,15 @@ public class MainComponent extends Canvas implements Runnable {
 
 			try {
 				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				System.out.println("Something is wrong... No response.");
+			}
+			catch (InterruptedException e) {
+				Debug.error("Something is wrong... No response.");
 				this.requestFocus();
 			}
 
 			if (System.currentTimeMillis() - lastTimer > 1000) {
 				lastTimer += 1000;
-				MainComponent.this.frame.setTitle(GAME_TITLE + " - FPS: " + Integer.toString(frames));
+				MainComponent.this.frame.setTitle(MainComponent.GAME_TITLE + " - FPS: " + Integer.toString(frames));
 				frames = 0;
 			}
 		}
@@ -197,25 +201,23 @@ public class MainComponent extends Canvas implements Runnable {
 	/**
 	 * Updates the game.
 	 * 
-	 * This method is synchronized for no reason other than to avoid the main thread
-	 * from fighting from the Game Thread. It is possible that this is unnecessary.
-	 * Please provide any feedback about this.
+	 * This method is synchronized for no reason other than to avoid the main thread from fighting from
+	 * the Game Thread. It is possible that this is unnecessary. Please provide any feedback about this.
 	 * 
 	 * @return Nothing.
 	 */
 	public synchronized void tick() {
 		// keys.tick();
 		// world.tick();
-		game.tick();
+		MainComponent.game.tick();
 	}
 
 	/**
 	 * Renders the game to the screen.
 	 * 
-	 * The game uses software renderer, since it is modifying the BufferedImage
-	 * acting as a back buffer. This method is synchronized for no reason other than
-	 * to avoid the main thread from fighting from the Game Thread. It is possible
-	 * that this is unnecessary. Please provide any feedback about this.
+	 * The game uses software renderer, since it is modifying the BufferedImage acting as a back buffer.
+	 * This method is synchronized for no reason other than to avoid the main thread from fighting from
+	 * the Game Thread. It is possible that this is unnecessary. Please provide any feedback about this.
 	 * 
 	 * @return Nothing.
 	 */
@@ -243,8 +245,8 @@ public class MainComponent extends Canvas implements Runnable {
 		// }
 
 		// game.setScrollOffset(GAME_WIDTH / 2, (GAME_HEIGHT + Tile.HEIGHT) / 2);
-		game.setCameraRelativeToArea(GAME_WIDTH / 2, GAME_HEIGHT / 2);
-		game.render(g);
+		MainComponent.game.setCameraRelativeToArea(MainComponent.GAME_WIDTH / 2, MainComponent.GAME_HEIGHT / 2);
+		MainComponent.game.render(g);
 
 		// Key input debugging only.
 		// debugKeys(g, 0, 30);
@@ -274,25 +276,26 @@ public class MainComponent extends Canvas implements Runnable {
 	// Private methods:
 
 	/**
-	 * Creates a BufferedImage that is compatible with the graphics card the player
-	 * is currently using.
+	 * Creates a BufferedImage that is compatible with the graphics card the player is currently using.
 	 * 
-	 * The developer is unsure of its benefits. Please provide feedback if you have
-	 * any comments about this.
+	 * The developer is unsure of its benefits. Please provide feedback if you have any comments about
+	 * this.
 	 * 
-	 * @param BufferedImage Takes a BufferedImage that is to make it compatible with
-	 *                      the graphics card built in the computer the game is
-	 *                      running on.
-	 * @return BufferedImage The BufferedImage used for the Graphics object to blit
-	 *         to the screen.
+	 * @param BufferedImage
+	 *            Takes a BufferedImage that is to make it compatible with the graphics card built in
+	 *            the computer the game is running on.
+	 * @return BufferedImage The BufferedImage used for the Graphics object to blit to the screen.
 	 */
 	public static final BufferedImage createCompatibleBufferedImage(BufferedImage image) {
-		GraphicsConfiguration gfx_config = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
-				.getDefaultConfiguration();
+		GraphicsConfiguration gfx_config = GraphicsEnvironment.getLocalGraphicsEnvironment()
+			.getDefaultScreenDevice()
+			.getDefaultConfiguration();
 		if (image.getColorModel().equals(gfx_config.getColorModel()))
 			return image;
-		BufferedImage newImage = gfx_config.createCompatibleImage(image.getWidth(), image.getHeight(),
-				image.getTransparency());
+		BufferedImage newImage = gfx_config.createCompatibleImage(
+			image.getWidth(), image.getHeight(),
+			image.getTransparency()
+		);
 		Graphics2D graphics = (Graphics2D) newImage.getGraphics();
 		graphics.drawImage(image, 0, 0, null);
 		graphics.dispose();
@@ -305,51 +308,46 @@ public class MainComponent extends Canvas implements Runnable {
 		int h = before.getHeight();
 		BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 		AffineTransform at = new AffineTransform();
-		at.scale(GAME_SCALE, GAME_SCALE);
+		at.scale(MainComponent.GAME_SCALE, MainComponent.GAME_SCALE);
 		AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BICUBIC);
 		after = scaleOp.filter(before, after);
 		return after;
 	}
 
-	public BaseScreen getBaseScreen() {
-		return this.screen;
-	}
-
-	// ---------------------------------
-	// Other methods
-
-	public static final Keys getMainInput() {
-		return keys;
-	}
-
-	public static final Game getGame() {
-		return game;
+	public Scene getScene() {
+		return this.scene;
 	}
 
 	// ---------------------------------
 	// Main execution method
 
 	public static void main(String[] args) {
-		System.out.println("Game is now loading, it will take a while.");
-		JFrame frame = new JFrame(GAME_TITLE);
-		JPanel panel = new JPanel(new BorderLayout());
-		MainComponent game = new MainComponent(frame);
-		panel.add(game);
-		frame.setContentPane(panel);
-		frame.pack();
-		frame.setResizable(false);
-		Insets inset = frame.getInsets();
-		frame.setSize(new Dimension(inset.left + inset.right + GAME_WIDTH * GAME_SCALE,
-				inset.top + inset.bottom + GAME_HEIGHT * GAME_SCALE));
+		Debug.log("Game is now loading, it will take a while.");
+
+		JFrame frame = new JFrame(MainComponent.GAME_TITLE);
+
+		MainComponent component = new MainComponent(frame);
+		frame.getContentPane().add(component);
 		frame.setLocationRelativeTo(null);
-		// DEBUG: Uncomment this line if you feel debugging and switching window focus
-		// from IDE to game and back is nauseous.
-		// frame.setAlwaysOnTop(true);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.addWindowListener(game.getWindowListener());
+		frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		frame.addWindowListener(component.getWindowListener());
+		frame.setResizable(false);
+		frame.setAlwaysOnTop(MainComponent.DebugMode);
+		frame.pack();
+
+		// Setting the frame size must come after pack() is called.
+		Insets inset = frame.getInsets();
+		frame.setSize(
+			new Dimension(
+				inset.left + inset.right + MainComponent.GAME_WIDTH * MainComponent.GAME_SCALE,
+				inset.top + inset.bottom + MainComponent.GAME_HEIGHT * MainComponent.GAME_SCALE
+			)
+		);
+
+		// Set visibility must come after pack() and setSize() are called.
 		frame.setVisible(true);
 
-		System.out.println("Game is now starting.");
-		game.start();
+		Debug.log("Game is now starting.");
+		component.start();
 	}
 }

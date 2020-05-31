@@ -1,27 +1,23 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package level;
-
-import item.ItemText;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import dialogue.Dialogue;
 import resources.Art;
 import resources.Mod;
 import screen.BaseBitmap;
 import script.Script;
-import abstracts.Item;
-import dialogue.NewDialogue;
+import utility.DialogueBuilder;
 
 public class WorldConstants {
 	private WorldConstants() {
@@ -39,6 +35,11 @@ public class WorldConstants {
 	public static final int ITEM_3_OPTIONS = 2;
 	public static final int ITEM_BICYCLE = 3;
 
+	// Entity Types
+	public static final int ENTITY_TYPE_OBSTACLE = 0x03;
+	public static final int ENTITY_TYPE_CHARACTER = 0x0E;
+	public static final int ENTITY_TYPE_ITEM = 0x0A;
+
 	// Biome Colors
 	public static final int GRASS_GREEN = 0xFFA4E767;
 	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
@@ -51,17 +52,27 @@ public class WorldConstants {
 	public static final int OVERWORLD = 0x0A000001;
 
 	// Dialogues
-	public static ArrayList<Map.Entry<NewDialogue, Integer>> signTexts = NewDialogue
-			.loadDialogues("dialogue/dialogue.txt");
+	public static List<Map.Entry<Dialogue, Integer>> signTexts = DialogueBuilder.loadDialogues("art/dialogue/dialogue.txt");
 
+	// NOTE(Thompson): We're going to start building items instead of loading items from script files.
 	// Items
-	// public static HashMap<Integer, ItemText> itemms =
-	// Item.loadItemResources("item/items.txt");
-	public static ArrayList<Map.Entry<ItemText, Item>> items = Item.loadItems("item/items.txt");
+	// public static HashMap<Integer, ItemText> itemms = Item.loadItemResources("item/items.txt");
+	// public static List<Map.Entry<ItemText, Item>> items =
+	// ItemBuilder.loadItems("art/item/items.txt");
 
 	// Areas
-	public static List<Area> areas = new ArrayList<Area>(0);
-	public static List<Area> moddedAreas = new ArrayList<Area>(0);
+	public static List<Area> areas = new ArrayList<>(0);
+	public static List<Area> moddedAreas = new ArrayList<>(0);
+
+	// Main Menu Item Names
+	public static final String MENU_ITEM_NAME_EXIT = "EXIT";
+	public static final String MENU_ITEM_NAME_INVENTORY = "PACK";
+	public static final String MENU_ITEM_NAME_SAVE = "SAVE";
+
+	// Main Menu Item Descriptions
+	public static final String MENU_ITEM_DESC_EXIT = "Exit the menu.";
+	public static final String MENU_ITEM_DESC_INVENTORY = "Open the pack.";
+	public static final String MENU_ITEM_DESC_SAVE = "Save the game.";
 
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
@@ -69,8 +80,8 @@ public class WorldConstants {
 	// Movement
 	// TODO (11/24/2014): Make map more flexible by allowing scripting files of
 	// different filenames to be loaded. Not sure where it was being loaded.
-	public static ArrayList<Script> scripts = new ArrayList<Script>(0);
-	public static ArrayList<Script> moddedScripts = new ArrayList<Script>(0);
+	public static List<Script> scripts = new ArrayList<>(0);
+	public static List<Script> moddedScripts = new ArrayList<>(0);
 	// public static ArrayList<Script> gameScripts =
 	// Script.loadScript("script/aas.script"); // TODO (6/19/2015): Check to see why
 	// there's a need to load "aas.script".
@@ -81,14 +92,15 @@ public class WorldConstants {
 	// ArrayList<Map.Entry<Script, String>>();
 
 	// All bitmaps
-	public static ArrayList<BaseBitmap> bitmaps = new ArrayList<BaseBitmap>();
+	public static List<BaseBitmap> bitmaps = new ArrayList<>();
 
 	/**
 	 * Returns the area matching the given area ID value.
 	 * 
-	 * @param areaID The area ID value.
-	 * @return The Area object with the matching area ID value. If no matching value
-	 *         exists, it returns null.
+	 * @param areaID
+	 *            The area ID value.
+	 * @return The Area object with the matching area ID value. If no matching value exists, it returns
+	 *         null.
 	 */
 	public static Area convertToArea(List<Area> areas, int areaID) {
 		for (int i = 0; i < areas.size(); i++) {
@@ -98,15 +110,15 @@ public class WorldConstants {
 		}
 		Area area = null;
 		switch (areaID) {
-		case TEST_WORLD_1:
-			area = new Area(Art.testArea, TEST_WORLD_1, "Test World 1");
-			break;
-		case TEST_WORLD_2:
-			area = new Area(Art.testArea2, TEST_WORLD_2, "Test World 2");
-			break;
-		default:
-			area = null;
-			break;
+			case TEST_WORLD_1:
+				area = new Area(Art.testArea, WorldConstants.TEST_WORLD_1, "Test World 1");
+				break;
+			case TEST_WORLD_2:
+				area = new Area(Art.testArea2, WorldConstants.TEST_WORLD_2, "Test World 2");
+				break;
+			default:
+				area = null;
+				break;
 		}
 		areas.add(area);
 		return area;
@@ -123,7 +135,8 @@ public class WorldConstants {
 		if (WorldConstants.isModsEnabled == null) {
 			if (Mod.moddedAreas.isEmpty()) {
 				WorldConstants.isModsEnabled = Boolean.FALSE;
-			} else {
+			}
+			else {
 				WorldConstants.isModsEnabled = Boolean.TRUE;
 			}
 		}
@@ -132,24 +145,25 @@ public class WorldConstants {
 	/**
 	 * Returns all available areas defined.
 	 * 
-	 * @return A List<Area> object containing all available areas in specified order
-	 *         defined.
+	 * @return A List<Area> object containing all available areas in specified order defined.
 	 */
 	public static List<Area> getAllNewAreas() {
 		// List<Area> result = new ArrayList<Area>();
 		if (WorldConstants.isModsEnabled == Boolean.FALSE || WorldConstants.isModsEnabled == null) {
 			if (WorldConstants.areas.isEmpty()) {
-				WorldConstants.areas.add(new Area(Art.testArea, TEST_WORLD_1));
-				WorldConstants.areas.add(new Area(Art.testArea2, TEST_WORLD_2));
-			} else {
-				WorldConstants.addNewArea(Art.testArea, TEST_WORLD_1);
-				WorldConstants.addNewArea(Art.testArea2, TEST_WORLD_2);
+				WorldConstants.areas.add(new Area(Art.testArea, WorldConstants.TEST_WORLD_1));
+				WorldConstants.areas.add(new Area(Art.testArea2, WorldConstants.TEST_WORLD_2));
+			}
+			else {
+				WorldConstants.addNewArea(Art.testArea, WorldConstants.TEST_WORLD_1);
+				WorldConstants.addNewArea(Art.testArea2, WorldConstants.TEST_WORLD_2);
 			}
 			// result.add(new Area(Art.testArea3, TEST_WORLD_3));
 			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
 			// result.add(new Area(Art.testArea_debug, Debug));
 			return WorldConstants.areas;
-		} else {
+		}
+		else {
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
 				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
 				WorldConstants.moddedAreas.add(new Area(entry.getKey(), entry.getValue()));
@@ -161,21 +175,22 @@ public class WorldConstants {
 	/**
 	 * Returns all available scripts defined.
 	 * 
-	 * @return A List<Script> object containing all available scripts in specified
-	 *         order defined.
+	 * @return A List<Script> object containing all available scripts in specified order defined.
 	 */
 	public static List<Script> getAllNewScripts() {
 		if (WorldConstants.isModsEnabled == null) {
 			if (Mod.moddedAreas.isEmpty()) {
 				WorldConstants.isModsEnabled = Boolean.FALSE;
-			} else {
+			}
+			else {
 				WorldConstants.isModsEnabled = Boolean.TRUE;
 			}
 		}
 		if (WorldConstants.isModsEnabled.booleanValue()) {
-			WorldConstants.moddedScripts = Script.loadModdedScripts();
+			WorldConstants.moddedScripts = Script.loadModdedScriptsNew();
 			return WorldConstants.moddedScripts;
-		} else {
+		}
+		else {
 			WorldConstants.scripts = Script.loadDefaultScripts();
 			return WorldConstants.scripts;
 		}
@@ -187,8 +202,10 @@ public class WorldConstants {
 	 */
 	private static void addNewArea(BaseBitmap bitmap, int areaID) {
 		// Java 8 feature
-		boolean exists = WorldConstants.areas.stream().filter(chosenArea -> chosenArea.getAreaID() == areaID)
-				.findFirst().isPresent();
+		boolean exists = WorldConstants.areas.stream()
+			.filter(chosenArea -> chosenArea.getAreaID() == areaID)
+			.findFirst()
+			.isPresent();
 		if (!exists) {
 			WorldConstants.areas.add(new Area(bitmap, areaID));
 		}
@@ -197,17 +214,18 @@ public class WorldConstants {
 	/**
 	 * Returns the area color theme of the given area ID.
 	 * 
-	 * @param areaID The area ID value.
+	 * @param areaID
+	 *            The area ID value.
 	 * @return The primary area color of full opacity.
 	 */
 	public static int convertToAreaColor(int areaID) {
 		switch (areaID) {
-		case TEST_WORLD_1:
-			return AREA_1_COLOR;
-		case TEST_WORLD_2:
-			return AREA_2_COLOR;
-		default:
-			return 0;
+			case TEST_WORLD_1:
+				return WorldConstants.AREA_1_COLOR;
+			case TEST_WORLD_2:
+				return WorldConstants.AREA_2_COLOR;
+			default:
+				return 0;
 		}
 	}
 }

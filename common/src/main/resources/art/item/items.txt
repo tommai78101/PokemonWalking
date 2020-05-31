@@ -1,0 +1,48 @@
+// %: Item Type for the game to recognize. (One of DUMMY, or ACTION)
+// #: Item Name.
+// @: Item Description.
+// ^: Item specified category for inventory. (One of POTIONS, KEYITEMS, POKEBALLS, TM_HM, or ALL)
+// ;: Item delimiter. Marks the end of an item section.
+
+// ------  Item Commands  ------
+// $: Item with "SET" command.
+// !: Item with "USE" command.
+// &: Item with "TOSS" command.
+
+// Example 1:
+//
+//     %DUMMY
+//     #RETURN
+//     @Return to menu.
+//     ^ALL
+//     ;
+
+// Example 2:
+//
+//     %ACTION
+//     #BICYCLE
+//     ^KEYITEMS
+//     !
+//     $
+//     ;
+
+%DUMMY
+#TEST
+@When used, it returns to menu.
+^KEYITEMS
+[SET,USE];
+
+%DUMMY
+#3_OPTIONS
+@Tests 3 options. Returns to menu.
+^POTIONS
+!
+&
+;
+
+%ACTION
+#BICYCLE
+^KEYITEMS
+!
+$
+;

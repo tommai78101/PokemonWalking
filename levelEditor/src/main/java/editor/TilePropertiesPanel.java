@@ -1,12 +1,10 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package editor;
 
@@ -34,6 +32,8 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public CustomJTextField blueInputField;
 
 	public int dataValue;
+	public Data selectData;
+	public ControlPanel panel;
 
 	public JLabel tileID, extendedTileID, tileSpecificID, fullDataInput;
 
@@ -49,22 +49,22 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 		@Override
 		public Dimension getSize() {
-			return SIZE;
+			return TilePropertiesPanel.SIZE;
 		}
 
 		@Override
 		public Dimension getPreferredSize() {
-			return SIZE;
+			return TilePropertiesPanel.SIZE;
 		}
 
 		@Override
 		public Dimension getMaximumSize() {
-			return SIZE;
+			return TilePropertiesPanel.SIZE;
 		}
 
 		@Override
 		public Dimension getMinimumSize() {
-			return SIZE;
+			return TilePropertiesPanel.SIZE;
 		}
 	}
 
@@ -73,124 +73,130 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 		@Override
 		public Dimension getSize() {
-			return INPUT_SIZE;
+			return TilePropertiesPanel.INPUT_SIZE;
 		}
 
 		@Override
 		public Dimension getPreferredSize() {
-			return INPUT_SIZE;
+			return TilePropertiesPanel.INPUT_SIZE;
 		}
 
 		@Override
 		public Dimension getMaximumSize() {
-			return INPUT_SIZE;
+			return TilePropertiesPanel.INPUT_SIZE;
 		}
 
 		@Override
 		public Dimension getMinimumSize() {
-			return INPUT_SIZE;
+			return TilePropertiesPanel.INPUT_SIZE;
 		}
 	}
 
-	public TilePropertiesPanel() {
+	public TilePropertiesPanel(ControlPanel controlPanel) {
 		super();
 
-		tileID = new CustomJLabel("Tile ID:");
-		extendedTileID = new CustomJLabel("Ext. ID:");
-		tileSpecificID = new CustomJLabel("Other ID:");
-		fullDataInput = new CustomJLabel("Edit Data:");
+		this.panel = controlPanel;
 
-		alphaField = new CustomJTextField(); // AA
-		redField = new CustomJTextField(); // RR
-		greenField = new CustomJTextField(); // GG
-		blueField = new CustomJTextField(); // BB
+		this.tileID = new CustomJLabel("Tile ID:");
+		this.extendedTileID = new CustomJLabel("Ext. ID:");
+		this.tileSpecificID = new CustomJLabel("Other ID:");
+		this.fullDataInput = new CustomJLabel("Edit Data:");
 
-		alphaInputField = new CustomJTextField();
-		redInputField = new CustomJTextField();
-		greenInputField = new CustomJTextField();
-		blueInputField = new CustomJTextField();
+		this.alphaField = new CustomJTextField(); // AA
+		this.redField = new CustomJTextField(); // RR
+		this.greenField = new CustomJTextField(); // GG
+		this.blueField = new CustomJTextField(); // BB
 
-		tileID.setHorizontalAlignment(SwingConstants.CENTER);
-		extendedTileID.setHorizontalAlignment(SwingConstants.CENTER);
-		tileSpecificID.setHorizontalAlignment(SwingConstants.CENTER);
+		this.alphaInputField = new CustomJTextField();
+		this.redInputField = new CustomJTextField();
+		this.greenInputField = new CustomJTextField();
+		this.blueInputField = new CustomJTextField();
 
-		alphaField.setHorizontalAlignment(SwingConstants.CENTER);
-		redField.setHorizontalAlignment(SwingConstants.CENTER);
-		greenField.setHorizontalAlignment(SwingConstants.CENTER);
-		blueField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.tileID.setHorizontalAlignment(SwingConstants.CENTER);
+		this.extendedTileID.setHorizontalAlignment(SwingConstants.CENTER);
+		this.tileSpecificID.setHorizontalAlignment(SwingConstants.CENTER);
 
-		alphaField.setEditable(false);
-		redField.setEditable(false);
-		greenField.setEditable(false);
-		blueField.setEditable(false);
+		this.alphaField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.redField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.greenField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.blueField.setHorizontalAlignment(SwingConstants.CENTER);
 
-		alphaInputField.setHorizontalAlignment(SwingConstants.CENTER);
-		redInputField.setHorizontalAlignment(SwingConstants.CENTER);
-		greenInputField.setHorizontalAlignment(SwingConstants.CENTER);
-		blueInputField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.alphaField.setEditable(false);
+		this.redField.setEditable(false);
+		this.greenField.setEditable(false);
+		this.blueField.setEditable(false);
 
-		alphaInputField.getDocument().addDocumentListener(this);
-		redInputField.getDocument().addDocumentListener(this);
-		greenInputField.getDocument().addDocumentListener(this);
-		blueInputField.getDocument().addDocumentListener(this);
+		this.alphaInputField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.redInputField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.greenInputField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.blueInputField.setHorizontalAlignment(SwingConstants.CENTER);
+
+		this.alphaInputField.getDocument().addDocumentListener(this);
+		this.redInputField.getDocument().addDocumentListener(this);
+		this.greenInputField.getDocument().addDocumentListener(this);
+		this.blueInputField.getDocument().addDocumentListener(this);
 
 		this.setLayout(new GridLayout(0, 1));
-		this.add(tileID);
-		this.add(alphaField);
-		this.add(extendedTileID);
-		this.add(redField);
-		this.add(tileSpecificID);
-		this.add(greenField);
-		this.add(blueField);
-		this.add(fullDataInput);
-		this.add(alphaInputField);
-		this.add(redInputField);
-		this.add(greenInputField);
-		this.add(blueInputField);
+		this.add(this.tileID);
+		this.add(this.alphaField);
+		this.add(this.extendedTileID);
+		this.add(this.redField);
+		this.add(this.tileSpecificID);
+		this.add(this.greenField);
+		this.add(this.blueField);
+		this.add(this.fullDataInput);
+		this.add(this.alphaInputField);
+		this.add(this.redInputField);
+		this.add(this.greenInputField);
+		this.add(this.blueInputField);
 
 		this.validate();
 	}
 
 	public char getAlpha() {
 		try {
-			return (char) (Integer.valueOf(alphaInputField.getText()) & 0xFF);
-		} catch (NumberFormatException e) {
+			return (char) (Integer.valueOf(this.alphaInputField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
 			return 0;
 		}
 	}
 
 	public String getTileIDString() {
-		return alphaField.getText();
+		return this.alphaField.getText();
 	}
 
 	public char getRed() {
 		try {
-			return (char) (Integer.valueOf(redInputField.getText()) & 0xFF);
-		} catch (NumberFormatException e) {
+			return (char) (Integer.valueOf(this.redInputField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
 			return 0;
 		}
 	}
 
 	public String getExtendedTileIDString() {
-		return redField.getText();
+		return this.redField.getText();
 	}
 
 	public char getGreen() {
 		try {
-			return (char) (Integer.valueOf(greenInputField.getText()) & 0xFF);
-		} catch (NumberFormatException e) {
+			return (char) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
 			return 0;
 		}
 	}
 
 	public String getTileIDGString() {
-		return greenField.getText();
+		return this.greenField.getText();
 	}
 
 	public char getBlue() {
 		try {
-			return (char) (Integer.valueOf(blueInputField.getText()) & 0xFF);
-		} catch (NumberFormatException e) {
+			return (char) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
 			return 0;
 		}
 	}
@@ -200,6 +206,24 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.redInputField.setText("");
 		this.greenInputField.setText("");
 		this.blueInputField.setText("");
+		this.selectData = null;
+	}
+
+	public void clearSelectedData() {
+		this.selectData = null;
+	}
+
+	/**
+	 * Given a Data object, set all of the input field values based on the data's properties.
+	 * 
+	 * @param selectedData
+	 */
+	public void setDataProperties(Data selectedData) {
+		this.alphaInputField.setText(Integer.toString(selectedData.alpha));
+		this.redInputField.setText(Integer.toString(selectedData.red));
+		this.greenInputField.setText(Integer.toString(selectedData.green));
+		this.blueInputField.setText(Integer.toString(selectedData.blue));
+		this.selectData = this.panel.getEditor().properties.getSelectedData();
 	}
 
 	@Override
@@ -210,8 +234,14 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			byte g = (byte) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
 			byte b = (byte) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
-		} catch (Exception e) {
-			dataValue = 0;
+
+			if (this.selectData != null && this.selectData.name.equals("Select")) {
+				Data editedData = EditorConstants.getData(this.dataValue);
+				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
+			}
+		}
+		catch (Exception e) {
+			this.dataValue = 0;
 		}
 	}
 
@@ -223,8 +253,14 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			byte g = (byte) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
 			byte b = (byte) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
-		} catch (Exception e) {
-			dataValue = 0;
+
+			if (this.selectData != null && this.selectData.name.equals("Select")) {
+				Data editedData = EditorConstants.getData(this.dataValue);
+				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
+			}
+		}
+		catch (Exception e) {
+			this.dataValue = 0;
 		}
 	}
 
@@ -236,8 +272,14 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			byte g = (byte) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
 			byte b = (byte) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
-		} catch (Exception e) {
-			dataValue = 0;
+
+			if (this.selectData != null && this.selectData.name.equals("Select")) {
+				Data editedData = EditorConstants.getData(this.dataValue);
+				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
+			}
+		}
+		catch (Exception e) {
+			this.dataValue = 0;
 		}
 	}
 
@@ -245,27 +287,27 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public void validate() {
 		super.validate();
 		switch (EditorConstants.metadata) {
-		case Pixel_Data:
-			this.tileID.setText("Tile ID:");
-			this.extendedTileID.setText("Extended ID:");
-			this.tileSpecificID.setText("Other IDs:");
-			this.fullDataInput.setVisible(true);
-			this.alphaInputField.setVisible(true);
-			this.redInputField.setVisible(true);
-			this.greenInputField.setVisible(true);
-			this.blueInputField.setVisible(true);
-			break;
-		case Triggers:
-			this.tileID.setText("X Position:");
-			this.extendedTileID.setText("Y Position:");
-			this.tileSpecificID.setText("Trigger ID:");
-			this.fullDataInput.setVisible(false);
-			this.alphaInputField.setVisible(false);
-			this.redInputField.setVisible(false);
-			this.greenInputField.setVisible(false);
-			this.blueInputField.setVisible(false);
+			case Pixel_Data:
+				this.tileID.setText("Tile ID:");
+				this.extendedTileID.setText("Extended ID:");
+				this.tileSpecificID.setText("Other IDs:");
+				this.fullDataInput.setVisible(true);
+				this.alphaInputField.setVisible(true);
+				this.redInputField.setVisible(true);
+				this.greenInputField.setVisible(true);
+				this.blueInputField.setVisible(true);
+				break;
+			case Triggers:
+				this.tileID.setText("X Position:");
+				this.extendedTileID.setText("Y Position:");
+				this.tileSpecificID.setText("Trigger ID:");
+				this.fullDataInput.setVisible(false);
+				this.alphaInputField.setVisible(false);
+				this.redInputField.setVisible(false);
+				this.greenInputField.setVisible(false);
+				this.blueInputField.setVisible(false);
 
-			break;
+				break;
 		}
 	}
 }

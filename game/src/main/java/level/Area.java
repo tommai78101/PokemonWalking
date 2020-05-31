@@ -1,26 +1,33 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package level;
 
+import java.awt.Graphics;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import abstracts.Character;
 import abstracts.Entity;
+import abstracts.Item;
+import abstracts.Obstacle;
+import common.Tileable;
 import entity.Player;
-import interfaces.InterfaceTile;
-import obstacle.Obstacle;
+import interfaces.UpdateRenderable;
 import screen.BaseBitmap;
-import screen.BaseScreen;
+import screen.Scene;
 import script.TriggerData;
 
-public class Area extends Entity {
+public class Area implements Tileable, UpdateRenderable {
 	private final int width;
 	private final int height;
 	private final int[] pixels;
@@ -40,29 +47,38 @@ public class Area extends Entity {
 	// TODO: Add area type.
 	// private int areaType;
 
-	private boolean displayExitArrow;
-	private boolean triggerIsBeingTriggered;
+	private boolean isExitArrowDisplayed;
+	private boolean isTriggerBeingTriggered;
 	private TriggerData trigger;
 
-	private final ArrayList<ArrayList<PixelData>> areaData = new ArrayList<ArrayList<PixelData>>();
-	private final ArrayList<Obstacle> areaObstacles = new ArrayList<Obstacle>();
-	private final ArrayList<PixelData> modifiedAreaData = new ArrayList<PixelData>();
-	private final ArrayList<TriggerData> triggerDatas = new ArrayList<TriggerData>();
+	private final List<List<PixelData>> areaData = new ArrayList<>();
+	private final Set<PixelData> modifiedAreaData = new HashSet<>();
+
+	// Area data hash maps.
+	private final Map<Map.Entry<Integer, Integer>, Obstacle> areaObstacles = new HashMap<>();
+	private final Map<Map.Entry<Integer, Integer>, Character> areaCharacters = new HashMap<>();
+	private final Map<Map.Entry<Integer, Integer>, Item> areaItems = new HashMap<>();
+	private final Map<Map.Entry<Integer, Integer>, TriggerData> triggerDatas = new HashMap<>();
 
 	public Area(BaseBitmap bitmap, final int areaID) {
 		int[] tempPixels = bitmap.getPixels();
 		int triggerSize = tempPixels[0];
 		int row = 0;
 		int column = 0;
+		int stride = bitmap.getWidth();
 		for (int i = 0; i < triggerSize; i++) {
-			column = i + 1;
-			int color = tempPixels[column + (bitmap.getHeight() * row)];
+			// The "color" is the ID.
 			// ID must not be negative. ID = 0 is reserved.
-			if (color > 0)
-				triggerDatas.add(new TriggerData().loadTriggerData(color));
-			if (column >= bitmap.getWidth()) {
+			column = i + 1;
+			int color = tempPixels[column + (stride * row)];
+			if (color > 0) {
+				int xPosition = (color >> 24) & 0xFF;
+				int yPosition = (color >> 16) & 0xFF;
+				this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color));
+			}
+			if (column >= stride) {
 				row++;
-				column -= bitmap.getWidth();
+				column -= stride;
 			}
 		}
 		// We need to add the row by 1 for the last row with trailing empty trigger IDs.
@@ -73,21 +89,37 @@ public class Area extends Entity {
 		System.arraycopy(bitmap.getPixels(), this.width * row, this.pixels, 0, this.pixels.length);
 
 		for (int y = 0; y < this.height; y++) {
-			areaData.add(new ArrayList<PixelData>());
+			this.areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
 				int pixel = this.pixels[y * this.width + x];
-				PixelData px = new PixelData(pixel, x, y);
-				if (((pixel >> 24) & 0xFF) == 0x03)
-					areaObstacles.add(new Obstacle(px, (pixel >> 16) & 0xFF));
-				areaData.get(y).add(px);
+				PixelData pixelData = new PixelData(pixel, x, y);
+
+				if (Entity.isObstacle(pixelData)) {
+					Obstacle entity = Obstacle.build(pixelData, x, y);
+					if (entity != null) {
+						this.areaObstacles.put(Map.entry(x, y), entity);
+					}
+				}
+				if (Entity.isCharacter(pixelData)) {
+					Character entity = Character.build(pixelData, x, y);
+					if (entity != null) {
+						this.areaCharacters.put(Map.entry(x, y), entity);
+					}
+				}
+				if (Entity.isItem(pixelData)) {
+					Item entity = Item.build(pixelData);
+					if (entity != null) {
+						this.areaItems.put(Map.entry(x, y), entity);
+					}
+				}
+				this.areaData.get(y).add(pixelData);
 			}
 		}
-
 		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInSectorPoint = false;
-		this.displayExitArrow = false;
-		this.triggerIsBeingTriggered = false;
+		this.isExitArrowDisplayed = false;
+		this.isTriggerBeingTriggered = false;
 		this.areaName = "";
 	}
 
@@ -121,423 +153,254 @@ public class Area extends Entity {
 	 * 
 	 * @return Nothing.
 	 */
+	@Override
 	public void tick() {
 		// Since "setPlayer" method isn't always set, there should be checks everywhere
 		// to make sure "player" isn't null.
-		if (this.player != null) {
-			// PixelData data = null;
-			if (this.triggerIsBeingTriggered) {
-				this.xPlayerPosition = this.player.getXInArea();
-				this.yPlayerPosition = this.player.getYInArea();
-				if (this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width || this.yPlayerPosition < 0
-						|| this.yPlayerPosition >= this.height)
-					return;
-				this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
-				this.checkCurrentPositionDataAndSetProperties();
-			}
+		if (this.player == null)
+			return;
 
-			if (!this.triggerIsBeingTriggered) {
-				if (!this.player.isLockedWalking()) {
-					if (this.trigger == null) {
-						this.trigger = checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
-					}
-					if (this.trigger != null) {
-						this.triggerIsBeingTriggered = true;
-					}
-				} else {
-					this.oldXTriggerPosition = -1;
-					this.oldYTriggerPosition = -1;
-				}
+		// PixelData data = null;
+		if (this.isTriggerBeingTriggered) {
+			this.xPlayerPosition = this.player.getXInArea();
+			this.yPlayerPosition = this.player.getYInArea();
+
+			// Do some bounds checking on the X and Y player positions.
+			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
+			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
+			if (isXOutOfBounds || isYOutOfBounds)
+				return;
+
+			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
+			this.checkCurrentPositionDataAndSetProperties(this.currentPixelData);
+		}
+		else {
+			if (!this.player.isLockedWalking()) {
+				if (this.trigger == null)
+					this.trigger = this.checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
+				else
+					this.isTriggerBeingTriggered = true;
 			}
-			if (this.triggerIsBeingTriggered && this.trigger != null)
-				handleTriggerActions();
-			else if ((this.triggerIsBeingTriggered && this.trigger == null) || !this.triggerIsBeingTriggered) {
-				this.triggerIsBeingTriggered = false;
-				handlePlayerActions();
+			else {
+				this.oldXTriggerPosition = -1;
+				this.oldYTriggerPosition = -1;
 			}
 		}
+		if (this.isTriggerBeingTriggered && this.trigger != null)
+			this.handleTriggerActions();
+		else if ((this.isTriggerBeingTriggered && this.trigger == null) || !this.isTriggerBeingTriggered) {
+			this.isTriggerBeingTriggered = false;
+			this.handlePlayerActions();
+		}
+
+		// Area specific entities are updated at the end.
+		this.areaObstacles.forEach((key, obstacleValue) -> {
+			obstacleValue.tick();
+		});
 	}
 
 	private void handleTriggerActions() {
-		if (!trigger.isFinished()) {
+		if (!this.trigger.isFinished()) {
 			this.player.enableAutomaticMode();
-			trigger.tick(this, xPlayerPosition, yPlayerPosition);
-		} else {
+			this.trigger.tick(this, this.xPlayerPosition, this.yPlayerPosition);
+		}
+		else {
 			this.player.disableAutomaticMode();
 			this.oldXTriggerPosition = this.xPlayerPosition;
 			this.oldYTriggerPosition = this.yPlayerPosition;
-			this.triggerIsBeingTriggered = false;
-			trigger = null;
+			this.isTriggerBeingTriggered = false;
+			this.trigger = null;
 		}
 	}
 
 	private void handlePlayerActions() {
 		if (!this.player.isLockedWalking()) {
-			xPlayerPosition = player.getXInArea();
-			yPlayerPosition = player.getYInArea();
-			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0
-					|| yPlayerPosition >= this.height)
+			// Update the area's X and Y player position from the Player object.
+			this.xPlayerPosition = this.player.getXInArea();
+			this.yPlayerPosition = this.player.getYInArea();
+
+			// Do some bounds checking on the X and Y player positions.
+			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
+			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
+			if (isXOutOfBounds || isYOutOfBounds)
 				return;
-			handleSurroundingTiles();
-		} else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
-			// A
-			// This goes with B. (30 lines down below.)
+
+			// Target pixel is used to determine what pixel the player is currently standing
+			// on (or what pixel the player is currently on top of).
+			this.player.handleSurroundingTiles(this);
+			this.checkCurrentPositionDataAndSetProperties(this.getPixelData(this.xPlayerPosition, this.yPlayerPosition));
+		}
+		else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
 			// It may be possible the player is still in the air, and hasn't done checking
-			// if the current pixel
-			// data is a ledge or not. This continues the data checking. It's required.
-			xPlayerPosition = player.getXInArea();
-			yPlayerPosition = player.getYInArea();
-			if (xPlayerPosition < 0 || xPlayerPosition >= this.width || yPlayerPosition < 0
-					|| yPlayerPosition >= this.height)
+			// if the current pixel data is a ledge or not. This continues the data checking. It's required.
+			this.xPlayerPosition = this.player.getXInArea();
+			this.yPlayerPosition = this.player.getYInArea();
+
+			// Do some bounds checking on the X and Y player positions.
+			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
+			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
+			if (isXOutOfBounds || isYOutOfBounds)
 				return;
-			this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-			this.checkCurrentPositionDataAndSetProperties();
-		} else {
+
 			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
+			this.checkCurrentPositionDataAndSetProperties(this.getCurrentPixelData());
+		}
+		else {
+			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
+			this.checkCurrentPositionDataAndSetProperties(this.getCurrentPixelData());
 		}
 	}
 
 	private TriggerData checkForTrigger(int playerX, int playerY) {
-		for (TriggerData t : this.triggerDatas) {
-			if (t.x == playerX && t.y == playerY && (!t.isFinished() || t.isOnRepeat())) {
-				if (this.oldXTriggerPosition == t.x && this.oldYTriggerPosition == t.y)
-					return null;
-				return new TriggerData(t).reset();
-			}
+		TriggerData data = this.triggerDatas.get(Map.entry(playerX, playerY));
+		if (data != null && (!data.isFinished() || data.isOnRepeat())) {
+			if (this.oldXTriggerPosition == data.x && this.oldYTriggerPosition == data.y)
+				return null;
+			return data.reset();
 		}
 		return null;
 	}
 
 	/**
-	 * <p>
-	 * Handles the 4 surrounding tiles around the player character, in the cardinal
-	 * directions of north, west, south, and east. Once the player is interacting
-	 * with one of the tiles, the area will remember and mark the tile's interaction
-	 * ID, and pass it to the OverWorld to handle.
-	 * </p>
+	 * Checks the pixel data the player is currently on, and sets the tile properties according to the
+	 * documentation provided. The tile the pixel data is representing determines the properties this
+	 * will set, and will affect how the game interacts with the player.
 	 * 
 	 * @return Nothing.
 	 */
-	private void handleSurroundingTiles() {
-		this.player.setAllBlockingDirections(checkSurroundingData(0, -1), checkSurroundingData(0, 1),
-				checkSurroundingData(-1, 0), checkSurroundingData(1, 0));
-		try {
-			if (this.player.isInteracting()) {
-				switch (this.player.getFacing()) {
-				case Player.UP:
-					this.player.interact(areaData.get(this.yPlayerPosition - 1).get(xPlayerPosition).getColor());
-					break;
-				case Player.DOWN:
-					this.player.interact(areaData.get(this.yPlayerPosition + 1).get(xPlayerPosition).getColor());
-					break;
-				case Player.LEFT:
-					this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition - 1).getColor());
-					break;
-				case Player.RIGHT:
-					this.player.interact(areaData.get(this.yPlayerPosition).get(xPlayerPosition + 1).getColor());
-					break;
-				}
-			}
-		} catch (Exception e) {
-			this.player.stopInteraction();
-		}
-
-		// Target pixel is used to determine what pixel the player is currently standing
-		// on
-		// (or what pixel the player is currently on top of).
-		this.currentPixelData = areaData.get(this.yPlayerPosition).get(xPlayerPosition);
-		this.checkCurrentPositionDataAndSetProperties();
-	}
-
-	/**
-	 * Checks the pixel data the player is currently on, and sets the tile
-	 * properties according to the documentation provided. The tile the pixel data
-	 * is representing determines the properties this will set, and will affect how
-	 * the game interacts with the player.
-	 * 
-	 * @return Nothing.
-	 */
-	public void checkCurrentPositionDataAndSetProperties() {
+	public void checkCurrentPositionDataAndSetProperties(PixelData data) {
 		// TODO: Fix this checkup.
-		int pixel = this.getCurrentPixelData().getColor();
+		int pixel = data.getColor();
 		int alpha = (pixel >> 24) & 0xFF;
 		int red = (pixel >> 16) & 0xFF;
 		int green = (pixel >> 8) & 0xFF;
 		int blue = pixel & 0xFF;
 		switch (alpha) {
-		case 0x02: // Ledges
-		{
-			switch (red) {
-			case 0x00: // Bottom
-				this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
-				break;
-			case 0x01: // Bottom Left
-				// this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
-				break;
-			case 0x02: // left
-				this.player.setLockJumping(red, green, blue, Player.LEFT, Player.RIGHT);
-				break;
-			case 0x03: // top left
-				break;
-			case 0x04: // top
-				if (this.checkIfValuesAreAllowed(this.getSurroundingTileID(0, -1), 0x01))
-					this.player.setLockJumping(red, green, blue, Player.DOWN, Player.UP);
-				break;
-			case 0x05: // top right
-				break;
-			case 0x06: // right
-				this.player.setLockJumping(red, green, blue, Player.RIGHT, Player.LEFT);
-				break;
-			case 0x07: // bottom right
-				break;
-			default:
-				break;
-			}
-			break;
-		}
-		case 0x04: // Determines warp zone.
-			if (!this.player.isLockedWalking()) {
-				this.isInWarpZone = true;
-			}
-			break;
-		case 0x05: // Area Connection Point.
-			if (!this.player.isLockedWalking() && !this.isInWarpZone) {
-				this.isInSectorPoint = true;
-				this.sectorID = this.currentPixelData.getTargetSectorID();
-			}
-			break;
-		case 0x07: // Water tiles. Checks to see if player is in the water.
-			if (!this.player.isInWater())
-				this.player.goesInWater();
-			break;
-		case 0x09: // House Doors are a type of warp zones.
-			if (!this.player.isLockedWalking()) {
-				this.isInWarpZone = true;
-			}
-			break;
-		case 0x0B: // Carpet Indoors
-			//
-			// this.displayExitArrow = true;
-			break;
-		case 0x0C: // Carpet Outdoors
-			// this.displayExitArrow = true;
-			break;
-		case 0x0D: // Default starting position
-			this.setPixelData(
-					new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
-					this.currentPixelData.xPosition, this.currentPixelData.yPosition);
-			break;
-		default:
-			// If no special tiles, then it will keep reseting the flags.
-			if (!this.player.isLockedWalking() || !this.player.isLockedJumping()) {
-				this.isInWarpZone = false;
-				this.isInSectorPoint = false;
-			}
-			// This is to check to see if player has left the water.
-			if (this.player.isInWater())
-				this.player.leavesWater();
-			break;
-		}
-	}
-
-	/**
-	 * Checks the pixel data and sets properties according to the documentation
-	 * provided. The tile the pixel data is representing determines whether it
-	 * should allow or block the player from walking towards it.
-	 * 
-	 * <p>
-	 * In other words, this is the method call that works out the collision
-	 * detection/response in the game.
-	 * 
-	 * @param xOffset Sets the offset of the PixelData it should check by the X
-	 *                axis.
-	 * @param yOffset Sets the offset of the PixelData it should check by the Y
-	 *                axis.
-	 * @return The value determining if this PixelData is to block or allow the
-	 *         player to pass/walk/jump through. Returns true to block the player
-	 *         from walking from the player's last position to this tile. Returns
-	 *         false to allow player to walk from the player's last position to this
-	 *         tile.
-	 */
-	private boolean checkSurroundingData(int xOffset, int yOffset) {
-		PixelData data = null;
-		try {
-			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
-		} catch (Exception e) {
-			// This means it is out of the area boundaries.
-			data = null;
-		}
-		if (data != null) {
-			int color = data.getColor();
-			int alpha = (color >> 24) & 0xFF;
-			int red = (color >> 16) & 0xFF;
-			// int green = (color >> 8) & 0xFF;
-			// int blue = color & 0xFF;
-			switch (alpha) {
-			case 0x01: // Paths
-				return false;
-			case 0x02: // Ledge
+			case 0x02: // Ledges
 			{
 				switch (red) {
-				/*
-				 * TODO: Incorporate pixel data facingsBlocked variable to this section.
-				 * Currently, the facingsBlocked[] variable for each pixel data isn't used.
-				 */
-				case 0x00: { // Bottom
-					int y = this.yPlayerPosition + yOffset;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(0, 2) >> 24) & 0xFF, 0x02, 0x03))
-						return true;
-					if (this.yPlayerPosition < y)
-						return false;
-					return true;
-				}
-				case 0x01: // Bottom Left
-					return true;
-				case 0x02: {// Left
-					int x = this.xPlayerPosition + xOffset;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(-2, 0) >> 24) & 0xFF, 0x02, 0x03))
-						return true;
-					if (this.xPlayerPosition > x)
-						return false;
-					return true;
-				}
-				case 0x03: // Top Left
-					return true;
-				case 0x04: {// Top
-					int y = this.yPlayerPosition + yOffset;
-					if (this.yPlayerPosition > y)
-						return false;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x02))
-						return true;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(-1, 0) >> 16) & 0xFF, 0x04))
-						return false;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(1, 0) >> 16) & 0xFF, 0x04))
-						return false;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(0, -2) >> 24) & 0xFF, 0x03))
-						return true;
-					return true;
-				}
-				case 0x05: // Top Right
-					return true;
-				case 0x06: { // Right
-					int x = this.xPlayerPosition + xOffset;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(2, 0) >> 24) & 0xFF, 0x02, 0x03))
-						return true;
-					if (this.xPlayerPosition < x)
-						return false;
-					return true;
-				}
-				case 0x07: // Bottom Right
-					// TODO: DO SOMETHING WITH WATER, MAKE PLAYER SURF!
-					return true;
-				case 0x18: // Inner bottom left
-				case 0x19: // Inner bottom right
-					return true;
-
-				// ------------------------- MOUNTAIN LEDGES ------------------------
-				case 0x0C:
-					int y = this.yPlayerPosition + yOffset;
-					if (this.yPlayerPosition > y)
-						return false;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(-1, 0) >> 16) & 0xFF, 0x0C))
-						return false;
-					if (this.checkIfValuesAreAllowed((this.getTileColor(1, 0) >> 16) & 0xFF, 0x0C))
-						return false;
-					return true;
-				default:
-					break;
+					case 0x00: // Bottom
+						this.player.setLockJumping(red, green, blue, Character.UP, Character.DOWN);
+						break;
+					case 0x01: // Bottom Left
+						// this.player.setLockJumping(red, green, blue, Player.UP, Player.DOWN);
+						break;
+					case 0x02: // left
+						this.player.setLockJumping(red, green, blue, Character.LEFT, Character.RIGHT);
+						break;
+					case 0x03: // top left
+						break;
+					case 0x04: // top
+						if (this.checkIfValuesAreAllowed(this.getSurroundingTileID(0, -1), 0x01))
+							this.player.setLockJumping(red, green, blue, Character.DOWN, Character.UP);
+						break;
+					case 0x05: // top right
+						break;
+					case 0x06: // right
+						this.player.setLockJumping(red, green, blue, Character.RIGHT, Character.LEFT);
+						break;
+					case 0x07: // bottom right
+						break;
+					default:
+						break;
 				}
 				break;
 			}
-			case 0x03: // Obstacle
-				switch (red) {
-				default:
-					if (this.player.isInteracting())
-						return true;
-					if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
-						if ((player.keys.Z.keyStateDown || player.keys.SLASH.keyStateDown)
-								&& (!player.keys.Z.lastKeyState || !player.keys.SLASH.lastKeyState)) {
-							this.player.startInteraction();
-							player.keys.Z.lastKeyState = true;
-							player.keys.SLASH.lastKeyState = true;
-						}
-					}
-					return true;
+			case 0x04: // Determines warp zone.
+				if (!this.player.isLockedWalking()) {
+					this.isInWarpZone = true;
 				}
-			case 0x04: // Warp point
-				return false;
-			case 0x05: // Area Connection point.
-				return false;
-			case 0x06: // Stairs
-				return false;
-			case 0x07: // Water
-				// TODO: Add something that detects a special boolean value in order to let the
-				// player move on water.
-				return false;
-			case 0x08: // House
-				return true;
-			case 0x09: // House Door
-				// TODO (6/18/2015): Door needs to be checked for null areas. If null areas are
-				// found, default to locked doors.
-				return false;
-			case 0x0A: // Item
-				if (this.player.isInteracting())
-					return true;
-				if (player.isFacingAt(this.xPlayerPosition + xOffset, this.yPlayerPosition + yOffset)) {
-					if ((player.keys.Z.keyStateDown || player.keys.SLASH.keyStateDown)
-							&& (!player.keys.Z.lastKeyState || !player.keys.SLASH.lastKeyState)) {
-						this.player.startInteraction();
-						player.keys.Z.lastKeyState = true;
-						player.keys.SLASH.lastKeyState = true;
-					}
+				break;
+			case 0x05: // Area Connection Point.
+				if (!this.player.isLockedWalking() && !this.isInWarpZone) {
+					this.isInSectorPoint = true;
+					this.sectorID = this.currentPixelData.getTargetSectorID();
 				}
-				return true; // Cannot go through items on the ground.
-			case 0x0B: // Carpet (Indoors)
-			case 0x0C: // Carpet (Outdoors)
-			case 0x0D: // Default starting point.
-				return false;
-			default: // Any other type of tiles should be walkable, for no apparent reasons.
-				return false;
-			}
+				break;
+			case 0x07: // Water tiles. Checks to see if player is in the water.
+				if (!this.player.isInWater())
+					this.player.goesInWater();
+				break;
+			case 0x09: // House Doors are a type of warp zones.
+				if (!this.player.isLockedWalking()) {
+					this.isInWarpZone = true;
+				}
+				break;
+			case 0x0B: // Carpet Indoors
+				// this.displayExitArrow = true;
+				break;
+			case 0x0C: // Carpet Outdoors
+				// this.displayExitArrow = true;
+				break;
+			case 0x0D: // Triggers
+				if (red == 0x00) { // Default starting Point
+					this.setPixelData(
+						new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
+						this.currentPixelData.xPosition, this.currentPixelData.yPosition
+					);
+				}
+				break;
+			default:
+				// If no special tiles, then it will keep reseting the flags.
+				if (!this.player.isLockedWalking() || !this.player.isLockedJumping()) {
+					this.isInWarpZone = false;
+					this.isInSectorPoint = false;
+				}
+				// This is to check to see if player has left the water.
+				if (this.player.isInWater())
+					this.player.startsWalking();
+				break;
 		}
-		return true;
 	}
 
 	/**
 	 * Renders the bitmap tiles based on the given pixel data.
 	 * 
 	 * <p>
-	 * Note that this is where the bitmap animation works by updating the bitmap
-	 * after it has been rendered to the screen.
+	 * Note that this is where the bitmap animation works by updating the bitmap after it has been
+	 * rendered to the screen.
 	 * 
-	 * @param screen The screen display where the bitmaps are to output to.
-	 * @param xOff   The X offset based on the player's X position in absolute world
-	 *               coordinates. The absolute world coordinates mean the precise X
-	 *               position on the Canvas.
-	 * @param yOff   The Y offset based on the player's Y position in absolute world
-	 *               coordinates. The absolute world coordinates mean the precise Y
-	 *               position on the Canvas.
+	 * @param screen
+	 *            The screen display where the bitmaps are to output to.
+	 * @param xOff
+	 *            The X offset based on the player's X position in absolute world coordinates. The
+	 *            absolute world coordinates mean the precise X position on the Canvas.
+	 * @param yOff
+	 *            The Y offset based on the player's Y position in absolute world coordinates. The
+	 *            absolute world coordinates mean the precise Y position on the Canvas.
 	 * @return Nothing.
 	 * 
 	 */
 	@Override
-	public void render(BaseScreen screen, int xOff, int yOff) {
+	public void render(Scene screen, Graphics graphics, int xOff, int yOff) {
+		// Rendering area background tiles.
 		for (int y = 0; y < this.height; y++) {
 			for (int x = 0; x < this.width; x++) {
 				PixelData data = this.areaData.get(y).get(x);
-				screen.blitBiome(data.getBiomeBitmap(), x * InterfaceTile.WIDTH - xOff, y * InterfaceTile.HEIGHT - yOff, data);
-				screen.blitBiome(data.getBitmap(), x * InterfaceTile.WIDTH - xOff, y * InterfaceTile.HEIGHT - yOff, data);
+				screen.blitBiome(data.getBiomeBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
+
+				// We do not render the pixel data if the pixel data is hidden from view.
+				if (!data.isHidden()) {
+					screen.blitBiome(data.getBitmap(), x * Tileable.WIDTH - xOff, y * Tileable.HEIGHT - yOff, data);
+				}
+				// This is for rendering exit arrows when you are in front of the exit/entrance doors.
 				if (x == this.player.getXInArea() && y == this.player.getYInArea()
-						&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
-					renderExitArrow(screen, xOff, yOff, data, x, y);
-				data.tick();
+					&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
+					this.renderExitArrow(screen, xOff, yOff, data, x, y);
+
+				// Each time the area background tile is rendered, it also updates the bitmap tick updates.
+				data.renderTick();
 			}
 		}
+		// Obstacle dialogues are rendered on top of the area background tiles.
+		this.areaObstacles.forEach((k, obstacle) -> {
+			obstacle.renderDialogue(screen, graphics);
+		});
 
 		if (this.trigger != null) {
 			screen.setOffset(0, 0);
 			this.trigger.render(screen, screen.getBufferedImage().createGraphics());
-			screen.setOffset(screen.getWidth() / 2 - InterfaceTile.WIDTH, (screen.getHeight() - InterfaceTile.HEIGHT) / 2);
+			screen.setOffset(screen.getWidth() / 2 - Tileable.WIDTH, (screen.getHeight() - Tileable.HEIGHT) / 2);
 		}
 	}
 
@@ -547,11 +410,13 @@ public class Area extends Entity {
 	}
 
 	public int getPlayerXInArea() {
-		return this.player.getXInArea();
+		this.xPlayerPosition = this.player.getXInArea();
+		return this.xPlayerPosition;
 	}
 
 	public void setPlayerX(int x) {
 		this.xPlayerPosition = x;
+		this.player.setAreaX(x);
 	}
 
 	public void setSectorID(int value) {
@@ -563,22 +428,25 @@ public class Area extends Entity {
 	}
 
 	public int getPlayerYInArea() {
-		return this.player.getYInArea();
+		this.yPlayerPosition = this.player.getYInArea();
+		return this.yPlayerPosition;
 	}
 
 	public void setPlayerY(int y) {
 		this.yPlayerPosition = y;
+		this.player.setAreaY(y);
 	}
 
 	public void setDebugDefaultPosition() {
 		// When the game starts from the very beginning, the player must always start
 		// from the very first way point.
-		SET_LOOP: for (ArrayList<PixelData> y : this.areaData) {
-			for (PixelData x : y) {
-				if (((x.getColor() >> 24) & 0xFF) == 0x0D) {
-					player.setAreaPosition(x.xPosition, x.yPosition);
-					setPlayerX(x.xPosition);
-					setPlayerY(x.yPosition);
+		SET_LOOP:
+		for (List<PixelData> pixelDataRow : this.areaData) {
+			for (PixelData pixelData : pixelDataRow) {
+				if (((pixelData.getColor() >> 24) & 0xFF) == 0x0D) {
+					this.setPlayerX(pixelData.xPosition);
+					this.setPlayerY(pixelData.yPosition);
+					this.currentPixelData = this.areaData.get(pixelData.yPosition).get(pixelData.xPosition);
 					break SET_LOOP;
 				}
 			}
@@ -588,29 +456,27 @@ public class Area extends Entity {
 	/**
 	 * Sets the player's position according to the given warp point pixel data.
 	 * 
-	 * It's mostly used in conjunction with initializing the area with the player
-	 * position set.
+	 * It's mostly used in conjunction with initializing the area with the player position set.
 	 * 
-	 * @param data The pixel data used to set the default player's position.
+	 * @param data
+	 *            The pixel data used to set the default player's position.
 	 */
 	public void setDefaultPosition(PixelData data) {
 		int color = data.getColor();
 		int alpha = (color >> 24) & 0xFF;
 		switch (alpha) {
-		case 0x04: // Warp point
-		case 0x09: // Door
-		case 0x0B: // Carpet (Indoors)
-		case 0x0C: // Carpet (Outdoors)
-		case 0x0D: // Default starting point.
-		{
-			int green = (color >> 8) & 0xFF;
-			int blue = color & 0xFF;
-			this.xPlayerPosition = green;
-			this.yPlayerPosition = blue;
-			this.player.setAreaPosition(xPlayerPosition, yPlayerPosition);
-			break;
-		}
-
+			case 0x04: // Warp point
+			case 0x09: // Door
+			case 0x0B: // Carpet (Indoors)
+			case 0x0C: // Carpet (Outdoors)
+			case 0x0D: // Default starting point.
+			{
+				int green = (color >> 8) & 0xFF;
+				int blue = color & 0xFF;
+				this.setPlayerX(green);
+				this.setPlayerY(blue);
+				break;
+			}
 		}
 	}
 
@@ -653,15 +519,18 @@ public class Area extends Entity {
 	/**
 	 * Obtains the tile ID of the tile being offset by the player's position.
 	 * 
-	 * @param xOffset The X value offset from the player's X position.
-	 * @param yOffset The Y value offset from the player's Y position.
+	 * @param xOffset
+	 *            The X value offset from the player's X position.
+	 * @param yOffset
+	 *            The Y value offset from the player's Y position.
 	 * @return The tile ID of the tile chosen.
 	 */
 	public int getSurroundingTileID(int xOffset, int yOffset) {
 		PixelData data;
 		try {
-			data = this.areaData.get(yPlayerPosition + yOffset).get(xPlayerPosition + xOffset);
-		} catch (Exception e) {
+			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
+		}
+		catch (Exception e) {
 			return -1;
 		}
 		if (data != null) {
@@ -671,19 +540,19 @@ public class Area extends Entity {
 	}
 
 	/**
-	 * Compares target tile ID with other multiple tile IDs to see if they are one
-	 * of many tiles that the player is allowed to walk on, or when the conditions
-	 * are right for the player to move on the tile.
+	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that
+	 * the player is allowed to walk on, or when the conditions are right for the player to move on the
+	 * tile.
 	 * 
-	 * @param targetIDToCompare The target tile ID used to test and see if it's
-	 *                          allowable for the player to move/walk on. Use
-	 *                          getSurroundingTileID() to fetch the target tile ID.
-	 * @param multipleTileIDs   The many tile IDs that are to be compared to the
-	 *                          target tile ID to see if the target tile ID is one
-	 *                          of the allowed tile IDs. You may use as many tile
-	 *                          IDs for comparison as you wished.
-	 * @return True, if the target tile ID is one of the many tile IDs that's
-	 *         allowable. False, if none of the tile IDs match the target tile ID.
+	 * @param targetIDToCompare
+	 *            The target tile ID used to test and see if it's allowable for the player to move/walk
+	 *            on. Use getSurroundingTileID() to fetch the target tile ID.
+	 * @param multipleTileIDs
+	 *            The many tile IDs that are to be compared to the target tile ID to see if the target
+	 *            tile ID is one of the allowed tile IDs. You may use as many tile IDs for comparison as
+	 *            you wished.
+	 * @return True, if the target tile ID is one of the many tile IDs that's allowable. False, if none
+	 *         of the tile IDs match the target tile ID.
 	 * 
 	 */
 	public boolean checkIfValuesAreAllowed(int targetIDToCompare, int... multipleTileIDs) {
@@ -700,8 +569,9 @@ public class Area extends Entity {
 	public int getTileColor(int xOffset, int yOffset) {
 		PixelData data;
 		try {
-			data = this.areaData.get(yPlayerPosition + yOffset).get(xPlayerPosition + xOffset);
-		} catch (Exception e) {
+			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
+		}
+		catch (Exception e) {
 			return 0;
 		}
 		if (data != null) {
@@ -717,13 +587,20 @@ public class Area extends Entity {
 		this.modifiedAreaData.add(data);
 	}
 
+	public void updateItem(Item item) {
+		PixelData data = item.getPixelData();
+		this.areaData.get(data.yPosition).set(data.xPosition, data);
+		this.modifiedAreaData.add(data);
+	}
+
 	public void loadModifiedPixelDataList() {
 		for (PixelData px : this.modifiedAreaData) {
 			this.areaData.get(px.yPosition).set(px.xPosition, px);
 		}
+		this.modifiedAreaData.clear();
 	}
 
-	public ArrayList<PixelData> getModifiedPixelDataList() {
+	public Set<PixelData> getModifiedPixelDataList() {
 		return this.modifiedAreaData;
 	}
 
@@ -731,15 +608,15 @@ public class Area extends Entity {
 		return this.areaData.get(y).get(x);
 	}
 
-	public ArrayList<ArrayList<PixelData>> getAllPixelDatas() {
+	public List<List<PixelData>> getAllPixelDatas() {
 		return this.areaData;
 	}
 
 	public boolean isDisplayingExitArrow() {
-		return this.displayExitArrow;
+		return this.isExitArrowDisplayed;
 	}
 
-	public ArrayList<Obstacle> getObstaclesList() {
+	public Map<Map.Entry<Integer, Integer>, Obstacle> getObstaclesList() {
 		return this.areaObstacles;
 	}
 
@@ -752,7 +629,40 @@ public class Area extends Entity {
 	}
 
 	public boolean isBeingTriggered() {
-		return this.triggerIsBeingTriggered;
+		return this.isTriggerBeingTriggered;
+	}
+
+	public Entity getEntity(int x, int y) {
+		// Only obstacles and characters are entities.
+		PixelData data = this.getPixelData(x, y);
+		if (Entity.isObstacle(data)) {
+			Obstacle obstacle = this.areaObstacles.get(Map.entry(x, y));
+			if (obstacle != null && obstacle.getPixelData().equals(data)) {
+				return obstacle;
+			}
+			else {
+				throw new NullPointerException("The obstacle shouldn't be null.");
+			}
+		}
+		else if (Entity.isCharacter(data)) {
+			Character character = this.areaCharacters.get(Map.entry(x, y));
+			if (character != null && character.getPixelData().equals(data)) {
+				return character;
+			}
+			else {
+				throw new NullPointerException("The character shouldn't be null.");
+			}
+		}
+		else if (Entity.isItem(data)) {
+			Item item = this.areaItems.get(Map.entry(x, y));
+			if (item != null && item.getPixelData().equals(data)) {
+				return item;
+			}
+			else {
+				throw new NullPointerException("The item shouldn't be null.");
+			}
+		}
+		return null;
 	}
 
 	// --------------------- OVERRIDDEN METHODS -------------------
@@ -765,7 +675,8 @@ public class Area extends Entity {
 				return false;
 			}
 			return true;
-		} else if (obj != null && obj instanceof Integer) {
+		}
+		else if (obj != null && obj instanceof Integer) {
 			Integer BigInt = (Integer) obj;
 			if (!(this.areaID == BigInt.intValue())) {
 				return false;
@@ -787,14 +698,16 @@ public class Area extends Entity {
 
 	// --------------------- PRIVATE METHODS ----------------------
 
-	private void renderExitArrow(BaseScreen screen, int xOff, int yOff, PixelData data, int x, int y) {
+	private void renderExitArrow(Scene screen, int xOff, int yOff, PixelData data, int x, int y) {
 		int height = this.getHeight();
-		if (y + 1 == height && this.player.getFacing() == Player.DOWN) {
-			screen.blitBiome(data.getBiomeBitmap(), x * InterfaceTile.WIDTH - xOff + 4, (y + 1) * InterfaceTile.HEIGHT - yOff + 2, data);
-			this.displayExitArrow = true;
-		} else if (y == 0 && this.player.getFacing() == Player.UP) {
+		if (y + 1 == height && this.player.getFacing() == Character.DOWN) {
+			screen.blitBiome(data.getBiomeBitmap(), x * Tileable.WIDTH - xOff + 4, (y + 1) * Tileable.HEIGHT - yOff + 2, data);
+			this.isExitArrowDisplayed = true;
+		}
+		else if (y == 0 && this.player.getFacing() == Character.UP) {
 			// TODO: Draw exit arrow point upwards.
-		} else
-			this.displayExitArrow = false;
+		}
+		else
+			this.isExitArrowDisplayed = false;
 	}
 }

@@ -1,12 +1,10 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package resources;
 
@@ -20,7 +18,8 @@ import java.util.Enumeration;
 
 import main.MainComponent;
 import screen.BaseBitmap;
-import screen.BaseScreen;
+import screen.Scene;
+import utility.Debug;
 
 public class Art {
 
@@ -167,146 +166,151 @@ public class Art {
 	// Font
 	public static Font font;
 
-	public static void loadAllResources(BaseScreen screen) {
+	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	// Miscellaneous
+	public static int COLOR_DEBUG_GREEN = 0xA4E767;
+
+	public static void loadAllResources(Scene screen) {
 
 		// Animation
-		water = loadAnimation(screen, 16, "art/animation/water/water00");
-		water_top = loadAnimation(screen, 16, "art/animation/water/water_top00");
-		water_top_left = loadAnimation(screen, 16, "art/animation/water/water_top_left00");
-		water_left = loadAnimation(screen, 16, "art/animation/water/water_left00");
-		water_top_right = loadAnimation(screen, 16, "art/animation/water/water_top_right00");
-		water_right = loadAnimation(screen, 16, "art/animation/water/water_right00");
+		Art.water = Art.loadAnimation(screen, 16, "art/animation/water/water00");
+		Art.water_top = Art.loadAnimation(screen, 16, "art/animation/water/water_top00");
+		Art.water_top_left = Art.loadAnimation(screen, 16, "art/animation/water/water_top_left00");
+		Art.water_left = Art.loadAnimation(screen, 16, "art/animation/water/water_left00");
+		Art.water_top_right = Art.loadAnimation(screen, 16, "art/animation/water/water_top_right00");
+		Art.water_right = Art.loadAnimation(screen, 16, "art/animation/water/water_right00");
 		// ----------------------------------------------------------
-		exit_arrow = loadAnimation(screen, 10, "art/animation/arrow/arrow00");
+		Art.exit_arrow = Art.loadAnimation(screen, 10, "art/animation/arrow/arrow00");
 
 		// Dialogue
-		dialogue_next = BaseScreen.load("art/dialog/dialogue_next.png");
-		dialogue_bottom = BaseScreen.load("art/dialog/dialogue_bottom.png");
-		dialogue_bottom_left = BaseScreen.load("art/dialog/dialogue_bottom_left.png");
-		dialogue_left = BaseScreen.load("art/dialog/dialogue_left.png");
-		dialogue_top_left = BaseScreen.load("art/dialog/dialogue_top_left.png");
-		dialogue_top = BaseScreen.load("art/dialog/dialogue_top.png");
-		dialogue_top_right = BaseScreen.load("art/dialog/dialogue_top_right.png");
-		dialogue_right = BaseScreen.load("art/dialog/dialogue_right.png");
-		dialogue_bottom_right = BaseScreen.load("art/dialog/dialogue_bottom_right.png");
-		dialogue_background = BaseScreen.load("art/dialog/dialogue_bg.png");
-		dialogue_pointer = BaseScreen.load("art/dialog/dialogue_pointer.png");
+		Art.dialogue_next = BaseBitmap.load("art/dialog/dialogue_next.png");
+		Art.dialogue_bottom = BaseBitmap.load("art/dialog/dialogue_bottom.png");
+		Art.dialogue_bottom_left = BaseBitmap.load("art/dialog/dialogue_bottom_left.png");
+		Art.dialogue_left = BaseBitmap.load("art/dialog/dialogue_left.png");
+		Art.dialogue_top_left = BaseBitmap.load("art/dialog/dialogue_top_left.png");
+		Art.dialogue_top = BaseBitmap.load("art/dialog/dialogue_top.png");
+		Art.dialogue_top_right = BaseBitmap.load("art/dialog/dialogue_top_right.png");
+		Art.dialogue_right = BaseBitmap.load("art/dialog/dialogue_right.png");
+		Art.dialogue_bottom_right = BaseBitmap.load("art/dialog/dialogue_bottom_right.png");
+		Art.dialogue_background = BaseBitmap.load("art/dialog/dialogue_bg.png");
+		Art.dialogue_pointer = BaseBitmap.load("art/dialog/dialogue_pointer.png");
 
 		// Editor
-		error = BaseScreen.load("art/editor/no_png.png");
+		Art.error = BaseBitmap.load("art/editor/no_png.png");
 
 		// Floor
-		grass = BaseScreen.load("art/floor/grass.png");
-		mt_ground = BaseScreen.load("art/floor/mt_ground.png");
-		forestEntrance = BaseScreen.load("art/floor/forestEntrance.png");
-		path = BaseScreen.load("art/floor/path.png");
-		stairs_left = BaseScreen.load("art/floor/stairs_left.png");
-		stairs_top = BaseScreen.load("art/floor/stairs_top.png");
-		stairs_right = BaseScreen.load("art/floor/stairs_right.png");
-		stairs_bottom = BaseScreen.load("art/floor/stairs_bottom.png");
-		stairs_mt_left = BaseScreen.load("art/floor/stairs_mt_left.png");
-		stairs_mt_top = BaseScreen.load("art/floor/stairs_mt_top.png");
-		stairs_mt_right = BaseScreen.load("art/floor/stairs_mt_right.png");
-		stairs_mt_bottom = BaseScreen.load("art/floor/stairs_mt_bottom.png");
-		carpet_indoors = BaseScreen.load("art/floor/carpet_indoors.png");
-		carpet_outdoors = BaseScreen.load("art/floor/carpet_outdoors.png");
-		hardwood_indoors = BaseScreen.load("art/floor/hardwood_indoors.png");
-		tatami_1_indoors = BaseScreen.load("art/floor/tatami_1_indoors.png");
-		tatami_2_indoors = BaseScreen.load("art/floor/tatami_2_indoors.png");
+		Art.grass = BaseBitmap.load("art/floor/grass.png");
+		Art.mt_ground = BaseBitmap.load("art/floor/mt_ground.png");
+		Art.forestEntrance = BaseBitmap.load("art/floor/forestEntrance.png");
+		Art.path = BaseBitmap.load("art/floor/path.png");
+		Art.stairs_left = BaseBitmap.load("art/floor/stairs_left.png");
+		Art.stairs_top = BaseBitmap.load("art/floor/stairs_top.png");
+		Art.stairs_right = BaseBitmap.load("art/floor/stairs_right.png");
+		Art.stairs_bottom = BaseBitmap.load("art/floor/stairs_bottom.png");
+		Art.stairs_mt_left = BaseBitmap.load("art/floor/stairs_mt_left.png");
+		Art.stairs_mt_top = BaseBitmap.load("art/floor/stairs_mt_top.png");
+		Art.stairs_mt_right = BaseBitmap.load("art/floor/stairs_mt_right.png");
+		Art.stairs_mt_bottom = BaseBitmap.load("art/floor/stairs_mt_bottom.png");
+		Art.carpet_indoors = BaseBitmap.load("art/floor/carpet_indoors.png");
+		Art.carpet_outdoors = BaseBitmap.load("art/floor/carpet_outdoors.png");
+		Art.hardwood_indoors = BaseBitmap.load("art/floor/hardwood_indoors.png");
+		Art.tatami_1_indoors = BaseBitmap.load("art/floor/tatami_1_indoors.png");
+		Art.tatami_2_indoors = BaseBitmap.load("art/floor/tatami_2_indoors.png");
 
 		// House
-		house_door = BaseScreen.load("art/house/house_door.png");
-		house_bottom = BaseScreen.load("art/house/house_bottom.png");
-		house_bottom_left = BaseScreen.load("art/house/house_bottom_left.png");
-		house_bottom_right = BaseScreen.load("art/house/house_bottom_right.png");
-		house_center = BaseScreen.load("art/house/house_center.png");
-		house_center_windows_center = BaseScreen.load("art/house/house_center_windows_center.png");
-		house_center_windows_left = BaseScreen.load("art/house/house_center_windows_left.png");
-		house_center_windows_right = BaseScreen.load("art/house/house_center_windows_right.png");
-		house_left = BaseScreen.load("art/house/house_left.png");
-		house_left_windows_right = BaseScreen.load("art/house/house_left_windows_right.png");
-		house_right = BaseScreen.load("art/house/house_right.png");
-		house_right_windows_left = BaseScreen.load("art/house/house_right_windows_left.png");
-		house_roof_left = BaseScreen.load("art/house/house_roof_left.png");
-		house_roof_middle = BaseScreen.load("art/house/house_roof_middle.png");
-		house_roof_right = BaseScreen.load("art/house/house_roof_right.png");
+		Art.house_door = BaseBitmap.load("art/house/house_door.png");
+		Art.house_bottom = BaseBitmap.load("art/house/house_bottom.png");
+		Art.house_bottom_left = BaseBitmap.load("art/house/house_bottom_left.png");
+		Art.house_bottom_right = BaseBitmap.load("art/house/house_bottom_right.png");
+		Art.house_center = BaseBitmap.load("art/house/house_center.png");
+		Art.house_center_windows_center = BaseBitmap.load("art/house/house_center_windows_center.png");
+		Art.house_center_windows_left = BaseBitmap.load("art/house/house_center_windows_left.png");
+		Art.house_center_windows_right = BaseBitmap.load("art/house/house_center_windows_right.png");
+		Art.house_left = BaseBitmap.load("art/house/house_left.png");
+		Art.house_left_windows_right = BaseBitmap.load("art/house/house_left_windows_right.png");
+		Art.house_right = BaseBitmap.load("art/house/house_right.png");
+		Art.house_right_windows_left = BaseBitmap.load("art/house/house_right_windows_left.png");
+		Art.house_roof_left = BaseBitmap.load("art/house/house_roof_left.png");
+		Art.house_roof_middle = BaseBitmap.load("art/house/house_roof_middle.png");
+		Art.house_roof_right = BaseBitmap.load("art/house/house_roof_right.png");
 
 		// Inventory
-		inventory_gui = BaseScreen.load("art/inventory/inventory_gui.png");
-		inventory_backpack_potions = BaseScreen.load("art/inventory/backpack_potions.png");
-		inventory_backpack_keyItems = BaseScreen.load("art/inventory/backpack_keyitems.png");
-		inventory_backpack_pokeballs = BaseScreen.load("art/inventory/backpack_pokeballs.png");
-		inventory_backpack_TM_HM = BaseScreen.load("art/inventory/backpack_tm_hm.png");
-		inventory_tag_potions = BaseScreen.load("art/inventory/potions.png");
-		inventory_tag_keyItems = BaseScreen.load("art/inventory/keyitems.png");
-		inventory_tag_pokeballs = BaseScreen.load("art/inventory/pokeballs.png");
-		inventory_tag_TM_HM = BaseScreen.load("art/inventory/tm_hm.png");
+		Art.inventory_gui = BaseBitmap.load("art/inventory/inventory_gui.png");
+		Art.inventory_backpack_potions = BaseBitmap.load("art/inventory/backpack_potions.png");
+		Art.inventory_backpack_keyItems = BaseBitmap.load("art/inventory/backpack_keyitems.png");
+		Art.inventory_backpack_pokeballs = BaseBitmap.load("art/inventory/backpack_pokeballs.png");
+		Art.inventory_backpack_TM_HM = BaseBitmap.load("art/inventory/backpack_tm_hm.png");
+		Art.inventory_tag_potions = BaseBitmap.load("art/inventory/potions.png");
+		Art.inventory_tag_keyItems = BaseBitmap.load("art/inventory/keyitems.png");
+		Art.inventory_tag_pokeballs = BaseBitmap.load("art/inventory/pokeballs.png");
+		Art.inventory_tag_TM_HM = BaseBitmap.load("art/inventory/tm_hm.png");
 
 		// Ledges
-		ledge_bottom = BaseScreen.load("art/ledge/ledge_bottom.png");
-		ledge_bottom_left = BaseScreen.load("art/ledge/ledge_bottom_left.png");
-		ledge_left = BaseScreen.load("art/ledge/ledge_left.png");
-		ledge_top_left = BaseScreen.load("art/ledge/ledge_top_left.png");
-		ledge_top = BaseScreen.load("art/ledge/ledge_top.png");
-		ledge_top_right = BaseScreen.load("art/ledge/ledge_top_right.png");
-		ledge_right = BaseScreen.load("art/ledge/ledge_right.png");
-		ledge_bottom_right = BaseScreen.load("art/ledge/ledge_bottom_right.png");
-		Ledge_bottom_left_corner = BaseScreen.load("art/ledge/ledge_bottom_left_corner.png");
-		Ledge_bottom_right_corner = BaseScreen.load("art/ledge/ledge_bottom_right_corner.png");
-		ledge_mt_bottom = BaseScreen.load("art/ledge/ledge_mt_bottom.png");
-		ledge_mt_bottom_left = BaseScreen.load("art/ledge/ledge_mt_bottom_left.png");
-		ledge_mt_left = BaseScreen.load("art/ledge/ledge_mt_left.png");
-		ledge_mt_top_left = BaseScreen.load("art/ledge/ledge_mt_top_left.png");
-		ledge_mt_top = BaseScreen.load("art/ledge/ledge_mt_top.png");
-		ledge_mt_top_right = BaseScreen.load("art/ledge/ledge_mt_top_right.png");
-		ledge_mt_right = BaseScreen.load("art/ledge/ledge_mt_right.png");
-		ledge_mt_bottom_right = BaseScreen.load("art/ledge/ledge_mt_bottom_right.png");
-		ledge_inner_bottom = BaseScreen.load("art/ledge/ledge_inner_bottom.png");
-		ledge_inner_bottom_left = BaseScreen.load("art/ledge/ledge_inner_bottom_left.png");
-		ledge_inner_left = BaseScreen.load("art/ledge/ledge_inner_left.png");
-		ledge_inner_top_left = BaseScreen.load("art/ledge/ledge_inner_top_left.png");
-		ledge_inner_top = BaseScreen.load("art/ledge/ledge_inner_top.png");
-		ledge_inner_top_right = BaseScreen.load("art/ledge/ledge_inner_top_right.png");
-		ledge_inner_right = BaseScreen.load("art/ledge/ledge_inner_right.png");
-		ledge_inner_bottom_right = BaseScreen.load("art/ledge/ledge_inner_bottom_right.png");
+		Art.ledge_bottom = BaseBitmap.load("art/ledge/ledge_bottom.png");
+		Art.ledge_bottom_left = BaseBitmap.load("art/ledge/ledge_bottom_left.png");
+		Art.ledge_left = BaseBitmap.load("art/ledge/ledge_left.png");
+		Art.ledge_top_left = BaseBitmap.load("art/ledge/ledge_top_left.png");
+		Art.ledge_top = BaseBitmap.load("art/ledge/ledge_top.png");
+		Art.ledge_top_right = BaseBitmap.load("art/ledge/ledge_top_right.png");
+		Art.ledge_right = BaseBitmap.load("art/ledge/ledge_right.png");
+		Art.ledge_bottom_right = BaseBitmap.load("art/ledge/ledge_bottom_right.png");
+		Art.Ledge_bottom_left_corner = BaseBitmap.load("art/ledge/ledge_bottom_left_corner.png");
+		Art.Ledge_bottom_right_corner = BaseBitmap.load("art/ledge/ledge_bottom_right_corner.png");
+		Art.ledge_mt_bottom = BaseBitmap.load("art/ledge/ledge_mt_bottom.png");
+		Art.ledge_mt_bottom_left = BaseBitmap.load("art/ledge/ledge_mt_bottom_left.png");
+		Art.ledge_mt_left = BaseBitmap.load("art/ledge/ledge_mt_left.png");
+		Art.ledge_mt_top_left = BaseBitmap.load("art/ledge/ledge_mt_top_left.png");
+		Art.ledge_mt_top = BaseBitmap.load("art/ledge/ledge_mt_top.png");
+		Art.ledge_mt_top_right = BaseBitmap.load("art/ledge/ledge_mt_top_right.png");
+		Art.ledge_mt_right = BaseBitmap.load("art/ledge/ledge_mt_right.png");
+		Art.ledge_mt_bottom_right = BaseBitmap.load("art/ledge/ledge_mt_bottom_right.png");
+		Art.ledge_inner_bottom = BaseBitmap.load("art/ledge/ledge_inner_bottom.png");
+		Art.ledge_inner_bottom_left = BaseBitmap.load("art/ledge/ledge_inner_bottom_left.png");
+		Art.ledge_inner_left = BaseBitmap.load("art/ledge/ledge_inner_left.png");
+		Art.ledge_inner_top_left = BaseBitmap.load("art/ledge/ledge_inner_top_left.png");
+		Art.ledge_inner_top = BaseBitmap.load("art/ledge/ledge_inner_top.png");
+		Art.ledge_inner_top_right = BaseBitmap.load("art/ledge/ledge_inner_top_right.png");
+		Art.ledge_inner_right = BaseBitmap.load("art/ledge/ledge_inner_right.png");
+		Art.ledge_inner_bottom_right = BaseBitmap.load("art/ledge/ledge_inner_bottom_right.png");
 
 		// Object
-		item = BaseScreen.load("art/object/item.png");
+		Art.item = BaseBitmap.load("art/object/item.png");
 
 		// Obstacle
-		logs = BaseScreen.load("art/obstacle/logs.png");
-		planks = BaseScreen.load("art/obstacle/planks.png");
-		scaffolding_left = BaseScreen.load("art/obstacle/scaffolding_left.png");
-		scaffolding_right = BaseScreen.load("art/obstacle/scaffolding_right.png");
-		smallTree = BaseScreen.load("art/obstacle/small_tree.png");
-		sign = BaseScreen.load("art/obstacle/sign.png");
-		workbench_left = BaseScreen.load("art/obstacle/workbench_left.png");
-		workbench_right = BaseScreen.load("art/obstacle/workbench_right.png");
-		deadSmallTree = BaseScreen.load("art/obstacle/dead_small_tree.png");
+		Art.logs = BaseBitmap.load("art/obstacle/logs.png");
+		Art.planks = BaseBitmap.load("art/obstacle/planks.png");
+		Art.scaffolding_left = BaseBitmap.load("art/obstacle/scaffolding_left.png");
+		Art.scaffolding_right = BaseBitmap.load("art/obstacle/scaffolding_right.png");
+		Art.smallTree = BaseBitmap.load("art/obstacle/small_tree.png");
+		Art.sign = BaseBitmap.load("art/obstacle/sign.png");
+		Art.workbench_left = BaseBitmap.load("art/obstacle/workbench_left.png");
+		Art.workbench_right = BaseBitmap.load("art/obstacle/workbench_right.png");
+		Art.deadSmallTree = BaseBitmap.load("art/obstacle/dead_small_tree.png");
 
 		// Player, NPCs
-		player = screen.cut("art/player/player.png", 16, 16, 0, 0);
-		player_surf = screen.cut("art/player/player_surf.png", 16, 16, 0, 0);
-		player_bicycle = screen.cut("art/player/player_bicycle.png", 16, 16, 0, 0);
-		shadow = BaseScreen.load("art/player/shadow.png");
+		Art.player = screen.cut("art/player/player.png", 16, 16, 0, 0);
+		Art.player_surf = screen.cut("art/player/player_surf.png", 16, 16, 0, 0);
+		Art.player_bicycle = screen.cut("art/player/player_bicycle.png", 16, 16, 0, 0);
+		Art.shadow = BaseBitmap.load("art/player/shadow.png");
 
 		// Areas
-		testArea = BaseScreen.load("area/test/testArea.png");
-		testArea2 = BaseScreen.load("area/test/testArea2.png");
+		Art.testArea = BaseBitmap.load("art/area/test/testArea.png");
+		Art.testArea2 = BaseBitmap.load("art/area/test/testArea2.png");
 
 		// Miscellaneous
-		font = loadFont("font/font.ttf");
+		Art.font = Art.loadFont("art/font/font.ttf");
 
 	}
 
-	private static BaseBitmap[] loadAnimation(BaseScreen screen, int frames, String filename) {
+	private static BaseBitmap[] loadAnimation(Scene screen, int frames, String filename) {
 		BaseBitmap[] result = new BaseBitmap[frames];
 		for (int i = 0; i < frames; i++) {
 			// There are 16 frames for the water.
 			if (i < 10) {
-				result[i] = BaseScreen.load(filename + "0" + String.valueOf(i) + ".png");
-			} else {
-				result[i] = BaseScreen.load(filename + String.valueOf(i) + ".png");
+				result[i] = BaseBitmap.load(filename + "0" + String.valueOf(i) + ".png");
+			}
+			else {
+				result[i] = BaseBitmap.load(filename + String.valueOf(i) + ".png");
 			}
 		}
 		return result;
@@ -317,7 +321,8 @@ public class Art {
 		URL url = null;
 		try {
 			urls = Art.class.getClassLoader().getResources(filename);
-		} catch (IOException e2) {
+		}
+		catch (IOException e2) {
 			e2.printStackTrace();
 		}
 		for (; urls.hasMoreElements();)
@@ -327,29 +332,36 @@ public class Art {
 		Font result = null;
 		try {
 			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
-		} catch (FontFormatException e) {
+		}
+		catch (FontFormatException e) {
 			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
-		} catch (NullPointerException e) {
+		}
+		catch (NullPointerException e) {
 			try {
 				result = Font.createFont(Font.TRUETYPE_FONT, Art.class.getResourceAsStream(filename));
-			} catch (FontFormatException e1) {
+			}
+			catch (FontFormatException e1) {
 				e1.printStackTrace();
-			} catch (IOException e1) {
+			}
+			catch (IOException e1) {
 				e1.printStackTrace();
 				try {
 					result = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/font.ttf"));
-				} catch (FontFormatException e2) {
+				}
+				catch (FontFormatException e2) {
 					e2.printStackTrace();
-				} catch (IOException e2) {
+				}
+				catch (IOException e2) {
 					e2.printStackTrace();
 				}
 			}
 		}
 		if (result != null) {
 			ge.registerFont(result);
-			System.out.println(filename);
+			Debug.log(filename);
 		}
 		return result.deriveFont(Font.PLAIN, 8f * MainComponent.GAME_SCALE);
 	}
@@ -362,12 +374,12 @@ public class Art {
 			int alpha = (pixels[i] >> 24) & 0xFF;
 			// May be possible this will expand in the future.
 			switch (alpha) {
-			case 0x01:
-				resultPixels[i] = 0xFF000000 | BaseScreen.lighten(color, 0.2f);
-				break;
-			default:
-				resultPixels[i] = 0xFF000000 | BaseScreen.darken(color, 0.1f);
-				break;
+				case 0x01:
+					resultPixels[i] = 0xFF000000 | Scene.lighten(color, 0.2f);
+					break;
+				default:
+					resultPixels[i] = 0xFF000000 | Scene.darken(color, 0.1f);
+					break;
 			}
 		}
 		return result;

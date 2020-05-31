@@ -1,12 +1,10 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package editor;
 
@@ -15,8 +13,12 @@ import javax.swing.JButton;
 
 public class Data {
 	enum DataType {
-		ALPHA, RED, GREEN, BLUE;
-	};
+		ALPHA,
+		RED,
+		GREEN,
+		BLUE,
+		NONE;
+	}
 
 	public String name;
 	public String filepath;
@@ -33,12 +35,12 @@ public class Data {
 	public boolean blueByEditor;
 
 	public Data() {
-		name = filepath = "";
-		alpha = red = green = blue = editorID = 0;
-		image = null;
-		button = null;
-		areaTypeIDType = DataType.ALPHA;
-		areaTypeIncluded = alphaByEditor = redByEditor = greenByEditor = blueByEditor = false;
+		this.name = this.filepath = "";
+		this.alpha = this.red = this.green = this.blue = this.editorID = 0;
+		this.image = null;
+		this.button = null;
+		this.areaTypeIDType = DataType.ALPHA;
+		this.areaTypeIncluded = this.alphaByEditor = this.redByEditor = this.greenByEditor = this.blueByEditor = false;
 	}
 
 	public boolean compare(Data d) {
@@ -50,6 +52,13 @@ public class Data {
 	}
 
 	public int getColorValue() {
-		return (alpha << 24) | (red << 16) | (green << 8) | blue;
+		return (this.alpha << 24) | (this.red << 16) | (this.green << 8) | this.blue;
+	}
+
+	public void setColorValue(int value) {
+		this.alpha = (value & 0xFF000000) >> 24;
+		this.red = (value & 0xFF0000) >> 16;
+		this.green = (value & 0xFF00) >> 8;
+		this.blue = (value & 0xFF);
 	}
 }

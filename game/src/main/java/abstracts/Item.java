@@ -1,64 +1,70 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package abstracts;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.AbstractMap;
+import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.Formatter;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
+import dialogue.Dialogue;
+import dialogue.Dialogue.DialogueType;
 import entity.Player;
-import interfaces.InterfaceItem;
-import item.ActionItem;
+import interfaces.Renderable;
 import item.Bicycle;
-import item.DummyItem;
-import item.ItemText;
+import item.ReturnMenu;
+import item.ModdedItem;
 import level.Area;
-import level.WorldConstants;
+import level.PixelData;
 import main.Game;
-import main.MainComponent;
+import menu.Inventory;
 import resources.Art;
-import screen.BaseScreen;
-import submenu.Inventory;
+import screen.Scene;
+import utility.DialogueBuilder;
 
-public abstract class Item implements Comparable<Item>, InterfaceItem {
+/**
+ * Any base implementations of the abstract class object, Item, will need to implement or devise a
+ * way to create Dialogues associated with that item object.
+ * 
+ * @author tlee
+ *
+ */
+public abstract class Item extends Entity implements Comparable<Item>, Renderable {
 
 	public enum Category {
 		// @formatter:off
-		POTIONS(0), 
-		KEYITEMS(1), 
-		POKEBALLS(2), 
-		TM_HM(3);
+		POTIONS(0x00, "Potions"), 
+		KEYITEMS(0x01, "KeyItems"), 
+		POKEBALLS(0x02, "Pokéballs"), 
+		TM_HM(0x03, "TMs_HMs");
 		// @formatter:on
 
+		private byte categoryByte;
 		private int id;
+		private String keyString;
 
-		private Category(int value) {
+		private Category(int value, String key) {
 			this.id = value;
+			this.categoryByte = (byte) value;
+			this.keyString = key;
 		}
 
 		/**
 		 * Obtains a Category enum value that matches the given ID number.
 		 * 
 		 * <p>
-		 * If there is no Category that comes after the last element, it will give the first element, and wraps from there.
+		 * If there is no Category that comes after the last element, it will give the first element, and
+		 * wraps from there.
 		 * </p>
 		 * 
-		 * @param value The ID number of the category that is to be obtained.
+		 * @param value
+		 *            The ID number of the category that is to be obtained.
 		 * 
 		 * @return The category that matches the given ID number.
 		 */
@@ -76,54 +82,94 @@ public abstract class Item implements Comparable<Item>, InterfaceItem {
 		}
 
 		public int getID() {
-			return id;
+			return this.id;
 		}
-	};
 
-	protected String name;
-	protected String description;
-	protected Game game;
-	protected Category category;
-	protected boolean picked;
-	protected int id;
-	protected List<String> availableCommands;
+		public byte getByte() {
+			return this.categoryByte;
+		}
 
-	private static final String TAG_POTIONS = "POTIONS";
-	private static final String TAG_KEYITEMS = "KEYITEMS";
-	private static final String TAG_POKEBALLS = "POKEBALLS";
-	private static final String TAG_TM_HM = "TM_HM";
-	private static final String TAG_ALL = "ALL";
-	private static final String FLAG_SET_COMMAND = "$";
-	private static final String FLAG_USE_COMMAND = "!";
-	private static final String FLAG_TOSS_COMMAND = "&";
-	private static final String ITEM_DELIMITER = ";";
+		public String getKey() {
+			return this.keyString;
+		}
 
-	public Item(Game game, String name, String description, Category category, int id) {
-		setName(name);
-		setDescription(description);
-		setCategory(category);
-		setID(id);
-		this.game = game;
-		this.picked = false;
-		availableCommands = new ArrayList<String>();
+		/**
+		 * Returns the correct Category enum value. Otherwise, returns null if no Category matches the
+		 * value.
+		 * 
+		 * @param value
+		 * @return
+		 */
+		public static Category convert(byte value) {
+			if (value == POTIONS.getByte())
+				return POTIONS;
+			if (value == KEYITEMS.getByte())
+				return KEYITEMS;
+			if (value == POKEBALLS.getByte())
+				return POKEBALLS;
+			if (value == TM_HM.getByte())
+				return TM_HM;
+			return null;
+		}
 	}
 
-	public Item(Game game, ItemText itemText) {
-		setName(itemText.itemName);
-		setDescription(itemText.description);
-		setCategory(itemText.category);
-		setID(itemText.id);
-		this.game = game;
+	protected String name;
+	protected String dialogueName;
+	protected String description;
+	protected Category category;
+	protected boolean picked;
+	protected boolean isReturnMenuFlag;
+	protected int id;
+	protected List<String> availableCommands;
+	protected Dialogue pickedDialogue;
+	protected Dialogue tossedDialogue;
+	protected Inventory inventory;
+
+	private boolean afterItemActionOccurred = false;
+
+	public Item(String name, String description, Category category, int id) {
+		this.setName(name);
+		this.setDescription(description);
+		this.setCategory(category);
+		this.setID(id);
 		this.picked = false;
-		availableCommands = new ArrayList<String>();
-		initializeCommands(itemText);
+
+		// We do not preload available commands from in-game data. This is handled automatically by the
+		// subclasses of Item.
+		this.availableCommands = new ArrayList<>();
+
+		try (Formatter formatter = new Formatter()) {
+			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", name);
+			this.dialogueName = formatter.toString();
+		}
+	}
+
+	public Item(ModdedItem itemText) {
+		this.setName(itemText.itemName);
+		this.setDescription(itemText.description);
+		this.setCategory(itemText.category);
+		this.setID(itemText.id);
+		this.picked = false;
+		this.availableCommands = new ArrayList<>();
+		this.initializeCommands(itemText);
+
+		try (Formatter formatter = new Formatter()) {
+			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", itemText.itemName);
+			this.dialogueName = formatter.toString();
+		}
 	}
 
 	public void setName(String value) {
+		if (value == null || value.isBlank() || value.isEmpty()) {
+			value = "UnknownItem";
+		}
 		this.name = value;
 	}
 
 	public void setDescription(String value) {
+		if (value == null || value.isBlank() || value.isEmpty()) {
+			value = "Unknown Item was found.";
+		}
 		this.description = value;
 	}
 
@@ -135,19 +181,22 @@ public abstract class Item implements Comparable<Item>, InterfaceItem {
 		this.id = value;
 	}
 
-	@Override
-	public void render(BaseScreen output, int xOffset, int yOffset) {
-		if (!this.picked) {
-			output.blit(Art.item, xOffset, yOffset);
-		}
+	public String getName() {
+		return this.name;
 	}
 
-	public String getName() {
-		return name;
+	/**
+	 * This returns the item's name, with extra padded whitespace. This name fills up the entire row of
+	 * the dialogue box.
+	 * 
+	 * @return
+	 */
+	public String getDialogueName() {
+		return this.dialogueName;
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public Category getCategory() {
@@ -160,10 +209,97 @@ public abstract class Item implements Comparable<Item>, InterfaceItem {
 
 	public void pick() {
 		this.picked = true;
+		this.hide();
+
+		this.afterItemActionOccurred = true;
+		if (this.pickedDialogue == null || !this.pickedDialogue.isReady()) {
+			this.pickedDialogue = DialogueBuilder.createText(
+				// Intentionally setting the first row of the dialogue to be only the item name, then the second
+				// sentence to be a fixed sized sentence.
+				this.getDialogueName() + "has been found.",
+				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
+			);
+			this.pickedDialogue.setShowDialog(true);
+		}
+		if (!(this.pickedDialogue.isDialogueCompleted() && this.pickedDialogue.isShowingDialog())) {
+			this.pickedDialogue.tick();
+		}
+		// We want the player to interact with the dialogue for the final time, before dismissing it.
+		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
+			this.afterItemActionOccurred = false;
+			this.pickedDialogue.clearDialogueLines();
+			this.pickedDialogue.setShowDialog(false);
+
+			// We need to completely remove the item out from the area world.
+		}
 	}
 
 	public void drop() {
 		this.picked = false;
+		this.reveal();
+
+		this.afterItemActionOccurred = true;
+		if (this.tossedDialogue == null || !this.tossedDialogue.isReady()) {
+			this.tossedDialogue = DialogueBuilder.createText(
+				// Intentionally setting the first row of the dialogue to be only the item name, then the second
+				// sentence to be a fixed sized sentence.
+				this.getDialogueName() + "was tossed away.",
+				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
+			);
+			this.tossedDialogue.setShowDialog(true);
+		}
+		if (!(this.tossedDialogue.isDialogueCompleted() && this.tossedDialogue.isShowingDialog())) {
+			this.tossedDialogue.tick();
+		}
+		// We want the player to interact with the dialogue for the final time, before dismissing it.
+		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
+			this.afterItemActionOccurred = false;
+			this.tossedDialogue.clearDialogueLines();
+			this.tossedDialogue.setShowDialog(false);
+		}
+	}
+
+	public void hide() {
+		this.getPixelData().hide();
+	}
+
+	public void reveal() {
+		this.getPixelData().reveal();
+	}
+
+	/**
+	 * Checks whether this item can be tossed away or sold in the PokeMart.
+	 * 
+	 * This can also be used to check whether the item is a Key Item or not.
+	 * 
+	 * @return True always for any item that is not a Key Item. False if the item is a Key Item.
+	 */
+	public boolean canBeTossed() {
+		return true;
+	}
+
+	/**
+	 * Two conditions must be satisfied before claiming the item has been properly picked up.<br/>
+	 * <ol>
+	 * <li>The action to initiate "picking up" has been triggered.
+	 * <li>The event "after picking up" has finished triggering.
+	 * </ol>
+	 * The conditional check has a short-circuited condition where if the "after picking up" event is
+	 * currently triggered, the item is still not properly picked up.
+	 * 
+	 * @return True if the item has been properly picked up. False, if otherwise.
+	 */
+	public boolean isPickedUp() {
+		return !this.afterItemActionOccurred && (this.picked);
+	}
+
+	/**
+	 * This checks if the event, "after picking up" has finished triggering.
+	 * 
+	 * @return True if the item has finished triggering the "after picked up" event.
+	 */
+	public boolean isFinishedPickingUp() {
+		return !this.afterItemActionOccurred;
 	}
 
 	public void droppedAt(Area area, Player player) {
@@ -171,11 +307,31 @@ public abstract class Item implements Comparable<Item>, InterfaceItem {
 		this.dropAt(area, player);
 	}
 
+	/**
+	 * Returns true, only if the item is a DummyItem, and the item itself is a menu item, "RETURN".
+	 * False, if otherwise.
+	 * 
+	 * @return
+	 */
+	public boolean isReturnMenu() {
+		boolean isDummy = this instanceof ReturnMenu;
+		return isDummy && this.isReturnMenuFlag;
+	}
+
+	public void setReturnMenu(boolean value) {
+		this.isReturnMenuFlag = value;
+	}
+
+	/**
+	 * Items must provide a default available commands to the Inventory menu dialogue.
+	 * <p>
+	 * More specific items can provide additional available commands to the Inventory menu.
+	 */
 	public List<String> getAvailableCommands() {
 		return this.availableCommands;
 	}
 
-	public void initializeCommands(ItemText itemText) {
+	public void initializeCommands(ModdedItem itemText) {
 		this.availableCommands.add(0, Inventory.MENU_CANCEL);
 		if (itemText.tossCommandFlag)
 			this.availableCommands.add(0, Inventory.MENU_TOSS);
@@ -185,10 +341,33 @@ public abstract class Item implements Comparable<Item>, InterfaceItem {
 			this.availableCommands.add(0, Inventory.MENU_USE);
 	}
 
-	public abstract void doAction();
+	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
+	}
+
+	public abstract void doAction(Game game);
 
 	// TODO: Add function that allows the item to be placed at.
 	public abstract void dropAt(Area area, Player player);
+
+	@Override
+	public void tick() {
+		// Items rarely have update ticks.
+		return;
+	}
+
+	@Override
+	public void render(Scene output, Graphics graphics, int xOffset, int yOffset) {
+		if (!this.picked) {
+			output.blit(Art.item, xOffset, yOffset);
+		}
+		if (this.afterItemActionOccurred) {
+			if (this.pickedDialogue.isReady())
+				this.pickedDialogue.render(output, graphics);
+			else if (this.tossedDialogue.isReady())
+				this.tossedDialogue.render(output, graphics);
+		}
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -198,14 +377,14 @@ public abstract class Item implements Comparable<Item>, InterfaceItem {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
 		Item other = (Item) obj;
-		if (category != other.category) {
+		if (this.category != other.category) {
 			return false;
 		}
-		if (id != other.id) {
+		if (this.id != other.id) {
 			return false;
 		}
 		return true;
@@ -215,8 +394,8 @@ public abstract class Item implements Comparable<Item>, InterfaceItem {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((category == null) ? 0 : category.hashCode());
-		result = prime * result + id;
+		result = prime * result + ((this.category == null) ? 0 : this.category.hashCode());
+		result = prime * result + this.id;
 		return result;
 	}
 
@@ -225,144 +404,27 @@ public abstract class Item implements Comparable<Item>, InterfaceItem {
 		return this.id - other.id;
 	}
 
-	public static HashMap<Integer, ItemText> loadItemResources(String filename) {
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
-			String line;
-			ItemText itemText = new ItemText();
-			HashMap<Integer, ItemText> result = new HashMap<Integer, ItemText>();
-			int id = 0;
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("%")) {
-					itemText.type = ItemText.Type.getType(line.split("%")[1]);
-				} else if (line.startsWith("#")) {
-					itemText.itemName = line.split("#")[1];
-				} else if (line.startsWith("@")) {
-					itemText.description = line.split("@")[1];
-				} else if (line.startsWith("^")) {
-					// '^' is a special character, therefore, one must use backslashes to get the
-					// literal form.
-					String value = line.split("\\^")[1];
-					if (value.equals(TAG_POTIONS)) {
-						itemText.category = Category.POTIONS;
-					} else if (value.equals(TAG_KEYITEMS)) {
-						itemText.category = Category.KEYITEMS;
-					} else if (value.equals(TAG_POKEBALLS)) {
-						itemText.category = Category.POKEBALLS;
-					} else if (value.equals(TAG_TM_HM)) {
-						itemText.category = Category.TM_HM;
-					} else if (value.equals(TAG_ALL)) {
-						itemText.skipCheckCategory = true;
-					}
-				} else if (line.startsWith(FLAG_SET_COMMAND)) {
-					itemText.setCommandFlag = true;
-				} else if (line.startsWith(FLAG_USE_COMMAND)) {
-					itemText.useCommandFlag = true;
-				} else if (line.startsWith(FLAG_TOSS_COMMAND)) {
-					itemText.tossCommandFlag = true;
-				} else if (line.startsWith(ITEM_DELIMITER)) {
-					itemText.done = true;
-				}
+	public static Item build(PixelData pixelData) {
+		// Assume the pixel data is of type Item.
+		Item item = null;
 
-				if (itemText.isComplete()) {
-					itemText.id = id;
-					result.put(id, itemText);
-					itemText = new ItemText();
-					id++;
-				}
-			}
-			return result;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	public static ArrayList<Map.Entry<ItemText, Item>> loadItems(String filename) {
-		ArrayList<Map.Entry<ItemText, Item>> result = new ArrayList<Map.Entry<ItemText, Item>>();
-		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
-			String line;
-			ItemText itemText = new ItemText();
-
-			int id = 0;
-			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("%")) {
-					itemText.type = ItemText.Type.getType(line.split("%")[1]);
-				} else if (line.startsWith("#")) {
-					itemText.itemName = line.split("#")[1];
-				} else if (line.startsWith("@")) {
-					itemText.description = line.split("@")[1];
-				} else if (line.startsWith("^")) {
-					// '^' is a special character, therefore, one must use backslashes to get the
-					// literal form.
-					String value = line.split("\\^")[1];
-					if (value.equals(TAG_POTIONS)) {
-						itemText.category = Category.POTIONS;
-					} else if (value.equals(TAG_KEYITEMS)) {
-						itemText.category = Category.KEYITEMS;
-					} else if (value.equals(TAG_POKEBALLS)) {
-						itemText.category = Category.POKEBALLS;
-					} else if (value.equals(TAG_TM_HM)) {
-						itemText.category = Category.TM_HM;
-					} else if (value.equals(TAG_ALL)) {
-						itemText.skipCheckCategory = true;
-					}
-				} else if (line.startsWith(FLAG_SET_COMMAND)) {
-					itemText.setCommandFlag = true;
-				} else if (line.startsWith(FLAG_USE_COMMAND)) {
-					itemText.useCommandFlag = true;
-				} else if (line.startsWith(FLAG_TOSS_COMMAND)) {
-					itemText.tossCommandFlag = true;
-				} else if (line.startsWith(ITEM_DELIMITER)) {
-					itemText.done = true;
-				}
-
-				if (itemText.isComplete()) {
-					itemText.id = id;
-					result.add(new AbstractMap.SimpleEntry<ItemText, Item>(itemText, createNewItem(itemText)));
-					itemText = new ItemText();
-					id++;
-				}
-			}
-
-			Collections.sort(result, new Comparator<Map.Entry<ItemText, Item>>() {
-				@Override
-				public int compare(Entry<ItemText, Item> e1, Entry<ItemText, Item> e2) {
-					if (e1.getKey().id < e2.getKey().id)
-						return -1;
-					if (e1.getKey().id > e2.getKey().id)
-						return 1;
-					return 0;
-				}
-			});
-
-			return result;
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	public static Item createNewItem(ItemText text) {
-		Item result = null;
-		switch (text.type) {
-			case DUMMY:
-				result = new DummyItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
-				break;
-			case ACTION:
-				switch (text.id) {
-					case WorldConstants.ITEM_BICYCLE:
-						result = new Bicycle(MainComponent.getGame(), text.itemName, text.description, text.category);
-						break;
-					default:
-						result = new ActionItem(MainComponent.getGame(), text.itemName, text.description, text.category, text.id);
-						break;
+		// Using unique item IDs to determine the item type to use.
+		int red = pixelData.getRed();
+		int blue = pixelData.getBlue();
+		// TODO(Thompson): Figure out how to assign items from the Area map based on PixelData.
+		// Red - Item Unique ID
+		switch (red) {
+			case 0x03: {// Bicycle
+				// Key item check
+				if (blue == 0x01) {
+					// This is a key item.
+					item = new Bicycle(pixelData);
 				}
 				break;
-			case ALL:
+			}
 			default:
-				result = null;
 				break;
 		}
-		return result;
+		return item;
 	}
 }

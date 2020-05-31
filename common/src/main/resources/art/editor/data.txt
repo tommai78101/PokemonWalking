@@ -12,17 +12,33 @@
 # -----------------------------------------
 # -: New Section.
 # _: Space character placeholder.
-# *: Includes area type.
+# *: Includes area type. Can only appear once per line max. Same functionality as @ otherwise.
 # +: End of File.
 #
 # To add new tiles, Art.java, PixelData.java, and this data.txt
 # needs to be updated.
 #
 # Here's how it is written:
-#		% Tile Name % Alpha % Red % Green % Blue % Filepath
+#     []:   This is optional.
+#     [*]:  Means we want to include area type. When we do want to include area type, mark 
+#           alpha, red, green, and/or blue with * to denote that the level editor only checks
+#           up to the preceding value.
+#           
+#           Example - Only check alpha and red values when attempting to run comparison checks
+#           on tile data value and properties:
+#                  % My_Tile    % 255 % 255 % * % @ % /path/to/tile.png
+#
+#           Example - Check alpha, red, and green values when attempting to run comparison checks
+#           on tile data value and properties, but still preserve blue values:
+#                  % My_Tile    % 255 % 255 % @ % 1 % /path/to/tile.png % * %
+#
+# Syntax:
+#     % Tile Name                   % Alpha % Red % Green % Blue % Filepath % [Area Type Y/N] %
 
--Eraser
-% Empty                         % 00 % 00 % 00 %00 % res/art/editor/no_png.png
+
+-Mouse
+% Select                        % 00 % 00 % 00 %00 % res/art/editor/no_png.png
+% Eraser                        % 00 % 00 % 00 %00 % res/art/editor/no_png.png
 -Floor_Path
 % Grass                         % 01 % 00 % @  % @  % res/art/floor/grass.png 
 % Dirt                          % 01 % 01 % @  % @  % res/art/floor/mt_ground.png
@@ -104,9 +120,9 @@
 % Carpet_[Indoors]              % 0B % @  % @ % @ %   res/art/floor/carpet_indoors.png
 % Carpet_[Outdoors]             % 0C % @  % @ % @ %   res/art/floor/carpet_outdoors.png
 -Items
-% Test_[Potions]                % 0A % 01 % @ % @ %    res/art/object/item.png
-% 3_Options_[Potions]           % 0A % 02 % @ % @ %    res/art/object/item.png
-% Bicycle_[Key_Items]           % 0A % 03 % @ % @ %    res/art/object/item.png
+% Test_[Potions]                % 0A % 01 % @ % @ %    res/art/object/item.png % * %
+% 3_Options_[Potions]           % 0A % 02 % @ % @ %    res/art/object/item.png % * %
+% Bicycle_[Key_Items]           % 0A % 03 % @ % * %    res/art/object/item.png
 -Initialized_Start_Position
 % Starting_Position             % 0D % 00 % ` % = %  res/art/player/shadow.png
 +

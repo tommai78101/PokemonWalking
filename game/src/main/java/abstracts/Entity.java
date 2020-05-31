@@ -1,28 +1,35 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package abstracts;
 
-import interfaces.InterfaceGameObject;
-import interfaces.InterfaceTile;
+import common.Tileable;
+import entity.Player;
+import interfaces.UpdateRenderable;
+import level.PixelData;
+import level.WorldConstants;
 import screen.BaseBitmap;
 
-public abstract class Entity implements InterfaceTile, InterfaceGameObject {
-	public static final int UP = 2;
-	public static final int DOWN = 0;
-	public static final int LEFT = 1;
-	public static final int RIGHT = 3;
-
+/**
+ * Parent abstract class of all abstract classes.
+ * 
+ * Holds all basic data needed for everything Entity.
+ * 
+ * @author tlee
+ *
+ */
+public abstract class Entity implements Tileable, UpdateRenderable {
 	public int id;
-	public int facing = 0;
+	public int interactableID;
+	public boolean isRemoved;
+	protected boolean interactingState;
 
+	protected byte typeId = 0;
 	protected int xPosition;
 	protected int yPosition;
 
@@ -30,19 +37,21 @@ public abstract class Entity implements InterfaceTile, InterfaceGameObject {
 	protected int yOffset;
 	protected BaseBitmap bitmap = null;
 
-	protected String name;
+	protected int lastFacing = 0;
+	protected int facing = 0;
 
-	public boolean isRemoved;
-	protected byte typeId = 0;
+	protected String name;
+	protected PixelData pixelData;
+	protected Event event;
 
 	// public abstract void initialize(BaseWorld world);
 
 	public int getX() {
-		return xPosition;
+		return this.xPosition;
 	}
 
 	public int getY() {
-		return yPosition;
+		return this.yPosition;
 	}
 
 	protected void setPosition(int x, int y) {
@@ -51,12 +60,12 @@ public abstract class Entity implements InterfaceTile, InterfaceGameObject {
 	}
 
 	public byte[] getByteName() {
-		if (name == null)
-			name = "Joe";
+		if (this.name == null)
+			this.name = "Joe";
 		byte[] result = new byte[16];
-		byte[] nameData = name.getBytes();
+		byte[] nameData = this.name.getBytes();
 		for (int i = 0; i < result.length; i++) {
-			if (i < name.length())
+			if (i < this.name.length())
 				result[i] = nameData[i];
 			else
 				result[i] = 0;
@@ -65,51 +74,82 @@ public abstract class Entity implements InterfaceTile, InterfaceGameObject {
 	}
 
 	/**
-	 * Gets a value that determines where the direction the entity is currently
-	 * facing towards.
+	 * Gets a value that determines where the direction the entity is currently facing towards.
 	 * 
-	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN,
-	 *         Entity.LEFT, Entity.RIGHT.
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
 	 */
 	public int getFacing() {
 		return this.facing;
 	}
 
 	/**
-	 * Sets a value that determines where the direction the entity is currently
-	 * facing towards.
+	 * Sets a value that determines where the direction the entity is currently facing towards.
 	 */
 	public void setFacing(int value) {
+		this.lastFacing = this.facing;
 		this.facing = value;
 	}
 
 	/**
-	 * Entity class objects include NPC, Player, and monsters. Thus, it is
-	 * fitting for the Entity objects to include a GenderType.
+	 * Gets a value that determines the direction the player had last been facing towards at.
+	 * 
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
 	 */
-	public enum GenderType {
-		// @formatter:off
-		Nondetermined((byte) 0x7F), 
-		Male((byte) 0x1), 
-		Female((byte) 0xFF);
-		// @formatter:on
+	public int getLastFacing() {
+		return this.lastFacing;
+	}
 
-		private byte typeId;
+	/**
+	 * Checks whether the entity object has recently changed its facing direction.
+	 * 
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
+	 */
+	public boolean hasChangedFacing() {
+		// True, if current facing has been changed.
+		return this.lastFacing != this.facing;
+	}
 
-		private GenderType(byte value) {
-			this.typeId = value;
+	public PixelData getPixelData() {
+		return this.pixelData;
+	}
+
+	public void setPixelData(PixelData data) {
+		this.pixelData = data;
+	}
+
+	public Event getEvent() {
+		return this.event;
+	}
+
+	public void setInteractingState(boolean value) {
+		this.interactingState = value;
+		if (value) {
+			if (!Player.isMovementsLocked())
+				Player.lockMovements();
 		}
-
-		public byte getByte() {
-			return this.typeId;
+		else {
+			if (Player.isMovementsLocked())
+				Player.unlockMovements();
 		}
+	}
 
-		public static GenderType determineGender(byte value) {
-			if (value == Male.typeId)
-				return Male;
-			if (value == Female.typeId)
-				return Female;
-			return Nondetermined;
-		}
+	public boolean isInteracting() {
+		return this.interactingState;
+	}
+
+	// ==============================================================
+	// Static helper methods
+	// ==============================================================
+
+	public static boolean isObstacle(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_OBSTACLE;
+	}
+
+	public static boolean isCharacter(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_CHARACTER;
+	}
+
+	public static boolean isItem(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_ITEM;
 	}
 }

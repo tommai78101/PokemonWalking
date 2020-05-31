@@ -1,12 +1,10 @@
 /**
- * THIS IS CREATED BY tom_mai78101. PLEASE GIVE CREDIT FOR WORKING ON A CLONE.
+ * Open-source Game Boy inspired game. 
  * 
- * ALL WORKS COPYRIGHTED TO The Pokémon Company and Nintendo. I REPEAT, THIS IS A CLONE.
- * 
- * YOU MAY NOT SELL COMMERCIALLY, OR YOU WILL BE PROSECUTED BY The Pokémon Company AND Nintendo.
- * 
- * THE CREATOR IS NOT LIABLE FOR ANY DAMAGES DONE. FOLLOW LOCAL LAWS, BE RESPECTFUL, AND HAVE A GOOD DAY!
- * */
+ * Created by tom_mai78101. Hobby game programming only.
+ *
+ * All rights copyrighted to The Pokémon Company and Nintendo. 
+ */
 
 package screen;
 
@@ -17,6 +15,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import level.WorldConstants;
+import utility.Debug;
 
 public class BaseBitmap {
 
@@ -62,7 +61,8 @@ public class BaseBitmap {
 				}
 			}
 			return results;
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -83,9 +83,10 @@ public class BaseBitmap {
 	public static BaseBitmap load(String filename) {
 		try {
 			BufferedImage image = ImageIO.read(BaseBitmap.class.getClassLoader().getResource(filename));
-			System.out.println(filename);
-			return load(image);
-		} catch (IOException e) {
+			Debug.log(filename);
+			return BaseBitmap.load(image);
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -95,10 +96,11 @@ public class BaseBitmap {
 		try {
 			// Prints out the bitmap filename. If there's something wrong, it won't print it
 			// out.
-			System.out.println(file.getAbsolutePath());
+			Debug.log(file.getAbsolutePath());
 			BufferedImage image = ImageIO.read(file);
-			return load(image);
-		} catch (IOException e) {
+			return BaseBitmap.load(image);
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
