@@ -50,7 +50,10 @@ public class Script {
 				return false;
 			if (line.length() < this.name().length())
 				return line.startsWith(this.symbol);
-			return line.regionMatches(true, 0, this.name(), 0, this.name().length());
+			else if (line.startsWith(this.symbol))
+				return true;
+			else
+				return line.regionMatches(true, 0, this.name(), 0, this.name().length());
 		}
 
 		/**
@@ -481,7 +484,7 @@ public class Script {
 	 */
 	public static List<Script> loadModdedScriptsNew() {
 		List<Script> results = new ArrayList<>();
-		File modDirectory = new File("mod" + File.pathSeparator + "script");
+		File modDirectory = new File("mod" + File.separator + "script");
 		if (modDirectory.exists() && modDirectory.isDirectory()) {
 			String[] scripts = modDirectory.list();
 			for (int i = 0; i < scripts.length; i++) {

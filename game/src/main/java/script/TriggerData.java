@@ -59,7 +59,6 @@ public class TriggerData {
 
 	public void tick(Area area, int entityX, int entityY) {
 		if (this.script != null) {
-
 			this.moves = this.script.getIteratedMoves();
 			this.dialogue = this.script.getIteratedDialogues();
 
@@ -81,7 +80,11 @@ public class TriggerData {
 						else
 							area.getPlayer().forceLockWalking();
 						steps--;
-						entry.setValue(steps);
+
+						// Replace the Map.Entry with a new Map.Entry that contains the updated values.
+						// Map.Entry is actually immutable, so we cannot use an unsupported operation of setting new values.
+						Map.Entry<Integer, Integer> newEntry = Map.entry(entry.getKey(), steps);
+						list.set(this.iteration, newEntry);
 					}
 					else {
 						list.remove(entry);

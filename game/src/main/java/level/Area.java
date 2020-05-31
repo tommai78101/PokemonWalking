@@ -71,8 +71,11 @@ public class Area implements Tileable, UpdateRenderable {
 			// ID must not be negative. ID = 0 is reserved.
 			column = i + 1;
 			int color = tempPixels[column + (stride * row)];
-			if (color > 0)
-				this.triggerDatas.put(Map.entry(column, row), new TriggerData().loadTriggerData(color));
+			if (color > 0) {
+				int xPosition = (color >> 24) & 0xFF;
+				int yPosition = (color >> 16) & 0xFF;
+				this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color));
+			}
 			if (column >= stride) {
 				row++;
 				column -= stride;
