@@ -135,7 +135,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 		this.offsetY = -((this.getHeight() - (h * Tileable.HEIGHT)) / 2);
 		this.editor.input.offsetX = this.offsetX;
 		this.editor.input.offsetY = this.offsetY;
-
 	}
 
 	public void newImage() {
@@ -340,28 +339,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 		bs.show();
 	}
 
-	private void setBiomeTile(final int toCompare, Graphics g) {
-		switch (toCompare) {
-			case 0x00: // grass
-				g.setColor(EditorConstants.GRASS_GREEN);
-				break;
-			case 0x01: // Road
-				g.setColor(EditorConstants.ROAD_WHITE);
-				break;
-			case 0x02: // Dirt
-			case 0x04: // dirt
-				g.setColor(EditorConstants.DIRT_SIENNA);
-				break;
-			case 0x03: // Water
-				g.setColor(EditorConstants.WATER_BLUE);
-				break;
-			case 0x05: // Door/Carpet
-			default:
-				g.setColor(Color.white);
-				break;
-		}
-	}
-
 	public void tick() {
 		switch (EditorConstants.metadata) {
 			case Pixel_Data: {
@@ -544,7 +521,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 		String greenText = Integer.toString(data.green);
 		String blueText = Integer.toString(data.blue);
+		String areaIDText = Integer.toString(this.editor.getUniqueAreaID());
+
 		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+		panel.areaIDInputField.setText(areaIDText);
 		panel.greenInputField.setText(greenText);
 		panel.blueInputField.setText(blueText);
 		panel.greenField.setText(greenText);
@@ -552,33 +532,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 		panel.validate();
 
 		return data;
-	}
-
-	private void defaultTileProperties(Data d) {
-		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-		Data temp = null;
-		for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
-			if (panel.dataValue == entry.getKey()) {
-				temp = entry.getValue();
-				break;
-			}
-		}
-		if (temp != null) {
-			this.tiles[i] = panel.dataValue;
-			this.tilesEditorID[i] = temp.editorID;
-		}
-		else {
-			this.tiles[i] = d.getColorValue();
-			this.tilesEditorID[i] = d.editorID;
-		}
-	}
-
-	private void manualInputTileProperties(Data d) {
-		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-		this.tiles[i] = panel.dataValue;
-		this.tilesEditorID[i] = d.editorID;
 	}
 
 	public void start() {
@@ -606,7 +559,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			return null;
 
 		int size = 0;
-		int h = 0;
+		int triggerRowHeight = 0;
 
 		if (this.triggers == null) {
 			this.triggers = new int[1];
@@ -618,14 +571,18 @@ public class DrawingBoard extends Canvas implements Runnable {
 				list.add(Integer.valueOf(i));
 		}
 		size = list.size();
-		h = (size / this.bitmapHeight) + 1;
+		triggerRowHeight = (size / this.bitmapHeight) + 1;
 
-		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + h, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + triggerRowHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
 
 		int index = 0;
 		int width = 0;
-		pixels[0] = list.size();
+		int triggerListSize = list.size() & 0xFFFF;
+		int areaID = this.editor.getUniqueAreaID();
+
+		// Storing important area information in the first pixel.
+		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerListSize & 0xFFFF));
 		for (int i = 0; i < list.size(); i++) {
 			width = i + 1;
 			pixels[width + (index * this.bitmapHeight)] = list.get(i).intValue();
@@ -636,7 +593,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 
 		for (int iterator = 0; iterator < this.tiles.length; iterator++) {
-			pixels[this.bitmapWidth * h + iterator] = this.tiles[iterator];
+			pixels[this.bitmapWidth * triggerRowHeight + iterator] = this.tiles[iterator];
 		}
 		return buffer;
 	}
@@ -717,6 +674,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
+	// --------------------------------------------------------------------------------------------
+	// Private methods
+
 	private void hoverOver() {
 		try {
 			int w = 0;
@@ -767,4 +727,54 @@ public class DrawingBoard extends Canvas implements Runnable {
 			panel.validate();
 		}
 	}
+
+	private void defaultTileProperties(Data d) {
+		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
+		Data temp = null;
+		for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
+			if (panel.dataValue == entry.getKey()) {
+				temp = entry.getValue();
+				break;
+			}
+		}
+		if (temp != null) {
+			this.tiles[i] = panel.dataValue;
+			this.tilesEditorID[i] = temp.editorID;
+		}
+		else {
+			this.tiles[i] = d.getColorValue();
+			this.tilesEditorID[i] = d.editorID;
+		}
+	}
+
+	private void manualInputTileProperties(Data d) {
+		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
+		this.tiles[i] = panel.dataValue;
+		this.tilesEditorID[i] = d.editorID;
+	}
+
+	private void setBiomeTile(final int toCompare, Graphics g) {
+		switch (toCompare) {
+			case 0x00: // grass
+				g.setColor(EditorConstants.GRASS_GREEN);
+				break;
+			case 0x01: // Road
+				g.setColor(EditorConstants.ROAD_WHITE);
+				break;
+			case 0x02: // Dirt
+			case 0x04: // dirt
+				g.setColor(EditorConstants.DIRT_SIENNA);
+				break;
+			case 0x03: // Water
+				g.setColor(EditorConstants.WATER_BLUE);
+				break;
+			case 0x05: // Door/Carpet
+			default:
+				g.setColor(Color.white);
+				break;
+		}
+	}
+
 }

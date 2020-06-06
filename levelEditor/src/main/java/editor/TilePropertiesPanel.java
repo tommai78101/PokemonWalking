@@ -17,15 +17,23 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
 
 public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	private static final long serialVersionUID = 1L;
+	private static final Dimension SIZE = new Dimension(70, 10);
+	private static final Dimension INPUT_SIZE = new Dimension(15, 15);
 
 	public JTextField alphaField;
 	public JTextField redField;
 	public JTextField greenField;
 	public JTextField blueField;
 
+	public CustomJTextField areaIDInputField;
 	public CustomJTextField alphaInputField;
 	public CustomJTextField redInputField;
 	public CustomJTextField greenInputField;
@@ -35,10 +43,45 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public Data selectData;
 	public ControlPanel panel;
 
-	public JLabel tileID, extendedTileID, tileSpecificID, fullDataInput;
+	public JLabel areaID, tileID, extendedTileID, tileSpecificID, fullDataInput;
 
-	private static final Dimension SIZE = new Dimension(70, 10);
-	private static final Dimension INPUT_SIZE = new Dimension(15, 15);
+	private int lastKnownValidAreaID = 0;
+
+	/**
+	 * Used for setting the min/max range for JTextFields.
+	 * 
+	 * @author tlee
+	 */
+	public class MinMaxFilter extends DocumentFilter {
+		private int minimum;
+		private int maximum;
+
+		public MinMaxFilter(int min, int max) {
+			this.minimum = min;
+			this.maximum = max;
+		}
+
+		@Override
+		public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+			Document doc = fb.getDocument();
+			String replacement = new StringBuilder(doc.getText(0, doc.getLength())).replace(offset, offset + length, text).toString();
+			try {
+				int value = Integer.parseInt(replacement);
+				if (value < this.minimum)
+					value = this.minimum;
+				if (value > this.maximum)
+					value = this.maximum;
+				super.replace(fb, 0, doc.getLength(), String.valueOf(value), attrs);
+			}
+			catch (NumberFormatException e) {
+				if (text.length() > 3)
+					text = Integer.toString(this.maximum);
+				else
+					text = Integer.toString(this.minimum);
+				super.replace(fb, 0, doc.getLength(), text, attrs);
+			}
+		}
+	}
 
 	public class CustomJLabel extends JLabel {
 		private static final long serialVersionUID = 1L;
@@ -97,6 +140,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 		this.panel = controlPanel;
 
+		this.areaID = new CustomJLabel("Area ID:");
 		this.tileID = new CustomJLabel("Tile ID:");
 		this.extendedTileID = new CustomJLabel("Ext. ID:");
 		this.tileSpecificID = new CustomJLabel("Other ID:");
@@ -107,11 +151,13 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.greenField = new CustomJTextField(); // GG
 		this.blueField = new CustomJTextField(); // BB
 
+		this.areaIDInputField = new CustomJTextField();
 		this.alphaInputField = new CustomJTextField();
 		this.redInputField = new CustomJTextField();
 		this.greenInputField = new CustomJTextField();
 		this.blueInputField = new CustomJTextField();
 
+		this.areaID.setHorizontalAlignment(SwingConstants.CENTER);
 		this.tileID.setHorizontalAlignment(SwingConstants.CENTER);
 		this.extendedTileID.setHorizontalAlignment(SwingConstants.CENTER);
 		this.tileSpecificID.setHorizontalAlignment(SwingConstants.CENTER);
@@ -126,24 +172,42 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.greenField.setEditable(false);
 		this.blueField.setEditable(false);
 
+		this.areaIDInputField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.alphaInputField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.redInputField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.greenInputField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.blueInputField.setHorizontalAlignment(SwingConstants.CENTER);
 
+		// Intentionally setting the default text value for the area ID to be non-empty first.
+		this.areaIDInputField.setText("0");
+
+		// Set a min/max range for input fields when entering any value to be of unsigned values.
+		((AbstractDocument) this.areaIDInputField.getDocument()).setDocumentFilter(new MinMaxFilter(0, Short.MAX_VALUE - Short.MIN_VALUE));
+		((AbstractDocument) this.alphaInputField.getDocument()).setDocumentFilter(new MinMaxFilter(0, Byte.MAX_VALUE - Byte.MIN_VALUE));
+		((AbstractDocument) this.redInputField.getDocument()).setDocumentFilter(new MinMaxFilter(0, Byte.MAX_VALUE - Byte.MIN_VALUE));
+		((AbstractDocument) this.greenInputField.getDocument()).setDocumentFilter(new MinMaxFilter(0, Byte.MAX_VALUE - Byte.MIN_VALUE));
+		((AbstractDocument) this.blueInputField.getDocument()).setDocumentFilter(new MinMaxFilter(0, Byte.MAX_VALUE - Byte.MIN_VALUE));
+
+		this.areaIDInputField.getDocument().addDocumentListener(this);
 		this.alphaInputField.getDocument().addDocumentListener(this);
 		this.redInputField.getDocument().addDocumentListener(this);
 		this.greenInputField.getDocument().addDocumentListener(this);
 		this.blueInputField.getDocument().addDocumentListener(this);
 
 		this.setLayout(new GridLayout(0, 1));
+		this.add(this.areaID);
+		this.add(this.areaIDInputField);
+
 		this.add(this.tileID);
 		this.add(this.alphaField);
+
 		this.add(this.extendedTileID);
 		this.add(this.redField);
+
 		this.add(this.tileSpecificID);
 		this.add(this.greenField);
 		this.add(this.blueField);
+
 		this.add(this.fullDataInput);
 		this.add(this.alphaInputField);
 		this.add(this.redInputField);
@@ -229,6 +293,14 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void changedUpdate(DocumentEvent event) {
 		try {
+			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
+		}
+		catch (NumberFormatException e) {
+			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
+		}
+
+		try {
 			byte a = (byte) (Integer.valueOf(this.alphaInputField.getText()) & 0xFF);
 			byte r = (byte) (Integer.valueOf(this.redInputField.getText()) & 0xFF);
 			byte g = (byte) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
@@ -248,6 +320,14 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void insertUpdate(DocumentEvent event) {
 		try {
+			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
+		}
+		catch (NumberFormatException e) {
+			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
+		}
+
+		try {
 			byte a = (byte) (Integer.valueOf(this.alphaInputField.getText()) & 0xFF);
 			byte r = (byte) (Integer.valueOf(this.redInputField.getText()) & 0xFF);
 			byte g = (byte) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
@@ -266,6 +346,14 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 	@Override
 	public void removeUpdate(DocumentEvent event) {
+		try {
+			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
+		}
+		catch (NumberFormatException e) {
+			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
+		}
+
 		try {
 			byte a = (byte) (Integer.valueOf(this.alphaInputField.getText()) & 0xFF);
 			byte r = (byte) (Integer.valueOf(this.redInputField.getText()) & 0xFF);
@@ -292,6 +380,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.extendedTileID.setText("Extended ID:");
 				this.tileSpecificID.setText("Other IDs:");
 				this.fullDataInput.setVisible(true);
+				this.areaIDInputField.setVisible(true);
 				this.alphaInputField.setVisible(true);
 				this.redInputField.setVisible(true);
 				this.greenInputField.setVisible(true);
@@ -301,12 +390,12 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.tileID.setText("X Position:");
 				this.extendedTileID.setText("Y Position:");
 				this.tileSpecificID.setText("Trigger ID:");
+				this.areaIDInputField.setVisible(false);
 				this.fullDataInput.setVisible(false);
 				this.alphaInputField.setVisible(false);
 				this.redInputField.setVisible(false);
 				this.greenInputField.setVisible(false);
 				this.blueInputField.setVisible(false);
-
 				break;
 		}
 	}

@@ -364,9 +364,21 @@ not assume their information to be permanent.
 	accordance with the PixelData data format.
 
 	Character and Area have a 16:1 ratio when converting
-	Character positions to Area positions.
+	Character positions to Area positions. In other words,
+	For every 16 steps the Character makes, it counts as
+	1 pixel traveled in the Area.
 
 	Area Position = Character Position * Character Tile size
+
+	When viewing the area map in an image editor, the area 
+	map is shown as a 2D image. Starting from the top left
+	corner, the area ID value is stored in the first pixel,
+	using the alpha and red values. The value is in the 
+	range, 0x0 ~ 0xFFFF.
+
+	In the same pixel, we store the total number of triggers
+	used in the area, using the green and blue values. The
+	value is in the range, 0x0 ~ 0xFFFF.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -431,6 +443,15 @@ not assume their information to be permanent.
 		- A way to store multiple user-created custom trigger scripts
 		  in the user-created area.
 		
+		When viewing the area map in an image editor, the area map is
+		shown as a 2D image. Starting from the top left corner, the
+		area ID value is stored in the first pixel, using the alpha
+		and red values. The value is in the range, 0x0 ~ 0xFFFF.
+
+		In the same pixel, we store the total number of triggers used
+		in the area, using the green and blue values. The value is in
+		the range, 0x0 ~ 0xFFFF.
+
 		There should be no distinction between an official area map
 		and an user-created area map. This distinction should only be
 		done by putting the area map file in the game/mod/ folder
@@ -1246,6 +1267,11 @@ mechanisms are modified and edited. (This can be seen
 as a drawback for unmodifiable scripting, but I also
 don't want to add too much complexity to this that
 makes it look like it's a Lua-supported software.)
+
+For any given area map, the max total number of
+triggers allowed in the area map is 65,536 triggers.
+
+This is the same maximum for user-created area maps.
 
  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 

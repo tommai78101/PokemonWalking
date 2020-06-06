@@ -39,6 +39,7 @@ public class LevelEditor extends JFrame {
 	public static final String SAVED_PATH_DATA = "cache.ini";
 
 	private List<Data> filepaths = new ArrayList<>();
+	private int uniqueAreaID;
 
 	public ControlPanel controlPanel;
 	public FileControl fileControlPanel;
@@ -135,7 +136,6 @@ public class LevelEditor extends JFrame {
 		});
 
 		this.createCache();
-
 	}
 
 	/**
@@ -284,6 +284,14 @@ public class LevelEditor extends JFrame {
 
 	public void setMapAreaName(String name) {
 		this.mapAreaName = name;
+	}
+
+	public int getUniqueAreaID() {
+		return this.uniqueAreaID;
+	}
+
+	public void setUniqueAreaID(int uniqueAreaID) {
+		this.uniqueAreaID = uniqueAreaID;
 	}
 
 	public static void main(String[] args) {
