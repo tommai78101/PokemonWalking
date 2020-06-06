@@ -74,8 +74,9 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				super.replace(fb, 0, doc.getLength(), String.valueOf(value), attrs);
 			}
 			catch (NumberFormatException e) {
-				if (text.length() > 3)
-					text = Integer.toString(this.maximum);
+				String max = Integer.toString(this.maximum);
+				if (text.length() > max.length() / 2)
+					text = max;
 				else
 					text = Integer.toString(this.minimum);
 				super.replace(fb, 0, doc.getLength(), text, attrs);
