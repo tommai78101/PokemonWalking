@@ -490,8 +490,14 @@ public class Area implements Tileable, UpdateRenderable {
 
 	public PixelData getCurrentPixelData() {
 		// Return the pixel data the player is currently on top of.
-		return this.currentPixelData;
-		// return this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
+		if (this.currentPixelData != null)
+			return this.currentPixelData;
+
+		// If current pixel data is null, it means the player has not moved off the tile after the area has
+		// been loaded in, and did not trigger an update to set this variable to be the current pixel data
+		// tile. So, we need to fetch the current pixel data from the "pool of area pixel data" using the
+		// current X and Y player positions to handle this edge case.
+		return this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 	}
 
 	public int getAreaID() {

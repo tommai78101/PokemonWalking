@@ -414,11 +414,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 
 	private void handleWarpPointEvent() {
 		boolean currentAreaFound = false;
-		int currentAreaID = 0;
-		if (WorldConstants.isModsEnabled.booleanValue() && this.currentArea.getAreaID() < 1000)
-			currentAreaID = this.currentArea.getAreaID() + 1000;
-		else
-			currentAreaID = this.currentArea.getAreaID();
+		int currentAreaID = this.currentArea.getAreaID();
 		// boolean doorIsLocked = false;
 		for (int i = 0; i < this.areas.size(); i++) {
 			if (this.areas.get(i) == null) {
@@ -427,18 +423,13 @@ public class OverWorld implements Tileable, UpdateRenderable {
 				continue;
 			}
 			if (this.areas.get(i).getAreaID() == currentAreaID) {
-				this.areas.set(i, this.currentArea);
 				currentAreaFound = true;
 				break;
 			}
 		}
 		if (currentAreaFound) {
 			PixelData data = this.currentArea.getCurrentPixelData();
-			int targetAreaID = 0;
-			if (WorldConstants.isModsEnabled.booleanValue() && this.currentArea.getAreaID() < 1000)
-				targetAreaID = data.getTargetAreaID() + 1000;
-			else
-				targetAreaID = data.getTargetAreaID();
+			int targetAreaID = data.getTargetAreaID();
 			this.currentArea = WorldConstants.convertToArea(this.areas, targetAreaID);
 			if (this.currentArea == null)
 				return;
