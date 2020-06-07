@@ -60,9 +60,10 @@ public class Area implements Tileable, UpdateRenderable {
 	private final Map<Map.Entry<Integer, Integer>, Item> areaItems = new HashMap<>();
 	private final Map<Map.Entry<Integer, Integer>, TriggerData> triggerDatas = new HashMap<>();
 
-	public Area(BaseBitmap bitmap, final int areaID) {
+	public Area(BaseBitmap bitmap) {
 		int[] tempPixels = bitmap.getPixels();
-		int triggerSize = tempPixels[0];
+		this.areaID = (tempPixels[0] >> 16) & 0xFFFF;
+		int triggerSize = tempPixels[0] & 0xFFFF;
 		int row = 0;
 		int column = 0;
 		int stride = bitmap.getWidth();
@@ -115,7 +116,6 @@ public class Area implements Tileable, UpdateRenderable {
 				this.areaData.get(y).add(pixelData);
 			}
 		}
-		this.areaID = areaID;
 		this.isInWarpZone = false;
 		this.isInSectorPoint = false;
 		this.isExitArrowDisplayed = false;
@@ -123,8 +123,8 @@ public class Area implements Tileable, UpdateRenderable {
 		this.areaName = "";
 	}
 
-	public Area(BaseBitmap bitmap, final int areaID, final String areaName) {
-		this(bitmap, areaID);
+	public Area(BaseBitmap bitmap, final String areaName) {
+		this(bitmap);
 		this.areaName = areaName;
 	}
 
@@ -663,6 +663,16 @@ public class Area implements Tileable, UpdateRenderable {
 			}
 		}
 		return null;
+	}
+
+	// --------------------- STATIC METHODS -----------------------
+
+	public static int getAreaIDFromBitmap(BaseBitmap bitmap) {
+		if (bitmap == null) {
+			throw new IllegalArgumentException("Bitmap is null. Cannot identify area ID from null bitmap.");
+		}
+		int[] pixels = bitmap.getPixels();
+		return (pixels[0] >> 16) & 0xFFFF;
 	}
 
 	// --------------------- OVERRIDDEN METHODS -------------------

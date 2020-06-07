@@ -23,25 +23,31 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.WindowConstants;
 
 import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
+import utility.Debug;
 
 public class ScriptEditor extends JFrame {
 	private static final long serialVersionUID = 1L;
+	private static final int ScriptDirectoryIndex = 1;
+
 	public static final String TITLE = "Script Editor (Hobby)";
 	public static final int WIDTH = 700;
 	public static final int HEIGHT = 400;
 
-	public static File LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
+	public static File lastSavedDirectory = FileControl.lastSavedDirectory;
 
 	public LevelEditor parent;
 	public ScriptInput input;
 	public ScriptToolbar scriptToolbar;
 	public ScriptViewer scriptViewer;
 	public ScriptChanger scriptChanger;
+
 	private boolean modifiedFlag = false;
+
 	@SuppressWarnings("unused")
 	private String scriptName;
 
@@ -49,11 +55,11 @@ public class ScriptEditor extends JFrame {
 		super(title);
 		this.parent = parent;
 
-		this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // For good measure.
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); // For good measure.
 		this.pack();
 		this.setVisible(true);
 
-		Dimension size = new Dimension(WIDTH, HEIGHT);
+		Dimension size = new Dimension(ScriptEditor.WIDTH, ScriptEditor.HEIGHT);
 		this.setSize(size);
 		this.setPreferredSize(size);
 		this.setMaximumSize(size);
@@ -73,14 +79,14 @@ public class ScriptEditor extends JFrame {
 				ScriptEditor.this.parent.scriptEditor = null;
 			}
 		});
-		addingComponents();
+		this.addingComponents();
 
 		// Generates a scripting tutorial upon loading script editor. This generated
 		// file will not be persistent and the script editor will not overwrite if the
 		// file exists.
-		generateScriptingTutorial();
+		this.generateScriptingTutorial();
 
-		LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
+		ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 		ToolTipManager.sharedInstance().setInitialDelay(1);
 		this.setTitle(this.getTitle() + " - Untitled.script");
 		this.setScriptName("Untitled");
@@ -134,7 +140,7 @@ public class ScriptEditor extends JFrame {
 			};
 			// @formatter:on
 
-			try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("readme.txt"), "utf-8"))){
+			try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("readme.txt"), "utf-8"))) {
 				for (int i = 0; i < tutorialLines.length; i++) {
 					writer.write(tutorialLines[i]);
 					writer.newLine();
@@ -154,31 +160,31 @@ public class ScriptEditor extends JFrame {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				if (input == null) {
-					input = new ScriptInput();
-					addMouseListener(input);
-					addMouseMotionListener(input);
+				if (ScriptEditor.this.input == null) {
+					ScriptEditor.this.input = new ScriptInput();
+					ScriptEditor.this.addMouseListener(ScriptEditor.this.input);
+					ScriptEditor.this.addMouseMotionListener(ScriptEditor.this.input);
 				}
-				if (scriptToolbar == null) {
-					scriptToolbar = new ScriptToolbar(ScriptEditor.this);
-					scriptToolbar.addMouseListener(input);
-					scriptToolbar.addMouseMotionListener(input);
-					add(scriptToolbar, BorderLayout.NORTH);
-					validate();
+				if (ScriptEditor.this.scriptToolbar == null) {
+					ScriptEditor.this.scriptToolbar = new ScriptToolbar(ScriptEditor.this);
+					ScriptEditor.this.scriptToolbar.addMouseListener(ScriptEditor.this.input);
+					ScriptEditor.this.scriptToolbar.addMouseMotionListener(ScriptEditor.this.input);
+					ScriptEditor.this.add(ScriptEditor.this.scriptToolbar, BorderLayout.NORTH);
+					ScriptEditor.this.validate();
 				}
-				if (scriptViewer == null) {
-					scriptViewer = new ScriptViewer(ScriptEditor.this);
-					scriptViewer.addMouseListener(input);
-					scriptViewer.addMouseMotionListener(input);
-					add(scriptViewer, BorderLayout.WEST);
-					validate();
+				if (ScriptEditor.this.scriptViewer == null) {
+					ScriptEditor.this.scriptViewer = new ScriptViewer(ScriptEditor.this);
+					ScriptEditor.this.scriptViewer.addMouseListener(ScriptEditor.this.input);
+					ScriptEditor.this.scriptViewer.addMouseMotionListener(ScriptEditor.this.input);
+					ScriptEditor.this.add(ScriptEditor.this.scriptViewer, BorderLayout.WEST);
+					ScriptEditor.this.validate();
 				}
-				if (scriptChanger == null) {
-					scriptChanger = new ScriptChanger(ScriptEditor.this);
-					scriptChanger.addMouseListener(input);
-					scriptChanger.addMouseMotionListener(input);
-					add(scriptChanger, BorderLayout.CENTER);
-					validate();
+				if (ScriptEditor.this.scriptChanger == null) {
+					ScriptEditor.this.scriptChanger = new ScriptChanger(ScriptEditor.this);
+					ScriptEditor.this.scriptChanger.addMouseListener(ScriptEditor.this.input);
+					ScriptEditor.this.scriptChanger.addMouseMotionListener(ScriptEditor.this.input);
+					ScriptEditor.this.add(ScriptEditor.this.scriptChanger, BorderLayout.CENTER);
+					ScriptEditor.this.validate();
 				}
 			}
 		});
@@ -348,6 +354,6 @@ public class ScriptEditor extends JFrame {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Saved Location: " + script.getAbsolutePath());
+		Debug.log("Saved Location: " + script.getAbsolutePath());
 	}
 }

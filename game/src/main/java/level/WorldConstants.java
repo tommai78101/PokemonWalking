@@ -24,11 +24,6 @@ public class WorldConstants {
 		// Add/delete a map area, update everything shown below.
 	}
 
-	// Area IDs
-	public static final int TEST_WORLD_1 = 0x01;
-	public static final int TEST_WORLD_2 = 0x02;
-	public static final int TEST_WORLD_3 = 0x03;
-
 	// Item IDs
 	public static final int ITEM_RETURN = 0;
 	public static final int ITEM_TEST = 1;
@@ -108,20 +103,7 @@ public class WorldConstants {
 			if (area != null && area.getAreaID() == areaID)
 				return area;
 		}
-		Area area = null;
-		switch (areaID) {
-			case TEST_WORLD_1:
-				area = new Area(Art.testArea, WorldConstants.TEST_WORLD_1, "Test World 1");
-				break;
-			case TEST_WORLD_2:
-				area = new Area(Art.testArea2, WorldConstants.TEST_WORLD_2, "Test World 2");
-				break;
-			default:
-				area = null;
-				break;
-		}
-		areas.add(area);
-		return area;
+		return null;
 	}
 
 	/**
@@ -151,12 +133,12 @@ public class WorldConstants {
 		// List<Area> result = new ArrayList<Area>();
 		if (WorldConstants.isModsEnabled == Boolean.FALSE || WorldConstants.isModsEnabled == null) {
 			if (WorldConstants.areas.isEmpty()) {
-				WorldConstants.areas.add(new Area(Art.testArea, WorldConstants.TEST_WORLD_1));
-				WorldConstants.areas.add(new Area(Art.testArea2, WorldConstants.TEST_WORLD_2));
+				WorldConstants.areas.add(new Area(Art.testArea));
+				WorldConstants.areas.add(new Area(Art.testArea2));
 			}
 			else {
-				WorldConstants.addNewArea(Art.testArea, WorldConstants.TEST_WORLD_1);
-				WorldConstants.addNewArea(Art.testArea2, WorldConstants.TEST_WORLD_2);
+				WorldConstants.addNewArea(Art.testArea);
+				WorldConstants.addNewArea(Art.testArea2);
 			}
 			// result.add(new Area(Art.testArea3, TEST_WORLD_3));
 			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
@@ -166,7 +148,7 @@ public class WorldConstants {
 		else {
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
 				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
-				WorldConstants.moddedAreas.add(new Area(entry.getKey(), entry.getValue()));
+				WorldConstants.moddedAreas.add(new Area(entry.getKey()));
 			}
 			return WorldConstants.moddedAreas;
 		}
@@ -200,14 +182,15 @@ public class WorldConstants {
 	 * Goes with the static method, "getAllNewAreas()".
 	 * 
 	 */
-	private static void addNewArea(BaseBitmap bitmap, int areaID) {
+	private static void addNewArea(BaseBitmap bitmap) {
+		int areaID = Area.getAreaIDFromBitmap(bitmap);
 		// Java 8 feature
 		boolean exists = WorldConstants.areas.stream()
 			.filter(chosenArea -> chosenArea.getAreaID() == areaID)
 			.findFirst()
 			.isPresent();
 		if (!exists) {
-			WorldConstants.areas.add(new Area(bitmap, areaID));
+			WorldConstants.areas.add(new Area(bitmap));
 		}
 	}
 
@@ -219,10 +202,10 @@ public class WorldConstants {
 	 * @return The primary area color of full opacity.
 	 */
 	public static int convertToAreaColor(int areaID) {
-		switch (areaID) {
-			case TEST_WORLD_1:
+		switch (areaID % 2) {
+			case 0x01:
 				return WorldConstants.AREA_1_COLOR;
-			case TEST_WORLD_2:
+			case 0x00:
 				return WorldConstants.AREA_2_COLOR;
 			default:
 				return 0;

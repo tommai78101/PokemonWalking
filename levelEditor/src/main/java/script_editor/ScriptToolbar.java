@@ -94,13 +94,13 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 			try {
 				raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
 				raf.readLine(); // The second line in the cache is for the Script Editor.
-				ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
+				ScriptEditor.lastSavedDirectory = new File(raf.readLine());
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (NullPointerException e) {
-				ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
+				ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 			} finally {
 				try {
 					raf.close();
@@ -156,13 +156,13 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				}
 			}
 			saver.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-			saver.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
+			saver.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
 			saver.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
 			saver.setVisible(true);
 			int answer = saver.showSaveDialog(null);
 			if (answer == JFileChooser.APPROVE_OPTION) {
 				File f = saver.getSelectedFile();
-				ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
+				ScriptEditor.lastSavedDirectory = f.getParentFile();
 
 				if (f.getName().endsWith(".script")) {
 					this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
@@ -179,7 +179,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				try {
 					rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
 					rf.readLine();
-					rf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
+					rf.writeBytes(ScriptEditor.lastSavedDirectory.getAbsolutePath());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} finally {
@@ -198,13 +198,13 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 			try {
 				raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
 				raf.readLine(); // The second line in the cache is for the Script Editor.
-				ScriptEditor.LAST_SAVED_DIRECTORY = new File(raf.readLine());
+				ScriptEditor.lastSavedDirectory = new File(raf.readLine());
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (NullPointerException e) {
-				ScriptEditor.LAST_SAVED_DIRECTORY = FileControl.lastSavedDirectory;
+				ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 			} finally {
 				try {
 					raf.close();
@@ -260,13 +260,13 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				}
 			}
 			opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-			opener.setCurrentDirectory(ScriptEditor.LAST_SAVED_DIRECTORY);
+			opener.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
 			opener.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
 			opener.setVisible(true);
 			int answer = opener.showOpenDialog(null);
 			if (answer == JFileChooser.APPROVE_OPTION) {
 				File f = opener.getSelectedFile();
-				ScriptEditor.LAST_SAVED_DIRECTORY = f.getParentFile();
+				ScriptEditor.lastSavedDirectory = f.getParentFile();
 				this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
 				this.editor.load(f);
 				this.editor.setModifiedFlag(false);
@@ -277,7 +277,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				try {
 					rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
 					rf.readLine();
-					rf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
+					rf.writeBytes(ScriptEditor.lastSavedDirectory.getAbsolutePath());
 				} catch (IOException e) {
 					e.printStackTrace();
 				} finally {
