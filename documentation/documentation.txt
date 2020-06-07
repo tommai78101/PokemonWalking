@@ -44,6 +44,7 @@ Metadata...........................[PWD05]
 	Areas..........................[PWD05#02]
 		Overworld..................[PWD05@02#01]
 		Sector.....................[PWD05@02#02]
+		User-Created Areas.........[PWD05@02#03]
 	Tiles..........................[PWD05#03]
 		Empty......................[PWD05@03#00]
 		Path.......................[PWD05@03#01]
@@ -363,9 +364,21 @@ not assume their information to be permanent.
 	accordance with the PixelData data format.
 
 	Character and Area have a 16:1 ratio when converting
-	Character positions to Area positions.
+	Character positions to Area positions. In other words,
+	For every 16 steps the Character makes, it counts as
+	1 pixel traveled in the Area.
 
 	Area Position = Character Position * Character Tile size
+
+	When viewing the area map in an image editor, the area 
+	map is shown as a 2D image. Starting from the top left
+	corner, the area ID value is stored in the first pixel,
+	using the alpha and red values. The value is in the 
+	range, 0x0 ~ 0xFFFF.
+
+	In the same pixel, we store the total number of triggers
+	used in the area, using the green and blue values. The
+	value is in the range, 0x0 ~ 0xFFFF.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -401,6 +414,56 @@ not assume their information to be permanent.
 		whereabouts to the player. In order to update the game, the
 		mark has to be set in the path of where the player must cross
 		in order to enter a new area of interest.
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+		User-Created Areas [PWD05@02#03]
+
+		This section deals with user-created area map files that are
+		created using the provided level editor in addition to the
+		game package.
+
+		The level editor only allows editing one area map per session,
+		meaning that if the user intends to create an overworld with
+		multiple user-created areas, then the user must create and
+		open new sessions of the level editor for each user-created
+		area.
+
+		If time allows, this may be improved.
+
+		In order to determine the chronological order of the
+		user-created area defined by the user themselves, the level
+		editor should be able to provide:
+
+		- A way to set the area ID value.
+			- A way to verify if the area ID value is unique.
+			- Easy and obvious way to let users know how the area ID
+			  value is determined.
+		- A way to set the chronological order sequence of the area.
+		- A way to store multiple user-created custom trigger scripts
+		  in the user-created area.
+		
+		When viewing the area map in an image editor, the area map is
+		shown as a 2D image. Starting from the top left corner, the
+		area ID value is stored in the first pixel, using the alpha
+		and red values. The value is in the range, 0x0 ~ 0xFFFF.
+
+		In the same pixel, we store the total number of triggers used
+		in the area, using the green and blue values. The value is in
+		the range, 0x0 ~ 0xFFFF.
+
+		There should be no distinction between an official area map
+		and an user-created area map. This distinction should only be
+		done by putting the area map file in the game/mod/ folder
+		directory or in the common/src/main/resources/art/area folder
+		directory.
+
+		The area map file format uses a standard Portable Network
+		Graphics with DEFLATE compression algorithm applied. Typical
+		area map files should display transparent images, and this
+		is intentionally done so that when players are looking around
+		in the game's file structure, they do not get spoiled by the
+		creator's area map layout.
 	
 -  -  -  -  -  -  -  -  -  -  -
 
@@ -1066,13 +1129,13 @@ towards the direction the tapped key represents.
 All of the inputs handled by the game are defined in
 the InputHandler class object. They are defined below:
 
-UP			W				Moves the player upwards.
-DOWN			S				Moves the player downwards.
-LEFT			A				Moves the player to the left.
-RIGHT			D				Moves the player to the right.
-ENTER							START BUTTON
-Z			/				The Action Button. (GameBoy equivalent of the A button.)
-X			.				The Cancel Button. (GameBoy equivalent of the B button.)
+UP              W               Moves the player upwards.
+DOWN            S               Moves the player downwards.
+LEFT            A               Moves the player to the left.
+RIGHT           D               Moves the player to the right.
+ENTER                           START BUTTON
+Z               /               The Action Button. (GameBoy equivalent of the A button.)
+X               .               The Cancel Button. (GameBoy equivalent of the B button.)
 
 -  -  -  -  -  -  -  -  -  -  -
 
@@ -1126,59 +1189,59 @@ newly extended POJOs.
 
 -  -  -  -  -  -  -  -  -  -  -
 
-Legacy File Format [PWD08#01]
+	Legacy File Format [PWD08#01]
 
-This is the old file format, used in version 0001.
+	This is the old file format, used in version 0001.
 
-Most of the information is similar to the current
-file format version, mentioned above.
+	Most of the information is similar to the current
+	file format version, mentioned above.
 
-The order of the file format tree hierarchy is
-determined by the last date of creation. Anything
-newer is inserted from the bottom of the main tree
-hierarchy, with nodes extending from the root to
-define the data for the game to use. This allows
-categorization, which can be used with the level
-editor for easier modification and possibly enable
-modding potential for the future community.
+	The order of the file format tree hierarchy is
+	determined by the last date of creation. Anything
+	newer is inserted from the bottom of the main tree
+	hierarchy, with nodes extending from the root to
+	define the data for the game to use. This allows
+	categorization, which can be used with the level
+	editor for easier modification and possibly enable
+	modding potential for the future community.
 
-Below is a diagram that shows how the tree structure
-is built. Note that for some text readers, they may
-use a non-monospaced font. To view correctly, please
-use a monospaced font. The encoding used is UTF-8.
+	Below is a diagram that shows how the tree structure
+	is built. Note that for some text readers, they may
+	use a non-monospaced font. To view correctly, please
+	use a monospaced font. The encoding used is UTF-8.
 
-File Format
-|
-├ Header Information ┬ Identification Code (int)
-|                    ├ Header Code (int)
-|                    └ Format Suffix (int)
-├ Player Information ┬ Player Name (2 longs, 16 bytes)
-|                    ├ Player Gender (1 byte)
-|                    ├ Inventory ─────────────┬ Potions ───────────┐
-|                    |                        ├ Key Items ─────────┼──────────── Items ───┬ Item Name
-|                    |                        ├ Pokéballs ─────────┤                      └ Item Quantity
-|                    |                        └ TMs/HMs ───────────┘
-|                    ├ Positional Data ───────┬ Current Area ─────┬ Area ID
-|                    |                        |                   └ Area Region
-|                    |                        ├ Current OverWorld
-|                    |                        ├ X Location
-|                    |                        └ Y Location
-|                    └ Player State
-├ Date of Saved Data ┬ Last Saved Time
-|                    ├ Day/Night State
-|                    └ Elapsed Time
-├ Using Custom Maps ─┬ Custom Area File Name
-|                    ├ Custom Area ID
-|                    └ Custom Area Region
-└ (Future TODO)
+	File Format
+	|
+	├ Header Information ┬ Identification Code (int)
+	|                    ├ Header Code (int)
+	|                    └ Format Suffix (int)
+	├ Player Information ┬ Player Name (2 longs, 16 bytes)
+	|                    ├ Player Gender (1 byte)
+	|                    ├ Inventory ─────────────┬ Potions ───────────┐
+	|                    |                        ├ Key Items ─────────┼──────────── Items ───┬ Item Name
+	|                    |                        ├ Pokéballs ─────────┤                      └ Item Quantity
+	|                    |                        └ TMs/HMs ───────────┘
+	|                    ├ Positional Data ───────┬ Current Area ─────┬ Area ID
+	|                    |                        |                   └ Area Region
+	|                    |                        ├ Current OverWorld
+	|                    |                        ├ X Location
+	|                    |                        └ Y Location
+	|                    └ Player State
+	├ Date of Saved Data ┬ Last Saved Time
+	|                    ├ Day/Night State
+	|                    └ Elapsed Time
+	├ Using Custom Maps ─┬ Custom Area File Name
+	|                    ├ Custom Area ID
+	|                    └ Custom Area Region
+	└ (Future TODO)
 
-Each node contains 2 bytes used for identifying the 
-nodes when the file format is being read. And another
-2 bytes containing the size of the chunk of the nodes.
+	Each node contains 2 bytes used for identifying the 
+	nodes when the file format is being read. And another
+	2 bytes containing the size of the chunk of the nodes.
 
-In each chunk, the data is read into groups, where
-the game will separate data it wants, and set the
-variables accordingly.
+	In each chunk, the data is read into groups, where
+	the game will separate data it wants, and set the
+	variables accordingly.
 
 -------------------------------
 
@@ -1204,6 +1267,11 @@ mechanisms are modified and edited. (This can be seen
 as a drawback for unmodifiable scripting, but I also
 don't want to add too much complexity to this that
 makes it look like it's a Lua-supported software.)
+
+For any given area map, the max total number of
+triggers allowed in the area map is 65,536 triggers.
+
+This is the same maximum for user-created area maps.
 
  ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
