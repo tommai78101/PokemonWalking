@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -35,23 +37,25 @@ import javax.swing.plaf.metal.MetalFileChooserUI;
 
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
+import utility.Debug;
 
 public class FileControl extends JPanel implements ActionListener {
-	private static final long serialVersionUID = 1L;
-
-	private static final String defaultPath = Paths.get("").toAbsolutePath().toString();
+	public static File lastSavedDirectory = null;
 	public static final String[] TAGS = new String[] {
 		"New", "Save", "Open", "", "Tileset", "Trigger", "", "Script"
 	};
 
-	public static File lastSavedDirectory = new File(FileControl.defaultPath);
+	private static final long serialVersionUID = 1L;
+	private static final String defaultPath = Paths.get("").toAbsolutePath().toString();
 
 	public HashMap<String, JButton> buttonCache = new HashMap<>();
 	private LevelEditor editor;
+	private List<String> cacheDirectories;
 
 	public FileControl(LevelEditor editor) {
 		super();
 		this.editor = editor;
+		this.cacheDirectories = new ArrayList<>();
 		this.setLayout(new GridLayout(1, FileControl.TAGS.length));
 
 		for (int i = 0; i < FileControl.TAGS.length; i++) {
@@ -88,7 +92,8 @@ public class FileControl extends JPanel implements ActionListener {
 					}
 
 					try (RandomAccessFile raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "r")) {
-						FileControl.lastSavedDirectory = new File(raf.readLine());
+						this.fetchCachedDirectories(raf);
+						FileControl.lastSavedDirectory = new File(this.cacheDirectories.get(LevelEditor.FileControlIndex));
 					}
 					catch (IOException e) {
 						FileControl.lastSavedDirectory = new File(FileControl.defaultPath);
@@ -169,19 +174,20 @@ public class FileControl extends JPanel implements ActionListener {
 							this.editor.setMapAreaName(filename);
 
 							// Storing the last approved current directory into the cache file.
-							cacheFile.seek(0);
-							cacheFile.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
+							this.cacheDirectories.set(LevelEditor.FileControlIndex, FileControl.lastSavedDirectory.getAbsolutePath());
+							this.storeCachedDirectories(cacheFile);
 						}
 						catch (IOException e) {
-							e.printStackTrace();
+							Debug.exception(e);
 						}
 					}
 					break;
 				}
 				case 2: { // Open
 					// String backupPath = LevelEditor.SAVED_PATH_DATA;
-					try (RandomAccessFile raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
-						FileControl.lastSavedDirectory = new File(raf.readLine());
+					try (RandomAccessFile raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "r")) {
+						this.fetchCachedDirectories(raf);
+						FileControl.lastSavedDirectory = new File(this.cacheDirectories.get(LevelEditor.FileControlIndex));
 					}
 					catch (IOException e) {
 						FileControl.lastSavedDirectory = new File(FileControl.defaultPath);
@@ -250,12 +256,12 @@ public class FileControl extends JPanel implements ActionListener {
 							this.editor.drawingBoardPanel.openMapImage(image);
 							this.editor.setMapAreaName(f.getName().substring(0, f.getName().length() - ".png".length()));
 
-							// Store the last approved current directory to the cache file.
-							cacheFile.seek(0);
-							cacheFile.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
+							// Storing the last approved current directory into the cache file.
+							this.cacheDirectories.set(LevelEditor.FileControlIndex, FileControl.lastSavedDirectory.getAbsolutePath());
+							this.storeCachedDirectories(cacheFile);
 						}
-						catch (IOException e1) {
-							e1.printStackTrace();
+						catch (IOException e) {
+							Debug.exception(e);
 						}
 					}
 					break;
@@ -284,6 +290,9 @@ public class FileControl extends JPanel implements ActionListener {
 		}
 	}
 
+	// --------------------------------------------------------------------------------
+	// Private methods
+
 	@SuppressWarnings("unchecked")
 	private JList<Class<?>> findFileList(Component comp) {
 		if (comp instanceof JList) {
@@ -298,5 +307,23 @@ public class FileControl extends JPanel implements ActionListener {
 			}
 		}
 		return null;
+	}
+
+	private void fetchCachedDirectories(RandomAccessFile file) throws IOException {
+		String buffer = null;
+		file.seek(0);
+		this.cacheDirectories.clear();
+		while ((buffer = file.readLine()) != null) {
+			this.cacheDirectories.add(buffer);
+		}
+	}
+
+	private void storeCachedDirectories(RandomAccessFile file) throws IOException {
+		file.setLength(0);
+		file.seek(0);
+		for (String buffer : this.cacheDirectories) {
+			file.writeBytes(buffer);
+			file.write(System.lineSeparator().getBytes());
+		}
 	}
 }

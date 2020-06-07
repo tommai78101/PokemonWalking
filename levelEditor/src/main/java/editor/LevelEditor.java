@@ -13,9 +13,9 @@ import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,20 +26,23 @@ import javax.swing.WindowConstants;
 import common.Tileable;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
+import utility.Debug;
 
 //TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating 
 //maps and scripts together.
 
 public class LevelEditor extends JFrame {
-	private static final long serialVersionUID = -8739477187675627751L;
 	public static final int WIDTH = 160;
 	public static final int HEIGHT = 144;
 	public static final int SIZE = 4;
 	public static final String NAME_TITLE = "Level Editor (Hobby)";
 	public static final String SAVED_PATH_DATA = "cache.ini";
+	public static final String defaultPath = Paths.get("").toAbsolutePath().toString();
 
-	private List<Data> filepaths = new ArrayList<>();
-	private int uniqueAreaID;
+	// For cache directory path index, fixed index in the array list.
+	public static final int FileControlIndex = 0;
+
+	private static final long serialVersionUID = -8739477187675627751L;
 
 	public ControlPanel controlPanel;
 	public FileControl fileControlPanel;
@@ -48,9 +51,11 @@ public class LevelEditor extends JFrame {
 	public Properties properties;
 	public ScriptEditor scriptEditor;
 
-	public String message;
 	public boolean running;
+	public String message;
 	public EditorInput input;
+
+	private int uniqueAreaID;
 
 	@SuppressWarnings("unused")
 	private String mapAreaName;
@@ -135,7 +140,7 @@ public class LevelEditor extends JFrame {
 			}
 		});
 
-		this.createCache();
+		this.createOrReadCache();
 	}
 
 	/**
@@ -149,71 +154,33 @@ public class LevelEditor extends JFrame {
 	 * 
 	 * @return Nothing.
 	 */
-	public void createCache() {
+	public void createOrReadCache() {
+		List<String> cachedDirectoryPaths = new ArrayList<>();
 		File file = new File(LevelEditor.SAVED_PATH_DATA);
-		RandomAccessFile raf = null;
 		if (!file.exists()) {
-			try {
-				// Creates a cache file that contains both the File Control's last saved
-				// directory and
-				// The script editor's last saved directory. It will be separated by two lines.
+			// Set the default paths first
+			FileControl.lastSavedDirectory = new File(LevelEditor.defaultPath);
+			ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 
-				// Made it so that it immediately saves the current editor file location upon
-				// initialization.
-				String lineSeparator = System.getProperty("line.separator");
-				raf = new RandomAccessFile(file, "rw");
-				raf.setLength(0);
-				raf.seek(0);
-				raf.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
-				raf.writeBytes(lineSeparator);
-				raf.writeBytes(lineSeparator);
-				raf.writeBytes(ScriptEditor.LAST_SAVED_DIRECTORY.getAbsolutePath());
-				raf.writeBytes(lineSeparator);
-			}
-			catch (FileNotFoundException e) {
-				e.printStackTrace();
+			cachedDirectoryPaths.add(FileControl.lastSavedDirectory.getAbsolutePath());
+
+			try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
+				this.storeCachedDirectories(raf, cachedDirectoryPaths);
 			}
 			catch (IOException e) {
-				e.printStackTrace();
-			}
-			finally {
-				try {
-					if (raf != null)
-						raf.close();
-				}
-				catch (IOException e) {}
+				Debug.exception(e);
 			}
 		}
 		else {
-			// Reads in two last saved directories in the cache.
-			// If it fails, revert back to original saved directories.
-			File fileBackup1 = FileControl.lastSavedDirectory;
-			File fileBackup2 = ScriptEditor.LAST_SAVED_DIRECTORY;
-			boolean isCorrupted = false;
-			try {
-				raf = new RandomAccessFile(file, "r");
-				raf.seek(0);
-				String fileControlFilePath = raf.readLine();
-				// Skipping an extra newline.
-				raf.readLine();
-				String scriptEditorFilePath = raf.readLine();
-				FileControl.lastSavedDirectory = new File(fileControlFilePath);
-				ScriptEditor.LAST_SAVED_DIRECTORY = new File(scriptEditorFilePath);
+			try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+				this.fetchCachedDirectories(raf, cachedDirectoryPaths);
 			}
-			catch (IOException | NullPointerException e) {
-				FileControl.lastSavedDirectory = fileBackup1;
-				ScriptEditor.LAST_SAVED_DIRECTORY = fileBackup2;
-				isCorrupted = true;
+			catch (IOException e) {
+				Debug.exception(e);
 			}
-			finally {
-				try {
-					raf.close();
-				}
-				catch (IOException e) {}
-				if (isCorrupted) {
-					file.delete();
-				}
-			}
+
+			FileControl.lastSavedDirectory = new File(cachedDirectoryPaths.get(LevelEditor.FileControlIndex));
+			ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 		}
 	}
 
@@ -278,10 +245,6 @@ public class LevelEditor extends JFrame {
 		this.setMapAreaName("Untitled");
 	}
 
-	public List<Data> getResourceFilePaths() {
-		return this.filepaths;
-	}
-
 	public void setMapAreaName(String name) {
 		this.mapAreaName = name;
 	}
@@ -294,7 +257,31 @@ public class LevelEditor extends JFrame {
 		this.uniqueAreaID = uniqueAreaID;
 	}
 
+	// --------------------------------------------------------------------------------
+	// Main method
+
 	public static void main(String[] args) {
 		new LevelEditor(LevelEditor.NAME_TITLE);
+	}
+
+	// --------------------------------------------------------------------------------
+	// Private methods
+
+	private void fetchCachedDirectories(RandomAccessFile file, List<String> output) throws IOException {
+		String buffer = null;
+		file.seek(0);
+		output.clear();
+		while ((buffer = file.readLine()) != null) {
+			output.add(buffer);
+		}
+	}
+
+	private void storeCachedDirectories(RandomAccessFile file, List<String> input) throws IOException {
+		file.setLength(0);
+		file.seek(0);
+		for (String buffer : input) {
+			file.writeBytes(buffer);
+			file.write(System.lineSeparator().getBytes());
+		}
 	}
 }
