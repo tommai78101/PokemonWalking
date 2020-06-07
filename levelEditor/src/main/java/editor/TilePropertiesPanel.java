@@ -202,6 +202,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	}
 
 	public void clearInputFields() {
+		this.areaIDInputField.setText("");
 		this.alphaInputField.setText("");
 		this.redInputField.setText("");
 		this.greenInputField.setText("");
@@ -219,6 +220,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	 * @param selectedData
 	 */
 	public void setDataProperties(Data selectedData) {
+		this.areaIDInputField.setText(Integer.toString(this.panel.getEditor().getUniqueAreaID()));
 		this.alphaInputField.setText(Integer.toString(selectedData.alpha));
 		this.redInputField.setText(Integer.toString(selectedData.red));
 		this.greenInputField.setText(Integer.toString(selectedData.green));

@@ -439,6 +439,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 	 */
 	public void setDataProperties(Data selectedData) {
 		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+		panel.areaIDInputField.setText(Integer.toString(this.editor.getUniqueAreaID()));
+
 		int tileIndex = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
 
 		// Search for the data from the actual collection of game data we have loaded in.
@@ -652,7 +654,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 	public void openMapImage(BufferedImage image) {
 		try {
 			int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-			int triggerCount = srcTiles[0];
+			this.editor.setUniqueAreaID((srcTiles[0] >> 16) & 0xFFFF);
+			int triggerCount = srcTiles[0] & 0xFFFF;
 			int triggerRows = (triggerCount / image.getWidth()) + 1;
 			this.setImageSize(image.getWidth(), (image.getHeight() - triggerRows));
 			if (this.triggers != null)

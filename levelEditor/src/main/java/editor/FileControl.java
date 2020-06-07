@@ -283,23 +283,14 @@ public class FileControl extends JPanel implements ActionListener {
 							BufferedImage image = ImageIO.read(f);
 							this.editor.drawingBoardPanel.openMapImage(image);
 							this.editor.setMapAreaName(f.getName().substring(0, f.getName().length() - ".png".length()));
-							RandomAccessFile rf = null;
-							try {
-								rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
-								rf.seek(0);
-								rf.writeBytes(FileControl.lastSavedDirectory.getAbsolutePath());
-							}
-							catch (IOException e) {
-								e.printStackTrace();
-							}
-							finally {
-								try {
-									rf.close();
-								}
-								catch (IOException e) {
-									e.printStackTrace();
-								}
-							}
+
+							// Setting Area ID
+							TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+							panel.areaIDInputField.setText(Integer.toString(this.editor.getUniqueAreaID()));
+
+							// Storing the last approved current directory into the cache file.
+							this.cacheDirectories.set(LevelEditor.FileControlIndex, FileControl.lastSavedDirectory.getAbsolutePath());
+							this.storeCachedDirectories(cacheFile);
 						}
 						catch (IOException e1) {
 							e1.printStackTrace();
