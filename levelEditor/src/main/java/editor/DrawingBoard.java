@@ -560,11 +560,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		if (this.bitmapWidth * this.bitmapHeight == 0)
 			return null;
 
-		int size = 0;
-		int triggerRowHeight = 0;
-
+		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
+		// designated as ID 0.
 		if (this.triggers == null) {
 			this.triggers = new int[1];
+			// Eraser trigger.
 			this.triggers[0] = 0;
 		}
 		List<Integer> list = new ArrayList<>();
@@ -572,8 +572,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 			if (i != 0)
 				list.add(Integer.valueOf(i));
 		}
-		size = list.size();
-		triggerRowHeight = (size / this.bitmapHeight) + 1;
+
+		int size = list.size();
+		int triggerRowHeight = (size / this.bitmapWidth) + 1;
 
 		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + triggerRowHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
@@ -585,8 +586,14 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 		// Storing important area information in the first pixel.
 		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerListSize & 0xFFFF));
+
+		// Represents how many reserved pixels that were used before entering this loop.
+		final int usedReservedPixelsCount = 1;
+
 		for (int i = 0; i < list.size(); i++) {
-			width = i + 1;
+			// The index "i" must be in range of 0 ~ list.size(). The "width" must include the reserved pixels
+			// count as offset.
+			width = i + usedReservedPixelsCount;
 			pixels[width + (index * this.bitmapHeight)] = list.get(i).intValue();
 			if (width >= this.bitmapHeight) {
 				index++;
