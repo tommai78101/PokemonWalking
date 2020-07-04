@@ -13,33 +13,33 @@ public class Trigger {
 	private static final int FLAG_TriggerScript = 3;
 
 	public Trigger() {
-		reset();
+		this.reset();
 	}
 
 	public void reset() {
-		x = y = 0;
-		triggerID = 0;
-		name = "<Untitled>";
-		for (int i = 0; i < valuesHasBeenSet.length; i++)
-			valuesHasBeenSet[i] = false;
+		this.x = this.y = 0;
+		this.triggerID = 0;
+		this.name = "<Untitled>";
+		for (int i = 0; i < this.valuesHasBeenSet.length; i++)
+			this.valuesHasBeenSet[i] = false;
 	}
 
 	public int getDataValue() {
-		return (x << 24) | (y << 16) | (triggerID & 0xFFFF);
+		return (this.x << 24) | (this.y << 16) | (this.triggerID & 0xFFFF);
 	}
 
 	public void setTriggerPositionX(byte x) {
-		this.valuesHasBeenSet[FLAG_PositionX] = true;
+		this.valuesHasBeenSet[Trigger.FLAG_PositionX] = true;
 		this.x = x;
 	}
 
 	public void setTriggerPositionY(byte y) {
-		this.valuesHasBeenSet[FLAG_PositionY] = true;
+		this.valuesHasBeenSet[Trigger.FLAG_PositionY] = true;
 		this.y = y;
 	}
 
 	public void setTriggerID(short value) {
-		this.valuesHasBeenSet[FLAG_TriggerID] = true;
+		this.valuesHasBeenSet[Trigger.FLAG_TriggerID] = true;
 		this.triggerID = value;
 	}
 
@@ -48,19 +48,19 @@ public class Trigger {
 	}
 
 	public boolean isPositionXSet() {
-		return this.valuesHasBeenSet[FLAG_PositionX];
+		return this.valuesHasBeenSet[Trigger.FLAG_PositionX];
 	}
 
 	public boolean isPositionYSet() {
-		return this.valuesHasBeenSet[FLAG_PositionY];
+		return this.valuesHasBeenSet[Trigger.FLAG_PositionY];
 	}
 
 	public boolean isTriggerIDSet() {
-		return this.valuesHasBeenSet[FLAG_TriggerID];
+		return this.valuesHasBeenSet[Trigger.FLAG_TriggerID];
 	}
 
 	public boolean isTriggerScriptSet() {
-		return this.valuesHasBeenSet[FLAG_TriggerScript];
+		return this.valuesHasBeenSet[Trigger.FLAG_TriggerScript];
 	}
 
 	public boolean areRequiredFieldsAllSet() {
@@ -99,14 +99,22 @@ public class Trigger {
 		return this.script;
 	}
 
+	public boolean equalsTriggerId(short otherTriggerId) {
+		return this.triggerID == otherTriggerId;
+	}
+
+	public boolean equalsTriggerId(int otherTriggerId) {
+		return this.equalsTriggerId((short) (otherTriggerId & 0xFFFF));
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + triggerID;
-		result = prime * result + x;
-		result = prime * result + y;
+		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+		result = prime * result + this.triggerID;
+		result = prime * result + this.x;
+		result = prime * result + this.y;
 		return result;
 	}
 
@@ -118,24 +126,25 @@ public class Trigger {
 		if (obj == null) {
 			return false;
 		}
-		if (getClass() != obj.getClass()) {
+		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
 		Trigger other = (Trigger) obj;
-		if (name == null) {
+		if (this.name == null) {
 			if (other.name != null) {
 				return false;
 			}
-		} else if (!name.equals(other.name)) {
+		}
+		else if (!this.name.equals(other.name)) {
 			return false;
 		}
-		if (triggerID != other.triggerID) {
+		if (this.triggerID != other.triggerID) {
 			return false;
 		}
-		if (x != other.x) {
+		if (this.x != other.x) {
 			return false;
 		}
-		if (y != other.y) {
+		if (this.y != other.y) {
 			return false;
 		}
 		return true;

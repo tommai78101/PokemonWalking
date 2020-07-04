@@ -29,6 +29,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import common.Tileable;
+import utility.Debug;
 
 public class DrawingBoard extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -245,80 +246,94 @@ public class DrawingBoard extends Canvas implements Runnable {
 				break;
 			}
 			case Triggers: {
-				if (this.triggers != null) {
-					for (int k = 0; k < this.triggers.length; k++) {
-						if (this.bitmapWidth <= 0)
-							break;
-						if (this.bitmapHeight <= 0)
-							break;
+				if (this.triggers == null)
+					break;
 
-						Trigger trigger = null;
-						try {
-							trigger = EditorConstants.getInstance().getTriggers().get(this.triggers[k]);
-						}
-						catch (Exception e) {
-							// Eraser.
-							trigger = EditorConstants.getInstance().getTriggers().get(0);
+				Trigger selectedTrigger = this.editor.properties.getSelectedTrigger();
 
-						}
-						Data data = null;
-						try {
-							Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(this.tilesEditorID[k]);
-							data = entry.getValue();
-						}
-						catch (Exception e) {
-							data = EditorConstants.getInstance().getDatas().get(0).getValue();
-						}
+				// Iterate through a bitmap array of triggers.
+				for (int currentTriggerIndex = 0; currentTriggerIndex < this.triggers.length; currentTriggerIndex++) {
+					if (this.bitmapWidth <= 0)
+						break;
+					if (this.bitmapHeight <= 0)
+						break;
 
-						if (trigger == null)
-							break;
-						int w = k % this.bitmapWidth;
-						int h = k / this.bitmapWidth;
+					Trigger triggerValidityCheck = null;
+					try {
+						triggerValidityCheck = EditorConstants.getInstance().getTriggers().get(this.triggers[currentTriggerIndex]);
+					}
+					catch (Exception e) {
+						// Eraser.
+						triggerValidityCheck = EditorConstants.getInstance().getTriggers().get(0);
+					}
+					// Trigger should never be null at this point.
+					if (triggerValidityCheck == null) {
+						Debug.error("The variable \"trigger\" should never be null when rendering tiles.");
+						break;
+					}
 
-						Graphics g = this.image.getGraphics();
+					Data data = null;
+					try {
+						Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(this.tilesEditorID[currentTriggerIndex]);
+						data = entry.getValue();
+					}
+					catch (Exception e) {
+						data = EditorConstants.getInstance().getDatas().get(0).getValue();
+					}
 
-						if ((this.triggers[k] & 0xFFFF) != 0) {
+					int w = currentTriggerIndex % this.bitmapWidth;
+					int h = currentTriggerIndex / this.bitmapWidth;
+
+					Graphics g = this.image.getGraphics();
+
+					// This check makes sure that the iterating current tile contains a trigger.
+					if ((this.triggers[currentTriggerIndex] & 0xFFFF) != 0) {
+						if (selectedTrigger.equalsTriggerId(this.triggers[currentTriggerIndex])) {
 							g.setColor(Color.cyan);
 							g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 						}
 						else {
-							// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT,
-							// Tile.WIDTH, Tile.HEIGHT, null);
-							Graphics gD = this.image.getGraphics();
-							BufferedImage bimg = new BufferedImage(
-								data.image.getIconWidth(), data.image.getIconHeight(),
-								BufferedImage.TYPE_INT_ARGB
-							);
-							Graphics gB = bimg.getGraphics();
-							// TODO: Area Type ID must be included.
-							gB.drawImage(data.image.getImage(), 0, 0, null);
-							gB.dispose();
-
-							if (data.areaTypeIncluded) {
-								switch (data.areaTypeIDType) {
-									case ALPHA:
-									default:
-										this.setBiomeTile((this.tiles[k] >> 24) & 0xFF, g);
-										break;
-									case RED:
-										this.setBiomeTile((this.tiles[k] >> 16) & 0xFF, g);
-										break;
-									case GREEN:
-										this.setBiomeTile((this.tiles[k] >> 8) & 0xFF, g);
-										break;
-									case BLUE:
-										this.setBiomeTile(this.tiles[k] & 0xFF, g);
-										break;
-								}
-							}
-							else
-								gD.setColor(Color.white);
+							g.setColor(Color.yellow);
 							g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
-							g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
-							g.dispose();
 						}
+					}
+					else {
+						// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT,
+						// Tile.WIDTH, Tile.HEIGHT, null);
+						Graphics gD = this.image.getGraphics();
+						BufferedImage bimg = new BufferedImage(
+							data.image.getIconWidth(), data.image.getIconHeight(),
+							BufferedImage.TYPE_INT_ARGB
+						);
+						Graphics gB = bimg.getGraphics();
+						// TODO: Area Type ID must be included.
+						gB.drawImage(data.image.getImage(), 0, 0, null);
+						gB.dispose();
+
+						if (data.areaTypeIncluded) {
+							switch (data.areaTypeIDType) {
+								case ALPHA:
+								default:
+									this.setBiomeTile((this.tiles[currentTriggerIndex] >> 24) & 0xFF, g);
+									break;
+								case RED:
+									this.setBiomeTile((this.tiles[currentTriggerIndex] >> 16) & 0xFF, g);
+									break;
+								case GREEN:
+									this.setBiomeTile((this.tiles[currentTriggerIndex] >> 8) & 0xFF, g);
+									break;
+								case BLUE:
+									this.setBiomeTile(this.tiles[currentTriggerIndex] & 0xFF, g);
+									break;
+							}
+						}
+						else
+							gD.setColor(Color.white);
+						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
+						g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
 						g.dispose();
 					}
+					g.dispose();
 				}
 				break;
 			}
