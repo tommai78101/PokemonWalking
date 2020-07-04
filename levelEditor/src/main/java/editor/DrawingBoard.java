@@ -20,8 +20,11 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,6 +34,122 @@ import javax.swing.JTextField;
 import common.Tileable;
 import utility.Debug;
 
+class TriggerSet {
+	// Map of <Tile ID (current tile index), Set of triggers>
+	private Map<Integer, Set<Trigger>> triggers;
+	// Since this is part of Javax Swing, I might as well use it to store the width and height of the
+	// bitmap.
+	private Dimension size;
+
+	public TriggerSet(int width, int height) {
+		this.size = new Dimension(width, height);
+		this.triggers = new HashMap<>();
+	}
+
+	public int getSize() {
+		return this.triggers.size();
+	}
+
+	public Trigger validityCheck(int triggerId) {
+		Trigger triggerValidityCheck = null;
+		try {
+			triggerValidityCheck = EditorConstants.getInstance().getTriggers().get(triggerId);
+		}
+		catch (Exception e) {
+			// Eraser.
+			triggerValidityCheck = EditorConstants.getInstance().getTriggers().get(0);
+		}
+		return triggerValidityCheck;
+	}
+
+	public Set<Trigger> getTriggers(int currentTriggerIndex) {
+		return this.triggers.get(currentTriggerIndex);
+	}
+
+	public void addTrigger(int index, Trigger trigger) {
+		Set<Trigger> set = this.triggers.get(index);
+		if (set == null) {
+			set = new HashSet<>();
+			this.triggers.put(index, set);
+		}
+		set.add(trigger);
+	}
+
+	public void removeTrigger(int index, Trigger trigger) {
+		Set<Trigger> set = this.triggers.get(index);
+		if (set == null || !set.contains(trigger)) {
+			return;
+		}
+		set.remove(trigger);
+	}
+
+	public void toggleTrigger(int index, Trigger trigger) {
+		Debug.log("Toggling trigger");
+		Set<Trigger> set = this.triggers.get(index);
+		if (set == null) {
+			set = new HashSet<>();
+			set.add(trigger);
+			this.triggers.put(index, set);
+			return;
+		}
+		if (set.contains(trigger)) {
+			set.remove(trigger);
+		}
+		else {
+			set.add(trigger);
+		}
+	}
+
+	public List<Integer> convertToData() {
+		List<Integer> output = new ArrayList<>();
+		// Eraser trigger by default.
+		output.add(0);
+		Set<Integer> keySet = this.triggers.keySet();
+		for (int tileId : keySet) {
+			Set<Trigger> triggerSet = this.triggers.get(tileId);
+			if (triggerSet == null || triggerSet.isEmpty()) {
+				continue;
+			}
+			for (Trigger trigger : triggerSet) {
+				output.add(trigger.getDataValue());
+			}
+		}
+		return output;
+	}
+
+	public void addTriggerById(int index, int triggerId) {
+		Trigger trigger = this.validityCheck(triggerId);
+		if (trigger != null && !trigger.isEraser()) {
+			this.addTrigger(index, trigger);
+		}
+		else {
+			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at: (" + (index % this.size.width) + "," + (index / this.size.width) + ").");
+		}
+	}
+
+	public void clearAllTriggers(int index) {
+		Set<Trigger> set = this.triggers.get(index);
+		if (set != null)
+			set.clear();
+	}
+
+	public boolean contains(int index, Trigger trigger) {
+		Set<Trigger> set = this.triggers.get(index);
+		if (set == null || set.isEmpty())
+			return false;
+		for (Trigger t : set) {
+			if (t.getTriggerID() == trigger.getTriggerID())
+				return true;
+		}
+		return false;
+	}
+
+	public boolean hasTriggers(int index) {
+		Set<Trigger> set = this.triggers.get(index);
+		return (set != null && !set.isEmpty());
+	}
+}
+
 public class DrawingBoard extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
 
@@ -39,7 +158,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private BufferedImage image;
 	private int[] tiles;
 	private int[] tilesEditorID;
-	private int[] triggers;
+	private TriggerSet triggers;
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
@@ -114,11 +233,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		this.tiles = new int[w * h];
 		this.tilesEditorID = new int[w * h];
-		this.triggers = new int[w * h];
+		this.triggers = new TriggerSet(w, h);
 		for (int i = 0; i < this.tiles.length; i++) {
 			this.tiles[i] = 0;
 			this.tilesEditorID[i] = 0;
-			this.triggers[i] = 0;
 		}
 		this.image = new BufferedImage(w * Tileable.WIDTH, h * Tileable.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
@@ -252,25 +370,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 				Trigger selectedTrigger = this.editor.properties.getSelectedTrigger();
 
 				// Iterate through a bitmap array of triggers.
-				for (int currentTriggerIndex = 0; currentTriggerIndex < this.triggers.length; currentTriggerIndex++) {
+				for (int currentTriggerIndex = 0; currentTriggerIndex < this.tiles.length; currentTriggerIndex++) {
 					if (this.bitmapWidth <= 0)
 						break;
 					if (this.bitmapHeight <= 0)
 						break;
-
-					Trigger triggerValidityCheck = null;
-					try {
-						triggerValidityCheck = EditorConstants.getInstance().getTriggers().get(this.triggers[currentTriggerIndex]);
-					}
-					catch (Exception e) {
-						// Eraser.
-						triggerValidityCheck = EditorConstants.getInstance().getTriggers().get(0);
-					}
-					// Trigger should never be null at this point.
-					if (triggerValidityCheck == null) {
-						Debug.error("The variable \"trigger\" should never be null when rendering tiles.");
-						break;
-					}
 
 					Data data = null;
 					try {
@@ -287,8 +391,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 					Graphics g = this.image.getGraphics();
 
 					// This check makes sure that the iterating current tile contains a trigger.
-					if ((this.triggers[currentTriggerIndex] & 0xFFFF) != 0) {
-						if (selectedTrigger.equalsTriggerId(this.triggers[currentTriggerIndex])) {
+					if (this.triggers.hasTriggers(currentTriggerIndex)) {
+						if (this.triggers.contains(currentTriggerIndex, selectedTrigger)) {
 							g.setColor(Color.cyan);
 							g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 						}
@@ -392,7 +496,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 					this.offsetX = this.editor.input.offsetX;
 					this.offsetY = this.editor.input.offsetY;
 				}
-				else if (this.isMouseInDrawingBoard() && this.editor.input.isDrawing()) {
+				// Only Triggers Editing is subjected to clicking only.
+				else if (this.isMouseInDrawingBoard() && this.editor.input.isClicking()) {
 					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
 					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH)
@@ -400,14 +505,25 @@ public class DrawingBoard extends Canvas implements Runnable {
 					if (this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
 					Trigger t = this.editor.controlPanel.getSelectedTrigger();
-					if (t != null) {
+					if (t != null && !t.isEraser()) {
 						int x = this.getMouseTileX();
 						int y = this.getMouseTileY();
 						t.setTriggerPositionX((byte) x);
 						t.setTriggerPositionY((byte) y);
-
 						int i = y * this.bitmapWidth + x;
-						this.triggers[i] = t.getDataValue();
+
+						if (this.triggers.contains(i, t)) {
+							this.triggers.removeTrigger(i, t);
+						}
+						else {
+							this.triggers.addTrigger(i, t);
+						}
+					}
+					else if (t != null && t.isEraser()) {
+						int x = this.getMouseTileX();
+						int y = this.getMouseTileY();
+						int i = y * this.bitmapWidth + x;
+						this.triggers.clearAllTriggers(i);
 					}
 					this.editor.validate();
 				}
@@ -578,15 +694,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
 		// designated as ID 0.
 		if (this.triggers == null) {
-			this.triggers = new int[1];
-			// Eraser trigger.
-			this.triggers[0] = 0;
+			this.triggers = new TriggerSet(this.bitmapWidth, this.bitmapHeight);
 		}
-		List<Integer> list = new ArrayList<>();
-		for (int i : this.triggers) {
-			if (i != 0)
-				list.add(Integer.valueOf(i));
-		}
+		List<Integer> list = this.triggers.convertToData();
 
 		int size = list.size();
 		int triggerRowHeight = (size / this.bitmapWidth) + 1;
@@ -639,11 +749,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.setImageSize(image.getWidth(), (image.getHeight() - triggerRows));
 			if (this.triggers != null)
 				this.triggers = null;
-			this.triggers = new int[image.getWidth() * (image.getHeight() - triggerRows)];
+			this.triggers = new TriggerSet(image.getWidth(), (image.getHeight() - triggerRows));
 			for (int i = 0; i < triggerCount; i++) {
 				int x = (srcTiles[i + 1] >> 24) & 0xFF;
 				int y = (srcTiles[i + 1] >> 16) & 0xFF;
-				this.triggers[y * image.getWidth() + x] = srcTiles[i + 1];
+				this.triggers.addTriggerById(y * image.getWidth() + x, srcTiles[i + 1]);
 			}
 			for (int i = 0; i < srcTiles.length - (triggerRows * image.getWidth()); i++)
 				this.tiles[i] = srcTiles[i + (triggerRows * image.getWidth())];
@@ -724,24 +834,23 @@ public class DrawingBoard extends Canvas implements Runnable {
 			}
 
 			// checks for mouse hoving above triggers
-			int[] list = null;
 			switch (EditorConstants.metadata) {
 				case Pixel_Data:
 				default:
-					list = this.tiles;
+					int value = this.tiles[h * this.bitmapWidth + w];
+					// Show trigger IDs and stuffs.
+					TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+					panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
+					panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
+					panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));
+					panel.blueField.setText(Integer.toString(value & 0xFF));
+					panel.validate();
 					break;
 				case Triggers:
-					list = this.triggers;
+					// TODO(Jul/4/2020): Figure out how to display a list of triggers for a single tile in the
+					// TilePropertiesPanel.
 					break;
 			}
-			int value = list[h * this.bitmapWidth + w];
-			// Show trigger IDs and stuffs.
-			TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-			panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
-			panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
-			panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));
-			panel.blueField.setText(Integer.toString(value & 0xFF));
-			panel.validate();
 		}
 		catch (Exception e) {
 			TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();

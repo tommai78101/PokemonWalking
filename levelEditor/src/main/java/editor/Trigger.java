@@ -17,7 +17,7 @@ public class Trigger {
 	}
 
 	public void reset() {
-		this.x = this.y = 0;
+		this.x = this.y = -1;
 		this.triggerID = 0;
 		this.name = "<Untitled>";
 		for (int i = 0; i < this.valuesHasBeenSet.length; i++)
@@ -83,6 +83,10 @@ public class Trigger {
 		return this.y;
 	}
 
+	public boolean hasValidPosition() {
+		return !(this.x == -1 || this.y == -1);
+	}
+
 	public short getTriggerID() {
 		return this.triggerID;
 	}
@@ -105,6 +109,17 @@ public class Trigger {
 
 	public boolean equalsTriggerId(int otherTriggerId) {
 		return this.equalsTriggerId((short) (otherTriggerId & 0xFFFF));
+	}
+
+	public boolean isEraser() {
+		return this.triggerID == 0;
+	}
+
+	public static Trigger createEraser() {
+		Trigger trigger = new Trigger();
+		trigger.setTriggerID((short) 0);
+		trigger.setName("Eraser");
+		return trigger;
 	}
 
 	@Override

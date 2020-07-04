@@ -200,7 +200,8 @@ public class SelectionDropdownMenu extends JPanel {
 		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
 		List<Trigger> list = EditorConstants.getInstance().getTriggers();
 		for (Trigger t : list) {
-			model.addElement(t);
+			if (t != null)
+				model.addElement(t);
 		}
 	}
 
