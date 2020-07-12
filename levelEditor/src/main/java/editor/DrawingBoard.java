@@ -687,9 +687,18 @@ public class DrawingBoard extends Canvas implements Runnable {
 		return this.bitmapHeight;
 	}
 
+	/**
+	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is
+	 * necessary.
+	 * 
+	 * @return <b>BufferedImage</b> object containing the triggers and tilesets data.
+	 */
 	public BufferedImage getMapImage() {
 		if (this.bitmapWidth * this.bitmapHeight == 0)
 			return null;
+
+		// Represents how many reserved pixels that will be used before creating the bitmap.
+		final int usedReservedPixelsCount = 1;
 
 		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
 		// designated as ID 0.
@@ -698,34 +707,42 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		List<Integer> list = this.triggers.convertToData();
 
-		int size = list.size();
-		int triggerRowHeight = (size / this.bitmapWidth) + 1;
+		// Trigger size will always be no more than 65536 triggers. Trigger size will always be 1 + (number
+		// of triggers seen in the editor), to account for the Eraser trigger.
+		int triggerSize = list.size() & 0xFFFF;
+		int triggerRowHeight = ((triggerSize + 1) / this.bitmapWidth);
 
 		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + triggerRowHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
 
-		int index = 0;
-		int width = 0;
-		int triggerListSize = list.size() & 0xFFFF;
+		// Storing important area information in the first pixel. This should use up all of the number of
+		// pixels we had reserved.
 		int areaID = this.editor.getUniqueAreaID();
+		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerSize));
 
-		// Storing important area information in the first pixel.
-		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerListSize & 0xFFFF));
-
-		// Represents how many reserved pixels that were used before entering this loop.
-		final int usedReservedPixelsCount = 1;
-
-		for (int i = 0; i < list.size(); i++) {
+		// Place the trigger data inside the trigger section in the bitmap file. This is usually located at
+		// the top of the bitmap file.
+		int columnIndex = 0;
+		int rowIndex = 0;
+		for (int i = 0; i < triggerSize; i++) {
 			// The index "i" must be in range of 0 ~ list.size(). The "width" must include the reserved pixels
 			// count as offset.
-			width = i + usedReservedPixelsCount;
-			pixels[width + (index * this.bitmapHeight)] = list.get(i).intValue();
-			if (width >= this.bitmapHeight) {
-				index++;
-				width -= this.bitmapHeight;
-			}
+			int pixelIndex = i + usedReservedPixelsCount;
+			columnIndex = pixelIndex % this.bitmapWidth;
+			rowIndex = pixelIndex / this.bitmapWidth;
+			pixels[columnIndex + (rowIndex * this.bitmapWidth)] = list.get(i).intValue();
 		}
 
+		// Pad out the trigger section with -1 if the current iterator is not inside the tileset section.
+		// This marks null trigger data, and should be ignored when the game is reading this padded part of
+		// the triggers section.
+		while (columnIndex < this.bitmapWidth && columnIndex % this.bitmapWidth != 0) {
+			pixels[columnIndex + (rowIndex * this.bitmapWidth)] = -1;
+			columnIndex++;
+		}
+
+		// Then place the tileset data inside the tileset section in the bitmap file. This is the rest of
+		// the bitmap file, right after the trigger section.
 		for (int iterator = 0; iterator < this.tiles.length; iterator++) {
 			pixels[this.bitmapWidth * triggerRowHeight + iterator] = this.tiles[iterator];
 		}
