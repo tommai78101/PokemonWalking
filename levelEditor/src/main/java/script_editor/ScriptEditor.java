@@ -192,17 +192,12 @@ public class ScriptEditor extends JFrame {
 		super.repaint();
 	}
 
-	// (11/24/2014): This is where I load triggers at. This is completed, but may
-	// require double-checking to be very sure.
+	// (11/24/2014): This is where I load triggers at. This is completed, but may require double-checking to be very sure.
 	/**
-	 * <p>
 	 * Loads the file script.
-	 * </p>
-	 * 
 	 * <p>
-	 * This method may require double-checking in the codes, just to be very sure that it is absolutely working as intended. Reason for this is that this method is used as a guideline for loading custom
-	 * scripts into the game itself.
-	 * </p>
+	 * This method may require double-checking in the codes, just to be very sure that it is absolutely working as intended.
+	 * Reason for this is that this method is used as a guideline for loading custom scripts into the game itself.
 	 * 
 	 * @param script
 	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script editor uses.
