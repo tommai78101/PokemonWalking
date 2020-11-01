@@ -25,6 +25,7 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.metal.MetalFileChooserUI;
 
+import common.EditorFileChooser;
 import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
@@ -35,7 +36,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private final ScriptEditor editor;
 	private final String[] tags = {
-		"New Session", "Save Session", "Open Session", ""
+	    "New Session", "Save Session", "Open Session", ""
 	};
 	private final HashMap<String, JButton> buttonCache = new HashMap<>();
 
@@ -73,7 +74,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 
 				JComboBox<Trigger> triggerComboBox = this.editor.parent.properties.getTriggerList();
 				DefaultComboBoxModel<Trigger> triggerComboModel = (DefaultComboBoxModel<Trigger>) triggerComboBox
-					.getModel();
+				    .getModel();
 				triggerComboModel.removeAllElements();
 
 				Trigger trigger = new Trigger();
@@ -114,7 +115,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					catch (IOException e) {}
 				}
 
-				final JFileChooser saver = new JFileChooser();
+				final JFileChooser saver = new EditorFileChooser();
 				JList<Class<?>> list = this.findFileList(saver);
 				LOOP_TEMP:
 				for (MouseListener l : list.getMouseListeners()) {
@@ -224,7 +225,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					catch (IOException e) {}
 				}
 
-				final JFileChooser opener = new JFileChooser();
+				final JFileChooser opener = new EditorFileChooser();
 				JList<Class<?>> list = this.findFileList(opener);
 				LOOP_TEMP:
 				for (MouseListener l : list.getMouseListeners()) {

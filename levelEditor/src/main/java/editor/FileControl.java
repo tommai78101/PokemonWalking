@@ -35,6 +35,7 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.metal.MetalFileChooserUI;
 
+import common.EditorFileChooser;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
 import utility.Debug;
@@ -42,7 +43,7 @@ import utility.Debug;
 public class FileControl extends JPanel implements ActionListener {
 	public static File lastSavedDirectory = null;
 	public static final String[] TAGS = new String[] {
-		"New", "Save", "Open", "", "Tileset", "Trigger", "", "Script"
+	    "New", "Save", "Open", "", "Tileset", "Trigger", "", "Script"
 	};
 
 	private static final long serialVersionUID = 1L;
@@ -99,7 +100,7 @@ public class FileControl extends JPanel implements ActionListener {
 						FileControl.lastSavedDirectory = new File(FileControl.defaultPath);
 					}
 
-					final JFileChooser chooser = new JFileChooser();
+					final JFileChooser chooser = new EditorFileChooser();
 
 					JList<Class<?>> list = this.findFileList(chooser);
 					LOOP_TEMP:
@@ -167,9 +168,9 @@ public class FileControl extends JPanel implements ActionListener {
 							while (filename.endsWith(".png"))
 								filename = filename.substring(0, filename.length() - ".png".length());
 							ImageIO.write(
-								img, "png", new File(
-									FileControl.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"
-								)
+							    img, "png", new File(
+							        FileControl.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"
+							    )
 							);
 							this.editor.setMapAreaName(filename);
 
@@ -192,7 +193,7 @@ public class FileControl extends JPanel implements ActionListener {
 					catch (IOException e) {
 						FileControl.lastSavedDirectory = new File(FileControl.defaultPath);
 					}
-					final JFileChooser opener = new JFileChooser();
+					final JFileChooser opener = new EditorFileChooser();
 
 					JList<Class<?>> list = this.findFileList(opener);
 					LOOP_TEMP1:
