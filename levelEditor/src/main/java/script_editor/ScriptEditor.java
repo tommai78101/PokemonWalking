@@ -188,6 +188,8 @@ public class ScriptEditor extends JFrame {
 				}
 			}
 		});
+		super.revalidate();
+		super.repaint();
 	}
 
 	// (11/24/2014): This is where I load triggers at. This is completed, but may
@@ -213,8 +215,7 @@ public class ScriptEditor extends JFrame {
 			return;
 		}
 		System.out.println("Opened Location: " + script.getAbsolutePath());
-		BufferedReader reader = null;
-		try {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
 			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
 			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
 			scriptTriggerListModel.clear();
@@ -230,7 +231,6 @@ public class ScriptEditor extends JFrame {
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);
 
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)));
 			String line = null;
 			String[] tokens;
 			trigger = null;
@@ -271,17 +271,13 @@ public class ScriptEditor extends JFrame {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		finally {
-			try {
-				reader.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 		this.scriptViewer.getTriggerList().clearSelection();
 		this.scriptViewer.revalidate();
+		this.scriptViewer.repaint();
 		this.parent.revalidate();
+		this.parent.repaint();
+		super.revalidate();
+		super.repaint();
 	}
 
 	public boolean isBeingModified() {
@@ -341,5 +337,7 @@ public class ScriptEditor extends JFrame {
 			e.printStackTrace();
 		}
 		Debug.log("Saved Location: " + script.getAbsolutePath());
+		super.revalidate();
+		super.repaint();
 	}
 }

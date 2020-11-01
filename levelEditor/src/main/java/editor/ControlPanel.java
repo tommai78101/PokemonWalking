@@ -119,6 +119,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 				break;
 			}
 		}
+		super.revalidate();
+		super.repaint();
 	}
 
 	public String getPickedEntityName() {
@@ -175,8 +177,9 @@ public class ControlPanel extends JPanel implements ActionListener {
 				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 				break;
 		}
-		super.validate();
 		if (this.propertiesPanel != null)
 			this.propertiesPanel.validate();
+		super.revalidate();
+		super.repaint();
 	}
 }

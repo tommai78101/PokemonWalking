@@ -26,18 +26,19 @@ public class StatusPanel extends JPanel {
 		this.mousePosition = new JLabel();
 		this.statusMessage = new JLabel();
 
-		this.add(mousePosition);
-		this.add(statusMessage);
+		this.add(this.mousePosition);
+		this.add(this.statusMessage);
 	}
 
 	public void setMousePositionText(int x, int y) {
 		this.mousePosition.setText("[" + x + ", " + y + "]");
-		this.validate();
+		super.revalidate();
+		super.repaint();
 	}
 
 	public void setStatusMessageText(String msg) {
 		this.statusMessage.setText(msg);
-		this.validate();
+		super.revalidate();
+		super.repaint();
 	}
-
 }

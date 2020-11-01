@@ -270,6 +270,8 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				break;
 			}
 		}
+		super.revalidate();
+		super.repaint();
 	}
 
 	@SuppressWarnings("unchecked")

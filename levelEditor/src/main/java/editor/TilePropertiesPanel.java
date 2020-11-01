@@ -337,7 +337,6 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 	@Override
 	public void validate() {
-		super.validate();
 		switch (EditorConstants.metadata) {
 			case Pixel_Data:
 				this.tileID.setText("Tile ID:");
@@ -362,5 +361,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.blueInputField.setVisible(false);
 				break;
 		}
+		super.revalidate();
+		super.repaint();
 	}
 }
