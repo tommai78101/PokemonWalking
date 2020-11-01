@@ -198,14 +198,12 @@ public class ScriptEditor extends JFrame {
 	 * </p>
 	 * 
 	 * <p>
-	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
-	 * working as intended. Reason for this is that this method is used as a guideline for loading
-	 * custom scripts into the game itself.
+	 * This method may require double-checking in the codes, just to be very sure that it is absolutely working as intended. Reason for this is that this method is used as a guideline for loading custom
+	 * scripts into the game itself.
 	 * </p>
 	 * 
 	 * @param script
-	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
-	 *            editor uses.
+	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script editor uses.
 	 * @return Nothing.
 	 */
 	public void load(File script) {
@@ -223,7 +221,7 @@ public class ScriptEditor extends JFrame {
 
 			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
 			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
-				.getModel();
+			    .getModel();
 			editorTriggerComboModel.removeAllElements();
 
 			Trigger trigger = new Trigger();
@@ -308,9 +306,7 @@ public class ScriptEditor extends JFrame {
 	}
 
 	public void save(File script) {
-		BufferedWriter writer = null;
-		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)));
+		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)))) {
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
 
 			writer.write("$0");
@@ -340,19 +336,9 @@ public class ScriptEditor extends JFrame {
 					e.printStackTrace();
 				}
 			}
-
 		}
 		catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
-			try {
-				writer.flush();
-				writer.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 		Debug.log("Saved Location: " + script.getAbsolutePath());
 	}

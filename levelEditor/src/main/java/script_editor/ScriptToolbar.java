@@ -93,9 +93,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				break;
 			}
 			case 1: { // Save Session
-				RandomAccessFile raf = null;
-				try {
-					raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+				try (RandomAccessFile raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 					raf.readLine(); // The second line in the cache is for the Script Editor.
 					ScriptEditor.lastSavedDirectory = new File(raf.readLine());
 				}
@@ -107,12 +105,6 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				}
 				catch (NullPointerException e) {
 					ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
-				}
-				finally {
-					try {
-						raf.close();
-					}
-					catch (IOException e) {}
 				}
 
 				final JFileChooser saver = new EditorFileChooser();
@@ -182,30 +174,18 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					}
 					this.editor.setModifiedFlag(false);
 
-					RandomAccessFile rf = null;
-					try {
-						rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+					try (RandomAccessFile rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 						rf.readLine();
 						rf.writeBytes(ScriptEditor.lastSavedDirectory.getAbsolutePath());
 					}
 					catch (IOException e) {
 						e.printStackTrace();
 					}
-					finally {
-						try {
-							rf.close();
-						}
-						catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
 				}
 				break;
 			}
 			case 2: { // Open Session.
-				RandomAccessFile raf = null;
-				try {
-					raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+				try (RandomAccessFile raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 					raf.readLine(); // The second line in the cache is for the Script Editor.
 					ScriptEditor.lastSavedDirectory = new File(raf.readLine());
 				}
@@ -217,12 +197,6 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				}
 				catch (NullPointerException e) {
 					ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
-				}
-				finally {
-					try {
-						raf.close();
-					}
-					catch (IOException e) {}
 				}
 
 				final JFileChooser opener = new EditorFileChooser();
@@ -285,22 +259,12 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
 					this.editor.scriptChanger.enableComponent();
 
-					RandomAccessFile rf = null;
-					try {
-						rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw");
+					try (RandomAccessFile rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 						rf.readLine();
 						rf.writeBytes(ScriptEditor.lastSavedDirectory.getAbsolutePath());
 					}
 					catch (IOException e) {
 						e.printStackTrace();
-					}
-					finally {
-						try {
-							rf.close();
-						}
-						catch (IOException e) {
-							e.printStackTrace();
-						}
 					}
 				}
 				break;
