@@ -711,8 +711,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 		// of triggers seen in the editor), to account for the Eraser trigger. If there are more triggers
 		// than the width of the bitmap, we add however many extra rows to compensate.
 		int triggerSize = list.size() & 0xFFFF;
-		int rows = (triggerSize + 1) / this.bitmapWidth;
-		int triggerRowHeight = ((triggerSize + 1) % this.bitmapWidth > 0 ? rows + 1 : rows);
+		int rows = (triggerSize + usedReservedPixelsCount) / this.bitmapWidth;
+		int triggerRowHeight = ((triggerSize + usedReservedPixelsCount) % this.bitmapWidth > 0 ? rows + 1 : rows);
 
 		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + triggerRowHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
