@@ -537,10 +537,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 	 * - From the argument parameter.<br/>
 	 * - From the ControlPanel object's "dataValue" property.<br/>
 	 * <p>
-	 * The "selectedData" will always get priority. It will be used to fetch the correct Data object from a lookup list.
+	 * The "selectedData" will always get priority. It will be used to fetch the correct Data object
+	 * from a lookup list.
 	 * <p>
-	 * The ControlPanel's dataValue gathers the user's modified data values, then inserts it into the data value of the "data
-	 * object from the lookup list".
+	 * The ControlPanel's dataValue gathers the user's modified data values, then inserts it into the
+	 * data value of the "data object from the lookup list".
 	 * 
 	 * @param selectedData
 	 */
@@ -687,7 +688,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 
 	/**
-	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is necessary.
+	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is
+	 * necessary.
 	 * 
 	 * @return <b>BufferedImage</b> object containing the triggers and tilesets data.
 	 */
@@ -706,9 +708,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		List<Integer> list = this.triggers.convertToData();
 
 		// Trigger size will always be no more than 65536 triggers. Trigger size will always be 1 + (number
-		// of triggers seen in the editor), to account for the Eraser trigger.
+		// of triggers seen in the editor), to account for the Eraser trigger. If there are more triggers
+		// than the width of the bitmap, we add however many extra rows to compensate.
 		int triggerSize = list.size() & 0xFFFF;
-		int triggerRowHeight = ((triggerSize + 1) / this.bitmapWidth);
+		int rows = (triggerSize + 1) / this.bitmapWidth;
+		int triggerRowHeight = ((triggerSize + 1) % this.bitmapWidth > 0 ? rows + 1 : rows);
 
 		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + triggerRowHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
