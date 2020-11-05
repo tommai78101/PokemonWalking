@@ -272,8 +272,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 					panel.add(new JLabel("  Height:"));
 					panel.add(heightField);
 					result = JOptionPane.showConfirmDialog(
-						null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.PLAIN_MESSAGE
+					    null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION,
+					    JOptionPane.PLAIN_MESSAGE
 					);
 				}
 				while (Integer.valueOf(widthField.getText()) <= 0 || Integer.valueOf(heightField.getText()) <= 0);
@@ -323,8 +323,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 							return;
 						Graphics g = this.image.getGraphics();
 						BufferedImage bimg = new BufferedImage(
-							data.image.getIconWidth(), data.image.getIconHeight(),
-							BufferedImage.TYPE_INT_ARGB
+						    data.image.getIconWidth(), data.image.getIconHeight(),
+						    BufferedImage.TYPE_INT_ARGB
 						);
 						Graphics gB = bimg.getGraphics();
 						// TODO: Area Type ID must be included.
@@ -406,8 +406,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 						// Tile.WIDTH, Tile.HEIGHT, null);
 						Graphics gD = this.image.getGraphics();
 						BufferedImage bimg = new BufferedImage(
-							data.image.getIconWidth(), data.image.getIconHeight(),
-							BufferedImage.TYPE_INT_ARGB
+						    data.image.getIconWidth(), data.image.getIconHeight(),
+						    BufferedImage.TYPE_INT_ARGB
 						);
 						Graphics gB = bimg.getGraphics();
 						// TODO: Area Type ID must be included.
@@ -537,11 +537,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 	 * - From the argument parameter.<br/>
 	 * - From the ControlPanel object's "dataValue" property.<br/>
 	 * <p>
-	 * The "selectedData" will always get priority. It will be used to fetch the correct Data object
-	 * from a lookup list.
+	 * The "selectedData" will always get priority. It will be used to fetch the correct Data object from a lookup list.
 	 * <p>
-	 * The ControlPanel's dataValue gathers the user's modified data values, then inserts it into the
-	 * data value of the "data object from the lookup list".
+	 * The ControlPanel's dataValue gathers the user's modified data values, then inserts it into the data value of the "data
+	 * object from the lookup list".
 	 * 
 	 * @param selectedData
 	 */
@@ -688,8 +687,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 
 	/**
-	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is
-	 * necessary.
+	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is necessary.
 	 * 
 	 * @return <b>BufferedImage</b> object containing the triggers and tilesets data.
 	 */
@@ -736,9 +734,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 		// Pad out the trigger section with -1 if the current iterator is not inside the tileset section.
 		// This marks null trigger data, and should be ignored when the game is reading this padded part of
 		// the triggers section.
-		while (columnIndex < this.bitmapWidth && columnIndex % this.bitmapWidth != 0) {
-			pixels[columnIndex + (rowIndex * this.bitmapWidth)] = -1;
-			columnIndex++;
+		for (int i = columnIndex + usedReservedPixelsCount; i < this.bitmapWidth; i++) {
+			pixels[i + (rowIndex * this.bitmapWidth)] = -1;
 		}
 
 		// Then place the tileset data inside the tileset section in the bitmap file. This is the rest of
