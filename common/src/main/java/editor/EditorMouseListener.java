@@ -30,11 +30,13 @@ public class EditorMouseListener implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 1) {
 			File file = this.fileChooser.getSelectedFile();
-			if (file != null && !file.isDirectory()) {
-				this.currentName = file.getName();
-			}
-			else {
-				this.oldName = file.getName();
+			if (file != null) {
+				if (!file.isDirectory()) {
+					this.currentName = file.getName();
+				}
+				else {
+					this.oldName = file.getName();
+				}
 			}
 		}
 		else if (e.getClickCount() == 2) {
