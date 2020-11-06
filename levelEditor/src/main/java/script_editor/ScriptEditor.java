@@ -192,15 +192,18 @@ public class ScriptEditor extends JFrame {
 		super.repaint();
 	}
 
-	// (11/24/2014): This is where I load triggers at. This is completed, but may require double-checking to be very sure.
+	// (11/24/2014): This is where I load triggers at. This is completed, but may require
+	// double-checking to be very sure.
 	/**
 	 * Loads the file script.
 	 * <p>
-	 * This method may require double-checking in the codes, just to be very sure that it is absolutely working as intended.
-	 * Reason for this is that this method is used as a guideline for loading custom scripts into the game itself.
+	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
+	 * working as intended. Reason for this is that this method is used as a guideline for loading
+	 * custom scripts into the game itself.
 	 * 
 	 * @param script
-	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script editor uses.
+	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
+	 *            editor uses.
 	 * @return Nothing.
 	 */
 	public void load(File script) {
@@ -296,19 +299,14 @@ public class ScriptEditor extends JFrame {
 		return this.parent;
 	}
 
+	/**
+	 * There is no need to add Eraser into the triggers list file.
+	 * 
+	 * @param script
+	 */
 	public void save(File script) {
 		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)))) {
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
-
-			writer.write("$0");
-			writer.newLine();
-			writer.write("@Eraser");
-			writer.newLine();
-			writer.write("%");
-			writer.newLine();
-			writer.newLine();
-			writer.newLine();
-
 			for (int i = 0; i < model.getSize(); i++) {
 				Trigger t = model.get(i);
 				try {
@@ -320,6 +318,8 @@ public class ScriptEditor extends JFrame {
 					writer.newLine();
 					writer.write("%");
 					writer.newLine();
+
+					// Double blank lines for separation of triggers.
 					writer.newLine();
 					writer.newLine();
 				}
