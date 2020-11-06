@@ -17,18 +17,24 @@ import javax.swing.plaf.metal.MetalFileChooserUI;
  */
 public class EditorMouseListener implements MouseListener {
 	private JFileChooser fileChooser;
+	private String currentName = "Untitled.script";
+	private String oldName = "";
 
 	public EditorMouseListener(JFileChooser fileChooser) {
 		this.fileChooser = fileChooser;
+		MetalFileChooserUI ui = (MetalFileChooserUI) this.fileChooser.getUI();
+		ui.setFileName(this.currentName);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 1) {
 			File file = this.fileChooser.getSelectedFile();
-			if (file != null) {
-				MetalFileChooserUI ui = (MetalFileChooserUI) this.fileChooser.getUI();
-				ui.setFileName(file.getName());
+			if (file != null && !file.isDirectory()) {
+				this.currentName = file.getName();
+			}
+			else {
+				this.oldName = file.getName();
 			}
 		}
 		else if (e.getClickCount() == 2) {
@@ -39,10 +45,14 @@ public class EditorMouseListener implements MouseListener {
 				}
 				else if (file.isFile()) {
 					this.fileChooser.setSelectedFile(file);
+					this.currentName = file.getName();
 				}
-				MetalFileChooserUI ui = (MetalFileChooserUI) this.fileChooser.getUI();
-				ui.setFileName(file.getName());
 			}
+		}
+		if (!this.oldName.equals(this.currentName)) {
+			MetalFileChooserUI ui = (MetalFileChooserUI) this.fileChooser.getUI();
+			ui.setFileName(this.currentName);
+			this.oldName = this.currentName;
 		}
 	}
 
@@ -56,5 +66,17 @@ public class EditorMouseListener implements MouseListener {
 	public void mousePressed(MouseEvent e) {}
 
 	@Override
-	public void mouseReleased(MouseEvent e) {}
+	public void mouseReleased(MouseEvent e) {
+		MouseEvent newEvent = new MouseEvent(
+		    this.fileChooser,
+		    e.getID(),
+		    e.getWhen(),
+		    e.getModifiersEx(),
+		    e.getX(),
+		    e.getY(),
+		    1,
+		    false
+		);
+		this.mouseClicked(newEvent);
+	}
 }

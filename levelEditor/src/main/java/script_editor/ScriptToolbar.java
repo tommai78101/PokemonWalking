@@ -63,7 +63,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		final JFileChooser chooser = new EditorFileChooser();
+		final EditorFileChooser chooser = new EditorFileChooser();
 		final EditorMouseListener mouseListener = new EditorMouseListener(chooser);
 
 		switch (Integer.valueOf(event.getActionCommand())) {
@@ -118,7 +118,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				chooser.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
 				chooser.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
 				chooser.setVisible(true);
-				int answer = chooser.showSaveDialog(null);
+				int answer = chooser.showSaveDialog(this.editor);
 				if (answer == JFileChooser.APPROVE_OPTION) {
 					File f = chooser.getSelectedFile();
 					ScriptEditor.lastSavedDirectory = f.getParentFile();
@@ -170,7 +170,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				chooser.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
 				chooser.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
 				chooser.setVisible(true);
-				int answer = chooser.showOpenDialog(null);
+				int answer = chooser.showOpenDialog(this.editor);
 				if (answer == JFileChooser.APPROVE_OPTION) {
 					File f = chooser.getSelectedFile();
 					ScriptEditor.lastSavedDirectory = f.getParentFile();
