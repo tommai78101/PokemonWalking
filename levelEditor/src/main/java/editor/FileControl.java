@@ -35,7 +35,6 @@ import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.metal.MetalFileChooserUI;
 
-import common.EditorFileChooser;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
 import utility.Debug;

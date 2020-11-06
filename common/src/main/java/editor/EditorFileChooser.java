@@ -1,7 +1,7 @@
 /**
  * 
  */
-package common;
+package editor;
 
 import java.io.File;
 

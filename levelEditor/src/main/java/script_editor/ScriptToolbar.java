@@ -5,10 +5,8 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
@@ -23,9 +21,9 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.plaf.metal.MetalFileChooserUI;
 
-import common.EditorFileChooser;
+import editor.EditorFileChooser;
+import editor.EditorMouseListener;
 import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
@@ -65,6 +63,9 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
+		final JFileChooser chooser = new EditorFileChooser();
+		final EditorMouseListener mouseListener = new EditorMouseListener(chooser);
+
 		switch (Integer.valueOf(event.getActionCommand())) {
 			case 0: { // New Session
 				this.editor.scriptChanger.clear();
@@ -97,9 +98,6 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					raf.readLine(); // The second line in the cache is for the Script Editor.
 					ScriptEditor.lastSavedDirectory = new File(raf.readLine());
 				}
-				catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
 				catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -107,59 +105,22 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 				}
 
-				final JFileChooser saver = new EditorFileChooser();
-				JList<Class<?>> list = this.findFileList(saver);
+				JList<Class<?>> list = this.findFileList(chooser);
 				LOOP_TEMP:
 				for (MouseListener l : list.getMouseListeners()) {
 					if (l.getClass().getName().indexOf("FilePane") >= 0) {
 						list.removeMouseListener(l);
-						list.addMouseListener(new MouseListener() {
-							@Override
-							public void mouseClicked(MouseEvent e) {
-								if (e.getClickCount() == 1) {
-									File file = saver.getSelectedFile();
-									if (file != null) {
-										MetalFileChooserUI ui = (MetalFileChooserUI) saver.getUI();
-										ui.setFileName(file.getName());
-									}
-								}
-								else if (e.getClickCount() == 2) {
-									File file = saver.getSelectedFile();
-									if (file != null) {
-										if (file.isDirectory()) {
-											saver.setCurrentDirectory(file);
-										}
-										else if (file.isFile()) {
-											saver.setSelectedFile(file);
-										}
-										MetalFileChooserUI ui = (MetalFileChooserUI) saver.getUI();
-										ui.setFileName(file.getName());
-									}
-								}
-							}
-
-							@Override
-							public void mouseEntered(MouseEvent e) {}
-
-							@Override
-							public void mouseExited(MouseEvent e) {}
-
-							@Override
-							public void mousePressed(MouseEvent e) {}
-
-							@Override
-							public void mouseReleased(MouseEvent e) {}
-						});
+						list.addMouseListener(mouseListener);
 						break LOOP_TEMP;
 					}
 				}
-				saver.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				saver.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
-				saver.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
-				saver.setVisible(true);
-				int answer = saver.showSaveDialog(null);
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				chooser.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
+				chooser.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
+				chooser.setVisible(true);
+				int answer = chooser.showSaveDialog(null);
 				if (answer == JFileChooser.APPROVE_OPTION) {
-					File f = saver.getSelectedFile();
+					File f = chooser.getSelectedFile();
 					ScriptEditor.lastSavedDirectory = f.getParentFile();
 
 					if (f.getName().endsWith(".script")) {
@@ -189,9 +150,6 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					raf.readLine(); // The second line in the cache is for the Script Editor.
 					ScriptEditor.lastSavedDirectory = new File(raf.readLine());
 				}
-				catch (FileNotFoundException e) {
-					e.printStackTrace();
-				}
 				catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -199,59 +157,22 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 				}
 
-				final JFileChooser opener = new EditorFileChooser();
-				JList<Class<?>> list = this.findFileList(opener);
+				JList<Class<?>> list = this.findFileList(chooser);
 				LOOP_TEMP:
 				for (MouseListener l : list.getMouseListeners()) {
 					if (l.getClass().getName().indexOf("FilePane") >= 0) {
 						list.removeMouseListener(l);
-						list.addMouseListener(new MouseListener() {
-							@Override
-							public void mouseClicked(MouseEvent e) {
-								if (e.getClickCount() == 1) {
-									File file = opener.getSelectedFile();
-									if (file != null) {
-										MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
-										ui.setFileName(file.getName());
-									}
-								}
-								else if (e.getClickCount() == 2) {
-									File file = opener.getSelectedFile();
-									if (file != null) {
-										if (file.isDirectory()) {
-											opener.setCurrentDirectory(file);
-										}
-										else if (file.isFile()) {
-											opener.setSelectedFile(file);
-										}
-										MetalFileChooserUI ui = (MetalFileChooserUI) opener.getUI();
-										ui.setFileName(file.getName());
-									}
-								}
-							}
-
-							@Override
-							public void mouseEntered(MouseEvent e) {}
-
-							@Override
-							public void mouseExited(MouseEvent e) {}
-
-							@Override
-							public void mousePressed(MouseEvent e) {}
-
-							@Override
-							public void mouseReleased(MouseEvent e) {}
-						});
+						list.addMouseListener(mouseListener);
 						break LOOP_TEMP;
 					}
 				}
-				opener.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				opener.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
-				opener.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
-				opener.setVisible(true);
-				int answer = opener.showOpenDialog(null);
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				chooser.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
+				chooser.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
+				chooser.setVisible(true);
+				int answer = chooser.showOpenDialog(null);
 				if (answer == JFileChooser.APPROVE_OPTION) {
-					File f = opener.getSelectedFile();
+					File f = chooser.getSelectedFile();
 					ScriptEditor.lastSavedDirectory = f.getParentFile();
 					this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
 					this.editor.load(f);
