@@ -293,8 +293,8 @@ public class Art {
 		Art.shadow = BaseBitmap.load("art/player/shadow.png");
 
 		// Areas (level areas for rapid iterations)
-		// Art.testArea = BaseBitmap.load("art/area/test/testArea.png");
-		// Art.testArea2 = BaseBitmap.load("art/area/test/testArea2.png");
+		Art.testArea = BaseBitmap.load("art/area/test/testArea.png");
+		Art.testArea2 = BaseBitmap.load("art/area/test/testArea2.png");
 
 		// Areas (debug area for testing only)
 		Art.debugArea = BaseBitmap.load("art/area/test/debug.png");

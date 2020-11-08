@@ -133,13 +133,13 @@ public class WorldConstants {
 		// List<Area> result = new ArrayList<Area>();
 		if (WorldConstants.isModsEnabled == Boolean.FALSE || WorldConstants.isModsEnabled == null) {
 			if (WorldConstants.areas.isEmpty()) {
-				WorldConstants.areas.add(new Area(Art.debugArea));
 				WorldConstants.areas.add(new Area(Art.testArea));
 				WorldConstants.areas.add(new Area(Art.testArea2));
+				WorldConstants.areas.add(new Area(Art.debugArea));
 			}
 			else {
-				WorldConstants.addNewArea(Art.testArea);
-				WorldConstants.addNewArea(Art.testArea2);
+				// WorldConstants.addNewArea(Art.testArea);
+				// WorldConstants.addNewArea(Art.testArea2);
 			}
 			// result.add(new Area(Art.testArea3, TEST_WORLD_3));
 			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
