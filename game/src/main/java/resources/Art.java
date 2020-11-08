@@ -158,10 +158,10 @@ public class Art {
 	public static BaseBitmap shadow;
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	// Area
+	// Areas
+	public static BaseBitmap debugArea;
 	public static BaseBitmap testArea;
 	public static BaseBitmap testArea2;
-	public static BaseBitmap testArea3;
 
 	// Font
 	public static Font font;
@@ -171,7 +171,6 @@ public class Art {
 	public static int COLOR_DEBUG_GREEN = 0xA4E767;
 
 	public static void loadAllResources(Scene screen) {
-
 		// Animation
 		Art.water = Art.loadAnimation(screen, 16, "art/animation/water/water00");
 		Art.water_top = Art.loadAnimation(screen, 16, "art/animation/water/water_top00");
@@ -293,13 +292,15 @@ public class Art {
 		Art.player_bicycle = screen.cut("art/player/player_bicycle.png", 16, 16, 0, 0);
 		Art.shadow = BaseBitmap.load("art/player/shadow.png");
 
-		// Areas
-		Art.testArea = BaseBitmap.load("art/area/test/testArea.png");
-		Art.testArea2 = BaseBitmap.load("art/area/test/testArea2.png");
+		// Areas (level areas for rapid iterations)
+		// Art.testArea = BaseBitmap.load("art/area/test/testArea.png");
+		// Art.testArea2 = BaseBitmap.load("art/area/test/testArea2.png");
+
+		// Areas (debug area for testing only)
+		Art.debugArea = BaseBitmap.load("art/area/test/debug.png");
 
 		// Miscellaneous
 		Art.font = Art.loadFont("art/font/font.ttf");
-
 	}
 
 	private static BaseBitmap[] loadAnimation(Scene screen, int frames, String filename) {

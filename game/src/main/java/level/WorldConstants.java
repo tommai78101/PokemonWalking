@@ -133,6 +133,7 @@ public class WorldConstants {
 		// List<Area> result = new ArrayList<Area>();
 		if (WorldConstants.isModsEnabled == Boolean.FALSE || WorldConstants.isModsEnabled == null) {
 			if (WorldConstants.areas.isEmpty()) {
+				WorldConstants.areas.add(new Area(Art.debugArea));
 				WorldConstants.areas.add(new Area(Art.testArea));
 				WorldConstants.areas.add(new Area(Art.testArea2));
 			}
@@ -186,9 +187,9 @@ public class WorldConstants {
 		int areaID = Area.getAreaIDFromBitmap(bitmap);
 		// Java 8 feature
 		boolean exists = WorldConstants.areas.stream()
-			.filter(chosenArea -> chosenArea.getAreaID() == areaID)
-			.findFirst()
-			.isPresent();
+		    .filter(chosenArea -> chosenArea.getAreaID() == areaID)
+		    .findFirst()
+		    .isPresent();
 		if (!exists) {
 			WorldConstants.areas.add(new Area(bitmap));
 		}
