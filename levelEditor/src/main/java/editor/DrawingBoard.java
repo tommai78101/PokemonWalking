@@ -66,21 +66,34 @@ class TriggerSet {
 		return this.triggers.get(currentTriggerIndex);
 	}
 
-	public void addTrigger(int index, Trigger trigger) {
+	public void addTrigger(int index, byte newX, byte newY, Trigger trigger) {
 		Set<Trigger> set = this.triggers.get(index);
 		if (set == null) {
 			set = new HashSet<>();
 			this.triggers.put(index, set);
 		}
-		set.add(trigger);
+		Trigger modifiedTrigger = new Trigger();
+		modifiedTrigger.setTriggerPositionX(newX);
+		modifiedTrigger.setTriggerPositionY(newY);
+		modifiedTrigger.setTriggerID(trigger.getTriggerID());
+		set.add(modifiedTrigger);
 	}
 
 	public void removeTrigger(int index, Trigger trigger) {
 		Set<Trigger> set = this.triggers.get(index);
-		if (set == null || !set.contains(trigger)) {
+		if (set == null) {
 			return;
 		}
-		set.remove(trigger);
+		Trigger delete = null;
+		for (Trigger t : set) {
+			if (t.getTriggerID() == trigger.getTriggerID()) {
+				delete = t;
+				break;
+			}
+		}
+		if (delete != null) {
+			set.remove(delete);
+		}
 	}
 
 	public void toggleTrigger(int index, Trigger trigger) {
@@ -120,7 +133,9 @@ class TriggerSet {
 	public void addTriggerById(int index, int triggerId) {
 		Trigger trigger = this.validityCheck(triggerId);
 		if (trigger != null && !trigger.isEraser()) {
-			this.addTrigger(index, trigger);
+			byte x = (byte) (index % this.size.width);
+			byte y = (byte) (index / this.size.width);
+			this.addTrigger(index, x, y, trigger);
 		}
 		else {
 			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at: (" + (index % this.size.width) + "," + (index / this.size.width) + ").");
@@ -504,22 +519,19 @@ public class DrawingBoard extends Canvas implements Runnable {
 						return;
 					if (this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
-					Trigger t = this.editor.controlPanel.getSelectedTrigger();
-					if (t != null && !t.isEraser()) {
+					Trigger selectedTrigger = this.editor.controlPanel.getSelectedTrigger();
+					if (selectedTrigger != null && !selectedTrigger.isEraser()) {
 						int x = this.getMouseTileX();
 						int y = this.getMouseTileY();
-						t.setTriggerPositionX((byte) x);
-						t.setTriggerPositionY((byte) y);
 						int i = y * this.bitmapWidth + x;
-
-						if (this.triggers.contains(i, t)) {
-							this.triggers.removeTrigger(i, t);
+						if (this.triggers.contains(i, selectedTrigger)) {
+							this.triggers.removeTrigger(i, selectedTrigger);
 						}
 						else {
-							this.triggers.addTrigger(i, t);
+							this.triggers.addTrigger(i, (byte) x, (byte) y, selectedTrigger);
 						}
 					}
-					else if (t != null && t.isEraser()) {
+					else if (selectedTrigger != null && selectedTrigger.isEraser()) {
 						int x = this.getMouseTileX();
 						int y = this.getMouseTileY();
 						int i = y * this.bitmapWidth + x;
