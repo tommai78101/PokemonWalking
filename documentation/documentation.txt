@@ -68,6 +68,9 @@ Controls...........................[PWD07]
 File Format........................[PWD08]
 	Legacy File Format.............[PWD08#01]
 Triggers...........................[PWD09]
+	Automation Script Format.......[PWD09#01]
+	Legacy Trigger System..........[PWD09#02]
+	New Trigger System.............[PWD09#03]
 Dialogues..........................[PWD10]
 Contributors.......................[PWD11]
 Terms of License...................[PWD12]
@@ -930,8 +933,9 @@ not assume their information to be permanent.
 			Default Starting Point			
 
 				This sets the default starting position for the player. If it so happens
-				that the game loads the map in such a way causing the player to be stuck,
-				then it means there is a problem with the game, the editor, or the map.
+				that the game loads the map in such a way causing the player to be
+				stuck, then it means there is a problem with the game, the editor, or
+				the map.
 
 			All other triggers depend on the Extended Tile ID.
 
@@ -1273,44 +1277,91 @@ triggers allowed in the area map is 65,536 triggers.
 
 This is the same maximum for user-created area maps.
 
- ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+-  -  -  -  -  -  -  -  -  -  -
 
-Automation Script Format:
+	Automation Script Format [PWD09#01]
 
-Entities that can walk, or run, must be required to 
-have movements for the gameto feel lively.
+	Entities that can walk, or run, must be required to 
+	have movements for the gameto feel lively.
 
-More commands to come. There will be more 
-clarifications on what commands does what, and what 
-commands need to go with what other commands in the 
-future, once the triggering sections are fully 
-outlined and organized.
+	More commands to come. There will be more 
+	clarifications on what commands does what, and what 
+	commands need to go with what other commands in the 
+	future, once the triggering sections are fully 
+	outlined and organized.
 
-_: Whitespaces.
-@: Trigger name.
-^: [Direction, Steps]. Can be chained for delaying scripted movements.
-$: Start of script. Appears at beginning of script. Uses numeric ID values as Trigger IDs
-%: Script delimiter. Always appear at end of script.
-#: Speech Dialogue.
-/: Comments. Whole line gets ignored, even if it's somewhere in the middle of the line.
-?: Question Dialogue. It must be immediately followed by both + and -. This will change.
-+: Affirmative dialogue.
--: Negative dialogue.
-[: Affirmative Action.
-]: Negative Action.
-;: Repeat Flag. If contains ';', it means it's enabled by default.
-|: Limited Repetition. Default is set to unlimited repetition. Adding a number at the end represents the number of times it can be triggered before it turns itself off. This is planned to be added after the start of the script. This can be optionally added or ignored.
+	_: Whitespaces.
+	@: Trigger name.
+	^: [Direction, Steps]. Can be chained for delaying scripted movements.
+	$: Start of script. Appears at beginning of script. Uses numeric ID values as
+		Trigger IDs
+	%: Script delimiter. Always appear at end of script.
+	#: Speech Dialogue.
+	/: Comments. Whole line gets ignored, even if it's somewhere in the middle of the 
+		line.
+	?: Question Dialogue. It must be immediately followed by both + and -. This will 
+		change.
+	+: Affirmative dialogue.
+	-: Negative dialogue.
+	[: Affirmative Action.
+	]: Negative Action.
+	;: Repeat Flag. If contains ';', it means it's enabled by default.
+	|: Limited Repetition. Default is set to unlimited repetition. Adding a number at
+		the end represents the number of times it can be triggered before it turns 
+		itself off. This is planned to be added after the start of the script. This can 
+		be optionally added or ignored.
 
-Example:
+	Example:
 
-$0 ;
-@Eraser
-%
+	$0 ;
+	@Eraser
+	%
 
-$1 |4
-@Hello_Test_Trigger
-#Hello_World!
-%
+	$1 |4
+	@Hello_Test_Trigger
+	#Hello_World!
+	%
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+	Legacy Trigger System [PWD09#02]
+
+	The current system is handled by the Area object. The Area object keeps track of
+	the player's position, where it checks to see if the player is on a tile that
+	holds a trigger data.
+
+	The Area uses a hashmap to store trigger data located in the Area, in which the
+	key is a pair of integers acting as the tile coordinates, and the value is the
+	trigger data information. Since each tile has its own unique coordinates, it is
+	unlikely to assume a tile will have multiple trigger data.
+
+	A script file is a file whose file format extension is SCRIPT. Each trigger 
+	data will have only one Script object. If the Script is loaded from	a modded 
+	script file, it will only load the first script found in the file. Script 
+	attributes are then set or flagged after the script has been assigned to the
+	trigger data.
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
+	New Trigger System [PWD09#03]
+
+	The new trigger system assumes that each tile holds one trigger data object, 
+	thus inheriting the legacy trigger system's approach to store them in the Area
+	object.
+
+	The main difference is a tile's single trigger data can hold multiple trigger
+	scripts. Each script contains conditions that are checked only once when the 
+	player lands on the tile containing trigger data. If the player moves away from 
+	the tile, the conditions are invalidated, and will be rechecked again once the
+	player moves back onto the tile.
+
+	Reusing the same script file format extension, we load the script file and will
+	load all script data into a collection. This trigger data will also store script
+	attributes specific to the script that is being processed, meaning each script 
+	can have their own unique script attributes, isolated from one another.
+
+	This allows more flexibility to support multiple triggers in the same tile in
+	the game.
 
 -------------------------------
 
