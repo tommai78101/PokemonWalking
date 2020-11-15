@@ -11,6 +11,9 @@ package screen;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Enumeration;
 
 import javax.imageio.ImageIO;
 
@@ -82,9 +85,29 @@ public class BaseBitmap {
 
 	public static BaseBitmap load(String filename) {
 		try {
-			BufferedImage image = ImageIO.read(BaseBitmap.class.getClassLoader().getResource(filename));
-			Debug.log(filename);
-			return BaseBitmap.load(image);
+			URL resourcePath = BaseBitmap.class.getClassLoader().getResource(filename);
+			if (resourcePath != null) {
+				BufferedImage image = ImageIO.read(resourcePath);
+				Debug.log(filename);
+				return BaseBitmap.load(image);
+			}
+			else {
+				Debug.error("Unable to find resource: " + filename);
+				Enumeration<URL> en = BaseBitmap.class.getClassLoader().getResources("art/area/test");
+				if (en.hasMoreElements()) {
+					URL metaInf = en.nextElement();
+					try {
+						File fileMetaInf = new File(metaInf.toURI());
+						File[] files = fileMetaInf.listFiles();
+						for (File f : files) {
+							Debug.error("File: " + f.getPath());
+						}
+					}
+					catch (URISyntaxException e) {
+						e.printStackTrace();
+					}
+				}
+			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();

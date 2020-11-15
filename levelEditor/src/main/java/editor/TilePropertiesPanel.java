@@ -18,10 +18,8 @@ import javax.swing.SwingConstants;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
-import javax.swing.text.DocumentFilter;
+
+import common.MinMaxFilter;
 
 public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	private static final long serialVersionUID = 1L;
@@ -46,43 +44,6 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public JLabel areaID, tileID, extendedTileID, tileSpecificID, fullDataInput;
 
 	private int lastKnownValidAreaID = 0;
-
-	/**
-	 * Used for setting the min/max range for JTextFields.
-	 * 
-	 * @author tlee
-	 */
-	public class MinMaxFilter extends DocumentFilter {
-		private int minimum;
-		private int maximum;
-
-		public MinMaxFilter(int min, int max) {
-			this.minimum = min;
-			this.maximum = max;
-		}
-
-		@Override
-		public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
-			Document doc = fb.getDocument();
-			String replacement = new StringBuilder(doc.getText(0, doc.getLength())).replace(offset, offset + length, text).toString();
-			try {
-				int value = Integer.parseInt(replacement);
-				if (value < this.minimum)
-					value = this.minimum;
-				if (value > this.maximum)
-					value = this.maximum;
-				super.replace(fb, 0, doc.getLength(), String.valueOf(value), attrs);
-			}
-			catch (NumberFormatException e) {
-				String max = Integer.toString(this.maximum);
-				if (text.length() > max.length() / 2)
-					text = max;
-				else
-					text = Integer.toString(this.minimum);
-				super.replace(fb, 0, doc.getLength(), text, attrs);
-			}
-		}
-	}
 
 	public class CustomJLabel extends JLabel {
 		private static final long serialVersionUID = 1L;
@@ -376,7 +337,6 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 	@Override
 	public void validate() {
-		super.validate();
 		switch (EditorConstants.metadata) {
 			case Pixel_Data:
 				this.tileID.setText("Tile ID:");
@@ -401,5 +361,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.blueInputField.setVisible(false);
 				break;
 		}
+		super.revalidate();
+		super.repaint();
 	}
 }

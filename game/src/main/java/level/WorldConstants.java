@@ -135,10 +135,11 @@ public class WorldConstants {
 			if (WorldConstants.areas.isEmpty()) {
 				WorldConstants.areas.add(new Area(Art.testArea));
 				WorldConstants.areas.add(new Area(Art.testArea2));
+				WorldConstants.areas.add(new Area(Art.debugArea));
 			}
 			else {
-				WorldConstants.addNewArea(Art.testArea);
-				WorldConstants.addNewArea(Art.testArea2);
+				// WorldConstants.addNewArea(Art.testArea);
+				// WorldConstants.addNewArea(Art.testArea2);
 			}
 			// result.add(new Area(Art.testArea3, TEST_WORLD_3));
 			// result.add(new Area(Art.testArea4, TEST_WORLD_4));
@@ -186,9 +187,9 @@ public class WorldConstants {
 		int areaID = Area.getAreaIDFromBitmap(bitmap);
 		// Java 8 feature
 		boolean exists = WorldConstants.areas.stream()
-			.filter(chosenArea -> chosenArea.getAreaID() == areaID)
-			.findFirst()
-			.isPresent();
+		    .filter(chosenArea -> chosenArea.getAreaID() == areaID)
+		    .findFirst()
+		    .isPresent();
 		if (!exists) {
 			WorldConstants.areas.add(new Area(bitmap));
 		}

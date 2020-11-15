@@ -188,20 +188,18 @@ public class ScriptEditor extends JFrame {
 				}
 			}
 		});
+		super.revalidate();
+		super.repaint();
 	}
 
-	// (11/24/2014): This is where I load triggers at. This is completed, but may
-	// require double-checking to be very sure.
+	// (11/24/2014): This is where I load triggers at. This is completed, but may require
+	// double-checking to be very sure.
 	/**
-	 * <p>
 	 * Loads the file script.
-	 * </p>
-	 * 
 	 * <p>
 	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
 	 * working as intended. Reason for this is that this method is used as a guideline for loading
 	 * custom scripts into the game itself.
-	 * </p>
 	 * 
 	 * @param script
 	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
@@ -215,15 +213,14 @@ public class ScriptEditor extends JFrame {
 			return;
 		}
 		System.out.println("Opened Location: " + script.getAbsolutePath());
-		BufferedReader reader = null;
-		try {
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
 			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
 			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
 			scriptTriggerListModel.clear();
 
 			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
 			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
-				.getModel();
+			    .getModel();
 			editorTriggerComboModel.removeAllElements();
 
 			Trigger trigger = new Trigger();
@@ -232,7 +229,6 @@ public class ScriptEditor extends JFrame {
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);
 
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)));
 			String line = null;
 			String[] tokens;
 			trigger = null;
@@ -273,17 +269,13 @@ public class ScriptEditor extends JFrame {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		finally {
-			try {
-				reader.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 		this.scriptViewer.getTriggerList().clearSelection();
 		this.scriptViewer.revalidate();
+		this.scriptViewer.repaint();
 		this.parent.revalidate();
+		this.parent.repaint();
+		super.revalidate();
+		super.repaint();
 	}
 
 	public boolean isBeingModified() {
@@ -307,21 +299,14 @@ public class ScriptEditor extends JFrame {
 		return this.parent;
 	}
 
+	/**
+	 * There is no need to add Eraser into the triggers list file.
+	 * 
+	 * @param script
+	 */
 	public void save(File script) {
-		BufferedWriter writer = null;
-		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)));
+		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)))) {
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
-
-			writer.write("$0");
-			writer.newLine();
-			writer.write("@Eraser");
-			writer.newLine();
-			writer.write("%");
-			writer.newLine();
-			writer.newLine();
-			writer.newLine();
-
 			for (int i = 0; i < model.getSize(); i++) {
 				Trigger t = model.get(i);
 				try {
@@ -333,6 +318,8 @@ public class ScriptEditor extends JFrame {
 					writer.newLine();
 					writer.write("%");
 					writer.newLine();
+
+					// Double blank lines for separation of triggers.
 					writer.newLine();
 					writer.newLine();
 				}
@@ -340,20 +327,12 @@ public class ScriptEditor extends JFrame {
 					e.printStackTrace();
 				}
 			}
-
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		finally {
-			try {
-				writer.flush();
-				writer.close();
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 		Debug.log("Saved Location: " + script.getAbsolutePath());
+		super.revalidate();
+		super.repaint();
 	}
 }

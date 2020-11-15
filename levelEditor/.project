@@ -22,6 +22,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>main</name>
+			<type>2</type>
+			<location>D:/Documents/JavaProjects/PokemonWalking/common/src/main</location>
+		</link>
+		<link>
 			<name>resources</name>
 			<type>2</type>
 			<location>D:/Documents/JavaProjects/PokemonWalking/common/src/main/resources</location>

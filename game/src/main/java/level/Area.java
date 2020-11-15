@@ -54,6 +54,8 @@ public class Area implements Tileable, UpdateRenderable {
 	private final List<List<PixelData>> areaData = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
 
+	private final int ReservedUsedPixelCount = 1;
+
 	// Area data hash maps.
 	private final Map<Map.Entry<Integer, Integer>, Obstacle> areaObstacles = new HashMap<>();
 	private final Map<Map.Entry<Integer, Integer>, Character> areaCharacters = new HashMap<>();
@@ -70,7 +72,7 @@ public class Area implements Tileable, UpdateRenderable {
 		for (int i = 0; i < triggerSize; i++) {
 			// The "color" is the ID.
 			// ID must not be negative. ID = 0 is reserved.
-			column = i + 1;
+			column = i + this.ReservedUsedPixelCount;
 			int color = tempPixels[column + (stride * row)];
 			if (color > 0) {
 				int xPosition = (color >> 24) & 0xFF;
@@ -194,9 +196,11 @@ public class Area implements Tileable, UpdateRenderable {
 		}
 
 		// Area specific entities are updated at the end.
-		this.areaObstacles.forEach((key, obstacleValue) -> {
-			obstacleValue.tick();
-		});
+		this.areaObstacles.forEach(
+		    (key, obstacleValue) -> {
+		        obstacleValue.tick();
+		    }
+		);
 	}
 
 	private void handleTriggerActions() {
@@ -335,8 +339,8 @@ public class Area implements Tileable, UpdateRenderable {
 			case 0x0D: // Triggers
 				if (red == 0x00) { // Default starting Point
 					this.setPixelData(
-						new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
-						this.currentPixelData.xPosition, this.currentPixelData.yPosition
+					    new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
+					    this.currentPixelData.xPosition, this.currentPixelData.yPosition
 					);
 				}
 				break;
@@ -385,7 +389,7 @@ public class Area implements Tileable, UpdateRenderable {
 				}
 				// This is for rendering exit arrows when you are in front of the exit/entrance doors.
 				if (x == this.player.getXInArea() && y == this.player.getYInArea()
-					&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
+				    && ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
 					this.renderExitArrow(screen, xOff, yOff, data, x, y);
 
 				// Each time the area background tile is rendered, it also updates the bitmap tick updates.
@@ -393,9 +397,11 @@ public class Area implements Tileable, UpdateRenderable {
 			}
 		}
 		// Obstacle dialogues are rendered on top of the area background tiles.
-		this.areaObstacles.forEach((k, obstacle) -> {
-			obstacle.renderDialogue(screen, graphics);
-		});
+		this.areaObstacles.forEach(
+		    (k, obstacle) -> {
+		        obstacle.renderDialogue(screen, graphics);
+		    }
+		);
 
 		if (this.trigger != null) {
 			screen.setOffset(0, 0);

@@ -48,7 +48,7 @@ public class LevelEditor extends JFrame {
 	public FileControl fileControlPanel;
 	public DrawingBoard drawingBoardPanel;
 	public StatusPanel statusPanel;
-	public Properties properties;
+	public SelectionDropdownMenu properties;
 	public ScriptEditor scriptEditor;
 
 	public boolean running;
@@ -122,7 +122,7 @@ public class LevelEditor extends JFrame {
 
 				// TODO: Add Trigger properties here.
 				if (LevelEditor.this.properties == null) {
-					LevelEditor.this.properties = new Properties(editor.LevelEditor.this);
+					LevelEditor.this.properties = new SelectionDropdownMenu(editor.LevelEditor.this);
 					LevelEditor.this.properties.addMouseListener(LevelEditor.this.input);
 					LevelEditor.this.properties.addMouseMotionListener(LevelEditor.this.input);
 					LevelEditor.this.add(LevelEditor.this.properties, BorderLayout.EAST);

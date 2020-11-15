@@ -1,56 +1,73 @@
 package editor;
 
+import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import editor.EditorConstants.Tools;
 
-public class Properties extends JPanel {
+public class SelectionDropdownMenu extends JPanel {
 	private static final long serialVersionUID = -8555733808183623384L;
 
-	private static final Dimension SIZE = new Dimension(150, 80);
+	private static final Dimension DropdownMenuSize = new Dimension(150, 30);
+	private static final Dimension LabelSize = new Dimension(150, 25);
 
 	private JComboBox<Category> tileCategory;
 	private JComboBox<Data> tiles;
 	private JComboBox<Trigger> triggers;
 	private Data selectedData;
 	private Trigger selectedTrigger;
+	private JPanel triggerEditorInfo;
 
 	public final LevelEditor editor;
 
-	public Properties(final LevelEditor editor) {
+	public SelectionDropdownMenu(final LevelEditor editor) {
 		this.editor = editor;
-		this.setLayout(new GridLayout(16, 1));
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		this.loadTiles();
 		this.loadCategory();
 		this.loadTriggers();
 
 		JLabel label = new JLabel("Tileset Category");
-		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		label.setMinimumSize(SelectionDropdownMenu.LabelSize);
+		label.setMaximumSize(SelectionDropdownMenu.LabelSize);
 		this.add(label);
 		this.add(this.tileCategory);
 		this.add(this.tiles);
 		label = new JLabel("Triggers");
-		label.setHorizontalAlignment(SwingConstants.CENTER);
+		label.setAlignmentX(Component.CENTER_ALIGNMENT);
+		label.setMinimumSize(SelectionDropdownMenu.LabelSize);
+		label.setMaximumSize(SelectionDropdownMenu.LabelSize);
 		this.add(label);
 		this.add(this.triggers);
+
+		this.triggerEditorInfo = new JPanel();
+		this.triggerEditorInfo.setLayout(new BoxLayout(this.triggerEditorInfo, BoxLayout.Y_AXIS));
+		this.triggerEditorInfo.add(Box.createVerticalStrut(20));
+		JLabel cyanlabel = new JLabel("Cyan: Selected Trigger");
+		cyanlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.triggerEditorInfo.add(cyanlabel);
+		JLabel yellowlabel = new JLabel("Yellow: Other triggers");
+		yellowlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.triggerEditorInfo.add(yellowlabel);
+		this.add(this.triggerEditorInfo);
 
 		this.tileCategory.setSelectedIndex(0);
 		this.tiles.setSelectedIndex(0);
 		this.triggers.setSelectedIndex(0);
-
 		this.validate();
 	}
 
@@ -68,7 +85,9 @@ public class Properties extends JPanel {
 
 	private void loadCategory() {
 		this.tileCategory = new JComboBox<>();
-		this.tileCategory.setPreferredSize(Properties.SIZE);
+		this.tileCategory.setPreferredSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.tileCategory.setMaximumSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.tileCategory.setMinimumSize(SelectionDropdownMenu.DropdownMenuSize);
 		new KeySelectionRenderer(this.tileCategory) {
 			private static final long serialVersionUID = 1L;
 
@@ -82,16 +101,16 @@ public class Properties extends JPanel {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				EditorConstants.chooser = Tools.Properties;
-				Properties.this.editor.input.forceCancelDrawing();
+				SelectionDropdownMenu.this.editor.input.forceCancelDrawing();
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					Category c = (Category) e.getItem();
-					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) Properties.this.tiles.getModel();
+					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) SelectionDropdownMenu.this.tiles.getModel();
 					for (Data d : c.nodes) {
 						model.addElement(d);
 					}
 				}
 				if (e.getStateChange() == ItemEvent.DESELECTED) {
-					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) Properties.this.tiles.getModel();
+					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) SelectionDropdownMenu.this.tiles.getModel();
 					model.removeAllElements();
 				}
 			}
@@ -108,7 +127,9 @@ public class Properties extends JPanel {
 
 	private void loadTiles() {
 		this.tiles = new JComboBox<>();
-		this.tiles.setPreferredSize(Properties.SIZE);
+		this.tiles.setPreferredSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.tiles.setMaximumSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.tiles.setMinimumSize(SelectionDropdownMenu.DropdownMenuSize);
 		new KeySelectionRenderer(this.tiles) {
 			private static final long serialVersionUID = 1L;
 
@@ -122,17 +143,17 @@ public class Properties extends JPanel {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				EditorConstants.chooser = Tools.Properties;
-				Properties.this.editor.input.forceCancelDrawing();
+				SelectionDropdownMenu.this.editor.input.forceCancelDrawing();
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					Data d = (Data) e.getItem();
-					Properties.this.selectedData = d;
-					TilePropertiesPanel panel = Properties.this.editor.controlPanel.getPropertiesPanel();
+					SelectionDropdownMenu.this.selectedData = d;
+					TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
 					panel.alphaInputField.setText(Integer.toString(d.alpha));
 					panel.redInputField.setText(Integer.toString(d.red));
 					panel.greenInputField.setText(Integer.toString(d.green));
 					panel.blueInputField.setText(Integer.toString(d.blue));
-					Properties.this.editor.controlPanel.setSelectedData(d);
-					Properties.this.editor.validate();
+					SelectionDropdownMenu.this.editor.controlPanel.setSelectedData(d);
+					SelectionDropdownMenu.this.editor.validate();
 				}
 			}
 		});
@@ -146,7 +167,9 @@ public class Properties extends JPanel {
 
 	private void loadTriggers() {
 		this.triggers = new JComboBox<>();
-		this.triggers.setPreferredSize(Properties.SIZE);
+		this.triggers.setPreferredSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.triggers.setMaximumSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.triggers.setMinimumSize(SelectionDropdownMenu.DropdownMenuSize);
 		new KeySelectionRenderer(this.triggers) {
 			private static final long serialVersionUID = 1L;
 
@@ -162,14 +185,14 @@ public class Properties extends JPanel {
 				EditorConstants.chooser = Tools.Properties;
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					Trigger t = (Trigger) e.getItem();
-					TilePropertiesPanel panel = Properties.this.editor.controlPanel.getPropertiesPanel();
+					TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
 					panel.alphaField.setText(Integer.toString(t.getPositionX()));
 					panel.redField.setText(Integer.toString(t.getPositionY()));
 					panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
 					panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
-					Properties.this.selectedTrigger = t;
-					Properties.this.editor.controlPanel.setSelectedTrigger(t);
-					Properties.this.editor.validate();
+					SelectionDropdownMenu.this.selectedTrigger = t;
+					SelectionDropdownMenu.this.editor.controlPanel.setSelectedTrigger(t);
+					SelectionDropdownMenu.this.editor.validate();
 				}
 			}
 		});
@@ -177,7 +200,8 @@ public class Properties extends JPanel {
 		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
 		List<Trigger> list = EditorConstants.getInstance().getTriggers();
 		for (Trigger t : list) {
-			model.addElement(t);
+			if (t != null)
+				model.addElement(t);
 		}
 	}
 
@@ -234,11 +258,13 @@ public class Properties extends JPanel {
 				this.tileCategory.setEnabled(true);
 				this.tiles.setEnabled(true);
 				this.triggers.setEnabled(false);
+				this.triggerEditorInfo.setVisible(false);
 				break;
 			case Triggers:
 				this.tileCategory.setEnabled(false);
 				this.tiles.setEnabled(false);
 				this.triggers.setEnabled(true);
+				this.triggerEditorInfo.setVisible(true);
 				break;
 		}
 		super.validate();

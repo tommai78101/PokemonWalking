@@ -8,6 +8,7 @@
 
 package editor;
 
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -19,6 +20,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	public int oldX, oldY;
 	public int drawingX, drawingY;
 
+	private boolean clicking;
 	private boolean panning;
 	private boolean drawing;
 
@@ -31,113 +33,129 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	}
 
 	public boolean isDragging() {
-		return panning;
+		return this.panning;
 	}
 
 	public boolean isDrawing() {
-		return drawing;
+		return this.drawing;
+	}
+
+	public boolean isClicking() {
+		return this.clicking;
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent event) {
-		int button1 = MouseEvent.BUTTON1_DOWN_MASK;
-		int button3 = MouseEvent.BUTTON3_DOWN_MASK;
+		int button1 = InputEvent.BUTTON1_DOWN_MASK;
+		int button3 = InputEvent.BUTTON3_DOWN_MASK;
 		if ((event.getModifiersEx() & (button1 | button3)) == button1) {
-			drawing = true;
-		} else if ((event.getModifiersEx() & (button1 | button3)) == button3) {
-			panning = true;
+			this.drawing = true;
 		}
-		mouseX = event.getX();
-		mouseY = event.getY();
-		if (drawing) {
-			drawingX = mouseX;
-			drawingY = mouseY;
-		} else if (panning) {
-			offsetX = oldX - mouseX;
-			offsetY = oldY - mouseY;
+		else if ((event.getModifiersEx() & (button1 | button3)) == button3) {
+			this.panning = true;
 		}
-		editor.validate();
+		this.mouseX = event.getX();
+		this.mouseY = event.getY();
+		if (this.drawing) {
+			this.drawingX = this.mouseX;
+			this.drawingY = this.mouseY;
+		}
+		else if (this.panning) {
+			this.offsetX = this.oldX - this.mouseX;
+			this.offsetY = this.oldY - this.mouseY;
+		}
+		this.editor.validate();
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent event) {
-		drawing = false;
-		mouseX = event.getX();
-		mouseY = event.getY();
-		editor.validate();
+		this.drawing = false;
+		this.mouseX = event.getX();
+		this.mouseY = event.getY();
+		this.editor.validate();
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent event) {
-		mouseX = event.getX();
-		mouseY = event.getY();
+		this.mouseX = event.getX();
+		this.mouseY = event.getY();
 		if (event.getButton() == MouseEvent.BUTTON1) {
-			drawing = true;
-			panning = false;
+			this.drawing = false;
+			this.panning = false;
+			this.clicking = true;
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						// Barely less than 2 ticks (33.34ms).
+						Thread.sleep(32);
+					}
+					catch (InterruptedException e) {}
+					EditorInput.this.clicking = false;
+				}
+			}).start();
 		}
-		if (drawing) {
-			drawingX = mouseX;
-			drawingY = mouseY;
-		}
-		editor.validate();
+		this.editor.validate();
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent event) {
-		drawing = false;
-		mouseX = event.getX();
-		mouseY = event.getY();
-		editor.validate();
+		this.drawing = false;
+		this.mouseX = event.getX();
+		this.mouseY = event.getY();
+		this.editor.validate();
 	}
 
 	@Override
 	public void mouseExited(MouseEvent event) {
-		drawing = false;
-		mouseX = event.getX();
-		mouseY = event.getY();
-		editor.validate();
-
+		this.drawing = false;
+		this.mouseX = event.getX();
+		this.mouseY = event.getY();
+		this.editor.validate();
 	}
 
 	@Override
 	public void mousePressed(MouseEvent event) {
-		mouseX = event.getX();
-		mouseY = event.getY();
+		this.mouseX = event.getX();
+		this.mouseY = event.getY();
 		if (event.getButton() == MouseEvent.BUTTON1) {
-			drawing = true;
-			panning = false;
-			drawingX = mouseX;
-			drawingY = mouseY;
-		} else if (event.getButton() == MouseEvent.BUTTON3) {
-			panning = true;
-			drawing = false;
-			oldX = mouseX + offsetX;
-			oldY = mouseY + offsetY;
-		} else {
-			drawing = panning = false;
+			this.drawing = true;
+			this.panning = false;
+			this.drawingX = this.mouseX;
+			this.drawingY = this.mouseY;
 		}
-		editor.validate();
+		else if (event.getButton() == MouseEvent.BUTTON3) {
+			this.panning = true;
+			this.drawing = false;
+			this.oldX = this.mouseX + this.offsetX;
+			this.oldY = this.mouseY + this.offsetY;
+		}
+		else {
+			this.drawing = this.panning = false;
+		}
+		this.editor.validate();
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent event) {
-		if (drawing) {
-			drawingX = event.getX();
-			drawingY = event.getY();
-		} else if (panning) {
-			mouseX = event.getX();
-			mouseY = event.getY();
-			offsetX = oldX - mouseX;
-			offsetY = oldY - mouseY;
+		if (this.drawing) {
+			this.drawingX = event.getX();
+			this.drawingY = event.getY();
 		}
-		drawing = false;
-		panning = false;
-		editor.validate();
-
+		else if (this.panning) {
+			this.mouseX = event.getX();
+			this.mouseY = event.getY();
+			this.offsetX = this.oldX - this.mouseX;
+			this.offsetY = this.oldY - this.mouseY;
+		}
+		this.drawing = false;
+		this.panning = false;
+		this.editor.validate();
 	}
 
 	public void forceCancelDrawing() {
-		drawing = false;
-		panning = false;
+		this.drawing = false;
+		this.panning = false;
+		this.clicking = false;
 	}
 }
