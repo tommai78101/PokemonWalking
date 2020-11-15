@@ -10,67 +10,13 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import constants.ScriptTag;
 import dialogue.Dialogue;
 import utility.Debug;
 import utility.DialogueBuilder;
 
 public class Script {
-	private enum ScriptTag {
-		ScriptName("@"),
-		Comment("/"),
-		BeginScript("$"),
-		PathData("^"),
-		EndScript("%"),
-		Speech("#"),
-		Question("?"),
-		Affirm("+"),
-		Reject("-"),
-		Confirm("["),
-		Deny("]"),
-		Repeat(";"),
-		Repeatable(";");
-
-		private String symbol;
-
-		private ScriptTag(String sym) {
-			this.symbol = sym;
-		}
-
-		/**
-		 * Checks if the line starts with either the symbol representation, or the tag name.
-		 * 
-		 * @param line
-		 * @return True if either the symbol or the tag name matches. False, if otherwise.
-		 */
-		public boolean beginsAt(String line) {
-			if (line == null || line.isEmpty() || line.isBlank())
-				return false;
-			if (line.length() < this.name().length())
-				return line.startsWith(this.symbol);
-			else if (line.startsWith(this.symbol))
-				return true;
-			else
-				return line.regionMatches(true, 0, this.name(), 0, this.name().length());
-		}
-
-		/**
-		 * Replaces the first occurrence of the tag name with the equivalent symbol representation.
-		 * <p>
-		 * Otherwise, if the line already has the symbol representation, then it does nothing.
-		 * 
-		 * @param line
-		 * @return The replaced line.
-		 */
-		public String replace(String line) {
-			if (line.startsWith(this.symbol))
-				return line;
-			return line.replaceFirst(Pattern.quote(this.name()), Matcher.quoteReplacement(this.symbol));
-		}
-	}
-
 	public int triggerID;
 	public ArrayList<Map.Entry<Integer, MovementData>> moves;
 	public ArrayList<Map.Entry<Integer, MovementData>> affirmativeMoves;
@@ -110,27 +56,27 @@ public class Script {
 		this.affirmativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, MovementData> e : s.affirmativeMoves)
 			this.affirmativeMoves
-				.add(Map.entry(e.getKey(), new MovementData(e.getValue())));
+			    .add(Map.entry(e.getKey(), new MovementData(e.getValue())));
 
 		this.negativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, MovementData> e : s.negativeMoves)
 			this.negativeMoves
-				.add(Map.entry(e.getKey(), new MovementData(e.getValue())));
+			    .add(Map.entry(e.getKey(), new MovementData(e.getValue())));
 
 		this.dialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.dialogues)
 			this.dialogues
-				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
+			    .add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
 		this.affirmativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.affirmativeDialogues)
 			this.affirmativeDialogues
-				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
+			    .add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
 		this.negativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.negativeDialogues)
 			this.negativeDialogues
-				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
+			    .add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
 		this.iteration = s.iteration;
 		this.affirmativeIteration = s.affirmativeIteration;
@@ -265,8 +211,8 @@ public class Script {
 
 		// Try-with-resource
 		try (
-			InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-			BufferedReader reader = new BufferedReader(inputStreamReader)
+		    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		    BufferedReader reader = new BufferedReader(inputStreamReader)
 		) {
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -309,8 +255,8 @@ public class Script {
 				else if (ScriptTag.Speech.beginsAt(line)) {
 					line = ScriptTag.Speech.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
+					    line.substring(1).trim().replace("_", " "),
+					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.dialogues.add(Map.entry(iteration, d));
 					iteration++;
@@ -320,8 +266,8 @@ public class Script {
 				else if (ScriptTag.Question.beginsAt(line)) {
 					line = ScriptTag.Question.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
+					    line.substring(1).trim().replace("_", " "),
+					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
 					);
 					script.dialogues.add(Map.entry(iteration, d));
 					iteration++;
@@ -331,11 +277,11 @@ public class Script {
 				else if (ScriptTag.Affirm.beginsAt(line)) {
 					line = ScriptTag.Affirm.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
+					    line.substring(1).trim().replace("_", " "),
+					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.affirmativeDialogues
-						.add(Map.entry(affirmativeIteration, d));
+					    .add(Map.entry(affirmativeIteration, d));
 					affirmativeIteration++;
 				}
 
@@ -343,11 +289,11 @@ public class Script {
 				else if (ScriptTag.Reject.beginsAt(line)) {
 					line = ScriptTag.Reject.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
+					    line.substring(1).trim().replace("_", " "),
+					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.negativeDialogues
-						.add(Map.entry(negativeIteration, d));
+					    .add(Map.entry(negativeIteration, d));
 					negativeIteration++;
 				}
 
@@ -358,7 +304,7 @@ public class Script {
 						line = ScriptTag.Confirm.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.affirmativeMoves
-							.add(Map.entry(affirmativeIteration, moves));
+						    .add(Map.entry(affirmativeIteration, moves));
 						affirmativeIteration++;
 					}
 				}
@@ -370,7 +316,7 @@ public class Script {
 						line = ScriptTag.Deny.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.negativeMoves
-							.add(Map.entry(negativeIteration, moves));
+						    .add(Map.entry(negativeIteration, moves));
 						negativeIteration++;
 					}
 				}
