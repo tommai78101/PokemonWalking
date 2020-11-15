@@ -8,6 +8,15 @@
 
 Pokémon Walking - Documentation
 
+Writing rules:
+- Each section line wraps at 60 characters length.
+- Indent size (tab width size) is 4 spaces.
+- Subsections are indented with tabs and line wraps at 
+  [60 + (Indent Count x 5)] characters.
+- Hyperlinks are exempt from this ruleset.
+- ASCII diagrams are exempt from this ruleset.
+- Changelogs are exempt from this ruleset.
+
 Changelogs:
 	r14: Updated Item data structure.
 	r13: Added Characters/NPCs section. 
@@ -99,7 +108,8 @@ RoadMap [PWD02]
 	~~~NOTES~~~
 
 	Rewrite Level Editor.
-	I mean, really rewrite level editor. Risk must be taken. Waste lots of resources.
+	I mean, really rewrite level editor. Risk must be taken.
+	Waste lots of resources.
 	Must relearn Swing and how to get things right.
 
 	Needs to incorporate triggers, NPCs, and pixel data.
@@ -349,39 +359,54 @@ not assume their information to be permanent.
 	
 	Areas [PWD05#02]
 	
-	Mentioned before, each area is created using an image
-	editor that can edit/modify alpha values. Preferrably,
-	GIMP or Paint.NET may be a good choice.
+	Mentioned before, each area is created using an image editor 
+	that can edit/modify alpha values. Preferrably, GIMP or 
+	Paint.NET may be a good choice.
 	
-	Due to limitations set by PixelData, the maximum
-	theoretical size of an area is 256x256. This is
-	determined by using 2 bytes from a PixelData, each byte
-	representing width and height respectively. This also
-	means that the tile's position a PixelData represents
-	in the game can span from (0, 0) to (255, 255) in a
-	256x256 area.
-	
-	The chosen 2 bytes are, again, determined by the tile
-	the Tile ID represents, and the area the tile is in.
-	This goes with the "Tile-specific data" that is
-	accordance with the PixelData data format.
+	Due to limitations set by PixelData, the maximum theoretical 
+	size of an area is 256x256. This is determined by using 2 
+	bytes from a PixelData, each byte representing width and 
+	height respectively. This also means that the tile's 
+	position a PixelData represents in the game can span from 
+	(0, 0) to (255, 255) in a 256x256 area.
 
-	Character and Area have a 16:1 ratio when converting
-	Character positions to Area positions. In other words,
-	For every 16 steps the Character makes, it counts as
-	1 pixel traveled in the Area.
+	For all areas, there will be at least one reserved pixel used
+	for determining:
+		- Width of the walkable area.
+		- Height of the walkable area.
+		- Triggers count.
+		- Trigger script file identification code.
+		- Other miscellaneous inforamtion.
+
+	Reserved pixel data used for determining all of the above 
+	information can be more than 5 times the amount of walkable 
+	area tile data if needed.
+
+	Trigger script file identification code can be a fixed-length
+	hashcode, a fixed-length SHA512 hashsum, or something that 
+	we can use to identify a trigger script easily with.
+	
+	The chosen 2 bytes are, again, determined by the tile the 
+	Tile ID represents, and the area the tile is in. This goes 
+	with the "Tile-specific data" that is accordance with the 
+	PixelData data format.
+
+	Character and Area have a 16:1 ratio when converting 
+	Character positions to Area positions. In other words, For 
+	every 16 steps the Character makes, it counts as 1 pixel 
+	traveled in the Area.
 
 	Area Position = Character Position * Character Tile size
 
-	When viewing the area map in an image editor, the area 
-	map is shown as a 2D image. Starting from the top left
-	corner, the area ID value is stored in the first pixel,
-	using the alpha and red values. The value is in the 
-	range, 0x0 ~ 0xFFFF.
+	When viewing the area map in an image editor, the area map 
+	is shown as a 2D image. Starting from the top left corner, 
+	the area ID value is stored in the first pixel, using the 
+	alpha and red values. The value is in the range:
+		0x0 ~ 0xFFFF.
 
-	In the same pixel, we store the total number of triggers
-	used in the area, using the green and blue values. The
-	value is in the range, 0x0 ~ 0xFFFF.
+	In the same pixel, we store the total number of triggers 
+	used in the area, using the green and blue values. The value 
+	is in the range, 0x0 ~ 0xFFFF.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -441,10 +466,10 @@ not assume their information to be permanent.
 		- A way to set the area ID value.
 			- A way to verify if the area ID value is unique.
 			- Easy and obvious way to let users know how the area ID
-			  value is determined.
+			value is determined.
 		- A way to set the chronological order sequence of the area.
 		- A way to store multiple user-created custom trigger scripts
-		  in the user-created area.
+		in the user-created area.
 		
 		When viewing the area map in an image editor, the area map is
 		shown as a 2D image. Starting from the top left corner, the
@@ -473,35 +498,36 @@ not assume their information to be permanent.
 	Tiles [PWD05#03]
 	
 	This section contains information of all available tiles used
-	in the game. You may need to look up related tiles in order to
-	find the tile you really wanted.
+	in the game. You may need to look up related tiles in order 
+	to find the tile you really wanted.
 	
 	Each tile consists of the following:
-                                
-        Tile ID:                The ID number and name of the tile.
-        Extended Tile ID:       The ID number used in conjunction of the
-                                Tile ID.
-        Tile Specific ID:       The ID number defined in relation to the
-                                tile and that tile only.
-        Full Data(s):           The full data value, listed in the order
-                                of ARGB format. There can be more than
-                                one specific full data, if there are a
-                                certain number of different full datas,
-                                it will all be listed. If there are
-                                unknown number of different full datas,
-                                it will be listed with variables in them.
-        Description:            Describes the properties of the tile, and
-                                how to use them accordingly.
-                                
-	The maximum amount of tiles available in the game is 256. With
-	extended tile IDs included, the maximum amount of tiles is
-	65536.
+
+		Tile ID:				The ID number and name of the tile.
+		Extended Tile ID:		The ID number used in conjunction of 
+								the Tile ID.
+		Tile Specific ID:		The ID number defined in relation to 
+								the tile and that tile only.
+		Full Data(s):			The full data value, listed in the 
+								order of ARGB format. There can be 
+								more than one specific full data, if 
+								there are a certain number of 
+								different full datas, it will all be 
+								listed. If there are unknown number of
+								different full datas, it will be 
+								listed with variables in them. 
+		Description:			Describes the properties of the tile, 
+								and how to use them accordingly.
+
+	The maximum amount of tiles available in the game is 256. 
+	With extended tile IDs included, the maximum amount of tiles
+	is 65536.
 	
-	If there exists a situation where a single tile cannot be represented
-	enough, then it will either be delegated into two or more different
-	tiles, or there will probably be a format update, which may break
-	backwards compatibility, and stop using an universal standard file 
-	format.
+	If there exists a situation where a single tile cannot be 
+	represented enough, then it will either be delegated into two
+	or more different tiles, or there will probably be a format 
+	update, which may break backwards compatibility, and stop 
+	using an universal standard file format.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 
@@ -517,18 +543,17 @@ not assume their information to be permanent.
 		Full Data:
 			00 00 00 00
 		Description:
-			Represents an empty, non-existing tile. Reserved for
-			both the game and the editor for its special uses.
+			Represents an empty, non-existing tile. Reserved for both 
+			the game and the editor for its special uses.
 			
-			In the editor, this represents an "Eraser" tile, used
-			to clean the map tiles and reset their values back to
-			zero.
+			In the editor, this represents an "Eraser" tile, used to 
+			clean the map tiles and reset their values back to zero.
 			
-			In the game, this represents an "Error" tile, shown
-			as a "NO PNG" bitmap tile. When this tile shows up
-			in the game, it is definitely either human error when
-			creating a custom map, or there exists a bug that 
-			may generate from loading other pixel data.
+			In the game, this represents an "Error" tile, shown as a 
+			"NO PNG" bitmap tile. When this tile shows up in the game,
+			it is definitely either human error when creating a custom
+			map, or there exists a bug that may generate from loading 
+			other pixel data.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 
 	
@@ -554,8 +579,8 @@ not assume their information to be permanent.
 			Walkable path tiles, may also represents unpaved roads or 
 			fields.
 			
-			Extended Tile ID is used to determine path biome type. Area
-			Type is used to determine path biome color.
+			Extended Tile ID is used to determine path biome type. 
+			Area Type is used to determine path biome color.
 			
 			Area Type determines the data type of path, which is used
 			for other metadata uses. The full list of area types are
@@ -570,9 +595,9 @@ not assume their information to be permanent.
 					0x04 = Cavern
 					0x05 = Building
 			
-			More area types may be specified at a later time, or when it is
-			required to add a new area type. All future area types are to 
-			refer back to this list.
+			More area types may be specified at a later time, or when
+			it is required to add a new area type. All future area 
+			types are to refer back to this list.
 			
 			Ground height specifies the light level drawn onto the
 			screen.
@@ -616,22 +641,23 @@ not assume their information to be permanent.
 		Full Data(s):
 			02 RR TT 00
 		Description:		
-			Can be jumped across according to its height, which is determined
-			by direction from where the player starts jumping. Horizontal
-			ledge heights are determined by thickness of the ledge. If it's
-			thick, it means top is higher than bottom. If it's thin, it means
-			bottom is higher than top. Player can only jump from higher
+			Can be jumped across according to its height, which is 
+			determined by direction from where the player starts 
+			jumping. Horizontal ledge heights are determined by 
+			thickness of the ledge. If it's thick, it means top is 
+			higher than bottom. If it's thin, it means bottom is 
+			higher than top. Player can only jump from higher 
 			ground to lower ground.
 			
-			Area Type ID determines the base color of the biome the tile is
-			currently in.
+			Area Type ID determines the base color of the biome the 
+			tile is currently in.
 			
-			RR stands for one of the 8 cardinal directions the ledges are
-			facing (N, S, E, W, NE, NW, SE, and SW).
+			RR stands for one of the 8 cardinal directions the ledges 
+			are facing (N, S, E, W, NE, NW, SE, and SW).
 			
-			Ledge Type is used to categorize all kinds of ledges. There may be
-			natural ledges, ramps for puzzles and traps, bicycle poles to hop
-			around, etc. This may be temporary.
+			Ledge Type is used to categorize all kinds of ledges. 
+			There may be natural ledges, ramps for puzzles and traps, 
+			bicycle poles to hop around, etc. This may be temporary.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -657,15 +683,16 @@ not assume their information to be permanent.
 		Full Data(s):
 			03 RR GG BB
 		Description:
-			An obstacle that blocks the Player's path. Currently, has no purposes
-			in the game.
+			An obstacle that blocks the Player's path. Currently, has 
+			no purposes in the game.
 			
 			Sign:
-				Sign post. Players can interact with sign posts by pressing the action
-				key, "Z" or "/". This will show up a dialogue of the text written on
-				the sign.
+				Sign post. Players can interact with sign posts by 
+				pressing the action	key, "Z" or "/". This will show 
+				up a dialogue of the text written on the sign.
 				
-				WARNING: Dialogue ID must not equal to 0, or 0x0000. This is reserved.
+				WARNING: Dialogue ID must not equal to 0, or 0x0000. 
+				This is reserved.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -681,14 +708,15 @@ not assume their information to be permanent.
 		Full Data(s):
 			04 XX WW HH
 		Description:
-			When stepped on, it warps the player to the target area. The RGB
-			values are arbitrary, meaning that there is no defined constant for
-			different target areas and different player target X and Y
-			coordinates. The maximum amount of warp points for a single area is
-			256. The range of where the player is to spawn in the area is 0 ~ 255.
+			When stepped on, it warps the player to the target area. 
+			The RGB values are arbitrary, meaning that there is no 
+			defined constant for different target areas and different 
+			player target X and Y coordinates. The maximum amount of 
+			warp points for a single area is 256. The range of where 
+			the player is to spawn in the area is 0 ~ 255. 
 			
-			Due to limitations of game data format, all warp points of different
-			bitmaps will have its own data tile ID.
+			Due to limitations of game data format, all warp points 
+			of different bitmaps will have its own data tile ID.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -710,17 +738,17 @@ not assume their information to be permanent.
 		Full Data(s):
 			05 TT SS 00
 		Description:
-			When stepped on, it tells the game the player has moved into a new
-			area. This new area is a separate image file loaded and initialized
-			from the very beginning. 
+			When stepped on, it tells the game the player has moved 
+			into a new area. This new area is a separate image file 
+			loaded and initialized from the very beginning. 
 			
 			The target area ID is obtained from the
-			pixel data and handled by the game in order to load the correct
-			area from a list of all areas pre-loaded.
+			pixel data and handled by the game in order to load the 
+			correct area from a list of all areas pre-loaded.
 			
-			The sector ID is used to tell the game what the new sector the player
-			is in when entering a new area. This is required in order to identify
-			the current sector.
+			The sector ID is used to tell the game what the new 
+			sector the player is in when entering a new area. This is 
+			required in order to identify the current sector.
 			
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -746,10 +774,11 @@ not assume their information to be permanent.
 			06 02 00 00
 			06 03 00 00
 		Description:
-			Lets the player move to a higher area in a small amount of time.
+			Lets the player move to a higher area in a small amount 
+			of time.
 			
-			Area Type ID determines the base color of the biome the tile is
-			currently in.
+			Area Type ID determines the base color of the biome the 
+			tile is currently in.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -804,15 +833,17 @@ not assume their information to be permanent.
 		Full Data(s):
 			08 HH 00 00
 		Description:
-			Represents buildings in the game. A single tile only represents a 
-			portion of the building.
+			Represents buildings in the game. A single tile only 
+			represents a portion of the building.
 			
-			Roofs are colored in gray, which is used for manipulating colors in the
-			game. Colors are to be determined by the game, not by the map makers.
-			The roof colors are determined by the area/sector ID.
+			Roofs are colored in gray, which is used for manipulating 
+			colors in the game. Colors are to be determined by the 
+			game, not by the map makers. The roof colors are 
+			determined by the area/sector ID.
 			
-			Doors are not related to Houses, even though they are entrances to
-			houses. This is due to limitations of the game data format.
+			Doors are not related to Houses, even though they are 
+			entrances to houses. This is due to limitations of the 
+			game data format.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -828,11 +859,11 @@ not assume their information to be permanent.
 		Full Data(s):
 			0A TT XX YY
 		Description:
-			Another type of warp point. For more information, see Warp Points. 
-			[PWD05#03@04].	
+			Another type of warp point. For more information, see 
+			Warp Points. [PWD05#03@04].	
 			
-			Door warp points will tell the game that the player is indoors, and
-			is no longer outside in the overworld.
+			Door warp points will tell the game that the player is 
+			indoors, and is no longer outside in the overworld.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -848,26 +879,29 @@ not assume their information to be permanent.
 		Full Data(s):
 			0B XX OO BB
 		Description:
-			An object that can be picked up and be used by the player. The object
-			itself can block a player's path, therefore, it can also act as an 
-			obstacle.
+			An object that can be picked up and be used by the 
+			player. The object itself can block a player's path, 
+			therefore, it can also act as an obstacle.
 			
-			Object Type determines whether or not the items can be picked up or 
-			can be moved around. By default, Values 00 is for items only. 
-			Anything else would be object types that would be moved around.
+			Object Type determines whether or not the items can be 
+			picked up or can be moved around. By default, Values 00 
+			is for items only. Anything else would be object types 
+			that would be moved around.
 			
-			There is a hard limitation of 256 unique items in the game. 
+			There is a hard limitation of 256 unique items in the 
+			game. 
 			
-			Certain items, such as key items, 1-time-use-only items, and really
-			rare items, can use the reserved miscellaneous bytes to add additional
-			information.
+			Certain items, such as key items, 1-time-use-only items, 
+			and really rare items, can use the reserved miscellaneous 
+			bytes to add additional information.
 			
 		Note:
-			The max total of unique item IDs of 256 may change, depending on where
-			the game will go towards. It is also likely we can split the Blue byte
-			into 2 nibbles (4 bits each), so that the bits group, "RRB" can have
-			4,096 unique items in total, and the final nibble bits group "B" will 
-			be reserved to store additional information.
+			The max total of unique item IDs of 256 may change, 
+			depending on where the game will go towards. It is also 
+			likely we can split the Blue byte into 2 nibbles (4 bits 
+			each), so that the bits group, "RRB" can have 4,096 
+			unique items in total, and the final nibble bits group 
+			"B" will be reserved to store additional information.
 		
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -884,9 +918,10 @@ not assume their information to be permanent.
 			0C AA XX YY
 		Description:
 
-		Acts similar to Warp Points, the only difference is that when the player 
-		is stepping on the carpet, an exit arrow will be displayed, telling the
-		player where the exit is, and where the player should go in order to exit.
+		Acts similar to Warp Points, the only difference is that when 
+		the player is stepping on the carpet, an exit arrow will be 
+		displayed, telling the player where the exit is, and where 
+		the player should go in order to exit.
 
 		Upon exiting, the player will walk out the exit.
 
@@ -905,13 +940,13 @@ not assume their information to be permanent.
 			0D AA XX YY
 		Description:
 
-		Acts similar to Warp Points, the only difference is that when the player 
-		is stepping on the carpet, an entrance arrow will be displayed, telling the
-		player where the entrance is, and where the player should go in order to 
-		enter.
+		Acts similar to Warp Points, the only difference is that when 
+		the player is stepping on the carpet, an entrance arrow will 
+		be displayed, telling the player where the entrance is, and 
+		where the player should go in order to enter.
 
-		Upon entering, the player will walk into the entrance before warping, and 
-		then stand still at the extrance.
+		Upon entering, the player will walk into the entrance before 
+		warping, and then stand still at the extrance.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -928,51 +963,60 @@ not assume their information to be permanent.
 		Full Data:
 			0D XX GG BB
 		Description:
-			(This should be used sparsingly. Useful for debugging maps.)
+			(This should be used sparsingly. Useful for debugging 
+			maps.)
 			
 			Default Starting Point			
 
-				This sets the default starting position for the player. If it so happens
-				that the game loads the map in such a way causing the player to be
-				stuck, then it means there is a problem with the game, the editor, or
+				This sets the default starting position for the 
+				player. If it so happens that the game loads the map 
+				in such a way causing the player to be stuck, then it 
+				means there is a problem with the game, the editor, or
 				the map.
 
 			All other triggers depend on the Extended Tile ID.
 
-				Depending on how it was triggered, this tile will trigger a scripted
-				event matching the script ID.
+				Depending on how it was triggered, this tile will 
+				trigger a scripted event matching the script ID.
 
-				The bitmap value determines what tile bitmap this trigger will use
-				when it is displayed on the screen. Depending on the bitmap tile
-				value, it can either be stepped on, or is blocking the player.
+				The bitmap value determines what tile bitmap this 
+				trigger will use when it is displayed on the screen. 
+				Depending on the bitmap tile value, it can either be 
+				stepped on, or is blocking the player.
 
-				If the player steps on this tile, or if the player interacts with this
-				tile, it will start triggering.
+				If the player steps on this tile, or if the player 
+				interacts with this tile, it will start triggering.
 
 			How it works:
 
-				You have a trigger script writen in either the default data file 
-				"art/script/scripts.txt", or by adding to "mod/script/scripts.txt".
-				In this file, it only contains information about the trigger script
-				data, but it should not contain any information about what location
-				the trigger script should execute in the Area map.
+				You have a trigger script writen in either the 
+				default data file "art/script/scripts.txt", or by 
+				adding to "mod/script/scripts.txt". 
+				
+				In this file, it only contains information about the 
+				trigger script data, but it should not contain any 
+				information about what location the trigger script 
+				should execute in the Area map.
 
-				The Area map is what decides on which trigger script to execute,
-				based on where the triggering pixel data is located in the Area map.
+				The Area map is what decides on which trigger script 
+				to execute, based on where the triggering pixel data 
+				is located in the Area map.
 
-				The triggering pixel data, called TriggerData, stores these data:
+				The triggering pixel data, called TriggerData, stores 
+				these data:
 				- The X position.
 				- The Y position.
 				- The Trigger ID
 
-				When the player or NPC lands on the X and Y position, the trigger
-				will activate and execute the trigger script associated with the
-				Trigger ID value, however many times the player or NPC lands on
-				the tile.
+				When the player or NPC lands on the X and Y position, 
+				the trigger will activate and execute the trigger 
+				script associated with the Trigger ID value, however 
+				many times the player or NPC lands on the tile.
 
-				It is up to the trigger script data that controls whether it
-				should execute this many times, handle dialogues, or trigger
-				scripted cinematic movements, called MovementData.
+				It is up to the trigger script data that controls 
+				whether it should execute this many times, handle 
+				dialogues, or trigger scripted cinematic movements, 
+				called MovementData.
 			
 -------------------------------
 
@@ -990,23 +1034,27 @@ not assume their information to be permanent.
 		Description:
 			Characters/NPCs will be part of this group.
 			
-			Since some Characters/NPCs will not have fixed positions and fixed
-			directional facings, it make sense to assign character unique IDs within
-			the game to differentiate each character. The game should be able to
-			handle and trigger the characters/NPCs the player will interact with,
+			Since some Characters/NPCs will not have fixed positions 
+			and fixed directional facings, it make sense to assign 
+			character unique IDs within the game to differentiate 
+			each character. The game should be able to handle and 
+			trigger the characters/NPCs the player will interact with,
 			based only on the character's unique ID value.
 			
-			A hard limitation is, there is a max total of 256 unique characters/NPCs
-			in the game. You cannot exceed this number. It is allowed to re-use
-			characters/NPCs in some game scenarios.
+			A hard limitation is, there is a max total of 256 unique 
+			characters/NPCs in the game. You cannot exceed this 
+			number. It is allowed to re-use characters/NPCs in some 
+			game scenarios.
 			
-			Script IDs are assigned to characters/NPCs. They can be assigned to common
-			scripts that all characters/NPCs can use or trigger, or they can have their
-			own, unique scripts be assigned. 
+			Script IDs are assigned to characters/NPCs. They can be 
+			assigned to common scripts that all characters/NPCs can 
+			use or trigger, or they can have their own, unique 
+			scripts be assigned. 
 			
-			Reserved data can be used in many ways, such as keeping track of game
-			progression, the number of times the character/NPC has been interacted with,
-			scripts related data storage, and many more. Not all characters/NPCs will
+			Reserved data can be used in many ways, such as keeping 
+			track of game progression, the number of times the 
+			character/NPC has been interacted with, scripts related 
+			data storage, and many more. Not all characters/NPCs will
 			use this data.
 			
 		Notes:
@@ -1018,128 +1066,140 @@ not assume their information to be permanent.
 
 	Entities [PWD06]
 	
-	Entities are animated beings in the game, and they
-	represent how life-like the game is going to look
-	when the players play the game.
+	Entities are animated beings in the game, and they represent 
+	how life-like the game is going to look when the players play
+	the game.
 	
-	In order to make entites be animated, it must
-	conform to a specific set of rules to follow. These
-	rules, when set in place, will allow the entities
-	to move freely and possibly provide interactions
-	and feedback based on movements to the players.
+	In order to make entites be animated, it must conform to a 
+	specific set of rules to follow. These rules, when set in 
+	place, will allow the entities to move freely and possibly 
+	provide interactions and feedback based on movements to the 
+	players.
 	
-	The set of rules are created using a scripting
-	language syntax, read from a file. Not only this
-	provides easier modifications, but also allow the
-	possibility to extend implementations for future
-	versions.
+	The set of rules are created using a scripting language 
+	syntax, read from a file. Not only this provides easier 
+	modifications, but also allow the possibility to extend 
+	implementations for future versions.
 	
 	The set of rules are given in the following list:
 	
 	Directions:
-	1.		U: Up. Makes the entity face up.
-	2.		D: Down. Makes the entity face down.
-	3.		L: Left. Same as above for left.
-	4.		R: Right. Same as above for right.
+	1.		U: 
+		Up. Makes the entity face up.
+	2.		D: 
+		Down. Makes the entity face down.
+	3.		L: 
+		Left. Same as above for left.
+	4.		R: 
+		Right. Same as above for right.
 	
-	Syntax:	<Direction> + #: How many steps the entity
-				should take. The number must be positive
-				and unsigned, ranging from 0 to 9.
-				0 represents turning around. Anything
-				above 0 represents steps the entity
-				should take until it is out of the screen.
+	Syntax:	<Direction> + #: 
+		How many steps the entity should take. The number must 
+		be positive and unsigned, ranging from 0 to 9. 0 
+		represents turning around. Anything above 0 represents 
+		steps the entity should take until it is out of the 
+		screen.
 	Syntax: <Direction> + # + <Same Direction> + # + ...:
-				The entity will continue to walk in the
-				given direction until otherwise. This is
-				used mostly in cinematics where the
-				entity leads the players to some place far
-				from where the players are standing before
-				the interaction.
+		The entity will continue to walk in the given direction 
+		until otherwise. This is used mostly in cinematics where 
+		the entity leads the players to some place far from 
+		where the players are standing before the interaction.
 				
 	Dialogues:
-	5.		@: Dialogue. Makes tne entity interact with
-				another entity.
+	5.		@: 
+		Dialogue. Makes tne entity interact with another 
+				entity.
 
-	Syntax:		@ + #: What dialogue should the entity use to
-				interact. The number indicates the
-				dialogue ID number, specifying what dialogue
-				to use.
-			@ + # + & + # + & + ...: What multiple dialogues
-				should the entity use to interact. The 
-				ampersand ('&') represents concatenation of
-				multiple dialogues, interacted in a way that
-				makes the entity tell something that one or
-				two dialogues aren't enough to finish.
-			@ + # + ?: What dialogue the entity should ask.
-				The number specifies the dialogue. The
-				question mark represents the dialogue type
-				is a question, and the answers are either
-				'Yes' or 'No'.
-			@ + # + ? + [...]: What dialogue the entity should
-				ask. Similar to above, but this provides
-				multiple, custom answers. To be implemented.
-			@ + # + !: What dialogue is used for the entity to
-				alert about. Usually used for specific story
-				plot events, or other player actions only.
-				The exclamation mark represents the dialogue
-				type is an alert, therefore the text being
-				displayed should be slow and meaningful, mostly
-				never more than 2 lines.
+	Syntax:	@ + #: 
+		What dialogue should the entity use to interact. The 
+		number indicates the dialogue ID number, specifying what 
+		dialogue to use.
+	Syntax:	@ + # + & + # + & + ...: 
+		What multiple dialogues should the entity use to 
+		interact. The ampersand ('&') represents concatenation 
+		of multiple dialogues, interacted in a way that makes 
+		the entity tell something that one or two dialogues 
+		aren't enough to finish.
+	Syntax: @ + # + ?: 
+		What dialogue the entity should ask. The number 
+		specifies the dialogue. The question mark represents the 
+		dialogue type is a question, and the answers are either 
+		'Yes' or 'No'.
+	Syntax: @ + # + ? + [...]: 
+		What dialogue the entity should ask. Similar to above, 
+		but this provides multiple, custom answers. To be 
+		implemented.
+	Syntax: @ + # + !: 
+		What dialogue is used for the entity to alert about.
+		Usually used for specific story plot events, or other 
+		player actions only. The exclamation mark represents the 
+		dialogue type is an alert, therefore the text being 
+		displayed should be slow and meaningful, mostly never 
+		more than 2 lines.
 	
 	Note that all of the syntaxes may be changed in
 	the future.
 	
-	6.		$ + #: Script header. Tells the game that this is
-				the	start of the script. The number indicates
-				the script ID. This allows multiple entities
-				to use the same script multiple times.
-	7.		%: Script delimiter. The script has ended.
-	8.		/: Comments.
-	9.		^: Movement header. Tells the game that this is
-				the start of movement scripts. One entire
-				line of infinite movements counts as one 
-				movement script. Adding a newline ends the 
-				movement script.
+	6.		$ + #: 
+		Script header. Tells the game that this is the start of 
+		the script. The number indicates the script ID. This 
+		allows multiple entities to use the same script multiple 
+		times.
+	7.		%: 
+		Script delimiter. The script has ended.
+	8.		/: 
+		Comments.
+	9.		^: 
+		Movement header. Tells the game that this is the start 
+		of movement scripts. One entire line of infinite 
+		movements counts as one movement script. Adding a 
+		newline ends the movement script.
 	
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 		
 	Player [PWD06#01]
 
-	Currently, the Player is represented as "Generic 
-	Male," a character that is based off of the design
-	of the main protagonist in the 2nd generation 
-	Pokémon games, Gold, Silver, and Crystal versions.
+	Currently, the Player is represented as "Generic Male," a 
+	character that is based off of the design of the main 
+	protagonist in the 2nd generation Pokémon games, Gold, 
+	Silver, and Crystal versions.
 	
-	The character design and artwork were done by hand,
-	and they are merely placeholder art.
+	The character design and artwork were done by hand, and they 
+	are merely placeholder art.
 	
-	The player can access their Inventory via the start
-	menu by pressing START key.
+	The player can access their Inventory via the start menu by 
+	pressing START key.
 
-	Player positions are Area Player positions, 
-	multiplied by the Player Tile's Width and Height.
-	There is a unit of measurement conversion between
-	Area and objects extended from the "Character" class
-	object.
+	Player positions are Area Player positions, multiplied by 
+	the Player Tile's Width and Height. There is a unit of 
+	measurement conversion between Area and objects extended 
+	from the "Character" class object.
 
 -------------------------------
 
 Controls [PWD07]
 
-To move the player around, use either WASD keys or 
-the arrow keys. Tap any key to let the Player face 
-towards the direction the tapped key represents.
+To move the player around, use either WASD keys or the 
+arrow keys. Tap any key to let the Player face towards the 
+direction the tapped key represents.
 
-All of the inputs handled by the game are defined in
-the InputHandler class object. They are defined below:
+All of the inputs handled by the game are defined in the 
+InputHandler class object. They are defined below:
 
-UP              W               Moves the player upwards.
-DOWN            S               Moves the player downwards.
-LEFT            A               Moves the player to the left.
-RIGHT           D               Moves the player to the right.
-ENTER                           START BUTTON
-Z               /               The Action Button. (GameBoy equivalent of the A button.)
-X               .               The Cancel Button. (GameBoy equivalent of the B button.)
+UP (W):
+	Moves the player upwards.
+DOWN (S):
+	Moves the player downwards.
+LEFT (A):
+	Moves the player to the left.
+RIGHT (D):
+	Moves the player to the right.
+ENTER:
+	Start button action
+Z (/):
+	The Action Button. (GameBoy equivalent of the A button.)
+X (.):
+	The Cancel Button. (GameBoy equivalent of the B button.)
 
 -  -  -  -  -  -  -  -  -  -  -
 
@@ -1153,43 +1213,42 @@ File Format [PWD08]
 
 The current file format used is version 0002.
 
-The data file format is used to structure saved
-data that the game is able to read/write/modify
-easily. 
+The data file format is used to structure saved data that 
+the game is able to read/write/modify easily. 
 
-It is decided that the file format is to use a
-tree structure hierarchy for storing relevant
-data bits as the game progresses. The file 
-format will expand further as the game includes
-more features that require persistent data.
+It is decided that the file format is to use a tree 
+structure hierarchy for storing relevant data bits as the 
+game progresses. The file format will expand further as the 
+game includes more features that require persistent data.
 
-The new file format is based off of packet
-wrappers, which encapsulates data with the
-following information for each encapsulated
-wrapper
+The new file format is based off of packet wrappers, which 
+encapsulates data with the following information for each 
+encapsulated wrapper:
 
 [short SIZE][4 bytes PACKET_NAME][N bytes DATA]
 
 Where, for each tag:
 
-- SIZE: Refers to the total size of the packet, 
-minus the 2 bytes used to store the data size.
-In other words, it's the length of the packet.
-- PACKET_NAME: Refers to the 4-bytes long storing
-text data of the name of the packet.
-- DATA: Refers to the packet data. It can be N
-bytes long, where N is a positive non-zero number.
+- SIZE: 
+	Refers to the total size of the packet, minus the 2 
+	bytes used to store the data size. In other words, it's 
+	the length of the packet.
+- PACKET_NAME: 
+	Refers to the 4-bytes long storing text data of the 
+	name of the packet.
+- DATA: 
+	Refers to the packet data. It can be N bytes long, 
+	where N is a positive non-zero number.
 
-These packets are called "Data Chunks" or "Chunks"
-in the source code. The file format system was
-updated to be able to easily add new information
-and packet data when necessary.
+These packets are called "Data Chunks" or "Chunks" in the 
+source code. The file format system was updated to be able 
+to easily add new information and packet data when 
+necessary.
 
-We can extend a plain old Java object, or called
-"POJO", from the base class called "Chunk". This
-handles reading, writing, and fetching the chunk
-size. These operations must be overridden in the
-newly extended POJOs.
+We can extend a plain old Java object, or called "POJO", 
+from the base class called "Chunk". This handles reading, 
+writing, and fetching the chunk size. These operations must 
+be overridden in the newly extended POJOs.
 
 -  -  -  -  -  -  -  -  -  -  -
 
@@ -1197,83 +1256,86 @@ newly extended POJOs.
 
 	This is the old file format, used in version 0001.
 
-	Most of the information is similar to the current
-	file format version, mentioned above.
+	Most of the information is similar to the current file 
+	format version, mentioned above.
 
-	The order of the file format tree hierarchy is
-	determined by the last date of creation. Anything
-	newer is inserted from the bottom of the main tree
-	hierarchy, with nodes extending from the root to
-	define the data for the game to use. This allows
-	categorization, which can be used with the level
-	editor for easier modification and possibly enable
-	modding potential for the future community.
+	The order of the file format tree hierarchy is determined by 
+	the last date of creation. Anything newer is inserted from 
+	the bottom of the main tree hierarchy, with nodes extending 
+	from the root to define the data for the game to use. This 
+	allows categorization, which can be used with the level 
+	editor for easier modification and possibly enable modding 
+	potential for the future community.
 
-	Below is a diagram that shows how the tree structure
-	is built. Note that for some text readers, they may
-	use a non-monospaced font. To view correctly, please
-	use a monospaced font. The encoding used is UTF-8.
+	Below is a diagram that shows how the tree structure is 
+	built. Note that for some text readers, they may use a 
+	non-monospaced font. To view correctly, please use a 
+	monospaced font. The encoding used is UTF-8.
 
-	File Format
-	|
-	├ Header Information ┬ Identification Code (int)
-	|                    ├ Header Code (int)
-	|                    └ Format Suffix (int)
-	├ Player Information ┬ Player Name (2 longs, 16 bytes)
-	|                    ├ Player Gender (1 byte)
-	|                    ├ Inventory ─────────────┬ Potions ───────────┐
-	|                    |                        ├ Key Items ─────────┼──────────── Items ───┬ Item Name
-	|                    |                        ├ Pokéballs ─────────┤                      └ Item Quantity
-	|                    |                        └ TMs/HMs ───────────┘
-	|                    ├ Positional Data ───────┬ Current Area ─────┬ Area ID
-	|                    |                        |                   └ Area Region
-	|                    |                        ├ Current OverWorld
-	|                    |                        ├ X Location
-	|                    |                        └ Y Location
-	|                    └ Player State
-	├ Date of Saved Data ┬ Last Saved Time
-	|                    ├ Day/Night State
-	|                    └ Elapsed Time
-	├ Using Custom Maps ─┬ Custom Area File Name
-	|                    ├ Custom Area ID
-	|                    └ Custom Area Region
-	└ (Future TODO)
+	File structure diagram:
 
-	Each node contains 2 bytes used for identifying the 
-	nodes when the file format is being read. And another
-	2 bytes containing the size of the chunk of the nodes.
+    Save Data ──┬ Header Information ──┬ Identification Code (int)
+                |                      ├ Header Code (int)
+                |                      └ Format Suffix (int)
+                ├ Player Information ──┬ Player Name (2 longs, 16 bytes)
+                |                      ├ Player Gender (1 byte)
+                |                      ├ Inventory ─────────────┬ Potions──────┬ Item Name
+                |                      |                        |              └ Item Quantity
+                |                      |                        ├ Key Items ───┬ Item Name
+                |                      |                        |              └ Item Quantity
+                |                      |                        ├ Pokéballs ───┬ Item Name
+                |                      |                        |              └ Item Quantity
+                |                      |                        └ TMs/HMs ─────┬ Item Name
+                |                      |                                       └ Item Quantity
+                |                      ├ Positional Data ───────┬ Current Area ──────┬ Area ID
+                |                      |                        |                    └ Area Region
+                |                      |                        ├ Current OverWorld
+                |                      |                        ├ X Location
+                |                      |                        └ Y Location
+                |                      └ Player State
+                ├ Saved Data Timestamp ┬ Last Saved Time
+                |                      ├ Day/Night State
+                |                      └ Elapsed Time
+                ├ Using Custom Maps ───┬ Custom Area File Name
+                |                      ├ Custom Area ID
+                |                      └ Custom Area Region
+                └ (Subject to future changes.)
 
-	In each chunk, the data is read into groups, where
-	the game will separate data it wants, and set the
-	variables accordingly.
+	Each node contains 2 bytes used for identifying the nodes 
+	when the file format is being read. And another 2 bytes 
+	containing the size of the chunk of the nodes.
+
+	In each chunk, the data is read into groups, where the game 
+	will separate data it wants, and set the variables 
+	accordingly.
 
 -------------------------------
 
 Triggers [PWD09]
 
-This section contains the same readme content 
-generated by Java code, but it is more up-to-date than
-the generated version. This can also be found in the
-"mod" folder that goes along with the game.
+This section contains the same readme content generated by 
+Java code, but it is more up-to-date than the generated 
+version. This can also be found in the "mod" folder that 
+goes along with the game.
 
-To start, the user puts their scripts in this folder,
-and start the game. This will allow the game to load 
-their custom scripts into the game. But, the game will
-then no longer load the default scripts, unless all of
-the custom scripts have been removed, or the game has 
-been placed in a separate folder.
+To start, the user puts their scripts in this folder, and 
+start the game. This will allow the game to load their 
+custom scripts into the game. But, the game will then no 
+longer load the default scripts, unless all of the custom 
+scripts have been removed, or the game has been placed in a 
+separate folder.
 
-All custom scripts must follow the layout set forth by
-the documentation (here). It is strictly adhered to 
-the game codes, which makes it more difficult to 
-modify and edit if the core (and essential) trigger
-mechanisms are modified and edited. (This can be seen
-as a drawback for unmodifiable scripting, but I also
-don't want to add too much complexity to this that
-makes it look like it's a Lua-supported software.)
+All custom scripts must follow the layout set forth by the 
+documentation (here). It is strictly adhered to the game 
+codes, which makes it more difficult to modify and edit if 
+the core (and essential) trigger mechanisms are modified 
+and edited. (This can be seen as a drawback for 
+unmodifiable scripting, but I also don't want to add too 
+much complexity to this that makes it look like it's a 
+Lua-supported software.)
 
-For any given area map, the max total number of
-triggers allowed in the area map is 65,536 triggers.
+For any given area map, the max total number of triggers 
+allowed in the area map is 65,536 triggers.
 
 This is the same maximum for user-created area maps.
 
@@ -1281,37 +1343,53 @@ This is the same maximum for user-created area maps.
 
 	Automation Script Format [PWD09#01]
 
-	Entities that can walk, or run, must be required to 
-	have movements for the gameto feel lively.
+	Entities that can walk, or run, must be required to have 
+	movements for the gameto feel lively.
 
-	More commands to come. There will be more 
-	clarifications on what commands does what, and what 
-	commands need to go with what other commands in the 
-	future, once the triggering sections are fully 
-	outlined and organized.
+	More commands to come. There will be more clarifications on 
+	what commands does what, and what commands need to go with 
+	what other commands in the future, once the triggering 
+	sections are fully outlined and organized.
 
-	_: Whitespaces.
-	@: Trigger name.
-	^: [Direction, Steps]. Can be chained for delaying scripted movements.
-	$: Start of script. Appears at beginning of script. Uses numeric ID values as
-		Trigger IDs
-	%: Script delimiter. Always appear at end of script.
-	#: Speech Dialogue.
-	/: Comments. Whole line gets ignored, even if it's somewhere in the middle of the 
-		line.
-	?: Question Dialogue. It must be immediately followed by both + and -. This will 
-		change.
-	+: Affirmative dialogue.
-	-: Negative dialogue.
-	[: Affirmative Action.
-	]: Negative Action.
-	;: Repeat Flag. If contains ';', it means it's enabled by default.
-	|: Limited Repetition. Default is set to unlimited repetition. Adding a number at
-		the end represents the number of times it can be triggered before it turns 
-		itself off. This is planned to be added after the start of the script. This can 
-		be optionally added or ignored.
+	_: 
+		Whitespaces.
+	@: 
+		Trigger name.
+	^: 
+		[Direction, Steps]. Can be chained for delaying scripted 
+		movements.
+	$: 
+		Start of script. Appears at beginning of script. Uses 
+		numeric ID values as Trigger IDs.
+	%: 
+		Script delimiter. Always appear at end of script.
+	#: 
+		Speech Dialogue.
+	/: 
+		Comments. Whole line gets ignored, even if it's 
+		somewhere in the middle of the line.
+	?: 
+		Question Dialogue. It must be immediately followed by 
+		both + and -. This will change.
+	+: 
+		Affirmative dialogue.
+	-: 
+		Negative dialogue.
+	[: 
+		Affirmative Action.
+	]: 
+		Negative Action.
+	;: 
+		Repeat Flag. If contains ';', it means it's enabled by 
+		default.
+	|: 
+		Limited Repetition. Default is set to unlimited 
+		repetition. Adding a number at the end represents the 
+		number of times it can be triggered before it turns 
+		itself off. This is planned to be added after the start 
+		of the script. This can be optionally added or ignored.
 
-	Example:
+	Script format example:
 
 	$0 ;
 	@Eraser
@@ -1326,71 +1404,85 @@ This is the same maximum for user-created area maps.
 
 	Legacy Trigger System [PWD09#02]
 
-	The current system is handled by the Area object. The Area object keeps track of
-	the player's position, where it checks to see if the player is on a tile that
-	holds a trigger data.
+	The current system is handled by the Area object. The Area 
+	object keeps track of the player's position, where it checks 
+	to see if the player is on a tile that holds a trigger data.
 
-	The Area uses a hashmap to store trigger data located in the Area, in which the
-	key is a pair of integers acting as the tile coordinates, and the value is the
-	trigger data information. Since each tile has its own unique coordinates, it is
-	unlikely to assume a tile will have multiple trigger data.
+	The Area uses a hashmap to store trigger data located in the 
+	Area, in which the key is a pair of integers acting as the 
+	tile coordinates, and the value is the trigger data 
+	information. Since each tile has its own unique coordinates, 
+	it is unlikely to assume a tile will have multiple trigger 
+	data.
 
-	A script file is a file whose file format extension is SCRIPT. Each trigger 
-	data will have only one Script object. If the Script is loaded from	a modded 
-	script file, it will only load the first script found in the file. Script 
-	attributes are then set or flagged after the script has been assigned to the
-	trigger data.
+	A script file is a file whose file format extension is 
+	SCRIPT. Each trigger data will have only one Script object. 
+	
+	If the Script is loaded from a modded script file, it will 
+	only load the first script found in the file. Script 
+	attributes are then set or flagged after the script has been 
+	assigned to the trigger data.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 	New Trigger System [PWD09#03]
 
-	The new trigger system assumes that each tile holds one trigger data object, 
-	thus inheriting the legacy trigger system's approach to store them in the Area
-	object.
+	The new trigger system assumes that each tile holds one 
+	trigger data object, thus inheriting the legacy trigger 
+	system's approach to store them in the Area object.
 
-	The main difference is a tile's single trigger data can hold multiple trigger
-	scripts. Each script contains conditions that are checked only once when the 
-	player lands on the tile containing trigger data. If the player moves away from 
-	the tile, the conditions are invalidated, and will be rechecked again once the
-	player moves back onto the tile.
+	The main difference is a tile's single trigger data can hold 
+	multiple trigger scripts. Each script contains conditions 
+	that are checked only once when the player lands on the tile 
+	containing trigger data. If the player moves away from the 
+	tile, the conditions are invalidated, and will be rechecked 
+	again once the player moves back onto the tile.
 
-	Reusing the same script file format extension, we load the script file and will
-	load all script data into a collection. This trigger data will also store script
-	attributes specific to the script that is being processed, meaning each script 
-	can have their own unique script attributes, isolated from one another.
+	Reusing the same script file format extension, we load the 
+	script file and will load all script data into a collection. 
+	This trigger data will also store script attributes specific 
+	to the script that is being processed, meaning each script 
+	can have their own unique script attributes, isolated from 
+	one another.
 
-	This allows more flexibility to support multiple triggers in the same tile in
-	the game.
+	This allows more flexibility to support multiple triggers in 
+	the same tile in the game.
 
 -------------------------------
 
 Dialogues [PWD10]
 
-Dialogues are text speech bubbles in the game. Any text displayed inside a white
-rectangle box with a border around it is considered to be a dialogue. Even a
-simple YES/NO text bubble is considered as a dialogue.
+Dialogues are text speech bubbles in the game. Any text 
+displayed inside a white rectangle box with a border around 
+it is considered to be a dialogue. Even a simple YES/NO 
+text bubble is considered as a dialogue.
 
-There are 2 types of dialogues, a full-width dialogue and a half-width dialogue.
-The full-width dialogue is the default dialogue normally used when a player is
-interacting with an entity. The half-width dialogue is used when the player
-is in the Start Menu, and when the player is reading the item descriptions.
+There are 2 types of dialogues, a full-width dialogue and a 
+half-width dialogue. The full-width dialogue is the default 
+dialogue normally used when a player is interacting with an 
+entity. The half-width dialogue is used when the player is 
+in the Start Menu, and when the player is reading the item 
+descriptions.
 
-The game renders the dialogue by rendering each character per 8 in-game ticks.
+The game renders the dialogue by rendering each character 
+per 8 in-game ticks.
 
-The max size of the full-width dialogue text row is 18 characters long. The max
-size of the half-width dialogue text row is 9 characters long. For both types of
-dialogues, there are 2 rows in total that can be shown on the screen. 
+The max size of the full-width dialogue text row is 18 
+characters long. The max size of the half-width dialogue 
+text row is 9 characters long. For both types of dialogues, 
+there are 2 rows in total that can be shown on the screen. 
 
-For any dialogue text that exceeds the max size, there will be a dialogue scroll
-arrow telling the player to continue the dialogue interaction. Once the player
-engages in the dialogue interaction to scroll the text, the 2 rows of the dialogue
-text is scrolled up, then the dialogue text continues until the end of the
-dialogue has been reached.
+For any dialogue text that exceeds the max size, there will 
+be a dialogue scroll arrow telling the player to continue 
+the dialogue interaction. Once the player engages in the 
+dialogue interaction to scroll the text, the 2 rows of the 
+dialogue text is scrolled up, then the dialogue text 
+continues until the end of the dialogue has been reached.
 
-Whenever a dialogue text contains 2 whitespaces, it is considered to be a "line
-break". When displaying a dialogue notifying the player an item has been picked
-up, the line breaks are added after the item's name.
+Whenever a dialogue text contains 2 whitespaces, it is 
+considered to be a "line break". When displaying a dialogue 
+notifying the player an item has been picked up, the line 
+breaks are added after the item's name.
 
 -------------------------------
 
