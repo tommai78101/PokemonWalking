@@ -16,6 +16,20 @@ import dialogue.Dialogue;
 import utility.Debug;
 import utility.DialogueBuilder;
 
+/**
+ * A "script", or "event", is a unit of scripted actions in the game. Each unit of scripted actions
+ * contains many different event actions, such as:
+ * <ul>
+ * <li>How many dialogues to display.
+ * <li>How many movements a player or an NPC will follow.
+ * <li>Affirmative and negative responses and different paths to choose
+ * <li>And many more that are related to the scripted event.
+ * </ul>
+ * <p>
+ * A script file will contain one or many "scripts".
+ * 
+ * @author tlee
+ */
 public class Script {
 	public int triggerID;
 	public ArrayList<Map.Entry<Integer, MovementData>> moves;

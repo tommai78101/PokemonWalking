@@ -2,8 +2,10 @@ package script;
 
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import dialogue.Dialogue;
 import entity.Player;
@@ -11,13 +13,25 @@ import level.Area;
 import level.WorldConstants;
 import screen.Scene;
 
+/**
+ * TriggerData refers to a tile in the Area where one or many {@linkplain Script scripts} can occur
+ * throughout the entire game. Depending on the script conditions necessary to trigger the "events"
+ * on the same tile, the script will trigger when the player lands on the TriggerData where the
+ * script is located.
+ * <p>
+ * TriggerData stores all possible {@linkplain Script scripts} that occurs on the same exact tile
+ * location. Each script should be unique from one another.
+ * 
+ * @author tlee
+ */
 public class TriggerData {
 	public int x, y;
-	public Script script;
 	public int iteration;
+
+	private Set<Script> scripts;
+	private Script currentScript;
 	private boolean finished;
 	private boolean repeat;
-
 	private MovementData moves;
 	private Dialogue dialogue;
 
@@ -28,14 +42,16 @@ public class TriggerData {
 
 	public TriggerData() {
 		this.x = this.y = 0;
-		this.script = null;
+		this.currentScript = null;
+		this.scripts = new HashSet<>();
 		this.finished = false;
 	}
 
 	public TriggerData(TriggerData t) {
 		this.x = t.x;
 		this.y = t.y;
-		this.script = new Script(t.script);
+		this.currentScript = new Script(t.currentScript);
+		this.scripts = new HashSet<>(t.scripts);
 		this.finished = t.finished;
 	}
 
@@ -45,10 +61,10 @@ public class TriggerData {
 		if (this.finished)
 			this.finished = false;
 		List<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
-			: WorldConstants.scripts);
+		    : WorldConstants.scripts);
 		for (Script s : scriptList) {
 			if (s.triggerID == (pixel & 0xFFFF)) {
-				this.script = s;
+				this.currentScript = s;
 				if (s.repeat)
 					this.setRepeating();
 				break;
@@ -58,9 +74,9 @@ public class TriggerData {
 	}
 
 	public void tick(Area area, int entityX, int entityY) {
-		if (this.script != null) {
-			this.moves = this.script.getIteratedMoves();
-			this.dialogue = this.script.getIteratedDialogues();
+		if (this.currentScript != null) {
+			this.moves = this.currentScript.getIteratedMoves();
+			this.dialogue = this.currentScript.getIteratedDialogues();
 
 			if (this.moves != null && this.dialogue == null) {
 				area.getPlayer().keys.resetInputs();
@@ -91,7 +107,7 @@ public class TriggerData {
 						if (list.isEmpty()) {
 							this.moves = null;
 							try {
-								if (!this.script.incrementIteration())
+								if (!this.currentScript.incrementIteration())
 									this.finished = true;
 							}
 							catch (Exception e) {
@@ -115,7 +131,7 @@ public class TriggerData {
 								Player.unlockMovements();
 								this.dialogue.tick();
 								try {
-									this.finished = !this.script.incrementIteration();
+									this.finished = !this.currentScript.incrementIteration();
 								}
 								catch (Exception e) {
 									this.finished = true;
@@ -127,7 +143,7 @@ public class TriggerData {
 									Player.unlockMovements();
 									this.dialogue = null;
 									try {
-										this.finished = !this.script.incrementIteration();
+										this.finished = !this.currentScript.incrementIteration();
 									}
 									catch (Exception e) {
 										this.finished = true;
@@ -139,7 +155,7 @@ public class TriggerData {
 							}
 						}
 						else if (this.dialogue.isReady()
-							&& !(this.dialogue.isDialogueCompleted() && this.dialogue.isShowingDialog())) {
+						    && !(this.dialogue.isDialogueCompleted() && this.dialogue.isShowingDialog())) {
 							Player.lockMovements();
 							this.dialogue.tick();
 						}
@@ -157,13 +173,13 @@ public class TriggerData {
 							area.getPlayer().enableAutomaticMode();
 							this.dialogue = null;
 							try {
-								this.finished = !this.script.incrementIteration();
+								this.finished = !this.currentScript.incrementIteration();
 							}
 							catch (Exception e) {
 								this.finished = true;
 								return;
 							}
-							this.script.setAffirmativeFlag();
+							this.currentScript.setAffirmativeFlag();
 							this.finished = false;
 						}
 						else if (this.dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
@@ -172,13 +188,13 @@ public class TriggerData {
 							area.getPlayer().enableAutomaticMode();
 							this.dialogue = null;
 							try {
-								this.finished = !this.script.incrementIteration();
+								this.finished = !this.currentScript.incrementIteration();
 							}
 							catch (Exception e) {
 								this.finished = true;
 								return;
 							}
-							this.script.setNegativeFlag();
+							this.currentScript.setNegativeFlag();
 							this.finished = false;
 						}
 						break;
