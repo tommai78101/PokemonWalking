@@ -25,10 +25,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 
+import common.Debug;
 import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
-import utility.Debug;
 
 public class ScriptEditor extends JFrame {
 	private static final long serialVersionUID = 1L;

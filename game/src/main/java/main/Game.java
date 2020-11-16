@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import abstracts.SubMenu;
+import common.Debug;
 import data.GameSave;
 import entity.Player;
 import item.KeyItem;
@@ -26,7 +27,6 @@ import resources.Art;
 import resources.Mod;
 import screen.Scene;
 import screen.Scene.FlashingType;
-import utility.Debug;
 
 public class Game {
 	public static final Keys keys = new Keys();

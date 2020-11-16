@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import common.Debug;
 import constants.ScriptTag;
 import dialogue.Dialogue;
-import utility.Debug;
 import utility.DialogueBuilder;
 
 /**

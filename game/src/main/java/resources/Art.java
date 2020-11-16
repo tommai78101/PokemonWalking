@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 
+import common.Debug;
 import main.MainComponent;
 import screen.BaseBitmap;
 import screen.Scene;
-import utility.Debug;
 
 public class Art {
 

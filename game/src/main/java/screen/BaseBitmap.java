@@ -17,8 +17,8 @@ import java.util.Enumeration;
 
 import javax.imageio.ImageIO;
 
+import common.Debug;
 import level.WorldConstants;
-import utility.Debug;
 
 public class BaseBitmap {
 

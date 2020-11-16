@@ -31,8 +31,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import common.Debug;
 import common.Tileable;
-import utility.Debug;
 
 class TriggerSet {
 	// Map of <Tile ID (current tile index), Set of triggers>

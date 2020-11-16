@@ -1,4 +1,6 @@
-package utility;
+package common;
+
+import enums.AnsiColors;
 
 public class Debug {
 	public static final int MinimumStringLength = 24;
@@ -43,5 +45,9 @@ public class Debug {
 
 	public static void exception(Exception e) {
 		System.err.println(Debug.createExceptionString(e));
+	}
+
+	public static void printColor(AnsiColors color, String input) {
+		System.out.println(color.getAnsiCode() + " " + input);
 	}
 }
