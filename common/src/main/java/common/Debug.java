@@ -48,6 +48,6 @@ public class Debug {
 	}
 
 	public static void printColor(AnsiColors color, String input) {
-		System.out.println(color.getAnsiCode() + " " + input);
+		System.out.println(color.getAnsiCode() + input + AnsiColors.Clear.getAnsiCode());
 	}
 }
