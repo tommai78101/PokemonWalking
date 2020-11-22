@@ -1,5 +1,6 @@
 package script;
 
+import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,6 +15,9 @@ import java.util.Map;
 import common.Debug;
 import constants.ScriptTag;
 import dialogue.Dialogue;
+import entity.Player;
+import level.Area;
+import screen.Scene;
 import utility.DialogueBuilder;
 
 /**
@@ -38,11 +42,15 @@ public class Script {
 	public ArrayList<Map.Entry<Integer, Dialogue>> dialogues;
 	public ArrayList<Map.Entry<Integer, Dialogue>> affirmativeDialogues;
 	public ArrayList<Map.Entry<Integer, Dialogue>> negativeDialogues;
+	private Map.Entry<Integer, Integer> remainingMoves;
 	public int iteration;
 	public int affirmativeIteration;
 	public int negativeIteration;
 	public Boolean questionResponse;
+	private boolean finished;
 	public boolean repeat;
+	private boolean enabled;
+	private boolean hasRecentlyReset;
 
 	public Script() {
 		this.triggerID = 0;
@@ -57,6 +65,8 @@ public class Script {
 		this.negativeIteration = 0;
 		this.questionResponse = null;
 		this.repeat = false;
+		this.finished = false;
+		this.enabled = true;
 	}
 
 	public Script(Script s) {
@@ -97,6 +107,8 @@ public class Script {
 		this.negativeIteration = s.negativeIteration;
 		this.questionResponse = s.questionResponse;
 		this.repeat = s.repeat;
+		this.finished = s.finished;
+		this.enabled = s.enabled;
 	}
 
 	public MovementData getIteratedMoves() {
@@ -154,8 +166,204 @@ public class Script {
 		this.questionResponse = Boolean.FALSE;
 	}
 
+	public void tick(Area area, int entityX, int entityY) {
+		MovementData moves = this.getIteratedMoves();
+		Dialogue dialogue = this.getIteratedDialogues();
+
+		if (dialogue == null) {
+			area.getPlayer().keys.resetInputs();
+			if (area.getPlayer().isLockedWalking())
+				return;
+			if (moves.hasNextMove()) {
+				this.remainingMoves = moves.getNextMove();
+				if (this.remainingMoves.getKey() != area.getPlayer().getFacing()) {
+					area.getPlayer().setFacing(this.remainingMoves.getKey());
+					return;
+				}
+
+				int steps = this.remainingMoves.getValue();
+				if (steps >= 0) {
+					if (steps == 0)
+						area.getPlayer().setFacing(this.remainingMoves.getKey());
+					else
+						area.getPlayer().forceLockWalking();
+					steps--;
+
+					moves.updateCurrentMove(steps);
+				}
+				else {
+					this.remainingMoves = moves.getNextMove();
+					int direction = moves.getNextMoveDirection();
+					if (direction != area.getPlayer().getFacing())
+						area.getPlayer().setFacing(direction);
+				}
+			}
+			else {
+				try {
+					if (!this.incrementIteration())
+						this.finished = true;
+				}
+				catch (Exception e) {
+					this.finished = true;
+					return;
+				}
+			}
+		}
+		else {
+			switch (dialogue.getDialogueType()) {
+				case SPEECH:
+					if (dialogue.isDialogueCompleted()) {
+						if (dialogue.isScrolling()) {
+							Player.unlockMovements();
+							dialogue.tick();
+							try {
+								this.finished = !this.incrementIteration();
+							}
+							catch (Exception e) {
+								this.finished = true;
+								return;
+							}
+						}
+						else {
+							if (!dialogue.isShowingDialog()) {
+								Player.unlockMovements();
+								dialogue = null;
+								try {
+									this.finished = !this.incrementIteration();
+								}
+								catch (Exception e) {
+									this.finished = true;
+									return;
+								}
+							}
+							else
+								dialogue.tick();
+						}
+					}
+					else if (dialogue.isReady()
+					    && !(dialogue.isDialogueCompleted() && dialogue.isShowingDialog())) {
+						Player.lockMovements();
+						dialogue.tick();
+					}
+					break;
+				case QUESTION:
+					if (!dialogue.yesNoQuestionHasBeenAnswered()) {
+						dialogue.tick();
+						if (!Player.isMovementsLocked())
+							Player.lockMovements();
+						area.getPlayer().disableAutomaticMode();
+					}
+					if (dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
+						if (Player.isMovementsLocked())
+							Player.unlockMovements();
+						area.getPlayer().enableAutomaticMode();
+						dialogue = null;
+						try {
+							this.finished = !this.incrementIteration();
+						}
+						catch (Exception e) {
+							this.finished = true;
+							return;
+						}
+						this.setAffirmativeFlag();
+						this.finished = false;
+					}
+					else if (dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+						if (Player.isMovementsLocked())
+							Player.unlockMovements();
+						area.getPlayer().enableAutomaticMode();
+						dialogue = null;
+						try {
+							this.finished = !this.incrementIteration();
+						}
+						catch (Exception e) {
+							this.finished = true;
+							return;
+						}
+						this.setNegativeFlag();
+						this.finished = false;
+					}
+					break;
+				case ALERT:
+				default:
+					break;
+			}
+		}
+	}
+
+	public void render(Scene screen, Graphics2D graphics) {
+		Dialogue dialogue = this.getIteratedDialogues();
+		if (dialogue != null) {
+			dialogue.render(screen, graphics);
+		}
+	}
+
+	public void setRepeating() {
+		this.repeat = true;
+	}
+
+	public void stopRepeating() {
+		this.repeat = false;
+	}
+
+	public boolean isOnRepeat() {
+		return this.repeat;
+	}
+
 	private void resetResponseFlag() {
 		this.questionResponse = null;
+	}
+
+	public void reset() {
+		this.iteration = 0;
+		for (Map.Entry<Integer, MovementData> entry : this.moves) {
+			entry.getValue().reset();
+		}
+		for (Map.Entry<Integer, MovementData> entry : this.affirmativeMoves) {
+			entry.getValue().reset();
+		}
+		for (Map.Entry<Integer, MovementData> entry : this.negativeMoves) {
+			entry.getValue().reset();
+		}
+		for (Map.Entry<Integer, Dialogue> entry : this.dialogues) {
+			entry.getValue().resetDialogue();
+		}
+		for (Map.Entry<Integer, Dialogue> entry : this.affirmativeDialogues) {
+			entry.getValue().resetDialogue();
+		}
+		for (Map.Entry<Integer, Dialogue> entry : this.negativeDialogues) {
+			entry.getValue().resetDialogue();
+		}
+		this.finished = false;
+		this.hasRecentlyReset = true;
+	}
+
+	public boolean hasReset() {
+		return this.hasRecentlyReset;
+	}
+
+	public void clearReset() {
+		this.hasRecentlyReset = false;
+	}
+
+	public boolean isFinished() {
+		return this.finished;
+	}
+
+	public void setCompleted() {
+		this.finished = true;
+	}
+
+	public void turnOffScript() {
+		this.enabled = false;
+	}
+
+	public void turnOnScript() {
+		this.enabled = true;
+	}
+
+	public boolean isScriptEnabled() {
+		return this.enabled;
 	}
 
 	public boolean incrementIteration() throws Exception {
@@ -384,10 +592,10 @@ public class Script {
 				}
 				steps = Character.getNumericValue(s);
 				if (direction != -1 && steps != -1 && steps != -2 && (steps <= 9 && steps >= 0)) {
-					Map.Entry<Integer, Integer> entry = Map.entry(direction, steps);
-					moves.moves.add(entry);
+					moves.writeOriginalMove(direction, steps);
 				}
 			}
+			moves.reset();
 		}
 		catch (Exception e) {
 			e.printStackTrace();

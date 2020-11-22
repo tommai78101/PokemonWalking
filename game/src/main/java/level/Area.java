@@ -178,14 +178,10 @@ public class Area implements Tileable, UpdateRenderable {
 		}
 		else {
 			if (!this.player.isLockedWalking()) {
-				if (this.trigger == null)
-					this.trigger = this.checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
-				else
+				this.trigger = this.checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
+				if (this.trigger != null) {
 					this.isTriggerBeingTriggered = true;
-			}
-			else {
-				this.oldXTriggerPosition = -1;
-				this.oldYTriggerPosition = -1;
+				}
 			}
 		}
 		if (this.isTriggerBeingTriggered && this.trigger != null)
@@ -204,14 +200,13 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	private void handleTriggerActions() {
-		if (!this.trigger.isFinished()) {
+		if (this.trigger.hasActiveScript()) {
+			this.trigger.prepareActiveScript();
 			this.player.enableAutomaticMode();
 			this.trigger.tick(this, this.xPlayerPosition, this.yPlayerPosition);
 		}
 		else {
 			this.player.disableAutomaticMode();
-			this.oldXTriggerPosition = this.xPlayerPosition;
-			this.oldYTriggerPosition = this.yPlayerPosition;
 			this.isTriggerBeingTriggered = false;
 			this.trigger = null;
 		}
@@ -257,10 +252,18 @@ public class Area implements Tileable, UpdateRenderable {
 
 	private TriggerData checkForTrigger(int playerX, int playerY) {
 		TriggerData data = this.triggerDatas.get(Map.entry(playerX, playerY));
-		if (data != null && (!data.isFinished() || data.isOnRepeat())) {
-			if (this.oldXTriggerPosition == data.x && this.oldYTriggerPosition == data.y)
-				return null;
-			return data.reset();
+		TriggerData oldData = this.triggerDatas.get(Map.entry(this.oldXTriggerPosition, this.oldYTriggerPosition));
+		if (oldData != null && oldData.isPaused() && (playerX != this.oldXTriggerPosition || playerY != this.oldYTriggerPosition)) {
+			// Need to unpause old trigger data if the trigger data was previously paused and the player has
+			// left the trigger tile.
+			oldData.setPaused(false);
+			this.oldXTriggerPosition = -1;
+			this.oldYTriggerPosition = -1;
+		}
+		if (data != null && data.x == playerX && data.y == playerY) {
+			this.oldXTriggerPosition = data.x;
+			this.oldYTriggerPosition = data.y;
+			return data;
 		}
 		return null;
 	}
