@@ -362,7 +362,7 @@ public class Art {
 		}
 		if (result != null) {
 			ge.registerFont(result);
-			Debug.log(filename);
+			Debug.info(filename);
 		}
 		return result.deriveFont(Font.PLAIN, 8f * MainComponent.GAME_SCALE);
 	}

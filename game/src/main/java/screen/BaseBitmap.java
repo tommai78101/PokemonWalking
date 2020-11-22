@@ -88,7 +88,7 @@ public class BaseBitmap {
 			URL resourcePath = BaseBitmap.class.getClassLoader().getResource(filename);
 			if (resourcePath != null) {
 				BufferedImage image = ImageIO.read(resourcePath);
-				Debug.log(filename);
+				Debug.info(filename);
 				return BaseBitmap.load(image);
 			}
 			else {
