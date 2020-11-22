@@ -260,9 +260,9 @@ public class Area implements Tileable, UpdateRenderable {
 			this.oldXTriggerPosition = -1;
 			this.oldYTriggerPosition = -1;
 		}
-		if (data != null && data.x == playerX && data.y == playerY) {
-			this.oldXTriggerPosition = data.x;
-			this.oldYTriggerPosition = data.y;
+		if (data != null && data.getXAreaPosition() == playerX && data.getYAreaPosition() == playerY) {
+			this.oldXTriggerPosition = data.getXAreaPosition();
+			this.oldYTriggerPosition = data.getYAreaPosition();
 			return data;
 		}
 		return null;

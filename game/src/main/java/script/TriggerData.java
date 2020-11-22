@@ -22,9 +22,8 @@ import screen.Scene;
  * @author tlee
  */
 public class TriggerData {
-	public int x, y;
-	public int iteration;
-
+	private int x;
+	private int y;
 	private Deque<Script> scripts;
 	private Deque<Script> finishedScripts;
 	private Script currentScript;
@@ -64,9 +63,9 @@ public class TriggerData {
 	/**
 	 * Initializes the trigger tile data with the information from the pixel color value.
 	 * <p>
-	 * TODO: Currently, it initializes the trigger tile data's current position from the pixel color
-	 * value. This will need to be updated, so that we can store the position of the trigger tile data,
-	 * and match up the trigger data identification code with the right script file.
+	 * TODO: Currently, it initializes the trigger tile data's current area position from the pixel
+	 * color value. This will need to be updated, so that we can store the position of the trigger tile
+	 * data, and match up the trigger data identification code with the right script file.
 	 * 
 	 * @param pixel
 	 * @return
@@ -132,6 +131,24 @@ public class TriggerData {
 	 */
 	public boolean isPaused() {
 		return this.isPaused;
+	}
+
+	/**
+	 * Returns the X position relative to the Area's origin.
+	 * 
+	 * @return
+	 */
+	public int getXAreaPosition() {
+		return this.x;
+	}
+
+	/**
+	 * Returns the Y position relative to the Area's origin.
+	 * 
+	 * @return
+	 */
+	public int getYAreaPosition() {
+		return this.y;
 	}
 
 	/**
