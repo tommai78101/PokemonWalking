@@ -23,7 +23,7 @@ import abstracts.Obstacle;
 import common.Tileable;
 import entity.Player;
 import interfaces.UpdateRenderable;
-import screen.BaseBitmap;
+import screen.Bitmap;
 import screen.Scene;
 import script.TriggerData;
 
@@ -62,7 +62,7 @@ public class Area implements Tileable, UpdateRenderable {
 	private final Map<Map.Entry<Integer, Integer>, Item> areaItems = new HashMap<>();
 	private final Map<Map.Entry<Integer, Integer>, TriggerData> triggerDatas = new HashMap<>();
 
-	public Area(BaseBitmap bitmap) {
+	public Area(Bitmap bitmap) {
 		int[] tempPixels = bitmap.getPixels();
 		this.areaID = (tempPixels[0] >> 16) & 0xFFFF;
 		int triggerSize = tempPixels[0] & 0xFFFF;
@@ -125,7 +125,7 @@ public class Area implements Tileable, UpdateRenderable {
 		this.areaName = "";
 	}
 
-	public Area(BaseBitmap bitmap, final String areaName) {
+	public Area(Bitmap bitmap, final String areaName) {
 		this(bitmap);
 		this.areaName = areaName;
 	}
@@ -683,7 +683,7 @@ public class Area implements Tileable, UpdateRenderable {
 
 	// --------------------- STATIC METHODS -----------------------
 
-	public static int getAreaIDFromBitmap(BaseBitmap bitmap) {
+	public static int getAreaIDFromBitmap(Bitmap bitmap) {
 		if (bitmap == null) {
 			throw new IllegalArgumentException("Bitmap is null. Cannot identify area ID from null bitmap.");
 		}

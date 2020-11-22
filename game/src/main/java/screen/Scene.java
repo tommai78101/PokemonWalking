@@ -19,7 +19,7 @@ import level.WorldConstants;
 import resources.Art;
 import resources.Mod;
 
-public class Scene extends BaseBitmap {
+public class Scene extends Bitmap {
 	public enum FlashingType {
 		NORMAL,
 		BURST
@@ -62,23 +62,23 @@ public class Scene extends BaseBitmap {
 		Arrays.fill(this.pixels, color);
 	}
 
-	public void blit(BaseBitmap bitmap, int x, int y) {
+	public void blit(Bitmap bitmap, int x, int y) {
 		if (bitmap != null)
 			this.blit(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height);
 	}
 
-	public void blitBiome(BaseBitmap bitmap, int x, int y, PixelData data) {
+	public void blitBiome(Bitmap bitmap, int x, int y, PixelData data) {
 		if (bitmap != null) {
 			this.blitBiome(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height, data);
 		}
 	}
 
-	public void npcBlit(BaseBitmap bitmap, int x, int y) {
+	public void npcBlit(Bitmap bitmap, int x, int y) {
 		if (bitmap != null)
 			this.blit(bitmap, x + this.xOffset, y + this.yOffset - 4, bitmap.width, bitmap.height);
 	}
 
-	public void blit(BaseBitmap bitmap, int x, int y, int w, int h) {
+	public void blit(Bitmap bitmap, int x, int y, int w, int h) {
 		// This directly blits the bitmap to the X and Y coordinates within the screen
 		// area.
 		// The Rect adjusts the blitting area to within the screen area.
@@ -104,7 +104,7 @@ public class Scene extends BaseBitmap {
 		}
 	}
 
-	public void blitBiome(BaseBitmap bitmap, int x, int y, int w, int h, PixelData data) {
+	public void blitBiome(Bitmap bitmap, int x, int y, int w, int h, PixelData data) {
 		// This directly blits the bitmap to the X and Y coordinates within the screen
 		// area.
 		// The Rect adjusts the blitting area to within the screen area.

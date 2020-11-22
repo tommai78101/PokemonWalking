@@ -15,7 +15,7 @@ import java.util.Map;
 import dialogue.Dialogue;
 import resources.Art;
 import resources.Mod;
-import screen.BaseBitmap;
+import screen.Bitmap;
 import script.Script;
 import utility.DialogueBuilder;
 
@@ -87,7 +87,7 @@ public class WorldConstants {
 	// ArrayList<Map.Entry<Script, String>>();
 
 	// All bitmaps
-	public static List<BaseBitmap> bitmaps = new ArrayList<>();
+	public static List<Bitmap> bitmaps = new ArrayList<>();
 
 	/**
 	 * Returns the area matching the given area ID value.
@@ -148,7 +148,7 @@ public class WorldConstants {
 		}
 		else {
 			for (int i = 0; i < Mod.moddedAreas.size(); i++) {
-				Map.Entry<BaseBitmap, Integer> entry = Mod.moddedAreas.get(i);
+				Map.Entry<Bitmap, Integer> entry = Mod.moddedAreas.get(i);
 				WorldConstants.moddedAreas.add(new Area(entry.getKey()));
 			}
 			return WorldConstants.moddedAreas;
@@ -183,7 +183,7 @@ public class WorldConstants {
 	 * Goes with the static method, "getAllNewAreas()".
 	 * 
 	 */
-	private static void addNewArea(BaseBitmap bitmap) {
+	private static void addNewArea(Bitmap bitmap) {
 		int areaID = Area.getAreaIDFromBitmap(bitmap);
 		// Java 8 feature
 		boolean exists = WorldConstants.areas.stream()

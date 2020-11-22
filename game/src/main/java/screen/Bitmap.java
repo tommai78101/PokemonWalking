@@ -20,7 +20,7 @@ import javax.imageio.ImageIO;
 import common.Debug;
 import level.WorldConstants;
 
-public class BaseBitmap {
+public class Bitmap {
 
 	protected int[] pixels;
 	protected int width;
@@ -28,13 +28,13 @@ public class BaseBitmap {
 
 	private int id;
 
-	public BaseBitmap(int w, int h) {
+	public Bitmap(int w, int h) {
 		this.width = w;
 		this.height = h;
 		this.pixels = new int[w * h];
 	}
 
-	public BaseBitmap(int w, int h, int[] p) {
+	public Bitmap(int w, int h, int[] p) {
 		this.width = w;
 		this.height = h;
 		this.pixels = new int[w * h];
@@ -50,16 +50,16 @@ public class BaseBitmap {
 		return this.id;
 	}
 
-	public BaseBitmap[][] cut(String filename, int w, int h, int clipW, int clipH) {
+	public Bitmap[][] cut(String filename, int w, int h, int clipW, int clipH) {
 		try {
 			// BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
-			BufferedImage image = ImageIO.read(BaseBitmap.this.getClass().getClassLoader().getResource(filename));
+			BufferedImage image = ImageIO.read(Bitmap.this.getClass().getClassLoader().getResource(filename));
 			int xTiles = (image.getWidth() - clipW) / w;
 			int yTiles = (image.getHeight() - clipH) / h;
-			BaseBitmap[][] results = new BaseBitmap[xTiles][yTiles];
+			Bitmap[][] results = new Bitmap[xTiles][yTiles];
 			for (int x = 0; x < xTiles; x++) {
 				for (int y = 0; y < yTiles; y++) {
-					results[x][y] = new BaseBitmap(w, h);
+					results[x][y] = new Bitmap(w, h);
 					image.getRGB(clipW + x * w, clipH + y * h, w, h, results[x][y].pixels, 0, w);
 				}
 			}
@@ -83,17 +83,17 @@ public class BaseBitmap {
 		return this.pixels;
 	}
 
-	public static BaseBitmap load(String filename) {
+	public static Bitmap load(String filename) {
 		try {
-			URL resourcePath = BaseBitmap.class.getClassLoader().getResource(filename);
+			URL resourcePath = Bitmap.class.getClassLoader().getResource(filename);
 			if (resourcePath != null) {
 				BufferedImage image = ImageIO.read(resourcePath);
 				Debug.info(filename);
-				return BaseBitmap.load(image);
+				return Bitmap.load(image);
 			}
 			else {
 				Debug.error("Unable to find resource: " + filename);
-				Enumeration<URL> en = BaseBitmap.class.getClassLoader().getResources("art/area/test");
+				Enumeration<URL> en = Bitmap.class.getClassLoader().getResources("art/area/test");
 				if (en.hasMoreElements()) {
 					URL metaInf = en.nextElement();
 					try {
@@ -115,13 +115,13 @@ public class BaseBitmap {
 		return null;
 	}
 
-	public static BaseBitmap load(File file) {
+	public static Bitmap load(File file) {
 		try {
 			// Prints out the bitmap filename. If there's something wrong, it won't print it
 			// out.
 			Debug.log(file.getAbsolutePath());
 			BufferedImage image = ImageIO.read(file);
-			return BaseBitmap.load(image);
+			return Bitmap.load(image);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -129,14 +129,14 @@ public class BaseBitmap {
 		return null;
 	}
 
-	public static BaseBitmap load(BufferedImage image) {
+	public static Bitmap load(BufferedImage image) {
 		if (image == null)
 			return null;
 
 		int width = image.getWidth();
 		int height = image.getHeight();
 
-		BaseBitmap result = new BaseBitmap(width, height, image.getRGB(0, 0, width, height, null, 0, width));
+		Bitmap result = new Bitmap(width, height, image.getRGB(0, 0, width, height, null, 0, width));
 		WorldConstants.bitmaps.add(result);
 		return result;
 	}

@@ -9,7 +9,7 @@
 package level;
 
 import resources.Art;
-import screen.BaseBitmap;
+import screen.Bitmap;
 
 public class PixelData {
 	// This class contains all of the area's pixel color, pixel's properties, pixel
@@ -35,8 +35,8 @@ public class PixelData {
 	// This represents the art resource this PixelData object is representing.
 	// This can also give flexibility when it comes to puzzle-themed areas.
 	// Now adding animations.
-	public BaseBitmap[] bitmap;
-	public BaseBitmap[] biomeBitmap;
+	public Bitmap[] bitmap;
+	public Bitmap[] biomeBitmap;
 	public int bitmapTick;
 	public int biomeBitmapTick;
 
@@ -161,7 +161,7 @@ public class PixelData {
 	public void prepareBitmap(int alpha, int red, int green, int blue) {
 		switch (alpha) {
 			case 0x01: // Path
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				// Tile Type
 				switch (red) {
 					case 0x00: // Grass Path
@@ -187,20 +187,20 @@ public class PixelData {
 				}
 				switch (green) { // Area Type
 					case 0x00:
-						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap = new Bitmap[1];
 						this.biomeBitmap[0] = Art.grass; // Forest
 						break;
 					case 0x01:
 						// TODO: Change this biome bitmap to something that represents the city even
 						// more.
-						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap = new Bitmap[1];
 						this.biomeBitmap[0] = Art.path; // City
 					case 0x02:
-						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap = new Bitmap[1];
 						this.biomeBitmap[0] = Art.mt_ground; // Mountain
 						break;
 					case 0x03:
-						this.biomeBitmap = new BaseBitmap[1];
+						this.biomeBitmap = new Bitmap[1];
 						this.biomeBitmap[0] = Art.water[0];
 						// TODO: Add more area type biome bitmaps here to the Path. (Refer to
 						// documentation.)
@@ -211,7 +211,7 @@ public class PixelData {
 			case 0x02: // Ledge
 			{
 				// TODO: Add biome bitmaps to ledge.
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				switch (red) {
 					case 0x00: // Bottom
 						this.bitmap[0] = Art.ledge_bottom;
@@ -298,7 +298,7 @@ public class PixelData {
 				break;
 			}
 			case 0x03: // Obstacles
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				switch (red) {
 					case 0x00: // Small Tree
 						this.bitmap[0] = Art.smallTree;
@@ -330,11 +330,11 @@ public class PixelData {
 				}
 				break;
 			case 0x04: // Warp point (Refer to documentation for flaws.)
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				this.bitmap[0] = Art.forestEntrance;
 				break;
 			case 0x05: // Area Sector Point (Refer to documentation.)
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				// TODO: Add new bitmaps for connection points to make them blend in with the
 				// surroundings.
 				// TODO: Create more biome bitmaps.
@@ -343,7 +343,7 @@ public class PixelData {
 				this.bitmap[0] = Art.grass;
 				break;
 			case 0x06: // Stairs
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				switch (red) {
 					case 0x00:
 						this.bitmap[0] = Art.stairs_bottom;
@@ -399,7 +399,7 @@ public class PixelData {
 				break;
 			}
 			case 0x08: // House
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				switch (red) { // House related tiles. Way too many to list them orderly.
 					case 0x00: // Bottom wall
 						this.bitmap[0] = Art.house_bottom;
@@ -447,25 +447,25 @@ public class PixelData {
 				}
 				break;
 			case 0x09: // House Door
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				this.bitmap[0] = Art.house_door;
 				break;
 			case 0x0A: // Item
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				this.bitmap[0] = Art.item;
 				break;
 			case 0x0B: // Carpet Floor (Indoors)
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				this.bitmap[0] = Art.carpet_indoors;
 				this.biomeBitmap = Art.exit_arrow;
 				break;
 			case 0x0C: // Carpet Floors (Outdoors)
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				this.bitmap[0] = Art.carpet_outdoors;
 				this.biomeBitmap = Art.exit_arrow;
 				break;
 			case 0x0D: // Starting position when game has initialized;
-				this.bitmap = new BaseBitmap[1];
+				this.bitmap = new Bitmap[1];
 				switch (red) {
 					case 0x01:
 					default:
@@ -477,11 +477,11 @@ public class PixelData {
 				break;
 		}
 		if (this.bitmap == null) {
-			this.bitmap = new BaseBitmap[1];
+			this.bitmap = new Bitmap[1];
 			this.bitmap[0] = Art.error;
 		}
 		if (this.biomeBitmap == null) {
-			this.biomeBitmap = new BaseBitmap[1];
+			this.biomeBitmap = new Bitmap[1];
 			this.biomeBitmap[0] = Art.grass; // By default, biome bitmap should be grass.
 		}
 	}
@@ -633,7 +633,7 @@ public class PixelData {
 			this.biomeBitmapTick = 0;
 	}
 
-	public BaseBitmap getBitmap() {
+	public Bitmap getBitmap() {
 		return this.bitmap[this.bitmapTick];
 	}
 
@@ -641,7 +641,7 @@ public class PixelData {
 		return this.groundHeight;
 	}
 
-	public BaseBitmap getBiomeBitmap() {
+	public Bitmap getBiomeBitmap() {
 		return this.biomeBitmap[this.biomeBitmapTick];
 	}
 

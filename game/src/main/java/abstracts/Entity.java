@@ -13,7 +13,7 @@ import entity.Player;
 import interfaces.UpdateRenderable;
 import level.PixelData;
 import level.WorldConstants;
-import screen.BaseBitmap;
+import screen.Bitmap;
 
 /**
  * Parent abstract class of all abstract classes.
@@ -35,7 +35,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 
 	protected int xOffset;
 	protected int yOffset;
-	protected BaseBitmap bitmap = null;
+	protected Bitmap bitmap = null;
 
 	protected int lastFacing = 0;
 	protected int facing = 0;
