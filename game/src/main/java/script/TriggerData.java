@@ -28,7 +28,6 @@ public class TriggerData {
 	private Deque<Script> scripts;
 	private Deque<Script> finishedScripts;
 	private Script currentScript;
-	private int debugIteration = 51;
 	private boolean isPaused = false;
 
 	// TODO: Add entity ID for NPCs.
