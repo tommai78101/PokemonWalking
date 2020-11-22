@@ -33,9 +33,13 @@ public class TriggerData {
 
 	// TODO: Add entity ID for NPCs.
 
-	// TriggerData is for the game. Area uses TriggerData to communicate with
-	// Scripts to obtain Movements.
-
+	/**
+	 * Constructor of the TriggerData object, which stores anything related to triggers placed on the
+	 * tile.
+	 * <p>
+	 * TriggerData is for use in the Game. Area uses TriggerData to communicate with Scripts to obtain
+	 * Movements.
+	 */
 	public TriggerData() {
 		this.x = this.y = 0;
 		this.currentScript = null;
@@ -44,6 +48,11 @@ public class TriggerData {
 		this.isPaused = false;
 	}
 
+	/**
+	 * Deep copy of the TriggerData object.
+	 * 
+	 * @param t
+	 */
 	public TriggerData(TriggerData t) {
 		this.x = t.x;
 		this.y = t.y;
@@ -53,6 +62,16 @@ public class TriggerData {
 		this.isPaused = t.isPaused;
 	}
 
+	/**
+	 * Initializes the trigger tile data with the information from the pixel color value.
+	 * <p>
+	 * TODO: Currently, it initializes the trigger tile data's current position from the pixel color
+	 * value. This will need to be updated, so that we can store the position of the trigger tile data,
+	 * and match up the trigger data identification code with the right script file.
+	 * 
+	 * @param pixel
+	 * @return
+	 */
 	public TriggerData loadTriggerData(int pixel) {
 		this.x = (pixel >> 24) & 0xFF;
 		this.y = (pixel >> 16) & 0xFF;
@@ -62,10 +81,20 @@ public class TriggerData {
 		return this;
 	}
 
+	/**
+	 * Checks if the trigger tile contains available scripts.
+	 * 
+	 * @return
+	 */
 	public boolean hasScripts() {
 		return !this.scripts.isEmpty();
 	}
 
+	/**
+	 * Checks if the trigger tile has an active script.
+	 * 
+	 * @return
+	 */
 	public boolean hasActiveScript() {
 		if (this.currentScript == null) {
 			if (!this.scripts.isEmpty() && !this.isPaused) {
@@ -75,6 +104,10 @@ public class TriggerData {
 		return this.currentScript != null;
 	}
 
+	/**
+	 * Prepares the trigger tile's current active script from a collection of scripts that may occur on
+	 * the same tile.
+	 */
 	public void prepareActiveScript() {
 		if (this.currentScript != null) {
 			if (!this.currentScript.isScriptEnabled() && this.currentScript.hasReset()) {
@@ -84,14 +117,31 @@ public class TriggerData {
 		}
 	}
 
+	/**
+	 * Sets the trigger tile to be paused or unpaused, determined by the boolean argument.
+	 * 
+	 * @param value
+	 */
 	public void setPaused(boolean value) {
 		this.isPaused = value;
 	}
 
+	/**
+	 * Checks if the trigger tile is paused.
+	 * 
+	 * @return
+	 */
 	public boolean isPaused() {
 		return this.isPaused;
 	}
 
+	/**
+	 * Updates the triggered script.
+	 * 
+	 * @param area
+	 * @param entityX
+	 * @param entityY
+	 */
 	public void tick(Area area, int entityX, int entityY) {
 		// No else condition. We check if the current script is no longer null.
 		if (this.currentScript != null) {
@@ -119,6 +169,12 @@ public class TriggerData {
 		}
 	}
 
+	/**
+	 * Renders the triggered script scenes.
+	 * 
+	 * @param screen
+	 * @param graphics
+	 */
 	public void render(Scene screen, Graphics2D graphics) {
 		if (this.currentScript != null) {
 			this.currentScript.render(screen, graphics);
