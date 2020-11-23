@@ -18,12 +18,14 @@ import java.io.RandomAccessFile;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import common.Debug;
+import common.Sha2Utils;
 import common.Tileable;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
@@ -56,6 +58,7 @@ public class LevelEditor extends JFrame {
 	public EditorInput input;
 
 	private int uniqueAreaID;
+	private String sha2Checksum = "";
 
 	@SuppressWarnings("unused")
 	private String mapAreaName;
@@ -255,6 +258,19 @@ public class LevelEditor extends JFrame {
 
 	public void setUniqueAreaID(int uniqueAreaID) {
 		this.uniqueAreaID = uniqueAreaID;
+	}
+
+	public String getChecksum() {
+		return this.sha2Checksum;
+	}
+
+	public void setChecksum(int[] pixels) {
+		this.sha2Checksum = "";
+	}
+
+	public String generateChecksum() {
+		this.sha2Checksum = Sha2Utils.generateRandom(UUID.randomUUID().toString());
+		return this.sha2Checksum;
 	}
 
 	// --------------------------------------------------------------------------------

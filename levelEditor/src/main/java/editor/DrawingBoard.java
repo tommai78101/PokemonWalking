@@ -294,6 +294,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 				while (Integer.valueOf(widthField.getText()) <= 0 || Integer.valueOf(heightField.getText()) <= 0);
 				if (result == JOptionPane.OK_OPTION) {
 					DrawingBoard.this.setImageSize(Integer.valueOf(widthField.getText()), Integer.valueOf(heightField.getText()));
+
+					// Script editor
+					if (DrawingBoard.this.editor.scriptEditor != null) {
+						// Start a clean slate for the Script Editor.
+						DrawingBoard.this.editor.scriptEditor.resetComponents();
+					}
 				}
 			}
 		});
