@@ -256,7 +256,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.speechDialogue = new JButton("#");
 		this.speechDialogue.setMargin(inset);
 		this.speechDialogue.setToolTipText(
-		    "<html><b>Speech Dialogue:</b><br/> A normal dialogue the player is to trigger. <br/><br/><b>Usage:</b><br/> #[One-line-only Sentence]<br/><br/><b>Example:</b><br/>#Hello World.</html>"
+			"<html><b>Speech Dialogue:</b><br/> A normal dialogue the player is to trigger. <br/><br/><b>Usage:</b><br/> #[One-line-only Sentence]<br/><br/><b>Example:</b><br/>#Hello World.</html>"
 		);
 		this.speechDialogue.setActionCommand("#");
 		this.speechDialogue.addActionListener(this.dialogueActions);
@@ -264,7 +264,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.questionDialogue = new JButton("?");
 		this.questionDialogue.setMargin(inset);
 		this.questionDialogue.setToolTipText(
-		    "<html><b>Question Dialogue:</b><br/> A question dialogue asking for the player's response to YES or NO.<br/><br/><b>WARNING:</b><br/>A single question must be followed by an Affirmative and a Negative Dialogue.<br/><br/><b>Usage:</b><br/>?[One-line-only Question] <br/><br/><b>Example:</b><br/>?Do you want to trade your Bulbasaur for my Pikachu?<br/>+Great! Let's trade!<br/>-Aw... I thought you had one.</html>"
+			"<html><b>Question Dialogue:</b><br/> A question dialogue asking for the player's response to YES or NO.<br/><br/><b>WARNING:</b><br/>A single question must be followed by an Affirmative and a Negative Dialogue.<br/><br/><b>Usage:</b><br/>?[One-line-only Question] <br/><br/><b>Example:</b><br/>?Do you want to trade your Bulbasaur for my Pikachu?<br/>+Great! Let's trade!<br/>-Aw... I thought you had one.</html>"
 		);
 		this.questionDialogue.setActionCommand("?");
 		this.questionDialogue.addActionListener(this.dialogueActions);
@@ -272,7 +272,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.affirmativeDialogue = new JButton("+");
 		this.affirmativeDialogue.setMargin(inset);
 		this.affirmativeDialogue.setToolTipText(
-		    "<html><b>Affirmative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to YES, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>+[One-line-only Sentence]<br/><br/><b>Example:</b><br/>+Great! Let's trade!</html>"
+			"<html><b>Affirmative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to YES, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>+[One-line-only Sentence]<br/><br/><b>Example:</b><br/>+Great! Let's trade!</html>"
 		);
 		this.affirmativeDialogue.setActionCommand("+");
 		this.affirmativeDialogue.addActionListener(this.dialogueActions);
@@ -280,7 +280,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.negativeDialogue = new JButton("-");
 		this.negativeDialogue.setMargin(inset);
 		this.negativeDialogue.setToolTipText(
-		    "<html><b>Negative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to NO, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>-[One-line-only Sentence]<br/><br/><b>Example:</b><br/>-Aw... I thought you had one.</html>"
+			"<html><b>Negative Dialogue:</b><br/> If a question dialogue has been asked, and the player reponded to NO, this and similar consecutive dialogues will be shown. <br/><br/><b>Usage:</b><br/>-[One-line-only Sentence]<br/><br/><b>Example:</b><br/>-Aw... I thought you had one.</html>"
 		);
 		this.negativeDialogue.setActionCommand("-");
 		this.negativeDialogue.addActionListener(this.dialogueActions);
@@ -331,7 +331,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.allowUpdate = false;
 	}
 
-	public void clear() {
+	public void clearTextFields() {
 		this.nameField.setText("");
 		// xField.setText("");
 		// yField.setText("");
@@ -401,7 +401,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 			lastCharacter = "";
 		}
 		if (lastDirection.equals("U") || lastDirection.equals("D") || lastDirection.equals("L")
-		    || lastDirection.equals("R")) {
+			|| lastDirection.equals("R")) {
 			switch (event.getActionCommand()) {
 				case UP: {
 					this.inputChange(doc, area, "U");
@@ -587,8 +587,8 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				}
 				catch (NumberFormatException e) {
 					JOptionPane.showMessageDialog(
-					    null,
-					    "Please input numbers in range 0 ~ 65535.\n\n0 is reserved for \"Eraser\", which is used to erase triggers from the map."
+						null,
+						"Please input numbers in range 0 ~ 65535.\n\n0 is reserved for \"Eraser\", which is used to erase triggers from the map."
 					);
 					SwingUtilities.invokeLater(new Runnable() {
 						@Override
