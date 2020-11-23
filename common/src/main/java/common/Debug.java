@@ -79,7 +79,7 @@ public class Debug {
 	 */
 	private static String createString(String msg) {
 		StackTraceElement[] elements = new Throwable().getStackTrace();
-		StackTraceElement element = elements[elements.length - 1];
+		StackTraceElement element = elements[2];
 		String className = element.getClassName() + ":" + element.getLineNumber();
 		String tabs = "\t";
 		int length = className.length();
