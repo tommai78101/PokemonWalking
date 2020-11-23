@@ -132,13 +132,17 @@ class TriggerSet {
 
 	public void addTriggerById(int index, int triggerId) {
 		Trigger trigger = this.validityCheck(triggerId);
-		if (trigger != null && !trigger.isEraser()) {
+		if (trigger == null) {
+			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at: (" + (index % this.size.width) + "," + (index / this.size.width) + ").");
+			return;
+		}
+		if (!trigger.isEraser()) {
 			byte x = (byte) (index % this.size.width);
 			byte y = (byte) (index / this.size.width);
 			this.addTrigger(index, x, y, trigger);
 		}
 		else {
-			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at: (" + (index % this.size.width) + "," + (index / this.size.width) + ").");
+			// Don't do anything with Erasers.
 		}
 	}
 
@@ -716,10 +720,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 			return null;
 
 		// Get the checksum and relevant information.
+		final int checksumPixelsCount = (LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4);
 		byte[] checksumBytes = this.editor.getChecksum().getBytes();
+		int checksumPixelsRow = ((1 + checksumPixelsCount) % this.bitmapWidth == 0) ? (1 + checksumPixelsCount) / this.bitmapWidth : ((1 + checksumPixelsCount) / this.bitmapWidth) + 1;
 
 		// Represents how many reserved pixels that will be used before creating the bitmap.
-		final int usedReservedPixelsCount = 1 + (checksumBytes.length / 4);
+		final int usedReservedPixelsCount = checksumPixelsRow * this.bitmapWidth;
 
 		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
 		// designated as ID 0.
@@ -744,18 +750,28 @@ public class DrawingBoard extends Canvas implements Runnable {
 		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerSize));
 
 		// Add the checksum after the first pixel.
-		for (int i = 0, pixelIterator = 1; i < checksumBytes.length; i += 4, pixelIterator++) {
-			pixels[pixelIterator] = (checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3];
+		int columnIndex = 0;
+		int rowIndex = 0;
+		int pixelIterator = 0;
+		for (int i = 0; i < checksumBytes.length; i += 4, pixelIterator++) {
+			columnIndex = (1 + pixelIterator) % this.bitmapWidth;
+			rowIndex = (1 + pixelIterator) / this.bitmapWidth;
+			pixels[columnIndex + rowIndex * this.bitmapWidth] = (checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3];
+		}
+
+		// Pad the checksums if there are leftover pixels
+		for (int i = columnIndex + 1; i < this.bitmapWidth; i++) {
+			pixels[i + (rowIndex * this.bitmapWidth)] = -1;
 		}
 
 		// Place the trigger data inside the trigger section in the bitmap file. This is usually located at
 		// the top of the bitmap file.
-		int columnIndex = 0;
-		int rowIndex = 0;
+		columnIndex = 0;
+		rowIndex = 0;
 		for (int i = 0; i < triggerSize; i++) {
 			// The index "i" must be in range of 0 ~ list.size(). The "width" must include the reserved pixels
 			// count as offset.
-			int pixelIndex = i + usedReservedPixelsCount;
+			int pixelIndex = i + checksumPixelsRow * this.bitmapWidth;
 			columnIndex = pixelIndex % this.bitmapWidth;
 			rowIndex = pixelIndex / this.bitmapWidth;
 			pixels[columnIndex + (rowIndex * this.bitmapWidth)] = list.get(i).intValue();
@@ -786,21 +802,48 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 	public void openMapImage(BufferedImage image) {
 		try {
-			int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-			this.editor.setUniqueAreaID((srcTiles[0] >> 16) & 0xFFFF);
-			int triggerCount = srcTiles[0] & 0xFFFF;
-			int triggerRows = (triggerCount / image.getWidth()) + 1;
-			this.setImageSize(image.getWidth(), (image.getHeight() - triggerRows));
-			if (this.triggers != null)
-				this.triggers = null;
-			this.triggers = new TriggerSet(image.getWidth(), (image.getHeight() - triggerRows));
+			int width = image.getWidth();
+			int height = image.getHeight();
+			int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
+
+			// First pixel is always the area ID and the size dimension of the area.
+			this.editor.setUniqueAreaID((pixels[0] >> 16) & 0xFFFF);
+			int triggerCount = pixels[0] & 0xFFFF;
+
+			// Get the checksum out from the pixels
+			this.editor.setChecksum(pixels, 1);
+
+			// The reserved pixel count should be tallied here
+			int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
+			final int reservedPixelsCount = 1 + checksumPixelsCount;
+
+			// Calculate the trigger rows without including the checksums
+			int reservedPixelsRows = (reservedPixelsCount % width == 0) ? (reservedPixelsCount / width) : (reservedPixelsCount / width) + 1;
+			int triggerRows = (triggerCount % width == 0) ? (triggerCount / width) : (triggerCount / width) + 1;
+
+			// Set the area size but without taking into account the padded trigger rows.
+			int tilesHeight = (height - reservedPixelsRows - triggerRows);
+			this.setImageSize(width, tilesHeight);
+
+			// Populate and fill in triggers from the buffered images as a set.
+			this.triggers = new TriggerSet(width, tilesHeight);
 			for (int i = 0; i < triggerCount; i++) {
-				int x = (srcTiles[i + 1] >> 24) & 0xFF;
-				int y = (srcTiles[i + 1] >> 16) & 0xFF;
-				this.triggers.addTriggerById(y * image.getWidth() + x, srcTiles[i + 1]);
+				int pixelIterator = (reservedPixelsRows * width) + i;
+				int x = (pixels[pixelIterator] >> 24) & 0xFF;
+				int y = (pixels[pixelIterator] >> 16) & 0xFF;
+
+				// This handles adding the default Eraser trigger as well as other triggers from the map.
+				this.triggers.addTriggerById(y * width + x, pixels[pixelIterator]);
 			}
-			for (int i = 0; i < srcTiles.length - (triggerRows * image.getWidth()); i++)
-				this.tiles[i] = srcTiles[i + (triggerRows * image.getWidth())];
+
+			// Draw the level editor tiles from the map.
+			int tilesCount = tilesHeight * width;
+			for (int i = 0; i < tilesCount; i++) {
+				int pixelIterator = i + (checksumPixelsCount + reservedPixelsCount);
+				this.tiles[i] = pixels[pixelIterator];
+			}
+
+			// Get and fill in the data based on the tiles obtained from above.
 			List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 			for (int i = 0; i < this.tiles.length; i++) {
 				int alpha = ((this.tiles[i] >> 24) & 0xFF);
