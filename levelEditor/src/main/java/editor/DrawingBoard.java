@@ -287,8 +287,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 					panel.add(new JLabel("  Height:"));
 					panel.add(heightField);
 					result = JOptionPane.showConfirmDialog(
-					    null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION,
-					    JOptionPane.PLAIN_MESSAGE
+						null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION,
+						JOptionPane.PLAIN_MESSAGE
 					);
 				}
 				while (Integer.valueOf(widthField.getText()) <= 0 || Integer.valueOf(heightField.getText()) <= 0);
@@ -344,8 +344,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 							return;
 						Graphics g = this.image.getGraphics();
 						BufferedImage bimg = new BufferedImage(
-						    data.image.getIconWidth(), data.image.getIconHeight(),
-						    BufferedImage.TYPE_INT_ARGB
+							data.image.getIconWidth(), data.image.getIconHeight(),
+							BufferedImage.TYPE_INT_ARGB
 						);
 						Graphics gB = bimg.getGraphics();
 						// TODO: Area Type ID must be included.
@@ -427,8 +427,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 						// Tile.WIDTH, Tile.HEIGHT, null);
 						Graphics gD = this.image.getGraphics();
 						BufferedImage bimg = new BufferedImage(
-						    data.image.getIconWidth(), data.image.getIconHeight(),
-						    BufferedImage.TYPE_INT_ARGB
+							data.image.getIconWidth(), data.image.getIconHeight(),
+							BufferedImage.TYPE_INT_ARGB
 						);
 						Graphics gB = bimg.getGraphics();
 						// TODO: Area Type ID must be included.
@@ -715,8 +715,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		if (this.bitmapWidth * this.bitmapHeight == 0)
 			return null;
 
+		// Get the checksum and relevant information.
+		byte[] checksumBytes = this.editor.getChecksum().getBytes();
+
 		// Represents how many reserved pixels that will be used before creating the bitmap.
-		final int usedReservedPixelsCount = 1;
+		final int usedReservedPixelsCount = 1 + (checksumBytes.length / 4);
 
 		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
 		// designated as ID 0.
@@ -739,6 +742,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		// pixels we had reserved.
 		int areaID = this.editor.getUniqueAreaID();
 		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerSize));
+
+		// Add the checksum after the first pixel.
+		for (int i = 0, pixelIterator = 1; i < checksumBytes.length; i += 4, pixelIterator++) {
+			pixels[pixelIterator] = (checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3];
+		}
 
 		// Place the trigger data inside the trigger section in the bitmap file. This is usually located at
 		// the top of the bitmap file.

@@ -39,6 +39,7 @@ public class LevelEditor extends JFrame {
 	public static final int SIZE = 4;
 	public static final String NAME_TITLE = "Level Editor (Hobby)";
 	public static final String SAVED_PATH_DATA = "cache.ini";
+	public static final int CHECKSUM_MAX_LENGTH = 16;
 	public static final String defaultPath = Paths.get("").toAbsolutePath().toString();
 
 	// For cache directory path index, fixed index in the array list.
@@ -142,7 +143,6 @@ public class LevelEditor extends JFrame {
 				LevelEditor.this.initialize();
 			}
 		});
-
 		this.createOrReadCache();
 	}
 
@@ -269,8 +269,19 @@ public class LevelEditor extends JFrame {
 	}
 
 	public String generateChecksum() {
-		this.sha2Checksum = Sha2Utils.generateRandom(UUID.randomUUID().toString());
+		this.sha2Checksum = Sha2Utils.generateRandom(UUID.randomUUID().toString()).substring(0, LevelEditor.CHECKSUM_MAX_LENGTH);
 		return this.sha2Checksum;
+	}
+
+	public void refresh() {
+		this.drawingBoardPanel.revalidate();
+		this.drawingBoardPanel.repaint();
+		this.properties.revalidate();
+		this.properties.repaint();
+		this.controlPanel.revalidate();
+		this.controlPanel.repaint();
+		this.fileControlPanel.revalidate();
+		this.fileControlPanel.repaint();
 	}
 
 	// --------------------------------------------------------------------------------
