@@ -306,6 +306,11 @@ public class ScriptEditor extends JFrame {
 	 */
 	public void save(File script) {
 		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)))) {
+			// Write the editor session's checksum here
+			String sha2Checksum = this.getLevelEditorParent().retrieveChecksum();
+			writer.write(sha2Checksum);
+			writer.newLine();
+
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Trigger t = model.get(i);

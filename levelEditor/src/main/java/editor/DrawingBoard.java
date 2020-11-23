@@ -13,7 +13,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
@@ -271,28 +274,49 @@ public class DrawingBoard extends Canvas implements Runnable {
 		this.editor.input.offsetY = this.offsetY;
 	}
 
-	public void newImage() {
+	public void createNewImage() {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				JTextField widthField;
 				JTextField heightField;
+				JTextField filenameField;
 				int result;
+
 				do {
+					filenameField = new JTextField(LevelEditor.defaultUnsavedFilename);
 					widthField = new JTextField("10");
 					heightField = new JTextField("10");
-					JPanel panel = new JPanel(new GridLayout(1, 2));
-					panel.add(new JLabel("  Width:"));
-					panel.add(widthField);
-					panel.add(new JLabel("  Height:"));
-					panel.add(heightField);
+
+					JPanel filenamePanel = new JPanel(new GridBagLayout());
+					JLabel filenameLabel = DrawingBoard.this.makeLabel("Filename:", 75, 10);
+					filenamePanel.add(filenameLabel, DrawingBoard.this.makeGridBagConstraints(1, 1, 0, 1));
+					filenamePanel.add(filenameField, DrawingBoard.this.makeGridBagConstraints(2, 1, 1, 1));
+
+					GridLayout gridLayout = new GridLayout(1, 2);
+					gridLayout.setHgap(5);
+					JPanel widthHeightPanel = new JPanel(gridLayout);
+					JLabel widthLabel = DrawingBoard.this.makeLabel("Width:", 70, 10);
+					JLabel heightLabel = DrawingBoard.this.makeLabel("Height:", 70, 10);
+					widthHeightPanel.add(widthLabel);
+					widthHeightPanel.add(widthField);
+					widthHeightPanel.add(heightLabel);
+					widthHeightPanel.add(heightField);
+
+					JPanel mainPanel = new JPanel(new GridLayout(2, 1));
+					mainPanel.add(filenamePanel);
+					mainPanel.add(widthHeightPanel);
+
 					result = JOptionPane.showConfirmDialog(
-					    null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION,
-					    JOptionPane.PLAIN_MESSAGE
+					    null, mainPanel, "Create New Area", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
 					);
 				}
 				while (Integer.valueOf(widthField.getText()) <= 0 || Integer.valueOf(heightField.getText()) <= 0);
+
 				if (result == JOptionPane.OK_OPTION) {
+					String filename = filenameField.getText();
+					DrawingBoard.this.editor.setMapAreaName(filename);
+					DrawingBoard.this.editor.generateNewChecksum();
 					DrawingBoard.this.setImageSize(Integer.valueOf(widthField.getText()), Integer.valueOf(heightField.getText()));
 				}
 			}
@@ -702,15 +726,23 @@ public class DrawingBoard extends Canvas implements Runnable {
 	/**
 	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is
 	 * necessary.
+	 * <p>
+	 * This method is primarily used to generate the bitmap image, thus it contains many data required
+	 * to be fetched from the LevelEditor.
 	 * 
 	 * @return <b>BufferedImage</b> object containing the triggers and tilesets data.
 	 */
-	public BufferedImage getMapImage() {
+	public BufferedImage createMapImage() {
 		if (this.bitmapWidth * this.bitmapHeight == 0)
 			return null;
 
+		// Retrieving a SHA-2 checksum and storing the values in the BufferedImage from the LevelEditor.
+		final String sha2Checksum = this.editor.retrieveChecksum();
+		byte[] checksumBytes = sha2Checksum.getBytes();
+		int checksumBytesSize = checksumBytes.length;
+
 		// Represents how many reserved pixels that will be used before creating the bitmap.
-		final int usedReservedPixelsCount = 1;
+		final int usedReservedPixelsCount = (checksumBytesSize / 4) + 1;
 
 		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
 		// designated as ID 0.
@@ -726,36 +758,43 @@ public class DrawingBoard extends Canvas implements Runnable {
 		int rows = (triggerSize + usedReservedPixelsCount) / this.bitmapWidth;
 		int triggerRowHeight = ((triggerSize + usedReservedPixelsCount) % this.bitmapWidth > 0 ? rows + 1 : rows);
 
+		// Create the buffered image with the additional trigger data rows added to the height.
 		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + triggerRowHeight, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
+		int pixelIterator = 0;
+
+		// Add the checksum to the pixels.
+		for (int i = 0; i < checksumBytesSize; i += 4, pixelIterator++) {
+			pixels[pixelIterator] = (checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3];
+		}
 
 		// Storing important area information in the first pixel. This should use up all of the number of
 		// pixels we had reserved.
 		int areaID = this.editor.getUniqueAreaID();
-		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerSize));
+		pixels[pixelIterator++] = (((areaID & 0xFFFF) << 16) | (triggerSize));
 
 		// Place the trigger data inside the trigger section in the bitmap file. This is usually located at
 		// the top of the bitmap file.
 		int columnIndex = 0;
 		int rowIndex = 0;
-		for (int i = 0; i < triggerSize; i++) {
+		for (int i = 0; i < triggerSize; i++, pixelIterator++) {
 			// The index "i" must be in range of 0 ~ list.size(). The "width" must include the reserved pixels
 			// count as offset.
-			int pixelIndex = i + usedReservedPixelsCount;
-			columnIndex = pixelIndex % this.bitmapWidth;
-			rowIndex = pixelIndex / this.bitmapWidth;
+			columnIndex = pixelIterator % this.bitmapWidth;
+			rowIndex = pixelIterator / this.bitmapWidth;
 			pixels[columnIndex + (rowIndex * this.bitmapWidth)] = list.get(i).intValue();
 		}
 
 		// Pad out the trigger section with -1 if the current iterator is not inside the tileset section.
 		// This marks null trigger data, and should be ignored when the game is reading this padded part of
 		// the triggers section.
-		for (int i = columnIndex + usedReservedPixelsCount; i < this.bitmapWidth; i++) {
+		for (int i = columnIndex + usedReservedPixelsCount; i < this.bitmapWidth; i++, pixelIterator++) {
 			pixels[i + (rowIndex * this.bitmapWidth)] = -1;
 		}
 
 		// Then place the tileset data inside the tileset section in the bitmap file. This is the rest of
-		// the bitmap file, right after the trigger section.
+		// the bitmap file, right after the trigger section. The iteration calculation is already taking
+		// into account all of the reserved pixels count and all of the trigger IDs.
 		for (int iterator = 0; iterator < this.tiles.length; iterator++) {
 			pixels[this.bitmapWidth * triggerRowHeight + iterator] = this.tiles[iterator];
 		}
@@ -772,21 +811,38 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 	public void openMapImage(BufferedImage image) {
 		try {
-			int[] srcTiles = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
-			this.editor.setUniqueAreaID((srcTiles[0] >> 16) & 0xFFFF);
-			int triggerCount = srcTiles[0] & 0xFFFF;
+			// Load all pixels from the buffered image.
+			int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+			int pixelsIterator = 0;
+
+			// Read back the checksum from the buffered image.
+			pixelsIterator = this.editor.loadSavedChecksum(pixels, pixelsIterator);
+
+			// Determine the offset by size of the reserved bytes count.
+			final int reservedPixelsCount = pixelsIterator + 1;
+
+			// Load the trigger tiles data from the image.
+			int triggerByte = pixels[pixelsIterator];
+			this.editor.setUniqueAreaID((triggerByte >> 16) & 0xFFFF);
+			int triggerCount = triggerByte & 0xFFFF;
 			int triggerRows = (triggerCount / image.getWidth()) + 1;
 			this.setImageSize(image.getWidth(), (image.getHeight() - triggerRows));
-			if (this.triggers != null)
-				this.triggers = null;
+
+			// Load the trigger data.
 			this.triggers = new TriggerSet(image.getWidth(), (image.getHeight() - triggerRows));
 			for (int i = 0; i < triggerCount; i++) {
-				int x = (srcTiles[i + 1] >> 24) & 0xFF;
-				int y = (srcTiles[i + 1] >> 16) & 0xFF;
-				this.triggers.addTriggerById(y * image.getWidth() + x, srcTiles[i + 1]);
+				int x = (pixels[i + reservedPixelsCount] >> 24) & 0xFF;
+				int y = (pixels[i + reservedPixelsCount] >> 16) & 0xFF;
+				this.triggers.addTriggerById(y * image.getWidth() + x, pixels[i + reservedPixelsCount]);
 			}
-			for (int i = 0; i < srcTiles.length - (triggerRows * image.getWidth()); i++)
-				this.tiles[i] = srcTiles[i + (triggerRows * image.getWidth())];
+
+			// Load the tiles from the image.
+			int tilesSize = pixels.length - (triggerRows * image.getWidth()) - reservedPixelsCount;
+			for (int i = 0; i < tilesSize; i++) {
+				this.tiles[i] = pixels[i + (triggerRows * image.getWidth()) + reservedPixelsCount];
+			}
+
+			// Prepare the data for level editor.
 			List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 			for (int i = 0; i < this.tiles.length; i++) {
 				int alpha = ((this.tiles[i] >> 24) & 0xFF);
@@ -941,4 +997,40 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
+	private GridBagConstraints makeGridBagConstraints(int width, int height, int x, int y) {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridwidth = width;
+		gbc.gridheight = height;
+		gbc.gridx = x;
+		gbc.gridy = y;
+		gbc.weightx = x;
+		gbc.weighty = 1.0;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.anchor = (x == 0) ? GridBagConstraints.LINE_START : GridBagConstraints.LINE_END;
+		return gbc;
+	}
+
+	/**
+	 * Going CSS-styled clockwise fashion, determines the size of the insets.
+	 * 
+	 * @param top
+	 * @param right
+	 * @param bottom
+	 * @param left
+	 * @return
+	 */
+	private GridBagConstraints makeInsets(int top, int right, int bottom, int left) {
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = new Insets(top, left, bottom, right);
+		return gbc;
+	}
+
+	private JLabel makeLabel(String labelName, int width, int height) {
+		Dimension dimension = new Dimension(width, height);
+		JLabel label = new JLabel(labelName);
+		label.setMinimumSize(dimension);
+		label.setPreferredSize(dimension);
+		label.setMaximumSize(dimension);
+		return label;
+	}
 }

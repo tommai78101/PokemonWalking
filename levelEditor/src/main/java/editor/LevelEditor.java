@@ -12,6 +12,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -24,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import common.Debug;
+import common.Sha2Utils;
 import common.Tileable;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
@@ -35,8 +37,10 @@ public class LevelEditor extends JFrame {
 	public static final int WIDTH = 160;
 	public static final int HEIGHT = 144;
 	public static final int SIZE = 4;
+	public static final int CHECKSUM_LENGTH = 16;
 	public static final String NAME_TITLE = "Level Editor (Hobby)";
 	public static final String SAVED_PATH_DATA = "cache.ini";
+	public static final String defaultUnsavedFilename = "Untitled";
 	public static final String defaultPath = Paths.get("").toAbsolutePath().toString();
 
 	// For cache directory path index, fixed index in the array list.
@@ -57,7 +61,8 @@ public class LevelEditor extends JFrame {
 
 	private int uniqueAreaID;
 
-	@SuppressWarnings("unused")
+	// The central place to store SHA-2 checksums for both the LevelEditor and the ScriptEditor.
+	private String sha2Checksum = "";
 	private String mapAreaName;
 
 	public LevelEditor(String name) {
@@ -71,10 +76,14 @@ public class LevelEditor extends JFrame {
 		this.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.pack();
-		this.setSize(size);// Mac issue.
-		this.setPreferredSize(size); // Mac issue.
-		this.setMinimumSize(size); // Mac issue.
-		this.setMaximumSize(size); // Mac issue.
+
+		// The following 4 settings are placed here to resolve Mac OS issues related to Java Swing.
+		// The order of operations is extremely sensitive here.
+		this.setSize(size);
+		this.setPreferredSize(size);
+		this.setMinimumSize(size);
+		this.setMaximumSize(size);
+
 		this.setVisible(true);
 
 		this.addWindowListener(new WindowAdapter() {
@@ -213,8 +222,8 @@ public class LevelEditor extends JFrame {
 					else {
 						try {
 							LevelEditor.this.statusPanel.setMousePositionText(
-								LevelEditor.this.input.oldX / LevelEditor.this.drawingBoardPanel.getBitmapWidth(),
-								LevelEditor.this.input.oldY / LevelEditor.this.drawingBoardPanel.getBitmapHeight()
+							    LevelEditor.this.input.oldX / LevelEditor.this.drawingBoardPanel.getBitmapWidth(),
+							    LevelEditor.this.input.oldY / LevelEditor.this.drawingBoardPanel.getBitmapHeight()
 							);
 						}
 						catch (Exception e) {
@@ -242,11 +251,17 @@ public class LevelEditor extends JFrame {
 	public final void initialize() {
 		EditorConstants.metadata = Metadata.Pixel_Data;
 		this.drawingBoardPanel.newImage(15, 15);
-		this.setMapAreaName("Untitled");
+		this.setMapAreaName(LevelEditor.defaultUnsavedFilename);
+		this.generateNewChecksum();
 	}
 
 	public void setMapAreaName(String name) {
 		this.mapAreaName = name;
+		this.setTitle(LevelEditor.NAME_TITLE + " - " + this.mapAreaName);
+	}
+
+	public String getMapAreaName() {
+		return this.mapAreaName;
 	}
 
 	public int getUniqueAreaID() {
@@ -255,6 +270,40 @@ public class LevelEditor extends JFrame {
 
 	public void setUniqueAreaID(int uniqueAreaID) {
 		this.uniqueAreaID = uniqueAreaID;
+	}
+
+	/**
+	 * Generate the SHA-512 checksum when creating a new map file.
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public String generateNewChecksum() {
+		this.sha2Checksum = Sha2Utils.generateRandom(this.mapAreaName).substring(0, LevelEditor.CHECKSUM_LENGTH);
+		return this.sha2Checksum;
+	}
+
+	/**
+	 * Retrieves the current SHA-512 checksum.
+	 * 
+	 * @return
+	 */
+	public String retrieveChecksum() {
+		return this.sha2Checksum;
+	}
+
+	public int loadSavedChecksum(int[] pixels, int startIndex) {
+		int read = 0;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		for (int i = 0; i < LevelEditor.CHECKSUM_LENGTH; i++, read++) {
+			int data = pixels[i];
+			baos.write((data >> 24) & 0xFF);
+			baos.write((data >> 16) & 0xFF);
+			baos.write((data >> 8) & 0xFF);
+			baos.write(data & 0xFF);
+		}
+		this.sha2Checksum = baos.toString();
+		return read;
 	}
 
 	// --------------------------------------------------------------------------------

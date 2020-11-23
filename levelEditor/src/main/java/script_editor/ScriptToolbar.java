@@ -22,6 +22,7 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import common.Debug;
 import editor.EditorFileChooser;
 import editor.EditorMouseListener;
 import editor.FileControl;
@@ -63,7 +64,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		final EditorFileChooser chooser = new EditorFileChooser();
+		final EditorFileChooser chooser = new EditorFileChooser(this.editor.getLevelEditorParent().getMapAreaName());
 		final EditorMouseListener mouseListener = new EditorMouseListener(chooser);
 
 		switch (Integer.valueOf(event.getActionCommand())) {
@@ -95,7 +96,9 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 			}
 			case 1: { // Save Session
 				try (RandomAccessFile raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
-					raf.readLine(); // The second line in the cache is for the Script Editor.
+					// Skip the first line mainly because it holds irrelevant data.
+					raf.readLine();
+					// The second line in the cache is for the Script Editor.
 					ScriptEditor.lastSavedDirectory = new File(raf.readLine());
 				}
 				catch (IOException e) {
@@ -136,11 +139,12 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					this.editor.setModifiedFlag(false);
 
 					try (RandomAccessFile rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
+						// Skip the first line because it holds irrelevant data.
 						rf.readLine();
 						rf.writeBytes(ScriptEditor.lastSavedDirectory.getAbsolutePath());
 					}
 					catch (IOException e) {
-						e.printStackTrace();
+						Debug.error("Unable to save the script file.", e);
 					}
 				}
 				break;

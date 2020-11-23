@@ -13,7 +13,6 @@ import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -72,8 +71,7 @@ public class FileControl extends JPanel implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent event) {
-		final EditorFileChooser chooser = new EditorFileChooser();
-		final EditorMouseListener mouseListener = new EditorMouseListener(chooser);
+		final EditorFileChooser chooser = new EditorFileChooser(this.editor.getMapAreaName());
 		JButton button = (JButton) event.getSource();
 		String command = button.getActionCommand();
 		try {
@@ -81,8 +79,7 @@ public class FileControl extends JPanel implements ActionListener {
 			switch (value) {
 				case 0: // New
 				{
-					this.editor.drawingBoardPanel.newImage();
-					this.editor.setMapAreaName("Untitled");
+					this.editor.drawingBoardPanel.createNewImage();
 					break;
 				}
 				case 1: { // Save
@@ -99,18 +96,20 @@ public class FileControl extends JPanel implements ActionListener {
 						FileControl.lastSavedDirectory = new File(FileControl.defaultPath);
 					}
 
+					/*
 					JList<Class<?>> list = this.findFileList(chooser);
 					LOOP_TEMP:
 					for (MouseListener l : list.getMouseListeners()) {
 						// If the class name do not contain "FilePane", we continue iterating.
 						if (l.getClass().getName().indexOf("FilePane") < 0)
 							continue;
-
+					
 						list.removeMouseListener(l);
-						list.addMouseListener(mouseListener);
 						break LOOP_TEMP;
 					}
-					chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+					*/
+
+					chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 					chooser.setCurrentDirectory(FileControl.lastSavedDirectory);
 					chooser.setFileFilter(new FileNameExtensionFilter("PNG files", "png"));
 					chooser.setVisible(true);
@@ -120,19 +119,18 @@ public class FileControl extends JPanel implements ActionListener {
 						FileControl.lastSavedDirectory = chooser.getCurrentDirectory();
 
 						try (RandomAccessFile cacheFile = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
-							BufferedImage img = this.editor.drawingBoardPanel.getMapImage();
-							if (img == null)
+							BufferedImage img = this.editor.drawingBoardPanel.createMapImage();
+							if (img == null) {
+								Debug.error("Unable to create and save the map image.");
 								break;
-							File file = chooser.getSelectedFile();
-							String filename = file.getName();
-							while (filename.endsWith(".png"))
-								filename = filename.substring(0, filename.length() - ".png".length());
+							}
+
+							String filename = this.editor.getMapAreaName();
 							ImageIO.write(
 							    img, "png", new File(
 							        FileControl.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"
 							    )
 							);
-							this.editor.setMapAreaName(filename);
 
 							// Storing the last approved current directory into the cache file.
 							this.cacheDirectories.set(LevelEditor.FileControlIndex, FileControl.lastSavedDirectory.getAbsolutePath());
@@ -154,17 +152,19 @@ public class FileControl extends JPanel implements ActionListener {
 						FileControl.lastSavedDirectory = new File(FileControl.defaultPath);
 					}
 
+					/*
 					JList<Class<?>> list = this.findFileList(chooser);
 					LOOP_TEMP1:
 					for (MouseListener l : list.getMouseListeners()) {
 						// If "FilePane" cannot be found in the name of the class object, we continue iterating.
 						if (l.getClass().getName().indexOf("FilePane") < 0)
 							continue;
-
+					
 						list.removeMouseListener(l);
-						list.addMouseListener(mouseListener);
 						break LOOP_TEMP1;
 					}
+					*/
+
 					chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 					chooser.setCurrentDirectory(FileControl.lastSavedDirectory);
 					chooser.setFileFilter(new FileNameExtensionFilter("PNG files", "png"));
@@ -174,10 +174,11 @@ public class FileControl extends JPanel implements ActionListener {
 						try (RandomAccessFile cacheFile = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 							File f = chooser.getSelectedFile();
 							FileControl.lastSavedDirectory = f.getParentFile();
-							this.editor.setTitle(LevelEditor.NAME_TITLE + " - " + f);
+							String filename = f.getName();
 							BufferedImage image = ImageIO.read(f);
+
+							this.editor.setMapAreaName(filename.replaceAll(".png", ""));
 							this.editor.drawingBoardPanel.openMapImage(image);
-							this.editor.setMapAreaName(f.getName().substring(0, f.getName().length() - ".png".length()));
 
 							// Setting Area ID
 							TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();

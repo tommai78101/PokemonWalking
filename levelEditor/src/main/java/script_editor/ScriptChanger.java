@@ -613,9 +613,6 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				SwingUtilities.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						String str = ScriptChanger.this.editor.getTitle();
-						if (!str.endsWith("*"))
-							ScriptChanger.this.editor.setTitle(str + "*");
 						ScriptChanger.this.editor.setModifiedFlag(true);
 					}
 				});
