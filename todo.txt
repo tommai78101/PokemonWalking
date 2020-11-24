@@ -1,8 +1,22 @@
 By line order (Specific --> Abstract):
 
+---------------- (Nov 23, 2020) -------------------
+
+TODO: Redesign the Script Editor UI, so that only:
+1. Level Editor can save and load both map area and script files.
+2. Level Editor determines where to save/load the map area and script files from.
+3. Level Editor should allow the user to save/load the map area from the official "area" directory, official "script" directory, or the all-in-one "mod" directory.
+4. If the user chooses a directory not from these 3 places, both the map area and the script files will be saved together.
+5. If the user chooses the "area" directory or "script" directory, then the map area will be saved to the "area" directory, and scripts to the "script" directory.
+6. If the user chooses the "mod" directory, the map area will be saved to the "mod/area" directory, the script files will be saved in the "mod/script" directory.
+7. When loading an area file or a script file, use the checksum to determine where the required files are at, from these places.
+8. If no required files were detected, do not attempt to continue loading the level editor session. Throw some dialog messages or something to warn the user.
+
+---------------- (Jun 25, 2015) -------------------
+
 BEFORE CONTINUING WITH THIS LIST OF TODOs:
 
-Open the project and look at the Tasks view. That contains the full list othings needed to be done. Contains (FIXME) Area.javaand (TODO).
+Open the project and look at the Tasks view. That contains the full list othings needed to be done. Contains (FIXME) Area.java and (TODO).
 
 
 DEBUG (NewDialogue.java): Needs testing to see if there's any problem with	NewDialogue.
