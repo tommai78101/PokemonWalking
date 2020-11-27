@@ -1,5 +1,6 @@
 package script;
 
+import java.awt.Graphics2D;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,80 +11,50 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import common.Debug;
+import constants.ScriptTag;
 import dialogue.Dialogue;
-import utility.Debug;
+import entity.Player;
+import level.Area;
+import screen.Scene;
 import utility.DialogueBuilder;
 
+/**
+ * A "script", or "event", is a unit of scripted actions in the game. Each unit of scripted actions
+ * contains many different event actions, such as:
+ * <ul>
+ * <li>How many dialogues to display.
+ * <li>How many movements a player or an NPC will follow.
+ * <li>Affirmative and negative responses and different paths to choose
+ * <li>And many more that are related to the scripted event.
+ * </ul>
+ * <p>
+ * A script file will contain one or many "scripts".
+ * 
+ * @author tlee
+ */
 public class Script {
-	private enum ScriptTag {
-		ScriptName("@"),
-		Comment("/"),
-		BeginScript("$"),
-		PathData("^"),
-		EndScript("%"),
-		Speech("#"),
-		Question("?"),
-		Affirm("+"),
-		Reject("-"),
-		Confirm("["),
-		Deny("]"),
-		Repeat(";"),
-		Repeatable(";");
+	private int triggerID;
+	private ArrayList<Map.Entry<Integer, MovementData>> moves;
+	private ArrayList<Map.Entry<Integer, MovementData>> affirmativeMoves;
+	private ArrayList<Map.Entry<Integer, MovementData>> negativeMoves;
+	private ArrayList<Map.Entry<Integer, Dialogue>> dialogues;
+	private ArrayList<Map.Entry<Integer, Dialogue>> affirmativeDialogues;
+	private ArrayList<Map.Entry<Integer, Dialogue>> negativeDialogues;
+	private Map.Entry<Integer, Integer> remainingMoves;
+	private int scriptIteration;
+	private int affirmativeIteration;
+	private int negativeIteration;
+	private Boolean questionResponse;
+	private boolean finished;
+	private boolean repeat;
+	private boolean enabled;
+	private boolean hasRecentlyReset;
 
-		private String symbol;
-
-		private ScriptTag(String sym) {
-			this.symbol = sym;
-		}
-
-		/**
-		 * Checks if the line starts with either the symbol representation, or the tag name.
-		 * 
-		 * @param line
-		 * @return True if either the symbol or the tag name matches. False, if otherwise.
-		 */
-		public boolean beginsAt(String line) {
-			if (line == null || line.isEmpty() || line.isBlank())
-				return false;
-			if (line.length() < this.name().length())
-				return line.startsWith(this.symbol);
-			else if (line.startsWith(this.symbol))
-				return true;
-			else
-				return line.regionMatches(true, 0, this.name(), 0, this.name().length());
-		}
-
-		/**
-		 * Replaces the first occurrence of the tag name with the equivalent symbol representation.
-		 * <p>
-		 * Otherwise, if the line already has the symbol representation, then it does nothing.
-		 * 
-		 * @param line
-		 * @return The replaced line.
-		 */
-		public String replace(String line) {
-			if (line.startsWith(this.symbol))
-				return line;
-			return line.replaceFirst(Pattern.quote(this.name()), Matcher.quoteReplacement(this.symbol));
-		}
-	}
-
-	public int triggerID;
-	public ArrayList<Map.Entry<Integer, MovementData>> moves;
-	public ArrayList<Map.Entry<Integer, MovementData>> affirmativeMoves;
-	public ArrayList<Map.Entry<Integer, MovementData>> negativeMoves;
-	public ArrayList<Map.Entry<Integer, Dialogue>> dialogues;
-	public ArrayList<Map.Entry<Integer, Dialogue>> affirmativeDialogues;
-	public ArrayList<Map.Entry<Integer, Dialogue>> negativeDialogues;
-	public int iteration;
-	public int affirmativeIteration;
-	public int negativeIteration;
-	public Boolean questionResponse;
-	public boolean repeat;
-
+	/**
+	 * Constructor of the Script object, which holds a single scripted event defined in the script file.
+	 */
 	public Script() {
 		this.triggerID = 0;
 		this.moves = new ArrayList<>();
@@ -92,15 +63,21 @@ public class Script {
 		this.dialogues = new ArrayList<>();
 		this.affirmativeDialogues = new ArrayList<>();
 		this.negativeDialogues = new ArrayList<>();
-		this.iteration = 0;
+		this.scriptIteration = 0;
 		this.affirmativeIteration = 0;
 		this.negativeIteration = 0;
 		this.questionResponse = null;
 		this.repeat = false;
+		this.finished = false;
+		this.enabled = true;
 	}
 
+	/**
+	 * Deep copying of the given Script object.
+	 * 
+	 * @param s
+	 */
 	public Script(Script s) {
-		// Deep copy
 		this.triggerID = s.triggerID;
 
 		this.moves = new ArrayList<>();
@@ -110,39 +87,50 @@ public class Script {
 		this.affirmativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, MovementData> e : s.affirmativeMoves)
 			this.affirmativeMoves
-				.add(Map.entry(e.getKey(), new MovementData(e.getValue())));
+			    .add(Map.entry(e.getKey(), new MovementData(e.getValue())));
 
 		this.negativeMoves = new ArrayList<>();
 		for (Map.Entry<Integer, MovementData> e : s.negativeMoves)
 			this.negativeMoves
-				.add(Map.entry(e.getKey(), new MovementData(e.getValue())));
+			    .add(Map.entry(e.getKey(), new MovementData(e.getValue())));
 
 		this.dialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.dialogues)
 			this.dialogues
-				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
+			    .add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
 		this.affirmativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.affirmativeDialogues)
 			this.affirmativeDialogues
-				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
+			    .add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
 		this.negativeDialogues = new ArrayList<>();
 		for (Map.Entry<Integer, Dialogue> e : s.negativeDialogues)
 			this.negativeDialogues
-				.add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
+			    .add(Map.entry(e.getKey(), new Dialogue(e.getValue())));
 
-		this.iteration = s.iteration;
+		this.scriptIteration = s.scriptIteration;
 		this.affirmativeIteration = s.affirmativeIteration;
 		this.negativeIteration = s.negativeIteration;
 		this.questionResponse = s.questionResponse;
 		this.repeat = s.repeat;
+		this.finished = s.finished;
+		this.enabled = s.enabled;
 	}
 
+	// --------------------------------------------------------------------------------------
+	// Public methods.
+
+	/**
+	 * Returns the current scripted movement action depending on what type of response the player has
+	 * given in the game.
+	 * 
+	 * @return
+	 */
 	public MovementData getIteratedMoves() {
 		if (this.questionResponse == null) {
 			for (Map.Entry<Integer, MovementData> entry : this.moves) {
-				if (entry.getKey() == this.iteration)
+				if (entry.getKey() == this.scriptIteration)
 					return entry.getValue();
 			}
 		}
@@ -161,10 +149,16 @@ public class Script {
 		return null;
 	}
 
+	/**
+	 * Returns the current scripted dialogue depending on what type of response the player has given in
+	 * the game.
+	 * 
+	 * @return
+	 */
 	public Dialogue getIteratedDialogues() {
 		if (this.questionResponse == null) {
 			for (Map.Entry<Integer, Dialogue> entry : this.dialogues) {
-				if (entry.getKey() == this.iteration) {
+				if (entry.getKey() == this.scriptIteration) {
 					return entry.getValue();
 				}
 			}
@@ -186,23 +180,286 @@ public class Script {
 		return null;
 	}
 
+	/**
+	 * Sets the script to execute a positive dialogue option route when the flag is set.
+	 */
 	public void setAffirmativeFlag() {
 		this.questionResponse = Boolean.TRUE;
 	}
 
+	/**
+	 * Sets the script to execute a negative dialogue option route when the flag is set.
+	 */
 	public void setNegativeFlag() {
 		this.questionResponse = Boolean.FALSE;
 	}
 
-	private void resetResponseFlag() {
-		this.questionResponse = null;
+	/**
+	 * Updates the script.
+	 * 
+	 * @param area
+	 * @param entityX
+	 * @param entityY
+	 */
+	public void tick(Area area, int entityX, int entityY) {
+		MovementData moves = this.getIteratedMoves();
+		Dialogue dialogue = this.getIteratedDialogues();
+
+		if (dialogue == null) {
+			area.getPlayer().keys.resetInputs();
+			if (area.getPlayer().isLockedWalking())
+				return;
+			if (moves.hasNextMove()) {
+				this.remainingMoves = moves.getNextMove();
+				if (this.remainingMoves.getKey() != area.getPlayer().getFacing()) {
+					area.getPlayer().setFacing(this.remainingMoves.getKey());
+					return;
+				}
+
+				int steps = this.remainingMoves.getValue();
+				if (steps >= 0) {
+					if (steps == 0)
+						area.getPlayer().setFacing(this.remainingMoves.getKey());
+					else
+						area.getPlayer().forceLockWalking();
+					steps--;
+
+					moves.updateCurrentMove(steps);
+				}
+				else {
+					this.remainingMoves = moves.getNextMove();
+					int direction = moves.getNextMoveDirection();
+					if (direction != area.getPlayer().getFacing())
+						area.getPlayer().setFacing(direction);
+				}
+			}
+			else {
+				try {
+					if (!this.incrementIteration())
+						this.finished = true;
+				}
+				catch (Exception e) {
+					this.finished = true;
+					return;
+				}
+			}
+		}
+		else {
+			switch (dialogue.getDialogueType()) {
+				case SPEECH:
+					if (dialogue.isDialogueCompleted()) {
+						if (dialogue.isScrolling()) {
+							Player.unlockMovements();
+							dialogue.tick();
+							try {
+								this.finished = !this.incrementIteration();
+							}
+							catch (Exception e) {
+								this.finished = true;
+								return;
+							}
+						}
+						else {
+							if (!dialogue.isShowingDialog()) {
+								Player.unlockMovements();
+								dialogue = null;
+								try {
+									this.finished = !this.incrementIteration();
+								}
+								catch (Exception e) {
+									this.finished = true;
+									return;
+								}
+							}
+							else
+								dialogue.tick();
+						}
+					}
+					else if (dialogue.isReady()
+					    && !(dialogue.isDialogueCompleted() && dialogue.isShowingDialog())) {
+						Player.lockMovements();
+						dialogue.tick();
+					}
+					break;
+				case QUESTION:
+					if (!dialogue.yesNoQuestionHasBeenAnswered()) {
+						dialogue.tick();
+						if (!Player.isMovementsLocked())
+							Player.lockMovements();
+						area.getPlayer().disableAutomaticMode();
+					}
+					if (dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
+						if (Player.isMovementsLocked())
+							Player.unlockMovements();
+						area.getPlayer().enableAutomaticMode();
+						dialogue = null;
+						try {
+							this.finished = !this.incrementIteration();
+						}
+						catch (Exception e) {
+							this.finished = true;
+							return;
+						}
+						this.setAffirmativeFlag();
+						this.finished = false;
+					}
+					else if (dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
+						if (Player.isMovementsLocked())
+							Player.unlockMovements();
+						area.getPlayer().enableAutomaticMode();
+						dialogue = null;
+						try {
+							this.finished = !this.incrementIteration();
+						}
+						catch (Exception e) {
+							this.finished = true;
+							return;
+						}
+						this.setNegativeFlag();
+						this.finished = false;
+					}
+					break;
+				case ALERT:
+				default:
+					break;
+			}
+		}
 	}
 
+	/**
+	 * Renders the scripted dialogue textbox.
+	 * 
+	 * @param screen
+	 * @param graphics
+	 */
+	public void render(Scene screen, Graphics2D graphics) {
+		Dialogue dialogue = this.getIteratedDialogues();
+		if (dialogue != null) {
+			dialogue.render(screen, graphics);
+		}
+	}
+
+	/**
+	 * Sets the script to be repeatable.
+	 */
+	public void setRepeating() {
+		this.repeat = true;
+	}
+
+	/**
+	 * Stops the script from being repeatable.
+	 */
+	public void stopRepeating() {
+		this.repeat = false;
+	}
+
+	/**
+	 * @return True if the script is set to repeat whenever the player triggers the script. False, if
+	 *         the script will fire off once in the game.
+	 */
+	public boolean isOnRepeat() {
+		return this.repeat;
+	}
+
+	/**
+	 * Resets the script back to its initial state. A reset history flag will be set when invoked.
+	 */
+	public void reset() {
+		this.scriptIteration = 0;
+		for (Map.Entry<Integer, MovementData> entry : this.moves) {
+			entry.getValue().reset();
+		}
+		for (Map.Entry<Integer, MovementData> entry : this.affirmativeMoves) {
+			entry.getValue().reset();
+		}
+		for (Map.Entry<Integer, MovementData> entry : this.negativeMoves) {
+			entry.getValue().reset();
+		}
+		for (Map.Entry<Integer, Dialogue> entry : this.dialogues) {
+			entry.getValue().resetDialogue();
+		}
+		for (Map.Entry<Integer, Dialogue> entry : this.affirmativeDialogues) {
+			entry.getValue().resetDialogue();
+		}
+		for (Map.Entry<Integer, Dialogue> entry : this.negativeDialogues) {
+			entry.getValue().resetDialogue();
+		}
+		this.finished = false;
+		this.hasRecentlyReset = true;
+	}
+
+	/**
+	 * Checks whether the reset history flag has been set. This flag is set only if the script has been
+	 * reset to its initial state.
+	 * 
+	 * @return
+	 */
+	public boolean hasReset() {
+		return this.hasRecentlyReset;
+	}
+
+	/**
+	 * Clears the reset history flag. This flag is set only if the script has been reset to its initial
+	 * state.
+	 */
+	public void clearReset() {
+		this.hasRecentlyReset = false;
+	}
+
+	/**
+	 * Checks whether the script has finished.
+	 * 
+	 * @return
+	 */
+	public boolean isFinished() {
+		return this.finished;
+	}
+
+	/**
+	 * Sets the script's status to be finished.
+	 */
+	public void setCompleted() {
+		this.finished = true;
+	}
+
+	/**
+	 * Turns off the script.
+	 */
+	public void turnOffScript() {
+		this.enabled = false;
+	}
+
+	/**
+	 * Turns on the script.
+	 */
+	public void turnOnScript() {
+		this.enabled = true;
+	}
+
+	/**
+	 * Checks if the script is enabled.
+	 * 
+	 * @return
+	 */
+	public boolean isScriptEnabled() {
+		return this.enabled;
+	}
+
+	/**
+	 * Increments the current iterator based on the type of response we are giving in the game. If we
+	 * are not giving an answer to a question, the current iterator will be incremented. If we are
+	 * giving an affirmative response to a question, the affirmative dialogue iterator will be
+	 * incremented. If we are giving a negative response to a question, the negative response dialogue
+	 * iterator will be incremented.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public boolean incrementIteration() throws Exception {
 		if (this.questionResponse == null) {
-			this.iteration++;
+			this.scriptIteration++;
 			int size = this.moves.size() + this.dialogues.size();
-			if (this.iteration < size)
+			if (this.scriptIteration < size)
 				return true;
 			return false;
 		}
@@ -223,6 +480,16 @@ public class Script {
 			return false;
 		}
 	}
+
+	// -------------------------------------------------------------------------------
+	// Private methods
+
+	private void resetResponseFlag() {
+		this.questionResponse = null;
+	}
+
+	// -------------------------------------------------------------------------------
+	// Static methods
 
 	/**
 	 * Loads triggers according to the script file.
@@ -265,8 +532,8 @@ public class Script {
 
 		// Try-with-resource
 		try (
-			InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-			BufferedReader reader = new BufferedReader(inputStreamReader)
+		    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+		    BufferedReader reader = new BufferedReader(inputStreamReader)
 		) {
 			String line;
 			while ((line = reader.readLine()) != null) {
@@ -309,8 +576,8 @@ public class Script {
 				else if (ScriptTag.Speech.beginsAt(line)) {
 					line = ScriptTag.Speech.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
+					    line.substring(1).trim().replace("_", " "),
+					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.dialogues.add(Map.entry(iteration, d));
 					iteration++;
@@ -320,8 +587,8 @@ public class Script {
 				else if (ScriptTag.Question.beginsAt(line)) {
 					line = ScriptTag.Question.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
+					    line.substring(1).trim().replace("_", " "),
+					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
 					);
 					script.dialogues.add(Map.entry(iteration, d));
 					iteration++;
@@ -331,11 +598,11 @@ public class Script {
 				else if (ScriptTag.Affirm.beginsAt(line)) {
 					line = ScriptTag.Affirm.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
+					    line.substring(1).trim().replace("_", " "),
+					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.affirmativeDialogues
-						.add(Map.entry(affirmativeIteration, d));
+					    .add(Map.entry(affirmativeIteration, d));
 					affirmativeIteration++;
 				}
 
@@ -343,11 +610,11 @@ public class Script {
 				else if (ScriptTag.Reject.beginsAt(line)) {
 					line = ScriptTag.Reject.replace(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
-						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
+					    line.substring(1).trim().replace("_", " "),
+					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.negativeDialogues
-						.add(Map.entry(negativeIteration, d));
+					    .add(Map.entry(negativeIteration, d));
 					negativeIteration++;
 				}
 
@@ -358,7 +625,7 @@ public class Script {
 						line = ScriptTag.Confirm.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.affirmativeMoves
-							.add(Map.entry(affirmativeIteration, moves));
+						    .add(Map.entry(affirmativeIteration, moves));
 						affirmativeIteration++;
 					}
 				}
@@ -370,7 +637,7 @@ public class Script {
 						line = ScriptTag.Deny.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.negativeMoves
-							.add(Map.entry(negativeIteration, moves));
+						    .add(Map.entry(negativeIteration, moves));
 						negativeIteration++;
 					}
 				}
@@ -396,48 +663,6 @@ public class Script {
 		}
 		return result;
 	}
-
-	private static void append(MovementData moves, char[] list) {
-		int direction = -1;
-		int steps = -1;
-
-		try {
-			for (int i = 0; i < list.length; i += 2) {
-				char d = list[i];
-				char s = list[i + 1];
-				switch (d) {
-					case 'U':
-						direction = abstracts.Character.UP;
-						break;
-					case 'D':
-						direction = abstracts.Character.DOWN;
-						break;
-					case 'L':
-						direction = abstracts.Character.LEFT;
-						break;
-					case 'R':
-						direction = abstracts.Character.RIGHT;
-						break;
-					default:
-						direction = -1;
-						break;
-				}
-				steps = Character.getNumericValue(s);
-				if (direction != -1 && steps != -1 && steps != -2 && (steps <= 9 && steps >= 0)) {
-					Map.Entry<Integer, Integer> entry = Map.entry(direction, steps);
-					moves.moves.add(entry);
-				}
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-			throw new NumberFormatException("Incorrect script syntax from \"script.txt\"");
-		}
-	}
-
-	// -------------------------------------------------------------
-	// Static Methods
-	// -------------------------------------------------------------
 
 	/**
 	 * Load all default scripts.
@@ -495,5 +720,45 @@ public class Script {
 			}
 		}
 		return results;
+	}
+
+	// -------------------------------------------------------------
+	// Private static methods
+
+	private static void append(MovementData moves, char[] list) {
+		int direction = -1;
+		int steps = -1;
+		try {
+			for (int i = 0; i < list.length; i += 2) {
+				char d = list[i];
+				char s = list[i + 1];
+				switch (d) {
+					case 'U':
+						direction = abstracts.Character.UP;
+						break;
+					case 'D':
+						direction = abstracts.Character.DOWN;
+						break;
+					case 'L':
+						direction = abstracts.Character.LEFT;
+						break;
+					case 'R':
+						direction = abstracts.Character.RIGHT;
+						break;
+					default:
+						direction = -1;
+						break;
+				}
+				steps = Character.getNumericValue(s);
+				if (direction != -1 && steps != -1 && steps != -2 && (steps <= 9 && steps >= 0)) {
+					moves.writeOriginalMove(direction, steps);
+				}
+			}
+			moves.reset();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			throw new NumberFormatException("Incorrect script syntax from \"script.txt\"");
+		}
 	}
 }

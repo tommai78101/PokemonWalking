@@ -14,6 +14,7 @@ import abstracts.Character;
 import abstracts.Entity;
 import abstracts.Item;
 import abstracts.Obstacle;
+import common.Debug;
 import common.Tileable;
 import level.Area;
 import level.PixelData;
@@ -22,7 +23,6 @@ import main.Keys;
 import menu.Inventory;
 import resources.Art;
 import screen.Scene;
-import utility.Debug;
 
 public class Player extends Character {
 	public static boolean isMovementsLocked() {

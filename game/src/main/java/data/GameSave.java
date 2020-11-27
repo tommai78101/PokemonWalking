@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import abstracts.Character.GenderType;
+import common.Debug;
 import abstracts.Item;
 import abstracts.SubMenu;
 import data.chunk.SaveChunk;
@@ -36,7 +37,6 @@ import level.WorldConstants;
 import main.Game;
 import main.SaveDataManager;
 import menu.Inventory;
-import utility.Debug;
 
 public class GameSave {
 	/*

@@ -23,7 +23,7 @@ import abstracts.Obstacle;
 import common.Tileable;
 import entity.Player;
 import interfaces.UpdateRenderable;
-import screen.BaseBitmap;
+import screen.Bitmap;
 import screen.Scene;
 import script.TriggerData;
 
@@ -62,7 +62,7 @@ public class Area implements Tileable, UpdateRenderable {
 	private final Map<Map.Entry<Integer, Integer>, Item> areaItems = new HashMap<>();
 	private final Map<Map.Entry<Integer, Integer>, TriggerData> triggerDatas = new HashMap<>();
 
-	public Area(BaseBitmap bitmap) {
+	public Area(Bitmap bitmap) {
 		int[] tempPixels = bitmap.getPixels();
 		this.areaID = (tempPixels[0] >> 16) & 0xFFFF;
 		int triggerSize = tempPixels[0] & 0xFFFF;
@@ -125,7 +125,7 @@ public class Area implements Tileable, UpdateRenderable {
 		this.areaName = "";
 	}
 
-	public Area(BaseBitmap bitmap, final String areaName) {
+	public Area(Bitmap bitmap, final String areaName) {
 		this(bitmap);
 		this.areaName = areaName;
 	}
@@ -178,14 +178,10 @@ public class Area implements Tileable, UpdateRenderable {
 		}
 		else {
 			if (!this.player.isLockedWalking()) {
-				if (this.trigger == null)
-					this.trigger = this.checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
-				else
+				this.trigger = this.checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
+				if (this.trigger != null) {
 					this.isTriggerBeingTriggered = true;
-			}
-			else {
-				this.oldXTriggerPosition = -1;
-				this.oldYTriggerPosition = -1;
+				}
 			}
 		}
 		if (this.isTriggerBeingTriggered && this.trigger != null)
@@ -204,14 +200,13 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	private void handleTriggerActions() {
-		if (!this.trigger.isFinished()) {
+		if (this.trigger.hasActiveScript()) {
+			this.trigger.prepareActiveScript();
 			this.player.enableAutomaticMode();
 			this.trigger.tick(this, this.xPlayerPosition, this.yPlayerPosition);
 		}
 		else {
 			this.player.disableAutomaticMode();
-			this.oldXTriggerPosition = this.xPlayerPosition;
-			this.oldYTriggerPosition = this.yPlayerPosition;
 			this.isTriggerBeingTriggered = false;
 			this.trigger = null;
 		}
@@ -257,10 +252,18 @@ public class Area implements Tileable, UpdateRenderable {
 
 	private TriggerData checkForTrigger(int playerX, int playerY) {
 		TriggerData data = this.triggerDatas.get(Map.entry(playerX, playerY));
-		if (data != null && (!data.isFinished() || data.isOnRepeat())) {
-			if (this.oldXTriggerPosition == data.x && this.oldYTriggerPosition == data.y)
-				return null;
-			return data.reset();
+		TriggerData oldData = this.triggerDatas.get(Map.entry(this.oldXTriggerPosition, this.oldYTriggerPosition));
+		if (oldData != null && oldData.isPaused() && (playerX != this.oldXTriggerPosition || playerY != this.oldYTriggerPosition)) {
+			// Need to unpause old trigger data if the trigger data was previously paused and the player has
+			// left the trigger tile.
+			oldData.setPaused(false);
+			this.oldXTriggerPosition = -1;
+			this.oldYTriggerPosition = -1;
+		}
+		if (data != null && data.getXAreaPosition() == playerX && data.getYAreaPosition() == playerY) {
+			this.oldXTriggerPosition = data.getXAreaPosition();
+			this.oldYTriggerPosition = data.getYAreaPosition();
+			return data;
 		}
 		return null;
 	}
@@ -680,7 +683,7 @@ public class Area implements Tileable, UpdateRenderable {
 
 	// --------------------- STATIC METHODS -----------------------
 
-	public static int getAreaIDFromBitmap(BaseBitmap bitmap) {
+	public static int getAreaIDFromBitmap(Bitmap bitmap) {
 		if (bitmap == null) {
 			throw new IllegalArgumentException("Bitmap is null. Cannot identify area ID from null bitmap.");
 		}

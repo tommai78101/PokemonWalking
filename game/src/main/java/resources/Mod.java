@@ -19,13 +19,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import screen.BaseBitmap;
+import screen.Bitmap;
 
 public class Mod {
 	private static final String[] names = new String[] {
 		"area", "script"
 	};
-	public static List<Map.Entry<BaseBitmap, Integer>> moddedAreas = new ArrayList<>();
+	public static List<Map.Entry<Bitmap, Integer>> moddedAreas = new ArrayList<>();
 	// public static List<Map.Entry<Script, Integer>> moddedScripts = new
 	// ArrayList<Map.Entry<Script, Integer>>();
 	private static boolean hasLoaded = false;
@@ -54,7 +54,7 @@ public class Mod {
 			Collections.sort(list, Mod.ALPHABETICAL_ORDER);
 			int id = 1;
 			for (File f : list) {
-				Mod.moddedAreas.add(new AbstractMap.SimpleEntry<>(BaseBitmap.load(f), id + 1000));
+				Mod.moddedAreas.add(new AbstractMap.SimpleEntry<>(Bitmap.load(f), id + 1000));
 				id++;
 			}
 

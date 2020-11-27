@@ -126,6 +126,14 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.model.remove(this.triggerList.getSelectedIndex());
 	}
 
+	public void clearTriggers() {
+		this.triggerList.removeAll();
+	}
+
+	public void clearTriggerModel() {
+		this.model.removeAllElements();
+	}
+
 	public Trigger getSelectedTrigger() {
 		return this.selectedTrigger;
 	}
@@ -139,7 +147,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		switch (Integer.valueOf(event.getActionCommand())) {
 			default:
 				break;
-			case 0: {// Create Button
+			case 0: {// Create button
 				Trigger t = new Trigger();
 				t.setTriggerID((short) 0);
 				t.setName("<Untitled>");
@@ -159,25 +167,21 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 					this.model.remove(this.model.getSize() - 1);
 				}
 				if (this.model.isEmpty()) {
-					ScriptViewer.this.editor.scriptChanger.clear();
+					ScriptViewer.this.editor.scriptChanger.clearTextFields();
 					ScriptViewer.this.editor.scriptChanger.disableComponent();
 				}
 				break;
 			}
-			case 2: {
-				while (!this.model.isEmpty()) {
-					this.model.remove(0);
-				}
-				ScriptViewer.this.editor.scriptChanger.clear();
+			case 2: {// Clear button
+				this.clearTriggerModel();
+				ScriptViewer.this.editor.scriptChanger.clearTextFields();
 				ScriptViewer.this.editor.scriptChanger.disableComponent();
 				break;
 			}
 		}
 		this.editor.getLevelEditorParent().properties.reloadTriggers();
 		this.triggerList.validate();
-
-		super.revalidate();
-		super.repaint();
+		this.editor.refresh();
 	}
 
 	@Override

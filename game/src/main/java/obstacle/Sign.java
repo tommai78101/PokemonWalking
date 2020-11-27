@@ -4,13 +4,13 @@ import java.awt.Graphics;
 
 import abstracts.Entity;
 import abstracts.Obstacle;
+import common.Debug;
 import dialogue.Dialogue;
 import dialogue.Dialogue.DialogueType;
 import level.Area;
 import level.PixelData;
 import main.Game;
 import screen.Scene;
-import utility.Debug;
 import utility.DialogueBuilder;
 
 public class Sign extends Obstacle {

@@ -46,21 +46,6 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 		this.createButtons();
 	}
 
-	private void createButtons() {
-		for (int i = 0; i < this.tags.length; i++) {
-			if (this.tags[i].isEmpty() || this.tags[i].equals("")) {
-				this.add(new JSeparator(SwingConstants.VERTICAL));
-				continue;
-			}
-			JButton button = new JButton(this.tags[i]);
-			button.addActionListener(this);
-			String actionCommand = Integer.toString(i);
-			button.setActionCommand(actionCommand);
-			this.buttonCache.put(actionCommand, button);
-			this.add(button);
-		}
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		final EditorFileChooser chooser = new EditorFileChooser();
@@ -68,7 +53,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 
 		switch (Integer.valueOf(event.getActionCommand())) {
 			case 0: { // New Session
-				this.editor.scriptChanger.clear();
+				this.editor.scriptChanger.clearTextFields();
 				JList<Trigger> triggerList = this.editor.scriptViewer.getTriggerList();
 				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
 				model.clear();
@@ -193,6 +178,21 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 		}
 		super.revalidate();
 		super.repaint();
+	}
+
+	private void createButtons() {
+		for (int i = 0; i < this.tags.length; i++) {
+			if (this.tags[i].isEmpty() || this.tags[i].equals("")) {
+				this.add(new JSeparator(SwingConstants.VERTICAL));
+				continue;
+			}
+			JButton button = new JButton(this.tags[i]);
+			button.addActionListener(this);
+			String actionCommand = Integer.toString(i);
+			button.setActionCommand(actionCommand);
+			this.buttonCache.put(actionCommand, button);
+			this.add(button);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

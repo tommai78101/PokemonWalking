@@ -22,6 +22,7 @@ import java.util.Map;
 import abstracts.Item;
 import abstracts.Item.Category;
 import abstracts.SubMenu;
+import common.Debug;
 import common.Tileable;
 import dialogue.Dialogue;
 import entity.Player;
@@ -36,7 +37,6 @@ import main.StateManager;
 import main.StateManager.GameState;
 import resources.Art;
 import screen.Scene;
-import utility.Debug;
 import utility.DialogueBuilder;
 
 public class Inventory extends SubMenu {

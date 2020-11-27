@@ -1,9 +1,9 @@
 package abstracts;
 
+import common.Debug;
 import interfaces.CharacterActionable;
 import interfaces.Interactable;
 import level.PixelData;
-import utility.Debug;
 
 public abstract class Character extends Entity implements Interactable, CharacterActionable {
 	/**

@@ -12,21 +12,25 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
+import common.Debug;
+import common.Sha2Utils;
 import common.Tileable;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
-import utility.Debug;
 
 //TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating 
 //maps and scripts together.
@@ -37,6 +41,7 @@ public class LevelEditor extends JFrame {
 	public static final int SIZE = 4;
 	public static final String NAME_TITLE = "Level Editor (Hobby)";
 	public static final String SAVED_PATH_DATA = "cache.ini";
+	public static final int CHECKSUM_MAX_BYTES_LENGTH = 16;
 	public static final String defaultPath = Paths.get("").toAbsolutePath().toString();
 
 	// For cache directory path index, fixed index in the array list.
@@ -56,6 +61,7 @@ public class LevelEditor extends JFrame {
 	public EditorInput input;
 
 	private int uniqueAreaID;
+	private String sha2Checksum = "";
 
 	@SuppressWarnings("unused")
 	private String mapAreaName;
@@ -139,7 +145,6 @@ public class LevelEditor extends JFrame {
 				LevelEditor.this.initialize();
 			}
 		});
-
 		this.createOrReadCache();
 	}
 
@@ -255,6 +260,41 @@ public class LevelEditor extends JFrame {
 
 	public void setUniqueAreaID(int uniqueAreaID) {
 		this.uniqueAreaID = uniqueAreaID;
+	}
+
+	public String getChecksum() {
+		return this.sha2Checksum;
+	}
+
+	public void setChecksum(int[] pixels, int startIndex) {
+		int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		for (int i = 0; i < checksumPixelsCount; i++) {
+			int pixel = pixels[startIndex + i];
+			baos.write((pixel >> 24) & 0xFF);
+			baos.write((pixel >> 16) & 0xFF);
+			baos.write((pixel >> 8) & 0xFF);
+			baos.write(pixel & 0xFF);
+		}
+		// SHA-512 checksum are written using ASCII.
+		String result = baos.toString(StandardCharsets.US_ASCII);
+		this.sha2Checksum = result;
+	}
+
+	public String generateChecksum() {
+		this.sha2Checksum = Sha2Utils.generateRandom(UUID.randomUUID().toString()).substring(0, LevelEditor.CHECKSUM_MAX_BYTES_LENGTH);
+		return this.sha2Checksum;
+	}
+
+	public void refresh() {
+		this.drawingBoardPanel.revalidate();
+		this.drawingBoardPanel.repaint();
+		this.properties.revalidate();
+		this.properties.repaint();
+		this.controlPanel.revalidate();
+		this.controlPanel.repaint();
+		this.fileControlPanel.revalidate();
+		this.fileControlPanel.repaint();
 	}
 
 	// --------------------------------------------------------------------------------

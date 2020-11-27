@@ -20,15 +20,14 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 
+import common.Debug;
 import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
-import utility.Debug;
 
 public class ScriptEditor extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -154,9 +153,6 @@ public class ScriptEditor extends JFrame {
 	}
 
 	public void addingComponents() {
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -186,10 +182,31 @@ public class ScriptEditor extends JFrame {
 					ScriptEditor.this.add(ScriptEditor.this.scriptChanger, BorderLayout.CENTER);
 					ScriptEditor.this.validate();
 				}
+				ScriptEditor.this.revalidate();
+				ScriptEditor.this.repaint();
 			}
 		});
-		super.revalidate();
-		super.repaint();
+	}
+
+	public void resetComponents() {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				if (ScriptEditor.this.scriptViewer != null) {
+					ScriptEditor.this.scriptViewer.clearTriggerModel();
+					ScriptEditor.this.scriptViewer.clearTriggers();
+				}
+				if (ScriptEditor.this.scriptChanger != null) {
+					ScriptEditor.this.scriptChanger.clearTextFields();
+				}
+				ScriptEditor.this.scriptChanger.disableComponent();
+				ScriptEditor.this.refresh();
+			}
+		});
+	}
+
+	public String getEditorChecksum() {
+		return this.parent.getChecksum();
 	}
 
 	// (11/24/2014): This is where I load triggers at. This is completed, but may require
@@ -278,6 +295,19 @@ public class ScriptEditor extends JFrame {
 		super.repaint();
 	}
 
+	public void refresh() {
+		this.scriptToolbar.revalidate();
+		this.scriptToolbar.repaint();
+		this.scriptViewer.revalidate();
+		this.scriptViewer.repaint();
+		this.scriptChanger.revalidate();
+		this.scriptChanger.repaint();
+		this.parent.revalidate();
+		this.parent.repaint();
+		super.revalidate();
+		super.repaint();
+	}
+
 	public boolean isBeingModified() {
 		return this.modifiedFlag;
 	}
@@ -306,32 +336,31 @@ public class ScriptEditor extends JFrame {
 	 */
 	public void save(File script) {
 		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)))) {
+			String checksum = this.getEditorChecksum();
+			writer.write(checksum);
+			writer.newLine();
+
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Trigger t = model.get(i);
-				try {
-					writer.write("$" + Short.toString(t.getTriggerID()));
-					writer.newLine();
-					writer.write("@" + t.getName().replace(" ", "_"));
-					writer.newLine();
-					writer.write(t.getScript());
-					writer.newLine();
-					writer.write("%");
-					writer.newLine();
+				writer.write("$" + Short.toString(t.getTriggerID()));
+				writer.newLine();
+				writer.write("@" + t.getName().replace(" ", "_"));
+				writer.newLine();
+				writer.write(t.getScript());
+				writer.newLine();
+				writer.write("%");
+				writer.newLine();
 
-					// Double blank lines for separation of triggers.
-					writer.newLine();
-					writer.newLine();
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
+				// Double blank lines for separation of triggers.
+				writer.newLine();
+				writer.newLine();
 			}
+			Debug.log("Saved Location: " + script.getAbsolutePath());
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			Debug.error("Script editor failed to save script.", e);
 		}
-		Debug.log("Saved Location: " + script.getAbsolutePath());
 		super.revalidate();
 		super.repaint();
 	}

@@ -27,8 +27,8 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import common.Debug;
 import screen.Scene;
-import utility.Debug;
 
 public class MainComponent extends Canvas implements Runnable {
 

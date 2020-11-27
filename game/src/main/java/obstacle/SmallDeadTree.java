@@ -4,11 +4,11 @@ import java.awt.Graphics;
 
 import abstracts.Entity;
 import abstracts.Obstacle;
+import common.Debug;
 import dialogue.Dialogue.DialogueType;
 import level.Area;
 import level.PixelData;
 import screen.Scene;
-import utility.Debug;
 import utility.DialogueBuilder;
 
 public class SmallDeadTree extends Obstacle {

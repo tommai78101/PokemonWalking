@@ -1,228 +1,199 @@
 package script;
 
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import dialogue.Dialogue;
-import entity.Player;
 import level.Area;
 import level.WorldConstants;
 import screen.Scene;
 
+/**
+ * TriggerData refers to a tile in the Area where one or many {@linkplain Script scripts} can occur
+ * throughout the entire game. Depending on the script conditions necessary to trigger the "events"
+ * on the same tile, the script will trigger when the player lands on the TriggerData where the
+ * script is located.
+ * <p>
+ * TriggerData stores all possible {@linkplain Script scripts} that occurs on the same exact tile
+ * location. Each script should be unique from one another.
+ * 
+ * @author tlee
+ */
 public class TriggerData {
-	public int x, y;
-	public Script script;
-	public int iteration;
-	private boolean finished;
-	private boolean repeat;
-
-	private MovementData moves;
-	private Dialogue dialogue;
+	private int x;
+	private int y;
+	private Deque<Script> scripts;
+	private Deque<Script> finishedScripts;
+	private Script currentScript;
+	private boolean isPaused = false;
 
 	// TODO: Add entity ID for NPCs.
 
-	// TriggerData is for the game. Area uses TriggerData to communicate with
-	// Scripts to obtain Movements.
-
+	/**
+	 * Constructor of the TriggerData object, which stores anything related to triggers placed on the
+	 * tile.
+	 * <p>
+	 * TriggerData is for use in the Game. Area uses TriggerData to communicate with Scripts to obtain
+	 * Movements.
+	 */
 	public TriggerData() {
 		this.x = this.y = 0;
-		this.script = null;
-		this.finished = false;
+		this.currentScript = null;
+		this.scripts = new LinkedList<>();
+		this.finishedScripts = new LinkedList<>();
+		this.isPaused = false;
 	}
 
+	/**
+	 * Deep copy of the TriggerData object.
+	 * 
+	 * @param t
+	 */
 	public TriggerData(TriggerData t) {
 		this.x = t.x;
 		this.y = t.y;
-		this.script = new Script(t.script);
-		this.finished = t.finished;
+		this.currentScript = new Script(t.currentScript);
+		this.scripts = new LinkedList<>(t.scripts);
+		this.finishedScripts = new LinkedList<>(t.finishedScripts);
+		this.isPaused = t.isPaused;
 	}
 
+	/**
+	 * Initializes the trigger tile data with the information from the pixel color value.
+	 * <p>
+	 * TODO: Currently, it initializes the trigger tile data's current area position from the pixel
+	 * color value. This will need to be updated, so that we can store the position of the trigger tile
+	 * data, and match up the trigger data identification code with the right script file.
+	 * 
+	 * @param pixel
+	 * @return
+	 */
 	public TriggerData loadTriggerData(int pixel) {
 		this.x = (pixel >> 24) & 0xFF;
 		this.y = (pixel >> 16) & 0xFF;
-		if (this.finished)
-			this.finished = false;
-		List<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
-			: WorldConstants.scripts);
-		for (Script s : scriptList) {
-			if (s.triggerID == (pixel & 0xFFFF)) {
-				this.script = s;
-				if (s.repeat)
-					this.setRepeating();
-				break;
-			}
-		}
+		Set<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
+		    : WorldConstants.scripts).parallelStream().collect(Collectors.toSet());
+		this.scripts.addAll(scriptList);
 		return this;
 	}
 
+	/**
+	 * Checks if the trigger tile contains available scripts.
+	 * 
+	 * @return
+	 */
+	public boolean hasScripts() {
+		return !this.scripts.isEmpty();
+	}
+
+	/**
+	 * Checks if the trigger tile has an active script.
+	 * 
+	 * @return
+	 */
+	public boolean hasActiveScript() {
+		if (this.currentScript == null) {
+			if (!this.scripts.isEmpty() && !this.isPaused) {
+				this.currentScript = this.scripts.pop();
+			}
+		}
+		return this.currentScript != null;
+	}
+
+	/**
+	 * Prepares the trigger tile's current active script from a collection of scripts that may occur on
+	 * the same tile.
+	 */
+	public void prepareActiveScript() {
+		if (this.currentScript != null) {
+			if (!this.currentScript.isScriptEnabled() && this.currentScript.hasReset()) {
+				this.currentScript.turnOnScript();
+				this.currentScript.clearReset();
+			}
+		}
+	}
+
+	/**
+	 * Sets the trigger tile to be paused or unpaused, determined by the boolean argument.
+	 * 
+	 * @param value
+	 */
+	public void setPaused(boolean value) {
+		this.isPaused = value;
+	}
+
+	/**
+	 * Checks if the trigger tile is paused.
+	 * 
+	 * @return
+	 */
+	public boolean isPaused() {
+		return this.isPaused;
+	}
+
+	/**
+	 * Returns the X position relative to the Area's origin.
+	 * 
+	 * @return
+	 */
+	public int getXAreaPosition() {
+		return this.x;
+	}
+
+	/**
+	 * Returns the Y position relative to the Area's origin.
+	 * 
+	 * @return
+	 */
+	public int getYAreaPosition() {
+		return this.y;
+	}
+
+	/**
+	 * Updates the triggered script.
+	 * 
+	 * @param area
+	 * @param entityX
+	 * @param entityY
+	 */
 	public void tick(Area area, int entityX, int entityY) {
-		if (this.script != null) {
-			this.moves = this.script.getIteratedMoves();
-			this.dialogue = this.script.getIteratedDialogues();
-
-			if (this.moves != null && this.dialogue == null) {
-				area.getPlayer().keys.resetInputs();
-				if (area.getPlayer().isLockedWalking())
-					return;
-				ArrayList<Map.Entry<Integer, Integer>> list = this.moves.getAllMoves();
-				if (this.iteration < list.size()) {
-					Map.Entry<Integer, Integer> entry = list.get(0);
-					if (entry.getKey() != area.getPlayer().getFacing()) {
-						area.getPlayer().setFacing(entry.getKey());
-						return;
-					}
-					int steps = entry.getValue();
-					if (steps >= 0) {
-						if (steps == 0)
-							area.getPlayer().setFacing(entry.getKey());
-						else
-							area.getPlayer().forceLockWalking();
-						steps--;
-
-						// Replace the Map.Entry with a new Map.Entry that contains the updated values.
-						// Map.Entry is actually immutable, so we cannot use an unsupported operation of setting new values.
-						Map.Entry<Integer, Integer> newEntry = Map.entry(entry.getKey(), steps);
-						list.set(this.iteration, newEntry);
-					}
-					else {
-						list.remove(entry);
-						if (list.isEmpty()) {
-							this.moves = null;
-							try {
-								if (!this.script.incrementIteration())
-									this.finished = true;
-							}
-							catch (Exception e) {
-								this.finished = true;
-								return;
-							}
-						}
-						else {
-							entry = list.get(0);
-							if (entry.getKey() != area.getPlayer().getFacing())
-								area.getPlayer().setFacing(entry.getKey());
-						}
-					}
+		// No else condition. We check if the current script is no longer null.
+		if (this.currentScript != null) {
+			// The current script exists. We do actions to this script.
+			if (this.currentScript.isScriptEnabled()) {
+				if (!this.currentScript.isFinished()) {
+					this.currentScript.tick(area, entityX, entityY);
 				}
 			}
-			else if (this.moves == null && this.dialogue != null) {
-				switch (this.dialogue.getDialogueType()) {
-					case SPEECH:
-						if (this.dialogue.isDialogueCompleted()) {
-							if (this.dialogue.isScrolling()) {
-								Player.unlockMovements();
-								this.dialogue.tick();
-								try {
-									this.finished = !this.script.incrementIteration();
-								}
-								catch (Exception e) {
-									this.finished = true;
-									return;
-								}
-							}
-							else {
-								if (!this.dialogue.isShowingDialog()) {
-									Player.unlockMovements();
-									this.dialogue = null;
-									try {
-										this.finished = !this.script.incrementIteration();
-									}
-									catch (Exception e) {
-										this.finished = true;
-										return;
-									}
-								}
-								else
-									this.dialogue.tick();
-							}
-						}
-						else if (this.dialogue.isReady()
-							&& !(this.dialogue.isDialogueCompleted() && this.dialogue.isShowingDialog())) {
-							Player.lockMovements();
-							this.dialogue.tick();
-						}
-						break;
-					case QUESTION:
-						if (!this.dialogue.yesNoQuestionHasBeenAnswered()) {
-							this.dialogue.tick();
-							if (!Player.isMovementsLocked())
-								Player.lockMovements();
-							area.getPlayer().disableAutomaticMode();
-						}
-						if (this.dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
-							if (Player.isMovementsLocked())
-								Player.unlockMovements();
-							area.getPlayer().enableAutomaticMode();
-							this.dialogue = null;
-							try {
-								this.finished = !this.script.incrementIteration();
-							}
-							catch (Exception e) {
-								this.finished = true;
-								return;
-							}
-							this.script.setAffirmativeFlag();
-							this.finished = false;
-						}
-						else if (this.dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
-							if (Player.isMovementsLocked())
-								Player.unlockMovements();
-							area.getPlayer().enableAutomaticMode();
-							this.dialogue = null;
-							try {
-								this.finished = !this.script.incrementIteration();
-							}
-							catch (Exception e) {
-								this.finished = true;
-								return;
-							}
-							this.script.setNegativeFlag();
-							this.finished = false;
-						}
-						break;
-					case ALERT:
-					default:
-						break;
+			if (this.currentScript.isFinished()) {
+				if (this.currentScript.isOnRepeat()) {
+					this.currentScript.turnOffScript();
+					this.currentScript.reset();
+					// Add only the non-null script to the back of the queue.
+					this.scripts.add(this.currentScript);
 				}
+				else {
+					this.currentScript.turnOffScript();
+					// Since the script is not repeatable, we should pop the current script.
+					this.finishedScripts.add(this.currentScript);
+				}
+				this.setPaused(true);
+				this.currentScript = null;
 			}
-
 		}
 	}
 
-	public void setRepeating() {
-		this.repeat = true;
-	}
-
-	public void stopRepeating() {
-		this.repeat = false;
-	}
-
-	public boolean isOnRepeat() {
-		return this.repeat;
-	}
-
-	public TriggerData reset() {
-		this.finished = false;
-		return this;
-	}
-
+	/**
+	 * Renders the triggered script scenes.
+	 * 
+	 * @param screen
+	 * @param graphics
+	 */
 	public void render(Scene screen, Graphics2D graphics) {
-		if (this.dialogue != null) {
-			this.dialogue.render(screen, graphics);
+		if (this.currentScript != null) {
+			this.currentScript.render(screen, graphics);
 		}
-	}
-
-	public boolean isFinished() {
-		return this.finished;
-	}
-
-	public void turnOffTrigger() {
-		this.finished = true;
-	}
-
-	public void turnOnTrigger() {
-		this.finished = false;
 	}
 }

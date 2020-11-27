@@ -33,9 +33,9 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import common.Debug;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
-import utility.Debug;
 
 public class FileControl extends JPanel implements ActionListener {
 	public static File lastSavedDirectory = null;
@@ -83,6 +83,7 @@ public class FileControl extends JPanel implements ActionListener {
 				{
 					this.editor.drawingBoardPanel.newImage();
 					this.editor.setMapAreaName("Untitled");
+					this.editor.generateChecksum();
 					break;
 				}
 				case 1: { // Save
