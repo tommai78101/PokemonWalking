@@ -27,7 +27,7 @@ public class Sha2Utils {
 			return new BigInteger(1, messageDigest.digest()).toString(16);
 		}
 		catch (NoSuchAlgorithmException e) {
-			Debug.error("No such algorithm found. Returning original input string. ", e);
+			Debug.showExceptionCause("No such algorithm found. Returning original input string. ", e);
 		}
 		return input;
 	}
@@ -55,7 +55,7 @@ public class Sha2Utils {
 			return new BigInteger(1, messageDigest.digest()).toString(16);
 		}
 		catch (NoSuchAlgorithmException e) {
-			Debug.error("No such algorithm found. Returning original input string. ", e);
+			Debug.showExceptionCause("No such algorithm found. Returning original input string. ", e);
 		}
 		return input;
 	}

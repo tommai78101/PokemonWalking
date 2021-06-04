@@ -889,10 +889,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 			}
 		}
 		catch (NegativeArraySizeException e) {
-			JOptionPane.showMessageDialog(null, "Incorrect file format. The file does not contain necessary metadata.");
+			Debug.showExceptionCause("Incorrect file format. The file does not contain necessary metadata.", e);
 		}
 		catch (Exception e) {
-			JOptionPane.showMessageDialog(null, "Error loading the file. Unable to pinpoint the cause.");
+			Debug.showExceptionCause(e);
 		}
 	}
 
