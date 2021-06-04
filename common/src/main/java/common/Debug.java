@@ -73,6 +73,12 @@ public class Debug {
 	 * @param e
 	 */
 	public static void showExceptionCause(String msg, Exception e) {
+		if (msg == null) {
+			StackTraceElement threadStack = Thread.currentThread().getStackTrace()[2];
+			String threadCause = threadStack.getClassName() + ":" + threadStack.getLineNumber();
+			JOptionPane.showMessageDialog(null, "Debug.showExceptionCause encountered null message.\n" + threadCause);
+			return;
+		}
 		StackTraceElement element = e.getStackTrace()[1];
 		String cause = "(" + element.getFileName() + ":" + element.getLineNumber() + ")";
 		if (!msg.isBlank()) {
