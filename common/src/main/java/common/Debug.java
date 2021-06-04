@@ -79,7 +79,7 @@ public class Debug {
 			JOptionPane.showMessageDialog(null, "Debug.showExceptionCause encountered null message.\n" + threadCause);
 			return;
 		}
-		StackTraceElement element = e.getStackTrace()[1];
+		StackTraceElement element = e.getStackTrace()[0];
 		String cause = "(" + element.getFileName() + ":" + element.getLineNumber() + ")";
 		if (!msg.isBlank()) {
 			msg += "\n";
