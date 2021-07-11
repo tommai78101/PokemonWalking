@@ -1,5 +1,7 @@
 package common;
 
+import javax.swing.JOptionPane;
+
 import enums.AnsiColors;
 
 /**
@@ -53,6 +55,37 @@ public class Debug {
 	 */
 	public static void exception(Exception e) {
 		Debug.printColor(AnsiColors.Red, Debug.createExceptionString(e));
+	}
+
+	/**
+	 * Displays an alert message box with the error message and line number.
+	 * 
+	 * @param e
+	 */
+	public static void showExceptionCause(Exception e) {
+		Debug.showExceptionCause("", e);
+	}
+
+	/**
+	 * Displays an alert message box with a customized message, the error message, and the line number.
+	 * 
+	 * @param msg
+	 * @param e
+	 */
+	public static void showExceptionCause(String msg, Exception e) {
+		if (msg == null) {
+			StackTraceElement threadStack = Thread.currentThread().getStackTrace()[2];
+			String threadCause = threadStack.getClassName() + ":" + threadStack.getLineNumber();
+			JOptionPane.showMessageDialog(null, "Debug.showExceptionCause encountered null message.\n" + threadCause);
+			return;
+		}
+		StackTraceElement element = e.getStackTrace()[0];
+		String cause = "(" + element.getFileName() + ":" + element.getLineNumber() + ")";
+		if (!msg.isBlank()) {
+			msg += "\n";
+		}
+		msg += e.getMessage() + " " + cause;
+		JOptionPane.showMessageDialog(null, msg);
 	}
 
 	// -----------------------------------------------------------------

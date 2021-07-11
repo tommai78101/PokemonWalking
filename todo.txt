@@ -1,5 +1,10 @@
 By line order (Specific --> Abstract):
 
+---------------- (Jun 03, 2021) -------------------
+
+TODO:
+1. Level Editor has a broken "Load Map". "Save Map" saves extra metadata, that the "Load Map" needs to address.
+
 ---------------- (Nov 23, 2020) -------------------
 
 TODO: Redesign the Script Editor UI, so that only:

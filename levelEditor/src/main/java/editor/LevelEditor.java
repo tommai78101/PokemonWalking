@@ -266,11 +266,11 @@ public class LevelEditor extends JFrame {
 		return this.sha2Checksum;
 	}
 
-	public void setChecksum(int[] pixels, int startIndex) {
-		int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
+	public int setChecksum(int[] pixels, int startIndex, int readLength) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		for (int i = 0; i < checksumPixelsCount; i++) {
-			int pixel = pixels[startIndex + i];
+		int readIndex = startIndex;
+		for (int i = 0; i < readLength; i++, readIndex++) {
+			int pixel = pixels[readIndex];
 			baos.write((pixel >> 24) & 0xFF);
 			baos.write((pixel >> 16) & 0xFF);
 			baos.write((pixel >> 8) & 0xFF);
@@ -279,6 +279,7 @@ public class LevelEditor extends JFrame {
 		// SHA-512 checksum are written using ASCII.
 		String result = baos.toString(StandardCharsets.US_ASCII);
 		this.sha2Checksum = result;
+		return readIndex;
 	}
 
 	public String generateChecksum() {
