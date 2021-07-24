@@ -251,7 +251,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.redInputField.setText(Integer.toString(selectedData.red));
 		this.greenInputField.setText(Integer.toString(selectedData.green));
 		this.blueInputField.setText(Integer.toString(selectedData.blue));
-		this.selectData = this.panel.getEditor().properties.getSelectedData();
+		this.selectData = selectedData;
 	}
 
 	@Override
