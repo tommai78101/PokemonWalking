@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Set;
 
 import abstracts.Character.GenderType;
-import common.Debug;
 import abstracts.Item;
 import abstracts.SubMenu;
+import common.Debug;
 import data.chunk.SaveChunk;
 import data.mod.AreaInfo;
 import data.mod.HeaderInfo;
@@ -329,9 +329,9 @@ public class GameSave {
 		int y = (this.playerInfo.player_y[0] << 24) | (this.playerInfo.player_y[1] << 16)
 			| (this.playerInfo.player_y[2] << 8) | this.playerInfo.player_y[3];
 		gamePlayer.setAreaPosition(x, y);
+		gameWorld.getCurrentArea().setPlayer(gamePlayer);
 		gameWorld.getCurrentArea().setPlayerX(x);
 		gameWorld.getCurrentArea().setPlayerY(y);
-		gameWorld.getCurrentArea().setPlayer(gamePlayer);
 
 		// Get Player direction facing.
 		int facing = (this.playerInfo.player_facing[0] & 0xFF) << 24 | (this.playerInfo.player_facing[1] & 0xFF) << 16
@@ -495,6 +495,9 @@ public class GameSave {
 			}
 			catch (IOException e) {
 				Debug.error("Fail to load in experimental feature.", e);
+			}
+			catch (Exception e) {
+				Debug.error("Corrupted game save. Please delete game save, and restart.", e);
 			}
 		}
 	}

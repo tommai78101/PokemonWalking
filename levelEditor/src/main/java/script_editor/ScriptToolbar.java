@@ -121,7 +121,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					this.editor.setModifiedFlag(false);
 
 					try (RandomAccessFile rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
-						rf.readLine();
+						rf.readLine(); // The second line in the cache is for the Script Editor.
 						rf.writeBytes(ScriptEditor.lastSavedDirectory.getAbsolutePath());
 					}
 					catch (IOException e) {
@@ -166,7 +166,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					this.editor.scriptChanger.enableComponent();
 
 					try (RandomAccessFile rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
-						rf.readLine();
+						rf.readLine(); // The second line in the cache is for the Script Editor.
 						rf.writeBytes(ScriptEditor.lastSavedDirectory.getAbsolutePath());
 					}
 					catch (IOException e) {
