@@ -8,6 +8,9 @@ plugins {
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
+tasks.withType(JavaCompile).configureEach {
+	options.forkOptions.jvmArgs.addAll(['--add-opens', 'jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED'])
+}
 
 //Specify the dependencies here.
 dependencies {
