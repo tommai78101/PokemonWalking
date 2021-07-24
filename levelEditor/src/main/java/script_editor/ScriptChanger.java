@@ -39,6 +39,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	// currently does not auto-set itself.
 
 	private JTextField nameField, idField;
+	private JLabel checksumField;
 	private JButton upButton, downButton, leftButton, rightButton;
 	private JButton questionDialogue, affirmativeDialogue, negativeDialogue, speechDialogue;
 	private JTextArea scriptArea;
@@ -116,45 +117,47 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.add((this.nameField = new JTextField()), c);
 		this.nameField.getDocument().addDocumentListener(this);
 
-		// // Second row
-		// c.gridx = 0;
-		// c.gridy = 1;
-		// c.gridwidth = 1;
-		// c.weightx = 0.5;
-		// c.weighty = 0.1;
-		// c.fill = GridBagConstraints.NONE;
-		// this.add(new JLabel("X Position: "), c);
-		//
-		// c.gridx = 1;
-		// c.gridy = 1;
-		// c.gridwidth = 1;
-		// c.weightx = 3.5;
-		// c.weighty = 0.1;
-		// c.fill = GridBagConstraints.HORIZONTAL;
-		// this.add((xField = new JTextField()), c);
-		// xField.getDocument().addDocumentListener(this);
-		//
-		// // Third row
-		// c.gridx = 0;
-		// c.gridy = 2;
-		// c.gridwidth = 1;
-		// c.weightx = 0.5;
-		// c.weighty = 0.1;
-		// c.fill = GridBagConstraints.NONE;
-		// this.add(new JLabel("Y Position: "), c);
-		//
-		// c.gridx = 1;
-		// c.gridy = 2;
-		// c.gridwidth = 1;
-		// c.weightx = 3.5;
-		// c.weighty = 0.1;
-		// c.fill = GridBagConstraints.HORIZONTAL;
-		// this.add((yField = new JTextField()), c);
-		// yField.getDocument().addDocumentListener(this);
+		/*
+		// Second row
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		c.weightx = 0.5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.NONE;
+		this.add(new JLabel("X Position: "), c);
+		
+		c.gridx = 1;
+		c.gridy = 1;
+		c.gridwidth = 1;
+		c.weightx = 3.5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		this.add((xField = new JTextField()), c);
+		xField.getDocument().addDocumentListener(this);
+		
+		// Third row
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		c.weightx = 0.5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.NONE;
+		this.add(new JLabel("Y Position: "), c);
+		
+		c.gridx = 1;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		c.weightx = 3.5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		this.add((yField = new JTextField()), c);
+		yField.getDocument().addDocumentListener(this);
+		*/
 
 		// Fourth row
 		c.gridx = 0;
-		c.gridy = 3;
+		c.gridy = 1;
 		c.gridwidth = 1;
 		c.weightx = 0.5;
 		c.weighty = 0.1;
@@ -162,7 +165,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.add(new JLabel("ID Value: "), c);
 
 		c.gridx = 1;
-		c.gridy = 3;
+		c.gridy = 1;
 		c.gridwidth = 1;
 		c.weightx = 3.5;
 		c.weighty = 0.1;
@@ -170,6 +173,24 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.add((this.idField = new JTextField()), c);
 		((AbstractDocument) this.idField.getDocument()).setDocumentFilter(new MinMaxFilter(1, Short.MAX_VALUE - Short.MIN_VALUE));
 		this.idField.getDocument().addDocumentListener(this);
+
+		// Fifth row
+		c.gridx = 0;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		c.weightx = 0.5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.NONE;
+		this.add(new JLabel("Checksum: "), c);
+
+		c.gridx = 1;
+		c.gridy = 2;
+		c.gridwidth = 1;
+		c.weightx = 3.5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		this.add((this.checksumField = new JLabel()), c);
+		this.checksumField.setText(this.editor.getEditorChecksum());
 
 		// Empty panel for adding spaces only.
 		c.gridx = 0;
@@ -307,13 +328,15 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		return this.nameField;
 	}
 
-	// public JTextField getXField() {
-	// return this.xField;
-	// }
-
-	// public JTextField getYField() {
-	// return this.yField;
-	// }
+	/*
+	public JTextField getXField() {
+		return this.xField;
+	}
+	
+	public JTextField getYField() {
+		return this.yField;
+	}
+	*/
 
 	public JTextField getIDField() {
 		return this.idField;
@@ -537,44 +560,44 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 				}
 				catch (Exception e) {}
 
-				// try {
-				// test = editor.scriptChanger.getXField().getText();
-				// if (!test.isEmpty() || !test.equals("")) {
-				// int n = Integer.valueOf(test);
-				// if (n > 0x0FF)
-				// throw new NumberFormatException();
-				// selectedTrigger.setTriggerPositionX((byte) (n & 0xFF));
-				// }
-				// }
-				// catch (NumberFormatException e) {
-				// JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~
-				// 255.");
-				// SwingUtilities.invokeLater(new Runnable() {
-				// @Override
-				// public void run() {
-				// editor.scriptChanger.getXField().setText("");
-				// }
-				// });
-				// }
-				// try {
-				// test = editor.scriptChanger.getYField().getText();
-				// if (!test.isEmpty() || !test.equals("")) {
-				// int n = Integer.valueOf(test);
-				// if (n > 0x0FF)
-				// throw new NumberFormatException();
-				// selectedTrigger.setTriggerPositionY((byte) (n & 0xFF));
-				// }
-				// }
-				// catch (NumberFormatException e) {
-				// JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~
-				// 255.");
-				// SwingUtilities.invokeLater(new Runnable() {
-				// @Override
-				// public void run() {
-				// editor.scriptChanger.getYField().setText("");
-				// }
-				// });
-				// }
+				/*
+				try {
+					test = editor.scriptChanger.getXField().getText();
+					if (!test.isEmpty() || !test.equals("")) {
+						int n = Integer.valueOf(test);
+						if (n > 0x0FF)
+							throw new NumberFormatException();
+						selectedTrigger.setTriggerPositionX((byte) (n & 0xFF));
+					}
+				}
+				catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~ 255.");
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							editor.scriptChanger.getXField().setText("");
+						}
+					});
+				}
+				try {
+					test = editor.scriptChanger.getYField().getText();
+					if (!test.isEmpty() || !test.equals("")) {
+						int n = Integer.valueOf(test);
+						if (n > 0x0FF)
+							throw new NumberFormatException();
+						selectedTrigger.setTriggerPositionY((byte) (n & 0xFF));
+					}
+				}
+				catch (NumberFormatException e) {
+					JOptionPane.showMessageDialog(null, "Please input numbers in range 0 ~ 255.");
+					SwingUtilities.invokeLater(new Runnable() {
+						@Override
+						public void run() {
+							editor.scriptChanger.getYField().setText("");
+						}
+					});
+				}
+				*/
 
 				try {
 					test = this.editor.scriptChanger.getIDField().getText();

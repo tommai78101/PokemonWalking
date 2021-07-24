@@ -314,6 +314,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			@Override
 			public void run() {
 				DrawingBoard.this.setImageSize(x, y);
+				DrawingBoard.this.editor.generateChecksum();
 			}
 		});
 	}

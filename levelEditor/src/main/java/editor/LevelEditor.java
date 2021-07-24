@@ -227,6 +227,7 @@ public class LevelEditor extends JFrame {
 						}
 					}
 					LevelEditor.this.statusPanel.setStatusMessageText(builder.toString());
+					LevelEditor.this.statusPanel.setChecksumLabel(LevelEditor.this.getChecksum());
 				}
 
 				if (LevelEditor.this.controlPanel != null)
@@ -263,6 +264,9 @@ public class LevelEditor extends JFrame {
 	}
 
 	public String getChecksum() {
+		if (this.sha2Checksum == null || this.sha2Checksum.trim().isBlank() || this.sha2Checksum.trim().isEmpty()) {
+			return this.generateChecksum();
+		}
 		return this.sha2Checksum;
 	}
 
