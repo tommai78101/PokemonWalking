@@ -175,8 +175,6 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.add(this.redInputField);
 		this.add(this.greenInputField);
 		this.add(this.blueInputField);
-
-		this.validate();
 	}
 
 	public char getAlpha() {

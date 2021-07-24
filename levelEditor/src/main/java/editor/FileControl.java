@@ -187,9 +187,6 @@ public class FileControl extends JPanel implements ActionListener {
 							// Storing the last approved current directory into the cache file.
 							this.cacheDirectories.set(LevelEditor.FileControlIndex, FileControl.lastSavedDirectory.getAbsolutePath());
 							this.storeCachedDirectories(cacheFile);
-
-							// Validate everything.
-							this.editor.validate();
 						}
 						catch (IOException e) {
 							Debug.exception(e);
@@ -199,12 +196,10 @@ public class FileControl extends JPanel implements ActionListener {
 				}
 				case 4: { // Tileset
 					EditorConstants.metadata = Metadata.Pixel_Data;
-					this.editor.validate();
 					break;
 				}
 				case 5: { // Trigger
 					EditorConstants.metadata = Metadata.Triggers;
-					this.editor.validate();
 					break;
 				}
 				case 7: {// Script editor

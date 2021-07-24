@@ -235,8 +235,11 @@ public class LevelEditor extends JFrame {
 					LevelEditor.this.statusPanel.setChecksumLabel(LevelEditor.this.getChecksum());
 				}
 
-				if (LevelEditor.this.controlPanel != null)
+				if (LevelEditor.this.controlPanel != null) {
 					LevelEditor.this.controlPanel.validate();
+					if (LevelEditor.this.controlPanel.getPropertiesPanel() != null)
+						LevelEditor.this.controlPanel.getPropertiesPanel().validate();
+				}
 				if (LevelEditor.this.fileControlPanel != null)
 					LevelEditor.this.fileControlPanel.validate();
 				if (LevelEditor.this.drawingBoardPanel != null)
@@ -294,17 +297,6 @@ public class LevelEditor extends JFrame {
 	public String generateChecksum() {
 		this.sha2Checksum = Sha2Utils.generateRandom(UUID.randomUUID().toString()).substring(0, LevelEditor.CHECKSUM_MAX_BYTES_LENGTH);
 		return this.sha2Checksum;
-	}
-
-	public void refresh() {
-		this.drawingBoardPanel.revalidate();
-		this.drawingBoardPanel.repaint();
-		this.properties.revalidate();
-		this.properties.repaint();
-		this.controlPanel.revalidate();
-		this.controlPanel.repaint();
-		this.fileControlPanel.revalidate();
-		this.fileControlPanel.repaint();
 	}
 
 	// --------------------------------------------------------------------------------

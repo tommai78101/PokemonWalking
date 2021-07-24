@@ -64,7 +64,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 			this.offsetX = this.oldX - this.mouseX;
 			this.offsetY = this.oldY - this.mouseY;
 		}
-		this.editor.validate();
 	}
 
 	@Override
@@ -72,7 +71,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		this.drawing = false;
 		this.mouseX = event.getX();
 		this.mouseY = event.getY();
-		this.editor.validate();
 	}
 
 	@Override
@@ -95,7 +93,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 				}
 			}).start();
 		}
-		this.editor.validate();
 	}
 
 	@Override
@@ -103,7 +100,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		this.drawing = false;
 		this.mouseX = event.getX();
 		this.mouseY = event.getY();
-		this.editor.validate();
 	}
 
 	@Override
@@ -111,7 +107,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		this.drawing = false;
 		this.mouseX = event.getX();
 		this.mouseY = event.getY();
-		this.editor.validate();
 	}
 
 	@Override
@@ -133,7 +128,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		else {
 			this.drawing = this.panning = false;
 		}
-		this.editor.validate();
 	}
 
 	@Override
@@ -150,7 +144,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		}
 		this.drawing = false;
 		this.panning = false;
-		this.editor.validate();
 	}
 
 	public void forceCancelDrawing() {
