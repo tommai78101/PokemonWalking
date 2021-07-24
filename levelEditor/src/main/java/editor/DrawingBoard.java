@@ -207,7 +207,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 		this.setPreferredSize(size);
 		this.setMaximumSize(size);
 		this.setMinimumSize(size);
-		this.validate();
 		editor.validate();
 	}
 

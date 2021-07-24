@@ -99,6 +99,7 @@ public class LevelEditor extends JFrame {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				boolean shouldValidate = false;
 				if (LevelEditor.this.input == null) {
 					LevelEditor.this.input = new EditorInput(editor.LevelEditor.this);
 					LevelEditor.this.addMouseListener(LevelEditor.this.input);
@@ -109,14 +110,14 @@ public class LevelEditor extends JFrame {
 					LevelEditor.this.fileControlPanel.addMouseListener(LevelEditor.this.input);
 					LevelEditor.this.fileControlPanel.addMouseMotionListener(LevelEditor.this.input);
 					LevelEditor.this.add(LevelEditor.this.fileControlPanel, BorderLayout.NORTH);
-					LevelEditor.this.validate();
+					shouldValidate = true;
 				}
 				if (LevelEditor.this.controlPanel == null) {
 					LevelEditor.this.controlPanel = new ControlPanel(editor.LevelEditor.this);
 					LevelEditor.this.controlPanel.addMouseListener(LevelEditor.this.input);
 					LevelEditor.this.controlPanel.addMouseMotionListener(LevelEditor.this.input);
 					LevelEditor.this.add(LevelEditor.this.controlPanel, BorderLayout.WEST);
-					LevelEditor.this.validate();
+					shouldValidate = true;
 				}
 				if (LevelEditor.this.drawingBoardPanel == null) {
 					LevelEditor.this.drawingBoardPanel = new DrawingBoard(editor.LevelEditor.this, 20, 20);
@@ -124,6 +125,7 @@ public class LevelEditor extends JFrame {
 					LevelEditor.this.drawingBoardPanel.addMouseMotionListener(LevelEditor.this.input);
 					LevelEditor.this.add(LevelEditor.this.drawingBoardPanel, BorderLayout.CENTER);
 					LevelEditor.this.drawingBoardPanel.start();
+					shouldValidate = true;
 				}
 
 				// TODO: Add Trigger properties here.
@@ -132,7 +134,7 @@ public class LevelEditor extends JFrame {
 					LevelEditor.this.properties.addMouseListener(LevelEditor.this.input);
 					LevelEditor.this.properties.addMouseMotionListener(LevelEditor.this.input);
 					LevelEditor.this.add(LevelEditor.this.properties, BorderLayout.EAST);
-					LevelEditor.this.validate();
+					shouldValidate = true;
 				}
 
 				if (LevelEditor.this.statusPanel == null) {
@@ -140,9 +142,12 @@ public class LevelEditor extends JFrame {
 					LevelEditor.this.statusPanel.addMouseListener(LevelEditor.this.input);
 					LevelEditor.this.statusPanel.addMouseMotionListener(LevelEditor.this.input);
 					LevelEditor.this.add(LevelEditor.this.statusPanel, BorderLayout.SOUTH);
-					LevelEditor.this.validate();
+					shouldValidate = true;
 				}
 				LevelEditor.this.initialize();
+				if (shouldValidate) {
+					LevelEditor.this.validate();
+				}
 			}
 		});
 		this.createOrReadCache();
