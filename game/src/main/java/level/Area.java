@@ -99,6 +99,10 @@ public class Area implements Tileable, UpdateRenderable {
 		// trigger data.
 		if (triggerSize > 1) {
 			column++;
+
+			// TODO(2021-July-24): This is the place to insert a static method to "search for any trigger
+			// scripts matching the checksum" and load the trigger script into TriggerData.loadTriggerData().
+
 			for (; column < triggerSize - 1; column++) {
 				// The "color" is the ID.
 				// ID must not be negative. ID = 0 is reserved.
