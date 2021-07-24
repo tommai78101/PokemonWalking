@@ -814,7 +814,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		try {
 			// Storing important area information in the first pixel. This should use up all of the number of
 			// pixels we had reserved.
-			this.editor.setUniqueAreaID(pixels[pixelIterator] & (0xFFFF << 16));
+			this.editor.setUniqueAreaID((pixels[pixelIterator] >> 16) & 0xFFFF);
 			int triggerSize = pixels[pixelIterator] & 0xFFFF;
 			pixelIterator++;
 

@@ -44,6 +44,7 @@ public class Area implements Tileable, UpdateRenderable {
 	private final int areaID;
 	private int sectorID;
 	private String areaName;
+	private String checksum;
 	// TODO: Add area type.
 	// private int areaType;
 
@@ -54,7 +55,7 @@ public class Area implements Tileable, UpdateRenderable {
 	private final List<List<PixelData>> areaData = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
 
-	private final int ReservedUsedPixelCount = 1;
+	private final int ReservedUsedPixelCount = 5;
 
 	// Area data hash maps.
 	private final Map<Map.Entry<Integer, Integer>, Obstacle> areaObstacles = new HashMap<>();
@@ -67,25 +68,57 @@ public class Area implements Tileable, UpdateRenderable {
 		this.areaID = (tempPixels[0] >> 16) & 0xFFFF;
 		int triggerSize = tempPixels[0] & 0xFFFF;
 		int row = 0;
-		int column = 0;
+		int column = 1;
 		int stride = bitmap.getWidth();
-		for (int i = 0; i < triggerSize; i++) {
-			// The "color" is the ID.
-			// ID must not be negative. ID = 0 is reserved.
-			column = i + this.ReservedUsedPixelCount;
-			int color = tempPixels[column + (stride * row)];
-			if (color > 0) {
-				int xPosition = (color >> 24) & 0xFF;
-				int yPosition = (color >> 16) & 0xFF;
-				this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color));
-			}
+
+		// Get checksum first. Checksum is set immediately after the first pixel.
+		StringBuilder checksumBuilder = new StringBuilder();
+		for (; (row * stride + column) < this.ReservedUsedPixelCount;) {
+			int pixel = tempPixels[row * stride + column];
+			// There are a total of 4 bytes in an "int" type.
+			char ch1 = (char) ((pixel & 0xFF000000) >> 24);
+			char ch2 = (char) ((pixel & 0x00FF0000) >> 16);
+			char ch3 = (char) ((pixel & 0x0000FF00) >> 8);
+			char ch4 = (char) (pixel & 0x000000FF);
+			checksumBuilder.append(ch1).append(ch2).append(ch3).append(ch4);
+
+			column++;
 			if (column >= stride) {
+				column %= stride;
 				row++;
-				column -= stride;
 			}
 		}
+		this.checksum = checksumBuilder.toString();
+
+		// After checksum, the rest of the pixels in the current row are just padded pixels. Skip them until
+		// we reach next row.
+		row++;
+		column = 0;
+
+		// If the trigger size is larger than 1 (meaning there are triggers other than Eraser), we parse the
+		// trigger data.
+		if (triggerSize > 1) {
+			column++;
+			for (; column < triggerSize - 1; column++) {
+				// The "color" is the ID.
+				// ID must not be negative. ID = 0 is reserved.
+				int color = tempPixels[column + (stride * row)];
+				if (color > 0) {
+					int xPosition = (color >> 24) & 0xFF;
+					int yPosition = (color >> 16) & 0xFF;
+					this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color));
+				}
+				if (column >= stride) {
+					row++;
+					column -= stride;
+				}
+			}
+		}
+
 		// We need to add the row by 1 for the last row with trailing empty trigger IDs.
 		row++;
+		column = 0;
+
 		this.width = bitmap.getWidth();
 		this.height = bitmap.getHeight() - row;
 		this.pixels = new int[this.width * this.height];
@@ -193,9 +226,9 @@ public class Area implements Tileable, UpdateRenderable {
 
 		// Area specific entities are updated at the end.
 		this.areaObstacles.forEach(
-		    (key, obstacleValue) -> {
-		        obstacleValue.tick();
-		    }
+			(key, obstacleValue) -> {
+				obstacleValue.tick();
+			}
 		);
 	}
 
@@ -342,8 +375,8 @@ public class Area implements Tileable, UpdateRenderable {
 			case 0x0D: // Triggers
 				if (red == 0x00) { // Default starting Point
 					this.setPixelData(
-					    new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
-					    this.currentPixelData.xPosition, this.currentPixelData.yPosition
+						new PixelData(0x01000000, this.currentPixelData.xPosition, this.currentPixelData.yPosition),
+						this.currentPixelData.xPosition, this.currentPixelData.yPosition
 					);
 				}
 				break;
@@ -392,7 +425,7 @@ public class Area implements Tileable, UpdateRenderable {
 				}
 				// This is for rendering exit arrows when you are in front of the exit/entrance doors.
 				if (x == this.player.getXInArea() && y == this.player.getYInArea()
-				    && ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
+					&& ((((data.getColor() >> 24) & 0xFF) == 0x0B) || (((data.getColor() >> 24) & 0xFF) == 0x04)))
 					this.renderExitArrow(screen, xOff, yOff, data, x, y);
 
 				// Each time the area background tile is rendered, it also updates the bitmap tick updates.
@@ -401,9 +434,9 @@ public class Area implements Tileable, UpdateRenderable {
 		}
 		// Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach(
-		    (k, obstacle) -> {
-		        obstacle.renderDialogue(screen, graphics);
-		    }
+			(k, obstacle) -> {
+				obstacle.renderDialogue(screen, graphics);
+			}
 		);
 
 		if (this.trigger != null) {
@@ -679,6 +712,10 @@ public class Area implements Tileable, UpdateRenderable {
 			}
 		}
 		return null;
+	}
+
+	public final String getChecksum() {
+		return this.checksum;
 	}
 
 	// --------------------- STATIC METHODS -----------------------

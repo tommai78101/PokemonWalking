@@ -97,6 +97,7 @@ public class PlayerChunk extends Chunk {
 		this.xPosition = raf.readInt();
 		this.yPosition = raf.readInt();
 		player.setAreaPosition(this.xPosition, this.yPosition);
+		world.getCurrentArea().setPlayer(player);
 		world.getCurrentArea().setPlayerX(this.xPosition);
 		world.getCurrentArea().setPlayerY(this.yPosition);
 

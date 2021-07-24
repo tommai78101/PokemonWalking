@@ -431,8 +431,10 @@ public class OverWorld implements Tileable, UpdateRenderable {
 			PixelData data = this.currentArea.getCurrentPixelData();
 			int targetAreaID = data.getTargetAreaID();
 			this.currentArea = WorldConstants.convertToArea(this.areas, targetAreaID);
-			if (this.currentArea == null)
+			if (this.currentArea == null) {
+				Debug.error("Unable to find target area to warp player to.");
 				return;
+			}
 			this.currentArea.setPlayer(this.player);
 			this.currentArea.setDefaultPosition(data);
 			this.invertBitmapColors = true;

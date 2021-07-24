@@ -187,6 +187,9 @@ public class FileControl extends JPanel implements ActionListener {
 							// Storing the last approved current directory into the cache file.
 							this.cacheDirectories.set(LevelEditor.FileControlIndex, FileControl.lastSavedDirectory.getAbsolutePath());
 							this.storeCachedDirectories(cacheFile);
+
+							// Validate everything.
+							this.editor.validate();
 						}
 						catch (IOException e) {
 							Debug.exception(e);
