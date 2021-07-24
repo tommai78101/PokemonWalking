@@ -5,7 +5,7 @@ plugins {
 //This applies to all sub-projects as well as the root project
 allprojects {
 	repositories {
-		jcenter()
+		mavenCentral()
 	}
 }
 
