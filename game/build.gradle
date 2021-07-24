@@ -6,12 +6,12 @@ plugins {
 
 // Enable gradle to compile source code in UTF-8 encoding.
 tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+	options.encoding = 'UTF-8'
 }
 
 //Specify the dependencies here.
 dependencies {
-	compileOnly project(":common")
+	implementation project(":common")
 }
 
 //Need to get the sprites.
@@ -21,6 +21,23 @@ sourceSets {
 			srcDirs = ["../common/src/main/resources"]
 		}
 	}
+}
+
+//Executable JAR
+jar {
+	archiveFileName = "game.jar"
+	manifest {
+		attributes 'Main-Class': "main.MainComponent"
+	}
+	from {
+		configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+		configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}
+
+//Duplicate strategy
+tasks.withType(Jar) { 
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE 
 }
 
 //With the plugin "application" added, we need to specify the class name where the "main" method resides in.
