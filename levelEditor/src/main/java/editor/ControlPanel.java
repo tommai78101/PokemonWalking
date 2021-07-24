@@ -108,7 +108,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 					this.propertiesPanel.blueInputField.setText(Integer.toString(d.blue));
 					EditorConstants.chooser = Tools.ControlPanel;
 				}
-				this.editor.validate();
 				break;
 			}
 			case Triggers: {
@@ -119,8 +118,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 				break;
 			}
 		}
-		super.revalidate();
-		super.repaint();
+		this.editor.validate();
 	}
 
 	public String getPickedEntityName() {
@@ -177,8 +175,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 				break;
 		}
-		if (this.propertiesPanel != null)
-			this.propertiesPanel.validate();
 		super.revalidate();
 		super.repaint();
 	}

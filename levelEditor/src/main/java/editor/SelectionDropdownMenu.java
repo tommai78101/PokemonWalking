@@ -153,7 +153,6 @@ public class SelectionDropdownMenu extends JPanel {
 					panel.greenInputField.setText(Integer.toString(d.green));
 					panel.blueInputField.setText(Integer.toString(d.blue));
 					SelectionDropdownMenu.this.editor.controlPanel.setSelectedData(d);
-					SelectionDropdownMenu.this.editor.validate();
 				}
 			}
 		});
@@ -220,8 +219,6 @@ public class SelectionDropdownMenu extends JPanel {
 			for (int i = 0; i < scriptModel.getSize(); i++) {
 				model.addElement(scriptModel.get(i));
 			}
-
-			this.revalidate();
 		}
 	}
 

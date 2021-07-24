@@ -81,7 +81,6 @@ public class StatusPanel extends JPanel {
 	}
 
 	private void update() {
-		super.revalidate();
-		super.repaint();
+		// Do nothing.
 	}
 }

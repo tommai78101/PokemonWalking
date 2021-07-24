@@ -481,6 +481,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		g.dispose();
 		bs.show();
+
+		// At each end of the rendering, we validate the editor, so the data is refreshed and kept up-to-date.
+		this.editor.validate();
 	}
 
 	public void tick() {
@@ -512,7 +515,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 							this.setDataProperties(selectedData);
 						}
 					}
-					this.editor.validate();
 				}
 				break;
 			}
@@ -547,7 +549,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int i = y * this.bitmapWidth + x;
 						this.triggers.clearAllTriggers(i);
 					}
-					this.editor.validate();
 				}
 				break;
 			}
@@ -652,7 +653,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 						panel.blueInputField.setText(Integer.toString(blue));
 						panel.greenField.setText(Integer.toString(green));
 						panel.blueField.setText(Integer.toString(blue));
-						panel.validate();
 						break;
 					}
 					default:
@@ -684,7 +684,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 		panel.blueInputField.setText(blueText);
 		panel.greenField.setText(greenText);
 		panel.blueField.setText(blueText);
-		panel.validate();
 
 		return data;
 	}
@@ -934,7 +933,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 					panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
 					panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));
 					panel.blueField.setText(Integer.toString(value & 0xFF));
-					panel.validate();
 					break;
 				case Triggers:
 					// TODO(Jul/4/2020): Figure out how to display a list of triggers for a single tile in the
@@ -948,7 +946,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 			panel.redField.setText("");
 			panel.greenField.setText("");
 			panel.blueField.setText("");
-			panel.validate();
 		}
 	}
 
