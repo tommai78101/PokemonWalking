@@ -280,12 +280,14 @@ public class Inventory extends SubMenu {
 	 *            The input keys the player is using.
 	 * @return Itself.
 	 */
-// @Override
-// public SubMenu initialize(Keys keys) {
-// // TODO: Add new inventory art for background.
-// this.keys = keys;
-// return Inventory.this;
-// }
+	/*
+	@Override
+	public SubMenu initialize(Keys keys) {
+		// TODO: Add new inventory art for background.
+		this.keys = keys;
+		return Inventory.this;
+	}
+	*/
 
 	/**
 	 * Renders the Inventory to the screen.
