@@ -296,6 +296,7 @@ public class Game {
 					if (this.player.isLockedWalking() || this.player.isLockedJumping() || this.player.isInteracting() || this.player.isInAutomaticMode()) {
 						break;
 					}
+					this.startMenu.clearActiveItem();
 					this.stateManager.setCurrentGameState(GameState.START_MENU);
 					break;
 				default:
@@ -310,6 +311,7 @@ public class Game {
 			case START_MENU:
 				if (this.startMenu.isExiting()) {
 					this.startMenu.resetExitState();
+					this.startMenu.clearActiveItem();
 					this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 					if (Player.isMovementsLocked())
 						Player.unlockMovements();
