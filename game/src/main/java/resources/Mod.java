@@ -229,33 +229,33 @@ public class Mod {
 									writer.newLine();
 									writer.write("_: Whitespaces.");
 									writer.newLine();
-									writer.write("@: Trigger name.");
+									writer.write("NAME (@): Trigger name.");
 									writer.newLine();
-									writer.write("^: [Direction, Steps]. Can be chained for delaying scripted movements.");
-									writer.newLine();
-									writer.write(
-										"$: Start of script. Appears at beginning of script. Uses numeric ID values as Trigger IDs"
-									);
-									writer.newLine();
-									writer.write("%: Script delimiter. Always appear at end of script.");
-									writer.newLine();
-									writer.write("#: Speech Dialogue.");
+									writer.write("PATH (^): [Direction, Steps]. Can be chained for delaying scripted movements.");
 									writer.newLine();
 									writer.write(
-										"/: Comments. Whole line gets ignored, even if it's somewhere in the middle of the line."
+										"BEGIN ($): Start of script. Appears at beginning of script. Uses numeric ID values as Trigger IDs"
 									);
 									writer.newLine();
-									writer.write("?: Question Dialogue.");
+									writer.write("END (%): Script delimiter. Always appear at end of script.");
 									writer.newLine();
-									writer.write("+: Affirmative dialogue.");
+									writer.write("SPEAK (#): Speech Dialogue.");
 									writer.newLine();
-									writer.write("-: Negative dialogue.");
+									writer.write(
+										"REM (/): Comments. Whole line gets ignored, even if it's somewhere in the middle of the line."
+									);
 									writer.newLine();
-									writer.write("[: Affirmative Action.");
+									writer.write("ASK (?): Question Dialogue.");
 									writer.newLine();
-									writer.write("]: Negative Action.");
+									writer.write("AFFIRM (+): Affirmative dialogue.");
 									writer.newLine();
-									writer.write(";: Repeat Flag. If contains ';', it means it's enabled by default.");
+									writer.write("REJECT (-): Negative dialogue.");
+									writer.newLine();
+									writer.write("CONFIRM ([): Affirmative Action.");
+									writer.newLine();
+									writer.write("DENY (]): Negative Action.");
+									writer.newLine();
+									writer.write("LOOP (;): Repeat Flag. If contains ';', it means it's enabled by default.");
 									writer.newLine();
 									writer.newLine();
 									writer.write("Examples:");
@@ -270,7 +270,7 @@ public class Mod {
 									writer.newLine();
 									writer.write("BEGIN 0");
 									writer.newLine();
-									writer.write("NAME Eraser");
+									writer.write("NAME Same_Eraser");
 									writer.newLine();
 									writer.write("END");
 								}
