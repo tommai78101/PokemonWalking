@@ -258,7 +258,7 @@ public class Mod {
 									writer.write(";: Repeat Flag. If contains ';', it means it's enabled by default.");
 									writer.newLine();
 									writer.newLine();
-									writer.write("Example:");
+									writer.write("Examples:");
 									writer.newLine();
 									writer.newLine();
 									writer.write("$0");
@@ -266,6 +266,13 @@ public class Mod {
 									writer.write("@Eraser");
 									writer.newLine();
 									writer.write("%");
+									writer.newLine();
+									writer.newLine();
+									writer.write("BEGIN 0");
+									writer.newLine();
+									writer.write("NAME Eraser");
+									writer.newLine();
+									writer.write("END");
 								}
 								catch (Exception e) {}
 								finally {

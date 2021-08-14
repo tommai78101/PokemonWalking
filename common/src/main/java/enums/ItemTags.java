@@ -81,7 +81,7 @@ public enum ItemTags {
 		else if (line.toUpperCase().contains(this.uppercaseSymbolName) || line.toLowerCase().contains(this.lowercaseSymbolName)) {
 			// We ignore anything that comes before the script tag. We're not doing anything complicated here.
 			int endOfIndex = line.indexOf(this.uppercaseSymbolName) + this.uppercaseSymbolName.length();
-			return line.substring(endOfIndex);
+			return line.substring(endOfIndex).trim();
 		}
 		// Cannot remove any script tags or symbols.
 		return line;
