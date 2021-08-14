@@ -63,6 +63,7 @@ public class DialogueBuilder {
 				}
 				else if (ScriptTags.ScriptName.beginsAt(line)) {
 					// Dialogue message
+					line = line.replaceAll("_", " ");
 					temp = DialogueBuilder.createText(
 						ScriptTags.ScriptName.removeScriptTag(line),
 						Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH,
