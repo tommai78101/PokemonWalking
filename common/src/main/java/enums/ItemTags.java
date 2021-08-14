@@ -38,9 +38,9 @@ public enum ItemTags {
 			return false;
 		if (this.startsWithUpperCase(line) || line.startsWith(this.symbol))
 			return true;
-		String upper = line.toUpperCase();
-		String lower = line.toLowerCase();
-		if (upper.contains(this.uppercaseSymbolName) || lower.contains(this.lowercaseSymbolName))
+		String upper = line.toUpperCase().trim();
+		String lower = line.toLowerCase().trim();
+		if (upper.startsWith(this.uppercaseSymbolName) || lower.startsWith(this.lowercaseSymbolName))
 			return true;
 		return line.regionMatches(true, 0, this.name(), 0, this.name().length());
 	}
@@ -78,7 +78,7 @@ public enum ItemTags {
 	public String removeItemTag(String line) {
 		if (line.startsWith(this.symbol))
 			return line.substring(this.symbol.length());
-		else if (line.toUpperCase().contains(this.uppercaseSymbolName) || line.toLowerCase().contains(this.lowercaseSymbolName)) {
+		else if (line.toUpperCase().startsWith(this.uppercaseSymbolName) || line.toLowerCase().startsWith(this.lowercaseSymbolName)) {
 			// We ignore anything that comes before the script tag. We're not doing anything complicated here.
 			int endOfIndex = line.indexOf(this.uppercaseSymbolName) + this.uppercaseSymbolName.length();
 			return line.substring(endOfIndex).trim();
