@@ -34,7 +34,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private final ScriptEditor editor;
 	private final String[] tags = {
-	    "New Session", "Save Session", "Open Session", ""
+	    "New Script", "Save Script", "Open Script", ""
 	};
 	private final HashMap<String, JButton> buttonCache = new HashMap<>();
 
@@ -52,7 +52,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 		final EditorMouseListener mouseListener = new EditorMouseListener(chooser);
 
 		switch (Integer.valueOf(event.getActionCommand())) {
-			case 0: { // New Session
+			case 0: { // New script
 				this.editor.scriptChanger.clearTextFields();
 				JList<Trigger> triggerList = this.editor.scriptViewer.getTriggerList();
 				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
@@ -78,7 +78,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				this.editor.parent.revalidate();
 				break;
 			}
-			case 1: { // Save Session
+			case 1: { // Save script
 				try (RandomAccessFile raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 					raf.readLine(); // The second line in the cache is for the Script Editor.
 					ScriptEditor.lastSavedDirectory = new File(raf.readLine());
@@ -130,7 +130,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				}
 				break;
 			}
-			case 2: { // Open Session.
+			case 2: { // Open script.
 				try (RandomAccessFile raf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 					raf.readLine(); // The second line in the cache is for the Script Editor.
 					ScriptEditor.lastSavedDirectory = new File(raf.readLine());

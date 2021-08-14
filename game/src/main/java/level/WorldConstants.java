@@ -69,6 +69,9 @@ public class WorldConstants {
 	public static final String MENU_ITEM_DESC_INVENTORY = "Open the pack.";
 	public static final String MENU_ITEM_DESC_SAVE = "Save the game.";
 
+	// Default scripts path. For internal use only.
+	public static final String ScriptsDefaultPath = "/art/script";
+	
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
 

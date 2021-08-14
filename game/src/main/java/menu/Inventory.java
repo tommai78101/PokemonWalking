@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 import abstracts.Item;
-import abstracts.Item.Category;
 import abstracts.SubMenu;
 import common.Debug;
 import common.Tileable;
 import dialogue.Dialogue;
 import entity.Player;
+import enums.ItemCategories;
 import item.Bicycle;
 import item.KeyItem;
 import item.ModdedItem;
@@ -57,7 +57,7 @@ public class Inventory extends SubMenu {
 	private int itemCursor;
 	private int arrowPosition;
 	private int itemListSpan = 0;
-	private Category category;
+	private ItemCategories category;
 	private byte tick = (byte) 0x0;
 	private InventoryState state;
 	private int stateArrowPosition = 0;
@@ -108,7 +108,7 @@ public class Inventory extends SubMenu {
 		this.pokéballs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.TMs_HMs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
 		this.arrowPosition = 0;
-		this.category = Category.POTIONS;
+		this.category = ItemCategories.POTIONS;
 		this.state = InventoryState.SELECTION;
 		this.set_completedLines = new ArrayList<>();
 		this.inventoryDialogue = new Dialogue();
@@ -162,6 +162,10 @@ public class Inventory extends SubMenu {
 				}
 				break;
 			}
+			default: {
+				// Ignore
+				break;
+			}
 		}
 
 		// In order to maintain the order of items, and always put the RETURN menu at the very end, we need
@@ -200,6 +204,10 @@ public class Inventory extends SubMenu {
 					case TM_HM:
 						entry.setValue(entry.getValue().intValue() + 1);
 						break;
+					default: {
+						// Ignore
+						break;
+					}
 				}
 				heldItemExists = true;
 				break;
@@ -240,7 +248,7 @@ public class Inventory extends SubMenu {
 		if (item.isReturnMenu())
 			return;
 
-		if (item.getCategory() == Category.KEYITEMS)
+		if (item.getCategory() == ItemCategories.KEYITEMS)
 			// Cannot remove key items, therefore, this does nothing.
 			return;
 
@@ -265,6 +273,10 @@ public class Inventory extends SubMenu {
 						break;
 					}
 				}
+				break;
+			}
+			default: {
+				// Ignore
 				break;
 			}
 		}
@@ -468,7 +480,7 @@ public class Inventory extends SubMenu {
 		this.arrowPosition = 0;
 		this.itemListSpan = 0;
 		this.resetSelectionCursor();
-		this.category = Category.POTIONS;
+		this.category = ItemCategories.POTIONS;
 		this.state = InventoryState.SELECTION;
 	}
 
@@ -512,13 +524,13 @@ public class Inventory extends SubMenu {
 				}
 				else if (Game.keys.isLeftPressed()) {
 					Game.keys.leftReceived();
-					this.category = Category.getWrapped(this.category.getID() - 1);
+					this.category = ItemCategories.getWrapped(this.category.getID() - 1);
 					this.tick = 0x0;
 					this.itemCursor = this.arrowPosition = 0;
 				}
 				else if (Game.keys.isRightPressed()) {
 					Game.keys.rightReceived();
-					this.category = Category.getWrapped(this.category.getID() + 1);
+					this.category = ItemCategories.getWrapped(this.category.getID() + 1);
 					this.tick = 0x0;
 					this.itemCursor = this.arrowPosition = 0;
 				}
@@ -558,6 +570,9 @@ public class Inventory extends SubMenu {
 									break;
 								case KEYITEMS:
 									this.selectionMenu.addAll(item.getAvailableCommands());
+									break;
+								default:
+									// Ignore
 									break;
 							}
 						}
@@ -648,6 +663,9 @@ public class Inventory extends SubMenu {
 								case KEYITEMS:
 									this.selectionMenu.addAll(item.getAvailableCommands());
 									break;
+								default:
+									// Ignore
+									break;
 							}
 						}
 					}
@@ -734,12 +752,12 @@ public class Inventory extends SubMenu {
 	 * 
 	 * @return
 	 */
-	public Map<Category, List<Map.Entry<Item, Integer>>> getAllMappedItemsList() {
-		Map<Category, List<Map.Entry<Item, Integer>>> result = new HashMap<>();
-		result.put(Category.POTIONS, this.potions);
-		result.put(Category.KEYITEMS, this.keyItems);
-		result.put(Category.POKEBALLS, this.pokéballs);
-		result.put(Category.TM_HM, this.TMs_HMs);
+	public Map<ItemCategories, List<Map.Entry<Item, Integer>>> getAllMappedItemsList() {
+		Map<ItemCategories, List<Map.Entry<Item, Integer>>> result = new HashMap<>();
+		result.put(ItemCategories.POTIONS, this.potions);
+		result.put(ItemCategories.KEYITEMS, this.keyItems);
+		result.put(ItemCategories.POKEBALLS, this.pokéballs);
+		result.put(ItemCategories.TM_HM, this.TMs_HMs);
 		return result;
 	}
 
@@ -792,6 +810,9 @@ public class Inventory extends SubMenu {
 			case TM_HM:
 				result = this.TMs_HMs;
 				break;
+			default:
+				// Ignore
+				break;
 		}
 		return result;
 	}
@@ -820,6 +841,9 @@ public class Inventory extends SubMenu {
 			case TM_HM:
 				result = this.TMs_HMs;
 				break;
+			default:
+				// Ignore
+				break;
 		}
 		return result;
 	}
@@ -847,6 +871,9 @@ public class Inventory extends SubMenu {
 				break;
 			case TM_HM:
 				result = this.TMs_HMs;
+				break;
+			default:
+				// Ignore
 				break;
 		}
 		return result;
@@ -1000,7 +1027,7 @@ public class Inventory extends SubMenu {
 							);
 							int value = entry.getValue().intValue();
 							if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null
-								&& this.category != Category.KEYITEMS) {
+								&& this.category != ItemCategories.KEYITEMS) {
 								String string = "*" + Integer.toString(value);
 								g.drawString(
 									string, 8 * (Tileable.WIDTH / 2) + ((12 - string.length()) * (Tileable.WIDTH / 2)),
@@ -1039,7 +1066,7 @@ public class Inventory extends SubMenu {
 						);
 						int value = entry.getValue().intValue();
 						if (value != Integer.MAX_VALUE && entry.getKey().getCategory() != null
-							&& this.category != Category.KEYITEMS) {
+							&& this.category != ItemCategories.KEYITEMS) {
 							String string = "*" + Integer.toString(value);
 							g.drawString(
 								string, 8 * (Tileable.WIDTH / 2) + ((12 - string.length()) * (Tileable.WIDTH / 2)),

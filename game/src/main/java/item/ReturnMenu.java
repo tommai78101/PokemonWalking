@@ -10,12 +10,13 @@ package item;
 
 import abstracts.Item;
 import entity.Player;
+import enums.ItemCategories;
 import level.Area;
 import main.Game;
 import main.StateManager.GameState;
 
 public class ReturnMenu extends Item {
-	public ReturnMenu(String name, String description, Category category, int id) {
+	public ReturnMenu(String name, String description, ItemCategories category, int id) {
 		super(name, description, category, id);
 	}
 

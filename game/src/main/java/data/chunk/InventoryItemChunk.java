@@ -8,7 +8,7 @@ import java.io.RandomAccessFile;
 
 import abstracts.Chunk;
 import abstracts.Item;
-import abstracts.Item.Category;
+import enums.ItemCategories;
 import level.PixelData;
 import main.Game;
 
@@ -18,11 +18,11 @@ import main.Game;
  */
 public class InventoryItemChunk extends Chunk {
 	// Category for the item list type.
-	private Category category;
+	private ItemCategories category;
 	private Item item;
 	private int count;
 
-	public void setCategory(Category category) {
+	public void setCategory(ItemCategories category) {
 		this.category = category;
 	}
 
@@ -40,7 +40,7 @@ public class InventoryItemChunk extends Chunk {
 
 	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
-		this.category = Category.convert(raf.readByte());
+		this.category = ItemCategories.convert(raf.readByte());
 		if (this.category == null) {
 			throw new IOException("Unmatched inventory item chunk category.");
 		}

@@ -8,15 +8,22 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import common.Debug;
-import constants.ScriptTag;
 import dialogue.Dialogue;
 import entity.Player;
+import enums.ScriptTags;
 import level.Area;
+import level.WorldConstants;
 import screen.Scene;
 import utility.DialogueBuilder;
 
@@ -35,6 +42,7 @@ import utility.DialogueBuilder;
  * @author tlee
  */
 public class Script {
+	private String checksum;
 	private int triggerID;
 	private ArrayList<Map.Entry<Integer, MovementData>> moves;
 	private ArrayList<Map.Entry<Integer, MovementData>> affirmativeMoves;
@@ -56,6 +64,7 @@ public class Script {
 	 * Constructor of the Script object, which holds a single scripted event defined in the script file.
 	 */
 	public Script() {
+		this.checksum = null;
 		this.triggerID = 0;
 		this.moves = new ArrayList<>();
 		this.affirmativeMoves = new ArrayList<>();
@@ -78,6 +87,7 @@ public class Script {
 	 * @param s
 	 */
 	public Script(Script s) {
+		this.checksum = s.checksum;
 		this.triggerID = s.triggerID;
 
 		this.moves = new ArrayList<>();
@@ -480,6 +490,27 @@ public class Script {
 			return false;
 		}
 	}
+	
+	public String getChecksum() {
+		return this.checksum;
+	}
+	
+	public void setChecksum(String checksum) {
+		this.checksum = checksum;
+	}
+	
+	public boolean isMatchingScript(Script s) {
+		if (this.checksum == null || this.checksum.isBlank() || s.checksum == null || s.checksum.isBlank())
+			return false;
+		return this.checksum.equals(s.checksum);
+	}
+	
+	public boolean isMatchingArea(Area area) {
+		String areaChecksum = area.getChecksum();
+		if (this.checksum == null || this.checksum.isBlank() || areaChecksum == null || areaChecksum.isBlank())
+			return false;
+		return this.checksum.equals(areaChecksum);
+	}
 
 	// -------------------------------------------------------------------------------
 	// Private methods
@@ -523,7 +554,7 @@ public class Script {
 				inputStream = new FileInputStream(new File(filename));
 			}
 			else {
-				inputStream = Script.class.getClassLoader().getResourceAsStream(filename);
+				inputStream = Script.class.getResourceAsStream(filename);
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -538,12 +569,20 @@ public class Script {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				// Ignored tags
-				if (ScriptTag.Comment.beginsAt(line) || ScriptTag.ScriptName.beginsAt(line) || line.startsWith(" ") || line.isEmpty())
+				if (ScriptTags.Comment.beginsAt(line) || ScriptTags.ScriptName.beginsAt(line) || line.startsWith(" ") || line.isEmpty())
 					continue;
+				
+				// Script checksum
+				else if (ScriptTags.Checksum.beginsAt(line)) {
+					line = ScriptTags.Checksum.removeScriptTag(line);
+					if (script == null)
+						script = new Script();
+					script.setChecksum(line);
+				}
 
 				// Start of script
-				else if (ScriptTag.BeginScript.beginsAt(line)) {
-					line = ScriptTag.BeginScript.replace(line);
+				else if (ScriptTags.BeginScript.beginsAt(line)) {
+					line = ScriptTags.BeginScript.replace(line);
 					int triggerID = Integer.valueOf(line.substring(1).trim());
 					if (triggerID > 0) {
 						if (script == null)
@@ -553,10 +592,10 @@ public class Script {
 				}
 
 				// Movement Data
-				else if (ScriptTag.PathData.beginsAt(line)) {
+				else if (ScriptTags.PathData.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTag.PathData.replace(line);
+						line = ScriptTags.PathData.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.moves.add(Map.entry(iteration, moves));
 						iteration++;
@@ -564,7 +603,7 @@ public class Script {
 				}
 
 				// Script delimiter
-				else if (ScriptTag.EndScript.beginsAt(line)) {
+				else if (ScriptTags.EndScript.beginsAt(line)) {
 					if (script != null) {
 						result.add(script);
 						script = null;
@@ -573,8 +612,8 @@ public class Script {
 				}
 
 				// Speech dialogue
-				else if (ScriptTag.Speech.beginsAt(line)) {
-					line = ScriptTag.Speech.replace(line);
+				else if (ScriptTags.Speech.beginsAt(line)) {
+					line = ScriptTags.Speech.replace(line);
 					Dialogue d = DialogueBuilder.createText(
 					    line.substring(1).trim().replace("_", " "),
 					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
@@ -584,8 +623,8 @@ public class Script {
 				}
 
 				// Question dialogue
-				else if (ScriptTag.Question.beginsAt(line)) {
-					line = ScriptTag.Question.replace(line);
+				else if (ScriptTags.Question.beginsAt(line)) {
+					line = ScriptTags.Question.replace(line);
 					Dialogue d = DialogueBuilder.createText(
 					    line.substring(1).trim().replace("_", " "),
 					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
@@ -595,8 +634,8 @@ public class Script {
 				}
 
 				// Affirmative Response dialogue
-				else if (ScriptTag.Affirm.beginsAt(line)) {
-					line = ScriptTag.Affirm.replace(line);
+				else if (ScriptTags.Affirm.beginsAt(line)) {
+					line = ScriptTags.Affirm.replace(line);
 					Dialogue d = DialogueBuilder.createText(
 					    line.substring(1).trim().replace("_", " "),
 					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
@@ -607,8 +646,8 @@ public class Script {
 				}
 
 				// Negative Response dialogue
-				else if (ScriptTag.Reject.beginsAt(line)) {
-					line = ScriptTag.Reject.replace(line);
+				else if (ScriptTags.Reject.beginsAt(line)) {
+					line = ScriptTags.Reject.replace(line);
 					Dialogue d = DialogueBuilder.createText(
 					    line.substring(1).trim().replace("_", " "),
 					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
@@ -619,10 +658,10 @@ public class Script {
 				}
 
 				// Affirmative Response action
-				else if (ScriptTag.Confirm.beginsAt(line)) {
+				else if (ScriptTags.Confirm.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTag.Confirm.replace(line);
+						line = ScriptTags.Confirm.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.affirmativeMoves
 						    .add(Map.entry(affirmativeIteration, moves));
@@ -631,10 +670,10 @@ public class Script {
 				}
 
 				// Negative Response action
-				else if (ScriptTag.Deny.beginsAt(line)) {
+				else if (ScriptTags.Deny.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTag.Deny.replace(line);
+						line = ScriptTags.Deny.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.negativeMoves
 						    .add(Map.entry(negativeIteration, moves));
@@ -643,7 +682,7 @@ public class Script {
 				}
 
 				// Is a Repeating Trigger
-				else if (ScriptTag.Repeat.beginsAt(line) || ScriptTag.Repeatable.beginsAt(line)) {
+				else if (ScriptTags.Repeat.beginsAt(line) || ScriptTags.Repeatable.beginsAt(line)) {
 					if (script != null) {
 						script.repeat = true;
 					}
@@ -656,7 +695,9 @@ public class Script {
 
 		// Closing the input stream.
 		try {
-			inputStream.close();
+			if (inputStream != null) {
+				inputStream.close();
+			}
 		}
 		catch (IOException e) {
 			Debug.error("Unable to close input stream.", e);
@@ -668,7 +709,20 @@ public class Script {
 	 * Load all default scripts.
 	 */
 	public static List<Script> loadDefaultScripts() {
-		return Script.loadScript("art/script/scripts.txt", false);
+		List<Script> result = new ArrayList<>();
+		URL uri = Script.class.getResource(WorldConstants.ScriptsDefaultPath);
+		try {
+			final File[] directory = new File(uri.toURI()).listFiles();
+			for (File f : directory) {
+				if (f.getName().endsWith(".script")) {
+					result.addAll(Script.loadScript(WorldConstants.ScriptsDefaultPath + File.separator + f.getName(), false));
+				}
+			}
+		}
+		catch (URISyntaxException e) {
+			Debug.error("Unable to load default scripts.", e);
+		}
+		return result;
 	}
 
 	/**

@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import abstracts.Item;
-import abstracts.Item.Category;
+import enums.ItemCategories;
+import enums.ItemTags;
 import item.Bicycle;
 import item.ReturnMenu;
 import item.ModdedItem;
@@ -79,16 +80,6 @@ public class ItemBuilder {
 		}
 	}
 
-	private static final String TAG_POTIONS = "POTIONS";
-	private static final String TAG_KEYITEMS = "KEYITEMS";
-	private static final String TAG_POKEBALLS = "POKEBALLS";
-	private static final String TAG_TM_HM = "TM HM";
-	private static final String TAG_ALL = "ALL";
-	private static final String FLAG_SET_COMMAND = "$";
-	private static final String FLAG_USE_COMMAND = "!";
-	private static final String FLAG_TOSS_COMMAND = "&";
-	private static final String ITEM_DELIMITER = ";";
-
 	public static HashMap<Integer, ModdedItem> loadItemResources(String filename) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(Item.class.getClassLoader().getResourceAsStream(filename)));
@@ -97,32 +88,32 @@ public class ItemBuilder {
 			HashMap<Integer, ModdedItem> result = new HashMap<>();
 			int id = 0;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("%")) {
-					itemText.type = ModdedItem.Type.getType(line.split("%")[1]);
+				if (ItemTags.Type.beginsAt(line)) {
+					itemText.type = ModdedItem.Type.getType(ItemTags.Type.removeItemTag(line));
 				}
-				else if (line.startsWith("#")) {
-					itemText.itemName = line.split("#")[1];
+				else if (ItemTags.Name.beginsAt(line)) {
+					itemText.itemName = ItemTags.Name.removeItemTag(line);
 				}
-				else if (line.startsWith("@")) {
-					itemText.description = line.split("@")[1];
+				else if (ItemTags.Description.beginsAt(line)) {
+					itemText.description = ItemTags.Description.removeItemTag(line);
 				}
-				else if (line.startsWith("^")) {
+				else if (ItemTags.Category.beginsAt(line)) {
 					// '^' is a special character, therefore, one must use backslashes to get the
 					// literal form.
-					String value = line.split("\\^")[1];
+					String value = ItemTags.Category.removeItemTag(line);
 					Tag tag = Tag.convert(value);
 					switch (tag) {
 						case POTIONS:
-							itemText.category = Category.POTIONS;
+							itemText.category = ItemCategories.POTIONS;
 							break;
 						case KEYITEMS:
-							itemText.category = Category.KEYITEMS;
+							itemText.category = ItemCategories.KEYITEMS;
 							break;
 						case POKEBALLS:
-							itemText.category = Category.POKEBALLS;
+							itemText.category = ItemCategories.POKEBALLS;
 							break;
 						case TM_HM:
-							itemText.category = Category.TM_HM;
+							itemText.category = ItemCategories.TM_HM;
 							break;
 						case ALL:
 							itemText.skipCheckCategory = true;
@@ -132,10 +123,11 @@ public class ItemBuilder {
 							break;
 					}
 				}
-				else if (line.startsWith(ItemBuilder.ITEM_DELIMITER)) {
+				else if (ItemTags.Delimiter.beginsAt(line)) {
 					itemText.done = true;
 				}
 				else {
+					// The rest of the line is what available item options the item allows the player to use.
 					ItemCommand command = ItemCommand.convert(line.charAt(0));
 					if (command != null) {
 						switch (command) {
@@ -175,45 +167,45 @@ public class ItemBuilder {
 
 			int id = 0;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("%")) {
-					itemText.type = ModdedItem.Type.getType(line.split("%")[1]);
+				if (ItemTags.Type.beginsAt(line)) {
+					itemText.type = ModdedItem.Type.getType(ItemTags.Type.removeItemTag(line));
 				}
-				else if (line.startsWith("#")) {
-					itemText.itemName = line.split("#")[1];
+				else if (ItemTags.Name.beginsAt(line)) {
+					itemText.itemName = ItemTags.Name.removeItemTag(line);
 				}
-				else if (line.startsWith("@")) {
-					itemText.description = line.split("@")[1];
+				else if (ItemTags.Description.beginsAt(line)) {
+					itemText.description = ItemTags.Description.removeItemTag(line);
 				}
-				else if (line.startsWith("^")) {
+				else if (ItemTags.Category.beginsAt(line)) {
 					// '^' is a special character, therefore, one must use backslashes to get the
 					// literal form.
-					String value = line.split("\\^")[1];
-					if (value.equals(ItemBuilder.TAG_POTIONS)) {
-						itemText.category = Category.POTIONS;
+					String value = ItemTags.Category.removeItemTag(line);
+					if (ItemCategories.POTIONS.chunkEquals(value)) {
+						itemText.category = ItemCategories.POTIONS;
 					}
-					else if (value.equals(ItemBuilder.TAG_KEYITEMS)) {
-						itemText.category = Category.KEYITEMS;
+					else if (ItemCategories.KEYITEMS.chunkEquals(value)) {
+						itemText.category = ItemCategories.KEYITEMS;
 					}
-					else if (value.equals(ItemBuilder.TAG_POKEBALLS)) {
-						itemText.category = Category.POKEBALLS;
+					else if (ItemCategories.POKEBALLS.chunkEquals(value)) {
+						itemText.category = ItemCategories.POKEBALLS;
 					}
-					else if (value.equals(ItemBuilder.TAG_TM_HM)) {
-						itemText.category = Category.TM_HM;
+					else if (ItemCategories.TM_HM.chunkEquals(value)) {
+						itemText.category = ItemCategories.TM_HM;
 					}
-					else if (value.equals(ItemBuilder.TAG_ALL)) {
+					else if (ItemCategories.ALL.chunkEquals(value)) {
 						itemText.skipCheckCategory = true;
 					}
 				}
-				else if (line.startsWith(ItemBuilder.FLAG_SET_COMMAND)) {
+				else if (ItemTags.SetCommand.beginsAt(line)) {
 					itemText.setCommandFlag = true;
 				}
-				else if (line.startsWith(ItemBuilder.FLAG_USE_COMMAND)) {
+				else if (ItemTags.UseCommand.beginsAt(line)) {
 					itemText.useCommandFlag = true;
 				}
-				else if (line.startsWith(ItemBuilder.FLAG_TOSS_COMMAND)) {
+				else if (ItemTags.TossCommand.beginsAt(line)) {
 					itemText.tossCommandFlag = true;
 				}
-				else if (line.startsWith(ItemBuilder.ITEM_DELIMITER)) {
+				else if (ItemTags.Delimiter.beginsAt(line)) {
 					itemText.done = true;
 				}
 

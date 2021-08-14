@@ -28,6 +28,7 @@ import common.Debug;
 import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
+import enums.ScriptTags;
 
 public class ScriptEditor extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -251,31 +252,30 @@ public class ScriptEditor extends JFrame {
 			trigger = null;
 			StringBuilder builder = new StringBuilder();
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("$")) {
-					tokens = line.split("\\$");
+				if (ScriptTags.BeginScript.beginsAt(line)) {
 					trigger = new Trigger();
-					trigger.setTriggerID(Short.valueOf(tokens[1]));
+					trigger.setTriggerID(Short.valueOf(ScriptTags.BeginScript.removeScriptTag(line)));
 				}
-				else if (line.startsWith("@")) {
-					tokens = line.split("@");
-					trigger.setName(tokens[1]);
+				else if (ScriptTags.ScriptName.beginsAt(line)) {
+					line = line.replaceAll("_", " ");
+					trigger.setName(ScriptTags.ScriptName.removeScriptTag(line));
 				}
-				else if (line.startsWith("%")) {
+				else if (ScriptTags.EndScript.beginsAt(line)) {
 					trigger.setScript(builder.toString());
 					scriptTriggerListModel.addElement(trigger);
 					editorTriggerComboModel.addElement(trigger);
 					builder.setLength(0);
 				}
-				else if (line.startsWith("#")) {
+				else if (ScriptTags.Speech.beginsAt(line)) {
 					// Dialogue
 				}
-				else if (line.startsWith("?")) {
+				else if (ScriptTags.Question.beginsAt(line)) {
 					// Question Mark
 				}
-				else if (line.startsWith("+")) {
+				else if (ScriptTags.Affirm.beginsAt(line)) {
 					// Affirmative Answer
 				}
-				else if (line.startsWith("-")) {
+				else if (ScriptTags.Reject.beginsAt(line)) {
 					// Negative Answer
 				}
 				else {
