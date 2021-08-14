@@ -23,6 +23,7 @@ import dialogue.Dialogue;
 import entity.Player;
 import enums.ScriptTags;
 import level.Area;
+import level.WorldConstants;
 import screen.Scene;
 import utility.DialogueBuilder;
 
@@ -709,13 +710,12 @@ public class Script {
 	 */
 	public static List<Script> loadDefaultScripts() {
 		List<Script> result = new ArrayList<>();
-		String defaultPath = "/art/script";
-		URL uri = Script.class.getResource(defaultPath);
+		URL uri = Script.class.getResource(WorldConstants.ScriptsDefaultPath);
 		try {
 			final File[] directory = new File(uri.toURI()).listFiles();
 			for (File f : directory) {
 				if (f.getName().endsWith(".script")) {
-					result.addAll(Script.loadScript(defaultPath + "/" + f.getName(), false));
+					result.addAll(Script.loadScript(WorldConstants.ScriptsDefaultPath + File.separator + f.getName(), false));
 				}
 			}
 		}
