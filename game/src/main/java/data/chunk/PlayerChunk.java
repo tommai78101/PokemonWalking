@@ -12,8 +12,8 @@ import java.util.stream.Collectors;
 import abstracts.Character.GenderType;
 import abstracts.Chunk;
 import abstracts.Item;
-import abstracts.Item.Category;
 import entity.Player;
+import enums.ItemCategories;
 import level.Area;
 import level.OverWorld;
 import main.Game;
@@ -121,13 +121,13 @@ public class PlayerChunk extends Chunk {
 		}
 
 		// Potions -> KeyItems -> Pokéballs -> TMs/HMs
-		int categorySize = Category.values().length;
+		int categorySize = ItemCategories.values().length;
 		for (int c = 0; c < categorySize; c++) {
 			short listSize = raf.readShort();
 			byte listCategory = raf.readByte();
 			for (short i = 0; i < listSize; i++) {
 				InventoryItemChunk chunk = new InventoryItemChunk();
-				chunk.setCategory(Category.convert(listCategory));
+				chunk.setCategory(ItemCategories.convert(listCategory));
 				chunk.read(game, raf);
 			}
 		}
@@ -164,9 +164,9 @@ public class PlayerChunk extends Chunk {
 		// Potions -> KeyItems -> Pokéballs -> TMs/HMs
 		// We have to go through them in order. We cannot guarantee the category order is the same when
 		// using inventory.getAllItemsList().
-		Map<Category, List<Map.Entry<Item, Integer>>> itemLists = inventory.getAllMappedItemsList();
-		Category[] values = Category.values();
-		for (Category category : values) {
+		Map<ItemCategories, List<Map.Entry<Item, Integer>>> itemLists = inventory.getAllMappedItemsList();
+		ItemCategories[] values = ItemCategories.values();
+		for (ItemCategories category : values) {
 			List<Map.Entry<Item, Integer>> list = itemLists.get(category);
 			list = list.stream().filter(e -> !e.getKey().isReturnMenu()).collect(Collectors.toList());
 
@@ -190,7 +190,7 @@ public class PlayerChunk extends Chunk {
 	public int getSize(Game game) {
 		// Prepare
 		Inventory inventory = game.getInventory();
-		Map<Category, List<Map.Entry<Item, Integer>>> mappedItems = inventory.getAllMappedItemsList();
+		Map<ItemCategories, List<Map.Entry<Item, Integer>>> mappedItems = inventory.getAllMappedItemsList();
 
 		// Chunk tag name
 		int size = PlayerChunk.ChunkTag.length;
@@ -203,8 +203,8 @@ public class PlayerChunk extends Chunk {
 		// Walking state (byte)
 		size += 1;
 
-		Category[] values = Category.values();
-		for (Category c : values) {
+		ItemCategories[] values = ItemCategories.values();
+		for (ItemCategories c : values) {
 			// Item list size (short)
 			size += 2;
 			// Item list category type (byte)

@@ -8,7 +8,7 @@
 
 package item;
 
-import abstracts.Item.Category;
+import enums.ItemCategories;
 
 /**
  * This class is dedicated for loading item data externally. This will be used to load modded items
@@ -42,7 +42,7 @@ public class ModdedItem {
 	public Type type;
 	public String itemName;
 	public String description;
-	public Category category;
+	public ItemCategories category;
 	public boolean skipCheckCategory;
 	public int id;
 	public boolean setCommandFlag;

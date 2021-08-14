@@ -16,6 +16,7 @@ import java.util.List;
 import dialogue.Dialogue;
 import dialogue.Dialogue.DialogueType;
 import entity.Player;
+import enums.ItemCategories;
 import interfaces.Renderable;
 import item.Bicycle;
 import item.ReturnMenu;
@@ -37,86 +38,10 @@ import utility.DialogueBuilder;
  */
 public abstract class Item extends Entity implements Comparable<Item>, Renderable {
 
-	public enum Category {
-		// @formatter:off
-		POTIONS(0x00, "Potions"), 
-		KEYITEMS(0x01, "KeyItems"), 
-		POKEBALLS(0x02, "Pokéballs"), 
-		TM_HM(0x03, "TMs_HMs");
-		// @formatter:on
-
-		private byte categoryByte;
-		private int id;
-		private String keyString;
-
-		private Category(int value, String key) {
-			this.id = value;
-			this.categoryByte = (byte) value;
-			this.keyString = key;
-		}
-
-		/**
-		 * Obtains a Category enum value that matches the given ID number.
-		 * 
-		 * <p>
-		 * If there is no Category that comes after the last element, it will give the first element, and
-		 * wraps from there.
-		 * </p>
-		 * 
-		 * @param value
-		 *            The ID number of the category that is to be obtained.
-		 * 
-		 * @return The category that matches the given ID number.
-		 */
-		public static Category getWrapped(int value) {
-			Category[] categories = Category.values();
-			if (value < 0)
-				value = (categories.length - 1);
-			if (value > categories.length - 1)
-				value = 0;
-			for (Category c : categories) {
-				if (c.id == value)
-					return categories[value];
-			}
-			return categories[0];
-		}
-
-		public int getID() {
-			return this.id;
-		}
-
-		public byte getByte() {
-			return this.categoryByte;
-		}
-
-		public String getKey() {
-			return this.keyString;
-		}
-
-		/**
-		 * Returns the correct Category enum value. Otherwise, returns null if no Category matches the
-		 * value.
-		 * 
-		 * @param value
-		 * @return
-		 */
-		public static Category convert(byte value) {
-			if (value == POTIONS.getByte())
-				return POTIONS;
-			if (value == KEYITEMS.getByte())
-				return KEYITEMS;
-			if (value == POKEBALLS.getByte())
-				return POKEBALLS;
-			if (value == TM_HM.getByte())
-				return TM_HM;
-			return null;
-		}
-	}
-
 	protected String name;
 	protected String dialogueName;
 	protected String description;
-	protected Category category;
+	protected ItemCategories category;
 	protected boolean picked;
 	protected boolean isReturnMenuFlag;
 	protected int id;
@@ -127,7 +52,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 	private boolean afterItemActionOccurred = false;
 
-	public Item(String name, String description, Category category, int id) {
+	public Item(String name, String description, ItemCategories category, int id) {
 		this.setName(name);
 		this.setDescription(description);
 		this.setCategory(category);
@@ -173,7 +98,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.description = value;
 	}
 
-	public void setCategory(Category category) {
+	public void setCategory(ItemCategories category) {
 		this.category = category;
 	}
 
@@ -199,7 +124,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		return this.description;
 	}
 
-	public Category getCategory() {
+	public ItemCategories getCategory() {
 		return this.category;
 	}
 

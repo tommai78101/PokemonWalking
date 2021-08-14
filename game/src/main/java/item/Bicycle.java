@@ -9,6 +9,7 @@
 package item;
 
 import entity.Player;
+import enums.ItemCategories;
 import level.PixelData;
 import level.WorldConstants;
 import main.StateManager.GameState;
@@ -18,8 +19,8 @@ public class Bicycle extends KeyItem {
 	private static final String ENABLING_DESCRIPTION = "Get on bicycle.";
 	private static final String DISABLING_DESCRIPTION = "Get off bicycle.";
 
-	public Bicycle(String name, String description, Category category) {
-		super("BICYCLE", Bicycle.ENABLING_DESCRIPTION, Category.KEYITEMS, WorldConstants.ITEM_BICYCLE);
+	public Bicycle(String name, String description, ItemCategories category) {
+		super("BICYCLE", Bicycle.ENABLING_DESCRIPTION, ItemCategories.KEYITEMS, WorldConstants.ITEM_BICYCLE);
 	}
 
 	/**
@@ -29,7 +30,7 @@ public class Bicycle extends KeyItem {
 	 * @param pixelData
 	 */
 	public Bicycle(PixelData pixelData) {
-		super("BICYCLE", "Ride bike.", Category.KEYITEMS, pixelData.getRed());
+		super("BICYCLE", "Ride bike.", ItemCategories.KEYITEMS, pixelData.getRed());
 		this.pixelData = pixelData;
 		this.pixelData.setAsItem(true);
 	}

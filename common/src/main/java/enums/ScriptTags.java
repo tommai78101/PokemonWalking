@@ -1,7 +1,7 @@
 /**
  * 
  */
-package constants;
+package enums;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,11 +10,12 @@ import java.util.regex.Pattern;
  * 
  * @author tlee
  */
-public enum ScriptTag {
-	ScriptName("@", "NAME", "Script Name"),
+public enum ScriptTags {
+	ScriptName("@", "NAME", "Script name"),
+	ScriptId("&", "ID", "Script ID value"),
 	Comment("/", "COMMENT", "Comment"),
 	BeginScript("$", "BEGIN", "Script begins"),
-	PathData("^", "PATH", "Scripted Path Data"),
+	PathData("^", "PATH", "Scripted path data"),
 	EndScript("%", "END", "Script ends"),
 	Speech("#", "SPEAK", "A speech dialogue"),
 	Question("?", "ASK", "A question dialogue"),
@@ -27,12 +28,14 @@ public enum ScriptTag {
 	Condition("~", "CONDITION", "Conditions that are to be met to complete the script");
 
 	private final String symbol;
-	private final String fullSymbol;
+	private final String uppercaseSymbolName;
+	private final String lowercaseSymbolName;
 	private final String description;
 
-	private ScriptTag(String sym, String alternate, String description) {
+	private ScriptTags(String sym, String alternate, String description) {
 		this.symbol = sym;
-		this.fullSymbol = alternate;
+		this.uppercaseSymbolName = alternate.toUpperCase();
+		this.lowercaseSymbolName = alternate.toLowerCase();
 		this.description = description;
 	}
 
@@ -45,9 +48,11 @@ public enum ScriptTag {
 	public boolean beginsAt(String line) {
 		if (line == null || line.isEmpty() || line.isBlank())
 			return false;
-		if (this.startsWithUpperCase(line))
+		if (this.startsWithUpperCase(line) || line.startsWith(this.symbol))
 			return true;
-		if (line.startsWith(this.symbol))
+		String upper = line.toUpperCase();
+		String lower = line.toLowerCase();
+		if (upper.contains(this.uppercaseSymbolName) || lower.contains(this.lowercaseSymbolName))
 			return true;
 		return line.regionMatches(true, 0, this.name(), 0, this.name().length());
 	}
@@ -70,9 +75,28 @@ public enum ScriptTag {
 		String[] tokens = line.toUpperCase().split(":=");
 		if (tokens.length > 0) {
 			String uppercase = tokens[0];
-			return (uppercase.trim().equals(this.fullSymbol));
+			return (uppercase.trim().equals(this.uppercaseSymbolName));
 		}
 		return false;
+	}
+
+	/**
+	 * Removes the script tag or script symbol from the given line, and returns the result.
+	 * 
+	 * @param line
+	 *            The line that contains the script tag or symbol.
+	 * @return The resulting string value after the script tag or symbol has been removed.
+	 */
+	public String removeScriptTag(String line) {
+		if (line.startsWith(this.symbol))
+			return line.substring(this.symbol.length());
+		else if (line.toUpperCase().contains(this.uppercaseSymbolName) || line.toLowerCase().contains(this.lowercaseSymbolName)) {
+			// We ignore anything that comes before the script tag. We're not doing anything complicated here.
+			int endOfIndex = line.indexOf(this.uppercaseSymbolName) + this.uppercaseSymbolName.length();
+			return line.substring(endOfIndex);
+		}
+		// Cannot remove any script tags or symbols.
+		return line;
 	}
 
 	public String getDescription() {
@@ -84,6 +108,10 @@ public enum ScriptTag {
 	}
 
 	public String getSymbolName() {
-		return this.fullSymbol;
+		return this.uppercaseSymbolName;
+	}
+
+	public String getLowercaseSymbolName() {
+		return this.lowercaseSymbolName;
 	}
 }

@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 
 import common.Debug;
-import constants.ScriptTag;
 import dialogue.Dialogue;
 import entity.Player;
+import enums.ScriptTags;
 import level.Area;
 import screen.Scene;
 import utility.DialogueBuilder;
@@ -538,12 +538,12 @@ public class Script {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				// Ignored tags
-				if (ScriptTag.Comment.beginsAt(line) || ScriptTag.ScriptName.beginsAt(line) || line.startsWith(" ") || line.isEmpty())
+				if (ScriptTags.Comment.beginsAt(line) || ScriptTags.ScriptName.beginsAt(line) || line.startsWith(" ") || line.isEmpty())
 					continue;
 
 				// Start of script
-				else if (ScriptTag.BeginScript.beginsAt(line)) {
-					line = ScriptTag.BeginScript.replace(line);
+				else if (ScriptTags.BeginScript.beginsAt(line)) {
+					line = ScriptTags.BeginScript.replace(line);
 					int triggerID = Integer.valueOf(line.substring(1).trim());
 					if (triggerID > 0) {
 						if (script == null)
@@ -553,10 +553,10 @@ public class Script {
 				}
 
 				// Movement Data
-				else if (ScriptTag.PathData.beginsAt(line)) {
+				else if (ScriptTags.PathData.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTag.PathData.replace(line);
+						line = ScriptTags.PathData.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.moves.add(Map.entry(iteration, moves));
 						iteration++;
@@ -564,7 +564,7 @@ public class Script {
 				}
 
 				// Script delimiter
-				else if (ScriptTag.EndScript.beginsAt(line)) {
+				else if (ScriptTags.EndScript.beginsAt(line)) {
 					if (script != null) {
 						result.add(script);
 						script = null;
@@ -573,8 +573,8 @@ public class Script {
 				}
 
 				// Speech dialogue
-				else if (ScriptTag.Speech.beginsAt(line)) {
-					line = ScriptTag.Speech.replace(line);
+				else if (ScriptTags.Speech.beginsAt(line)) {
+					line = ScriptTags.Speech.replace(line);
 					Dialogue d = DialogueBuilder.createText(
 					    line.substring(1).trim().replace("_", " "),
 					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
@@ -584,8 +584,8 @@ public class Script {
 				}
 
 				// Question dialogue
-				else if (ScriptTag.Question.beginsAt(line)) {
-					line = ScriptTag.Question.replace(line);
+				else if (ScriptTags.Question.beginsAt(line)) {
+					line = ScriptTags.Question.replace(line);
 					Dialogue d = DialogueBuilder.createText(
 					    line.substring(1).trim().replace("_", " "),
 					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
@@ -595,8 +595,8 @@ public class Script {
 				}
 
 				// Affirmative Response dialogue
-				else if (ScriptTag.Affirm.beginsAt(line)) {
-					line = ScriptTag.Affirm.replace(line);
+				else if (ScriptTags.Affirm.beginsAt(line)) {
+					line = ScriptTags.Affirm.replace(line);
 					Dialogue d = DialogueBuilder.createText(
 					    line.substring(1).trim().replace("_", " "),
 					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
@@ -607,8 +607,8 @@ public class Script {
 				}
 
 				// Negative Response dialogue
-				else if (ScriptTag.Reject.beginsAt(line)) {
-					line = ScriptTag.Reject.replace(line);
+				else if (ScriptTags.Reject.beginsAt(line)) {
+					line = ScriptTags.Reject.replace(line);
 					Dialogue d = DialogueBuilder.createText(
 					    line.substring(1).trim().replace("_", " "),
 					    Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
@@ -619,10 +619,10 @@ public class Script {
 				}
 
 				// Affirmative Response action
-				else if (ScriptTag.Confirm.beginsAt(line)) {
+				else if (ScriptTags.Confirm.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTag.Confirm.replace(line);
+						line = ScriptTags.Confirm.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.affirmativeMoves
 						    .add(Map.entry(affirmativeIteration, moves));
@@ -631,10 +631,10 @@ public class Script {
 				}
 
 				// Negative Response action
-				else if (ScriptTag.Deny.beginsAt(line)) {
+				else if (ScriptTags.Deny.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTag.Deny.replace(line);
+						line = ScriptTags.Deny.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.negativeMoves
 						    .add(Map.entry(negativeIteration, moves));
@@ -643,7 +643,7 @@ public class Script {
 				}
 
 				// Is a Repeating Trigger
-				else if (ScriptTag.Repeat.beginsAt(line) || ScriptTag.Repeatable.beginsAt(line)) {
+				else if (ScriptTags.Repeat.beginsAt(line) || ScriptTags.Repeatable.beginsAt(line)) {
 					if (script != null) {
 						script.repeat = true;
 					}

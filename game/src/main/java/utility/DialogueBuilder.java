@@ -10,6 +10,7 @@ import java.util.Map;
 import dialogue.Dialogue;
 import dialogue.Dialogue.DialogueType;
 import entity.Player;
+import enums.ScriptTags;
 
 public class DialogueBuilder {
 	public static Dialogue createText(String dialogue, DialogueType type) {
@@ -56,20 +57,19 @@ public class DialogueBuilder {
 			int dialogueID = 0;
 			Dialogue temp = null;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("#")) {
+				if (ScriptTags.Speech.beginsAt(line)) {
 					// Dialogue ID
-					tokens = line.split("#");
-					dialogueID = Integer.valueOf(tokens[1]);
+					dialogueID = Integer.valueOf(ScriptTags.Speech.removeScriptTag(line));
 				}
-				else if (line.startsWith("@")) {
+				else if (ScriptTags.ScriptName.beginsAt(line)) {
 					// Dialogue message
-					tokens = line.split("@");
 					temp = DialogueBuilder.createText(
-						tokens[1], Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH,
+						ScriptTags.ScriptName.removeScriptTag(line),
+						Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH,
 						false
 					);
 				}
-				else if (line.startsWith("-")) {
+				else if (ScriptTags.Reject.beginsAt(line)) {
 					// Dialogue delimiter
 					Map.Entry<Dialogue, Integer> entry = new AbstractMap.SimpleEntry<>(
 						temp,

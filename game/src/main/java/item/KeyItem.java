@@ -12,6 +12,7 @@ import java.util.List;
 
 import abstracts.Item;
 import entity.Player;
+import enums.ItemCategories;
 import level.Area;
 import main.Game;
 import menu.Inventory;
@@ -27,7 +28,7 @@ public class KeyItem extends Item {
 
 	protected boolean enabled;
 
-	public KeyItem(String name, String description, Category category, int id) {
+	public KeyItem(String name, String description, ItemCategories category, int id) {
 		super(name, description, category, id);
 	}
 

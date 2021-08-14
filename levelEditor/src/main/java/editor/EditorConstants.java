@@ -26,6 +26,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import common.Tileable;
+import enums.ScriptTags;
 
 public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for
@@ -238,22 +239,29 @@ public class EditorConstants {
 			String line;
 			Trigger trigger = null;
 			while ((line = reader.readLine()) != null) {
-				if (line.startsWith("/"))
+				if (ScriptTags.Comment.beginsAt(line)) {
+					// This is a comment.
 					continue;
-				else if (line.startsWith("$")) {
+				}
+				else if (ScriptTags.BeginScript.beginsAt(line)) {
+					// This is where the script begins. The proceeding number is the trigger ID value.
 					if (trigger == null)
 						trigger = new Trigger();
-					int value = Integer.valueOf(line.substring(1));
+					int value = Integer.valueOf(ScriptTags.BeginScript.removeScriptTag(line));
 					if (value != 0) {
 						trigger.setTriggerID((short) (value & 0xFFFF));
 					}
-
+					else {
+						// Ignore the trigger value that's equal to 0. This is the Eraser.
+					}
 				}
-				else if (line.startsWith("@")) {
+				else if (ScriptTags.ScriptName.beginsAt(line)) {
+					// This is the trigger script name.
 					if (trigger != null)
-						trigger.setName(line.substring(1));
+						trigger.setName(ScriptTags.ScriptName.removeScriptTag(line));
 				}
-				else if (line.startsWith("%")) {
+				else if (ScriptTags.EndScript.beginsAt(line)) {
+					// This is the delimiter / end of the trigger script section.
 					this.triggers.add(trigger);
 					trigger = null;
 				}
