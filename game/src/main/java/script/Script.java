@@ -8,6 +8,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +41,7 @@ import utility.DialogueBuilder;
  * @author tlee
  */
 public class Script {
+	private String checksum;
 	private int triggerID;
 	private ArrayList<Map.Entry<Integer, MovementData>> moves;
 	private ArrayList<Map.Entry<Integer, MovementData>> affirmativeMoves;
@@ -56,6 +63,7 @@ public class Script {
 	 * Constructor of the Script object, which holds a single scripted event defined in the script file.
 	 */
 	public Script() {
+		this.checksum = null;
 		this.triggerID = 0;
 		this.moves = new ArrayList<>();
 		this.affirmativeMoves = new ArrayList<>();
@@ -78,6 +86,7 @@ public class Script {
 	 * @param s
 	 */
 	public Script(Script s) {
+		this.checksum = s.checksum;
 		this.triggerID = s.triggerID;
 
 		this.moves = new ArrayList<>();
@@ -480,6 +489,27 @@ public class Script {
 			return false;
 		}
 	}
+	
+	public String getChecksum() {
+		return this.checksum;
+	}
+	
+	public void setChecksum(String checksum) {
+		this.checksum = checksum;
+	}
+	
+	public boolean isMatchingScript(Script s) {
+		if (this.checksum == null || this.checksum.isBlank() || s.checksum == null || s.checksum.isBlank())
+			return false;
+		return this.checksum.equals(s.checksum);
+	}
+	
+	public boolean isMatchingArea(Area area) {
+		String areaChecksum = area.getChecksum();
+		if (this.checksum == null || this.checksum.isBlank() || areaChecksum == null || areaChecksum.isBlank())
+			return false;
+		return this.checksum.equals(areaChecksum);
+	}
 
 	// -------------------------------------------------------------------------------
 	// Private methods
@@ -523,7 +553,7 @@ public class Script {
 				inputStream = new FileInputStream(new File(filename));
 			}
 			else {
-				inputStream = Script.class.getClassLoader().getResourceAsStream(filename);
+				inputStream = Script.class.getResourceAsStream(filename);
 			}
 		}
 		catch (FileNotFoundException e) {
@@ -540,6 +570,14 @@ public class Script {
 				// Ignored tags
 				if (ScriptTags.Comment.beginsAt(line) || ScriptTags.ScriptName.beginsAt(line) || line.startsWith(" ") || line.isEmpty())
 					continue;
+				
+				// Script checksum
+				else if (ScriptTags.Checksum.beginsAt(line)) {
+					line = ScriptTags.Checksum.removeScriptTag(line);
+					if (script == null)
+						script = new Script();
+					script.setChecksum(line);
+				}
 
 				// Start of script
 				else if (ScriptTags.BeginScript.beginsAt(line)) {
@@ -656,7 +694,9 @@ public class Script {
 
 		// Closing the input stream.
 		try {
-			inputStream.close();
+			if (inputStream != null) {
+				inputStream.close();
+			}
 		}
 		catch (IOException e) {
 			Debug.error("Unable to close input stream.", e);
@@ -668,7 +708,21 @@ public class Script {
 	 * Load all default scripts.
 	 */
 	public static List<Script> loadDefaultScripts() {
-		return Script.loadScript("art/script/scripts.txt", false);
+		List<Script> result = new ArrayList<>();
+		String defaultPath = "/art/script";
+		URL uri = Script.class.getResource(defaultPath);
+		try {
+			final File[] directory = new File(uri.toURI()).listFiles();
+			for (File f : directory) {
+				if (f.getName().endsWith(".script")) {
+					result.addAll(Script.loadScript(defaultPath + "/" + f.getName(), false));
+				}
+			}
+		}
+		catch (URISyntaxException e) {
+			Debug.error("Unable to load default scripts.", e);
+		}
+		return result;
 	}
 
 	/**

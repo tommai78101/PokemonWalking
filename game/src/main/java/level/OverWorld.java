@@ -186,7 +186,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 			}
 		}
 
-		if (this.currentArea != null && !this.currentArea.isBeingTriggered() && !this.player.isInteracting() && Player.isMovementsLocked()) {
+		if (this.currentArea != null && !this.currentArea.isTriggerBeingTriggered() && !this.player.isInteracting() && Player.isMovementsLocked()) {
 			Player.unlockMovements();
 		}
 

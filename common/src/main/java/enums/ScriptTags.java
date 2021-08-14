@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  */
 public enum ScriptTags {
 	ScriptName("@", "NAME", "Script name"),
-	ScriptId("&", "ID", "Script ID value"),
+	Checksum("&", "CHKSUM", "Script checksum"),
 	Comment("/", "REM", "Comment"),
 	BeginScript("$", "BEGIN", "Script begins"),
 	PathData("^", "PATH", "Scripted path data"),

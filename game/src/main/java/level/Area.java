@@ -49,7 +49,7 @@ public class Area implements Tileable, UpdateRenderable {
 	// private int areaType;
 
 	private boolean isExitArrowDisplayed;
-	private boolean isTriggerBeingTriggered;
+	private boolean isTriggerTriggered;
 	private TriggerData trigger;
 
 	private final List<List<PixelData>> areaData = new ArrayList<>();
@@ -103,7 +103,7 @@ public class Area implements Tileable, UpdateRenderable {
 			// TODO(2021-July-24): This is the place to insert a static method to "search for any trigger
 			// scripts matching the checksum" and load the trigger script into TriggerData.loadTriggerData().
 
-			for (; column < triggerSize - 1; column++) {
+			for (; column < triggerSize; column++) {
 				// The "color" is the ID.
 				// ID must not be negative. ID = 0 is reserved.
 				int color = tempPixels[column + (stride * row)];
@@ -158,7 +158,7 @@ public class Area implements Tileable, UpdateRenderable {
 		this.isInWarpZone = false;
 		this.isInSectorPoint = false;
 		this.isExitArrowDisplayed = false;
-		this.isTriggerBeingTriggered = false;
+		this.isTriggerTriggered = false;
 		this.areaName = "";
 	}
 
@@ -200,7 +200,7 @@ public class Area implements Tileable, UpdateRenderable {
 			return;
 
 		// PixelData data = null;
-		if (this.isTriggerBeingTriggered) {
+		if (this.isTriggerBeingTriggered()) {
 			this.xPlayerPosition = this.player.getXInArea();
 			this.yPlayerPosition = this.player.getYInArea();
 
@@ -217,14 +217,14 @@ public class Area implements Tileable, UpdateRenderable {
 			if (!this.player.isLockedWalking()) {
 				this.trigger = this.checkForTrigger(this.xPlayerPosition, this.yPlayerPosition);
 				if (this.trigger != null) {
-					this.isTriggerBeingTriggered = true;
+					this.setTriggerBeingTriggered();
 				}
 			}
 		}
-		if (this.isTriggerBeingTriggered && this.trigger != null)
+		if (this.isTriggerBeingTriggered() && this.trigger != null)
 			this.handleTriggerActions();
-		else if ((this.isTriggerBeingTriggered && this.trigger == null) || !this.isTriggerBeingTriggered) {
-			this.isTriggerBeingTriggered = false;
+		else if ((this.isTriggerBeingTriggered() && this.trigger == null) || !this.isTriggerBeingTriggered()) {
+			this.unsetTriggerBeingTriggered();
 			this.handlePlayerActions();
 		}
 
@@ -237,14 +237,14 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	private void handleTriggerActions() {
-		if (this.trigger.hasActiveScript()) {
+		if (this.trigger.hasActiveScript(this)) {
 			this.trigger.prepareActiveScript();
 			this.player.enableAutomaticMode();
 			this.trigger.tick(this, this.xPlayerPosition, this.yPlayerPosition);
 		}
 		else {
 			this.player.disableAutomaticMode();
-			this.isTriggerBeingTriggered = false;
+			this.unsetTriggerBeingTriggered();
 			this.trigger = null;
 		}
 	}
@@ -681,10 +681,18 @@ public class Area implements Tileable, UpdateRenderable {
 		return this.trigger;
 	}
 
-	public boolean isBeingTriggered() {
-		return this.isTriggerBeingTriggered;
+	public boolean isTriggerBeingTriggered() {
+		return this.isTriggerTriggered;
 	}
-
+	
+	public void setTriggerBeingTriggered() {
+		this.isTriggerTriggered = true;
+	}
+	
+	public void unsetTriggerBeingTriggered() {
+		this.isTriggerTriggered = false;
+	}
+	
 	public Entity getEntity(int x, int y) {
 		// Only obstacles and characters are entities.
 		PixelData data = this.getPixelData(x, y);

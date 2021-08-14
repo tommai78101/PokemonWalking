@@ -93,10 +93,15 @@ public class TriggerData {
 	 * 
 	 * @return
 	 */
-	public boolean hasActiveScript() {
+	public boolean hasActiveScript(Area area) {
 		if (this.currentScript == null) {
 			if (!this.scripts.isEmpty() && !this.isPaused) {
-				this.currentScript = this.scripts.pop();
+				for (Script s : this.scripts) {
+					if (s.isMatchingArea(area)) {
+						this.currentScript = s;
+						break;
+					}
+				}
 			}
 		}
 		return this.currentScript != null;
