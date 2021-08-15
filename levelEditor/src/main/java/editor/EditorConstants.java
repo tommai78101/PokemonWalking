@@ -13,7 +13,10 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,8 +28,11 @@ import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
+import common.Debug;
 import common.Tileable;
 import enums.ScriptTags;
+import level.WorldConstants;
+import script.Script;
 
 public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for
@@ -230,23 +236,45 @@ public class EditorConstants {
 	}
 
 	private void loadTriggers() {
+		URL uri = Script.class.getResource(WorldConstants.ScriptsDefaultPath);
 		try {
+			final File[] directory = new File(uri.toURI()).listFiles();
+			for (File f : directory) {
+				if (f.getName().endsWith(".script")) {
+					this.loadTriggers(WorldConstants.ScriptsDefaultPath + File.separator + f.getName());
+				}
+			}
+		}
+		catch (URISyntaxException e) {
+			Debug.error("Unable to load trigger scripts for the level editor.", e);
+		}
+	}
+
+	private void loadTriggers(String filename) {
+		try (
 			BufferedReader reader = new BufferedReader(
 				new InputStreamReader(
-					EditorConstants.class.getClassLoader().getResourceAsStream("art/script/scripts.txt")
+					EditorConstants.class.getResourceAsStream(filename)
 				)
-			);
+			)
+		) {
 			String line;
 			Trigger trigger = null;
+			String checksum = null;
 			while ((line = reader.readLine()) != null) {
 				if (ScriptTags.Comment.beginsAt(line)) {
 					// This is a comment.
 					continue;
 				}
+				else if (checksum == null && ScriptTags.Checksum.beginsAt(line)) {
+					checksum = ScriptTags.Checksum.removeScriptTag(line);
+				}
 				else if (ScriptTags.BeginScript.beginsAt(line)) {
 					// This is where the script begins. The proceeding number is the trigger ID value.
 					if (trigger == null)
 						trigger = new Trigger();
+					if (checksum != null)
+						trigger.setChecksum(checksum);
 					int value = Integer.valueOf(ScriptTags.BeginScript.removeScriptTag(line));
 					if (value != 0) {
 						trigger.setTriggerID((short) (value & 0xFFFF));
@@ -268,7 +296,7 @@ public class EditorConstants {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			Debug.error("Unhandled exception when loading level editor triggers.", e);
 		}
 	}
 

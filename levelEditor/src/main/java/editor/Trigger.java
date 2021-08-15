@@ -5,6 +5,7 @@ public class Trigger {
 	private short triggerID;
 	private String name;
 	private String script;
+	private String checksum;
 
 	private boolean[] valuesHasBeenSet = new boolean[4];
 	private static final int FLAG_PositionX = 0;
@@ -90,6 +91,14 @@ public class Trigger {
 	public short getTriggerID() {
 		return this.triggerID;
 	}
+	
+	public boolean checkTriggerID(short triggerId) {
+		return this.triggerID == triggerId;
+	}
+	
+	public boolean checkTriggerID(int triggerId) {
+		return this.checkTriggerID((short) triggerId);
+	}
 
 	public void setName(String name) {
 		this.name = name;
@@ -101,6 +110,14 @@ public class Trigger {
 
 	public String getScript() {
 		return this.script;
+	}
+
+	public String getChecksum() {
+		return checksum;
+	}
+
+	public void setChecksum(String checksum) {
+		this.checksum = checksum;
 	}
 
 	public boolean equalsTriggerId(short otherTriggerId) {

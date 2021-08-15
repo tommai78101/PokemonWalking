@@ -50,14 +50,29 @@ class TriggerSet {
 		return this.triggers.size();
 	}
 
-	public Trigger validityCheck(int triggerId) {
+	/**
+	 * Validate and check for triggers.
+	 * 
+	 * @param triggerPixelData
+	 *            The full RGBA pixel data of the supposed trigger in the area map.
+	 * @return
+	 */
+	public Trigger validityCheck(int triggerPixelData) {
 		Trigger triggerValidityCheck = null;
+		final short trigId = (short) (triggerPixelData & 0xFFFF);
+		List<Trigger> triggers = EditorConstants.getInstance().getTriggers();
 		try {
-			triggerValidityCheck = EditorConstants.getInstance().getTriggers().get(triggerId);
+			for (Trigger t : triggers) {
+				if (t.checkTriggerID(trigId)) {
+					triggerValidityCheck = t;
+					break;
+				}
+			}
 		}
 		catch (Exception e) {
+			Debug.error("Encountered an error related to validating the trigger ID: " + triggerPixelData, e);
 			// Eraser.
-			triggerValidityCheck = EditorConstants.getInstance().getTriggers().get(0);
+			triggerValidityCheck = triggers.get(0);
 		}
 		return triggerValidityCheck;
 	}
@@ -482,7 +497,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 		g.dispose();
 		bs.show();
 
-		// At each end of the rendering, we validate the editor, so the data is refreshed and kept up-to-date.
+		// At each end of the rendering, we validate the editor, so the data is refreshed and kept
+		// up-to-date.
 		this.editor.validate();
 	}
 
