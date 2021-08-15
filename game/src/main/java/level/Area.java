@@ -288,6 +288,8 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	private TriggerData checkForTrigger(int playerX, int playerY) {
+		if (this.triggerDatas.isEmpty())
+			return null;
 		TriggerData data = this.triggerDatas.get(Map.entry(playerX, playerY));
 		TriggerData oldData = this.triggerDatas.get(Map.entry(this.oldXTriggerPosition, this.oldYTriggerPosition));
 		if (oldData != null && oldData.isPaused() && (playerX != this.oldXTriggerPosition || playerY != this.oldYTriggerPosition)) {
