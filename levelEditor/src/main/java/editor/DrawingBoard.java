@@ -40,10 +40,13 @@ class TriggerSet {
 	// Since this is part of Javax Swing, I might as well use it to store the width and height of the
 	// bitmap.
 	private Dimension size;
+	// This checksum keeps track of the area checksum as well as the trigger scripts.
+	private String checksum;
 
-	public TriggerSet(int width, int height) {
+	public TriggerSet(int width, int height, String checksum) {
 		this.size = new Dimension(width, height);
 		this.triggers = new HashMap<>();
+		this.checksum = checksum;
 	}
 
 	public int getSize() {
@@ -192,6 +195,16 @@ class TriggerSet {
 	public boolean isEmpty() {
 		return this.getSize() == 0;
 	}
+
+	public boolean matchesChecksum(String checksum) {
+		if (this.checksum == null || this.checksum.isBlank() || checksum == null || checksum.isBlank())
+			return false;
+		return this.checksum.equals(checksum);
+	}
+	
+	public String getChecksum() {
+		return this.checksum;
+	}
 }
 
 public class DrawingBoard extends Canvas implements Runnable {
@@ -276,9 +289,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		this.tiles = new int[w * h];
 		this.tilesEditorID = new int[w * h];
-		if (this.triggers == null || this.triggers.isEmpty()) {
+		if (this.triggers == null || this.triggers.isEmpty() || !this.triggers.matchesChecksum(this.editor.getChecksum())) {
 			// Only if the triggers set is null or is empty, do we create a new trigger set.
-			this.triggers = new TriggerSet(w, h);
+			this.triggers = new TriggerSet(w, h, this.editor.getChecksum());
 		}
 		for (int i = 0; i < this.tiles.length; i++) {
 			this.tiles[i] = 0;
@@ -746,8 +759,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 			return null;
 
 		// Get the checksum and relevant information.
+		final String checksum = this.editor.getChecksum();
 		final int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
-		byte[] checksumBytes = this.editor.getChecksum().getBytes();
+		byte[] checksumBytes = checksum.getBytes();
 		int checksumPixelsRow = ((1 + checksumPixelsCount) % this.bitmapWidth == 0) ? (1 + checksumPixelsCount) / this.bitmapWidth : ((1 + checksumPixelsCount) / this.bitmapWidth) + 1;
 
 		// Represents how many reserved pixels that will be used before creating the bitmap.
@@ -756,7 +770,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
 		// designated as ID 0.
 		if (this.triggers == null) {
-			this.triggers = new TriggerSet(this.bitmapWidth, this.bitmapHeight);
+			this.triggers = new TriggerSet(this.bitmapWidth, this.bitmapHeight, checksum);
 		}
 		List<Integer> triggerDataList = this.triggers.convertToData();
 
@@ -857,11 +871,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 			// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
 			// designated as ID 0.
-			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight);
+			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight, this.editor.getChecksum());
 			for (int i = 0; i < triggerSize; i++, pixelIterator++) {
-				int x = (pixels[pixelIterator] >> 24) & 0xFF;
-				int y = (pixels[pixelIterator] >> 16) & 0xFF;
-				this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator]);
+				short triggerId = (short) (pixels[pixelIterator] & 0xFFFF);
+				if (triggerId != 0) {
+					// We only want non-Eraser triggers to be added to the trigger set in the level editor.
+					int x = (pixels[pixelIterator] >> 24) & 0xFF;
+					int y = (pixels[pixelIterator] >> 16) & 0xFF;
+					this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator]);
+				}
 			}
 			// Skipping the trigger row padding.
 			for (int i = 0; i < (triggerRowHeight * bitmapWidth - triggerSize); i++)
