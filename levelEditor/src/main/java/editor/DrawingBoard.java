@@ -59,8 +59,14 @@ class TriggerSet {
 	 */
 	public Trigger validityCheck(int triggerPixelData) {
 		Trigger triggerValidityCheck = null;
-		final short trigId = (short) (triggerPixelData & 0xFFFF);
 		List<Trigger> triggers = EditorConstants.getInstance().getTriggers();
+		if (triggerPixelData == 0x0) {
+			// Trigger data created by the user should never be 0. Trigger pixel data that is 0 is an internal
+			// Eraser trigger.
+			triggerValidityCheck = triggers.get(0);
+			return triggerValidityCheck;
+		}
+		final short trigId = (short) (triggerPixelData & 0xFFFF);
 		try {
 			for (Trigger t : triggers) {
 				if (t.checkTriggerID(trigId)) {
@@ -83,15 +89,15 @@ class TriggerSet {
 
 	public void addTrigger(int index, byte newX, byte newY, Trigger trigger) {
 		Set<Trigger> set = this.triggers.get(index);
-		if (set == null) {
+		if (set == null)
 			set = new HashSet<>();
-			this.triggers.put(index, set);
-		}
 		Trigger modifiedTrigger = new Trigger();
+		modifiedTrigger.setChecksum(trigger.getChecksum());
 		modifiedTrigger.setTriggerPositionX(newX);
 		modifiedTrigger.setTriggerPositionY(newY);
 		modifiedTrigger.setTriggerID(trigger.getTriggerID());
 		set.add(modifiedTrigger);
+		this.triggers.put(index, set);
 	}
 
 	public void removeTrigger(int index, Trigger trigger) {
@@ -182,6 +188,10 @@ class TriggerSet {
 		Set<Trigger> set = this.triggers.get(index);
 		return (set != null && !set.isEmpty());
 	}
+
+	public boolean isEmpty() {
+		return this.getSize() == 0;
+	}
 }
 
 public class DrawingBoard extends Canvas implements Runnable {
@@ -266,7 +276,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 		this.tiles = new int[w * h];
 		this.tilesEditorID = new int[w * h];
-		this.triggers = new TriggerSet(w, h);
+		if (this.triggers == null || this.triggers.isEmpty()) {
+			// Only if the triggers set is null or is empty, do we create a new trigger set.
+			this.triggers = new TriggerSet(w, h);
+		}
 		for (int i = 0; i < this.tiles.length; i++) {
 			this.tiles[i] = 0;
 			this.tilesEditorID[i] = 0;
@@ -411,9 +424,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 				// Iterate through a bitmap array of triggers.
 				for (int currentTriggerIndex = 0; currentTriggerIndex < this.tiles.length; currentTriggerIndex++) {
-					if (this.bitmapWidth <= 0)
-						break;
-					if (this.bitmapHeight <= 0)
+					if (this.bitmapWidth <= 0 || this.bitmapHeight <= 0)
 						break;
 
 					Data data = null;
@@ -856,6 +867,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			for (int i = 0; i < (triggerRowHeight * bitmapWidth - triggerSize); i++)
 				pixelIterator++;
 
+			// Set the dimensions of the area.
 			this.setImageSize(bitmapWidth, bitmapHeight);
 			for (int i = 0; i < bitmapWidth * bitmapHeight; i++, pixelIterator++) {
 				this.tiles[i] = pixels[pixelIterator];
