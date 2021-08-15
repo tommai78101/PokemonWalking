@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 
+import common.Debug;
 import editor.EditorConstants.Tools;
 
 public class SelectionDropdownMenu extends JPanel {
@@ -198,6 +199,9 @@ public class SelectionDropdownMenu extends JPanel {
 
 		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
 		List<Trigger> list = EditorConstants.getInstance().getTriggers();
+		if (list.isEmpty()) {
+			Debug.error("The default level editor triggers list shouldn't be empty. It should at least contain Eraser.");
+		}
 		for (Trigger t : list) {
 			if (t != null)
 				model.addElement(t);
