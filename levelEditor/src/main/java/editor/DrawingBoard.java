@@ -215,6 +215,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private BufferedImage image;
 	private int[] tiles;
 	private int[] tilesEditorID;
+	private int[] npcsEditorID;
 	private TriggerSet triggers;
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
@@ -281,21 +282,31 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 
 	public void setImageSize(int w, int h) {
-		if (w <= 0 || h <= 0)
+		if (w <= 0 || h <= 0) {
+			Debug.error("Improper image size [" + w + " x " + h + "] was given.");
 			return;
-		if (this.image != null) {
-			this.image.flush();
-			this.image = null;
 		}
-		this.tiles = new int[w * h];
-		this.tilesEditorID = new int[w * h];
+		
+		// Initializing a new Trigger Set.
 		if (this.triggers == null || this.triggers.isEmpty() || !this.triggers.matchesChecksum(this.editor.getChecksum())) {
 			// Only if the triggers set is null or is empty, do we create a new trigger set.
 			this.triggers = new TriggerSet(w, h, this.editor.getChecksum());
 		}
+
+		// Initializing the data editor ID arrays.
+		this.tiles = new int[w * h];
+		this.tilesEditorID = new int[w * h];
+		this.npcsEditorID = new int[w * h];
 		for (int i = 0; i < this.tiles.length; i++) {
 			this.tiles[i] = 0;
 			this.tilesEditorID[i] = 0;
+			this.npcsEditorID[i] = 0;
+		}
+
+		// Clearing the rendered area map image.
+		if (this.image != null) {
+			this.image.flush();
+			this.image = null;
 		}
 		this.image = new BufferedImage(w * Tileable.WIDTH, h * Tileable.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
@@ -307,6 +318,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 					pixels[j * this.image.getWidth() + i] = -1;
 			}
 		}
+		
+		// Initializing other attributes of the current area map session in the level editor.
 		this.bitmapWidth = w;
 		this.bitmapHeight = h;
 		this.offsetX = -((this.getWidth() - (w * Tileable.WIDTH)) / 2);
@@ -424,7 +437,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 						g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
 						g.dispose();
-
 					}
 				}
 				break;
@@ -499,14 +511,70 @@ public class DrawingBoard extends Canvas implements Runnable {
 							gD.setColor(Color.white);
 						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 						g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
-						g.dispose();
 					}
 					g.dispose();
 				}
 				break;
 			}
 			case NonPlayableCharacters: {
-				Debug.notYetImplemented();
+				if (this.tilesEditorID != null) {
+					for (int j = 0; j < this.tilesEditorID.length; j++) {
+						if (this.bitmapWidth <= 0 || this.bitmapHeight <= 0)
+							break;
+						int w = j % this.bitmapWidth;
+						int h = j / this.bitmapWidth;
+
+						Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(this.tilesEditorID[j]);
+						Data data = entry.getValue();
+						if (data == null) {
+							break;
+						}
+						if (data.image == null) {
+							this.tiles[j] = 0;
+							this.tilesEditorID[j] = 0;
+							continue;
+						}
+						if (this.image == null)
+							return;
+						Graphics g = this.image.getGraphics();
+						BufferedImage bimg = new BufferedImage(
+							data.image.getIconWidth(), data.image.getIconHeight(),
+							BufferedImage.TYPE_INT_ARGB
+						);
+						Graphics gB = bimg.getGraphics();
+						// TODO: Area Type ID must be included.
+						gB.drawImage(data.image.getImage(), 0, 0, null);
+						gB.dispose();
+
+						if (data.areaTypeIncluded) {
+							// If the area type is included with the Data object, we can add some biome colors.
+							// By default, we set the biome colors based on ALPHA value.
+							// When area type of NONE is used, the BLUE value determines the biome colors.
+							switch (data.areaTypeIDType) {
+								case ALPHA:
+								default:
+									this.setBiomeTile((this.tiles[j] >> 24) & 0xFF, g);
+									break;
+								case RED:
+									this.setBiomeTile((this.tiles[j] >> 16) & 0xFF, g);
+									break;
+								case GREEN:
+									this.setBiomeTile((this.tiles[j] >> 8) & 0xFF, g);
+									break;
+								case BLUE:
+								case NONE:
+									this.setBiomeTile(this.tiles[j] & 0xFF, g);
+									break;
+							}
+						}
+						else
+							g.setColor(Color.white);
+
+						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
+						g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
+						g.dispose();
+					}
+				}
 				break;
 			}
 		}
@@ -706,6 +774,24 @@ public class DrawingBoard extends Canvas implements Runnable {
 					default:
 						break;
 				}
+				break;
+			}
+			case 0x0E: { // Characters/NPCs
+				Debug.notYetImplemented();
+				int characterUID = data.red;
+				int scriptID = data.green;
+				int reserved = data.blue;
+				this.tiles[tileIndex] = (data.alpha << 24) | (characterUID << 16) | (scriptID << 8) | reserved;
+				this.tilesEditorID[tileIndex] = data.editorID;
+				this.npcsEditorID[tileIndex] = data.editorID;
+				panel.redInputField.setText(Integer.toString(characterUID));
+				panel.greenInputField.setText(Integer.toString(scriptID));
+				panel.redField.setText(Integer.toString(characterUID));
+				panel.greenField.setText(Integer.toString(scriptID));
+
+				// Disabling the blue field for now.
+				panel.blueInputField.setText(Integer.toString(-1));
+				panel.blueField.setText(Integer.toString(-1));
 				break;
 			}
 			default: {
@@ -929,6 +1015,16 @@ public class DrawingBoard extends Canvas implements Runnable {
 									this.tilesEditorID[i] = d.editorID;
 									break;
 								}
+							}
+							continue;
+						}
+						case 0x0E: {// Characters/NPCs
+							Debug.notYetImplemented();
+							// Alpha value is only used for tiles.
+							if (alpha == Integer.valueOf(d.alpha)) {
+								this.tilesEditorID[i] = d.editorID;
+								this.npcsEditorID[i] = d.editorID;
+								break;
 							}
 							continue;
 						}
