@@ -201,7 +201,7 @@ class TriggerSet {
 			return false;
 		return this.checksum.equals(checksum);
 	}
-	
+
 	public String getChecksum() {
 		return this.checksum;
 	}
@@ -505,6 +505,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 				}
 				break;
 			}
+			case NonPlayableCharacters: {
+				Debug.notYetImplemented();
+				break;
+			}
 		}
 		Graphics g = bs.getDrawGraphics();
 		g.setColor(Color.LIGHT_GRAY);
@@ -590,6 +594,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 						this.triggers.clearAllTriggers(i);
 					}
 				}
+				break;
+			}
+			case NonPlayableCharacters: {
+				Debug.notYetImplemented();
 				break;
 			}
 		}
@@ -983,6 +991,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 				case Triggers:
 					// TODO(Jul/4/2020): Figure out how to display a list of triggers for a single tile in the
 					// TilePropertiesPanel.
+					Debug.notYetImplemented();
+					break;
+				case NonPlayableCharacters:
+					// TODO(Aug/14/2021): Figure out how to display a single NPC on a single tile in the
+					// TilePropertiesPanel.
+					Debug.notYetImplemented();
 					break;
 			}
 		}

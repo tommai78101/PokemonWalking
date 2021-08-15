@@ -19,6 +19,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
+import common.Debug;
 import common.MinMaxFilter;
 
 public class TilePropertiesPanel extends JPanel implements DocumentListener {
@@ -358,6 +359,10 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.greenInputField.setVisible(false);
 				this.blueInputField.setVisible(false);
 				break;
+			case NonPlayableCharacters: {
+				Debug.notYetImplemented();
+				break;
+			}
 		}
 		super.revalidate();
 		super.repaint();

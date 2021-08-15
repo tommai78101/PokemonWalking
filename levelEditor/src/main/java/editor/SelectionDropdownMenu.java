@@ -267,6 +267,10 @@ public class SelectionDropdownMenu extends JPanel {
 				this.triggers.setEnabled(true);
 				this.triggerEditorInfo.setVisible(true);
 				break;
+			case NonPlayableCharacters: {
+				Debug.notYetImplemented();
+				break;
+			}
 		}
 		super.validate();
 	}

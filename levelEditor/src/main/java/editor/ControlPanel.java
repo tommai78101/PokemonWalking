@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import common.Debug;
 import common.Tileable;
 import editor.EditorConstants.Tools;
 
@@ -117,6 +118,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 				this.selectedTrigger.setTriggerPositionY((byte) 0x1);
 				break;
 			}
+			case NonPlayableCharacters: {
+				Debug.notYetImplemented();
+				break;
+			}
 		}
 		this.editor.validate();
 	}
@@ -174,6 +179,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 				this.iconsPanel.setEnabled(false);
 				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 				break;
+			case NonPlayableCharacters: {
+				Debug.notYetImplemented();
+				break;
+			}
 		}
 		super.revalidate();
 		super.repaint();

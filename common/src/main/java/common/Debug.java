@@ -1,5 +1,8 @@
 package common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.JOptionPane;
 
 import enums.AnsiColors;
@@ -10,6 +13,31 @@ import enums.AnsiColors;
  * @author tlee
  */
 public class Debug {
+	static class NotYetImplemented {
+		private int occurrences = 0;
+		private final String location;
+
+		public NotYetImplemented(String loc) {
+			this.location = loc;
+		}
+
+		public boolean grab(String loc) {
+			if (this.location.equals(loc) && !this.hasReachedLimit()) {
+				this.increment();
+				return true;
+			}
+			return false;
+		}
+
+		public void increment() {
+			this.occurrences++;
+		}
+
+		public boolean hasReachedLimit() {
+			return this.occurrences >= Debug.MaxDuplicateLogOccurrences;
+		}
+	}
+
 	/**
 	 * Logs information in yellow text.
 	 * 
@@ -88,11 +116,32 @@ public class Debug {
 		JOptionPane.showMessageDialog(null, msg);
 	}
 
+	/**
+	 * Nifty way of marking where in the code, have we not yet implemented any Java code.
+	 */
+	public static void notYetImplemented() {
+		String key = Debug.createString("", 3);
+		NotYetImplemented nyi = Debug.notYetImplementedTracker.getOrDefault(key, new NotYetImplemented(key));
+		if (nyi.grab(key)) {
+			String msg = null;
+			int index = 2;
+			do {
+				msg = Debug.createString("Not yet implemented", index);
+				index--;
+			}
+			while (msg == null || (msg.contains("$") && index > 0));
+			Debug.printColor(AnsiColors.BrightMagenta, msg);
+			Debug.notYetImplementedTracker.put(key, nyi);
+		}
+	}
+
 	// -----------------------------------------------------------------
 	// Private static methods and class member fields.
 
 	private static final int MinimumStringLength = 17;
 	private static final int TabLength = 8;
+	protected static final int MaxDuplicateLogOccurrences = 1;
+	private static Map<String, NotYetImplemented> notYetImplementedTracker = new HashMap<>();
 
 	/**
 	 * Handles wrapping the input string with ANSI color tags.
@@ -108,11 +157,13 @@ public class Debug {
 	 * Builds the log messages in a readable format for developers.
 	 * 
 	 * @param msg
+	 * @param index
+	 *            Specify which stack trace element to choose from.
 	 * @return
 	 */
-	private static String createString(String msg) {
+	private static String createString(String msg, int index) {
 		StackTraceElement[] elements = new Throwable().getStackTrace();
-		StackTraceElement element = elements[2];
+		StackTraceElement element = elements[index];
 		String className = element.getClassName() + ":" + element.getLineNumber();
 		String tabs = "\t";
 		int length = className.length();
@@ -124,13 +175,23 @@ public class Debug {
 	}
 
 	/**
+	 * Builds the log messages in a readable format for developers.
+	 * 
+	 * @param msg
+	 * @return
+	 */
+	private static String createString(String msg) {
+		return createString(msg, 2);
+	}
+
+	/**
 	 * Builds a simplified exception message thrown out by the actual class object containing the bug.
 	 * Does not display anything related with Java SDK internal classes.
 	 * 
 	 * @param e
 	 * @return
 	 */
-	private static String createExceptionString(Exception e) {
+	protected static String createExceptionString(Exception e) {
 		StackTraceElement[] elements = e.getStackTrace();
 		StackTraceElement element = elements[elements.length - 1];
 		String className = element.getClassName() + ":" + element.getLineNumber();

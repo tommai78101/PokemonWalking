@@ -53,9 +53,16 @@ public class EditorConstants {
 		Properties
 	}
 
+	/**
+	 * Level Editor Metadata Layers. Think of Google Maps information overlays, with each overlay
+	 * depicting relevant information based on what layer was selected.
+	 * 
+	 * @author tlee
+	 */
 	public static enum Metadata {
 		Pixel_Data("Pixel Data"),
-		Triggers("Triggers");
+		Triggers("Triggers"),
+		NonPlayableCharacters("NPCs");
 
 		private String name;
 
