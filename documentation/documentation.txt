@@ -47,43 +47,44 @@ Abstract...........................[PWD01]
 RoadMap............................[PWD02]
 About the Project..................[PWD03]
 	History........................[PWD03#01]
-How to Debug.......................[PWD04]
-Metadata...........................[PWD05]
-	PixelData......................[PWD05#01]
-	Areas..........................[PWD05#02]
-		Overworld..................[PWD05@02#01]
-		Sector.....................[PWD05@02#02]
-		User-Created Areas.........[PWD05@02#03]
-	Tiles..........................[PWD05#03]
-		Empty......................[PWD05@03#00]
-		Path.......................[PWD05@03#01]
-		Ledge......................[PWD05@03#02]
-		Tree.......................[PWD05@03#03]
-		Warp Point.................[PWD05@03#04]
-		Area Connection Point......[PWD05@03#05]
-		Stairs.....................[PWD05@03#06]
-		Water......................[PWD05@03#07]
-		House......................[PWD05@03#08]
-		House Door.................[PWD05@03#09]
-		Items......................[PWD05@03#10]
-		Carpet (Indoors)...........[PWD05@03#11]
-		Carpet (Outdoors)..........[PWD05@03#12]
-		Triggers...................[PWD05@03#13]
-		Characters/NPCs............[PWD05@03#14]
-Entities...........................[PWD06]
-	Player.........................[PWD06#01]
-Controls...........................[PWD07]
-	Walking Algorithm..............[PWD07#01]
-File Format........................[PWD08]
-	Legacy File Format.............[PWD08#01]
-Triggers...........................[PWD09]
-	Automation Script Format.......[PWD09#01]
-	Legacy Trigger System..........[PWD09#02]
-	New Trigger System.............[PWD09#03]
-Dialogues..........................[PWD10]
-Contributors.......................[PWD11]
-Terms of License...................[PWD12]
-Credits............................[PWD13]
+How to add new Features............[PWD04]
+How to Debug.......................[PWD05]
+Metadata...........................[PWD06]
+	PixelData......................[PWD06#01]
+	Areas..........................[PWD06#02]
+		Overworld..................[PWD06@02#01]
+		Sector.....................[PWD06@02#02]
+		User-Created Areas.........[PWD06@02#03]
+	Tiles..........................[PWD06#03]
+		Empty......................[PWD06@03#00]
+		Path.......................[PWD06@03#01]
+		Ledge......................[PWD06@03#02]
+		Tree.......................[PWD06@03#03]
+		Warp Point.................[PWD06@03#04]
+		Area Connection Point......[PWD06@03#05]
+		Stairs.....................[PWD06@03#06]
+		Water......................[PWD06@03#07]
+		House......................[PWD06@03#08]
+		House Door.................[PWD06@03#09]
+		Items......................[PWD06@03#10]
+		Carpet (Indoors)...........[PWD06@03#11]
+		Carpet (Outdoors)..........[PWD06@03#12]
+		Triggers...................[PWD06@03#13]
+		Characters/NPCs............[PWD06@03#14]
+Entities...........................[PWD07]
+	Player.........................[PWD07#01]
+Controls...........................[PWD08]
+	Walking Algorithm..............[PWD08#01]
+File Format........................[PWD09]
+	Legacy File Format.............[PWD09#01]
+Triggers...........................[PWD10]
+	Automation Script Format.......[PWD10#01]
+	Legacy Trigger System..........[PWD10#02]
+	New Trigger System.............[PWD10#03]
+Dialogues..........................[PWD11]
+Contributors.......................[PWD12]
+Terms of License...................[PWD13]
+Credits............................[PWD14]
 
 
 
@@ -224,7 +225,74 @@ exercise
 
 -------------------------------
 
-How to Debug [PWD04]
+How to add new Features [PWD04]
+
+1. Determine which part of the application will be affected
+by this feature.
+
+We first need to know the scope of the feature, and try to
+minimize the impact of affecting other parts of the
+application, or project modules in this project. 
+
+2. If the feature is a game mechanic or gameplay feature,
+think about what sort of actions that will trigger this.
+Determine whether the player or some other entity will
+need to interact or be interacted with to trigger said
+feature.
+
+Since the feature will be targeted towards gameplay, or it
+has an effect on the overall game and application logic,
+said feature will need to deal with triggering an event or
+an action to get the feature to execute its logic. Consider
+what it will do and leverage any form of expansion on the
+premise, in case the feature eats up the project scope.
+
+3. If the feature is a area map data change, consider how to
+read the area map data (pixel data) from the area map file,
+and interpret the data through the level editor and game.
+
+Since it is an area map data change, it will definitely need
+some form of data storage that will be added into the level
+editor, and some form of parsing the data from the storage
+to be added into the game. This way, the level editor can
+modify and update the new area map data, and the game can 
+handle what to do with the new area map data.
+
+Start by modifying a test area map, and open the map file
+using the level editor. From there, determine what to do
+with the new data by modifying or updating the logic to
+handle the new data upon parsing the map file.
+
+From there, expand what the level editor can do with the new
+data, and make as many user experience (UX) changes as you
+can, to make the troubleshooting process easier to manage.
+
+Afterwards, once the level editor changes are deemed enough,
+run the test area map through the game and work out the
+errors and inconsistencies. Return to the level editor and
+update some inconsistent behaviors when you noticed a few
+things from the game. Keep doing this, and go back and forth
+between the two project modules.
+
+Finally, make sure the feature is working as intended in
+both the level editor and the game. Once this is done, seek
+for any possible efficiencies and optimizations, as well as
+refactoring and moving source code files around to get it to
+build faster.
+
+4. If the feature is a level editor change, consider the
+UX aspects of the change, and try to make it as
+user-friendly as possible.
+
+Keeping things simple and understandable to the user is A
+high priority when it comes to enhancing the level editor.
+The more complex the feature may get, the more confusing
+and harder for the user to understand the unfamiliar
+complexity it gets.
+
+-------------------------------
+
+How to Debug [PWD05]
 
 This section explains steps to debugging this project and
 provide educational instructions to help new developers 
@@ -279,7 +347,7 @@ of behind the scenes, and knowing what does what.
 
 -------------------------------
 
-Metadata [PWD05]
+Metadata [PWD06]
 
 This section contains class objects that were deemed to
 have multiple properties. They are grouped together for
@@ -370,8 +438,8 @@ not assume their information to be permanent.
 	position a PixelData represents in the game can span from 
 	(0, 0) to (255, 255) in a 256x256 area.
 
-	For all areas, there will be at least one reserved pixel used
-	for determining:
+	For all areas, there will be at least one reserved pixel
+	used for determining:
 		- Width of the walkable area.
 		- Height of the walkable area.
 		- Triggers count.
@@ -382,9 +450,10 @@ not assume their information to be permanent.
 	information can be more than 5 times the amount of walkable 
 	area tile data if needed.
 
-	Trigger script file identification code can be a fixed-length
-	hashcode, a fixed-length SHA512 hashsum, or something that 
-	we can use to identify a trigger script easily with.
+	Trigger script file identification code can be a
+	fixed-length hashcode, a fixed-length SHA512 hashsum, or 
+	something that  we can use to identify a trigger script 
+	easily with.
 	
 	The chosen 2 bytes are, again, determined by the tile the 
 	Tile ID represents, and the area the tile is in. This goes 
@@ -440,8 +509,8 @@ not assume their information to be permanent.
 		
 		When crossing a sector, the game updates the current
 		whereabouts to the player. In order to update the game, the
-		mark has to be set in the path of where the player must cross
-		in order to enter a new area of interest.
+		mark has to be set in the path of where the player must
+		cross in order to enter a new area of interest.
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -451,11 +520,11 @@ not assume their information to be permanent.
 		created using the provided level editor in addition to the
 		game package.
 
-		The level editor only allows editing one area map per session,
-		meaning that if the user intends to create an overworld with
-		multiple user-created areas, then the user must create and
-		open new sessions of the level editor for each user-created
-		area.
+		The level editor only allows editing one area map per
+		session, meaning that if the user intends to create an 
+		overworld with multiple user-created areas, then the user
+		must create and open new sessions of the level editor for
+		each user-created area.
 
 		If time allows, this may be improved.
 
@@ -1064,7 +1133,7 @@ not assume their information to be permanent.
 			
 -------------------------------
 
-	Entities [PWD06]
+	Entities [PWD07]
 	
 	Entities are animated beings in the game, and they represent 
 	how life-like the game is going to look when the players play
@@ -1177,7 +1246,7 @@ not assume their information to be permanent.
 
 -------------------------------
 
-Controls [PWD07]
+Controls [PWD08]
 
 To move the player around, use either WASD keys or the 
 arrow keys. Tap any key to let the Player face towards the 
@@ -1209,7 +1278,7 @@ X (.):
 
 -------------------------------
 
-File Format [PWD08]
+File Format [PWD09]
 
 The current file format used is version 0002.
 
@@ -1311,7 +1380,7 @@ be overridden in the newly extended POJOs.
 
 -------------------------------
 
-Triggers [PWD09]
+Triggers [PWD10]
 
 This section contains the same readme content generated by 
 Java code, but it is more up-to-date than the generated 
@@ -1450,7 +1519,7 @@ This is the same maximum for user-created area maps.
 
 -------------------------------
 
-Dialogues [PWD10]
+Dialogues [PWD11]
 
 Dialogues are text speech bubbles in the game. Any text 
 displayed inside a white rectangle box with a border around 
@@ -1486,13 +1555,13 @@ breaks are added after the item's name.
 
 -------------------------------
 
-Contributors [PWD11]
+Contributors [PWD12]
 
 Developer - tom_mai78101
 
 -------------------------------
 
-Terms of License [PWD12]
+Terms of License [PWD13]
 
 This entire project is Apache Licensed. For more
 information, please read the terms and regulations
@@ -1500,6 +1569,6 @@ of the license file in the root of the project folder.
 
 -------------------------------
 
-Credits [PWD13]
+Credits [PWD14]
 
 Author - tom_mai78101
