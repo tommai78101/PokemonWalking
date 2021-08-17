@@ -122,9 +122,9 @@
 -Items
 % Test_[Potions]                % 0A % 01 % @ % @ %    res/art/object/item.png % * %
 % 3_Options_[Potions]           % 0A % 02 % @ % @ %    res/art/object/item.png % * %
-% Bicycle_[Key_Items]           % 0A % 03 % @ % * %    res/art/object/bicycle.png
-#-NonPlayable_Characters
-#% Joe                           % 0E % 01 % @ % * %    res/art/player/joe.png
+% Bicycle_[Key_Items]           % 0A % 03 % @ % @ %    res/art/object/bicycle.png
+-NonPlayable_Characters
+% Joe                           % 0E % 01 % @ % @ %    res/art/npcs/joe_editor.png
 -Initialized_Start_Position
 % Starting_Position             % 0D % 00 % ` % = %  res/art/player/shadow.png
 +
