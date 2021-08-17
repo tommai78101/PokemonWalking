@@ -137,6 +137,7 @@ public class Art {
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Object (Items, Movable)
 	public static Bitmap item;
+	public static Bitmap bicycle;
 
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Obstacle
@@ -156,6 +157,9 @@ public class Art {
 	public static Bitmap[][] player_surf;
 	public static Bitmap[][] player_bicycle;
 	public static Bitmap shadow;
+	
+	// NPCs (Entities)
+	public static Bitmap[][] joe;
 
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	// Areas
@@ -274,6 +278,7 @@ public class Art {
 
 		// Object
 		Art.item = Bitmap.load("art/object/item.png");
+		Art.bicycle = Bitmap.load("art/object/bicycle.png");
 
 		// Obstacle
 		Art.logs = Bitmap.load("art/obstacle/logs.png");
@@ -286,11 +291,14 @@ public class Art {
 		Art.workbench_right = Bitmap.load("art/obstacle/workbench_right.png");
 		Art.deadSmallTree = Bitmap.load("art/obstacle/dead_small_tree.png");
 
-		// Player, NPCs
+		// Player
 		Art.player = screen.cut("art/player/player.png", 16, 16, 0, 0);
 		Art.player_surf = screen.cut("art/player/player_surf.png", 16, 16, 0, 0);
 		Art.player_bicycle = screen.cut("art/player/player_bicycle.png", 16, 16, 0, 0);
 		Art.shadow = Bitmap.load("art/player/shadow.png");
+		
+		// NPCs
+		Art.joe = screen.cut("art/player/joe.png", 16, 16, 0, 0);
 
 		// Areas (level areas for rapid iterations)
 		Art.testArea = Bitmap.load("art/area/test/testArea.png");
