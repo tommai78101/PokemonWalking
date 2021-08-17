@@ -1053,12 +1053,16 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 	private void hoverOver() {
 		try {
-			int w = 0;
-			int h = 0;
+			int w = -1;
+			int h = -1;
+			int temp = -1;
 
 			// try...catch for X position
 			try {
-				w = (this.editor.input.offsetX + this.editor.input.mouseX) / Tileable.WIDTH;
+				temp = (this.editor.input.offsetX + this.editor.input.mouseX);
+				if (temp >= 0) {
+					w = temp / Tileable.WIDTH;
+				}
 			}
 			catch (Exception e) {
 				w = (this.editor.input.offsetX + this.editor.input.mouseX) / (LevelEditor.WIDTH * LevelEditor.SIZE);
@@ -1066,12 +1070,24 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 			// try catch for Y position
 			try {
-				h = (this.editor.input.offsetY + this.editor.input.mouseY) / Tileable.HEIGHT;
+				temp = (this.editor.input.offsetY + this.editor.input.mouseY);
+				if (temp >= 0) {
+					h = temp / Tileable.HEIGHT;
+				}
 			}
 			catch (Exception e) {
 				h = (this.editor.input.offsetY + this.editor.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);
 			}
-
+			
+			if (w < 0 || h < 0 || w >= this.bitmapWidth || h >= this.bitmapHeight) {
+				TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+				panel.alphaField.setText("");
+				panel.redField.setText("");
+				panel.greenField.setText("");
+				panel.blueField.setText("");
+				return;
+			}
+			
 			// checks for mouse hoving above triggers
 			switch (EditorConstants.metadata) {
 				case Pixel_Data:
