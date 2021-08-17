@@ -206,14 +206,23 @@ public class LevelEditor extends JFrame {
 						// This is how we do the [panning + pixel position] math.
 						int w = 0;
 						int h = 0;
+						int temp = 0;
 						try {
-							w = (LevelEditor.this.input.offsetX + LevelEditor.this.input.mouseX) / Tileable.WIDTH;
+							temp = (LevelEditor.this.input.offsetX + LevelEditor.this.input.mouseX);
+							if (temp >= 0)
+								w = temp / Tileable.WIDTH;
+							else
+								w = (temp / Tileable.WIDTH) - 1;
 						}
 						catch (Exception e) {
 							w = (LevelEditor.this.input.offsetX + LevelEditor.this.input.mouseX) / (LevelEditor.WIDTH * LevelEditor.SIZE);
 						}
 						try {
-							h = (LevelEditor.this.input.offsetY + LevelEditor.this.input.mouseY) / Tileable.HEIGHT;
+							temp = (LevelEditor.this.input.offsetY + LevelEditor.this.input.mouseY);
+							if (temp >= 0)
+								h = temp / Tileable.HEIGHT;
+							else
+								h = (temp / Tileable.HEIGHT) - 1;
 						}
 						catch (Exception e) {
 							h = (LevelEditor.this.input.offsetY + LevelEditor.this.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);

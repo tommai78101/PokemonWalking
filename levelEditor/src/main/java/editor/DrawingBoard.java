@@ -1060,9 +1060,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 			// try...catch for X position
 			try {
 				temp = (this.editor.input.offsetX + this.editor.input.mouseX);
-				if (temp >= 0) {
+				if (temp >= 0)
 					w = temp / Tileable.WIDTH;
-				}
 			}
 			catch (Exception e) {
 				w = (this.editor.input.offsetX + this.editor.input.mouseX) / (LevelEditor.WIDTH * LevelEditor.SIZE);
@@ -1071,9 +1070,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 			// try catch for Y position
 			try {
 				temp = (this.editor.input.offsetY + this.editor.input.mouseY);
-				if (temp >= 0) {
+				if (temp >= 0)
 					h = temp / Tileable.HEIGHT;
-				}
 			}
 			catch (Exception e) {
 				h = (this.editor.input.offsetY + this.editor.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);
@@ -1113,6 +1111,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			}
 		}
 		catch (Exception e) {
+			Debug.error("Unable to handle mouse hover cursor position to determine which tile was hovered on.", e);
 			TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
 			panel.alphaField.setText("");
 			panel.redField.setText("");
