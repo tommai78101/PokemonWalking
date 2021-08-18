@@ -181,7 +181,7 @@ public class Debug {
 	 * @return
 	 */
 	private static String createString(String msg) {
-		return createString(msg, 2);
+		return createString(msg, 3);
 	}
 
 	/**
