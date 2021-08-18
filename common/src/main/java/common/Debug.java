@@ -119,20 +119,27 @@ public class Debug {
 	/**
 	 * Nifty way of marking where in the code, have we not yet implemented any Java code.
 	 */
-	public static void notYetImplemented() {
-		String key = Debug.createString("", 3);
+	public static void toDo(String msg, int stackTraceIndex) {
+		String key = Debug.createString("", stackTraceIndex);
 		NotYetImplemented nyi = Debug.notYetImplementedTracker.getOrDefault(key, new NotYetImplemented(key));
 		if (nyi.grab(key)) {
-			String msg = null;
-			int index = 2;
+			int index = 3;
 			do {
-				msg = Debug.createString("Not yet implemented", index);
+				msg = Debug.createString(msg, index);
 				index--;
 			}
 			while (msg == null || (msg.contains("$") && index > 0));
 			Debug.printColor(AnsiColors.BrightMagenta, msg);
 			Debug.notYetImplementedTracker.put(key, nyi);
 		}
+	}
+
+	public static void toDo(String msg) {
+		Debug.toDo(msg, 5);
+	}
+
+	public static void notYetImplemented() {
+		Debug.toDo("Not yet implemented", 4);
 	}
 
 	// -----------------------------------------------------------------
