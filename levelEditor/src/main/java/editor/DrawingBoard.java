@@ -1018,8 +1018,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 							continue;
 						}
 						case 0x0E: {// Characters/NPCs
-							Debug.notYetImplemented();
-							// Alpha value is only used for tiles.
+							// Alpha value is only used.
 							this.tilesEditorID[i] = d.editorID;
 							this.npcsEditorID[i] = d.editorID;
 							break FOR_LOOP;

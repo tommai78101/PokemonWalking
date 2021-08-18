@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import common.Debug;
 import dialogue.Dialogue;
 import resources.Art;
 import resources.Mod;
@@ -184,9 +185,10 @@ public class WorldConstants {
 
 	/**
 	 * Goes with the static method, "getAllNewAreas()".
-	 * 
 	 */
+	@SuppressWarnings("unused")
 	private static void addNewArea(Bitmap bitmap) {
+		Debug.toDo("Utilize this method when the opportunity arises.");
 		int areaID = Area.getAreaIDFromBitmap(bitmap);
 		// Java 8 feature
 		boolean exists = WorldConstants.areas.stream()

@@ -76,6 +76,14 @@ public class PlayerChunk extends Chunk {
 		this.facingDirection = (byte) 0x0;
 		this.walkingState = (byte) 0x0;
 	}
+	
+	public String getPlayerName() {
+		return this.playerName;
+	}
+	
+	public void setPlayerName(String name) {
+		this.playerName = name;
+	}
 
 	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {

@@ -58,7 +58,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		this.xPosition = x;
 		this.yPosition = y;
 	}
-
+	
 	public byte[] getByteName() {
 		if (this.name == null)
 			this.name = "Joe";

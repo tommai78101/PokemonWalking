@@ -438,10 +438,18 @@ public class Area implements Tileable, UpdateRenderable {
 				data.renderTick();
 			}
 		}
+		
 		// Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach(
 			(k, obstacle) -> {
 				obstacle.renderDialogue(screen, graphics);
+			}
+		);
+
+		// Entities are rendered here.
+		this.areaCharacters.forEach(
+			(k, character) -> {
+				character.render(screen, graphics, xOff, yOff);
 			}
 		);
 
@@ -686,15 +694,15 @@ public class Area implements Tileable, UpdateRenderable {
 	public boolean isTriggerBeingTriggered() {
 		return this.isTriggerTriggered;
 	}
-	
+
 	public void setTriggerBeingTriggered() {
 		this.isTriggerTriggered = true;
 	}
-	
+
 	public void unsetTriggerBeingTriggered() {
 		this.isTriggerTriggered = false;
 	}
-	
+
 	public Entity getEntity(int x, int y) {
 		// Only obstacles and characters are entities.
 		PixelData data = this.getPixelData(x, y);

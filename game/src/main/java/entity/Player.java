@@ -39,8 +39,6 @@ public class Player extends Character {
 
 	public Keys keys;
 	private Entity interactingEntity = null;
-	private byte animationTick = 0;
-	private byte animationPointer = 0;
 	private Inventory inventory;
 
 	// These are based on the art sprite in the resource folder. The numbers are
@@ -545,6 +543,8 @@ public class Player extends Character {
 			case 0x0C: // Carpet (Outdoors)
 			case 0x0D: // Triggers
 				return false;
+			case 0x0E: // Characters / NPCs
+				return true; // Cannot walk through characters.
 			default: // Any other type of tiles should be walkable, for no apparent reasons.
 				return false;
 		}
@@ -843,11 +843,6 @@ public class Player extends Character {
 			this.warningsTriggered = true;
 	}
 
-	public void stopAnimation() {
-		this.animationTick = 0;
-		this.animationPointer = 0;
-	}
-
 	public void stopInteraction() {
 		this.isInteractionEnabled = false;
 		this.interactingEntity.setInteractingState(false);
@@ -910,7 +905,7 @@ public class Player extends Character {
 		}
 	}
 
-	private void controlTick() {
+	protected void controlTick() {
 		if (!this.isLockedWalking || !this.isLockedJumping) {
 			this.animationTick++;
 			if ((this.getFacing() == Character.UP && this.isFacingBlocked[Character.UP])) {
