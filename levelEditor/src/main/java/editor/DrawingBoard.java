@@ -286,7 +286,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			Debug.error("Improper image size [" + w + " x " + h + "] was given.");
 			return;
 		}
-		
+
 		// Initializing a new Trigger Set.
 		if (this.triggers == null || this.triggers.isEmpty() || !this.triggers.matchesChecksum(this.editor.getChecksum())) {
 			// Only if the triggers set is null or is empty, do we create a new trigger set.
@@ -318,7 +318,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					pixels[j * this.image.getWidth() + i] = -1;
 			}
 		}
-		
+
 		// Initializing other attributes of the current area map session in the level editor.
 		this.bitmapWidth = w;
 		this.bitmapHeight = h;
@@ -989,9 +989,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 			List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 			for (int i = 0; i < this.tiles.length; i++) {
 				int alpha = ((this.tiles[i] >> 24) & 0xFF);
+				FOR_LOOP:
 				for (int j = 0; j < list.size(); j++) {
-					Map.Entry<Integer, Data> entry = list.get(j);
-					Data d = entry.getValue();
+					Data d = list.get(j).getValue();
+					if (alpha != Integer.valueOf(d.alpha))
+						continue;
 					switch (alpha) {
 						case 0x01: // Path
 						case 0x02: // Ledges
@@ -1000,41 +1002,32 @@ public class DrawingBoard extends Canvas implements Runnable {
 						case 0x07: // Water
 						case 0x08: // House
 							// Extended Tile IDs are used to differentiate tiles.
-							if (alpha == Integer.valueOf(d.alpha)) {
-								int red = ((this.tiles[i] >> 16) & 0xFF);
-								if (red == Integer.valueOf(d.red)) {
-									this.tilesEditorID[i] = d.editorID;
-								}
+							int red = ((this.tiles[i] >> 16) & 0xFF);
+							if (red == Integer.valueOf(d.red)) {
+								this.tilesEditorID[i] = d.editorID;
+								break FOR_LOOP;
 							}
 							continue;
 						case 0x05: {// Area Zone
 							// Extended Tile IDs are used to differentiate tiles.
-							if (alpha == Integer.valueOf(d.alpha)) {
-								int blue = this.tiles[i] & 0xFF;
-								if (blue == d.blue) {
-									this.tilesEditorID[i] = d.editorID;
-									break;
-								}
+							int blue = this.tiles[i] & 0xFF;
+							if (blue == d.blue) {
+								this.tilesEditorID[i] = d.editorID;
+								break FOR_LOOP;
 							}
 							continue;
 						}
 						case 0x0E: {// Characters/NPCs
 							Debug.notYetImplemented();
 							// Alpha value is only used for tiles.
-							if (alpha == Integer.valueOf(d.alpha)) {
-								this.tilesEditorID[i] = d.editorID;
-								this.npcsEditorID[i] = d.editorID;
-								break;
-							}
-							continue;
+							this.tilesEditorID[i] = d.editorID;
+							this.npcsEditorID[i] = d.editorID;
+							break FOR_LOOP;
 						}
 						default: {
 							// Alpha value is only used.
-							if (alpha == Integer.valueOf(d.alpha)) {
-								this.tilesEditorID[i] = d.editorID;
-								break;
-							}
-							continue;
+							this.tilesEditorID[i] = d.editorID;
+							break FOR_LOOP;
 						}
 					}
 				}
@@ -1076,7 +1069,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			catch (Exception e) {
 				h = (this.editor.input.offsetY + this.editor.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);
 			}
-			
+
 			if (w < 0 || h < 0 || w >= this.bitmapWidth || h >= this.bitmapHeight) {
 				TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
 				panel.alphaField.setText("");
@@ -1085,7 +1078,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 				panel.blueField.setText("");
 				return;
 			}
-			
+
 			// checks for mouse hoving above triggers
 			switch (EditorConstants.metadata) {
 				case Pixel_Data:
