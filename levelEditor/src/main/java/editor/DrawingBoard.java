@@ -712,8 +712,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 		// ----------
 		// Step 1 - Set the important map info in the first pixel.
-		pixels.add(((areaID & 0xFFFF) << 16) | triggerSize);
-		pixels.add(((this.bitmapWidth & 0xFFFF) << 16) | this.bitmapHeight & 0xFFFF);
+		pixels.add(((areaID & 0xFFFF) << 16) | (triggerSize & 0xFFFF));
+		pixels.add(((this.bitmapWidth & 0xFFFF) << 16) | (this.bitmapHeight & 0xFFFF));
+		pixels.add(this.tiles.length);
 
 		// Step 2 - Store the area map checksum
 		for (int i = 0; i < checksumBytes.length; i += 4) {
@@ -729,21 +730,20 @@ public class DrawingBoard extends Canvas implements Runnable {
 		for (int i = 0; i < npcsData.length; i++) {
 			pixels.add(npcsData[i]);
 		}
-
+		
 		// Step 5 - Pad the remaining row with -1
 		int col = pixels.size();
 		for (; (col % this.bitmapWidth) != 0 && (col % this.bitmapWidth) < this.bitmapWidth; col = pixels.size())
 			pixels.add(-1);
 
 		// Step 6 - Store the tiles
-		pixels.add(this.tiles.length);
 		for (int i = 0; i < this.tiles.length; i++) {
 			pixels.add(this.tiles[i]);
 		}
 
 		// Step 7 - Convert List<Integer> to int[]
 		int[] data = pixels.parallelStream().mapToInt(Integer::intValue).toArray();
-		int newHeight = data.length / this.bitmapWidth + 1;
+		int newHeight = (data.length % this.bitmapWidth != 0) ? data.length / this.bitmapWidth + 1 : data.length / this.bitmapWidth;
 		BufferedImage image = new BufferedImage(this.bitmapWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
 		final int[] result = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 		System.arraycopy(data, 0, result, 0, data.length);
@@ -772,8 +772,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 			// Step 1 - Get important area information in the first pixel. This should use up all of the number
 			// of pixels we had reserved.
 			this.editor.setUniqueAreaID((pixels[pixelIterator] >> 16) & 0xFFFF);
-			int triggerSize = pixels[pixelIterator++] & 0xFFFF;
-			int areaInfo = pixels[pixelIterator++];
+			final int triggerSize = pixels[pixelIterator++] & 0xFFFF;
+			final int areaInfo = pixels[pixelIterator++];
+			final int tileSize = pixels[pixelIterator++];
 			int newWidth = (areaInfo >> 16) & 0xFFFF;
 			int newHeight = areaInfo & 0xFFFF;
 			this.setImageSize(newWidth, newHeight, false);
@@ -806,18 +807,17 @@ public class DrawingBoard extends Canvas implements Runnable {
 				this.npcs.add(x, y, data);
 			}
 
-			// Step 5 - Skip the padding
+			// Step 6 - Skip the padding
 			int col = pixelIterator % bitmapWidth;
 			for (; pixelIterator % bitmapWidth != 0 && col < bitmapWidth; pixelIterator++)
 				;
 
-			// Step 6 - Get the tiles.
-			int tileSize = pixels[pixelIterator++];
+			// Step 7 - Get the tiles.
 			for (int i = 0; i < tileSize; i++, pixelIterator++) {
 				this.tiles[i] = pixels[pixelIterator];
 			}
 
-			// Step 7 - Get and fill in the data based on the tiles obtained from above.
+			// Step 8 - Get and fill in the data based on the tiles obtained from above.
 			List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 			for (int i = 0; i < this.tiles.length; i++) {
 				int alpha = ((this.tiles[i] >> 24) & 0xFF);

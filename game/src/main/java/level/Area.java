@@ -72,6 +72,7 @@ public class Area implements Tileable, UpdateRenderable {
 		final int areaSize = tempPixels[pixelIterator++];
 		this.width = (areaSize >> 16) & 0xFFFF;
 		this.height = areaSize & 0xFFFF;
+		final int pixelSize = tempPixels[pixelIterator++];
 
 		// Step 2 - Get checksum first. Checksum is set immediately after the first pixel.
 		final int checksumPixelsCount = WorldConstants.CHECKSUM_MAX_BYTES_LENGTH / 4;
@@ -111,19 +112,18 @@ public class Area implements Tileable, UpdateRenderable {
 			int data = tempPixels[pixelIterator++];
 			this.areaCharacters.put(Map.entry(x, y), Character.build(data, x, y));
 		}
-
-		// Step 5 - Skip the padding
+		
+		// Step 6 - Skip the padding
 		int col = pixelIterator % this.width;
 		for (; pixelIterator % this.width != 0 && col < this.width; pixelIterator++)
 			;
 
-		// Step 6 - Get the tiles
-		final int pixelSize = tempPixels[pixelIterator++];
+		// Step 7 - Get the tiles
 		this.pixels = new int[pixelSize];
 		System.arraycopy(tempPixels, pixelIterator, this.pixels, 0, pixelSize);
 		pixelIterator += pixelSize;
 
-		// Step 7 - Get and fill in the area data.
+		// Step 8 - Get and fill in the area data.
 		for (int y = 0; y < this.height; y++) {
 			this.areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
