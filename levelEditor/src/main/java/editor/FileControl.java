@@ -83,7 +83,6 @@ public class FileControl extends JPanel implements ActionListener {
 				{
 					this.editor.drawingBoardPanel.newImage();
 					this.editor.setMapAreaName("Untitled");
-					this.editor.generateChecksum();
 					break;
 				}
 				case 1: { // Save

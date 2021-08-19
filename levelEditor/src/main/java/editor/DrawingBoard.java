@@ -106,14 +106,14 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
-	public void setImageSize(int w, int h, boolean shouldCreateTriggerSet) {
+	public void setImageSize(int w, int h, boolean runTriggerSetCheck) {
 		if (w <= 0 || h <= 0) {
 			Debug.error("Improper image size [" + w + " x " + h + "] was given.");
 			return;
 		}
 
 		// Initializing a new Trigger Set.
-		if (shouldCreateTriggerSet) {
+		if (runTriggerSetCheck) {
 			boolean isTriggerNullEmpty = this.triggers == null || this.triggers.isEmpty();
 			if (isTriggerNullEmpty || !this.triggers.matchesChecksum(this.editor.getChecksum())) {
 				// Only if the triggers set is null or is empty, do we create a new trigger set.
@@ -180,6 +180,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 				if (result == JOptionPane.OK_OPTION) {
 					int width = Integer.valueOf(widthField.getText());
 					int height = Integer.valueOf(heightField.getText());
+					DrawingBoard.this.editor.generateChecksum();
 					DrawingBoard.this.setImageSize(width, height, true);
 
 					// Script editor
@@ -197,7 +198,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 			@Override
 			public void run() {
 				DrawingBoard.this.setImageSize(x, y, true);
-				DrawingBoard.this.editor.generateChecksum();
 			}
 		});
 	}

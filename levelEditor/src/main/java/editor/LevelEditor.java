@@ -264,6 +264,7 @@ public class LevelEditor extends JFrame {
 
 	public final void initialize() {
 		EditorConstants.metadata = Metadata.Pixel_Data;
+		this.generateChecksum();
 		this.drawingBoardPanel.newImage(15, 15);
 		this.setMapAreaName("Untitled");
 	}
