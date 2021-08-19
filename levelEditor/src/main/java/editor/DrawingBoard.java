@@ -20,11 +20,8 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -44,6 +41,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private int[] tilesEditorID;
 	private int[] npcsEditorID;
 	private TriggerSet triggers;
+	private NpcSet npcs;
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
@@ -108,16 +106,19 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
-	public void setImageSize(int w, int h) {
+	public void setImageSize(int w, int h, boolean shouldCreateTriggerSet) {
 		if (w <= 0 || h <= 0) {
 			Debug.error("Improper image size [" + w + " x " + h + "] was given.");
 			return;
 		}
 
 		// Initializing a new Trigger Set.
-		if (this.triggers == null || this.triggers.isEmpty() || !this.triggers.matchesChecksum(this.editor.getChecksum())) {
-			// Only if the triggers set is null or is empty, do we create a new trigger set.
-			this.triggers = new TriggerSet(w, h, this.editor.getChecksum());
+		if (shouldCreateTriggerSet) {
+			boolean isTriggerNullEmpty = this.triggers == null || this.triggers.isEmpty();
+			if (isTriggerNullEmpty || !this.triggers.matchesChecksum(this.editor.getChecksum())) {
+				// Only if the triggers set is null or is empty, do we create a new trigger set.
+				this.triggers = new TriggerSet(w, h, this.editor.getChecksum());
+			}
 		}
 
 		// Initializing the data editor ID arrays.
@@ -177,7 +178,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 				}
 				while (Integer.valueOf(widthField.getText()) <= 0 || Integer.valueOf(heightField.getText()) <= 0);
 				if (result == JOptionPane.OK_OPTION) {
-					DrawingBoard.this.setImageSize(Integer.valueOf(widthField.getText()), Integer.valueOf(heightField.getText()));
+					int width = Integer.valueOf(widthField.getText());
+					int height = Integer.valueOf(heightField.getText());
+					DrawingBoard.this.setImageSize(width, height, true);
 
 					// Script editor
 					if (DrawingBoard.this.editor.scriptEditor != null) {
@@ -193,7 +196,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				DrawingBoard.this.setImageSize(x, y);
+				DrawingBoard.this.setImageSize(x, y, true);
 				DrawingBoard.this.editor.generateChecksum();
 			}
 		});
@@ -678,17 +681,18 @@ public class DrawingBoard extends Canvas implements Runnable {
 	public BufferedImage getMapImage() {
 		if (this.bitmapWidth * this.bitmapHeight == 0)
 			return null;
+		// Prepare the resulting data.
+		List<Integer> pixels = new ArrayList<>();
+
+		// Storing important area information in the first pixel. This should use up all of the number of
+		// pixels we had reserved.
+		final int areaID = this.editor.getUniqueAreaID();
 
 		// Get the checksum and relevant information.
 		final String checksum = this.editor.getChecksum();
-		final int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
 		byte[] checksumBytes = checksum.getBytes();
-		int checksumPixelsRow = ((1 + checksumPixelsCount) % this.bitmapWidth == 0) ? (1 + checksumPixelsCount) / this.bitmapWidth : ((1 + checksumPixelsCount) / this.bitmapWidth) + 1;
 
-		// Represents how many reserved pixels that will be used before creating the bitmap.
-		final int usedReservedPixelsCount = checksumPixelsRow * this.bitmapWidth;
-
-		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
+		// Add any triggers into a list. If triggers set is null, make sure to append the Eraser trigger,
 		// designated as ID 0.
 		if (this.triggers == null) {
 			this.triggers = new TriggerSet(this.bitmapWidth, this.bitmapHeight, checksum);
@@ -699,58 +703,51 @@ public class DrawingBoard extends Canvas implements Runnable {
 		// of triggers seen in the editor), to account for the Eraser trigger. If there are more triggers
 		// than the width of the bitmap, we add however many extra rows to compensate.
 		int triggerSize = triggerDataList.size() & 0xFFFF;
-		int triggerRows = (triggerSize + usedReservedPixelsCount) / this.bitmapWidth;
-		int triggerRowHeight = ((triggerSize + usedReservedPixelsCount) % this.bitmapWidth > 0 ? triggerRows + 1 : triggerRows);
 
-		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + triggerRowHeight, BufferedImage.TYPE_INT_ARGB);
-		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
+		// Add any NPCs into a list. If NPCs set is null, make sure to initialize it.
+		if (this.npcs == null) {
+			this.npcs = new NpcSet();
+		}
+		int[] npcsData = this.npcs.produce();
 
-		// Storing important area information in the first pixel. This should use up all of the number of
-		// pixels we had reserved.
-		int areaID = this.editor.getUniqueAreaID();
-		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerSize));
+		// ----------
+		// Step 1 - Set the important map info in the first pixel.
+		pixels.add(((areaID & 0xFFFF) << 16) | triggerSize);
+		pixels.add(((this.bitmapWidth & 0xFFFF) << 16) | this.bitmapHeight & 0xFFFF);
 
-		// Add the checksum after the first pixel.
-		int columnIndex = 0;
-		int rowIndex = 0;
-		int pixelIterator = 1;
-		for (int i = 0; i < checksumBytes.length; i += 4, pixelIterator++) {
-			columnIndex = pixelIterator % this.bitmapWidth;
-			rowIndex = pixelIterator / this.bitmapWidth;
-			pixels[columnIndex + rowIndex * this.bitmapWidth] = (checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3];
+		// Step 2 - Store the area map checksum
+		for (int i = 0; i < checksumBytes.length; i += 4) {
+			pixels.add((checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3]);
 		}
 
-		// Pad the checksums if there are leftover pixels
-		for (int i = columnIndex + 1; i < this.bitmapWidth; i++, pixelIterator++) {
-			pixels[i + (rowIndex * this.bitmapWidth)] = -1;
+		// Step 3 - Store the triggers
+		for (int i = 0; i < triggerSize; i++) {
+			pixels.add(triggerDataList.get(i).intValue());
 		}
 
-		// Place the trigger data inside the trigger section in the bitmap file. This is usually located at
-		// the top of the bitmap file.
-		columnIndex = 0;
-		rowIndex = 0;
-		for (int i = 0; i < triggerSize; i++, pixelIterator++) {
-			// The index "i" must be in range of 0 ~ list.size(). The "width" must include the reserved pixels
-			// count as offset.
-			int pixelIndex = i + checksumPixelsRow * this.bitmapWidth;
-			columnIndex = pixelIndex % this.bitmapWidth;
-			rowIndex = pixelIndex / this.bitmapWidth;
-			pixels[columnIndex + (rowIndex * this.bitmapWidth)] = triggerDataList.get(i).intValue();
+		// Step 4 - Store the NPCs
+		for (int i = 0; i < npcsData.length; i++) {
+			pixels.add(npcsData[i]);
 		}
 
-		// Pad out the trigger section with -1 if the current iterator is not inside the tileset section.
-		// This marks null trigger data, and should be ignored when the game is reading this padded part of
-		// the triggers section.
-		for (; pixelIterator % this.bitmapWidth != 0; pixelIterator++) {
-			pixels[pixelIterator] = -1;
+		// Step 5 - Pad the remaining row with -1
+		int col = pixels.size();
+		for (; (col % this.bitmapWidth) != 0 && (col % this.bitmapWidth) < this.bitmapWidth; col = pixels.size())
+			pixels.add(-1);
+
+		// Step 6 - Store the tiles
+		pixels.add(this.tiles.length);
+		for (int i = 0; i < this.tiles.length; i++) {
+			pixels.add(this.tiles[i]);
 		}
 
-		// Then place the tileset data inside the tileset section in the bitmap file. This is the rest of
-		// the bitmap file, right after the trigger section.
-		for (int iterator = 0; iterator < this.tiles.length; iterator++) {
-			pixels[this.bitmapWidth * triggerRowHeight + iterator] = this.tiles[iterator];
-		}
-		return buffer;
+		// Step 7 - Convert List<Integer> to int[]
+		int[] data = pixels.parallelStream().mapToInt(Integer::intValue).toArray();
+		int newHeight = data.length / this.bitmapWidth + 1;
+		BufferedImage image = new BufferedImage(this.bitmapWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+		final int[] result = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		System.arraycopy(data, 0, result, 0, data.length);
+		return image;
 	}
 
 	public boolean hasBitmap() {
@@ -772,26 +769,22 @@ public class DrawingBoard extends Canvas implements Runnable {
 		final int[] pixels = image.getRGB(0, 0, bitmapWidth, bitmapHeight, null, 0, bitmapWidth);
 		int pixelIterator = 0;
 		try {
-			// Storing important area information in the first pixel. This should use up all of the number of
-			// pixels we had reserved.
+			// Step 1 - Get important area information in the first pixel. This should use up all of the number
+			// of pixels we had reserved.
 			this.editor.setUniqueAreaID((pixels[pixelIterator] >> 16) & 0xFFFF);
-			int triggerSize = pixels[pixelIterator] & 0xFFFF;
-			pixelIterator++;
+			int triggerSize = pixels[pixelIterator++] & 0xFFFF;
+			int areaInfo = pixels[pixelIterator++];
+			int newWidth = (areaInfo >> 16) & 0xFFFF;
+			int newHeight = areaInfo & 0xFFFF;
+			this.setImageSize(newWidth, newHeight, false);
 
-			// Get the checksum and relevant information.
+			// Step 2 - Get the checksum and relevant information.
 			final int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
 			this.editor.setChecksum(pixels, pixelIterator, checksumPixelsCount);
+			pixelIterator += checksumPixelsCount;
 
-			int checksumPixelsRow = ((1 + checksumPixelsCount) % bitmapWidth == 0) ? (1 + checksumPixelsCount) / bitmapWidth : ((1 + checksumPixelsCount) / bitmapWidth) + 1;
-			pixelIterator = checksumPixelsRow * bitmapWidth;
-
-			int triggerRowHeight = triggerSize % bitmapWidth != 0 ? triggerSize / bitmapWidth + 1 : triggerSize / bitmapWidth;
-			bitmapHeight -= checksumPixelsRow + triggerRowHeight;
-
-			// Represents how many reserved pixels that will be used before creating the bitmap.
-
-			// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
-			// designated as ID 0.
+			// Step 3 - Add any triggers into a list. If triggers is null, make sure to append the Eraser
+			// trigger, designated as ID 0.
 			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight, this.editor.getChecksum());
 			for (int i = 0; i < triggerSize; i++, pixelIterator++) {
 				short triggerId = (short) (pixels[pixelIterator] & 0xFFFF);
@@ -802,17 +795,29 @@ public class DrawingBoard extends Canvas implements Runnable {
 					this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator]);
 				}
 			}
-			// Skipping the trigger row padding.
-			for (int i = 0; i < (triggerRowHeight * bitmapWidth - triggerSize); i++)
-				pixelIterator++;
 
-			// Set the dimensions of the area.
-			this.setImageSize(bitmapWidth, bitmapHeight);
-			for (int i = 0; i < bitmapWidth * bitmapHeight; i++, pixelIterator++) {
+			// Step 4 - Get the NPCs data.
+			this.npcs = new NpcSet();
+			int npcSize = pixels[pixelIterator++];
+			for (int i = 0; i < npcSize; i++) {
+				int x = pixels[pixelIterator++];
+				int y = pixels[pixelIterator++];
+				int data = pixels[pixelIterator++];
+				this.npcs.add(x, y, data);
+			}
+
+			// Step 5 - Skip the padding
+			int col = pixelIterator % bitmapWidth;
+			for (; pixelIterator % bitmapWidth != 0 && col < bitmapWidth; pixelIterator++)
+				;
+
+			// Step 6 - Get the tiles.
+			int tileSize = pixels[pixelIterator++];
+			for (int i = 0; i < tileSize; i++, pixelIterator++) {
 				this.tiles[i] = pixels[pixelIterator];
 			}
 
-			// Get and fill in the data based on the tiles obtained from above.
+			// Step 7 - Get and fill in the data based on the tiles obtained from above.
 			List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 			for (int i = 0; i < this.tiles.length; i++) {
 				int alpha = ((this.tiles[i] >> 24) & 0xFF);
