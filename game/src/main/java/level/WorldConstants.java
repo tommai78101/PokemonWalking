@@ -57,6 +57,7 @@ public class WorldConstants {
 	// ItemBuilder.loadItems("art/item/items.txt");
 
 	// Areas
+	public static final int CHECKSUM_MAX_BYTES_LENGTH = 16;
 	public static List<Area> areas = new ArrayList<>(0);
 	public static List<Area> moddedAreas = new ArrayList<>(0);
 

@@ -55,8 +55,6 @@ public class Area implements Tileable, UpdateRenderable {
 	private final List<List<PixelData>> areaData = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
 
-	private final int ReservedUsedPixelCount = 5;
-
 	// Area data hash maps.
 	private final Map<Map.Entry<Integer, Integer>, Obstacle> areaObstacles = new HashMap<>();
 	private final Map<Map.Entry<Integer, Integer>, Character> areaCharacters = new HashMap<>();
@@ -65,69 +63,67 @@ public class Area implements Tileable, UpdateRenderable {
 
 	public Area(Bitmap bitmap) {
 		int[] tempPixels = bitmap.getPixels();
-		this.areaID = (tempPixels[0] >> 16) & 0xFFFF;
-		int triggerSize = tempPixels[0] & 0xFFFF;
-		int row = 0;
-		int column = 1;
-		int stride = bitmap.getWidth();
+		int pixelIterator = 0;
 
-		// Get checksum first. Checksum is set immediately after the first pixel.
+		// Step 1 - Get all the important information
+		final int areaInfo = tempPixels[pixelIterator++];
+		this.areaID = (areaInfo >> 16) & 0xFFFF;
+		final int triggerSize = areaInfo & 0xFFFF;
+		final int areaSize = tempPixels[pixelIterator++];
+		this.width = (areaSize >> 16) & 0xFFFF;
+		this.height = areaSize & 0xFFFF;
+
+		// Step 2 - Get checksum first. Checksum is set immediately after the first pixel.
+		final int checksumPixelsCount = WorldConstants.CHECKSUM_MAX_BYTES_LENGTH / 4;
 		StringBuilder checksumBuilder = new StringBuilder();
-		for (; (row * stride + column) < this.ReservedUsedPixelCount;) {
-			int pixel = tempPixels[row * stride + column];
+		for (int i = 0; i < checksumPixelsCount; i++) {
+			int pixel = tempPixels[pixelIterator++];
 			// There are a total of 4 bytes in an "int" type.
 			char ch1 = (char) ((pixel & 0xFF000000) >> 24);
 			char ch2 = (char) ((pixel & 0x00FF0000) >> 16);
 			char ch3 = (char) ((pixel & 0x0000FF00) >> 8);
 			char ch4 = (char) (pixel & 0x000000FF);
 			checksumBuilder.append(ch1).append(ch2).append(ch3).append(ch4);
-
-			column++;
-			if (column >= stride) {
-				column %= stride;
-				row++;
-			}
 		}
 		this.checksum = checksumBuilder.toString();
 
-		// After checksum, the rest of the pixels in the current row are just padded pixels. Skip them until
-		// we reach next row.
-		row++;
-		column = 0;
-
+		// Step 3 - Get any triggers and put them into a triggers list.
 		// If the trigger size is larger than 1 (meaning there are triggers other than Eraser), we parse the
 		// trigger data.
 		if (triggerSize > 1) {
-			column++;
-
-			// TODO(2021-July-24): This is the place to insert a static method to "search for any trigger
-			// scripts matching the checksum" and load the trigger script into TriggerData.loadTriggerData().
-
-			for (; column < triggerSize; column++) {
+			for (int i = 0; i < triggerSize; i++) {
 				// The "color" is the ID.
 				// ID must not be negative. ID = 0 is reserved.
-				int color = tempPixels[column + (stride * row)];
+				int color = tempPixels[pixelIterator++];
 				if (color > 0) {
 					int xPosition = (color >> 24) & 0xFF;
 					int yPosition = (color >> 16) & 0xFF;
 					this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color));
 				}
-				if (column >= stride) {
-					row++;
-					column -= stride;
-				}
 			}
 		}
 
-		// We need to add the row by 1 for the last row with trailing empty trigger IDs.
-		row++;
-		column = 0;
+		// Step 4 - Get the NPCs data.
+		final int npcSize = tempPixels[pixelIterator++];
+		for (int i = 0; i < npcSize; i++) {
+			int x = tempPixels[pixelIterator++];
+			int y = tempPixels[pixelIterator++];
+			int data = tempPixels[pixelIterator++];
+			this.areaCharacters.put(Map.entry(x, y), Character.build(data, x, y));
+		}
 
-		this.width = bitmap.getWidth();
-		this.height = bitmap.getHeight() - row;
-		this.pixels = new int[this.width * this.height];
-		System.arraycopy(bitmap.getPixels(), this.width * row, this.pixels, 0, this.pixels.length);
+		// Step 5 - Skip the padding
+		int col = pixelIterator % this.width;
+		for (; pixelIterator % this.width != 0 && col < this.width; pixelIterator++)
+			;
 
+		// Step 6 - Get the tiles
+		final int pixelSize = tempPixels[pixelIterator++];
+		this.pixels = new int[pixelSize];
+		System.arraycopy(tempPixels, pixelIterator, this.pixels, 0, pixelSize);
+		pixelIterator += pixelSize;
+
+		// Step 7 - Get and fill in the area data.
 		for (int y = 0; y < this.height; y++) {
 			this.areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
@@ -438,7 +434,7 @@ public class Area implements Tileable, UpdateRenderable {
 				data.renderTick();
 			}
 		}
-		
+
 		// Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach(
 			(k, obstacle) -> {
