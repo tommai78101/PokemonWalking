@@ -255,7 +255,7 @@ public class SelectionDropdownMenu extends JPanel {
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
-			case Pixel_Data:
+			case Tilesets:
 				this.tileCategory.setEnabled(true);
 				this.tiles.setEnabled(true);
 				this.triggers.setEnabled(false);

@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -17,10 +17,8 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,9 +28,9 @@ import javax.swing.JButton;
 
 import common.Debug;
 import common.Tileable;
+import enums.DataType;
 import enums.ScriptTags;
 import level.WorldConstants;
-import script.Script;
 
 public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for
@@ -48,7 +46,7 @@ public class EditorConstants {
 	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
 
-	public static enum Tools {
+	public enum Tools {
 		ControlPanel,
 		Properties
 	}
@@ -56,17 +54,17 @@ public class EditorConstants {
 	/**
 	 * Level Editor Metadata Layers. Think of Google Maps information overlays, with each overlay
 	 * depicting relevant information based on what layer was selected.
-	 * 
+	 *
 	 * @author tlee
 	 */
-	public static enum Metadata {
-		Pixel_Data("Pixel Data"),
+	public enum Metadata {
+		Tilesets("Pixel Data"),
 		Triggers("Triggers"),
 		NonPlayableCharacters("NPCs");
 
 		private String name;
 
-		private Metadata(String text) {
+		Metadata(String text) {
 			this.name = text;
 		}
 
@@ -76,7 +74,7 @@ public class EditorConstants {
 	}
 
 	public static Tools chooser = Tools.ControlPanel;
-	public static Metadata metadata = Metadata.Pixel_Data;
+	public static Metadata metadata = Metadata.Tilesets;
 
 	private EditorConstants() {
 		this.loadTilesetData();
@@ -118,34 +116,19 @@ public class EditorConstants {
 						data.areaTypeIncluded = true;
 						// By default, the data type specified as NULL, means the alpha, red, green, and blue values are
 						// used for data integrity checks.
-						Data.DataType type = null;
+						DataType type = null;
 						short i = 0;
 						byte count = 0;
 						while (line.charAt(i) != '*') {
 							if (line.charAt(i) == '%') {
 								count++;
-								switch (count) {
-									case 2:
-										// If data type is ALPHA, we only need to data integrity check red, green, and blue values.
-										type = Data.DataType.ALPHA;
-										break;
-									case 3:
-										// If data type is RED, we only need to data integrity check alpha, green, and blue values.
-										type = Data.DataType.RED;
-										break;
-									case 4:
-										// If data type is GREEN, we only need to data integrity check alpha, red, and blue values.
-										type = Data.DataType.GREEN;
-										break;
-									case 5:
-										// If data type is BLUE, we only need to data integrity check alpha, red, and green values.
-										type = Data.DataType.BLUE;
-										break;
-									default:
-										// Data integrity check all values.
-										type = Data.DataType.NONE;
-										break;
-								}
+								type = switch (count) {
+									case 2 -> DataType.ALPHA;
+									case 3 -> DataType.RED;
+									case 4 -> DataType.GREEN;
+									case 5 -> DataType.BLUE;
+									default -> DataType.NONE;
+								};
 							}
 							i++;
 						}
@@ -170,10 +153,10 @@ public class EditorConstants {
 					}
 					tokens = line.trim().replaceAll("\\s+", "").replaceAll("@", "00").split("%");
 					data.name = tokens[1].replace('_', ' ');
-					data.alpha = Integer.valueOf(tokens[2], 16);
-					data.red = Integer.valueOf(tokens[3], 16);
-					data.green = Integer.valueOf(tokens[4], 16);
-					data.blue = Integer.valueOf(tokens[5], 16);
+					data.alpha = Integer.parseInt(tokens[2], 16);
+					data.red = Integer.parseInt(tokens[3], 16);
+					data.green = Integer.parseInt(tokens[4], 16);
+					data.blue = Integer.parseInt(tokens[5], 16);
 					data.filepath = tokens[6];
 					data.editorID = editorID++;
 					data.image = new ImageIcon(
@@ -200,7 +183,7 @@ public class EditorConstants {
 					data.button.setAlignmentX(Component.CENTER_ALIGNMENT);
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
-					this.datas.add(new AbstractMap.SimpleEntry<>(data.getColorValue(), data));
+					this.datas.add(Map.entry(data.getColorValue(), data));
 					temp.add(data);
 				}
 				else if (line.startsWith("+")) {
@@ -210,27 +193,20 @@ public class EditorConstants {
 				}
 			}
 
-			Collections.sort(this.datas, new Comparator<Map.Entry<Integer, Data>>() {
-
-				@Override
-				public int compare(Map.Entry<Integer, Data> d1, Map.Entry<Integer, Data> d2) {
-					if (d1.getValue().editorID < d2.getValue().editorID)
-						return -1;
-					if (d1.getValue().editorID > d2.getValue().editorID)
-						return 1;
-					return 0;
-				}
+			Collections.sort(this.datas, (d1, d2) -> {
+				if (d1.getValue().editorID < d2.getValue().editorID)
+					return -1;
+				if (d1.getValue().editorID > d2.getValue().editorID)
+					return 1;
+				return 0;
 			});
 
-			Collections.sort(this.categories, new Comparator<Category>() {
-				@Override
-				public int compare(Category d1, Category d2) {
-					if (d1.id < d2.id)
-						return -1;
-					if (d1.id > d2.id)
-						return 1;
-					return 0;
-				}
+			Collections.sort(this.categories, (d1, d2) -> {
+				if (d1.id < d2.id)
+					return -1;
+				if (d1.id > d2.id)
+					return 1;
+				return 0;
 			});
 
 		}
@@ -243,7 +219,7 @@ public class EditorConstants {
 	}
 
 	private void loadTriggers() {
-		URL uri = Script.class.getResource(WorldConstants.ScriptsDefaultPath);
+		URL uri = EditorConstants.class.getResource(WorldConstants.ScriptsDefaultPath);
 		try {
 			final File[] directory = new File(uri.toURI()).listFiles();
 			for (File f : directory) {
@@ -269,10 +245,7 @@ public class EditorConstants {
 			Trigger trigger = null;
 			String checksum = null;
 			while ((line = reader.readLine()) != null) {
-				if (ScriptTags.Comment.beginsAt(line)) {
-					// This is a comment.
-					continue;
-				}
+				if (ScriptTags.Comment.beginsAt(line)) {}
 				else if (checksum == null && ScriptTags.Checksum.beginsAt(line)) {
 					checksum = ScriptTags.Checksum.removeScriptTag(line);
 				}
@@ -282,7 +255,7 @@ public class EditorConstants {
 						trigger = new Trigger();
 					if (checksum != null)
 						trigger.setChecksum(checksum);
-					int value = Integer.valueOf(ScriptTags.BeginScript.removeScriptTag(line));
+					int value = Integer.parseInt(ScriptTags.BeginScript.removeScriptTag(line));
 					if (value != 0) {
 						trigger.setTriggerID((short) (value & 0xFFFF));
 					}

@@ -93,7 +93,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (EditorConstants.metadata) {
-			case Pixel_Data: {
+			case Tilesets: {
 				JButton button = (JButton) event.getSource();
 				int id = Integer.parseInt(button.getActionCommand());
 				Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(id);
@@ -169,7 +169,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
-			case Pixel_Data:
+			case Tilesets:
 				this.iconsPanel.setVisible(true);
 				this.iconsPanel.setEnabled(true);
 				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);

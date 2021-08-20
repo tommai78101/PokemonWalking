@@ -337,7 +337,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
-			case Pixel_Data:
+			case Tilesets:
 				this.tileID.setText("Tile ID:");
 				this.extendedTileID.setText("Extended ID:");
 				this.tileSpecificID.setText("Other IDs:");

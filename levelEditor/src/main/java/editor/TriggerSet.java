@@ -31,7 +31,7 @@ public class TriggerSet {
 
 	/**
 	 * Validate and check for triggers.
-	 * 
+	 *
 	 * @param triggerPixelData
 	 *            The full RGBA pixel data of the supposed trigger in the area map.
 	 * @return
@@ -40,10 +40,7 @@ public class TriggerSet {
 		Trigger triggerValidityCheck = null;
 		List<Trigger> triggers = EditorConstants.getInstance().getTriggers();
 		if (triggerPixelData == 0x0) {
-			// Trigger data created by the user should never be 0. Trigger pixel data that is 0 is an internal
-			// Eraser trigger.
-			triggerValidityCheck = triggers.get(0);
-			return triggerValidityCheck;
+			return triggers.get(0);
 		}
 		final short trigId = (short) (triggerPixelData & 0xFFFF);
 		try {

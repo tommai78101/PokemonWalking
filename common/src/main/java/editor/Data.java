@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -11,15 +11,9 @@ package editor;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
-public class Data {
-	enum DataType {
-		ALPHA,
-		RED,
-		GREEN,
-		BLUE,
-		NONE;
-	}
+import enums.DataType;
 
+public class Data {
 	public String name;
 	public String filepath;
 	public int editorID;
@@ -60,5 +54,6 @@ public class Data {
 		this.red = (value & 0xFF0000) >> 16;
 		this.green = (value & 0xFF00) >> 8;
 		this.blue = (value & 0xFF);
+		this.editorID = value;
 	}
 }

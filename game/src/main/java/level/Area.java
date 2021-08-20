@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package level;
@@ -103,6 +103,9 @@ public class Area implements Tileable, UpdateRenderable {
 				}
 			}
 		}
+		else {
+			pixelIterator++;
+		}
 
 		// Step 4 - Get the NPCs data.
 		final int npcSize = tempPixels[pixelIterator++];
@@ -112,7 +115,25 @@ public class Area implements Tileable, UpdateRenderable {
 			int data = tempPixels[pixelIterator++];
 			this.areaCharacters.put(Map.entry(x, y), Character.build(data, x, y));
 		}
-		
+
+		// Step 5 - Get obstacles
+		final int obstaclesSize = tempPixels[pixelIterator++];
+		for (int i = 0; i < obstaclesSize; i++) {
+			int x = tempPixels[pixelIterator++];
+			int y = tempPixels[pixelIterator++];
+			int data = tempPixels[pixelIterator++];
+			this.areaObstacles.put(Map.entry(x, y), Obstacle.build(data, x, y));
+		}
+
+		// Step 6 - Get items
+		final int itemsSize = tempPixels[pixelIterator++];
+		for (int i = 0; i < itemsSize; i++) {
+			int x = tempPixels[pixelIterator++];
+			int y = tempPixels[pixelIterator++];
+			int data = tempPixels[pixelIterator++];
+			this.areaItems.put(Map.entry(x, y), Item.build(data, x, y));
+		}
+
 		// Step 6 - Skip the padding
 		int col = pixelIterator % this.width;
 		for (; pixelIterator % this.width != 0 && col < this.width; pixelIterator++)
@@ -128,27 +149,7 @@ public class Area implements Tileable, UpdateRenderable {
 			this.areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
 				int pixel = this.pixels[y * this.width + x];
-				PixelData pixelData = new PixelData(pixel, x, y);
-
-				if (Entity.isObstacle(pixelData)) {
-					Obstacle entity = Obstacle.build(pixelData, x, y);
-					if (entity != null) {
-						this.areaObstacles.put(Map.entry(x, y), entity);
-					}
-				}
-				if (Entity.isCharacter(pixelData)) {
-					Character entity = Character.build(pixelData, x, y);
-					if (entity != null) {
-						this.areaCharacters.put(Map.entry(x, y), entity);
-					}
-				}
-				if (Entity.isItem(pixelData)) {
-					Item entity = Item.build(pixelData);
-					if (entity != null) {
-						this.areaItems.put(Map.entry(x, y), entity);
-					}
-				}
-				this.areaData.get(y).add(pixelData);
+				this.areaData.get(y).add(new PixelData(pixel, x, y));
 			}
 		}
 		this.isInWarpZone = false;
@@ -185,7 +186,7 @@ public class Area implements Tileable, UpdateRenderable {
 
 	/**
 	 * Updates the area.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	@Override
@@ -230,6 +231,12 @@ public class Area implements Tileable, UpdateRenderable {
 				obstacleValue.tick();
 			}
 		);
+
+		this.areaCharacters.forEach(
+			(key, character) -> {
+				character.tick();
+			}
+		);
 	}
 
 	private void handleTriggerActions() {
@@ -262,22 +269,19 @@ public class Area implements Tileable, UpdateRenderable {
 			this.player.handleSurroundingTiles(this);
 			this.checkCurrentPositionDataAndSetProperties(this.getPixelData(this.xPlayerPosition, this.yPlayerPosition));
 		}
-		else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
-			// It may be possible the player is still in the air, and hasn't done checking
-			// if the current pixel data is a ledge or not. This continues the data checking. It's required.
-			this.xPlayerPosition = this.player.getXInArea();
-			this.yPlayerPosition = this.player.getYInArea();
-
-			// Do some bounds checking on the X and Y player positions.
-			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
-			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
-			if (isXOutOfBounds || isYOutOfBounds)
-				return;
-
-			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
-			this.checkCurrentPositionDataAndSetProperties(this.getCurrentPixelData());
-		}
 		else {
+			if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
+				// It may be possible the player is still in the air, and hasn't done checking
+				// if the current pixel data is a ledge or not. This continues the data checking. It's required.
+				this.xPlayerPosition = this.player.getXInArea();
+				this.yPlayerPosition = this.player.getYInArea();
+
+				// Do some bounds checking on the X and Y player positions.
+				boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
+				boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
+				if (isXOutOfBounds || isYOutOfBounds)
+					return;
+			}
 			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 			this.checkCurrentPositionDataAndSetProperties(this.getCurrentPixelData());
 		}
@@ -307,7 +311,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 * Checks the pixel data the player is currently on, and sets the tile properties according to the
 	 * documentation provided. The tile the pixel data is representing determines the properties this
 	 * will set, and will affect how the game interacts with the player.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void checkCurrentPositionDataAndSetProperties(PixelData data) {
@@ -397,11 +401,11 @@ public class Area implements Tileable, UpdateRenderable {
 
 	/**
 	 * Renders the bitmap tiles based on the given pixel data.
-	 * 
+	 *
 	 * <p>
 	 * Note that this is where the bitmap animation works by updating the bitmap after it has been
 	 * rendered to the screen.
-	 * 
+	 *
 	 * @param screen
 	 *            The screen display where the bitmaps are to output to.
 	 * @param xOff
@@ -411,7 +415,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 *            The Y offset based on the player's Y position in absolute world coordinates. The
 	 *            absolute world coordinates mean the precise Y position on the Canvas.
 	 * @return Nothing.
-	 * 
+	 *
 	 */
 	@Override
 	public void render(Scene screen, Graphics graphics, int xOff, int yOff) {
@@ -507,9 +511,9 @@ public class Area implements Tileable, UpdateRenderable {
 
 	/**
 	 * Sets the player's position according to the given warp point pixel data.
-	 * 
+	 *
 	 * It's mostly used in conjunction with initializing the area with the player position set.
-	 * 
+	 *
 	 * @param data
 	 *            The pixel data used to set the default player's position.
 	 */
@@ -562,11 +566,9 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	public boolean playerHasLeftConnectionPoint() {
-		if (this.isInSectorPoint) {
-			if (this.player.isLockedWalking()) {
-				// Leaving
-				return true;
-			}
+		if (this.isInSectorPoint && this.player.isLockedWalking()) {
+			// Leaving
+			return true;
 		}
 		return false;
 	}
@@ -577,7 +579,7 @@ public class Area implements Tileable, UpdateRenderable {
 
 	/**
 	 * Obtains the tile ID of the tile being offset by the player's position.
-	 * 
+	 *
 	 * @param xOffset
 	 *            The X value offset from the player's X position.
 	 * @param yOffset
@@ -602,7 +604,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that
 	 * the player is allowed to walk on, or when the conditions are right for the player to move on the
 	 * tile.
-	 * 
+	 *
 	 * @param targetIDToCompare
 	 *            The target tile ID used to test and see if it's allowable for the player to move/walk
 	 *            on. Use getSurroundingTileID() to fetch the target tile ID.
@@ -612,7 +614,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 *            you wished.
 	 * @return True, if the target tile ID is one of the many tile IDs that's allowable. False, if none
 	 *         of the tile IDs match the target tile ID.
-	 * 
+	 *
 	 */
 	public boolean checkIfValuesAreAllowed(int targetIDToCompare, int... multipleTileIDs) {
 		boolean result = false;
@@ -750,15 +752,13 @@ public class Area implements Tileable, UpdateRenderable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof String) {
-			String str = (String) obj;
+		if (obj != null && obj instanceof String str) {
 			if (!(this.areaName.equals(str))) {
 				return false;
 			}
 			return true;
 		}
-		else if (obj != null && obj instanceof Integer) {
-			Integer BigInt = (Integer) obj;
+		else if (obj != null && obj instanceof Integer BigInt) {
 			if (!(this.areaID == BigInt.intValue())) {
 				return false;
 			}

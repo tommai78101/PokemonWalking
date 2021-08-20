@@ -194,7 +194,7 @@ public class FileControl extends JPanel implements ActionListener {
 					break;
 				}
 				case 4: { // Tileset
-					EditorConstants.metadata = Metadata.Pixel_Data;
+					EditorConstants.metadata = Metadata.Tilesets;
 					break;
 				}
 				case 5: { // Trigger
