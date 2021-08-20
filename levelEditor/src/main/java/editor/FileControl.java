@@ -40,7 +40,7 @@ import script_editor.ScriptEditor;
 public class FileControl extends JPanel implements ActionListener {
 	public static File lastSavedDirectory = null;
 	public static final String[] TAGS = new String[] {
-	    "New", "Save", "Open", "", "Tileset", "Trigger", "", "Script"
+	    "New", "Save", "Open", "", "Tileset", "Trigger", "NPC", "Script"
 	};
 
 	private static final long serialVersionUID = 1L;
@@ -83,7 +83,6 @@ public class FileControl extends JPanel implements ActionListener {
 				{
 					this.editor.drawingBoardPanel.newImage();
 					this.editor.setMapAreaName("Untitled");
-					this.editor.generateChecksum();
 					break;
 				}
 				case 1: { // Save
@@ -195,11 +194,15 @@ public class FileControl extends JPanel implements ActionListener {
 					break;
 				}
 				case 4: { // Tileset
-					EditorConstants.metadata = Metadata.Pixel_Data;
+					EditorConstants.metadata = Metadata.Tilesets;
 					break;
 				}
 				case 5: { // Trigger
 					EditorConstants.metadata = Metadata.Triggers;
+					break;
+				}
+				case 6: { // Non-Playable Characters (NPC)
+					EditorConstants.metadata = Metadata.NonPlayableCharacters;
 					break;
 				}
 				case 7: {// Script editor

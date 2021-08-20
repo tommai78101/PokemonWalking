@@ -32,7 +32,6 @@ import enums.ScriptTags;
 
 public class ScriptEditor extends JFrame {
 	private static final long serialVersionUID = 1L;
-	private static final int ScriptDirectoryIndex = 1;
 
 	public static final String TITLE = "Script Editor (Hobby)";
 	public static final int WIDTH = 700;
@@ -248,7 +247,6 @@ public class ScriptEditor extends JFrame {
 			comboTriggerList.setSelectedIndex(0);
 
 			String line = null;
-			String[] tokens;
 			trigger = null;
 			StringBuilder builder = new StringBuilder();
 			while ((line = reader.readLine()) != null) {

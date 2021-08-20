@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package level;
@@ -55,8 +55,6 @@ public class Area implements Tileable, UpdateRenderable {
 	private final List<List<PixelData>> areaData = new ArrayList<>();
 	private final Set<PixelData> modifiedAreaData = new HashSet<>();
 
-	private final int ReservedUsedPixelCount = 5;
-
 	// Area data hash maps.
 	private final Map<Map.Entry<Integer, Integer>, Obstacle> areaObstacles = new HashMap<>();
 	private final Map<Map.Entry<Integer, Integer>, Character> areaCharacters = new HashMap<>();
@@ -65,94 +63,99 @@ public class Area implements Tileable, UpdateRenderable {
 
 	public Area(Bitmap bitmap) {
 		int[] tempPixels = bitmap.getPixels();
-		this.areaID = (tempPixels[0] >> 16) & 0xFFFF;
-		int triggerSize = tempPixels[0] & 0xFFFF;
-		int row = 0;
-		int column = 1;
-		int stride = bitmap.getWidth();
+		int pixelIterator = 0;
 
-		// Get checksum first. Checksum is set immediately after the first pixel.
+		// Step 1 - Get all the important information
+		final int areaInfo = tempPixels[pixelIterator++];
+		this.areaID = (areaInfo >> 16) & 0xFFFF;
+		final int triggerSize = areaInfo & 0xFFFF;
+		final int areaSize = tempPixels[pixelIterator++];
+		this.width = (areaSize >> 16) & 0xFFFF;
+		this.height = areaSize & 0xFFFF;
+		final int pixelSize = tempPixels[pixelIterator++];
+
+		// Step 2 - Get checksum first. Checksum is set immediately after the first pixel.
+		final int checksumPixelsCount = WorldConstants.CHECKSUM_MAX_BYTES_LENGTH / 4;
 		StringBuilder checksumBuilder = new StringBuilder();
-		for (; (row * stride + column) < this.ReservedUsedPixelCount;) {
-			int pixel = tempPixels[row * stride + column];
+		for (int i = 0; i < checksumPixelsCount; i++) {
+			int pixel = tempPixels[pixelIterator++];
 			// There are a total of 4 bytes in an "int" type.
 			char ch1 = (char) ((pixel & 0xFF000000) >> 24);
 			char ch2 = (char) ((pixel & 0x00FF0000) >> 16);
 			char ch3 = (char) ((pixel & 0x0000FF00) >> 8);
 			char ch4 = (char) (pixel & 0x000000FF);
 			checksumBuilder.append(ch1).append(ch2).append(ch3).append(ch4);
-
-			column++;
-			if (column >= stride) {
-				column %= stride;
-				row++;
-			}
 		}
 		this.checksum = checksumBuilder.toString();
 
-		// After checksum, the rest of the pixels in the current row are just padded pixels. Skip them until
-		// we reach next row.
-		row++;
-		column = 0;
-
+		// Step 3 - Get any triggers and put them into a triggers list.
 		// If the trigger size is larger than 1 (meaning there are triggers other than Eraser), we parse the
 		// trigger data.
 		if (triggerSize > 1) {
-			column++;
-
-			// TODO(2021-July-24): This is the place to insert a static method to "search for any trigger
-			// scripts matching the checksum" and load the trigger script into TriggerData.loadTriggerData().
-
-			for (; column < triggerSize; column++) {
+			for (int i = 0; i < triggerSize; i++) {
 				// The "color" is the ID.
 				// ID must not be negative. ID = 0 is reserved.
-				int color = tempPixels[column + (stride * row)];
+				int color = tempPixels[pixelIterator++];
 				if (color > 0) {
 					int xPosition = (color >> 24) & 0xFF;
 					int yPosition = (color >> 16) & 0xFF;
 					this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color));
 				}
-				if (column >= stride) {
-					row++;
-					column -= stride;
-				}
 			}
 		}
+		else {
+			pixelIterator++;
+		}
 
-		// We need to add the row by 1 for the last row with trailing empty trigger IDs.
-		row++;
-		column = 0;
+		// Step 4 - Get the NPCs data.
+		final int npcSize = tempPixels[pixelIterator++];
+		for (int i = 0; i < npcSize; i++) {
+			int x = tempPixels[pixelIterator++];
+			int y = tempPixels[pixelIterator++];
+			// Ignoring Editor ID
+			pixelIterator++;
+			int data = tempPixels[pixelIterator++];
+			this.areaCharacters.put(Map.entry(x, y), Character.build(data, x, y));
+		}
 
-		this.width = bitmap.getWidth();
-		this.height = bitmap.getHeight() - row;
-		this.pixels = new int[this.width * this.height];
-		System.arraycopy(bitmap.getPixels(), this.width * row, this.pixels, 0, this.pixels.length);
+		// Step 5 - Get obstacles
+		final int obstaclesSize = tempPixels[pixelIterator++];
+		for (int i = 0; i < obstaclesSize; i++) {
+			int x = tempPixels[pixelIterator++];
+			int y = tempPixels[pixelIterator++];
+			// Ignoring Editor ID
+			pixelIterator++;
+			int data = tempPixels[pixelIterator++];
+			this.areaObstacles.put(Map.entry(x, y), Obstacle.build(data, x, y));
+		}
 
+		// Step 6 - Get items
+		final int itemsSize = tempPixels[pixelIterator++];
+		for (int i = 0; i < itemsSize; i++) {
+			int x = tempPixels[pixelIterator++];
+			int y = tempPixels[pixelIterator++];
+			// Ignoring Editor ID
+			pixelIterator++;
+			int data = tempPixels[pixelIterator++];
+			this.areaItems.put(Map.entry(x, y), Item.build(data, x, y));
+		}
+
+		// Step 6 - Skip the padding
+		int col = pixelIterator % this.width;
+		for (; pixelIterator % this.width != 0 && col < this.width; pixelIterator++)
+			;
+
+		// Step 7 - Get the tiles
+		this.pixels = new int[pixelSize];
+		System.arraycopy(tempPixels, pixelIterator, this.pixels, 0, pixelSize);
+		pixelIterator += pixelSize;
+
+		// Step 8 - Get and fill in the area data.
 		for (int y = 0; y < this.height; y++) {
 			this.areaData.add(new ArrayList<PixelData>());
 			for (int x = 0; x < this.width; x++) {
 				int pixel = this.pixels[y * this.width + x];
-				PixelData pixelData = new PixelData(pixel, x, y);
-
-				if (Entity.isObstacle(pixelData)) {
-					Obstacle entity = Obstacle.build(pixelData, x, y);
-					if (entity != null) {
-						this.areaObstacles.put(Map.entry(x, y), entity);
-					}
-				}
-				if (Entity.isCharacter(pixelData)) {
-					Character entity = Character.build(pixelData, x, y);
-					if (entity != null) {
-						this.areaCharacters.put(Map.entry(x, y), entity);
-					}
-				}
-				if (Entity.isItem(pixelData)) {
-					Item entity = Item.build(pixelData);
-					if (entity != null) {
-						this.areaItems.put(Map.entry(x, y), entity);
-					}
-				}
-				this.areaData.get(y).add(pixelData);
+				this.areaData.get(y).add(new PixelData(pixel, x, y));
 			}
 		}
 		this.isInWarpZone = false;
@@ -189,7 +192,7 @@ public class Area implements Tileable, UpdateRenderable {
 
 	/**
 	 * Updates the area.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	@Override
@@ -234,6 +237,12 @@ public class Area implements Tileable, UpdateRenderable {
 				obstacleValue.tick();
 			}
 		);
+
+		this.areaCharacters.forEach(
+			(key, character) -> {
+				character.tick();
+			}
+		);
 	}
 
 	private void handleTriggerActions() {
@@ -266,22 +275,19 @@ public class Area implements Tileable, UpdateRenderable {
 			this.player.handleSurroundingTiles(this);
 			this.checkCurrentPositionDataAndSetProperties(this.getPixelData(this.xPlayerPosition, this.yPlayerPosition));
 		}
-		else if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
-			// It may be possible the player is still in the air, and hasn't done checking
-			// if the current pixel data is a ledge or not. This continues the data checking. It's required.
-			this.xPlayerPosition = this.player.getXInArea();
-			this.yPlayerPosition = this.player.getYInArea();
-
-			// Do some bounds checking on the X and Y player positions.
-			boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
-			boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
-			if (isXOutOfBounds || isYOutOfBounds)
-				return;
-
-			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
-			this.checkCurrentPositionDataAndSetProperties(this.getCurrentPixelData());
-		}
 		else {
+			if (!this.player.isLockedJumping() && this.player.isLockedWalking()) {
+				// It may be possible the player is still in the air, and hasn't done checking
+				// if the current pixel data is a ledge or not. This continues the data checking. It's required.
+				this.xPlayerPosition = this.player.getXInArea();
+				this.yPlayerPosition = this.player.getYInArea();
+
+				// Do some bounds checking on the X and Y player positions.
+				boolean isXOutOfBounds = this.xPlayerPosition < 0 || this.xPlayerPosition >= this.width;
+				boolean isYOutOfBounds = this.yPlayerPosition < 0 || this.yPlayerPosition >= this.height;
+				if (isXOutOfBounds || isYOutOfBounds)
+					return;
+			}
 			this.currentPixelData = this.areaData.get(this.yPlayerPosition).get(this.xPlayerPosition);
 			this.checkCurrentPositionDataAndSetProperties(this.getCurrentPixelData());
 		}
@@ -311,7 +317,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 * Checks the pixel data the player is currently on, and sets the tile properties according to the
 	 * documentation provided. The tile the pixel data is representing determines the properties this
 	 * will set, and will affect how the game interacts with the player.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void checkCurrentPositionDataAndSetProperties(PixelData data) {
@@ -401,11 +407,11 @@ public class Area implements Tileable, UpdateRenderable {
 
 	/**
 	 * Renders the bitmap tiles based on the given pixel data.
-	 * 
+	 *
 	 * <p>
 	 * Note that this is where the bitmap animation works by updating the bitmap after it has been
 	 * rendered to the screen.
-	 * 
+	 *
 	 * @param screen
 	 *            The screen display where the bitmaps are to output to.
 	 * @param xOff
@@ -415,7 +421,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 *            The Y offset based on the player's Y position in absolute world coordinates. The
 	 *            absolute world coordinates mean the precise Y position on the Canvas.
 	 * @return Nothing.
-	 * 
+	 *
 	 */
 	@Override
 	public void render(Scene screen, Graphics graphics, int xOff, int yOff) {
@@ -438,10 +444,18 @@ public class Area implements Tileable, UpdateRenderable {
 				data.renderTick();
 			}
 		}
+
 		// Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach(
 			(k, obstacle) -> {
 				obstacle.renderDialogue(screen, graphics);
+			}
+		);
+
+		// Entities are rendered here.
+		this.areaCharacters.forEach(
+			(k, character) -> {
+				character.render(screen, graphics, xOff, yOff);
 			}
 		);
 
@@ -503,9 +517,9 @@ public class Area implements Tileable, UpdateRenderable {
 
 	/**
 	 * Sets the player's position according to the given warp point pixel data.
-	 * 
+	 *
 	 * It's mostly used in conjunction with initializing the area with the player position set.
-	 * 
+	 *
 	 * @param data
 	 *            The pixel data used to set the default player's position.
 	 */
@@ -558,11 +572,9 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	public boolean playerHasLeftConnectionPoint() {
-		if (this.isInSectorPoint) {
-			if (this.player.isLockedWalking()) {
-				// Leaving
-				return true;
-			}
+		if (this.isInSectorPoint && this.player.isLockedWalking()) {
+			// Leaving
+			return true;
 		}
 		return false;
 	}
@@ -573,7 +585,7 @@ public class Area implements Tileable, UpdateRenderable {
 
 	/**
 	 * Obtains the tile ID of the tile being offset by the player's position.
-	 * 
+	 *
 	 * @param xOffset
 	 *            The X value offset from the player's X position.
 	 * @param yOffset
@@ -598,7 +610,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 * Compares target tile ID with other multiple tile IDs to see if they are one of many tiles that
 	 * the player is allowed to walk on, or when the conditions are right for the player to move on the
 	 * tile.
-	 * 
+	 *
 	 * @param targetIDToCompare
 	 *            The target tile ID used to test and see if it's allowable for the player to move/walk
 	 *            on. Use getSurroundingTileID() to fetch the target tile ID.
@@ -608,7 +620,7 @@ public class Area implements Tileable, UpdateRenderable {
 	 *            you wished.
 	 * @return True, if the target tile ID is one of the many tile IDs that's allowable. False, if none
 	 *         of the tile IDs match the target tile ID.
-	 * 
+	 *
 	 */
 	public boolean checkIfValuesAreAllowed(int targetIDToCompare, int... multipleTileIDs) {
 		boolean result = false;
@@ -659,7 +671,29 @@ public class Area implements Tileable, UpdateRenderable {
 		return this.modifiedAreaData;
 	}
 
+	/**
+	 * This is the main function that determines whether the pixel data is walkable, or it is occupied
+	 * by an entity.
+	 *
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	public PixelData getPixelData(int x, int y) {
+		// These objects have the same higher priority over tileset data.
+
+		// NPC data has higher priority over obstacles and items.
+		Character npcData = this.areaCharacters.get(Map.entry(x, y));
+		if (npcData != null) {
+			return npcData.getPixelData();
+		}
+		// Obstacles and items are both on the same priority.
+		Obstacle obstacleData = this.areaObstacles.get(Map.entry(x, y));
+		Item itemData = this.areaItems.get(Map.entry(x, y));
+		if (obstacleData != null || itemData != null) {
+			return (obstacleData != null ? obstacleData : itemData).getPixelData();
+		}
+		// If nothing else, tileset data is the final priority.
 		return this.areaData.get(y).get(x);
 	}
 
@@ -686,15 +720,15 @@ public class Area implements Tileable, UpdateRenderable {
 	public boolean isTriggerBeingTriggered() {
 		return this.isTriggerTriggered;
 	}
-	
+
 	public void setTriggerBeingTriggered() {
 		this.isTriggerTriggered = true;
 	}
-	
+
 	public void unsetTriggerBeingTriggered() {
 		this.isTriggerTriggered = false;
 	}
-	
+
 	public Entity getEntity(int x, int y) {
 		// Only obstacles and characters are entities.
 		PixelData data = this.getPixelData(x, y);
@@ -746,15 +780,13 @@ public class Area implements Tileable, UpdateRenderable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj != null && obj instanceof String) {
-			String str = (String) obj;
+		if (obj != null && obj instanceof String str) {
 			if (!(this.areaName.equals(str))) {
 				return false;
 			}
 			return true;
 		}
-		else if (obj != null && obj instanceof Integer) {
-			Integer BigInt = (Integer) obj;
+		else if (obj != null && obj instanceof Integer BigInt) {
 			if (!(this.areaID == BigInt.intValue())) {
 				return false;
 			}

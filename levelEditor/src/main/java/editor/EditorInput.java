@@ -43,6 +43,10 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	public boolean isClicking() {
 		return this.clicking;
 	}
+	
+	public LevelEditor getEditor() {
+		return this.editor;
+	}
 
 	@Override
 	public void mouseDragged(MouseEvent event) {

@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -20,11 +20,9 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -33,179 +31,10 @@ import javax.swing.JTextField;
 
 import common.Debug;
 import common.Tileable;
-
-class TriggerSet {
-	// Map of <Tile ID (current tile index), Set of triggers>
-	private Map<Integer, Set<Trigger>> triggers;
-	// Since this is part of Javax Swing, I might as well use it to store the width and height of the
-	// bitmap.
-	private Dimension size;
-	// This checksum keeps track of the area checksum as well as the trigger scripts.
-	private String checksum;
-
-	public TriggerSet(int width, int height, String checksum) {
-		this.size = new Dimension(width, height);
-		this.triggers = new HashMap<>();
-		this.checksum = checksum;
-	}
-
-	public int getSize() {
-		return this.triggers.size();
-	}
-
-	/**
-	 * Validate and check for triggers.
-	 * 
-	 * @param triggerPixelData
-	 *            The full RGBA pixel data of the supposed trigger in the area map.
-	 * @return
-	 */
-	public Trigger validityCheck(int triggerPixelData) {
-		Trigger triggerValidityCheck = null;
-		List<Trigger> triggers = EditorConstants.getInstance().getTriggers();
-		if (triggerPixelData == 0x0) {
-			// Trigger data created by the user should never be 0. Trigger pixel data that is 0 is an internal
-			// Eraser trigger.
-			triggerValidityCheck = triggers.get(0);
-			return triggerValidityCheck;
-		}
-		final short trigId = (short) (triggerPixelData & 0xFFFF);
-		try {
-			for (Trigger t : triggers) {
-				if (t.checkTriggerID(trigId)) {
-					triggerValidityCheck = t;
-					break;
-				}
-			}
-		}
-		catch (Exception e) {
-			Debug.error("Encountered an error related to validating the trigger ID: " + triggerPixelData, e);
-			// Eraser.
-			triggerValidityCheck = triggers.get(0);
-		}
-		return triggerValidityCheck;
-	}
-
-	public Set<Trigger> getTriggers(int currentTriggerIndex) {
-		return this.triggers.get(currentTriggerIndex);
-	}
-
-	public void addTrigger(int index, byte newX, byte newY, Trigger trigger) {
-		Set<Trigger> set = this.triggers.get(index);
-		if (set == null)
-			set = new HashSet<>();
-		Trigger modifiedTrigger = new Trigger();
-		modifiedTrigger.setChecksum(trigger.getChecksum());
-		modifiedTrigger.setTriggerPositionX(newX);
-		modifiedTrigger.setTriggerPositionY(newY);
-		modifiedTrigger.setTriggerID(trigger.getTriggerID());
-		set.add(modifiedTrigger);
-		this.triggers.put(index, set);
-	}
-
-	public void removeTrigger(int index, Trigger trigger) {
-		Set<Trigger> set = this.triggers.get(index);
-		if (set == null) {
-			return;
-		}
-		Trigger delete = null;
-		for (Trigger t : set) {
-			if (t.getTriggerID() == trigger.getTriggerID()) {
-				delete = t;
-				break;
-			}
-		}
-		if (delete != null) {
-			set.remove(delete);
-		}
-	}
-
-	public void toggleTrigger(int index, Trigger trigger) {
-		Debug.log("Toggling trigger");
-		Set<Trigger> set = this.triggers.get(index);
-		if (set == null) {
-			set = new HashSet<>();
-			set.add(trigger);
-			this.triggers.put(index, set);
-			return;
-		}
-		if (set.contains(trigger)) {
-			set.remove(trigger);
-		}
-		else {
-			set.add(trigger);
-		}
-	}
-
-	public List<Integer> convertToData() {
-		List<Integer> output = new ArrayList<>();
-		// Eraser trigger by default.
-		output.add(0);
-		Set<Integer> keySet = this.triggers.keySet();
-		for (int tileId : keySet) {
-			Set<Trigger> triggerSet = this.triggers.get(tileId);
-			if (triggerSet == null || triggerSet.isEmpty()) {
-				continue;
-			}
-			for (Trigger trigger : triggerSet) {
-				output.add(trigger.getDataValue());
-			}
-		}
-		return output;
-	}
-
-	public void addTriggerById(int index, int triggerId) {
-		Trigger trigger = this.validityCheck(triggerId);
-		if (trigger == null) {
-			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at: (" + (index % this.size.width) + "," + (index / this.size.width) + ").");
-			return;
-		}
-		if (!trigger.isEraser()) {
-			byte x = (byte) (index % this.size.width);
-			byte y = (byte) (index / this.size.width);
-			this.addTrigger(index, x, y, trigger);
-		}
-		else {
-			// Don't do anything with Erasers.
-		}
-	}
-
-	public void clearAllTriggers(int index) {
-		Set<Trigger> set = this.triggers.get(index);
-		if (set != null)
-			set.clear();
-	}
-
-	public boolean contains(int index, Trigger trigger) {
-		Set<Trigger> set = this.triggers.get(index);
-		if (set == null || set.isEmpty())
-			return false;
-		for (Trigger t : set) {
-			if (t.getTriggerID() == trigger.getTriggerID())
-				return true;
-		}
-		return false;
-	}
-
-	public boolean hasTriggers(int index) {
-		Set<Trigger> set = this.triggers.get(index);
-		return (set != null && !set.isEmpty());
-	}
-
-	public boolean isEmpty() {
-		return this.getSize() == 0;
-	}
-
-	public boolean matchesChecksum(String checksum) {
-		if (this.checksum == null || this.checksum.isBlank() || checksum == null || checksum.isBlank())
-			return false;
-		return this.checksum.equals(checksum);
-	}
-	
-	public String getChecksum() {
-		return this.checksum;
-	}
-}
+import dataset.EditorData;
+import dataset.ItemSet;
+import dataset.NpcSet;
+import dataset.ObstacleSet;
 
 public class DrawingBoard extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -216,13 +45,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private int[] tiles;
 	private int[] tilesEditorID;
 	private TriggerSet triggers;
+	private NpcSet npcs;
+	private ObstacleSet obstacles;
+	private ItemSet items;
 	private int bitmapWidth, bitmapHeight;
 	private int offsetX, offsetY;
 	private int mouseOnTileX, mouseOnTileY;
 	private boolean mouseInsideDrawingBoardCheck = false;
 
 	public DrawingBoard(final LevelEditor editor, int width, int height) {
-		super();
 		this.editor = editor;
 		this.offsetX = this.offsetY = 0;
 
@@ -271,31 +102,53 @@ public class DrawingBoard extends Canvas implements Runnable {
 				this.render();
 				Thread.sleep(1);
 			}
-			catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
 
-	public void setImageSize(int w, int h) {
-		if (w <= 0 || h <= 0)
+	public void setImageSize(int w, int h, boolean runTriggerSetCheck) {
+		if (w <= 0 || h <= 0) {
+			Debug.error("Improper image size [" + w + " x " + h + "] was given.");
 			return;
+		}
+
+		// Initializing a new Trigger Set.
+		if (runTriggerSetCheck) {
+			String checksum = this.editor.getChecksum();
+			boolean isSetEmpty = (this.triggers == null || this.triggers.isEmpty());
+			if (isSetEmpty || !this.triggers.matchesChecksum(checksum)) {
+				// Only if the triggers set is null or is empty, do we create a new trigger set.
+				this.triggers = new TriggerSet(w, h, this.editor.getChecksum());
+			}
+
+			isSetEmpty = (this.npcs == null || this.npcs.isEmpty());
+			if (isSetEmpty || !this.npcs.matchesChecksum(checksum)) {
+				this.npcs = new NpcSet(this.editor.getChecksum());
+			}
+
+			isSetEmpty = (this.obstacles == null || this.obstacles.isEmpty());
+			if (isSetEmpty || !this.obstacles.matchesChecksum(checksum)) {
+				this.obstacles = new ObstacleSet(checksum);
+			}
+
+			isSetEmpty = (this.items == null || this.items.isEmpty());
+			if (isSetEmpty || !this.items.matchesChecksum(checksum)) {
+				this.items = new ItemSet(checksum);
+			}
+		}
+
+		// Initializing the data editor ID arrays.
+		this.tiles = new int[w * h];
+		this.tilesEditorID = new int[w * h];
+		Arrays.fill(this.tiles, 0);
+		Arrays.fill(this.tilesEditorID, 0);
+
+		// Clearing the rendered area map image.
 		if (this.image != null) {
 			this.image.flush();
 			this.image = null;
-		}
-		this.tiles = new int[w * h];
-		this.tilesEditorID = new int[w * h];
-		if (this.triggers == null || this.triggers.isEmpty() || !this.triggers.matchesChecksum(this.editor.getChecksum())) {
-			// Only if the triggers set is null or is empty, do we create a new trigger set.
-			this.triggers = new TriggerSet(w, h, this.editor.getChecksum());
-		}
-		for (int i = 0; i < this.tiles.length; i++) {
-			this.tiles[i] = 0;
-			this.tilesEditorID[i] = 0;
 		}
 		this.image = new BufferedImage(w * Tileable.WIDTH, h * Tileable.HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
@@ -307,6 +160,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 					pixels[j * this.image.getWidth() + i] = -1;
 			}
 		}
+
+		// Initializing other attributes of the current area map session in the level editor.
 		this.bitmapWidth = w;
 		this.bitmapHeight = h;
 		this.offsetX = -((this.getWidth() - (w * Tileable.WIDTH)) / 2);
@@ -316,66 +171,61 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 
 	public void newImage() {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				JTextField widthField;
-				JTextField heightField;
-				int result;
-				do {
-					widthField = new JTextField("10");
-					heightField = new JTextField("10");
-					JPanel panel = new JPanel(new GridLayout(1, 2));
-					panel.add(new JLabel("  Width:"));
-					panel.add(widthField);
-					panel.add(new JLabel("  Height:"));
-					panel.add(heightField);
-					result = JOptionPane.showConfirmDialog(
-						null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION,
-						JOptionPane.PLAIN_MESSAGE
-					);
-				}
-				while (Integer.valueOf(widthField.getText()) <= 0 || Integer.valueOf(heightField.getText()) <= 0);
-				if (result == JOptionPane.OK_OPTION) {
-					DrawingBoard.this.setImageSize(Integer.valueOf(widthField.getText()), Integer.valueOf(heightField.getText()));
+		EventQueue.invokeLater(() -> {
+			JTextField widthField;
+			JTextField heightField;
+			int result;
+			do {
+				widthField = new JTextField("10");
+				heightField = new JTextField("10");
+				JPanel panel = new JPanel(new GridLayout(1, 2));
+				panel.add(new JLabel("  Width:"));
+				panel.add(widthField);
+				panel.add(new JLabel("  Height:"));
+				panel.add(heightField);
+				result = JOptionPane.showConfirmDialog(
+					null, panel, "Create New Area", JOptionPane.OK_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE
+				);
+			}
+			while (Integer.valueOf(widthField.getText()) <= 0 || Integer.valueOf(heightField.getText()) <= 0);
+			if (result == JOptionPane.OK_OPTION) {
+				int width = Integer.parseInt(widthField.getText());
+				int height = Integer.parseInt(heightField.getText());
+				DrawingBoard.this.editor.generateChecksum();
+				DrawingBoard.this.setImageSize(width, height, true);
 
-					// Script editor
-					if (DrawingBoard.this.editor.scriptEditor != null) {
-						// Start a clean slate for the Script Editor.
-						DrawingBoard.this.editor.scriptEditor.resetComponents();
-					}
+				// Script editor
+				if (DrawingBoard.this.editor.scriptEditor != null) {
+					// Start a clean slate for the Script Editor.
+					DrawingBoard.this.editor.scriptEditor.resetComponents();
 				}
 			}
 		});
 	}
 
 	public void newImage(final int x, final int y) {
-		EventQueue.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				DrawingBoard.this.setImageSize(x, y);
-				DrawingBoard.this.editor.generateChecksum();
-			}
-		});
+		EventQueue.invokeLater(() -> DrawingBoard.this.setImageSize(x, y, true));
 	}
 
 	public void render() throws Exception {
+		if (this.bitmapWidth <= 0 || this.bitmapHeight <= 0)
+			return;
 		BufferStrategy bs = this.getBufferStrategy();
 		if (bs == null) {
 			this.createBufferStrategy(3);
 			bs = this.getBufferStrategy();
 		}
 		this.hoverOver();
+		final List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 		switch (EditorConstants.metadata) {
-			case Pixel_Data: {
+			case Tilesets: {
 				if (this.tilesEditorID != null) {
 					for (int j = 0; j < this.tilesEditorID.length; j++) {
-						if (this.bitmapWidth <= 0 || this.bitmapHeight <= 0)
-							break;
 						int w = j % this.bitmapWidth;
 						int h = j / this.bitmapWidth;
 
-						Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(this.tilesEditorID[j]);
+						Map.Entry<Integer, Data> entry = list.get(this.tilesEditorID[j]);
 						Data data = entry.getValue();
 						if (data == null) {
 							break;
@@ -424,7 +274,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 						g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
 						g.dispose();
-
 					}
 				}
 				break;
@@ -437,16 +286,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 				// Iterate through a bitmap array of triggers.
 				for (int currentTriggerIndex = 0; currentTriggerIndex < this.tiles.length; currentTriggerIndex++) {
-					if (this.bitmapWidth <= 0 || this.bitmapHeight <= 0)
-						break;
-
 					Data data = null;
 					try {
-						Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(this.tilesEditorID[currentTriggerIndex]);
+						Map.Entry<Integer, Data> entry = list.get(this.tilesEditorID[currentTriggerIndex]);
 						data = entry.getValue();
 					}
 					catch (Exception e) {
-						data = EditorConstants.getInstance().getDatas().get(0).getValue();
+						data = list.get(0).getValue();
 					}
 
 					int w = currentTriggerIndex % this.bitmapWidth;
@@ -458,12 +304,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 					if (this.triggers.hasTriggers(currentTriggerIndex)) {
 						if (this.triggers.contains(currentTriggerIndex, selectedTrigger)) {
 							g.setColor(Color.cyan);
-							g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 						}
 						else {
 							g.setColor(Color.yellow);
-							g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 						}
+						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 					}
 					else {
 						// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT,
@@ -499,9 +344,79 @@ public class DrawingBoard extends Canvas implements Runnable {
 							gD.setColor(Color.white);
 						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 						g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
-						g.dispose();
 					}
 					g.dispose();
+				}
+				break;
+			}
+			case NonPlayableCharacters: {
+				if (this.tilesEditorID != null) {
+					for (int j = 0; j < this.tilesEditorID.length; j++) {
+						int w = j % this.bitmapWidth;
+						int h = j / this.bitmapWidth;
+
+						// Drawing Tileset first
+						Map.Entry<Integer, Data> entry = list.get(this.tilesEditorID[j]);
+						Data data = entry.getValue();
+						if (data == null) {
+							break;
+						}
+						if (data.image == null) {
+							this.tiles[j] = 0;
+							this.tilesEditorID[j] = 0;
+							continue;
+						}
+						if (this.image == null)
+							return;
+						Graphics g = this.image.getGraphics();
+						BufferedImage bimg = new BufferedImage(
+							data.image.getIconWidth(), data.image.getIconHeight(),
+							BufferedImage.TYPE_INT_ARGB
+						);
+						Graphics gB = bimg.getGraphics();
+						// TODO: Area Type ID must be included.
+						gB.drawImage(data.image.getImage(), 0, 0, null);
+
+						// Drawing NPCs on top of Tileset
+						EditorData npc = this.npcs.get(w, h);
+						if (npc != null) {
+							entry = list.get(npc.getEditorData());
+							Data npcData = entry.getValue();
+							if (npcData != null) {
+								gB.drawImage(npcData.image.getImage(), 0, 0, null);
+							}
+						}
+
+						gB.dispose();
+
+						if (data.areaTypeIncluded) {
+							// If the area type is included with the Data object, we can add some biome colors.
+							// By default, we set the biome colors based on ALPHA value.
+							// When area type of NONE is used, the BLUE value determines the biome colors.
+							switch (data.areaTypeIDType) {
+								case ALPHA:
+								default:
+									this.setBiomeTile((this.tiles[j] >> 24) & 0xFF, g);
+									break;
+								case RED:
+									this.setBiomeTile((this.tiles[j] >> 16) & 0xFF, g);
+									break;
+								case GREEN:
+									this.setBiomeTile((this.tiles[j] >> 8) & 0xFF, g);
+									break;
+								case BLUE:
+								case NONE:
+									this.setBiomeTile(this.tiles[j] & 0xFF, g);
+									break;
+							}
+						}
+						else
+							g.setColor(Color.white);
+
+						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
+						g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
+						g.dispose();
+					}
 				}
 				break;
 			}
@@ -527,19 +442,19 @@ public class DrawingBoard extends Canvas implements Runnable {
 	}
 
 	public void tick() {
-		switch (EditorConstants.metadata) {
-			case Pixel_Data: {
-				if (this.editor.input.isDragging()) {
-					this.offsetX = this.editor.input.offsetX;
-					this.offsetY = this.editor.input.offsetY;
-				}
-				else if (this.isMouseInDrawingBoard() && this.editor.input.isDrawing()) {
+		if (this.editor.input.isDragging()) {
+			this.offsetX = this.editor.input.offsetX;
+			this.offsetY = this.editor.input.offsetY;
+		}
+		else if (this.isMouseInDrawingBoard() && this.editor.input.isDrawing()) {
+			switch (EditorConstants.metadata) {
+				case Tilesets: {
+					// Tilesets Editing is subjected to both dragging and clicking.
 					this.mouseOnTileX = this.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.offsetY + this.editor.input.drawingY;
-					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH)
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
-					if (this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
-						return;
+
 					Data selectedData = this.editor.controlPanel.getSelectedData();
 					if (selectedData != null) {
 						if (selectedData.name.equals("Select")) {
@@ -555,22 +470,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 							this.setDataProperties(selectedData);
 						}
 					}
+					break;
 				}
-				break;
-			}
-			case Triggers: {
-				if (this.editor.input.isDragging()) {
-					this.offsetX = this.editor.input.offsetX;
-					this.offsetY = this.editor.input.offsetY;
-				}
-				// Only Triggers Editing is subjected to clicking only.
-				else if (this.isMouseInDrawingBoard() && this.editor.input.isClicking()) {
+				case Triggers: {
+					// Triggers Editing is subjected to clicking only.
 					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
-					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH)
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
-					if (this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
-						return;
+
 					Trigger selectedTrigger = this.editor.controlPanel.getSelectedTrigger();
 					if (selectedTrigger != null && !selectedTrigger.isEraser()) {
 						int x = this.getMouseTileX();
@@ -589,8 +497,23 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int i = y * this.bitmapWidth + x;
 						this.triggers.clearAllTriggers(i);
 					}
+					break;
 				}
-				break;
+				case NonPlayableCharacters: {
+					Debug.notYetImplemented();
+
+					// NPCs Editing is subjected to clicking only.
+					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
+					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
+						return;
+
+					Data selectedData = this.editor.controlPanel.getSelectedData();
+					if (selectedData != null) {
+						this.setDataProperties(selectedData);
+					}
+					break;
+				}
 			}
 		}
 	}
@@ -605,7 +528,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 	 * <p>
 	 * The ControlPanel's dataValue gathers the user's modified data values, then inserts it into the
 	 * data value of the "data object from the lookup list".
-	 * 
+	 *
 	 * @param selectedData
 	 */
 	public void setDataProperties(Data selectedData) {
@@ -689,6 +612,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 							blue = this.getMouseTileY();
 						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
 						this.tilesEditorID[tileIndex] = data.editorID;
+						this.triggers.addTriggerById(tileIndex, data.editorID);
 						panel.greenInputField.setText(Integer.toString(green));
 						panel.blueInputField.setText(Integer.toString(blue));
 						panel.greenField.setText(Integer.toString(green));
@@ -698,6 +622,20 @@ public class DrawingBoard extends Canvas implements Runnable {
 					default:
 						break;
 				}
+				break;
+			}
+			case 0x0E: { // Characters/NPCs
+				int characterUID = data.red;
+				int scriptID = data.green;
+				this.npcs.add(this.getMouseTileX(), this.getMouseTileY(), data.editorID, data.getColorValue());
+				panel.redInputField.setText(Integer.toString(characterUID));
+				panel.greenInputField.setText(Integer.toString(scriptID));
+				panel.redField.setText(Integer.toString(characterUID));
+				panel.greenField.setText(Integer.toString(scriptID));
+
+				// Disabling the blue field for now.
+				panel.blueInputField.setText(Integer.toString(-1));
+				panel.blueField.setText(Integer.toString(-1));
 				break;
 			}
 			default: {
@@ -751,85 +689,77 @@ public class DrawingBoard extends Canvas implements Runnable {
 	/**
 	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is
 	 * necessary.
-	 * 
+	 *
 	 * @return <b>BufferedImage</b> object containing the triggers and tilesets data.
 	 */
 	public BufferedImage getMapImage() {
 		if (this.bitmapWidth * this.bitmapHeight == 0)
 			return null;
+		// Prepare the resulting data.
+		List<Integer> pixels = new ArrayList<>();
+
+		// Storing important area information in the first pixel. This should use up all of the number of
+		// pixels we had reserved.
+		final int areaID = this.editor.getUniqueAreaID();
 
 		// Get the checksum and relevant information.
 		final String checksum = this.editor.getChecksum();
-		final int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
 		byte[] checksumBytes = checksum.getBytes();
-		int checksumPixelsRow = ((1 + checksumPixelsCount) % this.bitmapWidth == 0) ? (1 + checksumPixelsCount) / this.bitmapWidth : ((1 + checksumPixelsCount) / this.bitmapWidth) + 1;
 
-		// Represents how many reserved pixels that will be used before creating the bitmap.
-		final int usedReservedPixelsCount = checksumPixelsRow * this.bitmapWidth;
-
-		// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
+		// Add any triggers into a list. If triggers set is null, make sure to append the Eraser trigger,
 		// designated as ID 0.
-		if (this.triggers == null) {
-			this.triggers = new TriggerSet(this.bitmapWidth, this.bitmapHeight, checksum);
-		}
 		List<Integer> triggerDataList = this.triggers.convertToData();
 
 		// Trigger size will always be no more than 65536 triggers. Trigger size will always be 1 + (number
 		// of triggers seen in the editor), to account for the Eraser trigger. If there are more triggers
 		// than the width of the bitmap, we add however many extra rows to compensate.
 		int triggerSize = triggerDataList.size() & 0xFFFF;
-		int triggerRows = (triggerSize + usedReservedPixelsCount) / this.bitmapWidth;
-		int triggerRowHeight = ((triggerSize + usedReservedPixelsCount) % this.bitmapWidth > 0 ? triggerRows + 1 : triggerRows);
 
-		BufferedImage buffer = new BufferedImage(this.bitmapWidth, this.bitmapHeight + triggerRowHeight, BufferedImage.TYPE_INT_ARGB);
-		int[] pixels = ((DataBufferInt) buffer.getRaster().getDataBuffer()).getData();
+		// Add any NPCs, obstacles, and items into a list.
+		int[] npcsData = this.npcs.produce();
+		int[] obstaclesData = this.obstacles.produce();
+		int[] itemsData = this.items.produce();
 
-		// Storing important area information in the first pixel. This should use up all of the number of
-		// pixels we had reserved.
-		int areaID = this.editor.getUniqueAreaID();
-		pixels[0] = (((areaID & 0xFFFF) << 16) | (triggerSize));
+		// ----------
+		// Step 1 - Set the important map info in the first pixel.
+		pixels.add(((areaID & 0xFFFF) << 16) | (triggerSize & 0xFFFF));
+		pixels.add(((this.bitmapWidth & 0xFFFF) << 16) | (this.bitmapHeight & 0xFFFF));
+		pixels.add(this.tiles.length);
 
-		// Add the checksum after the first pixel.
-		int columnIndex = 0;
-		int rowIndex = 0;
-		int pixelIterator = 1;
-		for (int i = 0; i < checksumBytes.length; i += 4, pixelIterator++) {
-			columnIndex = pixelIterator % this.bitmapWidth;
-			rowIndex = pixelIterator / this.bitmapWidth;
-			pixels[columnIndex + rowIndex * this.bitmapWidth] = (checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3];
+		// Step 2 - Store the area map checksum
+		for (int i = 0; i < checksumBytes.length; i += 4) {
+			pixels.add((checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3]);
 		}
 
-		// Pad the checksums if there are leftover pixels
-		for (int i = columnIndex + 1; i < this.bitmapWidth; i++, pixelIterator++) {
-			pixels[i + (rowIndex * this.bitmapWidth)] = -1;
+		// Step 3 - Store the triggers
+		for (int i = 0; i < triggerSize; i++) {
+			pixels.add(triggerDataList.get(i).intValue());
 		}
 
-		// Place the trigger data inside the trigger section in the bitmap file. This is usually located at
-		// the top of the bitmap file.
-		columnIndex = 0;
-		rowIndex = 0;
-		for (int i = 0; i < triggerSize; i++, pixelIterator++) {
-			// The index "i" must be in range of 0 ~ list.size(). The "width" must include the reserved pixels
-			// count as offset.
-			int pixelIndex = i + checksumPixelsRow * this.bitmapWidth;
-			columnIndex = pixelIndex % this.bitmapWidth;
-			rowIndex = pixelIndex / this.bitmapWidth;
-			pixels[columnIndex + (rowIndex * this.bitmapWidth)] = triggerDataList.get(i).intValue();
-		}
+		// Step 4 - Store the NPCs
+		Arrays.stream(npcsData).forEach(pixels::add);
 
-		// Pad out the trigger section with -1 if the current iterator is not inside the tileset section.
-		// This marks null trigger data, and should be ignored when the game is reading this padded part of
-		// the triggers section.
-		for (; pixelIterator % this.bitmapWidth != 0; pixelIterator++) {
-			pixels[pixelIterator] = -1;
-		}
+		// Step 5 - Store obstacles
+		Arrays.stream(obstaclesData).forEach(pixels::add);
 
-		// Then place the tileset data inside the tileset section in the bitmap file. This is the rest of
-		// the bitmap file, right after the trigger section.
-		for (int iterator = 0; iterator < this.tiles.length; iterator++) {
-			pixels[this.bitmapWidth * triggerRowHeight + iterator] = this.tiles[iterator];
-		}
-		return buffer;
+		// Step 6 - Store items
+		Arrays.stream(itemsData).forEach(pixels::add);
+
+		// Step 6 - Pad the remaining row with -1
+		int col = pixels.size();
+		for (; (col % this.bitmapWidth) != 0 && (col % this.bitmapWidth) < this.bitmapWidth; col = pixels.size())
+			pixels.add(-1);
+
+		// Step 6 - Store the tiles
+		Arrays.stream(this.tiles).forEach(pixels::add);
+
+		// Step 7 - Convert List<Integer> to int[]
+		int[] data = pixels.parallelStream().mapToInt(Integer::intValue).toArray();
+		int newHeight = (data.length % this.bitmapWidth != 0) ? data.length / this.bitmapWidth + 1 : data.length / this.bitmapWidth;
+		BufferedImage image = new BufferedImage(this.bitmapWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+		final int[] result = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		System.arraycopy(data, 0, result, 0, data.length);
+		return image;
 	}
 
 	public boolean hasBitmap() {
@@ -851,26 +781,24 @@ public class DrawingBoard extends Canvas implements Runnable {
 		final int[] pixels = image.getRGB(0, 0, bitmapWidth, bitmapHeight, null, 0, bitmapWidth);
 		int pixelIterator = 0;
 		try {
-			// Storing important area information in the first pixel. This should use up all of the number of
-			// pixels we had reserved.
+			// Step 1 - Get important area information in the first pixel. This should use up all of the number
+			// of pixels we had reserved.
 			this.editor.setUniqueAreaID((pixels[pixelIterator] >> 16) & 0xFFFF);
-			int triggerSize = pixels[pixelIterator] & 0xFFFF;
-			pixelIterator++;
+			final int triggerSize = pixels[pixelIterator++] & 0xFFFF;
+			final int areaInfo = pixels[pixelIterator++];
+			final int tileSize = pixels[pixelIterator++];
+			int newWidth = (areaInfo >> 16) & 0xFFFF;
+			int newHeight = areaInfo & 0xFFFF;
+			this.setImageSize(newWidth, newHeight, false);
 
-			// Get the checksum and relevant information.
+			// Step 2 - Get the checksum and relevant information.
 			final int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
 			this.editor.setChecksum(pixels, pixelIterator, checksumPixelsCount);
+			final String checksum = this.editor.getChecksum();
+			pixelIterator += checksumPixelsCount;
 
-			int checksumPixelsRow = ((1 + checksumPixelsCount) % bitmapWidth == 0) ? (1 + checksumPixelsCount) / bitmapWidth : ((1 + checksumPixelsCount) / bitmapWidth) + 1;
-			pixelIterator = checksumPixelsRow * bitmapWidth;
-
-			int triggerRowHeight = triggerSize % bitmapWidth != 0 ? triggerSize / bitmapWidth + 1 : triggerSize / bitmapWidth;
-			bitmapHeight -= checksumPixelsRow + triggerRowHeight;
-
-			// Represents how many reserved pixels that will be used before creating the bitmap.
-
-			// Add any triggers into a list. If triggers is null, make sure to append the Eraser trigger,
-			// designated as ID 0.
+			// Step 3 - Add any triggers into a list. If triggers is null, make sure to append the Eraser
+			// trigger, designated as ID 0.
 			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight, this.editor.getChecksum());
 			for (int i = 0; i < triggerSize; i++, pixelIterator++) {
 				short triggerId = (short) (pixels[pixelIterator] & 0xFFFF);
@@ -881,23 +809,58 @@ public class DrawingBoard extends Canvas implements Runnable {
 					this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator]);
 				}
 			}
-			// Skipping the trigger row padding.
-			for (int i = 0; i < (triggerRowHeight * bitmapWidth - triggerSize); i++)
-				pixelIterator++;
 
-			// Set the dimensions of the area.
-			this.setImageSize(bitmapWidth, bitmapHeight);
-			for (int i = 0; i < bitmapWidth * bitmapHeight; i++, pixelIterator++) {
-				this.tiles[i] = pixels[pixelIterator];
+			// Step 4 - Get the NPCs data.
+			this.npcs = new NpcSet(checksum);
+			int npcSize = pixels[pixelIterator++];
+			for (int i = 0; i < npcSize; i++) {
+				int x = pixels[pixelIterator++];
+				int y = pixels[pixelIterator++];
+				int editorID = pixels[pixelIterator++];
+				int data = pixels[pixelIterator++];
+				this.npcs.add(x, y, editorID, data);
 			}
 
-			// Get and fill in the data based on the tiles obtained from above.
+			// Step 5 - Get obstacles.
+			this.obstacles = new ObstacleSet(checksum);
+			int obstacleSize = pixels[pixelIterator++];
+			for (int i = 0; i < obstacleSize; i++) {
+				int x = pixels[pixelIterator++];
+				int y = pixels[pixelIterator++];
+				int editorID = pixels[pixelIterator++];
+				int data = pixels[pixelIterator++];
+				this.obstacles.add(x, y, editorID, data);
+			}
+
+			// Step 6 - Get items.
+			this.items = new ItemSet(checksum);
+			int itemSize = pixels[pixelIterator++];
+			for (int i = 0; i < itemSize; i++) {
+				int x = pixels[pixelIterator++];
+				int y = pixels[pixelIterator++];
+				int editorID = pixels[pixelIterator++];
+				int data = pixels[pixelIterator++];
+				this.items.add(x, y, editorID, data);
+			}
+
+			// Step 6 - Skip the padding
+			int col = pixelIterator % bitmapWidth;
+			for (; pixelIterator % bitmapWidth != 0 && col < bitmapWidth; pixelIterator++)
+				;
+
+			// Step 7 - Get the tiles.
+			System.arraycopy(pixels, pixelIterator, this.tiles, 0, tileSize);
+			pixelIterator += tileSize;
+
+			// Step 8 - Get and fill in the data based on the tiles obtained from above.
 			List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
 			for (int i = 0; i < this.tiles.length; i++) {
 				int alpha = ((this.tiles[i] >> 24) & 0xFF);
+				FOR_LOOP:
 				for (int j = 0; j < list.size(); j++) {
-					Map.Entry<Integer, Data> entry = list.get(j);
-					Data d = entry.getValue();
+					Data d = list.get(j).getValue();
+					if (alpha != Integer.valueOf(d.alpha))
+						continue;
 					switch (alpha) {
 						case 0x01: // Path
 						case 0x02: // Ledges
@@ -906,31 +869,30 @@ public class DrawingBoard extends Canvas implements Runnable {
 						case 0x07: // Water
 						case 0x08: // House
 							// Extended Tile IDs are used to differentiate tiles.
-							if (alpha == Integer.valueOf(d.alpha)) {
-								int red = ((this.tiles[i] >> 16) & 0xFF);
-								if (red == Integer.valueOf(d.red)) {
-									this.tilesEditorID[i] = d.editorID;
-								}
+							int red = ((this.tiles[i] >> 16) & 0xFF);
+							if (red == Integer.valueOf(d.red)) {
+								this.tilesEditorID[i] = d.editorID;
+								break FOR_LOOP;
 							}
 							continue;
 						case 0x05: {// Area Zone
 							// Extended Tile IDs are used to differentiate tiles.
-							if (alpha == Integer.valueOf(d.alpha)) {
-								int blue = this.tiles[i] & 0xFF;
-								if (blue == d.blue) {
-									this.tilesEditorID[i] = d.editorID;
-									break;
-								}
+							int blue = this.tiles[i] & 0xFF;
+							if (blue == d.blue) {
+								this.tilesEditorID[i] = d.editorID;
+								break FOR_LOOP;
 							}
 							continue;
 						}
+						case 0x0E: {// Characters/NPCs
+							// Alpha value is only used.
+							this.tilesEditorID[i] = d.editorID;
+							break FOR_LOOP;
+						}
 						default: {
 							// Alpha value is only used.
-							if (alpha == Integer.valueOf(d.alpha)) {
-								this.tilesEditorID[i] = d.editorID;
-								break;
-							}
-							continue;
+							this.tilesEditorID[i] = d.editorID;
+							break FOR_LOOP;
 						}
 					}
 				}
@@ -949,12 +911,15 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 	private void hoverOver() {
 		try {
-			int w = 0;
-			int h = 0;
+			int w = -1;
+			int h = -1;
+			int temp = -1;
 
 			// try...catch for X position
 			try {
-				w = (this.editor.input.offsetX + this.editor.input.mouseX) / Tileable.WIDTH;
+				temp = (this.editor.input.offsetX + this.editor.input.mouseX);
+				if (temp >= 0)
+					w = temp / Tileable.WIDTH;
 			}
 			catch (Exception e) {
 				w = (this.editor.input.offsetX + this.editor.input.mouseX) / (LevelEditor.WIDTH * LevelEditor.SIZE);
@@ -962,15 +927,26 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 			// try catch for Y position
 			try {
-				h = (this.editor.input.offsetY + this.editor.input.mouseY) / Tileable.HEIGHT;
+				temp = (this.editor.input.offsetY + this.editor.input.mouseY);
+				if (temp >= 0)
+					h = temp / Tileable.HEIGHT;
 			}
 			catch (Exception e) {
 				h = (this.editor.input.offsetY + this.editor.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);
 			}
 
+			if (w < 0 || h < 0 || w >= this.bitmapWidth || h >= this.bitmapHeight) {
+				TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+				panel.alphaField.setText("");
+				panel.redField.setText("");
+				panel.greenField.setText("");
+				panel.blueField.setText("");
+				return;
+			}
+
 			// checks for mouse hoving above triggers
 			switch (EditorConstants.metadata) {
-				case Pixel_Data:
+				case Tilesets:
 				default:
 					int value = this.tiles[h * this.bitmapWidth + w];
 					// Show trigger IDs and stuffs.
@@ -983,10 +959,17 @@ public class DrawingBoard extends Canvas implements Runnable {
 				case Triggers:
 					// TODO(Jul/4/2020): Figure out how to display a list of triggers for a single tile in the
 					// TilePropertiesPanel.
+					Debug.toDo("Ignore this.");
+					break;
+				case NonPlayableCharacters:
+					// TODO(Aug/14/2021): Figure out how to display a single NPC on a single tile in the
+					// TilePropertiesPanel.
+					Debug.toDo("Ignore this.");
 					break;
 			}
 		}
 		catch (Exception e) {
+			Debug.error("Unable to handle mouse hover cursor position to determine which tile was hovered on.", e);
 			TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
 			panel.alphaField.setText("");
 			panel.redField.setText("");

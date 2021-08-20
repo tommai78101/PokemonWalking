@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package abstracts;
@@ -19,8 +19,8 @@ import entity.Player;
 import enums.ItemCategories;
 import interfaces.Renderable;
 import item.Bicycle;
-import item.ReturnMenu;
 import item.ModdedItem;
+import item.ReturnMenu;
 import level.Area;
 import level.PixelData;
 import main.Game;
@@ -32,22 +32,22 @@ import utility.DialogueBuilder;
 /**
  * Any base implementations of the abstract class object, Item, will need to implement or devise a
  * way to create Dialogues associated with that item object.
- * 
+ *
  * @author tlee
  *
  */
 public abstract class Item extends Entity implements Comparable<Item>, Renderable {
 
 	protected String name;
-	protected String dialogueName;
+	protected String itemDialogueName;
 	protected String description;
 	protected ItemCategories category;
 	protected boolean picked;
 	protected boolean isReturnMenuFlag;
 	protected int id;
 	protected List<String> availableCommands;
-	protected Dialogue pickedDialogue;
-	protected Dialogue tossedDialogue;
+	protected Dialogue itemPickedDialogue;
+	protected Dialogue itemTossedDialogue;
 	protected Inventory inventory;
 
 	private boolean afterItemActionOccurred = false;
@@ -65,7 +65,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 		try (Formatter formatter = new Formatter()) {
 			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", name);
-			this.dialogueName = formatter.toString();
+			this.itemDialogueName = formatter.toString();
 		}
 	}
 
@@ -80,7 +80,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 		try (Formatter formatter = new Formatter()) {
 			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", itemText.itemName);
-			this.dialogueName = formatter.toString();
+			this.itemDialogueName = formatter.toString();
 		}
 	}
 
@@ -113,11 +113,11 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	/**
 	 * This returns the item's name, with extra padded whitespace. This name fills up the entire row of
 	 * the dialogue box.
-	 * 
+	 *
 	 * @return
 	 */
 	public String getDialogueName() {
-		return this.dialogueName;
+		return this.itemDialogueName;
 	}
 
 	public String getDescription() {
@@ -137,23 +137,23 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.hide();
 
 		this.afterItemActionOccurred = true;
-		if (this.pickedDialogue == null || !this.pickedDialogue.isReady()) {
-			this.pickedDialogue = DialogueBuilder.createText(
+		if (this.itemPickedDialogue == null || !this.itemPickedDialogue.isReady()) {
+			this.itemPickedDialogue = DialogueBuilder.createText(
 				// Intentionally setting the first row of the dialogue to be only the item name, then the second
 				// sentence to be a fixed sized sentence.
 				this.getDialogueName() + "has been found.",
 				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
 			);
-			this.pickedDialogue.setShowDialog(true);
+			this.itemPickedDialogue.setShowDialog(true);
 		}
-		if (!(this.pickedDialogue.isDialogueCompleted() && this.pickedDialogue.isShowingDialog())) {
-			this.pickedDialogue.tick();
+		if (!(this.itemPickedDialogue.isDialogueCompleted() && this.itemPickedDialogue.isShowingDialog())) {
+			this.itemPickedDialogue.tick();
 		}
 		// We want the player to interact with the dialogue for the final time, before dismissing it.
 		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
 			this.afterItemActionOccurred = false;
-			this.pickedDialogue.clearDialogueLines();
-			this.pickedDialogue.setShowDialog(false);
+			this.itemPickedDialogue.clearDialogueLines();
+			this.itemPickedDialogue.setShowDialog(false);
 
 			// We need to completely remove the item out from the area world.
 		}
@@ -164,23 +164,23 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.reveal();
 
 		this.afterItemActionOccurred = true;
-		if (this.tossedDialogue == null || !this.tossedDialogue.isReady()) {
-			this.tossedDialogue = DialogueBuilder.createText(
+		if (this.itemTossedDialogue == null || !this.itemTossedDialogue.isReady()) {
+			this.itemTossedDialogue = DialogueBuilder.createText(
 				// Intentionally setting the first row of the dialogue to be only the item name, then the second
 				// sentence to be a fixed sized sentence.
 				this.getDialogueName() + "was tossed away.",
 				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
 			);
-			this.tossedDialogue.setShowDialog(true);
+			this.itemTossedDialogue.setShowDialog(true);
 		}
-		if (!(this.tossedDialogue.isDialogueCompleted() && this.tossedDialogue.isShowingDialog())) {
-			this.tossedDialogue.tick();
+		if (!(this.itemTossedDialogue.isDialogueCompleted() && this.itemTossedDialogue.isShowingDialog())) {
+			this.itemTossedDialogue.tick();
 		}
 		// We want the player to interact with the dialogue for the final time, before dismissing it.
 		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
 			this.afterItemActionOccurred = false;
-			this.tossedDialogue.clearDialogueLines();
-			this.tossedDialogue.setShowDialog(false);
+			this.itemTossedDialogue.clearDialogueLines();
+			this.itemTossedDialogue.setShowDialog(false);
 		}
 	}
 
@@ -194,9 +194,9 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 	/**
 	 * Checks whether this item can be tossed away or sold in the PokeMart.
-	 * 
+	 *
 	 * This can also be used to check whether the item is a Key Item or not.
-	 * 
+	 *
 	 * @return True always for any item that is not a Key Item. False if the item is a Key Item.
 	 */
 	public boolean canBeTossed() {
@@ -211,7 +211,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	 * </ol>
 	 * The conditional check has a short-circuited condition where if the "after picking up" event is
 	 * currently triggered, the item is still not properly picked up.
-	 * 
+	 *
 	 * @return True if the item has been properly picked up. False, if otherwise.
 	 */
 	public boolean isPickedUp() {
@@ -220,7 +220,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 	/**
 	 * This checks if the event, "after picking up" has finished triggering.
-	 * 
+	 *
 	 * @return True if the item has finished triggering the "after picked up" event.
 	 */
 	public boolean isFinishedPickingUp() {
@@ -235,7 +235,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	/**
 	 * Returns true, only if the item is a DummyItem, and the item itself is a menu item, "RETURN".
 	 * False, if otherwise.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isReturnMenu() {
@@ -276,10 +276,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	public abstract void dropAt(Area area, Player player);
 
 	@Override
-	public void tick() {
-		// Items rarely have update ticks.
-		return;
-	}
+	public void tick() {}
 
 	@Override
 	public void render(Scene output, Graphics graphics, int xOffset, int yOffset) {
@@ -287,10 +284,10 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 			output.blit(Art.item, xOffset, yOffset);
 		}
 		if (this.afterItemActionOccurred) {
-			if (this.pickedDialogue.isReady())
-				this.pickedDialogue.render(output, graphics);
-			else if (this.tossedDialogue.isReady())
-				this.tossedDialogue.render(output, graphics);
+			if (this.itemPickedDialogue.isReady())
+				this.itemPickedDialogue.render(output, graphics);
+			else if (this.itemTossedDialogue.isReady())
+				this.itemTossedDialogue.render(output, graphics);
 		}
 	}
 
@@ -299,17 +296,11 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
-		if (this.getClass() != obj.getClass()) {
+		if ((obj == null) || (this.getClass() != obj.getClass())) {
 			return false;
 		}
 		Item other = (Item) obj;
-		if (this.category != other.category) {
-			return false;
-		}
-		if (this.id != other.id) {
+		if ((this.category != other.category) || (this.id != other.id)) {
 			return false;
 		}
 		return true;
@@ -320,8 +311,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((this.category == null) ? 0 : this.category.hashCode());
-		result = prime * result + this.id;
-		return result;
+		return prime * result + this.id;
 	}
 
 	@Override
@@ -329,7 +319,15 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		return this.id - other.id;
 	}
 
-	public static Item build(PixelData pixelData) {
+	/**
+	 * For the Game
+	 *
+	 * @param pixelData
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Item build(PixelData pixelData, int x, int y) {
 		// Assume the pixel data is of type Item.
 		Item item = null;
 
@@ -343,7 +341,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 				// Key item check
 				if (blue == 0x01) {
 					// This is a key item.
-					item = new Bicycle(pixelData);
+					item = new Bicycle(pixelData, x, y);
 				}
 				break;
 			}
@@ -351,5 +349,17 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 				break;
 		}
 		return item;
+	}
+
+	/**
+	 * For the Level Editor
+	 *
+	 * @param pixel
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Item build(int pixel, int x, int y) {
+		return Item.build(new PixelData(pixel), x, y);
 	}
 }

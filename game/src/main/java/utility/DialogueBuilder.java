@@ -53,7 +53,6 @@ public class DialogueBuilder {
 				new InputStreamReader(Dialogue.class.getClassLoader().getResourceAsStream(filename))
 			);
 			String line;
-			String[] tokens;
 			int dialogueID = 0;
 			Dialogue temp = null;
 			while ((line = reader.readLine()) != null) {
