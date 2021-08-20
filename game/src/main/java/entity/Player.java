@@ -811,6 +811,25 @@ public class Player extends Character {
 		this.isInteractionEnabled = true;
 		this.interactingEntity = entity;
 		this.interactingEntity.setInteractingState(true);
+		if (this.interactingEntity instanceof Character) {
+			// Need to set the character entity facing towards the Player.
+			int facingTowardsPlayer = -1;
+			switch (this.getFacing()) {
+				case Character.DOWN:
+					facingTowardsPlayer = Character.UP;
+					break;
+				case Character.LEFT:
+					facingTowardsPlayer = Character.RIGHT;
+					break;
+				case Character.UP:
+					facingTowardsPlayer = Character.DOWN;
+					break;
+				case Character.RIGHT:
+					facingTowardsPlayer = Character.LEFT;
+					break;
+			}
+			this.interactingEntity.setFacing(facingTowardsPlayer);
+		}
 	}
 
 	// -------------------------------------------------------------------------------------
