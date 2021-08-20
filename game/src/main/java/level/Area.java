@@ -112,6 +112,8 @@ public class Area implements Tileable, UpdateRenderable {
 		for (int i = 0; i < npcSize; i++) {
 			int x = tempPixels[pixelIterator++];
 			int y = tempPixels[pixelIterator++];
+			// Ignoring Editor ID
+			pixelIterator++;
 			int data = tempPixels[pixelIterator++];
 			this.areaCharacters.put(Map.entry(x, y), Character.build(data, x, y));
 		}
@@ -121,6 +123,8 @@ public class Area implements Tileable, UpdateRenderable {
 		for (int i = 0; i < obstaclesSize; i++) {
 			int x = tempPixels[pixelIterator++];
 			int y = tempPixels[pixelIterator++];
+			// Ignoring Editor ID
+			pixelIterator++;
 			int data = tempPixels[pixelIterator++];
 			this.areaObstacles.put(Map.entry(x, y), Obstacle.build(data, x, y));
 		}
@@ -130,6 +134,8 @@ public class Area implements Tileable, UpdateRenderable {
 		for (int i = 0; i < itemsSize; i++) {
 			int x = tempPixels[pixelIterator++];
 			int y = tempPixels[pixelIterator++];
+			// Ignoring Editor ID
+			pixelIterator++;
 			int data = tempPixels[pixelIterator++];
 			this.areaItems.put(Map.entry(x, y), Item.build(data, x, y));
 		}

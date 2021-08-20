@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 
 import common.Debug;
 import common.Tileable;
+import dataset.EditorData;
 import dataset.ItemSet;
 import dataset.NpcSet;
 import dataset.ObstacleSet;
@@ -354,6 +355,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int w = j % this.bitmapWidth;
 						int h = j / this.bitmapWidth;
 
+						// Drawing Tileset first
 						Map.Entry<Integer, Data> entry = list.get(this.tilesEditorID[j]);
 						Data data = entry.getValue();
 						if (data == null) {
@@ -374,6 +376,17 @@ public class DrawingBoard extends Canvas implements Runnable {
 						Graphics gB = bimg.getGraphics();
 						// TODO: Area Type ID must be included.
 						gB.drawImage(data.image.getImage(), 0, 0, null);
+
+						// Drawing NPCs on top of Tileset
+						EditorData npc = this.npcs.get(w, h);
+						if (npc != null) {
+							entry = list.get(npc.getEditorData());
+							Data npcData = entry.getValue();
+							if (npcData != null) {
+								gB.drawImage(npcData.image.getImage(), 0, 0, null);
+							}
+						}
+
 						gB.dispose();
 
 						if (data.areaTypeIncluded) {
@@ -460,7 +473,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					break;
 				}
 				case Triggers: {
-					// Only Triggers Editing is subjected to clicking only.
+					// Triggers Editing is subjected to clicking only.
 					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
 					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
@@ -488,6 +501,17 @@ public class DrawingBoard extends Canvas implements Runnable {
 				}
 				case NonPlayableCharacters: {
 					Debug.notYetImplemented();
+
+					// NPCs Editing is subjected to clicking only.
+					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
+					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
+						return;
+
+					Data selectedData = this.editor.controlPanel.getSelectedData();
+					if (selectedData != null) {
+						this.setDataProperties(selectedData);
+					}
 					break;
 				}
 			}
@@ -603,10 +627,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			case 0x0E: { // Characters/NPCs
 				int characterUID = data.red;
 				int scriptID = data.green;
-				int reserved = data.blue;
-				this.tiles[tileIndex] = (data.alpha << 24) | (characterUID << 16) | (scriptID << 8) | reserved;
-				this.tilesEditorID[tileIndex] = data.editorID;
-				this.npcs.add(this.getMouseTileX(), this.getMouseTileY(), data.editorID);
+				this.npcs.add(this.getMouseTileX(), this.getMouseTileY(), data.editorID, data.getColorValue());
 				panel.redInputField.setText(Integer.toString(characterUID));
 				panel.greenInputField.setText(Integer.toString(scriptID));
 				panel.redField.setText(Integer.toString(characterUID));
@@ -795,8 +816,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 			for (int i = 0; i < npcSize; i++) {
 				int x = pixels[pixelIterator++];
 				int y = pixels[pixelIterator++];
+				int editorID = pixels[pixelIterator++];
 				int data = pixels[pixelIterator++];
-				this.npcs.add(x, y, data);
+				this.npcs.add(x, y, editorID, data);
 			}
 
 			// Step 5 - Get obstacles.
@@ -805,8 +827,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 			for (int i = 0; i < obstacleSize; i++) {
 				int x = pixels[pixelIterator++];
 				int y = pixels[pixelIterator++];
+				int editorID = pixels[pixelIterator++];
 				int data = pixels[pixelIterator++];
-				this.obstacles.add(x, y, data);
+				this.obstacles.add(x, y, editorID, data);
 			}
 
 			// Step 6 - Get items.
@@ -815,8 +838,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 			for (int i = 0; i < itemSize; i++) {
 				int x = pixels[pixelIterator++];
 				int y = pixels[pixelIterator++];
+				int editorID = pixels[pixelIterator++];
 				int data = pixels[pixelIterator++];
-				this.items.add(x, y, data);
+				this.items.add(x, y, editorID, data);
 			}
 
 			// Step 6 - Skip the padding
@@ -935,12 +959,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 				case Triggers:
 					// TODO(Jul/4/2020): Figure out how to display a list of triggers for a single tile in the
 					// TilePropertiesPanel.
-					Debug.notYetImplemented();
+					Debug.toDo("Ignore this.");
 					break;
 				case NonPlayableCharacters:
 					// TODO(Aug/14/2021): Figure out how to display a single NPC on a single tile in the
 					// TilePropertiesPanel.
-					Debug.notYetImplemented();
+					Debug.toDo("Ignore this.");
 					break;
 			}
 		}

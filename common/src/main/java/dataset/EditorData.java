@@ -4,9 +4,10 @@ public class EditorData {
 	private int editorData;
 	private int xPosition;
 	private int yPosition;
+	private int colorData;
 
 	public int getEditorData() {
-		return editorData;
+		return this.editorData;
 	}
 
 	public void setEditorData(int editorData) {
@@ -14,7 +15,7 @@ public class EditorData {
 	}
 
 	public int getX() {
-		return xPosition;
+		return this.xPosition;
 	}
 
 	public void setX(int xPosition) {
@@ -22,10 +23,18 @@ public class EditorData {
 	}
 
 	public int getY() {
-		return yPosition;
+		return this.yPosition;
 	}
 
 	public void setY(int yPosition) {
 		this.yPosition = yPosition;
+	}
+
+	public int getColorData() {
+		return this.colorData;
+	}
+
+	public void setColorData(int colorData) {
+		this.colorData = colorData;
 	}
 }

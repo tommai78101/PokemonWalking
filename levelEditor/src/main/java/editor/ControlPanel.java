@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -20,7 +20,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import common.Debug;
 import common.Tileable;
 import editor.EditorConstants.Tools;
 
@@ -33,8 +32,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 	private LevelEditor editor; // reference to parent
 	private Data selectedData; // reference to selected data.
 	private Trigger selectedTrigger; // reference to selected trigger.
-	private JPanel iconsPanel;
-	private JScrollPane scrollPanel;
+	private JPanel iconsPanel; // The small square icon buttons on the right of the Level Editor
+	private JPanel npcsPanel; // Same small square icon buttons panel, but for NPCs.
+	private JScrollPane scrollIconsPanel;
+	private JScrollPane scrollNpcsPanel;
 
 	public ControlPanel(LevelEditor editor) {
 		this.editor = editor;
@@ -46,9 +47,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 
 		this.setLayout(new FlowLayout(FlowLayout.LEADING));
 
+		final EditorConstants constants = EditorConstants.getInstance();
+		// For Tilesets
 		this.iconsPanel = new JPanel();
 		this.iconsPanel.setLayout(new BoxLayout(this.iconsPanel, BoxLayout.Y_AXIS));
-		EditorConstants constants = EditorConstants.getInstance();
 		for (Map.Entry<Integer, Data> entry : constants.getDatas()) {
 			Data d = entry.getValue();
 			if (d.name.equals("Select"))
@@ -58,14 +60,28 @@ public class ControlPanel extends JPanel implements ActionListener {
 			this.iconsPanel.add(d.button);
 		}
 
-		this.scrollPanel = new JScrollPane(this.iconsPanel) {
+		// For NPCs
+		this.npcsPanel = new JPanel();
+		this.npcsPanel.setLayout(new BoxLayout(this.npcsPanel, BoxLayout.Y_AXIS));
+		for (Map.Entry<Integer, Data> entry : constants.getNpcs()) {
+			Data d = entry.getValue();
+			d.button.setActionCommand(Integer.toString(d.editorID));
+			d.button.addActionListener(this);
+			this.npcsPanel.add(d.button);
+		}
+
+		this.scrollIconsPanel = new JScrollPane(this.iconsPanel) {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Dimension getPreferredSize() {
-				int maxWidth = 50;
+				int maxWidth = 34;
 				int maxHeight = Tileable.HEIGHT * 20;
 				Dimension dim = super.getPreferredSize();
+				if (dim.width < maxWidth)
+					dim.width = maxWidth;
+				if (dim.height < maxHeight)
+					dim.height = maxHeight;
 				if (dim.width > maxWidth)
 					dim.width = maxWidth;
 				if (dim.height > maxHeight)
@@ -77,11 +93,50 @@ public class ControlPanel extends JPanel implements ActionListener {
 			public Dimension getMaximumSize() {
 				return this.getPreferredSize();
 			}
+
+			@Override
+			public Dimension getMinimumSize() {
+				return this.getPreferredSize();
+			}
 		};
-		this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		this.scrollPanel.createVerticalScrollBar();
-		this.scrollPanel.setVisible(true);
-		this.add(this.scrollPanel);
+		this.scrollIconsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		this.scrollIconsPanel.createVerticalScrollBar();
+		this.scrollIconsPanel.setVisible(true);
+		this.add(this.scrollIconsPanel);
+
+		this.scrollNpcsPanel = new JScrollPane(this.npcsPanel) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Dimension getPreferredSize() {
+				int maxWidth = 34;
+				int maxHeight = Tileable.HEIGHT * 20;
+				Dimension dim = super.getPreferredSize();
+				if (dim.width < maxWidth)
+					dim.width = maxWidth;
+				if (dim.height < maxHeight)
+					dim.height = maxHeight;
+				if (dim.width > maxWidth)
+					dim.width = maxWidth;
+				if (dim.height > maxHeight)
+					dim.height = maxHeight;
+				return dim;
+			}
+
+			@Override
+			public Dimension getMaximumSize() {
+				return this.getPreferredSize();
+			}
+
+			@Override
+			public Dimension getMinimumSize() {
+				return this.getPreferredSize();
+			}
+		};
+		this.scrollNpcsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		this.scrollNpcsPanel.createVerticalScrollBar();
+		this.scrollNpcsPanel.setVisible(false);
+		this.add(this.scrollNpcsPanel);
 
 		this.propertiesPanel = new TilePropertiesPanel(this);
 		this.add(this.propertiesPanel);
@@ -93,7 +148,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (EditorConstants.metadata) {
-			case Tilesets: {
+			case Tilesets:
+			case NonPlayableCharacters: {
 				JButton button = (JButton) event.getSource();
 				int id = Integer.parseInt(button.getActionCommand());
 				Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(id);
@@ -116,10 +172,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 				this.selectedTrigger.setTriggerID((short) 1);
 				this.selectedTrigger.setTriggerPositionX((byte) 0x1);
 				this.selectedTrigger.setTriggerPositionY((byte) 0x1);
-				break;
-			}
-			case NonPlayableCharacters: {
-				Debug.notYetImplemented();
 				break;
 			}
 		}
@@ -172,15 +224,32 @@ public class ControlPanel extends JPanel implements ActionListener {
 			case Tilesets:
 				this.iconsPanel.setVisible(true);
 				this.iconsPanel.setEnabled(true);
-				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+				this.npcsPanel.setVisible(false);
+				this.npcsPanel.setEnabled(false);
+				this.scrollIconsPanel.setVisible(true);
+				this.scrollNpcsPanel.setVisible(false);
+				this.scrollIconsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+				this.scrollNpcsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 				break;
 			case Triggers:
 				this.iconsPanel.setVisible(false);
 				this.iconsPanel.setEnabled(false);
-				this.scrollPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				this.npcsPanel.setVisible(false);
+				this.npcsPanel.setEnabled(false);
+				this.scrollIconsPanel.setVisible(false);
+				this.scrollNpcsPanel.setVisible(false);
+				this.scrollIconsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				this.scrollNpcsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 				break;
 			case NonPlayableCharacters: {
-				Debug.notYetImplemented();
+				this.iconsPanel.setVisible(false);
+				this.iconsPanel.setEnabled(false);
+				this.npcsPanel.setVisible(true);
+				this.npcsPanel.setEnabled(true);
+				this.scrollIconsPanel.setVisible(false);
+				this.scrollNpcsPanel.setVisible(true);
+				this.scrollIconsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				this.scrollNpcsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 				break;
 			}
 		}

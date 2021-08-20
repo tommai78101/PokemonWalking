@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -19,7 +19,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AbstractDocument;
 
-import common.Debug;
 import common.MinMaxFilter;
 
 public class TilePropertiesPanel extends JPanel implements DocumentListener {
@@ -99,8 +98,6 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	}
 
 	public TilePropertiesPanel(ControlPanel controlPanel) {
-		super();
-
 		this.panel = controlPanel;
 
 		this.areaID = new CustomJLabel("Area ID:");
@@ -241,7 +238,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 	/**
 	 * Given a Data object, set all of the input field values based on the data's properties.
-	 * 
+	 *
 	 * @param selectedData
 	 */
 	public void setDataProperties(Data selectedData) {
@@ -256,7 +253,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void changedUpdate(DocumentEvent event) {
 		try {
-			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.lastKnownValidAreaID = Integer.parseInt(this.areaIDInputField.getText());
 			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
 		}
 		catch (NumberFormatException e) {
@@ -283,7 +280,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void insertUpdate(DocumentEvent event) {
 		try {
-			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.lastKnownValidAreaID = Integer.parseInt(this.areaIDInputField.getText());
 			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
 		}
 		catch (NumberFormatException e) {
@@ -310,7 +307,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void removeUpdate(DocumentEvent event) {
 		try {
-			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.lastKnownValidAreaID = Integer.parseInt(this.areaIDInputField.getText());
 			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
 		}
 		catch (NumberFormatException e) {
@@ -347,6 +344,10 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.redInputField.setVisible(true);
 				this.greenInputField.setVisible(true);
 				this.blueInputField.setVisible(true);
+
+				// Label field
+				this.areaID.setVisible(true);
+				this.blueField.setVisible(true);
 				break;
 			case Triggers:
 				this.tileID.setText("X Position:");
@@ -358,9 +359,25 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.redInputField.setVisible(false);
 				this.greenInputField.setVisible(false);
 				this.blueInputField.setVisible(false);
+
+				// Label field
+				this.areaID.setVisible(false);
+				this.blueField.setVisible(true);
 				break;
 			case NonPlayableCharacters: {
-				Debug.notYetImplemented();
+				this.tileID.setText("NPC Type:");
+				this.extendedTileID.setText("Unique ID:");
+				this.tileSpecificID.setText("Trigger ID:");
+				this.fullDataInput.setVisible(false);
+				this.areaIDInputField.setVisible(false);
+				this.alphaInputField.setVisible(true);
+				this.redInputField.setVisible(true);
+				this.greenInputField.setVisible(true);
+				this.blueInputField.setVisible(false);
+
+				// Label field
+				this.areaID.setVisible(false);
+				this.blueField.setVisible(false);
 				break;
 			}
 		}

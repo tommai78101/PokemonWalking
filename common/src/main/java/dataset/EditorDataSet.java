@@ -1,82 +1,76 @@
 package dataset;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import common.Debug;
 
 public class EditorDataSet {
-	private List<EditorData> editorDataSet;
+	private Map<Map.Entry<Integer, Integer>, EditorData> cache;
 	private String checksum;
 
 	public EditorDataSet(String checksum) {
 		this.checksum = checksum;
-		this.editorDataSet = new ArrayList<>();
+		this.cache = new HashMap<>();
 	}
 
-	public boolean add(int x, int y, int data) {
+	public boolean add(int x, int y, int editorID, int data) {
 		EditorData d = new EditorData();
-		d.setEditorData(data);
+		d.setEditorData(editorID);
+		d.setColorData(data);
 		d.setX(x);
 		d.setY(y);
-		return this.editorDataSet.add(d);
+		EditorData prev = this.cache.put(Map.entry(x, y), d);
+		return prev != null && prev.getEditorData() != data;
 	}
 
 	public boolean remove(int x, int y) {
-		int oldSize = this.editorDataSet.size();
-		this.editorDataSet = this.editorDataSet.stream()
-			.filter(npc -> x != npc.getX() && y != npc.getY())
-			.collect(Collectors.toList());
-		int newSize = this.editorDataSet.size();
-		return oldSize != newSize;
+		return this.cache.remove(Map.entry(x, y)) != null;
+	}
+
+	public EditorData get(int x, int y) {
+		Map.Entry<Integer, Integer> key = Map.entry(x, y);
+		return this.cache.getOrDefault(key, null);
 	}
 
 	public int[] produce() {
-		int size = this.editorDataSet.size();
+		int size = this.cache.size();
 		List<Integer> result = new ArrayList<>();
 		result.add(size);
-		for (int i = 0; i < size; i++) {
-			EditorData d = this.editorDataSet.get(i);
-			result.add(d.getX());
-			result.add(d.getY());
-			result.add(d.getEditorData());
-		}
+		this.cache.forEach(
+			(key, data) -> {
+				result.add(data.getX());
+				result.add(data.getY());
+				result.add(data.getEditorData());
+				result.add(data.getColorData());
+			}
+		);
 		return result.parallelStream().mapToInt(Integer::intValue).toArray();
 	}
 
 	public void read(int[] data) {
-		if ((data.length - 1) % 3 != 0) {
+		if ((data.length - 1) % 4 != 0) {
 			Debug.error("Invalid data structure for NPC data set.");
 			return;
 		}
-		this.editorDataSet = new ArrayList<>();
+		this.cache = new HashMap<>();
 		int size = data[0];
-		for (int i = 1; i < size; i += 3) {
-			this.add(data[i], data[i + 1], data[i + 2]);
+		for (int i = 1; i < size; i += 4) {
+			this.add(data[i], data[i + 1], data[i + 2], data[i + 3]);
 		}
 	}
 
 	public boolean isEmpty() {
-		return this.editorDataSet.isEmpty();
+		return this.cache.isEmpty();
 	}
 
 	public boolean matchesChecksum(String checksum) {
 		return this.checksum.equals(checksum);
 	}
 
-	// ---------------------------------------------------------------------
-	// Getters and setters
-
-	public List<EditorData> getNpcEditorData() {
-		return this.editorDataSet;
-	}
-
-	public void setNpcEditorData(List<EditorData> npcEditorData) {
-		this.editorDataSet = npcEditorData;
-	}
-
 	public int getSize() {
-		return this.editorDataSet.size();
+		return this.cache.size();
 	}
 }

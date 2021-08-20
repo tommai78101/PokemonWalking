@@ -37,9 +37,11 @@ public class EditorConstants {
 	// the area.
 	private final List<Category> categories = new ArrayList<>();
 	private final List<Map.Entry<Integer, Data>> datas = new ArrayList<>();
+	private final List<Map.Entry<Integer, Data>> npcs = new ArrayList<>();
 	private final List<Trigger> triggers = new ArrayList<>();
 
 	private static final EditorConstants instance = new EditorConstants();
+	private static final int KeyColor_Alpha_NPC = 0x0E;
 
 	public static final Color GRASS_GREEN = new Color(164, 231, 103);
 	public static final Color ROAD_WHITE = new Color(255, 244, 201);
@@ -92,20 +94,21 @@ public class EditorConstants {
 			String[] tokens;
 			int categoryID = 0;
 			int editorID = 0;
-			Category c = null;
-			List<Data> temp = new ArrayList<>();
+			Category categoryTemp = null;
+			List<Data> dataTemp = new ArrayList<>();
+			List<Data> npcDataTemp = new ArrayList<>();
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#"))
 					continue;
 				else if (line.startsWith("-")) {
 					tokens = line.replace("\\W", "").replace("_", " ").split("-");
-					if (!temp.isEmpty() && c != null) {
-						c.nodes.addAll(temp);
-						categoryID = c.setIdByData(temp.get(0));
-						this.categories.add(c);
-						temp.clear();
+					if (!dataTemp.isEmpty() && categoryTemp != null) {
+						categoryTemp.nodes.addAll(dataTemp);
+						categoryID = categoryTemp.setIdByData(dataTemp.get(0));
+						this.categories.add(categoryTemp);
+						dataTemp.clear();
 					}
-					c = new Category(tokens[1], categoryID);
+					categoryTemp = new Category(tokens[1], categoryID);
 				}
 				else if (line.startsWith("%")) {
 					Data data = new Data();
@@ -184,16 +187,36 @@ public class EditorConstants {
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
 					this.datas.add(Map.entry(data.getColorValue(), data));
-					temp.add(data);
+					dataTemp.add(data);
+
+					if (data.alpha == EditorConstants.KeyColor_Alpha_NPC) {
+						npcDataTemp.add(data);
+					}
 				}
 				else if (line.startsWith("+")) {
-					c.nodes.addAll(temp);
-					this.categories.add(c);
-					temp.clear();
+					categoryTemp.nodes.addAll(dataTemp);
+					this.categories.add(categoryTemp);
+					dataTemp.clear();
+
+					npcDataTemp.stream()
+						.forEach(
+							data -> {
+								this.npcs.add(Map.entry(data.getColorValue(), data));
+							}
+						);
+					npcDataTemp.clear();
 				}
 			}
 
 			Collections.sort(this.datas, (d1, d2) -> {
+				if (d1.getValue().editorID < d2.getValue().editorID)
+					return -1;
+				if (d1.getValue().editorID > d2.getValue().editorID)
+					return 1;
+				return 0;
+			});
+
+			Collections.sort(this.npcs, (d1, d2) -> {
 				if (d1.getValue().editorID < d2.getValue().editorID)
 					return -1;
 				if (d1.getValue().editorID > d2.getValue().editorID)
@@ -290,6 +313,10 @@ public class EditorConstants {
 
 	public List<Map.Entry<Integer, Data>> getDatas() {
 		return this.datas;
+	}
+
+	public List<Map.Entry<Integer, Data>> getNpcs() {
+		return this.npcs;
 	}
 
 	public List<Trigger> getTriggers() {
