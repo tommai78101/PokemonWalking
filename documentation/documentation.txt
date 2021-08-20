@@ -82,9 +82,10 @@ Triggers...........................[PWD10]
 	Legacy Trigger System..........[PWD10#02]
 	New Trigger System.............[PWD10#03]
 Dialogues..........................[PWD11]
-Contributors.......................[PWD12]
-Terms of License...................[PWD13]
-Credits............................[PWD14]
+Level Editor.......................[PWD12]
+Contributors.......................[PWD13]
+Terms of License...................[PWD14]
+Credits............................[PWD15]
 
 
 
@@ -1555,13 +1556,50 @@ breaks are added after the item's name.
 
 -------------------------------
 
-Contributors [PWD12]
+Level Editor [PWD12]
+
+This section contains information about the level editor,
+the data to work with in the level editor, how the data is
+used between the game and the level editor, and other small
+details in general.
+
+Both the game and the level editor share a common data set,
+called the "Editor Data Set". It's an object which holds
+necessary information, such as the X and Y tile positions,
+the data's editor ID, and the data's pixel data value.
+
+The X and Y tile positions refers to the in-game area map's
+coordinates, starting from the upper left to the lower
+right.
+
+The editor ID, also known as the "sprite order value", is a
+value designated within the level editor. All bitmap sprites
+are ordered based on the data specifications, the Metadata,
+and are categorized based on the color ID value. The editor
+ID is determined by the data.txt file found in the Common
+module, under the src/main/resources/editor/ directory. The
+sprite bitmap images are sorted by color values, and are
+defined in the Art.java class file.
+
+The last data information is the color value, which stores
+many different types of data values in the ARGB format.
+Everything there is to know about the color values are
+explained in the Metadata section.
+
+This common editor data set handles saving and loading area
+map data in a consistent way, and is key to producing
+reliable results when attempting to load the area map data
+both in the game and in the level editor.
+
+-------------------------------
+
+Contributors [PWD13]
 
 Developer - tom_mai78101
 
 -------------------------------
 
-Terms of License [PWD13]
+Terms of License [PWD14]
 
 This entire project is Apache Licensed. For more
 information, please read the terms and regulations
@@ -1569,6 +1607,6 @@ of the license file in the root of the project folder.
 
 -------------------------------
 
-Credits [PWD14]
+Credits [PWD15]
 
 Author - tom_mai78101
