@@ -4,29 +4,33 @@ import java.awt.Graphics;
 
 import abstracts.Character;
 import abstracts.Entity;
+import dialogue.Dialogue.DialogueType;
 import level.Area;
 import resources.Art;
 import screen.Scene;
+import utility.DialogueBuilder;
 
 public class Joe extends Character {
 	public Joe() {
-		super();
+		// TODO(4/04/2020): Figure out a way to load dialogue scripts for Signs based on the pixel data's
+		// green and blue values.
+		this.defaultDialogues.add(
+			DialogueBuilder.createText(
+				"Hello world.", DialogueType.SPEECH
+			)
+		);
 	}
 
 	@Override
 	public void tick() {
-		// TODO Auto-generated method stub
+		this.controlTick();
+		this.dialogueTick();
 	}
 
 	@Override
 	public void render(Scene screen, Graphics graphics, int playerX, int playerY) {
-		if (this.isLockedWalking) {
-			screen.npcBlit(Art.joe[this.getFacing()][this.animationPointer], this.getRenderPositionX(playerX), this.getRenderPositionY(playerY));
-		}
-		else {
-			// Idle animation
-			screen.npcBlit(Art.joe[this.getFacing()][0], this.getRenderPositionX(playerX), this.getRenderPositionY(playerY));
-		}
+		this.characterRender(screen, Art.joe, graphics, playerX, playerY);
+		this.renderDialogue(screen, graphics);
 	}
 
 	@Override
@@ -57,41 +61,5 @@ public class Joe extends Character {
 	@Override
 	public void interact(Area area, Entity target) {
 		// TODO Auto-generated method stub
-	}
-
-	@Override
-	protected void controlTick() {
-		if (!this.isLockedWalking) {
-			this.animationTick++;
-			if ((this.getFacing() == Character.UP && this.isFacingBlocked[Character.UP])) {
-				if (this.animationTick >= 10) {
-					this.animationTick = 0;
-				}
-			}
-			else if ((this.getFacing() == Character.DOWN && this.isFacingBlocked[Character.DOWN])) {
-				if (this.animationTick >= 10) {
-					this.animationTick = 0;
-				}
-			}
-			else if ((this.getFacing() == Character.LEFT && this.isFacingBlocked[Character.LEFT])) {
-				if (this.animationTick >= 10) {
-					this.animationTick = 0;
-				}
-			}
-			else if ((this.getFacing() == Character.RIGHT && this.isFacingBlocked[Character.RIGHT])) {
-				if (this.animationTick >= 10) {
-					this.animationTick = 0;
-				}
-			}
-			else {
-				if (this.animationTick >= 4)
-					this.animationTick = 0;
-			}
-			if (this.animationTick == 0) {
-				this.animationPointer++;
-				if (this.animationPointer > 3)
-					this.animationPointer = 0;
-			}
-		}
 	}
 }

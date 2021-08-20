@@ -671,7 +671,29 @@ public class Area implements Tileable, UpdateRenderable {
 		return this.modifiedAreaData;
 	}
 
+	/**
+	 * This is the main function that determines whether the pixel data is walkable, or it is occupied
+	 * by an entity.
+	 *
+	 * @param x
+	 * @param y
+	 * @return
+	 */
 	public PixelData getPixelData(int x, int y) {
+		// These objects have the same higher priority over tileset data.
+
+		// NPC data has higher priority over obstacles and items.
+		Character npcData = this.areaCharacters.get(Map.entry(x, y));
+		if (npcData != null) {
+			return npcData.getPixelData();
+		}
+		// Obstacles and items are both on the same priority.
+		Obstacle obstacleData = this.areaObstacles.get(Map.entry(x, y));
+		Item itemData = this.areaItems.get(Map.entry(x, y));
+		if (obstacleData != null || itemData != null) {
+			return (obstacleData != null ? obstacleData : itemData).getPixelData();
+		}
+		// If nothing else, tileset data is the final priority.
 		return this.areaData.get(y).get(x);
 	}
 

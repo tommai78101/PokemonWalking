@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import abstracts.Character.GenderType;
 import abstracts.Item;
 import abstracts.SubMenu;
 import common.Debug;
@@ -30,6 +29,7 @@ import data.mod.AreaInfo;
 import data.mod.HeaderInfo;
 import data.mod.PlayerInfo;
 import entity.Player;
+import enums.GenderType;
 import level.Area;
 import level.OverWorld;
 import level.PixelData;

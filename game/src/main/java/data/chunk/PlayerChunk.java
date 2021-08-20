@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package data.chunk;
 
@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import abstracts.Character.GenderType;
 import abstracts.Chunk;
 import abstracts.Item;
 import entity.Player;
+import enums.GenderType;
 import enums.ItemCategories;
 import level.Area;
 import level.OverWorld;
@@ -20,7 +20,7 @@ import main.Game;
 import menu.Inventory;
 
 /**
- * 
+ *
  * @author tlee
  */
 public class PlayerChunk extends Chunk {
@@ -31,7 +31,7 @@ public class PlayerChunk extends Chunk {
 
 		private byte value;
 
-		private WalkState(int value) {
+		WalkState(int value) {
 			this.value = (byte) value;
 		}
 
@@ -76,11 +76,11 @@ public class PlayerChunk extends Chunk {
 		this.facingDirection = (byte) 0x0;
 		this.walkingState = (byte) 0x0;
 	}
-	
+
 	public String getPlayerName() {
 		return this.playerName;
 	}
-	
+
 	public void setPlayerName(String name) {
 		this.playerName = name;
 	}

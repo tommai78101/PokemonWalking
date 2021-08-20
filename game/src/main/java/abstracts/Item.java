@@ -39,15 +39,15 @@ import utility.DialogueBuilder;
 public abstract class Item extends Entity implements Comparable<Item>, Renderable {
 
 	protected String name;
-	protected String dialogueName;
+	protected String itemDialogueName;
 	protected String description;
 	protected ItemCategories category;
 	protected boolean picked;
 	protected boolean isReturnMenuFlag;
 	protected int id;
 	protected List<String> availableCommands;
-	protected Dialogue pickedDialogue;
-	protected Dialogue tossedDialogue;
+	protected Dialogue itemPickedDialogue;
+	protected Dialogue itemTossedDialogue;
 	protected Inventory inventory;
 
 	private boolean afterItemActionOccurred = false;
@@ -65,7 +65,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 		try (Formatter formatter = new Formatter()) {
 			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", name);
-			this.dialogueName = formatter.toString();
+			this.itemDialogueName = formatter.toString();
 		}
 	}
 
@@ -80,7 +80,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 
 		try (Formatter formatter = new Formatter()) {
 			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", itemText.itemName);
-			this.dialogueName = formatter.toString();
+			this.itemDialogueName = formatter.toString();
 		}
 	}
 
@@ -117,7 +117,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	 * @return
 	 */
 	public String getDialogueName() {
-		return this.dialogueName;
+		return this.itemDialogueName;
 	}
 
 	public String getDescription() {
@@ -137,23 +137,23 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.hide();
 
 		this.afterItemActionOccurred = true;
-		if (this.pickedDialogue == null || !this.pickedDialogue.isReady()) {
-			this.pickedDialogue = DialogueBuilder.createText(
+		if (this.itemPickedDialogue == null || !this.itemPickedDialogue.isReady()) {
+			this.itemPickedDialogue = DialogueBuilder.createText(
 				// Intentionally setting the first row of the dialogue to be only the item name, then the second
 				// sentence to be a fixed sized sentence.
 				this.getDialogueName() + "has been found.",
 				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
 			);
-			this.pickedDialogue.setShowDialog(true);
+			this.itemPickedDialogue.setShowDialog(true);
 		}
-		if (!(this.pickedDialogue.isDialogueCompleted() && this.pickedDialogue.isShowingDialog())) {
-			this.pickedDialogue.tick();
+		if (!(this.itemPickedDialogue.isDialogueCompleted() && this.itemPickedDialogue.isShowingDialog())) {
+			this.itemPickedDialogue.tick();
 		}
 		// We want the player to interact with the dialogue for the final time, before dismissing it.
 		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
 			this.afterItemActionOccurred = false;
-			this.pickedDialogue.clearDialogueLines();
-			this.pickedDialogue.setShowDialog(false);
+			this.itemPickedDialogue.clearDialogueLines();
+			this.itemPickedDialogue.setShowDialog(false);
 
 			// We need to completely remove the item out from the area world.
 		}
@@ -164,23 +164,23 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.reveal();
 
 		this.afterItemActionOccurred = true;
-		if (this.tossedDialogue == null || !this.tossedDialogue.isReady()) {
-			this.tossedDialogue = DialogueBuilder.createText(
+		if (this.itemTossedDialogue == null || !this.itemTossedDialogue.isReady()) {
+			this.itemTossedDialogue = DialogueBuilder.createText(
 				// Intentionally setting the first row of the dialogue to be only the item name, then the second
 				// sentence to be a fixed sized sentence.
 				this.getDialogueName() + "was tossed away.",
 				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
 			);
-			this.tossedDialogue.setShowDialog(true);
+			this.itemTossedDialogue.setShowDialog(true);
 		}
-		if (!(this.tossedDialogue.isDialogueCompleted() && this.tossedDialogue.isShowingDialog())) {
-			this.tossedDialogue.tick();
+		if (!(this.itemTossedDialogue.isDialogueCompleted() && this.itemTossedDialogue.isShowingDialog())) {
+			this.itemTossedDialogue.tick();
 		}
 		// We want the player to interact with the dialogue for the final time, before dismissing it.
 		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
 			this.afterItemActionOccurred = false;
-			this.tossedDialogue.clearDialogueLines();
-			this.tossedDialogue.setShowDialog(false);
+			this.itemTossedDialogue.clearDialogueLines();
+			this.itemTossedDialogue.setShowDialog(false);
 		}
 	}
 
@@ -284,10 +284,10 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 			output.blit(Art.item, xOffset, yOffset);
 		}
 		if (this.afterItemActionOccurred) {
-			if (this.pickedDialogue.isReady())
-				this.pickedDialogue.render(output, graphics);
-			else if (this.tossedDialogue.isReady())
-				this.tossedDialogue.render(output, graphics);
+			if (this.itemPickedDialogue.isReady())
+				this.itemPickedDialogue.render(output, graphics);
+			else if (this.itemTossedDialogue.isReady())
+				this.itemTossedDialogue.render(output, graphics);
 		}
 	}
 
