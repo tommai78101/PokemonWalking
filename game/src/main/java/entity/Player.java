@@ -901,6 +901,11 @@ public class Player extends Character {
 			this.jump();
 	}
 
+	@Override
+	public int getAutoWalkTickFrequency() {
+		return Character.AUTO_WALK_DISABLE;
+	}
+
 	// ---------------------------------------------------------------------
 	// Private methods
 

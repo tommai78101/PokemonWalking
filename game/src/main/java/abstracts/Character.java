@@ -3,6 +3,7 @@ package abstracts;
 import java.awt.Graphics;
 
 import common.Debug;
+import common.Randomness;
 import common.Tileable;
 import entity.Joe;
 import entity.Player;
@@ -24,6 +25,14 @@ public abstract class Character extends Entity implements Interactable, Characte
 	public static final int LEFT = 1;
 	public static final int UP = 2;
 	public static final int RIGHT = 3;
+
+	// AutoWalk frequency settings
+	public static final int AUTO_WALK_DISABLE = 0;
+	public static final int AUTO_WALK_VERY_FREQUENT = 0xF;
+	public static final int AUTO_WALK_FAST = 0x1F;
+	public static final int AUTO_WALK_MODERATE = 0x3F;
+	public static final int AUTO_WALK_SLOW = 0x7F;
+	public static final int AUTO_WALK_VERY_SLOW = 0xFF;
 
 	private boolean isPlayable;
 	private int interactionDataColorID = 0;
@@ -184,7 +193,21 @@ public abstract class Character extends Entity implements Interactable, Characte
 	}
 
 	// ----------------------------------------------------------------------
+	// Abstract methods
+
+	public abstract int getAutoWalkTickFrequency();
+
+	// ----------------------------------------------------------------------
 	// Override methods
+
+	@Override
+	public void tick() {
+		this.handleAutoWalking();
+		this.checkWalkingSpeed();
+		this.handleMovement();
+		this.controlTick();
+		this.dialogueTick();
+	}
 
 	@Override
 	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
@@ -192,6 +215,8 @@ public abstract class Character extends Entity implements Interactable, Characte
 			screen.blit(Art.error, this.oldXAreaPosition * Tileable.WIDTH - offsetX, this.oldYAreaPosition * Tileable.HEIGHT - offsetY);
 			screen.blit(Art.error, this.predictedXAreaPosition * Tileable.WIDTH - offsetX, this.predictedYAreaPosition * Tileable.HEIGHT - offsetY);
 		}
+		this.characterRender(screen, Art.joe, graphics, offsetX, offsetY);
+		this.renderDialogue(screen, graphics);
 	}
 
 	@Override
@@ -250,6 +275,31 @@ public abstract class Character extends Entity implements Interactable, Characte
 		}
 	}
 
+	@Override
+	public void sprint() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void jump() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void ride() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void swim() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void interact(Area area, Entity target) {
+		// TODO Auto-generated method stub
+	}
+
 	// ----------------------------------------------------------------------
 	// Protected methods
 
@@ -286,8 +336,6 @@ public abstract class Character extends Entity implements Interactable, Characte
 			this.stopAnimation();
 		}
 	}
-
-	protected void handleAutoWalking() {}
 
 	protected void handleSurroundingTiles() {
 		boolean upDirection = this.checkCharacterSurroundingData(this.area, 0, -1);
@@ -383,6 +431,43 @@ public abstract class Character extends Entity implements Interactable, Characte
 				return true;
 			default: // Any other type of tiles should be walkable, for no apparent reasons.
 				return false;
+		}
+	}
+
+	private void checkWalkingSpeed() {
+		this.xAccel = this.yAccel = 0;
+		if (this.isLockedWalking) {
+			if (!this.isChangingPositions)
+				this.isChangingPositions = true;
+			int facing = this.getFacing();
+			if (facing == Character.UP && !this.isFacingBlocked[Character.UP]) {
+				this.yAccel--;
+			}
+			else if (facing == Character.DOWN && !this.isFacingBlocked[Character.DOWN]) {
+				this.yAccel++;
+			}
+			else if (facing == Character.LEFT && !this.isFacingBlocked[Character.LEFT]) {
+				this.xAccel--;
+			}
+			else if (facing == Character.RIGHT && !this.isFacingBlocked[Character.RIGHT]) {
+				this.xAccel++;
+			}
+		}
+	}
+
+	private void handleAutoWalking() {
+		if (!this.isAutoWalking) {
+			return;
+		}
+		if (this.autoWalkingTick <= 0) {
+			if (this.isLockedWalking || this.isInteracting())
+				return;
+			this.autoWalkingTick = Randomness.randInt() & this.getAutoWalkTickFrequency();
+			this.setFacing(Randomness.randDirection());
+			this.isLockedWalking = Randomness.randBool();
+		}
+		else {
+			this.autoWalkingTick--;
 		}
 	}
 
