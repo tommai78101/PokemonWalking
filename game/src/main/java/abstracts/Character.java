@@ -2,6 +2,7 @@ package abstracts;
 
 import java.awt.Graphics;
 
+import common.Debug;
 import common.Tileable;
 import entity.Joe;
 import entity.Player;
@@ -190,6 +191,62 @@ public abstract class Character extends Entity implements Interactable, Characte
 		if (this.isDebugMode) {
 			screen.blit(Art.error, this.oldXAreaPosition * Tileable.WIDTH - offsetX, this.oldYAreaPosition * Tileable.HEIGHT - offsetY);
 			screen.blit(Art.error, this.predictedXAreaPosition * Tileable.WIDTH - offsetX, this.predictedYAreaPosition * Tileable.HEIGHT - offsetY);
+		}
+	}
+
+	@Override
+	public void walk() {
+		if (this.getArea() == null) {
+			Debug.error("Area is not set for character. This shouldn't be happening.");
+			return;
+		}
+
+		// Check for collisions
+		this.handleSurroundingTiles();
+		if (this.isFacingBlocked[this.getFacing()]) {
+			this.isLockedWalking = false;
+
+			// This is one of those cases where the tile alignment is incorrect. We need to reset the positions
+			// back inside the tiles.
+			this.xPixelPosition = this.oldXAreaPosition * Tileable.WIDTH;
+			this.yPixelPosition = this.oldYAreaPosition * Tileable.HEIGHT;
+			return;
+		}
+
+		// Makes sure the acceleration stays limited to 1 pixel/tick.
+		if (this.xAccel > 1)
+			this.xAccel = 1;
+		if (this.xAccel < -1)
+			this.xAccel = -1;
+		if (this.yAccel > 1)
+			this.yAccel = 1;
+		if (this.yAccel < -1)
+			this.yAccel = -1;
+
+		this.xPixelPosition += this.xAccel;
+		this.yPixelPosition += this.yAccel;
+
+		// Needs to get out of being locked to walking/jumping.
+		// Note that we cannot compare using ||, what if the player is moving in one direction? What about
+		// the other axis? Now about to walk. First, check to see if there's an obstacle blocking the path.
+		if ((this.xPixelPosition % Tileable.WIDTH == 0 && this.yPixelPosition % Tileable.HEIGHT == 0)) {
+			// Resets every flag that locks the player.
+			this.isLockedWalking = false;
+			this.xAreaPosition = this.xPixelPosition / Tileable.WIDTH;
+			this.yAreaPosition = this.yPixelPosition / Tileable.HEIGHT;
+
+			// Before we walk, check to see if the oldX and oldY are up-to-date with the
+			// latest X and Y.
+			if (this.oldXAreaPosition != this.xAreaPosition)
+				this.oldXAreaPosition = this.xAreaPosition;
+			if (this.oldYAreaPosition != this.yAreaPosition)
+				this.oldYAreaPosition = this.yAreaPosition;
+
+		}
+		else if (this.isChangingPositions) {
+			this.isChangingPositions = false;
+			this.predictedXAreaPosition = this.xAreaPosition + this.xAccel;
+			this.predictedYAreaPosition = this.yAreaPosition + this.yAccel;
 		}
 	}
 
