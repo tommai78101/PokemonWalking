@@ -460,7 +460,9 @@ public abstract class Character extends Entity implements Interactable, Characte
 			return;
 		}
 		int frequencyMask = this.getAutoWalkTickFrequency();
-		if (frequencyMask > 0 && this.autoWalkingTick <= 0) {
+		if (frequencyMask <= 0)
+			return;
+		if (this.autoWalkingTick <= 0) {
 			if (this.isLockedWalking || this.isInteracting())
 				return;
 			this.autoWalkingTick = Randomness.randInt() & frequencyMask;
