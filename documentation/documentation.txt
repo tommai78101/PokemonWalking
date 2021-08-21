@@ -1426,17 +1426,21 @@ This is the same maximum for user-created area maps.
 		Whitespaces.
 	@: 
 		Trigger name.
+	&:
+		Trigger Data Identification Checksum (TDIC)
 	^: 
 		[Direction, Steps]. Can be chained for delaying scripted 
 		movements.
 	$: 
-		Start of script. Appears at beginning of script. Uses 
-		numeric ID values as Trigger IDs.
-	&:
+		Start of script. Appears at beginning of script. Symbol
+		is followed by a numeric ID value, representing Trigger
+		IDs. Up to 65535 scripts are supported per area. 0 is
+		reserved.
+	!:
 		Start of NPC script. Appears at the beginning of script.
-		Uses numeric ID values as NPC Script IDs, corresponding
-		to the NPC data value. Only 255 NPCs are supported per
-		area. 0 is reserved.
+		Symbol is followed by a numeric ID value, representing
+		NPC Script IDs, which corresponds to the NPC data value.
+		Only 255 NPCs are supported per area. 0 is reserved.
 	%: 
 		Script delimiter. Always appear at end of script.
 	#: 
@@ -1464,17 +1468,27 @@ This is the same maximum for user-created area maps.
 		number of times it can be triggered before it turns 
 		itself off. This is planned to be added after the start 
 		of the script. This can be optionally added or ignored.
+	~:
+		Conditional check. Variables are stored as key-value
+		pair. This symbol is followed by a key string, then a
+		"+" or "-" to indicate whether to increment or
+		decrement the value. "++" or "--" to change by 1. "+"
+		or "-" followed by a number to change by that amount.
 
 	Script format example:
 
+	``````
+	/ This is an Eraser script. For internal use.
 	$0 ;
 	@Eraser
 	%
 
+	/ This Hello_World script will repeat for 4 times.
 	$1 |4
 	@Hello_Test_Trigger
 	#Hello_World!
 	%
+	``````
 
 ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
