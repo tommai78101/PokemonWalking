@@ -8,11 +8,14 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -31,7 +34,7 @@ import common.MinMaxFilter;
 import editor.Trigger;
 import enums.ScriptTags;
 
-public class ScriptChanger extends JPanel implements ActionListener, DocumentListener {
+public class ScriptChanger extends JPanel implements ActionListener, ItemListener, DocumentListener {
 	private static final long serialVersionUID = 1L;
 
 	private final ScriptEditor editor;
@@ -41,6 +44,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 
 	private JTextField nameField, idField;
 	private JLabel checksumField;
+	private JCheckBox isNpcTriggerBox;
 	private JButton upButton, downButton, leftButton, rightButton;
 	private JButton questionDialogue, affirmativeDialogue, negativeDialogue, speechDialogue, confirmDialogue, denyDialogue;
 	private JTextArea scriptArea;
@@ -86,7 +90,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("X Position: "), c);
-		
+
 		c.gridx = 1;
 		c.gridy = 1;
 		c.gridwidth = 1;
@@ -95,7 +99,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((xField = new JTextField()), c);
 		xField.getDocument().addDocumentListener(this);
-		
+
 		// Third row
 		c.gridx = 0;
 		c.gridy = 2;
@@ -104,7 +108,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("Y Position: "), c);
-		
+
 		c.gridx = 1;
 		c.gridy = 2;
 		c.gridwidth = 1;
@@ -152,6 +156,25 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		this.add((this.checksumField = new JLabel()), c);
 		this.checksumField.setText(this.editor.getEditorChecksum());
 
+		// Sixth row
+		c.gridx = 0;
+		c.gridy = 3;
+		c.gridwidth = 1;
+		c.weightx = 0.5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.NONE;
+		this.add(new JLabel("Is NPC Script: "), c);
+
+		c.gridx = 1;
+		c.gridy = 3;
+		c.gridwidth = 1;
+		c.weightx = 3.5;
+		c.weighty = 0.1;
+		c.fill = GridBagConstraints.HORIZONTAL;
+		this.add((this.isNpcTriggerBox = new JCheckBox()), c);
+		this.isNpcTriggerBox.setSelected(false);
+		this.isNpcTriggerBox.addItemListener(this);
+
 		// Empty panel for adding spaces only.
 		c.gridx = 0;
 		c.gridy = 4;
@@ -195,7 +218,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	public JTextField getXField() {
 		return this.xField;
 	}
-	
+
 	public JTextField getYField() {
 		return this.yField;
 	}
@@ -207,6 +230,10 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 
 	public JTextArea getScriptArea() {
 		return this.scriptArea;
+	}
+
+	public JCheckBox getNpcTriggerFlag() {
+		return this.isNpcTriggerBox;
 	}
 
 	public void allowFieldsToUpdate() {
@@ -223,11 +250,13 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		// yField.setText("");
 		this.idField.setText("");
 		this.scriptArea.setText("");
+		this.isNpcTriggerBox.setSelected(false);
 	}
 
 	public void disableComponent() {
 		this.nameField.setEnabled(false);
 		this.idField.setEnabled(false);
+		this.isNpcTriggerBox.setEnabled(false);
 
 		this.upButton.setEnabled(false);
 		this.downButton.setEnabled(false);
@@ -248,6 +277,7 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 	public void enableComponent() {
 		this.nameField.setEnabled(true);
 		this.idField.setEnabled(true);
+		this.isNpcTriggerBox.setEnabled(true);
 
 		this.upButton.setEnabled(true);
 		this.downButton.setEnabled(true);
@@ -637,5 +667,21 @@ public class ScriptChanger extends JPanel implements ActionListener, DocumentLis
 		}
 		super.revalidate();
 		super.repaint();
+	}
+
+	// ItemListener - For checkboxes
+	@Override
+	public void itemStateChanged(ItemEvent e) {
+		Object source = e.getSource();
+		final Trigger selectedTrigger = this.editor.scriptViewer.getSelectedTrigger();
+		if (source instanceof JCheckBox checkbox && checkbox == this.isNpcTriggerBox) {
+			int state = e.getStateChange();
+			if (state == ItemEvent.SELECTED) {
+				selectedTrigger.setNpcTrigger(true);
+			}
+			else if (state == ItemEvent.DESELECTED) {
+				selectedTrigger.setNpcTrigger(false);
+			}
+		}
 	}
 }

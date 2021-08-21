@@ -1,13 +1,23 @@
 package editor;
 
+import java.util.Arrays;
+
 public class Trigger {
+	/**
+	 * This represents the trigger ID is not an NPC trigger.
+	 */
+	public static final short NPC_TRIGGER_ID_NONE = 0;
+
 	private byte x, y;
 	private short triggerID;
+	private short npcTriggerID;
 	private String name;
 	private String script;
 	private String checksum;
+	private boolean isNpcTrigger;
 
 	private boolean[] valuesHasBeenSet = new boolean[4];
+
 	private static final int FLAG_PositionX = 0;
 	private static final int FLAG_PositionY = 1;
 	private static final int FLAG_TriggerID = 2;
@@ -20,13 +30,18 @@ public class Trigger {
 	public void reset() {
 		this.x = this.y = -1;
 		this.triggerID = 0;
+		this.npcTriggerID = Trigger.NPC_TRIGGER_ID_NONE;
 		this.name = "<Untitled>";
-		for (int i = 0; i < this.valuesHasBeenSet.length; i++)
-			this.valuesHasBeenSet[i] = false;
+		Arrays.fill(this.valuesHasBeenSet, false);
 	}
 
 	public int getDataValue() {
 		return (this.x << 24) | (this.y << 16) | (this.triggerID & 0xFFFF);
+	}
+
+	public int getNpcDataValue() {
+		// The higher 8 bits are to be reserved for something else.
+		return this.npcTriggerID;
 	}
 
 	public void setTriggerPositionX(byte x) {
@@ -64,11 +79,29 @@ public class Trigger {
 		return this.valuesHasBeenSet[Trigger.FLAG_TriggerScript];
 	}
 
+	public boolean isNpcTrigger() {
+		return this.isNpcTrigger;
+	}
+
+	public void setNpcTrigger(boolean state) {
+		this.isNpcTrigger = state;
+	}
+
+	public void setNpcTriggerId(short npcTriggerId) {
+		this.npcTriggerID = npcTriggerId;
+		if (!this.isNpcTrigger && npcTriggerId > Trigger.NPC_TRIGGER_ID_NONE) {
+			this.setNpcTrigger(true);
+		}
+	}
+
 	public boolean areRequiredFieldsAllSet() {
 		boolean result = true;
-		for (int i = 0; i < 3; i++)
-			if (!this.valuesHasBeenSet[i])
+		for (int i = 0; i < 3; i++) {
+			if (!this.valuesHasBeenSet[i]) {
 				result = false;
+				break;
+			}
+		}
 		return result;
 	}
 
@@ -91,11 +124,15 @@ public class Trigger {
 	public short getTriggerID() {
 		return this.triggerID;
 	}
-	
+
+	public short getNpcTriggerID() {
+		return this.npcTriggerID;
+	}
+
 	public boolean checkTriggerID(short triggerId) {
 		return this.triggerID == triggerId;
 	}
-	
+
 	public boolean checkTriggerID(int triggerId) {
 		return this.checkTriggerID((short) triggerId);
 	}
@@ -113,7 +150,7 @@ public class Trigger {
 	}
 
 	public String getChecksum() {
-		return checksum;
+		return this.checksum;
 	}
 
 	public void setChecksum(String checksum) {
@@ -146,8 +183,7 @@ public class Trigger {
 		result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
 		result = prime * result + this.triggerID;
 		result = prime * result + this.x;
-		result = prime * result + this.y;
-		return result;
+		return prime * result + this.y;
 	}
 
 	@Override
@@ -155,10 +191,7 @@ public class Trigger {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
-		if (this.getClass() != obj.getClass()) {
+		if ((obj == null) || (this.getClass() != obj.getClass())) {
 			return false;
 		}
 		Trigger other = (Trigger) obj;
@@ -170,13 +203,7 @@ public class Trigger {
 		else if (!this.name.equals(other.name)) {
 			return false;
 		}
-		if (this.triggerID != other.triggerID) {
-			return false;
-		}
-		if (this.x != other.x) {
-			return false;
-		}
-		if (this.y != other.y) {
+		if ((this.triggerID != other.triggerID) || (this.x != other.x) || (this.y != other.y)) {
 			return false;
 		}
 		return true;

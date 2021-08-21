@@ -122,12 +122,13 @@ public class TriggerSet {
 			}
 			for (Trigger trigger : triggerSet) {
 				output.add(trigger.getDataValue());
+				output.add(trigger.getNpcDataValue());
 			}
 		}
 		return output;
 	}
 
-	public void addTriggerById(int index, int triggerId) {
+	public void addTriggerById(int index, int triggerId, short npcTriggerId) {
 		Trigger trigger = this.validityCheck(triggerId);
 		if (trigger == null) {
 			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at: (" + (index % this.size.width) + "," + (index / this.size.width) + ").");
@@ -136,6 +137,7 @@ public class TriggerSet {
 		if (!trigger.isEraser()) {
 			byte x = (byte) (index % this.size.width);
 			byte y = (byte) (index / this.size.width);
+			trigger.setNpcTriggerId(npcTriggerId);
 			this.addTrigger(index, x, y, trigger);
 		}
 		else {

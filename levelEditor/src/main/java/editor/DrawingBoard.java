@@ -612,7 +612,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 							blue = this.getMouseTileY();
 						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
 						this.tilesEditorID[tileIndex] = data.editorID;
-						this.triggers.addTriggerById(tileIndex, data.editorID);
+						this.triggers.addTriggerById(tileIndex, data.editorID, Trigger.NPC_TRIGGER_ID_NONE);
 						panel.greenInputField.setText(Integer.toString(green));
 						panel.blueInputField.setText(Integer.toString(blue));
 						panel.greenField.setText(Integer.toString(green));
@@ -706,14 +706,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 		final String checksum = this.editor.getChecksum();
 		byte[] checksumBytes = checksum.getBytes();
 
-		// Add any triggers into a list. If triggers set is null, make sure to append the Eraser trigger,
-		// designated as ID 0.
-		List<Integer> triggerDataList = this.triggers.convertToData();
-
 		// Trigger size will always be no more than 65536 triggers. Trigger size will always be 1 + (number
 		// of triggers seen in the editor), to account for the Eraser trigger. If there are more triggers
 		// than the width of the bitmap, we add however many extra rows to compensate.
-		int triggerSize = triggerDataList.size() & 0xFFFF;
+		int triggerSize = this.triggers.getSize() & 0xFFFF;
 
 		// Add any NPCs, obstacles, and items into a list.
 		int[] npcsData = this.npcs.produce();
@@ -732,8 +728,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 
 		// Step 3 - Store the triggers
+		List<Integer> triggerData = this.triggers.convertToData();
 		for (int i = 0; i < triggerSize; i++) {
-			pixels.add(triggerDataList.get(i).intValue());
+			// Add any triggers into a list. If triggers set is null, make sure to append the Eraser trigger,
+			// designated as ID 0.
+			pixels.add(triggerData.get(i * 2)); // Trigger Info
+			pixels.add(triggerData.get(i * 2 + 1)); // NPC Trigger Info
 		}
 
 		// Step 4 - Store the NPCs
@@ -800,13 +800,16 @@ public class DrawingBoard extends Canvas implements Runnable {
 			// Step 3 - Add any triggers into a list. If triggers is null, make sure to append the Eraser
 			// trigger, designated as ID 0.
 			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight, this.editor.getChecksum());
-			for (int i = 0; i < triggerSize; i++, pixelIterator++) {
-				short triggerId = (short) (pixels[pixelIterator] & 0xFFFF);
+			for (int i = 0; i < triggerSize; i++) {
+				int triggerInfo = pixels[pixelIterator++];
+				int npcTriggerInfo = pixels[pixelIterator++];
+				short triggerId = (short) (triggerInfo & 0xFFFF);
 				if (triggerId != 0) {
 					// We only want non-Eraser triggers to be added to the trigger set in the level editor.
 					int x = (pixels[pixelIterator] >> 24) & 0xFF;
 					int y = (pixels[pixelIterator] >> 16) & 0xFF;
-					this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator]);
+					short npcTriggerId = (short) ((npcTriggerInfo >> 16) & 0xFFFF);
+					this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator], npcTriggerId);
 				}
 			}
 
