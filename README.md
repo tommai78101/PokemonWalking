@@ -206,15 +206,16 @@ $0
 |:---:|:---:|:---:|
 | Triggers/Events | Dialogues | All Movements* |
 | Script Editor | Level Editor | Ledges |
-| ??? | ??? | Area Warping |
+| NPC Scripting | ??? | Area Warping |
 | | | Stairs |
 | | | Water |
 | | | Bitmap Animation |
 | | | Item Balls |
 | | | Inventory |
 | | | Saving/Loading |
+| | | Characters/NPCs |
 
-\*All movements: Walking, Facing/Turning, Surfing, Bicycling, Jumping, etc.
+\*All movements: Walking, Facing/Turning, Surfing, Bicycling, Jumping, NPC collisions, Obstacle collisions, etc.
 
 ===
 
