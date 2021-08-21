@@ -16,14 +16,22 @@ public class Trigger {
 	private String checksum;
 	private boolean isNpcTrigger;
 
-	private boolean[] valuesHasBeenSet = new boolean[4];
+	private boolean[] valuesHasBeenSet;
 
 	private static final int FLAG_PositionX = 0;
 	private static final int FLAG_PositionY = 1;
 	private static final int FLAG_TriggerID = 2;
 	private static final int FLAG_TriggerScript = 3;
+	private static final int FLAG_NpcTriggerID = 4;
 
 	public Trigger() {
+		this.valuesHasBeenSet = new boolean[Arrays.asList(
+			Trigger.FLAG_PositionX,
+			Trigger.FLAG_PositionY,
+			Trigger.FLAG_TriggerID,
+			Trigger.FLAG_TriggerScript,
+			Trigger.FLAG_NpcTriggerID
+		).size()];
 		this.reset();
 	}
 
@@ -72,7 +80,7 @@ public class Trigger {
 	}
 
 	public boolean isTriggerIDSet() {
-		return this.valuesHasBeenSet[Trigger.FLAG_TriggerID];
+		return this.valuesHasBeenSet[Trigger.FLAG_TriggerID] || this.valuesHasBeenSet[Trigger.FLAG_NpcTriggerID];
 	}
 
 	public boolean isTriggerScriptSet() {
@@ -87,26 +95,18 @@ public class Trigger {
 		this.isNpcTrigger = state;
 	}
 
-	public void setNpcTriggerId(short npcTriggerId) {
+	public void setNpcTriggerID(short npcTriggerId) {
 		this.npcTriggerID = npcTriggerId;
 		if (!this.isNpcTrigger && npcTriggerId > Trigger.NPC_TRIGGER_ID_NONE) {
 			this.setNpcTrigger(true);
+			this.valuesHasBeenSet[Trigger.FLAG_NpcTriggerID] = true;
 		}
 	}
 
 	public boolean areRequiredFieldsAllSet() {
-		boolean result = true;
-		for (int i = 0; i < 3; i++) {
-			if (!this.valuesHasBeenSet[i]) {
-				result = false;
-				break;
-			}
-		}
-		return result;
-	}
-
-	public boolean isEmptyScriptTrigger() {
-		return this.valuesHasBeenSet[3];
+		boolean result = this.isPositionXSet();
+		result = result && this.isPositionYSet();
+		return result && this.isTriggerIDSet();
 	}
 
 	public byte getPositionX() {

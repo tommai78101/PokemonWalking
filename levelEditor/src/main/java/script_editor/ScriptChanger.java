@@ -90,7 +90,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("X Position: "), c);
-
+		
 		c.gridx = 1;
 		c.gridy = 1;
 		c.gridwidth = 1;
@@ -99,7 +99,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((xField = new JTextField()), c);
 		xField.getDocument().addDocumentListener(this);
-
+		
 		// Third row
 		c.gridx = 0;
 		c.gridy = 2;
@@ -108,7 +108,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("Y Position: "), c);
-
+		
 		c.gridx = 1;
 		c.gridy = 2;
 		c.gridwidth = 1;
@@ -218,7 +218,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 	public JTextField getXField() {
 		return this.xField;
 	}
-
+	
 	public JTextField getYField() {
 		return this.yField;
 	}
@@ -595,16 +595,25 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 					test = this.editor.scriptChanger.getIDField().getText();
 					if (!test.isBlank()) {
 						int n = Integer.parseInt(test);
-						if (n > 0x0FFFF)
+						if ((!selectedTrigger.isNpcTrigger() && n > 0x0FFFF) || (selectedTrigger.isNpcTrigger() && (n > 0x0FFFF || n == 0x0))) {
 							throw new NumberFormatException();
+						}
 						selectedTrigger.setTriggerID((short) (n & 0xFFFF));
 					}
 				}
 				catch (NumberFormatException e) {
-					JOptionPane.showMessageDialog(
-						null,
-						"Please input numbers in range 0 ~ 65535.\n\n0 is reserved for \"Eraser\", which is used to erase triggers from the map."
-					);
+					if (!selectedTrigger.isNpcTrigger()) {
+						JOptionPane.showMessageDialog(
+							null,
+							"Please input numbers in range 0 ~ 65535.\n\n0 is reserved for \"Eraser\", which is used to erase triggers from the map."
+						);
+					}
+					else {
+						JOptionPane.showMessageDialog(
+							null,
+							"Please input numbers in range 1 ~ 255.\n\n0 is reserved for \"NPC Trigger Disabled\", which turns off NPC trigger processing."
+						);
+					}
 					SwingUtilities.invokeLater(() -> ScriptChanger.this.editor.scriptChanger.getIDField().setText(""));
 				}
 
@@ -678,9 +687,12 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 			int state = e.getStateChange();
 			if (state == ItemEvent.SELECTED) {
 				selectedTrigger.setNpcTrigger(true);
+				selectedTrigger.setNpcTriggerID(Short.parseShort(this.getIDField().getText()));
 			}
 			else if (state == ItemEvent.DESELECTED) {
 				selectedTrigger.setNpcTrigger(false);
+				selectedTrigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+				selectedTrigger.setTriggerID(Short.parseShort(this.getIDField().getText()));
 			}
 		}
 	}

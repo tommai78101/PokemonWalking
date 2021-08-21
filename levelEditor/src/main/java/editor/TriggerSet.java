@@ -137,7 +137,7 @@ public class TriggerSet {
 		if (!trigger.isEraser()) {
 			byte x = (byte) (index % this.size.width);
 			byte y = (byte) (index / this.size.width);
-			trigger.setNpcTriggerId(npcTriggerId);
+			trigger.setNpcTriggerID(npcTriggerId);
 			this.addTrigger(index, x, y, trigger);
 		}
 		else {

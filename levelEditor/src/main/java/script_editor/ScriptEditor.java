@@ -237,6 +237,7 @@ public class ScriptEditor extends JFrame {
 
 			Trigger trigger = new Trigger();
 			trigger.setTriggerID((short) 0);
+			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
 			trigger.setName("Eraser");
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);
@@ -248,6 +249,10 @@ public class ScriptEditor extends JFrame {
 				if (ScriptTags.BeginScript.beginsAt(line)) {
 					trigger = new Trigger();
 					trigger.setTriggerID(Short.parseShort(ScriptTags.BeginScript.removeScriptTag(line)));
+				}
+				else if (ScriptTags.NpcScript.beginsAt(line)) {
+					trigger = new Trigger();
+					trigger.setNpcTriggerID(Short.parseShort(ScriptTags.NpcScript.removeScriptTag(line)));
 				}
 				else if (ScriptTags.ScriptName.beginsAt(line)) {
 					line = line.replaceAll("_", " ");
@@ -327,7 +332,12 @@ public class ScriptEditor extends JFrame {
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Trigger t = model.get(i);
-				writer.write("$" + Short.toString(t.getTriggerID()));
+				if (t.isNpcTrigger() && !t.isEraser()) {
+					writer.write(ScriptTags.NpcScript.getSymbol() + Short.toString(t.getNpcTriggerID()));
+				}
+				else {
+					writer.write(ScriptTags.BeginScript.getSymbol() + Short.toString(t.getTriggerID()));
+				}
 				writer.newLine();
 				writer.write("@" + t.getName().replace(" ", "_"));
 				writer.newLine();
