@@ -209,7 +209,7 @@ public enum ScriptTags {
 	public static ScriptTags parse(String actionCommand) {
 		ScriptTags[] values = ScriptTags.values();
 		for (ScriptTags tag : values) {
-			if (tag.getSymbolName().equals(actionCommand))
+			if (tag.getSymbol().equals(actionCommand))
 				return tag;
 		}
 		throw new IllegalArgumentException("Unknown script tag action command symbol.");

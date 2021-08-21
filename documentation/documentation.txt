@@ -1458,7 +1458,7 @@ This is the same maximum for user-created area maps.
 	[: 
 		Confirmation Action.
 	]: 
-		Denial Action.
+		Cancellation or Denial Action.
 	;: 
 		Repeat Flag. If contains ';', it means it's enabled by 
 		default.
