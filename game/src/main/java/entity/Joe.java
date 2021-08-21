@@ -51,6 +51,11 @@ public class Joe extends Character {
 		this.handleSurroundingTiles();
 		if (this.isFacingBlocked[this.getFacing()]) {
 			this.isLockedWalking = false;
+
+			// This is one of those cases where the tile alignment is incorrect. We need to reset the positions
+			// back inside the tiles.
+			this.xPixelPosition = this.oldXAreaPosition * Tileable.WIDTH;
+			this.yPixelPosition = this.oldYAreaPosition * Tileable.HEIGHT;
 			return;
 		}
 
