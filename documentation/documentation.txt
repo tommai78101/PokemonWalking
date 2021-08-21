@@ -18,6 +18,7 @@ Writing rules:
 - Changelogs are exempt from this ruleset.
 
 Changelogs:
+	r15: Added Level Editor section.
 	r14: Updated Item data structure.
 	r13: Added Characters/NPCs section. 
 	r12: Added Triggers section and to clarify a bit more on how scripting is done.
@@ -1431,6 +1432,11 @@ This is the same maximum for user-created area maps.
 	$: 
 		Start of script. Appears at beginning of script. Uses 
 		numeric ID values as Trigger IDs.
+	&:
+		Start of NPC script. Appears at the beginning of script.
+		Uses numeric ID values as NPC Script IDs, corresponding
+		to the NPC data value. Only 255 NPCs are supported per
+		area. 0 is reserved.
 	%: 
 		Script delimiter. Always appear at end of script.
 	#: 
