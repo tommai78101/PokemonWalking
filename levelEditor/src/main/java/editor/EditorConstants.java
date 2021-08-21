@@ -286,6 +286,20 @@ public class EditorConstants {
 						// Ignore the trigger value that's equal to 0. This is the Eraser.
 					}
 				}
+				else if (ScriptTags.NpcScript.beginsAt(line)) {
+					// This is where the script begins. The proceeding number is the trigger ID value.
+					if (trigger == null)
+						trigger = new Trigger();
+					if (checksum != null)
+						trigger.setChecksum(checksum);
+					int value = Integer.parseInt(ScriptTags.NpcScript.removeScriptTag(line));
+					if (value != 0) {
+						trigger.setNpcTriggerID((short) (value & 0xFFFF));
+					}
+					else {
+						// Ignore the trigger value that's equal to 0. This is the Eraser.
+					}
+				}
 				else if (ScriptTags.ScriptName.beginsAt(line)) {
 					// This is the trigger script name.
 					if (trigger != null)
