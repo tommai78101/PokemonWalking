@@ -6,6 +6,8 @@ package enums;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import common.StringUtils;
+
 /**
  * Please read the documentation, in the Trigger section [PWD10] for more information on what the
  * script tags mean.
@@ -13,33 +15,104 @@ import java.util.regex.Pattern;
  * @author tlee
  */
 public enum ScriptTags {
+	/**
+	 * @
+	 */
 	ScriptName("@", "NAME", "Script name"),
+
+	/**
+	 * &
+	 */
 	Checksum("&", "CHKSUM", "Script checksum"),
+
+	/**
+	 * /
+	 */
 	Comment("/", "REM", "Comment"),
+
+	/**
+	 * $
+	 */
 	BeginScript("$", "BEGIN", "Trigger Script begins"),
+
+	/**
+	 * !
+	 */
 	NpcScript("!", "NPC", "NPC Script begins"),
+
+	/**
+	 * ^
+	 */
 	PathData("^", "PATH", "Scripted path data"),
+
+	/**
+	 * %
+	 */
 	EndScript("%", "END", "Script ends"),
-	Speech("#", "SPEAK", "A speech dialogue"),
-	Question("?", "ASK", "A question dialogue"),
-	Affirm("+", "AFFIRM", "Affirm with a positive answer"),
-	Reject("-", "REJECT", "Reject with a negative answer"),
-	Confirm("[", "CONFIRM", "Asking the player to confirm response"),
-	Deny("]", "DENY", "Asking the player to deny response"),
+
+	/**
+	 * #
+	 */
+	Speech("#", "SPEAK", "A normal speech dialogue"),
+
+	/**
+	 * ?
+	 */
+	Question("?", "ASK", "A question dialogue asking for the player's response to YES or NO.", "A single question must be followed by an Affirmative and a Negative Dialogue."),
+
+	/**
+	 * +
+	 */
+	Affirm("+", "AFFIRM", "Affirm a question dialogue with a positive answer. If a question dialogue has been asked, and the player reponded to YES, this and similar consecutive dialogues will be shown."),
+
+	/**
+	 * -
+	 */
+	Reject("-", "REJECT", "Reject a question dialogue with a negative answer. If a question dialogue has been asked, and the player reponded to NO, this and similar consecutive dialogues will be shown."),
+
+	/**
+	 * [
+	 */
+	Confirm("[", "CONFIRM", "Asking the player to confirm an option. If a confirm dialogue has been selected, this and similar consecutive dialogues will be shown."),
+
+	/**
+	 * ]
+	 */
+	Cancel("]", "DENY", "Asking the player to deny or cancel an option. If a denial dialogue has been selected, this and similar consecutive dialogues will be shown."),
+
+	/**
+	 * ;
+	 */
 	Repeat(";", "LOOP", "Repeat the script"),
+
+	/**
+	 * |
+	 */
 	Counter("|", "COUNTER", "Script can only be repeated for a limited time"),
+
+	/**
+	 * ~
+	 */
 	Condition("~", "CONDITION", "Conditions that are to be met to complete the script");
 
 	private final String symbol;
 	private final String uppercaseSymbolName;
+	private final String capitalizedSymbolName;
 	private final String lowercaseSymbolName;
 	private final String description;
+	private final String note;
 
 	ScriptTags(String sym, String alternate, String description) {
+		this(sym, alternate, description, null);
+	}
+
+	ScriptTags(String sym, String alternate, String description, String note) {
 		this.symbol = sym;
 		this.uppercaseSymbolName = alternate.toUpperCase();
 		this.lowercaseSymbolName = alternate.toLowerCase();
+		this.capitalizedSymbolName = StringUtils.capitalize(this.lowercaseSymbolName);
 		this.description = description;
+		this.note = (note != null && !note.isBlank()) ? note : "";
 	}
 
 	/**
@@ -116,5 +189,29 @@ public enum ScriptTags {
 
 	public String getLowercaseSymbolName() {
 		return this.lowercaseSymbolName;
+	}
+
+	public String getCapitalizedSymbolName() {
+		return this.capitalizedSymbolName;
+	}
+
+	public String getSymbol() {
+		return this.symbol;
+	}
+
+	public String getAdditionalNote() {
+		return this.note;
+	}
+
+	// ------------------------------------------------------------------------
+	// Static methods
+
+	public static ScriptTags parse(String actionCommand) {
+		ScriptTags[] values = ScriptTags.values();
+		for (ScriptTags tag : values) {
+			if (tag.getSymbolName().equals(actionCommand))
+				return tag;
+		}
+		throw new IllegalArgumentException("Unknown script tag action command symbol.");
 	}
 }

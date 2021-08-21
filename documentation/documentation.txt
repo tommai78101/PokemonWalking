@@ -1456,9 +1456,9 @@ This is the same maximum for user-created area maps.
 	-: 
 		Negative dialogue.
 	[: 
-		Affirmative Action.
+		Confirmation Action.
 	]: 
-		Negative Action.
+		Denial Action.
 	;: 
 		Repeat Flag. If contains ';', it means it's enabled by 
 		default.

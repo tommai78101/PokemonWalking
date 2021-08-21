@@ -666,10 +666,10 @@ public class Script {
 				}
 
 				// Negative Response action
-				else if (ScriptTags.Deny.beginsAt(line)) {
+				else if (ScriptTags.Cancel.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTags.Deny.replace(line);
+						line = ScriptTags.Cancel.replace(line);
 						Script.append(moves, line.substring(1).trim().toCharArray());
 						script.negativeMoves
 						    .add(Map.entry(negativeIteration, moves));
