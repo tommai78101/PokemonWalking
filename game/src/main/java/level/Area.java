@@ -115,7 +115,7 @@ public class Area implements Tileable, UpdateRenderable {
 			// Ignoring Editor ID
 			pixelIterator++;
 			int data = tempPixels[pixelIterator++];
-			this.areaCharacters.put(Map.entry(x, y), Character.build(data, x, y));
+			this.areaCharacters.put(Map.entry(x, y), Character.build(this, data, x, y));
 		}
 
 		// Step 5 - Get obstacles
@@ -596,6 +596,29 @@ public class Area implements Tileable, UpdateRenderable {
 		PixelData data;
 		try {
 			data = this.areaData.get(this.yPlayerPosition + yOffset).get(this.xPlayerPosition + xOffset);
+		}
+		catch (Exception e) {
+			return -1;
+		}
+		if (data != null) {
+			return (data.getColor() >> 24) & 0xFF;
+		}
+		return -1;
+	}
+
+	/**
+	 * Obtains the tile ID of the tile being offset by the Character's position.
+	 *
+	 * @param xOffset
+	 *            The X value offset from the player's X position.
+	 * @param yOffset
+	 *            The Y value offset from the player's Y position.
+	 * @return The tile ID of the tile chosen.
+	 */
+	public int getCharacterSurroundingTileID(Character entity, int xOffset, int yOffset) {
+		PixelData data;
+		try {
+			data = this.areaData.get(entity.getY() + yOffset).get(entity.getX() + xOffset);
 		}
 		catch (Exception e) {
 			return -1;

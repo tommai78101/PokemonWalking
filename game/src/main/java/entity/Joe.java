@@ -4,6 +4,9 @@ import java.awt.Graphics;
 
 import abstracts.Character;
 import abstracts.Entity;
+import common.Debug;
+import common.Randomness;
+import common.Tileable;
 import dialogue.Dialogue.DialogueType;
 import level.Area;
 import resources.Art;
@@ -19,10 +22,14 @@ public class Joe extends Character {
 				"Hello world.", DialogueType.SPEECH
 			)
 		);
+		this.setAutoWalking(true);
 	}
 
 	@Override
 	public void tick() {
+		this.handleAutoWalking();
+		this.checkWalkingSpeed();
+		this.handleMovement();
 		this.controlTick();
 		this.dialogueTick();
 	}
@@ -35,7 +42,48 @@ public class Joe extends Character {
 
 	@Override
 	public void walk() {
-		// TODO Auto-generated method stub
+		if (this.getArea() == null) {
+			Debug.error("Area is not set for character. This shouldn't be happening.");
+			return;
+		}
+
+		// Check for collisions
+		this.handleSurroundingTiles();
+		if (this.isFacingBlocked[this.getFacing()]) {
+			this.isLockedWalking = false;
+			return;
+		}
+
+		// Makes sure the acceleration stays limited to 1 pixel/tick.
+		if (this.xAccel > 1)
+			this.xAccel = 1;
+		if (this.xAccel < -1)
+			this.xAccel = -1;
+		if (this.yAccel > 1)
+			this.yAccel = 1;
+		if (this.yAccel < -1)
+			this.yAccel = -1;
+
+		this.xPixelPosition += this.xAccel;
+		this.yPixelPosition += this.yAccel;
+
+		// Needs to get out of being locked to walking/jumping.
+		// Note that we cannot compare using ||, what if the player is moving in one direction? What about
+		// the other axis? Now about to walk. First, check to see if there's an obstacle blocking the path.
+		if ((this.xPixelPosition % Tileable.WIDTH == 0 && this.yPixelPosition % Tileable.HEIGHT == 0)) {
+			// Resets every flag that locks the player.
+			this.isLockedWalking = false;
+			this.xAreaPosition = this.xPixelPosition / Tileable.WIDTH;
+			this.yAreaPosition = this.yPixelPosition / Tileable.HEIGHT;
+
+			// Before we walk, check to see if the oldX and oldY are up-to-date with the
+			// latest X and Y.
+			if (this.oldXAreaPosition != this.xAreaPosition)
+				this.oldXAreaPosition = this.xAreaPosition;
+			if (this.oldYAreaPosition != this.yAreaPosition)
+				this.oldYAreaPosition = this.yAreaPosition;
+
+		}
 	}
 
 	@Override
@@ -61,5 +109,44 @@ public class Joe extends Character {
 	@Override
 	public void interact(Area area, Entity target) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void handleAutoWalking() {
+		if (!this.isAutoWalking) {
+			return;
+		}
+		if (this.autoWalkingTick <= 0) {
+			if (this.isLockedWalking)
+				return;
+			this.autoWalkingTick = Randomness.randInt() & 0xF;
+			this.setFacing(Randomness.randDirection());
+			this.isLockedWalking = Randomness.randBool();
+		}
+		else {
+			this.autoWalkingTick--;
+		}
+	}
+
+	// -------------------------------------------------------------------
+	// Private methods
+
+	private void checkWalkingSpeed() {
+		this.xAccel = this.yAccel = 0;
+		if (this.isLockedWalking) {
+			int facing = this.getFacing();
+			if (facing == Character.UP && !this.isFacingBlocked[Character.UP]) {
+				this.yAccel--;
+			}
+			else if (facing == Character.DOWN && !this.isFacingBlocked[Character.DOWN]) {
+				this.yAccel++;
+			}
+			else if (facing == Character.LEFT && !this.isFacingBlocked[Character.LEFT]) {
+				this.xAccel--;
+			}
+			else if (facing == Character.RIGHT && !this.isFacingBlocked[Character.RIGHT]) {
+				this.xAccel++;
+			}
+		}
 	}
 }

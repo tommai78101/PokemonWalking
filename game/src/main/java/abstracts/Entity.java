@@ -37,8 +37,12 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	protected boolean interactingState;
 
 	protected byte typeId = 0;
-	protected int xPosition;
-	protected int yPosition;
+	protected int xAreaPosition;
+	protected int yAreaPosition;
+	protected int oldXAreaPosition;
+	protected int oldYAreaPosition;
+	protected int xPixelPosition;
+	protected int yPixelPosition;
 
 	protected int xOffset;
 	protected int yOffset;
@@ -62,16 +66,26 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	// public abstract void initialize(BaseWorld world);
 
 	public int getX() {
-		return this.xPosition;
+		return this.xAreaPosition;
 	}
 
 	public int getY() {
-		return this.yPosition;
+		return this.yAreaPosition;
+	}
+
+	public int getOldX() {
+		return this.oldXAreaPosition;
+	}
+
+	public int getOldY() {
+		return this.oldYAreaPosition;
 	}
 
 	protected void setPosition(int x, int y) {
-		this.xPosition = x;
-		this.yPosition = y;
+		this.xAreaPosition = x;
+		this.yAreaPosition = y;
+		this.xPixelPosition = x * Tileable.WIDTH;
+		this.yPixelPosition = y * Tileable.HEIGHT;
 	}
 
 	public byte[] getByteName() {
@@ -250,6 +264,32 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 				this.endDialogue();
 			}
 		}
+	}
+
+	public int getXInArea() {
+		// Returns area position X.
+		int result = (this.xAreaPosition / Tileable.WIDTH);
+		switch (this.getFacing()) {
+			case Character.LEFT:
+				break;
+			case Character.RIGHT:
+				result += 1;
+				break;
+		}
+		return result;
+	}
+
+	public int getYInArea() {
+		// Returns area position Y.
+		int result = (this.yAreaPosition / Tileable.HEIGHT);
+		switch (this.getFacing()) {
+			case Character.UP:
+				break;
+			case Character.DOWN:
+				result += 1;
+				break;
+		}
+		return result;
 	}
 
 	// ==============================================================

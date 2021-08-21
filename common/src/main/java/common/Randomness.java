@@ -12,4 +12,8 @@ public class Randomness {
 	public static int randDirection() {
 		return Math.abs(Randomness.rand.nextInt()) % 4;
 	}
+
+	public static boolean randBool() {
+		return Randomness.rand.nextBoolean();
+	}
 }

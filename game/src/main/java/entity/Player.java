@@ -44,13 +44,10 @@ public class Player extends Character {
 	// These are based on the art sprite in the resource folder. The numbers are
 	// used to get elements from a 2D array.
 	private int walking = 0;
-	private int oldXPosition;
-	private int oldYPosition;
 
 	// These are animation-related locks specific to the player.
 	private boolean isLockedJumping;
 
-	private final boolean[] isFacingBlocked = new boolean[4];
 	private boolean isInWater;
 	private boolean isOnBicycle;
 	private boolean isSprinting;
@@ -133,9 +130,10 @@ public class Player extends Character {
 		}).start();
 	}
 
+	@Override
 	public int getXInArea() {
 		// Returns area position X.
-		int result = (this.xPosition / Tileable.WIDTH);
+		int result = (this.xAreaPosition / Tileable.WIDTH);
 		if (this.isLockedWalking)
 			switch (this.getFacing()) {
 				case LEFT:
@@ -147,9 +145,10 @@ public class Player extends Character {
 		return result;
 	}
 
+	@Override
 	public int getYInArea() {
 		// Returns area position Y.
-		int result = (this.yPosition / Tileable.HEIGHT);
+		int result = (this.yAreaPosition / Tileable.HEIGHT);
 		if (this.isLockedWalking)
 			switch (this.getFacing()) {
 				case UP:
@@ -402,8 +401,9 @@ public class Player extends Character {
 	 *         this tile. Returns false to allow player to walk from the player's last position to this
 	 *         tile.
 	 */
-	public boolean checkSurroundingData(Area area, int xOffset, int yOffset) {
+	private boolean checkSurroundingData(Area area, int xOffset, int yOffset) {
 		PixelData data = null;
+		Entity entity = null;
 		int playerAreaX = this.getXInArea();
 		int playerAreaY = this.getYInArea();
 		try {
@@ -411,10 +411,16 @@ public class Player extends Character {
 		}
 		catch (Exception e) {
 			// This means it is out of the area boundaries.
-			data = null;
-		}
-		if (data == null)
 			return true;
+		}
+
+		try {
+			entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
+		}
+		catch (Exception e) {
+			entity = null;
+		}
+
 		int color = data.getColor();
 		int alpha = (color >> 24) & 0xFF;
 		int red = (color >> 16) & 0xFF;
@@ -499,7 +505,7 @@ public class Player extends Character {
 							return true;
 						if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset) && Game.keys.isPrimaryPressed()) {
 							Game.keys.primaryReceived();
-							Entity entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
+							entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
 							this.startInteraction(entity);
 						}
 						return true;
@@ -527,7 +533,7 @@ public class Player extends Character {
 					return true;
 				if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset) && Game.keys.isPrimaryPressed()) {
 					Game.keys.primaryReceived();
-					Entity entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
+					entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
 					this.startInteraction(entity);
 				}
 				return true; // Cannot go through items on the ground.
@@ -540,10 +546,14 @@ public class Player extends Character {
 					return true;
 				if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset) && Game.keys.isPrimaryPressed()) {
 					Game.keys.primaryReceived();
-					Entity entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
+					entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
 					this.startInteraction(entity);
 				}
-				return true; // Cannot walk through characters.
+				// Since characters can move, we need to check for the entity's current and old positions.
+				if (entity != null && ((playerAreaX + xOffset == entity.getOldX() && playerAreaY + yOffset == entity.getOldY()) || (playerAreaX + xOffset == entity.getX() && playerAreaY + yOffset == entity.getY()))) {
+					return true; // Cannot walk through characters.
+				}
+				return false;
 			default: // Any other type of tiles should be walkable, for no apparent reasons.
 				return false;
 		}
@@ -641,31 +651,6 @@ public class Player extends Character {
 	}
 
 	/**
-	 * Sets where each of the four directions are blocked by obstacles in front of the player. The
-	 * obstacles are in front of the player, when the player is facing towards them. That is the time to
-	 * check and see if the obstacle is blocking the player or not.
-	 *
-	 * @param up
-	 *            If an obstacle is in front of the player when the player is facing towards NORTH, or
-	 *            UP, then up is true. False, otherwise.
-	 * @param down
-	 *            If an obstacle is below of the player when the player is facing towards SOUTH, or
-	 *            DOWN, then down is true. False, otherwise.
-	 * @param left
-	 *            If an obstacle is to the left of the player when the player is facing towards WEST, or
-	 *            LEFT, then left is true. False, otherwise.
-	 * @param right
-	 *            If an obstacle is to the right of the player when the player is facing towards EAST,
-	 *            or RIGHT, then right is true. False, otherwise.
-	 */
-	public void setAllBlockingDirections(final boolean up, final boolean down, final boolean left, final boolean right) {
-		this.isFacingBlocked[Character.UP] = up;
-		this.isFacingBlocked[Character.DOWN] = down;
-		this.isFacingBlocked[Character.LEFT] = left;
-		this.isFacingBlocked[Character.RIGHT] = right;
-	}
-
-	/**
 	 * Sets the player's current area position to the corresponding X and Y coordinates given.
 	 *
 	 * <p>
@@ -692,7 +677,7 @@ public class Player extends Character {
 	 * @return Nothing.
 	 */
 	public void setAreaX(final int x) {
-		this.xPosition = x * Tileable.WIDTH;
+		this.xAreaPosition = x * Tileable.WIDTH;
 	}
 
 	/**
@@ -703,7 +688,7 @@ public class Player extends Character {
 	 * @return Nothing.
 	 */
 	public void setAreaY(final int y) {
-		this.yPosition = y * Tileable.HEIGHT;
+		this.yAreaPosition = y * Tileable.HEIGHT;
 	}
 
 	/**
@@ -976,10 +961,10 @@ public class Player extends Character {
 		else {
 			// Before we walk, check to see if the oldX and oldY are up-to-date with the
 			// latest X and Y.
-			if (this.oldXPosition != this.xPosition)
-				this.oldXPosition = this.xPosition;
-			if (this.oldYPosition != this.yPosition)
-				this.oldYPosition = this.yPosition;
+			if (this.oldXAreaPosition != this.xAreaPosition)
+				this.oldXAreaPosition = this.xAreaPosition;
+			if (this.oldYAreaPosition != this.yAreaPosition)
+				this.oldYAreaPosition = this.yAreaPosition;
 
 			// Reset the acceleration values, since we're not really walking.
 			this.xAccel = 0;
@@ -1019,8 +1004,8 @@ public class Player extends Character {
 			if (this.yAccel < -1)
 				this.yAccel = -1;
 
-			this.xPosition += this.xAccel * 2;
-			this.yPosition += this.yAccel * 2;
+			this.xAreaPosition += this.xAccel * 2;
+			this.yAreaPosition += this.yAccel * 2;
 
 			// Jumping stuffs go here.
 			if (!this.jumpHeightSignedFlag)
@@ -1033,7 +1018,7 @@ public class Player extends Character {
 			// Needs to get out of being locked to walking/jumping.
 			// Note that we cannot compare using ||, what if the player is moving in one
 			// direction? What about the other axis?
-			if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
+			if ((this.xAreaPosition % Tileable.WIDTH == 0 && this.yAreaPosition % Tileable.HEIGHT == 0)) {
 				// Resets every flag that locks the player.
 				this.isLockedWalking = false;
 				this.isLockedJumping = false;
@@ -1187,13 +1172,13 @@ public class Player extends Character {
 		if (this.yAccel < -1)
 			this.yAccel = -1;
 		if (!this.isOnBicycle && !Player.isMovementsLocked()) {
-			this.xPosition += this.xAccel * 2;
-			this.yPosition += this.yAccel * 2;
+			this.xAreaPosition += this.xAccel * 2;
+			this.yAreaPosition += this.yAccel * 2;
 		}
 		// Needs to get out of being locked to walking/jumping.
 		// Note that we cannot compare using ||, what if the player is moving in one
 		// direction? What about the other axis?
-		if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
+		if ((this.xAreaPosition % Tileable.WIDTH == 0 && this.yAreaPosition % Tileable.HEIGHT == 0)) {
 			// Resets every flag that locks the player.
 			this.isLockedWalking = false;
 		}
@@ -1214,13 +1199,13 @@ public class Player extends Character {
 		if (this.yAccel < -1)
 			this.yAccel = -1;
 		if (!this.isOnBicycle && !Player.isMovementsLocked()) {
-			this.xPosition += this.xAccel * 4;
-			this.yPosition += this.yAccel * 4;
+			this.xAreaPosition += this.xAccel * 4;
+			this.yAreaPosition += this.yAccel * 4;
 		}
 		// Needs to get out of being locked to walking/jumping.
 		// Note that we cannot compare using ||, what if the player is moving in one
 		// direction? What about the other axis?
-		if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
+		if ((this.xAreaPosition % Tileable.WIDTH == 0 && this.yAreaPosition % Tileable.HEIGHT == 0)) {
 			// Resets every flag that locks the player.
 			this.isLockedWalking = false;
 		}
@@ -1241,13 +1226,13 @@ public class Player extends Character {
 		if (this.yAccel < -1)
 			this.yAccel = -1;
 		if (this.isOnBicycle && !Player.isMovementsLocked()) {
-			this.xPosition += this.xAccel * 8;
-			this.yPosition += this.yAccel * 8;
+			this.xAreaPosition += this.xAccel * 8;
+			this.yAreaPosition += this.yAccel * 8;
 		}
 		// Needs to get out of being locked to walking/jumping.
 		// Note that we cannot compare using ||, what if the player is moving in one
 		// direction? What about the other axis?
-		if ((this.xPosition % Tileable.WIDTH == 0 && this.yPosition % Tileable.HEIGHT == 0)) {
+		if ((this.xAreaPosition % Tileable.WIDTH == 0 && this.yAreaPosition % Tileable.HEIGHT == 0)) {
 			// Resets every flag that locks the player.
 			this.isLockedWalking = false;
 		}
