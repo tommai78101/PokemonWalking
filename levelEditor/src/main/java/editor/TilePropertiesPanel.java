@@ -38,7 +38,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public CustomJTextField blueInputField;
 
 	public int dataValue;
-	public Data selectData;
+	public SpriteData selectData;
 	public ControlPanel panel;
 
 	public JLabel areaID, tileID, extendedTileID, tileSpecificID, fullDataInput;
@@ -241,7 +241,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	 *
 	 * @param selectedData
 	 */
-	public void setDataProperties(Data selectedData) {
+	public void setDataProperties(SpriteData selectedData) {
 		this.areaIDInputField.setText(Integer.toString(this.panel.getEditor().getUniqueAreaID()));
 		this.alphaInputField.setText(Integer.toString(selectedData.alpha));
 		this.redInputField.setText(Integer.toString(selectedData.red));
@@ -268,7 +268,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
 
 			if (this.selectData != null && this.selectData.name.equals("Select")) {
-				Data editedData = EditorConstants.getData(this.dataValue);
+				SpriteData editedData = EditorConstants.getData(this.dataValue);
 				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
 			}
 		}
@@ -295,7 +295,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
 
 			if (this.selectData != null && this.selectData.name.equals("Select")) {
-				Data editedData = EditorConstants.getData(this.dataValue);
+				SpriteData editedData = EditorConstants.getData(this.dataValue);
 				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
 			}
 		}
@@ -322,7 +322,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
 
 			if (this.selectData != null && this.selectData.name.equals("Select")) {
-				Data editedData = EditorConstants.getData(this.dataValue);
+				SpriteData editedData = EditorConstants.getData(this.dataValue);
 				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
 			}
 		}

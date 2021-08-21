@@ -30,7 +30,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 	@SuppressWarnings("unused")
 	private String iconName; // Used to display name in the status panel of Level Editor
 	private LevelEditor editor; // reference to parent
-	private Data selectedData; // reference to selected data.
+	private SpriteData selectedData; // reference to selected data.
 	private Trigger selectedTrigger; // reference to selected trigger.
 	private JPanel iconsPanel; // The small square icon buttons on the right of the Level Editor
 	private JPanel npcsPanel; // Same small square icon buttons panel, but for NPCs.
@@ -39,7 +39,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 
 	public ControlPanel(LevelEditor editor) {
 		this.editor = editor;
-		this.selectedData = new Data();
+		this.selectedData = new SpriteData();
 		this.selectedData.editorID = 0;
 		this.selectedData.filepath = "no_png.png";
 
@@ -51,8 +51,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 		// For Tilesets
 		this.iconsPanel = new JPanel();
 		this.iconsPanel.setLayout(new BoxLayout(this.iconsPanel, BoxLayout.Y_AXIS));
-		for (Map.Entry<Integer, Data> entry : constants.getDatas()) {
-			Data d = entry.getValue();
+		for (Map.Entry<Integer, SpriteData> entry : constants.getDatas()) {
+			SpriteData d = entry.getValue();
 			if (d.name.equals("Select"))
 				continue;
 			d.button.setActionCommand(Integer.toString(d.editorID));
@@ -63,8 +63,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 		// For NPCs
 		this.npcsPanel = new JPanel();
 		this.npcsPanel.setLayout(new BoxLayout(this.npcsPanel, BoxLayout.Y_AXIS));
-		for (Map.Entry<Integer, Data> entry : constants.getNpcs()) {
-			Data d = entry.getValue();
+		for (Map.Entry<Integer, SpriteData> entry : constants.getNpcs()) {
+			SpriteData d = entry.getValue();
 			d.button.setActionCommand(Integer.toString(d.editorID));
 			d.button.addActionListener(this);
 			this.npcsPanel.add(d.button);
@@ -152,8 +152,8 @@ public class ControlPanel extends JPanel implements ActionListener {
 			case NonPlayableCharacters: {
 				JButton button = (JButton) event.getSource();
 				int id = Integer.parseInt(button.getActionCommand());
-				Map.Entry<Integer, Data> entry = EditorConstants.getInstance().getDatas().get(id);
-				Data d = entry.getValue();
+				Map.Entry<Integer, SpriteData> entry = EditorConstants.getInstance().getDatas().get(id);
+				SpriteData d = entry.getValue();
 				if (d != null) {
 					button.setToolTipText(d.name);
 					this.selectedData = d;
@@ -188,7 +188,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 		return "";
 	}
 
-	public Data getSelectedData() {
+	public SpriteData getSelectedData() {
 		switch (EditorConstants.chooser) {
 			case ControlPanel:
 				return this.selectedData;
@@ -198,7 +198,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 		return null;
 	}
 
-	public void setSelectedData(Data data) {
+	public void setSelectedData(SpriteData data) {
 		this.selectedData = data;
 	}
 

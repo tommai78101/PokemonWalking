@@ -6,7 +6,7 @@ import java.util.List;
 public class Category {
 	public int id;
 	public String name;
-	public List<Data> nodes;
+	public List<SpriteData> nodes;
 	public List<Trigger> triggers;
 
 	public Category() {
@@ -21,12 +21,12 @@ public class Category {
 		this.id = id;
 	}
 
-	public int setIdByData(Data data) {
+	public int setIdByData(SpriteData data) {
 		this.id = data.alpha;
 		return this.id;
 	}
 
-	public void add(Data data) {
+	public void add(SpriteData data) {
 		this.nodes.add(data);
 	}
 
@@ -34,7 +34,7 @@ public class Category {
 		this.triggers.add(trigger);
 	}
 
-	public boolean matchesData(Data data) {
+	public boolean matchesData(SpriteData data) {
 		return this.id == data.alpha;
 	}
 }

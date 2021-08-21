@@ -36,8 +36,8 @@ public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for
 	// the area.
 	private final List<Category> categories = new ArrayList<>();
-	private final List<Map.Entry<Integer, Data>> datas = new ArrayList<>();
-	private final List<Map.Entry<Integer, Data>> npcs = new ArrayList<>();
+	private final List<Map.Entry<Integer, SpriteData>> datas = new ArrayList<>();
+	private final List<Map.Entry<Integer, SpriteData>> npcs = new ArrayList<>();
 	private final List<Trigger> triggers = new ArrayList<>();
 
 	private static final EditorConstants instance = new EditorConstants();
@@ -95,8 +95,8 @@ public class EditorConstants {
 			int categoryID = 0;
 			int editorID = 0;
 			Category categoryTemp = null;
-			List<Data> dataTemp = new ArrayList<>();
-			List<Data> npcDataTemp = new ArrayList<>();
+			List<SpriteData> dataTemp = new ArrayList<>();
+			List<SpriteData> npcDataTemp = new ArrayList<>();
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#"))
 					continue;
@@ -111,7 +111,7 @@ public class EditorConstants {
 					categoryTemp = new Category(tokens[1], categoryID);
 				}
 				else if (line.startsWith("%")) {
-					Data data = new Data();
+					SpriteData data = new SpriteData();
 					// In the art/editor/data.txt, we use the last bit of data, the area type inclusion flag '*', to
 					// filter and specify which area type the tileset belongs in.
 
@@ -311,11 +311,11 @@ public class EditorConstants {
 		return this.categories;
 	}
 
-	public List<Map.Entry<Integer, Data>> getDatas() {
+	public List<Map.Entry<Integer, SpriteData>> getDatas() {
 		return this.datas;
 	}
 
-	public List<Map.Entry<Integer, Data>> getNpcs() {
+	public List<Map.Entry<Integer, SpriteData>> getNpcs() {
 		return this.npcs;
 	}
 
@@ -323,9 +323,9 @@ public class EditorConstants {
 		return this.triggers;
 	}
 
-	public static Data getData(int alpha, int red, int green, int blue) {
-		List<Map.Entry<Integer, Data>> dataList = EditorConstants.getInstance().datas.stream().filter(entry -> {
-			Data d = entry.getValue();
+	public static SpriteData getData(int alpha, int red, int green, int blue) {
+		List<Map.Entry<Integer, SpriteData>> dataList = EditorConstants.getInstance().datas.stream().filter(entry -> {
+			SpriteData d = entry.getValue();
 			if (d.areaTypeIncluded) {
 				// Area type ID is value used in the data value. We want to exclude this when doing comparison
 				// checks. Data integrity checks is done here.
@@ -352,7 +352,7 @@ public class EditorConstants {
 		return dataList.get(0).getValue();
 	}
 
-	public static Data getData(int colorValue) {
+	public static SpriteData getData(int colorValue) {
 		int alpha = (colorValue & 0xFF000000) >> 24;
 		int red = (colorValue & 0xFF0000) >> 16;
 		int green = (colorValue & 0xFF00) >> 8;

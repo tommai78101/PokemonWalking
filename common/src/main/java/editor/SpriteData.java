@@ -13,7 +13,7 @@ import javax.swing.JButton;
 
 import enums.DataType;
 
-public class Data {
+public class SpriteData {
 	public String name;
 	public String filepath;
 	public int editorID;
@@ -28,7 +28,7 @@ public class Data {
 	public boolean greenByEditor;
 	public boolean blueByEditor;
 
-	public Data() {
+	public SpriteData() {
 		this.name = this.filepath = "";
 		this.alpha = this.red = this.green = this.blue = this.editorID = 0;
 		this.image = null;
@@ -37,7 +37,7 @@ public class Data {
 		this.areaTypeIncluded = this.alphaByEditor = this.redByEditor = this.greenByEditor = this.blueByEditor = false;
 	}
 
-	public boolean compare(Data d) {
+	public boolean compare(SpriteData d) {
 		int dataValue1 = (this.alpha << 24) | (this.red << 16) | (this.green << 8) | this.blue;
 		int dataValue2 = (d.alpha << 24) | (d.red << 16) | (d.green << 8) | d.blue;
 		if (dataValue1 == dataValue2)

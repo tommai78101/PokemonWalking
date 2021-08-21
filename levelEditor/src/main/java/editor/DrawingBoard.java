@@ -217,7 +217,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			bs = this.getBufferStrategy();
 		}
 		this.hoverOver();
-		final List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
+		final List<Map.Entry<Integer, SpriteData>> list = EditorConstants.getInstance().getDatas();
 		switch (EditorConstants.metadata) {
 			case Tilesets: {
 				if (this.tilesEditorID != null) {
@@ -225,8 +225,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int w = j % this.bitmapWidth;
 						int h = j / this.bitmapWidth;
 
-						Map.Entry<Integer, Data> entry = list.get(this.tilesEditorID[j]);
-						Data data = entry.getValue();
+						Map.Entry<Integer, SpriteData> entry = list.get(this.tilesEditorID[j]);
+						SpriteData data = entry.getValue();
 						if (data == null) {
 							break;
 						}
@@ -286,9 +286,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 				// Iterate through a bitmap array of triggers.
 				for (int currentTriggerIndex = 0; currentTriggerIndex < this.tiles.length; currentTriggerIndex++) {
-					Data data = null;
+					SpriteData data = null;
 					try {
-						Map.Entry<Integer, Data> entry = list.get(this.tilesEditorID[currentTriggerIndex]);
+						Map.Entry<Integer, SpriteData> entry = list.get(this.tilesEditorID[currentTriggerIndex]);
 						data = entry.getValue();
 					}
 					catch (Exception e) {
@@ -356,8 +356,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int h = j / this.bitmapWidth;
 
 						// Drawing Tileset first
-						Map.Entry<Integer, Data> entry = list.get(this.tilesEditorID[j]);
-						Data data = entry.getValue();
+						Map.Entry<Integer, SpriteData> entry = list.get(this.tilesEditorID[j]);
+						SpriteData data = entry.getValue();
 						if (data == null) {
 							break;
 						}
@@ -381,7 +381,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						EditorData npc = this.npcs.get(w, h);
 						if (npc != null) {
 							entry = list.get(npc.getEditorData());
-							Data npcData = entry.getValue();
+							SpriteData npcData = entry.getValue();
 							if (npcData != null) {
 								gB.drawImage(npcData.image.getImage(), 0, 0, null);
 							}
@@ -455,13 +455,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
 
-					Data selectedData = this.editor.controlPanel.getSelectedData();
+					SpriteData selectedData = this.editor.controlPanel.getSelectedData();
 					if (selectedData != null) {
 						if (selectedData.name.equals("Select")) {
 							this.editor.controlPanel.setSelectedData(selectedData);
 
 							// NOTE(Thompson): Do not set the control panel's selected data to the picked data.
-							Data tilePickerData = this.getSelectedDataProperties();
+							SpriteData tilePickerData = this.getSelectedDataProperties();
 
 							// Overwrite the Mouse Select data with the new data from the DrawingBoard.
 							this.editor.controlPanel.getPropertiesPanel().setDataProperties(tilePickerData);
@@ -508,7 +508,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
 						return;
 
-					Data selectedData = this.editor.controlPanel.getSelectedData();
+					SpriteData selectedData = this.editor.controlPanel.getSelectedData();
 					if (selectedData != null) {
 						this.setDataProperties(selectedData);
 					}
@@ -531,17 +531,17 @@ public class DrawingBoard extends Canvas implements Runnable {
 	 *
 	 * @param selectedData
 	 */
-	public void setDataProperties(Data selectedData) {
+	public void setDataProperties(SpriteData selectedData) {
 		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
 		panel.areaIDInputField.setText(Integer.toString(this.editor.getUniqueAreaID()));
 
 		int tileIndex = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
 
 		// Search for the data from the actual collection of game data we have loaded in.
-		Data data = null;
+		SpriteData data = null;
 		int tempColorValue = selectedData.getColorValue();
-		List<Map.Entry<Integer, Data>> dataList = EditorConstants.getInstance().getDatas();
-		for (Map.Entry<Integer, Data> entry : dataList) {
+		List<Map.Entry<Integer, SpriteData>> dataList = EditorConstants.getInstance().getDatas();
+		for (Map.Entry<Integer, SpriteData> entry : dataList) {
 			if (tempColorValue == entry.getKey()) {
 				data = entry.getValue();
 				break;
@@ -645,8 +645,8 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
-	public Data getSelectedDataProperties() {
-		Data data = new Data();
+	public SpriteData getSelectedDataProperties() {
+		SpriteData data = new SpriteData();
 
 		int tileIndex = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
 		data.setColorValue(this.tiles[tileIndex]);
@@ -853,12 +853,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 			pixelIterator += tileSize;
 
 			// Step 8 - Get and fill in the data based on the tiles obtained from above.
-			List<Map.Entry<Integer, Data>> list = EditorConstants.getInstance().getDatas();
+			List<Map.Entry<Integer, SpriteData>> list = EditorConstants.getInstance().getDatas();
 			for (int i = 0; i < this.tiles.length; i++) {
 				int alpha = ((this.tiles[i] >> 24) & 0xFF);
 				FOR_LOOP:
 				for (int j = 0; j < list.size(); j++) {
-					Data d = list.get(j).getValue();
+					SpriteData d = list.get(j).getValue();
 					if (alpha != Integer.valueOf(d.alpha))
 						continue;
 					switch (alpha) {
@@ -978,11 +978,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
-	private void defaultTileProperties(Data d) {
+	private void defaultTileProperties(SpriteData d) {
 		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
 		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-		Data temp = null;
-		for (Map.Entry<Integer, Data> entry : EditorConstants.getInstance().getDatas()) {
+		SpriteData temp = null;
+		for (Map.Entry<Integer, SpriteData> entry : EditorConstants.getInstance().getDatas()) {
 			if (panel.dataValue == entry.getKey()) {
 				temp = entry.getValue();
 				break;
@@ -998,7 +998,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
-	private void manualInputTileProperties(Data d) {
+	private void manualInputTileProperties(SpriteData d) {
 		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
 		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
 		this.tiles[i] = panel.dataValue;
