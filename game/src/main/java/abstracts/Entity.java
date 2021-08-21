@@ -37,8 +37,14 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	protected boolean interactingState;
 
 	protected byte typeId = 0;
-	protected int xPosition;
-	protected int yPosition;
+	protected int xAreaPosition;
+	protected int yAreaPosition;
+	protected int oldXAreaPosition;
+	protected int oldYAreaPosition;
+	protected int xPixelPosition;
+	protected int yPixelPosition;
+	protected int predictedXAreaPosition;
+	protected int predictedYAreaPosition;
 
 	protected int xOffset;
 	protected int yOffset;
@@ -52,6 +58,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	protected Event event;
 
 	// Dialogues
+	protected boolean isDialogueReset = false;
 	protected int defaultDialogueIterator = 0;
 	protected int overrideDialogueIterator = 0;
 	protected Dialogue currentDefaultDialogue = null;
@@ -62,16 +69,34 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	// public abstract void initialize(BaseWorld world);
 
 	public int getX() {
-		return this.xPosition;
+		return this.xAreaPosition;
 	}
 
 	public int getY() {
-		return this.yPosition;
+		return this.yAreaPosition;
+	}
+
+	public int getOldX() {
+		return this.oldXAreaPosition;
+	}
+
+	public int getOldY() {
+		return this.oldYAreaPosition;
+	}
+
+	public int getPredictedX() {
+		return this.predictedXAreaPosition;
+	}
+
+	public int getPredictedY() {
+		return this.predictedYAreaPosition;
 	}
 
 	protected void setPosition(int x, int y) {
-		this.xPosition = x;
-		this.yPosition = y;
+		this.xAreaPosition = x;
+		this.yAreaPosition = y;
+		this.xPixelPosition = x * Tileable.WIDTH;
+		this.yPixelPosition = y * Tileable.HEIGHT;
 	}
 
 	public byte[] getByteName() {
@@ -139,10 +164,12 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	public void setInteractingState(boolean value) {
 		this.interactingState = value;
 		if (value) {
+			this.isDialogueReset = false;
 			if (!Player.isMovementsLocked())
 				Player.lockMovements();
 		}
 		else {
+			this.endDialogue();
 			if (Player.isMovementsLocked())
 				Player.unlockMovements();
 		}
@@ -199,6 +226,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 					dialogue.resetDialogue();
 				}
 			);
+			this.isDialogueReset = true;
 			return;
 		}
 		this.overrideDialogueIterator = 0;
@@ -207,6 +235,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 				dialogue.resetDialogue();
 			}
 		);
+		this.isDialogueReset = true;
 	}
 
 	/**
@@ -250,6 +279,32 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 				this.endDialogue();
 			}
 		}
+	}
+
+	public int getXInArea() {
+		// Returns area position X.
+		int result = (this.xAreaPosition / Tileable.WIDTH);
+		switch (this.getFacing()) {
+			case Character.LEFT:
+				break;
+			case Character.RIGHT:
+				result += 1;
+				break;
+		}
+		return result;
+	}
+
+	public int getYInArea() {
+		// Returns area position Y.
+		int result = (this.yAreaPosition / Tileable.HEIGHT);
+		switch (this.getFacing()) {
+			case Character.UP:
+				break;
+			case Character.DOWN:
+				result += 1;
+				break;
+		}
+		return result;
 	}
 
 	// ==============================================================
