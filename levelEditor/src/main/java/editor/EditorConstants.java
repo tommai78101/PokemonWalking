@@ -48,6 +48,9 @@ public class EditorConstants {
 	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
 
+	private boolean hasLoadedTilesetData = false;
+	private boolean hasLoadedTriggers = false;
+
 	public enum Tools {
 		ControlPanel,
 		Properties
@@ -84,12 +87,17 @@ public class EditorConstants {
 	}
 
 	private void loadTilesetData() {
-		try {
+		if (this.hasLoadedTilesetData)
+			return;
+		this.hasLoadedTilesetData = true;
+
+		try (
 			BufferedReader reader = new BufferedReader(
 				new InputStreamReader(
 					EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")
 				)
-			);
+			)
+		) {
 			String line;
 			String[] tokens;
 			int categoryID = 0;
@@ -233,15 +241,16 @@ public class EditorConstants {
 			});
 
 		}
-		catch (
-
-			Exception e
-		) {
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void loadTriggers() {
+		if (this.hasLoadedTriggers)
+			return;
+		this.hasLoadedTriggers = true;
+
 		URL uri = EditorConstants.class.getResource(WorldConstants.ScriptsDefaultPath);
 		try {
 			final File[] directory = new File(uri.toURI()).listFiles();
@@ -264,6 +273,13 @@ public class EditorConstants {
 				)
 			)
 		) {
+			// Check by default if there is an Eraser trigger
+			if (this.triggers.isEmpty()) {
+				Trigger eraser = new Trigger();
+				eraser.setName("Eraser");
+				this.triggers.add(eraser);
+			}
+
 			String line;
 			Trigger trigger = null;
 			String checksum = null;
