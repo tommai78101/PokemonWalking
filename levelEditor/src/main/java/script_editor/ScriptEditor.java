@@ -339,11 +339,11 @@ public class ScriptEditor extends JFrame {
 					writer.write(ScriptTags.BeginScript.getSymbol() + Short.toString(t.getTriggerID()));
 				}
 				writer.newLine();
-				writer.write("@" + t.getName().replace(" ", "_"));
+				writer.write(ScriptTags.ScriptName + t.getName().replace(" ", "_"));
 				writer.newLine();
 				writer.write(t.getScript());
 				writer.newLine();
-				writer.write("%");
+				writer.write(ScriptTags.EndScript.getSymbol());
 				writer.newLine();
 
 				// Double blank lines for separation of triggers.
