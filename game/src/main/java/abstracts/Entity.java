@@ -43,6 +43,8 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	protected int oldYAreaPosition;
 	protected int xPixelPosition;
 	protected int yPixelPosition;
+	protected int predictedXAreaPosition;
+	protected int predictedYAreaPosition;
 
 	protected int xOffset;
 	protected int yOffset;
@@ -56,6 +58,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	protected Event event;
 
 	// Dialogues
+	protected boolean isDialogueReset = false;
 	protected int defaultDialogueIterator = 0;
 	protected int overrideDialogueIterator = 0;
 	protected Dialogue currentDefaultDialogue = null;
@@ -79,6 +82,14 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 
 	public int getOldY() {
 		return this.oldYAreaPosition;
+	}
+
+	public int getPredictedX() {
+		return this.predictedXAreaPosition;
+	}
+
+	public int getPredictedY() {
+		return this.predictedYAreaPosition;
 	}
 
 	protected void setPosition(int x, int y) {
@@ -153,10 +164,12 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	public void setInteractingState(boolean value) {
 		this.interactingState = value;
 		if (value) {
+			this.isDialogueReset = false;
 			if (!Player.isMovementsLocked())
 				Player.lockMovements();
 		}
 		else {
+			this.endDialogue();
 			if (Player.isMovementsLocked())
 				Player.unlockMovements();
 		}
@@ -213,6 +226,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 					dialogue.resetDialogue();
 				}
 			);
+			this.isDialogueReset = true;
 			return;
 		}
 		this.overrideDialogueIterator = 0;
@@ -221,6 +235,7 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 				dialogue.resetDialogue();
 			}
 		);
+		this.isDialogueReset = true;
 	}
 
 	/**

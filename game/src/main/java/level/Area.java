@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import abstracts.Character;
 import abstracts.Entity;
@@ -753,7 +754,12 @@ public class Area implements Tileable, UpdateRenderable {
 	}
 
 	public Entity getEntity(int x, int y) {
-		// Only obstacles and characters are entities.
+		// Characters are movable entities, so it needs a different method of fetching them.
+		Character character = this.findCharacterAt(x, y);
+		if (character != null)
+			return character;
+
+		// Only obstacles and items are immovable entities.
 		PixelData data = this.getPixelData(x, y);
 		if (Entity.isObstacle(data)) {
 			Obstacle obstacle = this.areaObstacles.get(Map.entry(x, y));
@@ -764,15 +770,6 @@ public class Area implements Tileable, UpdateRenderable {
 				throw new NullPointerException("The obstacle shouldn't be null.");
 			}
 		}
-		else if (Entity.isCharacter(data)) {
-			Character character = this.areaCharacters.get(Map.entry(x, y));
-			if (character != null && character.getPixelData().equals(data)) {
-				return character;
-			}
-			else {
-				throw new NullPointerException("The character shouldn't be null.");
-			}
-		}
 		else if (Entity.isItem(data)) {
 			Item item = this.areaItems.get(Map.entry(x, y));
 			if (item != null && item.getPixelData().equals(data)) {
@@ -780,6 +777,25 @@ public class Area implements Tileable, UpdateRenderable {
 			}
 			else {
 				throw new NullPointerException("The item shouldn't be null.");
+			}
+		}
+		return null;
+	}
+
+	public Character findCharacterAt(int x, int y) {
+		List<Character> npcs = this.areaCharacters.entrySet().parallelStream().map(Map.Entry::getValue).collect(Collectors.toList());
+		for (Character c : npcs) {
+			if (c.isLockedWalking()) {
+				int oldX = c.getOldX();
+				int oldY = c.getOldY();
+				int newX = c.getPredictedX();
+				int newY = c.getPredictedY();
+				if ((x == oldX && y == oldY) || (x == newX && y == newY) || (x == newX && y == oldY) || (x == oldX && y == newY)) {
+					return c;
+				}
+			}
+			else if (x == c.getX() && y == c.getY()) {
+				return c;
 			}
 		}
 		return null;

@@ -2,6 +2,7 @@ package abstracts;
 
 import java.awt.Graphics;
 
+import common.Tileable;
 import entity.Joe;
 import entity.Player;
 import enums.GenderType;
@@ -9,10 +10,14 @@ import interfaces.CharacterActionable;
 import interfaces.Interactable;
 import level.Area;
 import level.PixelData;
+import resources.Art;
 import screen.Bitmap;
 import screen.Scene;
 
 public abstract class Character extends Entity implements Interactable, CharacterActionable {
+	// Character debug mode only
+	private final boolean isDebugMode = false;
+
 	// These numbers correspond to the index number of the columns of the character sprite sheet.
 	public static final int DOWN = 0;
 	public static final int LEFT = 1;
@@ -31,6 +36,7 @@ public abstract class Character extends Entity implements Interactable, Characte
 	protected boolean isAutoWalking;
 	protected int autoWalkingTick = 0;
 	protected boolean isLockedWalking;
+	protected boolean isChangingPositions = false;
 	protected final boolean isFacingBlocked[] = new boolean[4];
 	protected int xAccel;
 	protected int yAccel;
@@ -73,6 +79,10 @@ public abstract class Character extends Entity implements Interactable, Characte
 	public void stopAnimation() {
 		this.animationTick = 0;
 		this.animationPointer = 0;
+	}
+
+	public void stopAutoWalking() {
+		this.autoWalkingTick = 0;
 	}
 
 	/**
@@ -135,6 +145,18 @@ public abstract class Character extends Entity implements Interactable, Characte
 		return this.isAutoWalking;
 	}
 
+	public boolean isLockedWalking() {
+		return this.isLockedWalking;
+	}
+
+	public void setLockedWalking(boolean state) {
+		this.isLockedWalking = state;
+	}
+
+	public boolean isDebugMode() {
+		return this.isDebugMode;
+	}
+
 	/**
 	 * Sets where each of the four directions are blocked by obstacles in front of the player. The
 	 * obstacles are in front of the player, when the player is facing towards them. That is the time to
@@ -158,6 +180,17 @@ public abstract class Character extends Entity implements Interactable, Characte
 		this.isFacingBlocked[Character.DOWN] = down;
 		this.isFacingBlocked[Character.LEFT] = left;
 		this.isFacingBlocked[Character.RIGHT] = right;
+	}
+
+	// ----------------------------------------------------------------------
+	// Override methods
+
+	@Override
+	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
+		if (this.isDebugMode) {
+			screen.blit(Art.error, this.oldXAreaPosition * Tileable.WIDTH - offsetX, this.oldYAreaPosition * Tileable.HEIGHT - offsetY);
+			screen.blit(Art.error, this.predictedXAreaPosition * Tileable.WIDTH - offsetX, this.predictedYAreaPosition * Tileable.HEIGHT - offsetY);
+		}
 	}
 
 	// ----------------------------------------------------------------------
@@ -237,6 +270,13 @@ public abstract class Character extends Entity implements Interactable, Characte
 		}
 		catch (Exception e) {
 			// This means it is out of the area boundaries.
+			return true;
+		}
+
+		Player player = area.getPlayer();
+		int x = player.getXInArea();
+		int y = player.getYInArea();
+		if ((x == this.oldXAreaPosition + xOffset && y == this.oldYAreaPosition + yOffset)) {
 			return true;
 		}
 

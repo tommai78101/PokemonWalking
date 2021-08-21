@@ -313,6 +313,7 @@ public class Player extends Character {
 	 *
 	 * @return True, if the player is walking right now. False, otherwise.
 	 */
+	@Override
 	public boolean isLockedWalking() {
 		return this.isLockedWalking;
 	}
@@ -373,6 +374,8 @@ public class Player extends Character {
 				if (entity != null) {
 					this.interact(area, entity);
 				}
+				if (entity == null && this.interactingEntity != null && this.isInteractionEnabled)
+					this.stopInteraction();
 			}
 		}
 		catch (Exception e) {
@@ -414,8 +417,31 @@ public class Player extends Character {
 			return true;
 		}
 
+		// Characters / NPCs - Has a higher priority over tilesets.
 		try {
-			entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
+			if (this.isInteracting())
+				return true;
+			entity = area.findCharacterAt(playerAreaX + xOffset, playerAreaY + yOffset);
+			if (entity != null && entity instanceof Character c) {
+				boolean result = false;
+				if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset) && Game.keys.isPrimaryPressed()) {
+					Game.keys.primaryReceived();
+					if (!c.isLockedWalking())
+						this.startInteraction(entity);
+				}
+
+				// Since characters can move, we need to check for the entity's current and old positions.
+				int oldX = c.getOldX();
+				int oldY = c.getOldY();
+				int preX = c.getPredictedX();
+				int preY = c.getPredictedY();
+				int x = playerAreaX + xOffset;
+				int y = playerAreaY + yOffset;
+				if ((oldX == x && oldY == y) || (oldX == x && preY == y) || (preX == x && oldY == y) || (preX == x && preY == y)) {
+					result = true;
+				}
+				return result;
+			}
 		}
 		catch (Exception e) {
 			entity = null;
@@ -541,19 +567,6 @@ public class Player extends Character {
 			case 0x0C: // Carpet (Outdoors)
 			case 0x0D: // Triggers
 				return false;
-			case 0x0E: // Characters / NPCs
-				if (this.isInteracting())
-					return true;
-				if (this.isFacingAt(playerAreaX + xOffset, playerAreaY + yOffset) && Game.keys.isPrimaryPressed()) {
-					Game.keys.primaryReceived();
-					entity = area.getEntity(playerAreaX + xOffset, playerAreaY + yOffset);
-					this.startInteraction(entity);
-				}
-				// Since characters can move, we need to check for the entity's current and old positions.
-				if (entity != null && ((playerAreaX + xOffset == entity.getOldX() && playerAreaY + yOffset == entity.getOldY()) || (playerAreaX + xOffset == entity.getX() && playerAreaY + yOffset == entity.getY()))) {
-					return true; // Cannot walk through characters.
-				}
-				return false;
 			default: // Any other type of tiles should be walkable, for no apparent reasons.
 				return false;
 		}
@@ -643,9 +656,9 @@ public class Player extends Character {
 					output.npcBlit(Art.player[this.getFacing()][0], this.xOffset + x, this.yOffset + y);
 			}
 			// Interacting with another entity.
-			if (this.isInteractionEnabled) {
+			if (this.isInteractionEnabled && this.interactingEntity != null) {
 				// Dialogues can be rendered at this point here.
-				this.interactingEntity.render(output, graphics, this.xOffset + x, this.yOffset + y);
+				this.interactingEntity.render(output, graphics, this.xOffset, this.yOffset);
 			}
 		}
 	}
@@ -796,7 +809,11 @@ public class Player extends Character {
 		this.isInteractionEnabled = true;
 		this.interactingEntity = entity;
 		this.interactingEntity.setInteractingState(true);
-		if (this.interactingEntity instanceof Character) {
+		if (this.interactingEntity instanceof Character c) {
+			// Need to pause the character from walking.
+			c.setLockedWalking(false);
+			c.stopAutoWalking();
+
 			// Need to set the character entity facing towards the Player.
 			int facingTowardsPlayer = -1;
 			switch (this.getFacing()) {
@@ -813,7 +830,7 @@ public class Player extends Character {
 					facingTowardsPlayer = Character.LEFT;
 					break;
 			}
-			this.interactingEntity.setFacing(facingTowardsPlayer);
+			c.setFacing(facingTowardsPlayer);
 		}
 	}
 

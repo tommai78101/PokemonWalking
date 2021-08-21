@@ -84,6 +84,11 @@ public class Joe extends Character {
 				this.oldYAreaPosition = this.yAreaPosition;
 
 		}
+		else if (this.isChangingPositions) {
+			this.isChangingPositions = false;
+			this.predictedXAreaPosition = this.xAreaPosition + this.xAccel;
+			this.predictedYAreaPosition = this.yAreaPosition + this.yAccel;
+		}
 	}
 
 	@Override
@@ -117,7 +122,7 @@ public class Joe extends Character {
 			return;
 		}
 		if (this.autoWalkingTick <= 0) {
-			if (this.isLockedWalking)
+			if (this.isLockedWalking || this.isInteracting())
 				return;
 			this.autoWalkingTick = Randomness.randInt() & 0xF;
 			this.setFacing(Randomness.randDirection());
@@ -134,6 +139,8 @@ public class Joe extends Character {
 	private void checkWalkingSpeed() {
 		this.xAccel = this.yAccel = 0;
 		if (this.isLockedWalking) {
+			if (!this.isChangingPositions)
+				this.isChangingPositions = true;
 			int facing = this.getFacing();
 			if (facing == Character.UP && !this.isFacingBlocked[Character.UP]) {
 				this.yAccel--;
