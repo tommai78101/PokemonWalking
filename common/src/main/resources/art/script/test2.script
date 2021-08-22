@@ -1,8 +1,10 @@
+f133b47816b56e3c
+!2
+@NPC_test_script
 &eb7280781bb89cfb
-$2
-@TurningAround_Event
-/ Turn around after seeing things.
-#What else can I do?
+/ This is an NPC test
+
+#Hello World 2.
 %
 
 

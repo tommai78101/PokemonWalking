@@ -92,19 +92,25 @@ public class Area implements Tileable, UpdateRenderable {
 		// Step 3 - Get any triggers and put them into a triggers list.
 		// If the trigger size is larger than 1 (meaning there are triggers other than Eraser), we parse the
 		// trigger data.
-		if (triggerSize > 1) {
+		if (triggerSize > 0) {
+			// Ignoring Eraser trigger.
+			pixelIterator++;
+			pixelIterator++;
+
 			for (int i = 0; i < triggerSize; i++) {
 				// The "color" is the ID.
 				// ID must not be negative. ID = 0 is reserved.
 				int color = tempPixels[pixelIterator++];
+				int npcInfo = tempPixels[pixelIterator++];
 				if (color > 0) {
 					int xPosition = (color >> 24) & 0xFF;
 					int yPosition = (color >> 16) & 0xFF;
-					this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color));
+					this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color, npcInfo));
 				}
 			}
 		}
 		else {
+			pixelIterator++;
 			pixelIterator++;
 		}
 
@@ -449,7 +455,7 @@ public class Area implements Tileable, UpdateRenderable {
 		// Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach(
 			(k, obstacle) -> {
-				obstacle.renderDialogue(screen, graphics);
+				obstacle.dialogueRender(screen);
 			}
 		);
 
@@ -725,12 +731,20 @@ public class Area implements Tileable, UpdateRenderable {
 		return this.areaData;
 	}
 
-	public boolean isDisplayingExitArrow() {
-		return this.isExitArrowDisplayed;
+	public Map<Map.Entry<Integer, Integer>, Character> getCharactersMap() {
+		return this.areaCharacters;
 	}
 
-	public Map<Map.Entry<Integer, Integer>, Obstacle> getObstaclesList() {
+	public Map<Map.Entry<Integer, Integer>, Obstacle> getObstaclesMap() {
 		return this.areaObstacles;
+	}
+
+	public Map<Map.Entry<Integer, Integer>, TriggerData> getTriggerDatasMap() {
+		return this.triggerDatas;
+	}
+
+	public boolean isDisplayingExitArrow() {
+		return this.isExitArrowDisplayed;
 	}
 
 	public Player getPlayer() {

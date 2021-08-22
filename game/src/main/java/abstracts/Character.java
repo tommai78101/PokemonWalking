@@ -15,6 +15,8 @@ import level.PixelData;
 import resources.Art;
 import screen.Bitmap;
 import screen.Scene;
+import script.Script;
+import script.TriggerData;
 
 public abstract class Character extends Entity implements Interactable, CharacterActionable {
 	// Character debug mode only
@@ -35,9 +37,9 @@ public abstract class Character extends Entity implements Interactable, Characte
 	public static final int AUTO_WALK_VERY_SLOW = 0xFF;
 
 	private boolean isPlayable;
+	@Deprecated
 	private int interactionDataColorID = 0;
 	private GenderType gender = GenderType.Nondetermined;
-	private Area area;
 
 	// General character animations.
 	protected byte animationTick = 0;
@@ -139,10 +141,12 @@ public abstract class Character extends Entity implements Interactable, Characte
 		return this.animationDefaultFacing;
 	}
 
+	@Override
 	public void setArea(Area area) {
 		this.area = area;
 	}
 
+	@Override
 	public Area getArea() {
 		return this.area;
 	}
@@ -165,6 +169,10 @@ public abstract class Character extends Entity implements Interactable, Characte
 
 	public boolean isDebugMode() {
 		return this.isDebugMode;
+	}
+
+	public int getTriggerID() {
+		return this.pixelData.getRed();
 	}
 
 	/**
@@ -192,6 +200,27 @@ public abstract class Character extends Entity implements Interactable, Characte
 		this.isFacingBlocked[Character.RIGHT] = right;
 	}
 
+	/**
+	 * Sets up the area scripts into the Character object.
+	 */
+	public void loadAllScripts() {
+		if (this.area == null) {
+			Debug.error("Unable to prepare and load Character scripts.");
+			return;
+		}
+		var triggersMap = this.area.getTriggerDatasMap();
+		for (var entry : triggersMap.entrySet()) {
+			TriggerData data = triggersMap.get(entry);
+			if (data.getNpcTriggerID() == this.getTriggerID()) {
+				for (Script s : data.getScripts()) {
+					if (s.getNpcTriggerID() == this.getTriggerID()) {
+						this.addScript(s);
+					}
+				}
+			}
+		}
+	}
+
 	// ----------------------------------------------------------------------
 	// Abstract methods
 
@@ -216,7 +245,6 @@ public abstract class Character extends Entity implements Interactable, Characte
 			screen.blit(Art.error, this.predictedXAreaPosition * Tileable.WIDTH - offsetX, this.predictedYAreaPosition * Tileable.HEIGHT - offsetY);
 		}
 		this.characterRender(screen, Art.joe, graphics, offsetX, offsetY);
-		this.renderDialogue(screen, graphics);
 	}
 
 	@Override
@@ -490,6 +518,7 @@ public abstract class Character extends Entity implements Interactable, Characte
 				result.setOriginPosition(x, y);
 				result.setPixelData(pixelData);
 				result.setArea(area);
+				result.loadAllScripts();
 				break;
 			}
 			default:

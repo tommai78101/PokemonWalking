@@ -5,23 +5,13 @@ import java.awt.Graphics;
 import abstracts.Entity;
 import abstracts.Obstacle;
 import common.Debug;
-import dialogue.Dialogue.DialogueType;
 import level.Area;
 import level.PixelData;
 import screen.Scene;
-import utility.DialogueBuilder;
 
 public class SmallDeadTree extends Obstacle {
 	public SmallDeadTree(PixelData data, int id) {
 		this.pixelData = data;
-
-		// Another easter egg.
-		this.defaultDialogues.add(
-			DialogueBuilder.createText(
-				"This dead tree has withered away, but it is still pretty strong.",
-				DialogueType.SPEECH
-			)
-		);
 	}
 
 	@Override
@@ -31,7 +21,7 @@ public class SmallDeadTree extends Obstacle {
 
 	@Override
 	public void tick() {
-		// SmallTree should not be interacted with.
+		// SmallDeadTree should not be interacted with.
 		if (this.interactingState) {
 			this.setInteractingState(false);
 		}

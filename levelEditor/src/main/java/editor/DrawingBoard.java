@@ -446,9 +446,12 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.offsetX = this.editor.input.offsetX;
 			this.offsetY = this.editor.input.offsetY;
 		}
-		else if (this.isMouseInDrawingBoard() && this.editor.input.isDrawing()) {
+		else if (this.isMouseInDrawingBoard()) {
 			switch (EditorConstants.metadata) {
 				case Tilesets: {
+					if (!this.editor.input.isDrawing())
+						return;
+
 					// Tilesets Editing is subjected to both dragging and clicking.
 					this.mouseOnTileX = this.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.offsetY + this.editor.input.drawingY;
@@ -480,28 +483,29 @@ public class DrawingBoard extends Canvas implements Runnable {
 						return;
 
 					Trigger selectedTrigger = this.editor.controlPanel.getSelectedTrigger();
-					if (selectedTrigger != null && !selectedTrigger.isEraser()) {
-						int x = this.getMouseTileX();
-						int y = this.getMouseTileY();
-						int i = y * this.bitmapWidth + x;
-						if (this.triggers.contains(i, selectedTrigger)) {
-							this.triggers.removeTrigger(i, selectedTrigger);
+					if (selectedTrigger != null) {
+						if (this.editor.input.isClicking() && !selectedTrigger.isEraser()) {
+							int x = this.getMouseTileX();
+							int y = this.getMouseTileY();
+							int i = y * this.bitmapWidth + x;
+							if (this.triggers.contains(i, selectedTrigger)) {
+								this.triggers.removeTrigger(i, selectedTrigger);
+							}
+							else {
+								this.triggers.addTrigger(i, (byte) x, (byte) y, selectedTrigger);
+							}
+							this.editor.input.forceCancelDrawing();
 						}
-						else {
-							this.triggers.addTrigger(i, (byte) x, (byte) y, selectedTrigger);
+						else if (this.editor.input.isDrawing() && selectedTrigger.isEraser()) {
+							int x = this.getMouseTileX();
+							int y = this.getMouseTileY();
+							int i = y * this.bitmapWidth + x;
+							this.triggers.clearAllTriggers(i);
 						}
-					}
-					else if (selectedTrigger != null && selectedTrigger.isEraser()) {
-						int x = this.getMouseTileX();
-						int y = this.getMouseTileY();
-						int i = y * this.bitmapWidth + x;
-						this.triggers.clearAllTriggers(i);
 					}
 					break;
 				}
 				case NonPlayableCharacters: {
-					Debug.notYetImplemented();
-
 					// NPCs Editing is subjected to clicking only.
 					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
@@ -509,7 +513,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						return;
 
 					SpriteData selectedData = this.editor.controlPanel.getSelectedData();
-					if (selectedData != null) {
+					if (selectedData != null && this.editor.input.isDrawing()) {
 						this.setDataProperties(selectedData);
 					}
 					break;
@@ -539,10 +543,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 		// Search for the data from the actual collection of game data we have loaded in.
 		SpriteData data = null;
-		int tempColorValue = selectedData.getColorValue();
+		int tempEditorIDValue = selectedData.getEditorID();
 		List<Map.Entry<Integer, SpriteData>> dataList = EditorConstants.getInstance().getDatas();
 		for (Map.Entry<Integer, SpriteData> entry : dataList) {
-			if (tempColorValue == entry.getKey()) {
+			if (tempEditorIDValue == entry.getKey()) {
 				data = entry.getValue();
 				break;
 			}
@@ -564,6 +568,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int blue = (panel.dataValue & 0xFF);
 						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
 						this.tilesEditorID[tileIndex] = data.editorID;
+						this.obstacles.add(this.getMouseTileX(), this.getMouseTileY(), data.editorID, this.tiles[tileIndex]);
 						break;
 					}
 					default: {
@@ -578,7 +583,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 			case 0x09: // Door
 			case 0x0B: // Carpet
 			case 0x0C: { // Carpet
-				this.manualInputTileProperties(data);
+				data = this.manualInputTileProperties(data);
+				panel.redInputField.setText(Integer.toString(data.red));
+				panel.greenInputField.setText(Integer.toString(data.green));
+				panel.redField.setText(Integer.toString(data.red));
+				panel.greenField.setText(Integer.toString(data.green));
+				panel.blueInputField.setText(Integer.toString(data.blue));
+				panel.blueField.setText(Integer.toString(data.blue));
 				break;
 			}
 			case 0x08: { // House
@@ -599,6 +610,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 			case 0x0A: { // Items
 				this.tiles[tileIndex] = (data.alpha << 24) | panel.dataValue & 0xFFFFFF;
 				this.tilesEditorID[tileIndex] = data.editorID;
+				this.items.add(this.getMouseTileX(), this.getMouseTileY(), data.editorID, data.getColorValue());
 				break;
 			}
 			case 0x0D: { // Triggers
@@ -625,13 +637,18 @@ public class DrawingBoard extends Canvas implements Runnable {
 				break;
 			}
 			case 0x0E: { // Characters/NPCs
-				int characterUID = data.red;
-				int scriptID = data.green;
+				int dataColor = data.getColorValue();
+				int panelRed = panel.getRed();
+				int panelGreen = panel.getGreen();
+				if (data.red != panelRed)
+					data.setColorValue((dataColor & 0xFF00FFFF) | (panelRed << 16));
+				if (data.green != panelGreen)
+					data.setColorValue((dataColor & 0xFFFF00FF) | (panelGreen << 8));
 				this.npcs.add(this.getMouseTileX(), this.getMouseTileY(), data.editorID, data.getColorValue());
-				panel.redInputField.setText(Integer.toString(characterUID));
-				panel.greenInputField.setText(Integer.toString(scriptID));
-				panel.redField.setText(Integer.toString(characterUID));
-				panel.greenField.setText(Integer.toString(scriptID));
+				panel.redInputField.setText(Integer.toString(data.red));
+				panel.greenInputField.setText(Integer.toString(data.green));
+				panel.redField.setText(Integer.toString(data.red));
+				panel.greenField.setText(Integer.toString(data.green));
 
 				// Disabling the blue field for now.
 				panel.blueInputField.setText(Integer.toString(-1));
@@ -650,7 +667,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 		int tileIndex = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
 		data.setColorValue(this.tiles[tileIndex]);
-		data.editorID = this.tilesEditorID[tileIndex];
+		data.setEditorID(this.tilesEditorID[tileIndex]);
 
 		String greenText = Integer.toString(data.green);
 		String blueText = Integer.toString(data.blue);
@@ -729,12 +746,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 		// Step 3 - Store the triggers
 		List<Integer> triggerData = this.triggers.convertToData();
-		for (int i = 0; i < triggerSize; i++) {
-			// Add any triggers into a list. If triggers set is null, make sure to append the Eraser trigger,
-			// designated as ID 0.
-			pixels.add(triggerData.get(i * 2)); // Trigger Info
-			pixels.add(triggerData.get(i * 2 + 1)); // NPC Trigger Info
-		}
+		triggerData.stream().forEach(pixels::add);
 
 		// Step 4 - Store the NPCs
 		Arrays.stream(npcsData).forEach(pixels::add);
@@ -800,17 +812,23 @@ public class DrawingBoard extends Canvas implements Runnable {
 			// Step 3 - Add any triggers into a list. If triggers is null, make sure to append the Eraser
 			// trigger, designated as ID 0.
 			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight, this.editor.getChecksum());
-			for (int i = 0; i < triggerSize; i++) {
-				int triggerInfo = pixels[pixelIterator++];
-				int npcTriggerInfo = pixels[pixelIterator++];
-				short triggerId = (short) (triggerInfo & 0xFFFF);
-				if (triggerId != 0) {
-					// We only want non-Eraser triggers to be added to the trigger set in the level editor.
-					int x = (pixels[pixelIterator] >> 24) & 0xFF;
-					int y = (pixels[pixelIterator] >> 16) & 0xFF;
-					short npcTriggerId = (short) ((npcTriggerInfo >> 16) & 0xFFFF);
-					this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator], npcTriggerId);
+			if (triggerSize > 0) {
+				for (int i = 0; i < triggerSize; i++) {
+					int triggerInfo = pixels[pixelIterator++];
+					int npcTriggerInfo = pixels[pixelIterator++];
+					short triggerId = (short) (triggerInfo & 0xFFFF);
+					if (triggerId != 0) {
+						// We only want non-Eraser triggers to be added to the trigger set in the level editor.
+						int x = (pixels[pixelIterator] >> 24) & 0xFF;
+						int y = (pixels[pixelIterator] >> 16) & 0xFF;
+						short npcTriggerId = (short) ((npcTriggerInfo >> 16) & 0xFFFF);
+						this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator], npcTriggerId);
+					}
 				}
+			}
+			else {
+				pixelIterator++;
+				pixelIterator++;
 			}
 
 			// Step 4 - Get the NPCs data.
@@ -1001,11 +1019,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
-	private void manualInputTileProperties(SpriteData d) {
+	private SpriteData manualInputTileProperties(SpriteData d) {
 		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
 		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
 		this.tiles[i] = panel.dataValue;
 		this.tilesEditorID[i] = d.editorID;
+		d.setColorValue(panel.dataValue);
+		return d;
 	}
 
 	private void setBiomeTile(final int toCompare, Graphics g) {

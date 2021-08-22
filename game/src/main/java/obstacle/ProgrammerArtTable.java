@@ -4,27 +4,19 @@ import java.awt.Graphics;
 
 import abstracts.Entity;
 import abstracts.Obstacle;
-import dialogue.Dialogue.DialogueType;
 import level.Area;
 import level.PixelData;
 import screen.Scene;
-import utility.DialogueBuilder;
 
 /**
  * This class shouldn't be used for long. Needs to be replaced/removed eventually.
- * 
+ *
  * @author tlee
  */
 @Deprecated
 public class ProgrammerArtTable extends Obstacle {
 	public ProgrammerArtTable(PixelData data, int id) {
 		this.pixelData = data;
-
-		this.defaultDialogues.add(
-			DialogueBuilder.createText(
-				"This is programmer art.", DialogueType.SPEECH
-			)
-		);
 	}
 
 	@Override

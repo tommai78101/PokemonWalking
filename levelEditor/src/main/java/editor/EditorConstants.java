@@ -169,7 +169,10 @@ public class EditorConstants {
 					data.green = Integer.parseInt(tokens[4], 16);
 					data.blue = Integer.parseInt(tokens[5], 16);
 					data.filepath = tokens[6];
+
+					// Editor ID refers to the chronological order of Art assets being loaded in.
 					data.editorID = editorID++;
+
 					data.image = new ImageIcon(
 						EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1])
 					);
@@ -194,7 +197,7 @@ public class EditorConstants {
 					data.button.setAlignmentX(Component.CENTER_ALIGNMENT);
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
-					this.datas.add(Map.entry(data.getColorValue(), data));
+					this.datas.add(Map.entry(data.editorID, data));
 					dataTemp.add(data);
 
 					if (data.alpha == EditorConstants.KeyColor_Alpha_NPC) {

@@ -113,7 +113,9 @@ public class TriggerSet {
 	public List<Integer> convertToData() {
 		List<Integer> output = new ArrayList<>();
 		// Eraser trigger by default.
-		output.add(0);
+		output.add(0); // Eraser Trigger info
+		output.add(0); // Eraser NPC trigger info.
+
 		Set<Integer> keySet = this.triggers.keySet();
 		for (int tileId : keySet) {
 			Set<Trigger> triggerSet = this.triggers.get(tileId);

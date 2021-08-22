@@ -39,13 +39,15 @@ import utility.DialogueBuilder;
  */
 public class Script {
 	private String checksum;
+	private String triggerName;
 	private int triggerID;
-	private ArrayList<Map.Entry<Integer, MovementData>> moves;
-	private ArrayList<Map.Entry<Integer, MovementData>> affirmativeMoves;
-	private ArrayList<Map.Entry<Integer, MovementData>> negativeMoves;
-	private ArrayList<Map.Entry<Integer, Dialogue>> dialogues;
-	private ArrayList<Map.Entry<Integer, Dialogue>> affirmativeDialogues;
-	private ArrayList<Map.Entry<Integer, Dialogue>> negativeDialogues;
+	private int npcTriggerID;
+	private List<Map.Entry<Integer, MovementData>> moves;
+	private List<Map.Entry<Integer, MovementData>> affirmativeMoves;
+	private List<Map.Entry<Integer, MovementData>> negativeMoves;
+	private List<Map.Entry<Integer, Dialogue>> dialogues;
+	private List<Map.Entry<Integer, Dialogue>> affirmativeDialogues;
+	private List<Map.Entry<Integer, Dialogue>> negativeDialogues;
 	private Map.Entry<Integer, Integer> remainingMoves;
 	private int scriptIteration;
 	private int affirmativeIteration;
@@ -62,6 +64,7 @@ public class Script {
 	 */
 	public Script() {
 		this.checksum = null;
+		this.triggerName = "";
 		this.triggerID = 0;
 		this.moves = new ArrayList<>();
 		this.affirmativeMoves = new ArrayList<>();
@@ -87,6 +90,8 @@ public class Script {
 	public Script(Script s) {
 		this.checksum = s.checksum;
 		this.triggerID = s.triggerID;
+		this.npcTriggerID = s.npcTriggerID;
+		this.triggerName = s.triggerName;
 
 		this.moves = new ArrayList<>();
 		for (Map.Entry<Integer, MovementData> e : s.moves)
@@ -122,6 +127,7 @@ public class Script {
 		this.negativeIteration = s.negativeIteration;
 		this.questionResponse = s.questionResponse;
 		this.repeat = s.repeat;
+		this.countdown = s.countdown;
 		this.finished = s.finished;
 		this.enabled = s.enabled;
 	}
@@ -209,7 +215,7 @@ public class Script {
 	 * @param entityX
 	 * @param entityY
 	 */
-	public void tick(Area area, int entityX, int entityY) {
+	public void tick(Area area) {
 		MovementData moves = this.getIteratedMoves();
 		Dialogue dialogue = this.getIteratedDialogues();
 
@@ -454,6 +460,24 @@ public class Script {
 	}
 
 	/**
+	 * Sets the trigger name from the script file.
+	 *
+	 * @param value
+	 */
+	public void setTriggerName(String value) {
+		this.triggerName = value;
+	}
+
+	/**
+	 * Returns the trigger name.
+	 *
+	 * @return
+	 */
+	public String getTriggerName() {
+		return this.triggerName;
+	}
+
+	/**
 	 * Increments the current iterator based on the type of response we are giving in the game. If we
 	 * are not giving an answer to a question, the current iterator will be incremented. If we are
 	 * giving an affirmative response to a question, the affirmative dialogue iterator will be
@@ -514,6 +538,10 @@ public class Script {
 
 	public void setRemainingCounter(int value) {
 		this.countdown = value;
+	}
+
+	public int getNpcTriggerID() {
+		return this.npcTriggerID;
 	}
 
 	// -------------------------------------------------------------------------------
@@ -584,14 +612,23 @@ public class Script {
 					script.setChecksum(line);
 				}
 
-				// Start of script
+				// Start of script (Trigger and NPC Triggers)
 				else if (ScriptTags.BeginScript.beginsAt(line)) {
-					line = ScriptTags.BeginScript.replace(line);
-					int triggerID = Integer.parseInt(line.substring(1).trim());
+					line = ScriptTags.BeginScript.removeScriptTag(line);
+					int triggerID = Integer.parseInt(line.trim());
 					if (triggerID > 0) {
 						if (script == null)
 							script = new Script();
 						script.triggerID = triggerID;
+					}
+				}
+				else if (ScriptTags.NpcScript.beginsAt(line)) {
+					line = ScriptTags.BeginScript.removeScriptTag(line);
+					int npcTriggerID = Integer.parseInt(line.trim());
+					if (npcTriggerID > 0) {
+						if (script == null)
+							script = new Script();
+						script.npcTriggerID = npcTriggerID;
 					}
 				}
 
@@ -599,8 +636,8 @@ public class Script {
 				else if (ScriptTags.PathData.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTags.PathData.replace(line);
-						Script.append(moves, line.substring(1).trim().toCharArray());
+						line = ScriptTags.PathData.removeScriptTag(line);
+						Script.append(moves, line.trim().toCharArray());
 						script.moves.add(Map.entry(iteration, moves));
 						iteration++;
 					}
@@ -617,9 +654,9 @@ public class Script {
 
 				// Speech dialogue
 				else if (ScriptTags.Speech.beginsAt(line)) {
-					line = ScriptTags.Speech.replace(line);
+					line = ScriptTags.Speech.removeScriptTag(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
+						line.trim().replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.dialogues.add(Map.entry(iteration, d));
@@ -628,9 +665,9 @@ public class Script {
 
 				// Question dialogue
 				else if (ScriptTags.Question.beginsAt(line)) {
-					line = ScriptTags.Question.replace(line);
+					line = ScriptTags.Question.removeScriptTag(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
+						line.trim().replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.QUESTION, true
 					);
 					script.dialogues.add(Map.entry(iteration, d));
@@ -639,9 +676,9 @@ public class Script {
 
 				// Affirmative Response dialogue
 				else if (ScriptTags.Affirm.beginsAt(line)) {
-					line = ScriptTags.Affirm.replace(line);
+					line = ScriptTags.Affirm.removeScriptTag(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
+						line.trim().replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.affirmativeDialogues
@@ -651,9 +688,9 @@ public class Script {
 
 				// Negative Response dialogue
 				else if (ScriptTags.Reject.beginsAt(line)) {
-					line = ScriptTags.Reject.replace(line);
+					line = ScriptTags.Reject.removeScriptTag(line);
 					Dialogue d = DialogueBuilder.createText(
-						line.substring(1).trim().replace("_", " "),
+						line.trim().replace("_", " "),
 						Dialogue.MAX_STRING_LENGTH, Dialogue.DialogueType.SPEECH, true
 					);
 					script.negativeDialogues
@@ -665,8 +702,8 @@ public class Script {
 				else if (ScriptTags.Confirm.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTags.Confirm.replace(line);
-						Script.append(moves, line.substring(1).trim().toCharArray());
+						line = ScriptTags.Confirm.removeScriptTag(line);
+						Script.append(moves, line.trim().toCharArray());
 						script.affirmativeMoves
 							.add(Map.entry(affirmativeIteration, moves));
 						affirmativeIteration++;
@@ -677,8 +714,8 @@ public class Script {
 				else if (ScriptTags.Cancel.beginsAt(line)) {
 					if (script != null) {
 						MovementData moves = new MovementData();
-						line = ScriptTags.Cancel.replace(line);
-						Script.append(moves, line.substring(1).trim().toCharArray());
+						line = ScriptTags.Cancel.removeScriptTag(line);
+						Script.append(moves, line.trim().toCharArray());
 						script.negativeMoves
 							.add(Map.entry(negativeIteration, moves));
 						negativeIteration++;

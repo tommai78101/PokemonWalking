@@ -54,6 +54,13 @@ public class SpriteData {
 		this.red = (value & 0xFF0000) >> 16;
 		this.green = (value & 0xFF00) >> 8;
 		this.blue = (value & 0xFF);
+	}
+
+	public void setEditorID(int value) {
 		this.editorID = value;
+	}
+
+	public int getEditorID() {
+		return this.editorID;
 	}
 }
