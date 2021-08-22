@@ -26,7 +26,14 @@ public class TriggerSet {
 	}
 
 	public int getSize() {
-		return this.triggers.size();
+		int result = 0;
+		for (var entry : this.triggers.entrySet()) {
+			for (var trigger : entry.getValue()) {
+				if (!trigger.isEraser())
+					result++;
+			}
+		}
+		return result;
 	}
 
 	/**
