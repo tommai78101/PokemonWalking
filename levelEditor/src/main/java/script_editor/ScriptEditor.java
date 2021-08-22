@@ -282,7 +282,11 @@ public class ScriptEditor extends JFrame {
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.scriptViewer.getTriggerList().clearSelection();
+		var triggerList = this.scriptViewer.getTriggerList();
+		triggerList.clearSelection();
+		if (triggerList.getModel().getSize() > 0)
+			triggerList.setSelectedIndex(0);
+
 		this.scriptViewer.revalidate();
 		this.scriptViewer.repaint();
 		this.parent.revalidate();
