@@ -544,6 +544,10 @@ public class Script {
 		return this.npcTriggerID;
 	}
 
+	public int getTriggerID() {
+		return this.triggerID;
+	}
+
 	// -------------------------------------------------------------------------------
 	// Private methods
 
@@ -578,6 +582,7 @@ public class Script {
 		int iteration = 0;
 		int affirmativeIteration = 0;
 		int negativeIteration = 0;
+		String scriptName = null;
 		InputStream inputStream = null;
 
 		// Check if the file is a modded script file, or a default script file.
@@ -601,8 +606,13 @@ public class Script {
 			String line;
 			while ((line = reader.readLine()) != null) {
 				// Ignored tags
-				if (ScriptTags.Comment.beginsAt(line) || ScriptTags.ScriptName.beginsAt(line) || line.startsWith(" ") || line.isEmpty())
+				if (ScriptTags.Comment.beginsAt(line) || line.startsWith(" ") || line.isEmpty())
 					continue;
+
+				// Script name
+				else if (ScriptTags.ScriptName.beginsAt(line)) {
+					scriptName = ScriptTags.ScriptName.removeScriptTag(line);
+				}
 
 				// Script checksum
 				else if (ScriptTags.Checksum.beginsAt(line)) {
@@ -646,6 +656,7 @@ public class Script {
 				// Script delimiter
 				else if (ScriptTags.EndScript.beginsAt(line)) {
 					if (script != null) {
+						script.setTriggerName(scriptName);
 						result.add(script);
 						script = null;
 						iteration = 0;

@@ -119,7 +119,7 @@ public class Bitmap {
 		try {
 			// Prints out the bitmap filename. If there's something wrong, it won't print it
 			// out.
-			Debug.log(file.getAbsolutePath());
+			Debug.warn(file.getAbsolutePath());
 			BufferedImage image = ImageIO.read(file);
 			return Bitmap.load(image);
 		}

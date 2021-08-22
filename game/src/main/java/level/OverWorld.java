@@ -181,7 +181,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 				if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
 					this.currentAreaSectorID = this.currentArea.getSectorID();
 					// This is where you get the latest sector id at.
-					Debug.log("Area: " + this.currentArea.getAreaID() + " Sector: " + this.currentArea.getSectorID());
+					Debug.warn("Area: " + this.currentArea.getAreaID() + " Sector: " + this.currentArea.getSectorID());
 				}
 			}
 		}

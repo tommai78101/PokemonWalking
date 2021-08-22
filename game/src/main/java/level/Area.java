@@ -133,7 +133,7 @@ public class Area implements Tileable, UpdateRenderable {
 			// Ignoring Editor ID
 			pixelIterator++;
 			int data = tempPixels[pixelIterator++];
-			this.areaObstacles.put(Map.entry(x, y), Obstacle.build(data, x, y));
+			this.areaObstacles.put(Map.entry(x, y), Obstacle.build(this, data, x, y));
 		}
 
 		// Step 6 - Get items
@@ -256,7 +256,7 @@ public class Area implements Tileable, UpdateRenderable {
 		if (this.trigger.hasActiveScript(this)) {
 			this.trigger.prepareActiveScript();
 			this.player.enableAutomaticMode();
-			this.trigger.tick(this, this.xPlayerPosition, this.yPlayerPosition);
+			this.trigger.tick(this);
 		}
 		else {
 			this.player.disableAutomaticMode();

@@ -9,6 +9,7 @@
 package abstracts;
 
 import interfaces.Interactable;
+import level.Area;
 import level.PixelData;
 import obstacle.ProgrammerArtTable;
 import obstacle.Sign;
@@ -19,15 +20,19 @@ public abstract class Obstacle extends Entity implements Interactable {
 	protected int color;
 	protected int id;
 
-	public static Obstacle build(final PixelData data, final int xPosition, final int yPosition) {
+	public static Obstacle build(final Area area, final PixelData data, final int xPosition, final int yPosition) {
 		int red = data.getRed();
+		Obstacle obj = null;
 		switch (red) {
 			case 0x00:
-				return new SmallTree(data, red);
+				obj = new SmallTree(data);
+				break;
 			case 0x05:
-				return new Sign(data, red);
+				obj = new Sign(data);
+				break;
 			case 0x08:
-				return new SmallDeadTree(data, red);
+				obj = new SmallDeadTree(data);
+				break;
 
 			// Programmer art goes here. Marked as deprecated for this reason.
 			// Rock
@@ -40,15 +45,21 @@ public abstract class Obstacle extends Entity implements Interactable {
 				// Workbench (left) and (right)
 			case 0x06:
 			case 0x07:
-				return new ProgrammerArtTable(data, red);
+				obj = new ProgrammerArtTable(data);
+				break;
 			default:
 				System.err.println("Unknown obstacle " + red + " at [" + xPosition + "," + yPosition + "] found.");
-				return null;
+				break;
 		}
+		if (obj != null) {
+			obj.setArea(area);
+			obj.loadTriggerData();
+		}
+		return obj;
 	}
 
-	public static Obstacle build(final int pixel, final int xPosition, final int yPosition) {
-		return Obstacle.build(new PixelData(pixel, xPosition, yPosition), xPosition, yPosition);
+	public static Obstacle build(final Area area, final int pixel, final int xPosition, final int yPosition) {
+		return Obstacle.build(area, new PixelData(pixel, xPosition, yPosition), xPosition, yPosition);
 	}
 
 	// public Obstacle(PixelData data, int id) {

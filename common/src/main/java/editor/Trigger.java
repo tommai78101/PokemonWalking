@@ -166,7 +166,7 @@ public class Trigger {
 	}
 
 	public boolean isEraser() {
-		return this.triggerID == 0;
+		return (this.triggerID == 0 && this.npcTriggerID == 0);
 	}
 
 	public static Trigger createEraser() {

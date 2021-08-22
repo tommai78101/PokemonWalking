@@ -63,4 +63,12 @@ public class SpriteData {
 	public int getEditorID() {
 		return this.editorID;
 	}
+
+	public short getTileSpecificID() {
+		return (short) ((this.green << 8) | this.blue);
+	}
+
+	public byte getExtendedID() {
+		return (byte) this.red;
+	}
 }

@@ -196,6 +196,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				// this.editor.scriptChanger.getXField().setText("");
 				// this.editor.scriptChanger.getYField().setText("");
 				this.editor.scriptChanger.getIDField().setText("");
+				this.editor.scriptChanger.getNpcTriggerFlag().setSelected(this.selectedTrigger.isNpcTrigger());
 				this.editor.scriptChanger.getScriptArea().setText("");
 
 				this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());

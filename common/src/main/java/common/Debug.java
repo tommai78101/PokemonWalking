@@ -43,7 +43,7 @@ public class Debug {
 	 * 
 	 * @param msg
 	 */
-	public static void log(String msg) {
+	public static void warn(String msg) {
 		Debug.printColor(AnsiColors.Yellow, Debug.createString(msg));
 	}
 

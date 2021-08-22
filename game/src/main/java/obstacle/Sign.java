@@ -10,7 +10,7 @@ import level.PixelData;
 import screen.Scene;
 
 public class Sign extends Obstacle {
-	public Sign(PixelData data, int id) {
+	public Sign(PixelData data) {
 		this.pixelData = data;
 	}
 

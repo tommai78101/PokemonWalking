@@ -15,7 +15,7 @@ import screen.Scene;
  */
 @Deprecated
 public class ProgrammerArtTable extends Obstacle {
-	public ProgrammerArtTable(PixelData data, int id) {
+	public ProgrammerArtTable(PixelData data) {
 		this.pixelData = data;
 	}
 

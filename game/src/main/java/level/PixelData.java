@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package level;
@@ -19,10 +19,10 @@ public class PixelData {
 
 	/*
 	 * Pixel data types: (Including alpha values)
-	 * 
+	 *
 	 * 0xFF00FF00: Flat grass (Can be walked, no Pokémon) 0xFF0000DD: Ledges
 	 * Horizontal 0xFF0000AA: Small tree
-	 * 
+	 *
 	 * Anything else: Flat grass.
 	 */
 
@@ -132,22 +132,22 @@ public class PixelData {
 
 	/**
 	 * Sets the bitmap tile the pixel data is representing.
-	 * 
+	 *
 	 * <p>
 	 * When setting the bitmap, first it must set the bitmap to something other than null. Since the
 	 * bitmap variable holds an array, it takes in at least 1 bitmap pre-loaded by the Art class. Then,
 	 * once the bitmap is set, it must break all the way outside of the nested switch conditions,
 	 * otherwise, setting bitmaps will overwrite correct data with incorrect data.
-	 * 
+	 *
 	 * <p>
 	 * If the bitmap stays null, the bitmap will then be set to "NO PNG" error bitmap, which when loaded
 	 * into the game, the game will not crash, and the developers/players can tell where the bitmap
 	 * loading has gone wrong.
-	 * 
+	 *
 	 * <p>
 	 * If the bitmap is an animated bitmap, the Art class will load the animated bitmap into an array.
 	 * The next step would be to just pass the array to this bitmap.
-	 * 
+	 *
 	 * @param alpha
 	 *            The alpha value of the pixel data's color.
 	 * @param red
@@ -488,10 +488,10 @@ public class PixelData {
 
 	/**
 	 * Prepares the bitmap if the color has been pre-determined.
-	 * 
+	 *
 	 * <p>
 	 * Will cause undefined behaviors if the colors have not been set yet.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void prepareBitmap() {
@@ -505,13 +505,13 @@ public class PixelData {
 	/**
 	 * Sets the properties of a given pixel data. This is where the game gets the area's information on
 	 * what the player should do and don't.
-	 * 
+	 *
 	 * <p>
 	 * Some of the features are currently unused. Especially collision detection.
-	 * 
+	 *
 	 * <p>
 	 * Only the ones that set target areas, warp zone areas, etc. are the ones being used.
-	 * 
+	 *
 	 * @param alpha
 	 *            The alpha value of the pixel data's color.
 	 * @param red
@@ -596,6 +596,14 @@ public class PixelData {
 		return this.color;
 	}
 
+	public short getTileSpecificData() {
+		return (short) (this.color & 0xFFFF);
+	}
+
+	public byte getExtendedID() {
+		return (byte) ((this.color >> 16) & 0xFF);
+	}
+
 	// public int getParentAreaID() {
 	// return parentArea;
 	// }
@@ -645,27 +653,26 @@ public class PixelData {
 		return this.biomeBitmap[this.biomeBitmapTick];
 	}
 
-	public int getAlpha() {
-		return (this.color >> 24) & 0xFF;
+	public byte getAlpha() {
+		return (byte) ((this.color >> 24) & 0xFF);
 	}
 
-	public int getRed() {
-		return (this.color >> 16) & 0xFF;
+	public byte getRed() {
+		return (byte) ((this.color >> 16) & 0xFF);
 	}
 
-	public int getGreen() {
-		return (this.color >> 8) & 0xFF;
+	public byte getGreen() {
+		return (byte) ((this.color >> 8) & 0xFF);
 	}
 
-	public int getBlue() {
-		return this.color & 0xFF;
+	public byte getBlue() {
+		return (byte) (this.color & 0xFF);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof PixelData))
+		if (obj == null || !(obj instanceof PixelData objData))
 			return false;
-		PixelData objData = (PixelData) obj;
 		return this.color == objData.color;
 	}
 

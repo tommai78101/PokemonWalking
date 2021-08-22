@@ -8,9 +8,7 @@
 
 package abstracts;
 
-import java.util.Deque;
-import java.util.Iterator;
-
+import common.Debug;
 import common.Tileable;
 import entity.Player;
 import interfaces.UpdateRenderable;
@@ -20,6 +18,7 @@ import level.WorldConstants;
 import screen.Bitmap;
 import screen.Scene;
 import script.Script;
+import script.TriggerData;
 
 /**
  * Parent abstract class of all abstract classes.
@@ -31,6 +30,7 @@ import script.Script;
  */
 public abstract class Entity implements Tileable, UpdateRenderable {
 	public int id;
+	@Deprecated
 	public int interactableID;
 	public boolean isRemoved;
 	protected boolean interactingState;
@@ -54,11 +54,11 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 
 	protected String name;
 	protected PixelData pixelData;
+	protected TriggerData triggerData;
 	protected Event event;
-	protected Iterator<Script> currentScriptIterator;
-	protected Deque<Script> scripts;
-	protected Script currentScript;
 	protected Area area;
+
+	public Entity() {}
 
 	public int getX() {
 		return this.xAreaPosition;
@@ -169,32 +169,20 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		return this.interactingState;
 	}
 
-	public Deque<Script> getAllScripts() {
-		return this.scripts;
-	}
-
-	public void addScript(Script s) {
-		this.scripts.add(s);
-	}
-
-	public Script getCurrentScript() {
-		if (this.currentScriptIterator != null && this.currentScriptIterator.hasNext()) {
-			return this.currentScriptIterator.next();
-		}
-		this.currentScriptIterator = this.scripts.iterator();
-		return this.getCurrentScript();
-	}
-
 	public void dialogueTick() {
 		if (this.interactingState) {
-			this.getCurrentScript().tick(this.area);
+			if (this.triggerData != null && this.triggerData.hasActiveScript(this.area)) {
+				this.triggerData.prepareActiveScript();
+				this.triggerData.tick(this.area);
+			}
+			else
+				this.interactingState = false;
 		}
 	}
 
 	public void dialogueRender(Scene screen) {
-		if (this.interactingState) {
-			this.getCurrentScript().render(screen, screen.getBufferedImage().createGraphics());
-		}
+		if (this.interactingState && this.triggerData != null)
+			this.triggerData.render(screen, screen.getBufferedImage().createGraphics());
 	}
 
 	public int getXInArea() {
@@ -229,6 +217,37 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 
 	public void setArea(Area a) {
 		this.area = a;
+	}
+
+	public TriggerData getTriggerData() {
+		return this.triggerData;
+	}
+
+	public void setTriggerData(TriggerData data) {
+		this.triggerData = data;
+	}
+
+	public void loadTriggerData() {
+		if (this.area == null) {
+			Debug.warn("Area is not set.");
+			return;
+		}
+		if (this.area.getTriggerDatasMap() == null || this.area.getTriggerDatasMap().isEmpty()) {
+			Debug.warn("Area trigger data map is not set.");
+			return;
+		}
+		var triggerDataMap = this.area.getTriggerDatasMap();
+		FINISH_LOADING:
+		for (var entry : triggerDataMap.entrySet()) {
+			TriggerData data = entry.getValue();
+			var scripts = data.getScripts();
+			for (Script s : scripts) {
+				if ((this instanceof Obstacle o && s.getTriggerID() == this.pixelData.getTileSpecificData()) || (this instanceof Character c && s.getNpcTriggerID() == this.pixelData.getRed())) {
+					this.setTriggerData(data);
+					break FINISH_LOADING;
+				}
+			}
+		}
 	}
 
 	// ==============================================================

@@ -24,6 +24,7 @@ import screen.Scene;
 public class TriggerData {
 	private int x;
 	private int y;
+	private short triggerID;
 	private short npcTriggerID;
 	private Deque<Script> scripts;
 	private Deque<Script> finishedScripts;
@@ -41,6 +42,7 @@ public class TriggerData {
 	 */
 	public TriggerData() {
 		this.x = this.y = 0;
+		this.triggerID = 0;
 		this.npcTriggerID = 0;
 		this.currentScript = null;
 		this.scripts = new LinkedList<>();
@@ -56,6 +58,7 @@ public class TriggerData {
 	public TriggerData(TriggerData t) {
 		this.x = t.x;
 		this.y = t.y;
+		this.triggerID = t.triggerID;
 		this.npcTriggerID = t.npcTriggerID;
 		this.currentScript = new Script(t.currentScript);
 		this.scripts = new LinkedList<>(t.scripts);
@@ -76,6 +79,7 @@ public class TriggerData {
 	public TriggerData loadTriggerData(int triggerInfo, int npcInfo) {
 		this.x = (triggerInfo >> 24) & 0xFF;
 		this.y = (triggerInfo >> 16) & 0xFF;
+		this.triggerID = (short) (triggerInfo & 0xFFFF);
 		this.npcTriggerID = (short) ((npcInfo >> 16) & 0xFFFF);
 		Set<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
 			: WorldConstants.scripts).parallelStream().collect(Collectors.toSet());
@@ -157,6 +161,16 @@ public class TriggerData {
 	}
 
 	/**
+	 * Returns the Trigger ID, which is used to load custom scripts and dialogues into the respective
+	 * non-Character entities.
+	 *
+	 * @return
+	 */
+	public short getTriggerID() {
+		return this.triggerID;
+	}
+
+	/**
 	 * Returns the X position relative to the Area's origin.
 	 *
 	 * @return
@@ -181,7 +195,7 @@ public class TriggerData {
 	 * @param entityX
 	 * @param entityY
 	 */
-	public void tick(Area area, int entityX, int entityY) {
+	public void tick(Area area) {
 		// No else condition. We check if the current script is no longer null.
 		if (this.currentScript != null) {
 			// The current script exists. We do actions to this script.

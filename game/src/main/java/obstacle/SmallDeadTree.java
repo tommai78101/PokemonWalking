@@ -10,7 +10,7 @@ import level.PixelData;
 import screen.Scene;
 
 public class SmallDeadTree extends Obstacle {
-	public SmallDeadTree(PixelData data, int id) {
+	public SmallDeadTree(PixelData data) {
 		this.pixelData = data;
 	}
 

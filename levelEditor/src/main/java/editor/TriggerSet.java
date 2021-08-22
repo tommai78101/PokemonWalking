@@ -36,13 +36,13 @@ public class TriggerSet {
 	 *            The full RGBA pixel data of the supposed trigger in the area map.
 	 * @return
 	 */
-	public Trigger validityCheck(int triggerPixelData) {
+	public Trigger validityCheck(int colorPixelData, short triggerId) {
 		Trigger triggerValidityCheck = null;
 		List<Trigger> triggers = EditorConstants.getInstance().getTriggers();
-		if (triggerPixelData == 0x0) {
+		if (colorPixelData == 0x0) {
 			return triggers.get(0);
 		}
-		final short trigId = (short) (triggerPixelData & 0xFFFF);
+		final short trigId = triggerId;
 		try {
 			for (Trigger t : triggers) {
 				if (t.checkTriggerID(trigId)) {
@@ -52,7 +52,7 @@ public class TriggerSet {
 			}
 		}
 		catch (Exception e) {
-			Debug.error("Encountered an error related to validating the trigger ID: " + triggerPixelData, e);
+			Debug.error("Encountered an error related to validating the trigger ID: " + triggerId, e);
 			// Eraser.
 			triggerValidityCheck = triggers.get(0);
 		}
@@ -94,7 +94,7 @@ public class TriggerSet {
 	}
 
 	public void toggleTrigger(int index, Trigger trigger) {
-		Debug.log("Toggling trigger");
+		Debug.warn("Toggling trigger");
 		Set<Trigger> set = this.triggers.get(index);
 		if (set == null) {
 			set = new HashSet<>();
@@ -130,15 +130,16 @@ public class TriggerSet {
 		return output;
 	}
 
-	public void addTriggerById(int index, int triggerId, short npcTriggerId) {
-		Trigger trigger = this.validityCheck(triggerId);
+	public void addTriggerById(int index, int pixelColor, short triggerId, short npcTriggerId) {
+		Trigger trigger = this.validityCheck(pixelColor, triggerId);
+		byte x = (byte) (index % this.size.width);
+		byte y = (byte) (index / this.size.width);
 		if (trigger == null) {
-			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at: (" + (index % this.size.width) + "," + (index / this.size.width) + ").");
+			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at [" + x + "," + y + "].");
 			return;
 		}
 		if (!trigger.isEraser()) {
-			byte x = (byte) (index % this.size.width);
-			byte y = (byte) (index / this.size.width);
+			trigger.setTriggerID(triggerId);
 			trigger.setNpcTriggerID(npcTriggerId);
 			this.addTrigger(index, x, y, trigger);
 		}

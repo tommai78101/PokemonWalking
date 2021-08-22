@@ -1,10 +1,8 @@
-f133b47816b56e3c
-!2
+&f133b47816b56e3c
+!1
 @NPC_test_script
-&eb7280781bb89cfb
-/ This is an NPC test
-
-#Hello World 2.
+#NPC Test.
+;
 %
 
 

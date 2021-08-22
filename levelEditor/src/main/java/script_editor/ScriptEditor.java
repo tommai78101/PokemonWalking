@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -244,6 +245,7 @@ public class ScriptEditor extends JFrame {
 
 			String line = null;
 			trigger = null;
+			String checksum = null;
 			StringBuilder builder = new StringBuilder();
 			while ((line = reader.readLine()) != null) {
 				if (ScriptTags.BeginScript.beginsAt(line)) {
@@ -260,15 +262,20 @@ public class ScriptEditor extends JFrame {
 				}
 				else if (ScriptTags.EndScript.beginsAt(line)) {
 					trigger.setScript(builder.toString());
+					trigger.setChecksum(checksum);
 					scriptTriggerListModel.addElement(trigger);
 					editorTriggerComboModel.addElement(trigger);
 					builder.setLength(0);
 				}
-				else if (ScriptTags.Speech.beginsAt(line) || ScriptTags.Question.beginsAt(line) || ScriptTags.Affirm.beginsAt(line) || ScriptTags.Reject.beginsAt(line)) {
-					// Dialogue
+				else if (ScriptTags.Checksum.beginsAt(line)) {
+					line = ScriptTags.Checksum.removeScriptTag(line);
+					checksum = line;
+				}
+				else if (ScriptTags.Speech.beginsAt(line) || ScriptTags.Question.beginsAt(line) || ScriptTags.Affirm.beginsAt(line) || ScriptTags.Reject.beginsAt(line) || ScriptTags.Confirm.beginsAt(line) || ScriptTags.Cancel.beginsAt(line)) {
+					builder.append(line).append("\n");
 				}
 				else {
-					builder.append(line).append("\n");
+					// Ignore lines.
 				}
 			}
 		}
@@ -324,9 +331,10 @@ public class ScriptEditor extends JFrame {
 	 * @param script
 	 */
 	public void save(File script) {
-		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)))) {
+		// FileWriter(File, false) will explicitly clear the target file first before writing text.
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(script, false))) {
 			String checksum = this.getEditorChecksum();
-			writer.write(checksum);
+			writer.write(ScriptTags.Checksum.getSymbol() + checksum);
 			writer.newLine();
 
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
@@ -350,7 +358,7 @@ public class ScriptEditor extends JFrame {
 				writer.newLine();
 				writer.newLine();
 			}
-			Debug.log("Saved Location: " + script.getAbsolutePath());
+			Debug.warn("Saved Location: " + script.getAbsolutePath());
 		}
 		catch (IOException e) {
 			Debug.error("Script editor failed to save script.", e);

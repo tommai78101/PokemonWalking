@@ -566,9 +566,16 @@ public class DrawingBoard extends Canvas implements Runnable {
 					case 0x05: { // Sign
 						int green = (panel.dataValue >> 8) & 0xFF;
 						int blue = (panel.dataValue & 0xFF);
-						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
-						this.tilesEditorID[tileIndex] = data.editorID;
-						this.obstacles.add(this.getMouseTileX(), this.getMouseTileY(), data.editorID, this.tiles[tileIndex]);
+						int check = (green << 8) | blue;
+						if (check > 0) {
+							this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | check;
+							this.tilesEditorID[tileIndex] = data.editorID;
+							this.obstacles.add(this.getMouseTileX(), this.getMouseTileY(), data.editorID, this.tiles[tileIndex]);
+						}
+						else {
+							JOptionPane.showMessageDialog(null, "Sign: Tile specific ID (dialogue ID) should not be 0x0000.");
+							this.editor.input.forceCancelDrawing();
+						}
 						break;
 					}
 					default: {
@@ -624,7 +631,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 							blue = this.getMouseTileY();
 						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
 						this.tilesEditorID[tileIndex] = data.editorID;
-						this.triggers.addTriggerById(tileIndex, data.editorID, Trigger.NPC_TRIGGER_ID_NONE);
+						this.triggers.addTriggerById(tileIndex, data.getColorValue(), data.getTileSpecificID(), Trigger.NPC_TRIGGER_ID_NONE);
 						panel.greenInputField.setText(Integer.toString(green));
 						panel.blueInputField.setText(Integer.toString(blue));
 						panel.greenField.setText(Integer.toString(green));
@@ -813,6 +820,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 			// trigger, designated as ID 0.
 			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight, this.editor.getChecksum());
 			if (triggerSize > 0) {
+				// Ignoring Eraser trigger.
+				pixelIterator++;
+				pixelIterator++;
+
 				for (int i = 0; i < triggerSize; i++) {
 					int triggerInfo = pixels[pixelIterator++];
 					int npcTriggerInfo = pixels[pixelIterator++];
@@ -822,7 +833,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int x = (pixels[pixelIterator] >> 24) & 0xFF;
 						int y = (pixels[pixelIterator] >> 16) & 0xFF;
 						short npcTriggerId = (short) ((npcTriggerInfo >> 16) & 0xFFFF);
-						this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator], npcTriggerId);
+						this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator], triggerId, npcTriggerId);
 					}
 				}
 			}
@@ -965,29 +976,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 				return;
 			}
 
-			// checks for mouse hoving above triggers
-			switch (EditorConstants.metadata) {
-				case Tilesets:
-				default:
-					int value = this.tiles[h * this.bitmapWidth + w];
-					// Show trigger IDs and stuffs.
-					TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-					panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
-					panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
-					panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));
-					panel.blueField.setText(Integer.toString(value & 0xFF));
-					break;
-				case Triggers:
-					// TODO(Jul/4/2020): Figure out how to display a list of triggers for a single tile in the
-					// TilePropertiesPanel.
-					Debug.toDo("Ignore this.");
-					break;
-				case NonPlayableCharacters:
-					// TODO(Aug/14/2021): Figure out how to display a single NPC on a single tile in the
-					// TilePropertiesPanel.
-					Debug.toDo("Ignore this.");
-					break;
-			}
+			// checks for mouse hoving above tiles, regardless of what editor metadata we are on.
+			int value = this.tiles[h * this.bitmapWidth + w];
+			TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+			panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
+			panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
+			panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));
+			panel.blueField.setText(Integer.toString(value & 0xFF));
 		}
 		catch (Exception e) {
 			Debug.error("Unable to handle mouse hover cursor position to determine which tile was hovered on.", e);

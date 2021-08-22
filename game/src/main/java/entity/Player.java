@@ -832,6 +832,7 @@ public class Player extends Character {
 			}
 			c.setFacing(facingTowardsPlayer);
 		}
+		else if (this.interactingEntity instanceof Obstacle o) {}
 	}
 
 	// -------------------------------------------------------------------------------------

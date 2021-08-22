@@ -15,8 +15,6 @@ import level.PixelData;
 import resources.Art;
 import screen.Bitmap;
 import screen.Scene;
-import script.Script;
-import script.TriggerData;
 
 public abstract class Character extends Entity implements Interactable, CharacterActionable {
 	// Character debug mode only
@@ -171,10 +169,6 @@ public abstract class Character extends Entity implements Interactable, Characte
 		return this.isDebugMode;
 	}
 
-	public int getTriggerID() {
-		return this.pixelData.getRed();
-	}
-
 	/**
 	 * Sets where each of the four directions are blocked by obstacles in front of the player. The
 	 * obstacles are in front of the player, when the player is facing towards them. That is the time to
@@ -198,27 +192,6 @@ public abstract class Character extends Entity implements Interactable, Characte
 		this.isFacingBlocked[Character.DOWN] = down;
 		this.isFacingBlocked[Character.LEFT] = left;
 		this.isFacingBlocked[Character.RIGHT] = right;
-	}
-
-	/**
-	 * Sets up the area scripts into the Character object.
-	 */
-	public void loadAllScripts() {
-		if (this.area == null) {
-			Debug.error("Unable to prepare and load Character scripts.");
-			return;
-		}
-		var triggersMap = this.area.getTriggerDatasMap();
-		for (var entry : triggersMap.entrySet()) {
-			TriggerData data = triggersMap.get(entry);
-			if (data.getNpcTriggerID() == this.getTriggerID()) {
-				for (Script s : data.getScripts()) {
-					if (s.getNpcTriggerID() == this.getTriggerID()) {
-						this.addScript(s);
-					}
-				}
-			}
-		}
 	}
 
 	// ----------------------------------------------------------------------
@@ -518,7 +491,7 @@ public abstract class Character extends Entity implements Interactable, Characte
 				result.setOriginPosition(x, y);
 				result.setPixelData(pixelData);
 				result.setArea(area);
-				result.loadAllScripts();
+				result.loadTriggerData();
 				break;
 			}
 			default:
