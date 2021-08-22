@@ -20,11 +20,6 @@ public class Sign extends Obstacle {
 	}
 
 	@Override
-	public void tick() {
-		this.dialogueTick();
-	}
-
-	@Override
 	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
 		this.dialogueRender(screen);
 	}

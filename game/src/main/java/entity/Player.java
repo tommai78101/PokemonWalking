@@ -803,6 +803,12 @@ public class Player extends Character {
 		this.yOffset = y;
 	}
 
+	/**
+	 * Handles setting the entity's facing towards the player once the player starts interacting with
+	 * it. with.
+	 *
+	 * @param entity
+	 */
 	public void startInteraction(Entity entity) {
 		if (this.isInteractionEnabled)
 			return;
@@ -832,7 +838,6 @@ public class Player extends Character {
 			}
 			c.setFacing(facingTowardsPlayer);
 		}
-		else if (this.interactingEntity instanceof Obstacle o) {}
 	}
 
 	// -------------------------------------------------------------------------------------

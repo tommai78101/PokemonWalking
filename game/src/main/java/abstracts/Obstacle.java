@@ -131,4 +131,13 @@ public abstract class Obstacle extends Entity implements Interactable {
 	public PixelData getPixelData() {
 		return this.pixelData;
 	}
+
+	@Override
+	public void tick() {
+		this.dialogueTick();
+		if (!this.interactingState) {
+			// As obstacles, always reset the script.
+			this.getTriggerData().resetCurrentScript(this.area);
+		}
+	}
 }

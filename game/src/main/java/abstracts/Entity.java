@@ -175,8 +175,9 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 				this.triggerData.prepareActiveScript();
 				this.triggerData.tick(this.area);
 			}
-			else
+			else {
 				this.interactingState = false;
+			}
 		}
 	}
 

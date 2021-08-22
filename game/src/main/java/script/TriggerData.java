@@ -126,9 +126,24 @@ public class TriggerData {
 	 * the same tile.
 	 */
 	public void prepareActiveScript() {
-		if ((this.currentScript != null) && (!this.currentScript.isScriptEnabled() && this.currentScript.hasReset())) {
-			this.currentScript.turnOnScript();
-			this.currentScript.clearReset();
+		if (this.currentScript != null) {
+			if (!this.currentScript.isScriptEnabled() && this.currentScript.hasReset()) {
+				this.currentScript.turnOnScript();
+				this.currentScript.clearReset();
+			}
+			else if (this.currentScript.hasReset()) {
+				this.currentScript.clearReset();
+			}
+		}
+	}
+
+	/**
+	 * Resets the current script.
+	 */
+	public void resetCurrentScript(Area area) {
+		this.setPaused(false);
+		if (this.currentScript == null && this.hasActiveScript(area)) {
+			this.currentScript.reset();
 		}
 	}
 
