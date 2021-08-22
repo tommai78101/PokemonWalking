@@ -219,23 +219,28 @@ public class Script {
 		MovementData moves = this.getIteratedMoves();
 		Dialogue dialogue = this.getIteratedDialogues();
 
+		Player player = area.getPlayer();
 		if (dialogue == null) {
-			area.getPlayer().keys.resetInputs();
-			if (area.getPlayer().isLockedWalking())
+			player.keys.resetInputs();
+			if (player.isLockedWalking()) {
+				if (!moves.hasNextMove()) {
+					this.finished = true;
+				}
 				return;
+			}
 			if (moves.hasNextMove()) {
 				this.remainingMoves = moves.getNextMove();
-				if (this.remainingMoves.getKey() != area.getPlayer().getFacing()) {
-					area.getPlayer().setFacing(this.remainingMoves.getKey());
+				if (this.remainingMoves.getKey() != player.getFacing()) {
+					player.setFacing(this.remainingMoves.getKey());
 					return;
 				}
 
 				int steps = this.remainingMoves.getValue();
 				if (steps >= 0) {
 					if (steps == 0)
-						area.getPlayer().setFacing(this.remainingMoves.getKey());
+						player.setFacing(this.remainingMoves.getKey());
 					else
-						area.getPlayer().forceLockWalking();
+						player.forceLockWalking();
 					steps--;
 
 					moves.updateCurrentMove(steps);
@@ -243,8 +248,8 @@ public class Script {
 				else {
 					this.remainingMoves = moves.getNextMove();
 					int direction = moves.getNextMoveDirection();
-					if (direction != area.getPlayer().getFacing())
-						area.getPlayer().setFacing(direction);
+					if (direction != player.getFacing())
+						player.setFacing(direction);
 				}
 			}
 			else {
@@ -300,12 +305,12 @@ public class Script {
 						dialogue.tick();
 						if (!Player.isMovementsLocked())
 							Player.lockMovements();
-						area.getPlayer().disableAutomaticMode();
+						player.disableAutomaticMode();
 					}
 					if (dialogue.getAnswerToSimpleQuestion() == Boolean.TRUE) {
 						if (Player.isMovementsLocked())
 							Player.unlockMovements();
-						area.getPlayer().enableAutomaticMode();
+						player.enableAutomaticMode();
 						dialogue = null;
 						try {
 							this.finished = !this.incrementIteration();
@@ -320,7 +325,7 @@ public class Script {
 					else if (dialogue.getAnswerToSimpleQuestion() == Boolean.FALSE) {
 						if (Player.isMovementsLocked())
 							Player.unlockMovements();
-						area.getPlayer().enableAutomaticMode();
+						player.enableAutomaticMode();
 						dialogue = null;
 						try {
 							this.finished = !this.incrementIteration();
