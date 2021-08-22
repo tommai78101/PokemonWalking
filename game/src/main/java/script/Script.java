@@ -623,7 +623,7 @@ public class Script {
 					}
 				}
 				else if (ScriptTags.NpcScript.beginsAt(line)) {
-					line = ScriptTags.BeginScript.removeScriptTag(line);
+					line = ScriptTags.NpcScript.removeScriptTag(line);
 					int npcTriggerID = Integer.parseInt(line.trim());
 					if (npcTriggerID > 0) {
 						if (script == null)
