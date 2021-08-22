@@ -780,8 +780,8 @@ public class Area implements Tileable, UpdateRenderable {
 			if (obstacle != null && obstacle.getPixelData().equals(data)) {
 				return obstacle;
 			}
-			else {
-				throw new NullPointerException("The obstacle shouldn't be null.");
+			else if (obstacle == null) {
+				this.areaObstacles.put(Map.entry(x, y), (obstacle = Obstacle.build(this, data, x, y)));
 			}
 		}
 		else if (Entity.isItem(data)) {
@@ -789,8 +789,8 @@ public class Area implements Tileable, UpdateRenderable {
 			if (item != null && item.getPixelData().equals(data)) {
 				return item;
 			}
-			else {
-				throw new NullPointerException("The item shouldn't be null.");
+			else if (item == null) {
+				this.areaItems.put(Map.entry(x, y), (item = Item.build(data, x, y)));
 			}
 		}
 		return null;

@@ -147,6 +147,14 @@ public class TriggerData {
 		}
 	}
 
+	public boolean hasNotFinishedInteracting() {
+		if (this.currentScript == null || this.currentScript.hasReset()) {
+			// Meaning this entity has finished interacting with the player.
+			return false;
+		}
+		return !this.currentScript.isFinished();
+	}
+
 	/**
 	 * Sets the trigger tile to be paused or unpaused, determined by the boolean argument.
 	 *

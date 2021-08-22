@@ -15,6 +15,7 @@ import obstacle.ProgrammerArtTable;
 import obstacle.Sign;
 import obstacle.SmallDeadTree;
 import obstacle.SmallTree;
+import script.TriggerData;
 
 public abstract class Obstacle extends Entity implements Interactable {
 	protected int color;
@@ -135,9 +136,10 @@ public abstract class Obstacle extends Entity implements Interactable {
 	@Override
 	public void tick() {
 		this.dialogueTick();
-		if (!this.interactingState) {
+		TriggerData data = null;
+		if (!this.interactingState && (data = this.getTriggerData()) != null) {
 			// As obstacles, always reset the script.
-			this.getTriggerData().resetCurrentScript(this.area);
+			data.resetCurrentScript(this.area);
 		}
 	}
 }

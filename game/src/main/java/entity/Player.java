@@ -23,6 +23,7 @@ import main.Keys;
 import menu.Inventory;
 import resources.Art;
 import screen.Scene;
+import script.TriggerData;
 
 public class Player extends Character {
 	public static boolean isMovementsLocked() {
@@ -374,8 +375,11 @@ public class Player extends Character {
 				if (entity != null) {
 					this.interact(area, entity);
 				}
-				if (entity == null && this.interactingEntity != null && this.isInteractionEnabled)
-					this.stopInteraction();
+				if (entity == null && this.interactingEntity != null && this.isInteractionEnabled) {
+					TriggerData data = this.interactingEntity.getTriggerData();
+					if (!data.hasNotFinishedInteracting())
+						this.stopInteraction();
+				}
 			}
 		}
 		catch (Exception e) {
