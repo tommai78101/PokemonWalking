@@ -36,23 +36,22 @@ public class TriggerSet {
 	 *            The full RGBA pixel data of the supposed trigger in the area map.
 	 * @return
 	 */
-	public Trigger validityCheck(int colorPixelData, short triggerId) {
+	public Trigger validityCheck(final int colorPixelData, final short triggerId, final short npcTriggerId) {
 		Trigger triggerValidityCheck = null;
 		List<Trigger> triggers = EditorConstants.getInstance().getTriggers();
 		if (colorPixelData == 0x0) {
 			return triggers.get(0);
 		}
-		final short trigId = triggerId;
 		try {
 			for (Trigger t : triggers) {
-				if (t.checkTriggerID(trigId)) {
+				if (!t.isNpcTrigger() && t.checkTriggerID(triggerId) || (t.isNpcTrigger() && t.checkNpcTriggerID(npcTriggerId))) {
 					triggerValidityCheck = t;
 					break;
 				}
 			}
 		}
 		catch (Exception e) {
-			Debug.error("Encountered an error related to validating the trigger ID: " + triggerId, e);
+			Debug.error("Encountered error while validating the trigger ID: " + triggerId + ", npc trigger ID: " + npcTriggerId, e);
 			// Eraser.
 			triggerValidityCheck = triggers.get(0);
 		}
@@ -72,6 +71,7 @@ public class TriggerSet {
 		modifiedTrigger.setTriggerPositionX(newX);
 		modifiedTrigger.setTriggerPositionY(newY);
 		modifiedTrigger.setTriggerID(trigger.getTriggerID());
+		modifiedTrigger.setNpcTriggerID(trigger.getNpcTriggerID());
 		set.add(modifiedTrigger);
 		this.triggers.put(index, set);
 	}
@@ -83,7 +83,7 @@ public class TriggerSet {
 		}
 		Trigger delete = null;
 		for (Trigger t : set) {
-			if (t.getTriggerID() == trigger.getTriggerID()) {
+			if (t.getTriggerID() == trigger.getTriggerID() || t.getNpcTriggerID() == trigger.getNpcTriggerID()) {
 				delete = t;
 				break;
 			}
@@ -116,13 +116,8 @@ public class TriggerSet {
 		output.add(0); // Eraser Trigger info
 		output.add(0); // Eraser NPC trigger info.
 
-		Set<Integer> keySet = this.triggers.keySet();
-		for (int tileId : keySet) {
-			Set<Trigger> triggerSet = this.triggers.get(tileId);
-			if (triggerSet == null || triggerSet.isEmpty()) {
-				continue;
-			}
-			for (Trigger trigger : triggerSet) {
+		for (var entry : this.triggers.entrySet()) {
+			for (Trigger trigger : entry.getValue()) {
 				output.add(trigger.getDataValue());
 				output.add(trigger.getNpcDataValue());
 			}
@@ -131,7 +126,7 @@ public class TriggerSet {
 	}
 
 	public void addTriggerById(int index, int pixelColor, short triggerId, short npcTriggerId) {
-		Trigger trigger = this.validityCheck(pixelColor, triggerId);
+		Trigger trigger = this.validityCheck(pixelColor, triggerId, npcTriggerId);
 		byte x = (byte) (index % this.size.width);
 		byte y = (byte) (index / this.size.width);
 		if (trigger == null) {
@@ -159,13 +154,15 @@ public class TriggerSet {
 		if (set == null || set.isEmpty())
 			return false;
 		for (Trigger t : set) {
-			if (t.getTriggerID() == trigger.getTriggerID())
+			if (t.getTriggerID() == trigger.getTriggerID() || t.getNpcTriggerID() == trigger.getNpcTriggerID())
 				return true;
 		}
 		return false;
 	}
 
 	public boolean hasTriggers(int index) {
+		if (this.triggers != null && this.triggers.isEmpty())
+			return false;
 		Set<Trigger> set = this.triggers.get(index);
 		return (set != null && !set.isEmpty());
 	}

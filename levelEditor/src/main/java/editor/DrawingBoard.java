@@ -827,13 +827,13 @@ public class DrawingBoard extends Canvas implements Runnable {
 				for (int i = 0; i < triggerSize; i++) {
 					int triggerInfo = pixels[pixelIterator++];
 					int npcTriggerInfo = pixels[pixelIterator++];
-					short triggerId = (short) (triggerInfo & 0xFFFF);
-					if (triggerId != 0) {
+					if (triggerInfo - npcTriggerInfo != 0 || triggerInfo + npcTriggerInfo != 0) {
 						// We only want non-Eraser triggers to be added to the trigger set in the level editor.
-						int x = (pixels[pixelIterator] >> 24) & 0xFF;
-						int y = (pixels[pixelIterator] >> 16) & 0xFF;
+						int x = (triggerInfo >> 24) & 0xFF;
+						int y = (triggerInfo >> 16) & 0xFF;
+						short triggerId = (short) (triggerInfo & 0xFFFF);
 						short npcTriggerId = (short) ((npcTriggerInfo >> 16) & 0xFFFF);
-						this.triggers.addTriggerById(y * bitmapWidth + x, pixels[pixelIterator], triggerId, npcTriggerId);
+						this.triggers.addTriggerById(y * bitmapWidth + x, triggerInfo, triggerId, npcTriggerId);
 					}
 				}
 			}

@@ -137,6 +137,14 @@ public class Trigger {
 		return this.checkTriggerID((short) triggerId);
 	}
 
+	public boolean checkNpcTriggerID(short npcTriggerId) {
+		return this.npcTriggerID == npcTriggerId;
+	}
+
+	public boolean checkNpcTriggerID(int npcTriggerId) {
+		return this.checkNpcTriggerID((short) npcTriggerId);
+	}
+
 	public void setName(String name) {
 		this.name = name;
 	}

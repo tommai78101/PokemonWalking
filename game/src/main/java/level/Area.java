@@ -102,7 +102,7 @@ public class Area implements Tileable, UpdateRenderable {
 				// ID must not be negative. ID = 0 is reserved.
 				int color = tempPixels[pixelIterator++];
 				int npcInfo = tempPixels[pixelIterator++];
-				if (color > 0) {
+				if (color - npcInfo != 0 || color + npcInfo != 0) {
 					int xPosition = (color >> 24) & 0xFF;
 					int yPosition = (color >> 16) & 0xFF;
 					this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color, npcInfo));
