@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -43,7 +43,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	public boolean isClicking() {
 		return this.clicking;
 	}
-	
+
 	public LevelEditor getEditor() {
 		return this.editor;
 	}
@@ -52,11 +52,14 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	public void mouseDragged(MouseEvent event) {
 		int button1 = InputEvent.BUTTON1_DOWN_MASK;
 		int button3 = InputEvent.BUTTON3_DOWN_MASK;
+		this.clicking = false;
 		if ((event.getModifiersEx() & (button1 | button3)) == button1) {
 			this.drawing = true;
+			this.panning = false;
 		}
 		else if ((event.getModifiersEx() & (button1 | button3)) == button3) {
 			this.panning = true;
+			this.drawing = false;
 		}
 		this.mouseX = event.getX();
 		this.mouseY = event.getY();
@@ -85,16 +88,13 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 			this.drawing = false;
 			this.panning = false;
 			this.clicking = true;
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						// Barely less than 2 ticks (33.34ms).
-						Thread.sleep(32);
-					}
-					catch (InterruptedException e) {}
-					EditorInput.this.clicking = false;
+			new Thread(() -> {
+				try {
+					// Barely less than 2 ticks (33.34ms).
+					Thread.sleep(32);
 				}
+				catch (InterruptedException e) {}
+				EditorInput.this.clicking = false;
 			}).start();
 		}
 	}
@@ -117,6 +117,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	public void mousePressed(MouseEvent event) {
 		this.mouseX = event.getX();
 		this.mouseY = event.getY();
+		this.clicking = false;
 		if (event.getButton() == MouseEvent.BUTTON1) {
 			this.drawing = true;
 			this.panning = false;
@@ -130,7 +131,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 			this.oldY = this.mouseY + this.offsetY;
 		}
 		else {
-			this.drawing = this.panning = false;
+			this.drawing = this.panning = this.clicking = false;
 		}
 	}
 
@@ -148,6 +149,7 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		}
 		this.drawing = false;
 		this.panning = false;
+		this.clicking = false;
 	}
 
 	public void forceCancelDrawing() {

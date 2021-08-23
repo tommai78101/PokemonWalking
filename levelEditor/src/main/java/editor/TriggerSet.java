@@ -26,7 +26,14 @@ public class TriggerSet {
 	}
 
 	public int getSize() {
-		return this.triggers.size();
+		int result = 0;
+		for (var entry : this.triggers.entrySet()) {
+			for (var trigger : entry.getValue()) {
+				if (!trigger.isEraser())
+					result++;
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -36,23 +43,22 @@ public class TriggerSet {
 	 *            The full RGBA pixel data of the supposed trigger in the area map.
 	 * @return
 	 */
-	public Trigger validityCheck(int triggerPixelData) {
+	public Trigger validityCheck(final int colorPixelData, final short triggerId, final short npcTriggerId) {
 		Trigger triggerValidityCheck = null;
 		List<Trigger> triggers = EditorConstants.getInstance().getTriggers();
-		if (triggerPixelData == 0x0) {
+		if (colorPixelData == 0x0) {
 			return triggers.get(0);
 		}
-		final short trigId = (short) (triggerPixelData & 0xFFFF);
 		try {
 			for (Trigger t : triggers) {
-				if (t.checkTriggerID(trigId)) {
+				if (!t.isNpcTrigger() && t.checkTriggerID(triggerId) || (t.isNpcTrigger() && t.checkNpcTriggerID(npcTriggerId))) {
 					triggerValidityCheck = t;
 					break;
 				}
 			}
 		}
 		catch (Exception e) {
-			Debug.error("Encountered an error related to validating the trigger ID: " + triggerPixelData, e);
+			Debug.error("Encountered error while validating the trigger ID: " + triggerId + ", npc trigger ID: " + npcTriggerId, e);
 			// Eraser.
 			triggerValidityCheck = triggers.get(0);
 		}
@@ -61,6 +67,10 @@ public class TriggerSet {
 
 	public Set<Trigger> getTriggers(int currentTriggerIndex) {
 		return this.triggers.get(currentTriggerIndex);
+	}
+
+	public Map<Integer, Set<Trigger>> getAllTriggers() {
+		return this.triggers;
 	}
 
 	public void addTrigger(int index, byte newX, byte newY, Trigger trigger) {
@@ -72,6 +82,7 @@ public class TriggerSet {
 		modifiedTrigger.setTriggerPositionX(newX);
 		modifiedTrigger.setTriggerPositionY(newY);
 		modifiedTrigger.setTriggerID(trigger.getTriggerID());
+		modifiedTrigger.setNpcTriggerID(trigger.getNpcTriggerID());
 		set.add(modifiedTrigger);
 		this.triggers.put(index, set);
 	}
@@ -83,7 +94,7 @@ public class TriggerSet {
 		}
 		Trigger delete = null;
 		for (Trigger t : set) {
-			if (t.getTriggerID() == trigger.getTriggerID()) {
+			if (t.getTriggerID() == trigger.getTriggerID() || t.getNpcTriggerID() == trigger.getNpcTriggerID()) {
 				delete = t;
 				break;
 			}
@@ -94,7 +105,7 @@ public class TriggerSet {
 	}
 
 	public void toggleTrigger(int index, Trigger trigger) {
-		Debug.log("Toggling trigger");
+		Debug.warn("Toggling trigger");
 		Set<Trigger> set = this.triggers.get(index);
 		if (set == null) {
 			set = new HashSet<>();
@@ -113,29 +124,29 @@ public class TriggerSet {
 	public List<Integer> convertToData() {
 		List<Integer> output = new ArrayList<>();
 		// Eraser trigger by default.
-		output.add(0);
-		Set<Integer> keySet = this.triggers.keySet();
-		for (int tileId : keySet) {
-			Set<Trigger> triggerSet = this.triggers.get(tileId);
-			if (triggerSet == null || triggerSet.isEmpty()) {
-				continue;
-			}
-			for (Trigger trigger : triggerSet) {
+		output.add(0); // Eraser Trigger info
+		output.add(0); // Eraser NPC trigger info.
+
+		for (var entry : this.triggers.entrySet()) {
+			for (Trigger trigger : entry.getValue()) {
 				output.add(trigger.getDataValue());
+				output.add(trigger.getNpcDataValue());
 			}
 		}
 		return output;
 	}
 
-	public void addTriggerById(int index, int triggerId) {
-		Trigger trigger = this.validityCheck(triggerId);
+	public void addTriggerById(int index, int pixelColor, short triggerId, short npcTriggerId) {
+		Trigger trigger = this.validityCheck(pixelColor, triggerId, npcTriggerId);
+		byte x = (byte) (index % this.size.width);
+		byte y = (byte) (index / this.size.width);
 		if (trigger == null) {
-			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at: (" + (index % this.size.width) + "," + (index / this.size.width) + ").");
+			Debug.error("Unrecognized trigger ID: " + triggerId + " at tile: " + index + " located at [" + x + "," + y + "].");
 			return;
 		}
 		if (!trigger.isEraser()) {
-			byte x = (byte) (index % this.size.width);
-			byte y = (byte) (index / this.size.width);
+			trigger.setTriggerID(triggerId);
+			trigger.setNpcTriggerID(npcTriggerId);
 			this.addTrigger(index, x, y, trigger);
 		}
 		else {
@@ -154,13 +165,15 @@ public class TriggerSet {
 		if (set == null || set.isEmpty())
 			return false;
 		for (Trigger t : set) {
-			if (t.getTriggerID() == trigger.getTriggerID())
+			if (t.getTriggerID() == trigger.getTriggerID() || t.getNpcTriggerID() == trigger.getNpcTriggerID())
 				return true;
 		}
 		return false;
 	}
 
 	public boolean hasTriggers(int index) {
+		if (this.triggers != null && this.triggers.isEmpty())
+			return false;
 		Set<Trigger> set = this.triggers.get(index);
 		return (set != null && !set.isEmpty());
 	}

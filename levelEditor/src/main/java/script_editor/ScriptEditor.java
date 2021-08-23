@@ -9,6 +9,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -92,116 +93,111 @@ public class ScriptEditor extends JFrame {
 	}
 
 	/**
-	 * 
+	 *
 	 * <p>
 	 * Generates a ReadMe text file upon opening the Script Editor.
 	 * </p>
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void generateScriptingTutorial() {
 		File file = new File("readme.txt");
-		if (!file.exists()) {
-			// There are many different ways you can do to write data to files. This is one
-			// of them.
-			// @formatter:off
-			String[] tutorialLines = new String[] {
-				"/ This is an automated content generation.", 
-				" ",
-				"/ Entities that can walk, or run, must be required to have movements for the game",
-				"/ to feel lively.", 
-				" ",
-				"/ You can either use the corresponding symbols or tag names when adding new scripts.",
-				" ",
-				"/ More commands will be added.", 
-				" ", 
-				"/ /: Comments. Gets ignored.",
-				"/ _: Whitespaces.",
-				"/ @: Trigger name.",
-				" ",
-				"/ Tag names are wrapped inside < > angle brackets. Similar tags are comma-separated.",
-				" ",
-				"/ ^ <PathData>: [Direction, Steps]. Can be chained for delaying scripted movements.",
-				"/ $ <BeginScript>: Start of script. Always appear at beginning of script.",
-				"/ % <EndScript>: Script delimiter. Always appear at end of script.", 
-				"/ # <Speech>: Speech Dialogue.",
-				"/ ? <Question>: Question Dialogue.", 
-				"/ + <Affirm>: Affirmative dialogue.",
-				"/ - <Reject>: Negative dialogue", 
-				"/ [ <Confirm>: Affirmative Action", 
-				"/ ] <Deny>: Negative Action",
-				"/ ; <Repeat, Repeatable>: Repeat Flag. If contains ';', it means it's enabled by default.", 
-				" ",
-				"/ DO NOT CHANGE/REMOVE THIS TRIGGER SCRIPT. THIS IS RESERVED ONLY. FOLLOW THIS FORMAT.", 
-				"$0",
-				"@Eraser", 
-				"%"
-			};
-			// @formatter:on
+		if (file.exists())
+			return;
+		// There are many different ways you can do to write data to files. This is one
+		// of them.
+		// @formatter:off
+		String[] tutorialLines = {
+			"/ This is an automated content generation.",
+			" ",
+			"/ Entities that can walk, or run, must be required to have movements for the game",
+			"/ to feel lively.",
+			" ",
+			"/ You can either use the corresponding symbols or tag names when adding new scripts.",
+			" ",
+			"/ More commands will be added.",
+			" ",
+			"/ /: Comments. Gets ignored.",
+			"/ _: Whitespaces.",
+			"/ @: Trigger name.",
+			" ",
+			"/ Tag names are wrapped inside < > angle brackets. Similar tags are comma-separated.",
+			" ",
+			"/ ^ <PathData>: [Direction, Steps]. Can be chained for delaying scripted movements.",
+			"/ $ <BeginScript>: Start of script. Always appear at beginning of script. Range [1~65535]",
+			"/ & <NpcScript>: Start of NPC script. Appears at the beginning of script. Range [1~255]",
+			"/ % <EndScript>: Script delimiter. Always appear at end of script.",
+			"/ # <Speech>: Speech Dialogue.",
+			"/ ? <Question>: Question Dialogue.",
+			"/ + <Affirm>: Affirmative dialogue.",
+			"/ - <Reject>: Negative dialogue",
+			"/ [ <Confirm>: Affirmative Action",
+			"/ ] <Deny>: Negative Action",
+			"/ ; <Repeat, Repeatable>: Repeat Flag. If contains ';', it means it's enabled by default.",
+			" ",
+			"/ DO NOT CHANGE/REMOVE THIS TRIGGER SCRIPT. THIS IS RESERVED ONLY. FOLLOW THIS FORMAT.",
+			"$0",
+			"@Eraser",
+			"%"
+		};
+		// @formatter:on
 
-			try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("readme.txt"), "utf-8"))) {
-				for (int i = 0; i < tutorialLines.length; i++) {
-					writer.write(tutorialLines[i]);
-					writer.newLine();
-				}
+		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("readme.txt"), "utf-8"))) {
+			for (int i = 0; i < tutorialLines.length; i++) {
+				writer.write(tutorialLines[i]);
+				writer.newLine();
 			}
-			catch (IOException e) {
-				JOptionPane.showMessageDialog(null, e.getMessage());
-				e.printStackTrace();
-			}
+		}
+		catch (IOException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage());
+			e.printStackTrace();
 		}
 	}
 
 	public void addingComponents() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if (ScriptEditor.this.input == null) {
-					ScriptEditor.this.input = new ScriptInput();
-					ScriptEditor.this.addMouseListener(ScriptEditor.this.input);
-					ScriptEditor.this.addMouseMotionListener(ScriptEditor.this.input);
-				}
-				if (ScriptEditor.this.scriptToolbar == null) {
-					ScriptEditor.this.scriptToolbar = new ScriptToolbar(ScriptEditor.this);
-					ScriptEditor.this.scriptToolbar.addMouseListener(ScriptEditor.this.input);
-					ScriptEditor.this.scriptToolbar.addMouseMotionListener(ScriptEditor.this.input);
-					ScriptEditor.this.add(ScriptEditor.this.scriptToolbar, BorderLayout.NORTH);
-					ScriptEditor.this.validate();
-				}
-				if (ScriptEditor.this.scriptViewer == null) {
-					ScriptEditor.this.scriptViewer = new ScriptViewer(ScriptEditor.this);
-					ScriptEditor.this.scriptViewer.addMouseListener(ScriptEditor.this.input);
-					ScriptEditor.this.scriptViewer.addMouseMotionListener(ScriptEditor.this.input);
-					ScriptEditor.this.add(ScriptEditor.this.scriptViewer, BorderLayout.WEST);
-					ScriptEditor.this.validate();
-				}
-				if (ScriptEditor.this.scriptChanger == null) {
-					ScriptEditor.this.scriptChanger = new ScriptChanger(ScriptEditor.this);
-					ScriptEditor.this.scriptChanger.addMouseListener(ScriptEditor.this.input);
-					ScriptEditor.this.scriptChanger.addMouseMotionListener(ScriptEditor.this.input);
-					ScriptEditor.this.add(ScriptEditor.this.scriptChanger, BorderLayout.CENTER);
-					ScriptEditor.this.validate();
-				}
-				ScriptEditor.this.revalidate();
-				ScriptEditor.this.repaint();
+		SwingUtilities.invokeLater(() -> {
+			if (ScriptEditor.this.input == null) {
+				ScriptEditor.this.input = new ScriptInput();
+				ScriptEditor.this.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.addMouseMotionListener(ScriptEditor.this.input);
 			}
+			if (ScriptEditor.this.scriptToolbar == null) {
+				ScriptEditor.this.scriptToolbar = new ScriptToolbar(ScriptEditor.this);
+				ScriptEditor.this.scriptToolbar.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptToolbar.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptToolbar, BorderLayout.NORTH);
+				ScriptEditor.this.validate();
+			}
+			if (ScriptEditor.this.scriptViewer == null) {
+				ScriptEditor.this.scriptViewer = new ScriptViewer(ScriptEditor.this);
+				ScriptEditor.this.scriptViewer.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptViewer.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptViewer, BorderLayout.WEST);
+				ScriptEditor.this.validate();
+			}
+			if (ScriptEditor.this.scriptChanger == null) {
+				ScriptEditor.this.scriptChanger = new ScriptChanger(ScriptEditor.this);
+				ScriptEditor.this.scriptChanger.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptChanger.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptChanger, BorderLayout.CENTER);
+				ScriptEditor.this.validate();
+			}
+			ScriptEditor.this.revalidate();
+			ScriptEditor.this.repaint();
 		});
 	}
 
 	public void resetComponents() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if (ScriptEditor.this.scriptViewer != null) {
-					ScriptEditor.this.scriptViewer.clearTriggerModel();
-					ScriptEditor.this.scriptViewer.clearTriggers();
-				}
-				if (ScriptEditor.this.scriptChanger != null) {
-					ScriptEditor.this.scriptChanger.clearTextFields();
-				}
-				ScriptEditor.this.scriptChanger.disableComponent();
-				ScriptEditor.this.refresh();
+		SwingUtilities.invokeLater(() -> {
+			if (ScriptEditor.this.scriptViewer != null) {
+				ScriptEditor.this.scriptViewer.clearTriggerModel();
+				ScriptEditor.this.scriptViewer.clearTriggers();
 			}
+			if (ScriptEditor.this.scriptChanger != null) {
+				ScriptEditor.this.scriptChanger.clearTextFields();
+			}
+			ScriptEditor.this.scriptChanger.disableComponent();
+			ScriptEditor.this.refresh();
 		});
 	}
 
@@ -217,7 +213,7 @@ public class ScriptEditor extends JFrame {
 	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
 	 * working as intended. Reason for this is that this method is used as a guideline for loading
 	 * custom scripts into the game itself.
-	 * 
+	 *
 	 * @param script
 	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
 	 *            editor uses.
@@ -237,22 +233,28 @@ public class ScriptEditor extends JFrame {
 
 			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
 			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
-			    .getModel();
+				.getModel();
 			editorTriggerComboModel.removeAllElements();
 
 			Trigger trigger = new Trigger();
 			trigger.setTriggerID((short) 0);
+			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
 			trigger.setName("Eraser");
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);
 
 			String line = null;
 			trigger = null;
+			String checksum = null;
 			StringBuilder builder = new StringBuilder();
 			while ((line = reader.readLine()) != null) {
 				if (ScriptTags.BeginScript.beginsAt(line)) {
 					trigger = new Trigger();
-					trigger.setTriggerID(Short.valueOf(ScriptTags.BeginScript.removeScriptTag(line)));
+					trigger.setTriggerID(Short.parseShort(ScriptTags.BeginScript.removeScriptTag(line)));
+				}
+				else if (ScriptTags.NpcScript.beginsAt(line)) {
+					trigger = new Trigger();
+					trigger.setNpcTriggerID(Short.parseShort(ScriptTags.NpcScript.removeScriptTag(line)));
 				}
 				else if (ScriptTags.ScriptName.beginsAt(line)) {
 					line = line.replaceAll("_", " ");
@@ -260,31 +262,31 @@ public class ScriptEditor extends JFrame {
 				}
 				else if (ScriptTags.EndScript.beginsAt(line)) {
 					trigger.setScript(builder.toString());
+					trigger.setChecksum(checksum);
 					scriptTriggerListModel.addElement(trigger);
 					editorTriggerComboModel.addElement(trigger);
 					builder.setLength(0);
 				}
-				else if (ScriptTags.Speech.beginsAt(line)) {
-					// Dialogue
+				else if (ScriptTags.Checksum.beginsAt(line)) {
+					line = ScriptTags.Checksum.removeScriptTag(line);
+					checksum = line;
 				}
-				else if (ScriptTags.Question.beginsAt(line)) {
-					// Question Mark
-				}
-				else if (ScriptTags.Affirm.beginsAt(line)) {
-					// Affirmative Answer
-				}
-				else if (ScriptTags.Reject.beginsAt(line)) {
-					// Negative Answer
+				else if (ScriptTags.Speech.beginsAt(line) || ScriptTags.Question.beginsAt(line) || ScriptTags.Affirm.beginsAt(line) || ScriptTags.Reject.beginsAt(line) || ScriptTags.Confirm.beginsAt(line) || ScriptTags.Cancel.beginsAt(line)) {
+					builder.append(line).append("\n");
 				}
 				else {
-					builder.append(line).append("\n");
+					// Ignore lines.
 				}
 			}
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.scriptViewer.getTriggerList().clearSelection();
+		var triggerList = this.scriptViewer.getTriggerList();
+		triggerList.clearSelection();
+		if (triggerList.getModel().getSize() > 0)
+			triggerList.setSelectedIndex(0);
+
 		this.scriptViewer.revalidate();
 		this.scriptViewer.repaint();
 		this.parent.revalidate();
@@ -329,32 +331,38 @@ public class ScriptEditor extends JFrame {
 
 	/**
 	 * There is no need to add Eraser into the triggers list file.
-	 * 
+	 *
 	 * @param script
 	 */
 	public void save(File script) {
-		try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(script)))) {
+		// FileWriter(File, false) will explicitly clear the target file first before writing text.
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(script, false))) {
 			String checksum = this.getEditorChecksum();
-			writer.write(checksum);
+			writer.write(ScriptTags.Checksum.getSymbol() + checksum);
 			writer.newLine();
 
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Trigger t = model.get(i);
-				writer.write("$" + Short.toString(t.getTriggerID()));
+				if (t.isNpcTrigger() && !t.isEraser()) {
+					writer.write(ScriptTags.NpcScript.getSymbol() + Short.toString(t.getNpcTriggerID()));
+				}
+				else {
+					writer.write(ScriptTags.BeginScript.getSymbol() + Short.toString(t.getTriggerID()));
+				}
 				writer.newLine();
-				writer.write("@" + t.getName().replace(" ", "_"));
+				writer.write(ScriptTags.ScriptName.getSymbol() + t.getName().replace(" ", "_"));
 				writer.newLine();
 				writer.write(t.getScript());
 				writer.newLine();
-				writer.write("%");
+				writer.write(ScriptTags.EndScript.getSymbol());
 				writer.newLine();
 
 				// Double blank lines for separation of triggers.
 				writer.newLine();
 				writer.newLine();
 			}
-			Debug.log("Saved Location: " + script.getAbsolutePath());
+			Debug.warn("Saved Location: " + script.getAbsolutePath());
 		}
 		catch (IOException e) {
 			Debug.error("Script editor failed to save script.", e);

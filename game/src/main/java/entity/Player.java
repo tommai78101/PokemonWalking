@@ -23,6 +23,7 @@ import main.Keys;
 import menu.Inventory;
 import resources.Art;
 import screen.Scene;
+import script.TriggerData;
 
 public class Player extends Character {
 	public static boolean isMovementsLocked() {
@@ -346,6 +347,7 @@ public class Player extends Character {
 	 * @return Nothing.
 	 */
 	public void handleSurroundingTiles(Area area) {
+		this.setAllBlockingDirections(false, false, false, false);
 		boolean upDirection = this.checkSurroundingData(area, 0, -1);
 		boolean downDirection = this.checkSurroundingData(area, 0, 1);
 		boolean leftDirection = this.checkSurroundingData(area, -1, 0);
@@ -374,8 +376,16 @@ public class Player extends Character {
 				if (entity != null) {
 					this.interact(area, entity);
 				}
-				if (entity == null && this.interactingEntity != null && this.isInteractionEnabled)
-					this.stopInteraction();
+				if (entity == null && this.interactingEntity != null && this.isInteractionEnabled) {
+					if (this.interactingEntity instanceof Obstacle o) {
+						TriggerData data = this.interactingEntity.getTriggerData();
+						if (data.hasFinishedInteracting())
+							this.stopInteraction();
+					}
+					else if (this.interactingEntity instanceof Character c) {
+						this.stopInteraction();
+					}
+				}
 			}
 		}
 		catch (Exception e) {
@@ -803,6 +813,12 @@ public class Player extends Character {
 		this.yOffset = y;
 	}
 
+	/**
+	 * Handles setting the entity's facing towards the player once the player starts interacting with
+	 * it. with.
+	 *
+	 * @param entity
+	 */
 	public void startInteraction(Entity entity) {
 		if (this.isInteractionEnabled)
 			return;

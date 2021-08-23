@@ -92,19 +92,25 @@ public class Area implements Tileable, UpdateRenderable {
 		// Step 3 - Get any triggers and put them into a triggers list.
 		// If the trigger size is larger than 1 (meaning there are triggers other than Eraser), we parse the
 		// trigger data.
-		if (triggerSize > 1) {
+		if (triggerSize > 0) {
+			// Ignoring Eraser trigger.
+			pixelIterator++;
+			pixelIterator++;
+
 			for (int i = 0; i < triggerSize; i++) {
 				// The "color" is the ID.
 				// ID must not be negative. ID = 0 is reserved.
 				int color = tempPixels[pixelIterator++];
-				if (color > 0) {
+				int npcInfo = tempPixels[pixelIterator++];
+				if (color - npcInfo != 0 || color + npcInfo != 0) {
 					int xPosition = (color >> 24) & 0xFF;
 					int yPosition = (color >> 16) & 0xFF;
-					this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color));
+					this.triggerDatas.put(Map.entry(xPosition, yPosition), new TriggerData().loadTriggerData(color, npcInfo));
 				}
 			}
 		}
 		else {
+			pixelIterator++;
 			pixelIterator++;
 		}
 
@@ -127,7 +133,7 @@ public class Area implements Tileable, UpdateRenderable {
 			// Ignoring Editor ID
 			pixelIterator++;
 			int data = tempPixels[pixelIterator++];
-			this.areaObstacles.put(Map.entry(x, y), Obstacle.build(data, x, y));
+			this.areaObstacles.put(Map.entry(x, y), Obstacle.build(this, data, x, y));
 		}
 
 		// Step 6 - Get items
@@ -250,7 +256,7 @@ public class Area implements Tileable, UpdateRenderable {
 		if (this.trigger.hasActiveScript(this)) {
 			this.trigger.prepareActiveScript();
 			this.player.enableAutomaticMode();
-			this.trigger.tick(this, this.xPlayerPosition, this.yPlayerPosition);
+			this.trigger.tick(this);
 		}
 		else {
 			this.player.disableAutomaticMode();
@@ -299,14 +305,14 @@ public class Area implements Tileable, UpdateRenderable {
 			return null;
 		TriggerData data = this.triggerDatas.get(Map.entry(playerX, playerY));
 		TriggerData oldData = this.triggerDatas.get(Map.entry(this.oldXTriggerPosition, this.oldYTriggerPosition));
-		if (oldData != null && oldData.isPaused() && (playerX != this.oldXTriggerPosition || playerY != this.oldYTriggerPosition)) {
+		if (oldData != null && !oldData.isNpcTrigger() && oldData.isPaused() && (playerX != this.oldXTriggerPosition || playerY != this.oldYTriggerPosition)) {
 			// Need to unpause old trigger data if the trigger data was previously paused and the player has
 			// left the trigger tile.
 			oldData.setPaused(false);
 			this.oldXTriggerPosition = -1;
 			this.oldYTriggerPosition = -1;
 		}
-		if (data != null && data.getXAreaPosition() == playerX && data.getYAreaPosition() == playerY) {
+		if (data != null && !data.isNpcTrigger() && data.getXAreaPosition() == playerX && data.getYAreaPosition() == playerY) {
 			this.oldXTriggerPosition = data.getXAreaPosition();
 			this.oldYTriggerPosition = data.getYAreaPosition();
 			return data;
@@ -449,7 +455,7 @@ public class Area implements Tileable, UpdateRenderable {
 		// Obstacle dialogues are rendered on top of the area background tiles.
 		this.areaObstacles.forEach(
 			(k, obstacle) -> {
-				obstacle.renderDialogue(screen, graphics);
+				obstacle.dialogueRender(screen);
 			}
 		);
 
@@ -725,12 +731,20 @@ public class Area implements Tileable, UpdateRenderable {
 		return this.areaData;
 	}
 
-	public boolean isDisplayingExitArrow() {
-		return this.isExitArrowDisplayed;
+	public Map<Map.Entry<Integer, Integer>, Character> getCharactersMap() {
+		return this.areaCharacters;
 	}
 
-	public Map<Map.Entry<Integer, Integer>, Obstacle> getObstaclesList() {
+	public Map<Map.Entry<Integer, Integer>, Obstacle> getObstaclesMap() {
 		return this.areaObstacles;
+	}
+
+	public Map<Map.Entry<Integer, Integer>, TriggerData> getTriggerDatasMap() {
+		return this.triggerDatas;
+	}
+
+	public boolean isDisplayingExitArrow() {
+		return this.isExitArrowDisplayed;
 	}
 
 	public Player getPlayer() {
@@ -766,8 +780,8 @@ public class Area implements Tileable, UpdateRenderable {
 			if (obstacle != null && obstacle.getPixelData().equals(data)) {
 				return obstacle;
 			}
-			else {
-				throw new NullPointerException("The obstacle shouldn't be null.");
+			else if (obstacle == null) {
+				this.areaObstacles.put(Map.entry(x, y), (obstacle = Obstacle.build(this, data, x, y)));
 			}
 		}
 		else if (Entity.isItem(data)) {
@@ -775,8 +789,8 @@ public class Area implements Tileable, UpdateRenderable {
 			if (item != null && item.getPixelData().equals(data)) {
 				return item;
 			}
-			else {
-				throw new NullPointerException("The item shouldn't be null.");
+			else if (item == null) {
+				this.areaItems.put(Map.entry(x, y), (item = Item.build(data, x, y)));
 			}
 		}
 		return null;

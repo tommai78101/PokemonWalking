@@ -24,9 +24,9 @@ public class SelectionDropdownMenu extends JPanel {
 	private static final Dimension LabelSize = new Dimension(150, 25);
 
 	private JComboBox<Category> tileCategory;
-	private JComboBox<Data> tiles;
+	private JComboBox<SpriteData> tiles;
 	private JComboBox<Trigger> triggers;
-	private Data selectedData;
+	private SpriteData selectedData;
 	private Trigger selectedTrigger;
 	private JPanel triggerEditorInfo;
 
@@ -71,7 +71,7 @@ public class SelectionDropdownMenu extends JPanel {
 		this.validate();
 	}
 
-	public Data getSelectedData() {
+	public SpriteData getSelectedData() {
 		return this.selectedData;
 	}
 
@@ -102,13 +102,13 @@ public class SelectionDropdownMenu extends JPanel {
 			SelectionDropdownMenu.this.editor.input.forceCancelDrawing();
 			if (e.getStateChange() == ItemEvent.SELECTED) {
 				Category c = (Category) e.getItem();
-				DefaultComboBoxModel<Data> model1 = (DefaultComboBoxModel<Data>) SelectionDropdownMenu.this.tiles.getModel();
-				for (Data d : c.nodes) {
+				DefaultComboBoxModel<SpriteData> model1 = (DefaultComboBoxModel<SpriteData>) SelectionDropdownMenu.this.tiles.getModel();
+				for (SpriteData d : c.nodes) {
 					model1.addElement(d);
 				}
 			}
 			if (e.getStateChange() == ItemEvent.DESELECTED) {
-				DefaultComboBoxModel<Data> model2 = (DefaultComboBoxModel<Data>) SelectionDropdownMenu.this.tiles.getModel();
+				DefaultComboBoxModel<SpriteData> model2 = (DefaultComboBoxModel<SpriteData>) SelectionDropdownMenu.this.tiles.getModel();
 				model2.removeAllElements();
 			}
 		});
@@ -132,7 +132,7 @@ public class SelectionDropdownMenu extends JPanel {
 
 			@Override
 			public String getDisplayValue(Object item) {
-				Data d = (Data) item;
+				SpriteData d = (SpriteData) item;
 				return d.name;
 			}
 		};
@@ -140,7 +140,7 @@ public class SelectionDropdownMenu extends JPanel {
 			EditorConstants.chooser = Tools.Properties;
 			SelectionDropdownMenu.this.editor.input.forceCancelDrawing();
 			if (e.getStateChange() == ItemEvent.SELECTED) {
-				Data d = (Data) e.getItem();
+				SpriteData d = (SpriteData) e.getItem();
 				SelectionDropdownMenu.this.selectedData = d;
 				TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
 				panel.alphaInputField.setText(Integer.toString(d.alpha));
@@ -154,7 +154,7 @@ public class SelectionDropdownMenu extends JPanel {
 		// No need to add all of the data elements into this model. Rather, remove all of them, so the
 		// Category can load the Tile model elements in.
 		// Category c = EditorConstants.getInstance().getCategories().get(0);
-		DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) this.tiles.getModel();
+		DefaultComboBoxModel<SpriteData> model = (DefaultComboBoxModel<SpriteData>) this.tiles.getModel();
 		model.removeAllElements();
 	}
 
@@ -216,9 +216,9 @@ public class SelectionDropdownMenu extends JPanel {
 		}
 	}
 
-	public void setDataAsSelected(Data data) {
+	public void setDataAsSelected(SpriteData data) {
 		DefaultComboBoxModel<Category> categoryModel = (DefaultComboBoxModel<Category>) this.tileCategory.getModel();
-		DefaultComboBoxModel<Data> tilesModel = (DefaultComboBoxModel<Data>) this.tiles.getModel();
+		DefaultComboBoxModel<SpriteData> tilesModel = (DefaultComboBoxModel<SpriteData>) this.tiles.getModel();
 		int categorySize = categoryModel.getSize();
 
 		// Tiles Category
@@ -229,7 +229,7 @@ public class SelectionDropdownMenu extends JPanel {
 				// Tiles
 				int tilesSize = category.nodes.size();
 				for (int j = 0; j < tilesSize; j++) {
-					Data tilesData = category.nodes.get(j);
+					SpriteData tilesData = category.nodes.get(j);
 					if (tilesData.compare(data)) {
 						// Do all of this in 1 go.
 						this.editor.controlPanel.getPropertiesPanel().clearSelectedData();

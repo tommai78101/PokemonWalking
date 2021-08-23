@@ -36,8 +36,8 @@ public class EditorConstants {
 	// TODO: Add additional pixel data properties that can be edited/modified for
 	// the area.
 	private final List<Category> categories = new ArrayList<>();
-	private final List<Map.Entry<Integer, Data>> datas = new ArrayList<>();
-	private final List<Map.Entry<Integer, Data>> npcs = new ArrayList<>();
+	private final List<Map.Entry<Integer, SpriteData>> datas = new ArrayList<>();
+	private final List<Map.Entry<Integer, SpriteData>> npcs = new ArrayList<>();
 	private final List<Trigger> triggers = new ArrayList<>();
 
 	private static final EditorConstants instance = new EditorConstants();
@@ -47,6 +47,9 @@ public class EditorConstants {
 	public static final Color ROAD_WHITE = new Color(255, 244, 201);
 	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
 	public static final Color WATER_BLUE = new Color(0, 65, 255);
+
+	private boolean hasLoadedTilesetData = false;
+	private boolean hasLoadedTriggers = false;
 
 	public enum Tools {
 		ControlPanel,
@@ -84,19 +87,24 @@ public class EditorConstants {
 	}
 
 	private void loadTilesetData() {
-		try {
+		if (this.hasLoadedTilesetData)
+			return;
+		this.hasLoadedTilesetData = true;
+
+		try (
 			BufferedReader reader = new BufferedReader(
 				new InputStreamReader(
 					EditorConstants.class.getClassLoader().getResourceAsStream("art/editor/data.txt")
 				)
-			);
+			)
+		) {
 			String line;
 			String[] tokens;
 			int categoryID = 0;
 			int editorID = 0;
 			Category categoryTemp = null;
-			List<Data> dataTemp = new ArrayList<>();
-			List<Data> npcDataTemp = new ArrayList<>();
+			List<SpriteData> dataTemp = new ArrayList<>();
+			List<SpriteData> npcDataTemp = new ArrayList<>();
 			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#"))
 					continue;
@@ -111,7 +119,7 @@ public class EditorConstants {
 					categoryTemp = new Category(tokens[1], categoryID);
 				}
 				else if (line.startsWith("%")) {
-					Data data = new Data();
+					SpriteData data = new SpriteData();
 					// In the art/editor/data.txt, we use the last bit of data, the area type inclusion flag '*', to
 					// filter and specify which area type the tileset belongs in.
 
@@ -161,7 +169,10 @@ public class EditorConstants {
 					data.green = Integer.parseInt(tokens[4], 16);
 					data.blue = Integer.parseInt(tokens[5], 16);
 					data.filepath = tokens[6];
+
+					// Editor ID refers to the chronological order of Art assets being loaded in.
 					data.editorID = editorID++;
+
 					data.image = new ImageIcon(
 						EditorConstants.class.getClassLoader().getResource(tokens[6].split("res/")[1])
 					);
@@ -186,7 +197,7 @@ public class EditorConstants {
 					data.button.setAlignmentX(Component.CENTER_ALIGNMENT);
 					data.button.setMargin(new Insets(0, 0, 0, 0));
 					data.button.setBorder(null);
-					this.datas.add(Map.entry(data.getColorValue(), data));
+					this.datas.add(Map.entry(data.editorID, data));
 					dataTemp.add(data);
 
 					if (data.alpha == EditorConstants.KeyColor_Alpha_NPC) {
@@ -233,15 +244,16 @@ public class EditorConstants {
 			});
 
 		}
-		catch (
-
-			Exception e
-		) {
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void loadTriggers() {
+		if (this.hasLoadedTriggers)
+			return;
+		this.hasLoadedTriggers = true;
+
 		URL uri = EditorConstants.class.getResource(WorldConstants.ScriptsDefaultPath);
 		try {
 			final File[] directory = new File(uri.toURI()).listFiles();
@@ -264,6 +276,13 @@ public class EditorConstants {
 				)
 			)
 		) {
+			// Check by default if there is an Eraser trigger
+			if (this.triggers.isEmpty()) {
+				Trigger eraser = new Trigger();
+				eraser.setName("Eraser");
+				this.triggers.add(eraser);
+			}
+
 			String line;
 			Trigger trigger = null;
 			String checksum = null;
@@ -281,6 +300,20 @@ public class EditorConstants {
 					int value = Integer.parseInt(ScriptTags.BeginScript.removeScriptTag(line));
 					if (value != 0) {
 						trigger.setTriggerID((short) (value & 0xFFFF));
+					}
+					else {
+						// Ignore the trigger value that's equal to 0. This is the Eraser.
+					}
+				}
+				else if (ScriptTags.NpcScript.beginsAt(line)) {
+					// This is where the script begins. The proceeding number is the trigger ID value.
+					if (trigger == null)
+						trigger = new Trigger();
+					if (checksum != null)
+						trigger.setChecksum(checksum);
+					int value = Integer.parseInt(ScriptTags.NpcScript.removeScriptTag(line));
+					if (value != 0) {
+						trigger.setNpcTriggerID((short) (value & 0xFFFF));
 					}
 					else {
 						// Ignore the trigger value that's equal to 0. This is the Eraser.
@@ -311,11 +344,11 @@ public class EditorConstants {
 		return this.categories;
 	}
 
-	public List<Map.Entry<Integer, Data>> getDatas() {
+	public List<Map.Entry<Integer, SpriteData>> getDatas() {
 		return this.datas;
 	}
 
-	public List<Map.Entry<Integer, Data>> getNpcs() {
+	public List<Map.Entry<Integer, SpriteData>> getNpcs() {
 		return this.npcs;
 	}
 
@@ -323,9 +356,9 @@ public class EditorConstants {
 		return this.triggers;
 	}
 
-	public static Data getData(int alpha, int red, int green, int blue) {
-		List<Map.Entry<Integer, Data>> dataList = EditorConstants.getInstance().datas.stream().filter(entry -> {
-			Data d = entry.getValue();
+	public static SpriteData getData(int alpha, int red, int green, int blue) {
+		List<Map.Entry<Integer, SpriteData>> dataList = EditorConstants.getInstance().datas.stream().filter(entry -> {
+			SpriteData d = entry.getValue();
 			if (d.areaTypeIncluded) {
 				// Area type ID is value used in the data value. We want to exclude this when doing comparison
 				// checks. Data integrity checks is done here.
@@ -352,7 +385,7 @@ public class EditorConstants {
 		return dataList.get(0).getValue();
 	}
 
-	public static Data getData(int colorValue) {
+	public static SpriteData getData(int colorValue) {
 		int alpha = (colorValue & 0xFF000000) >> 24;
 		int red = (colorValue & 0xFF0000) >> 16;
 		int green = (colorValue & 0xFF00) >> 8;

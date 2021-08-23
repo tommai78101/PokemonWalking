@@ -322,7 +322,7 @@ public class MainComponent extends Canvas implements Runnable {
 	// Main execution method
 
 	public static void main(String[] args) {
-		Debug.log("Game is now loading, it will take a while.");
+		Debug.warn("Game is now loading, it will take a while.");
 
 		JFrame frame = new JFrame(MainComponent.GAME_TITLE);
 
@@ -347,7 +347,7 @@ public class MainComponent extends Canvas implements Runnable {
 		// Set visibility must come after pack() and setSize() are called.
 		frame.setVisible(true);
 
-		Debug.log("Game is now starting.");
+		Debug.warn("Game is now starting.");
 		component.start();
 	}
 }

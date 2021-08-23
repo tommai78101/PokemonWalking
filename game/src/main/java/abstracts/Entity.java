@@ -8,19 +8,17 @@
 
 package abstracts;
 
-import java.awt.Graphics;
-import java.util.ArrayList;
-import java.util.List;
-
+import common.Debug;
 import common.Tileable;
-import dialogue.Dialogue;
 import entity.Player;
 import interfaces.UpdateRenderable;
+import level.Area;
 import level.PixelData;
 import level.WorldConstants;
-import main.Game;
 import screen.Bitmap;
 import screen.Scene;
+import script.Script;
+import script.TriggerData;
 
 /**
  * Parent abstract class of all abstract classes.
@@ -32,6 +30,7 @@ import screen.Scene;
  */
 public abstract class Entity implements Tileable, UpdateRenderable {
 	public int id;
+	@Deprecated
 	public int interactableID;
 	public boolean isRemoved;
 	protected boolean interactingState;
@@ -55,18 +54,11 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 
 	protected String name;
 	protected PixelData pixelData;
+	protected TriggerData triggerData;
 	protected Event event;
+	protected Area area;
 
-	// Dialogues
-	protected boolean isDialogueReset = false;
-	protected int defaultDialogueIterator = 0;
-	protected int overrideDialogueIterator = 0;
-	protected Dialogue currentDefaultDialogue = null;
-	protected Dialogue currentOverrideDialogue = null;
-	protected List<Dialogue> defaultDialogues = new ArrayList<>();
-	protected List<Dialogue> overrideDialogues = new ArrayList<>();
-
-	// public abstract void initialize(BaseWorld world);
+	public Entity() {}
 
 	public int getX() {
 		return this.xAreaPosition;
@@ -164,12 +156,10 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	public void setInteractingState(boolean value) {
 		this.interactingState = value;
 		if (value) {
-			this.isDialogueReset = false;
 			if (!Player.isMovementsLocked())
 				Player.lockMovements();
 		}
 		else {
-			this.endDialogue();
 			if (Player.isMovementsLocked())
 				Player.unlockMovements();
 		}
@@ -179,106 +169,21 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		return this.interactingState;
 	}
 
-	// Dialogues
-
-	public Dialogue getCurrentDialogue() {
-		if (this.overrideDialogues.isEmpty()) {
-			if (this.defaultDialogues.isEmpty()) {
-				return null;
-			}
-			this.currentDefaultDialogue = this.defaultDialogues.get(this.defaultDialogueIterator);
-			return this.currentDefaultDialogue;
-		}
-		this.currentOverrideDialogue = this.overrideDialogues.get(this.overrideDialogueIterator);
-		return this.currentOverrideDialogue;
-	}
-
-	public Dialogue nextDialogue() {
-		if (this.overrideDialogues.isEmpty()) {
-			if (this.defaultDialogues.isEmpty()) {
-				return null;
-			}
-			this.defaultDialogueIterator++;
-			if (this.defaultDialogueIterator >= this.defaultDialogues.size()) {
-				this.endDialogue();
-				return null;
-			}
-			this.currentDefaultDialogue = this.defaultDialogues.get(this.defaultDialogueIterator);
-			return this.currentDefaultDialogue;
-		}
-		this.overrideDialogueIterator++;
-		if (this.overrideDialogueIterator >= this.overrideDialogues.size()) {
-			this.endDialogue();
-			return null;
-		}
-		this.currentOverrideDialogue = this.overrideDialogues.get(this.overrideDialogueIterator);
-		return this.currentOverrideDialogue;
-	}
-
-	public void endDialogue() {
-		if (this.overrideDialogues.isEmpty()) {
-			if (this.defaultDialogues.isEmpty()) {
-				return;
-			}
-			this.defaultDialogueIterator = 0;
-			this.defaultDialogues.forEach(
-				dialogue -> {
-					dialogue.resetDialogue();
-				}
-			);
-			this.isDialogueReset = true;
-			return;
-		}
-		this.overrideDialogueIterator = 0;
-		this.overrideDialogues.forEach(
-			dialogue -> {
-				dialogue.resetDialogue();
-			}
-		);
-		this.isDialogueReset = true;
-	}
-
-	/**
-	 * Render the dialogue, while temporarily ignoring previous offsets that were set in the Scene.
-	 *
-	 * @param screen
-	 * @param graphics
-	 */
-	public void renderDialogue(Scene screen, Graphics graphics) {
-		if (this.interactingState) {
-			Dialogue currentDialogue = this.getCurrentDialogue();
-			if (currentDialogue != null)
-				currentDialogue.render(screen, graphics);
-		}
-	}
-
-	public List<Dialogue> getDialogues() {
-		if (this.overrideDialogues.isEmpty()) {
-			if (this.defaultDialogues.isEmpty()) {
-				return null;
-			}
-			return this.defaultDialogues;
-		}
-		return this.overrideDialogues;
-	}
-
 	public void dialogueTick() {
 		if (this.interactingState) {
-			this.setInteractingState(true);
-			Dialogue currentDialogue = this.getCurrentDialogue();
-			if (currentDialogue == null || !currentDialogue.isReady()) {
-				this.setInteractingState(false);
-				return;
+			if (this.triggerData != null && this.triggerData.hasActiveScript(this.area)) {
+				this.triggerData.prepareActiveScript();
+				this.triggerData.tick(this.area);
 			}
-			if (!currentDialogue.isDialogueCompleted()) {
-				currentDialogue.tick();
-			}
-			else if (Game.keys.isPrimaryPressed()) {
-				Game.keys.primaryReceived();
-				this.setInteractingState(false);
-				this.endDialogue();
+			else {
+				this.interactingState = false;
 			}
 		}
+	}
+
+	public void dialogueRender(Scene screen) {
+		if (this.interactingState && this.triggerData != null)
+			this.triggerData.render(screen, screen.getBufferedImage().createGraphics());
 	}
 
 	public int getXInArea() {
@@ -305,6 +210,45 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 				break;
 		}
 		return result;
+	}
+
+	public Area getArea() {
+		return this.area;
+	}
+
+	public void setArea(Area a) {
+		this.area = a;
+	}
+
+	public TriggerData getTriggerData() {
+		return this.triggerData;
+	}
+
+	public void setTriggerData(TriggerData data) {
+		this.triggerData = data;
+	}
+
+	public void loadTriggerData() {
+		if (this.area == null) {
+			Debug.warn("Area is not set.");
+			return;
+		}
+		if (this.area.getTriggerDatasMap() == null || this.area.getTriggerDatasMap().isEmpty()) {
+			Debug.warn("Area trigger data map is not set.");
+			return;
+		}
+		var triggerDataMap = this.area.getTriggerDatasMap();
+		FINISH_LOADING:
+		for (var entry : triggerDataMap.entrySet()) {
+			TriggerData data = entry.getValue();
+			var scripts = data.getScripts();
+			for (Script s : scripts) {
+				if ((this instanceof Obstacle o && s.getTriggerID() == this.pixelData.getTileSpecificData()) || (this instanceof Character c && s.getNpcTriggerID() == this.pixelData.getRed())) {
+					this.setTriggerData(data);
+					break FINISH_LOADING;
+				}
+			}
+		}
 	}
 
 	// ==============================================================

@@ -35,9 +35,9 @@ public abstract class Character extends Entity implements Interactable, Characte
 	public static final int AUTO_WALK_VERY_SLOW = 0xFF;
 
 	private boolean isPlayable;
+	@Deprecated
 	private int interactionDataColorID = 0;
 	private GenderType gender = GenderType.Nondetermined;
-	private Area area;
 
 	// General character animations.
 	protected byte animationTick = 0;
@@ -139,10 +139,12 @@ public abstract class Character extends Entity implements Interactable, Characte
 		return this.animationDefaultFacing;
 	}
 
+	@Override
 	public void setArea(Area area) {
 		this.area = area;
 	}
 
+	@Override
 	public Area getArea() {
 		return this.area;
 	}
@@ -207,6 +209,11 @@ public abstract class Character extends Entity implements Interactable, Characte
 		this.handleMovement();
 		this.controlTick();
 		this.dialogueTick();
+		if (!this.interactingState && this.triggerData.hasFinishedInteracting()) {
+			// As characters, always reset the script.
+			this.triggerData.setPaused(false);
+			this.triggerData.resetCurrentScript(this.area);
+		}
 	}
 
 	@Override
@@ -216,7 +223,7 @@ public abstract class Character extends Entity implements Interactable, Characte
 			screen.blit(Art.error, this.predictedXAreaPosition * Tileable.WIDTH - offsetX, this.predictedYAreaPosition * Tileable.HEIGHT - offsetY);
 		}
 		this.characterRender(screen, Art.joe, graphics, offsetX, offsetY);
-		this.renderDialogue(screen, graphics);
+		this.dialogueRender(screen);
 	}
 
 	@Override
@@ -372,16 +379,16 @@ public abstract class Character extends Entity implements Interactable, Characte
 		PixelData data = null;
 		try {
 			data = area.getPixelData(this.xAreaPosition + xOffset, this.yAreaPosition + yOffset);
+
+			Player player = area.getPlayer();
+			int x = player.getXInArea();
+			int y = player.getYInArea();
+			if ((x == this.oldXAreaPosition + xOffset && y == this.oldYAreaPosition + yOffset) || (x == this.predictedXAreaPosition + xOffset && y == this.predictedYAreaPosition + yOffset)) {
+				return true;
+			}
 		}
 		catch (Exception e) {
 			// This means it is out of the area boundaries.
-			return true;
-		}
-
-		Player player = area.getPlayer();
-		int x = player.getXInArea();
-		int y = player.getYInArea();
-		if ((x == this.oldXAreaPosition + xOffset && y == this.oldYAreaPosition + yOffset)) {
 			return true;
 		}
 
@@ -490,6 +497,7 @@ public abstract class Character extends Entity implements Interactable, Characte
 				result.setOriginPosition(x, y);
 				result.setPixelData(pixelData);
 				result.setArea(area);
+				result.loadTriggerData();
 				break;
 			}
 			default:
