@@ -60,10 +60,6 @@ public abstract class Character extends Entity implements Interactable, Characte
 		return this;
 	}
 
-	protected void setCharacterPlayable(final boolean value) {
-		this.isPlayable = value;
-	}
-
 	public boolean isCharacterPlayable() {
 		return this.isPlayable;
 	}
@@ -137,16 +133,6 @@ public abstract class Character extends Entity implements Interactable, Characte
 
 	public byte getDefaultAnimationFacing() {
 		return this.animationDefaultFacing;
-	}
-
-	@Override
-	public void setArea(Area area) {
-		this.area = area;
-	}
-
-	@Override
-	public Area getArea() {
-		return this.area;
 	}
 
 	public void setAutoWalking(boolean state) {
@@ -307,6 +293,16 @@ public abstract class Character extends Entity implements Interactable, Characte
 		// TODO Auto-generated method stub
 	}
 
+	@Override
+	public void setArea(Area area) {
+		this.area = area;
+	}
+
+	@Override
+	public Area getArea() {
+		return this.area;
+	}
+
 	// ----------------------------------------------------------------------
 	// Protected methods
 
@@ -350,6 +346,10 @@ public abstract class Character extends Entity implements Interactable, Characte
 		boolean leftDirection = this.checkCharacterSurroundingData(this.area, -1, 0);
 		boolean rightDirection = this.checkCharacterSurroundingData(this.area, 1, 0);
 		this.setAllBlockingDirections(upDirection, downDirection, leftDirection, rightDirection);
+	}
+
+	protected void setCharacterPlayable(final boolean value) {
+		this.isPlayable = value;
 	}
 
 	// ----------------------------------------------------------------------

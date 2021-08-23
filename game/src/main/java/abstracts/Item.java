@@ -270,10 +270,16 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.inventory = inventory;
 	}
 
+	// ------------------------------------------------------------------
+	// Abstract methods
+
 	public abstract void doAction(Game game);
 
 	// TODO: Add function that allows the item to be placed at.
 	public abstract void dropAt(Area area, Player player);
+
+	// ------------------------------------------------------------------
+	// Override methods
 
 	@Override
 	public void tick() {}
@@ -319,6 +325,15 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		return this.id - other.id;
 	}
 
+	@Override
+	protected void setPosition(final int x, final int y) {
+		super.setPosition(x, y);
+		this.setPixelDataPosition(x, y);
+	}
+
+	// ------------------------------------------------------------------
+	// Static helper methods
+
 	/**
 	 * For the Game
 	 *
@@ -337,7 +352,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		// TODO(Thompson): Figure out how to assign items from the Area map based on PixelData.
 		// Red - Item Unique ID
 		switch (red) {
-			case 0x03: {// Bicycle
+			case 0x03: {// Bicycle (Key Item)
 				// Key item check
 				if (blue == 0x01) {
 					// This is a key item.
