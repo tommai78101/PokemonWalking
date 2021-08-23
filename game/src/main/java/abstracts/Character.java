@@ -379,16 +379,16 @@ public abstract class Character extends Entity implements Interactable, Characte
 		PixelData data = null;
 		try {
 			data = area.getPixelData(this.xAreaPosition + xOffset, this.yAreaPosition + yOffset);
+
+			Player player = area.getPlayer();
+			int x = player.getXInArea();
+			int y = player.getYInArea();
+			if ((x == this.oldXAreaPosition + xOffset && y == this.oldYAreaPosition + yOffset) || (x == this.predictedXAreaPosition + xOffset && y == this.predictedYAreaPosition + yOffset)) {
+				return true;
+			}
 		}
 		catch (Exception e) {
 			// This means it is out of the area boundaries.
-			return true;
-		}
-
-		Player player = area.getPlayer();
-		int x = player.getXInArea();
-		int y = player.getYInArea();
-		if ((x == this.oldXAreaPosition + xOffset && y == this.oldYAreaPosition + yOffset)) {
 			return true;
 		}
 
