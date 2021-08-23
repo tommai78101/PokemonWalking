@@ -305,14 +305,14 @@ public class Area implements Tileable, UpdateRenderable {
 			return null;
 		TriggerData data = this.triggerDatas.get(Map.entry(playerX, playerY));
 		TriggerData oldData = this.triggerDatas.get(Map.entry(this.oldXTriggerPosition, this.oldYTriggerPosition));
-		if (oldData != null && oldData.isPaused() && (playerX != this.oldXTriggerPosition || playerY != this.oldYTriggerPosition)) {
+		if (oldData != null && !oldData.isNpcTrigger() && oldData.isPaused() && (playerX != this.oldXTriggerPosition || playerY != this.oldYTriggerPosition)) {
 			// Need to unpause old trigger data if the trigger data was previously paused and the player has
 			// left the trigger tile.
 			oldData.setPaused(false);
 			this.oldXTriggerPosition = -1;
 			this.oldYTriggerPosition = -1;
 		}
-		if (data != null && data.getXAreaPosition() == playerX && data.getYAreaPosition() == playerY) {
+		if (data != null && !data.isNpcTrigger() && data.getXAreaPosition() == playerX && data.getYAreaPosition() == playerY) {
 			this.oldXTriggerPosition = data.getXAreaPosition();
 			this.oldYTriggerPosition = data.getYAreaPosition();
 			return data;

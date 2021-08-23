@@ -347,6 +347,7 @@ public class Player extends Character {
 	 * @return Nothing.
 	 */
 	public void handleSurroundingTiles(Area area) {
+		this.setAllBlockingDirections(false, false, false, false);
 		boolean upDirection = this.checkSurroundingData(area, 0, -1);
 		boolean downDirection = this.checkSurroundingData(area, 0, 1);
 		boolean leftDirection = this.checkSurroundingData(area, -1, 0);
@@ -376,9 +377,14 @@ public class Player extends Character {
 					this.interact(area, entity);
 				}
 				if (entity == null && this.interactingEntity != null && this.isInteractionEnabled) {
-					TriggerData data = this.interactingEntity.getTriggerData();
-					if (!data.hasNotFinishedInteracting())
+					if (this.interactingEntity instanceof Obstacle o) {
+						TriggerData data = this.interactingEntity.getTriggerData();
+						if (!data.hasNotFinishedInteracting())
+							this.stopInteraction();
+					}
+					else if (this.interactingEntity instanceof Character c) {
 						this.stopInteraction();
+					}
 				}
 			}
 		}

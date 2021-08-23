@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import editor.Trigger;
 import level.Area;
 import level.WorldConstants;
 import screen.Scene;
@@ -80,7 +81,7 @@ public class TriggerData {
 		this.x = (triggerInfo >> 24) & 0xFF;
 		this.y = (triggerInfo >> 16) & 0xFF;
 		this.triggerID = (short) (triggerInfo & 0xFFFF);
-		this.npcTriggerID = (short) ((npcInfo >> 16) & 0xFFFF);
+		this.npcTriggerID = (short) (npcInfo & 0xFFFF);
 		Set<Script> scriptList = (WorldConstants.isModsEnabled.booleanValue() ? WorldConstants.moddedScripts
 			: WorldConstants.scripts).parallelStream().collect(Collectors.toSet());
 		this.scripts.addAll(scriptList);
@@ -191,6 +192,15 @@ public class TriggerData {
 	 */
 	public short getTriggerID() {
 		return this.triggerID;
+	}
+
+	/**
+	 * Checks whether the trigger data is an NPC trigger data.
+	 *
+	 * @return
+	 */
+	public boolean isNpcTrigger() {
+		return this.npcTriggerID != Trigger.NPC_TRIGGER_ID_NONE;
 	}
 
 	/**
