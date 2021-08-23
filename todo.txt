@@ -1,5 +1,10 @@
 By line order (Specific --> Abstract):
 
+---------------- (Aug 22, 2021) -------------------
+
+TODO:
+1. Revisit this todo.txt file and check what needs to be updated. Some of the backlogged tasks no longer applies to many of the new changes right now.
+
 ---------------- (Jun 03, 2021) -------------------
 
 TODO:
