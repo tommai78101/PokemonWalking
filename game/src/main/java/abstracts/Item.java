@@ -337,7 +337,7 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		// TODO(Thompson): Figure out how to assign items from the Area map based on PixelData.
 		// Red - Item Unique ID
 		switch (red) {
-			case 0x03: {// Bicycle
+			case 0x03: {// Bicycle (Key Item)
 				// Key item check
 				if (blue == 0x01) {
 					// This is a key item.
