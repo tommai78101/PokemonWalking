@@ -379,7 +379,7 @@ public class Player extends Character {
 				if (entity == null && this.interactingEntity != null && this.isInteractionEnabled) {
 					if (this.interactingEntity instanceof Obstacle o) {
 						TriggerData data = this.interactingEntity.getTriggerData();
-						if (!data.hasNotFinishedInteracting())
+						if (data.hasFinishedInteracting())
 							this.stopInteraction();
 					}
 					else if (this.interactingEntity instanceof Character c) {

@@ -224,7 +224,7 @@ public class Script {
 			player.keys.resetInputs();
 			if (player.isLockedWalking()) {
 				if (!moves.hasNextMove()) {
-					this.finished = true;
+					this.setCompleted();
 				}
 				return;
 			}
@@ -255,10 +255,11 @@ public class Script {
 			else {
 				try {
 					if (!this.incrementIteration())
-						this.finished = true;
+						this.setCompleted();
 				}
 				catch (Exception e) {
-					this.finished = true;
+					Debug.error("Script encountered exception: ", e);
+					this.setCompleted();
 					return;
 				}
 			}
@@ -274,6 +275,7 @@ public class Script {
 								this.finished = !this.incrementIteration();
 							}
 							catch (Exception e) {
+								Debug.error("Script encountered exception: ", e);
 								this.finished = true;
 								return;
 							}

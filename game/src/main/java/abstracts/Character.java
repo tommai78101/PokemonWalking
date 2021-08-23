@@ -209,6 +209,11 @@ public abstract class Character extends Entity implements Interactable, Characte
 		this.handleMovement();
 		this.controlTick();
 		this.dialogueTick();
+		if (!this.interactingState && this.triggerData.hasFinishedInteracting()) {
+			// As characters, always reset the script.
+			this.triggerData.setPaused(false);
+			this.triggerData.resetCurrentScript(this.area);
+		}
 	}
 
 	@Override
@@ -218,6 +223,7 @@ public abstract class Character extends Entity implements Interactable, Characte
 			screen.blit(Art.error, this.predictedXAreaPosition * Tileable.WIDTH - offsetX, this.predictedYAreaPosition * Tileable.HEIGHT - offsetY);
 		}
 		this.characterRender(screen, Art.joe, graphics, offsetX, offsetY);
+		this.dialogueRender(screen);
 	}
 
 	@Override
