@@ -847,9 +847,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.npcs = new NpcSet(checksum);
 			int npcSize = pixels[pixelIterator++];
 			for (int i = 0; i < npcSize; i++) {
-				int x = pixels[pixelIterator++];
-				int y = pixels[pixelIterator++];
-				int editorID = pixels[pixelIterator++];
+				int triggerInfo = pixels[pixelIterator++];
+				int x = (triggerInfo >> 24) & 0xFF;
+				int y = (triggerInfo >> 16) & 0xFF;
+				int editorID = (triggerInfo & 0xFFFF);
 				int data = pixels[pixelIterator++];
 				this.npcs.add(x, y, editorID, data);
 			}
@@ -858,9 +859,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.obstacles = new ObstacleSet(checksum);
 			int obstacleSize = pixels[pixelIterator++];
 			for (int i = 0; i < obstacleSize; i++) {
-				int x = pixels[pixelIterator++];
-				int y = pixels[pixelIterator++];
-				int editorID = pixels[pixelIterator++];
+				int triggerInfo = pixels[pixelIterator++];
+				int x = (triggerInfo >> 24) & 0xFF;
+				int y = (triggerInfo >> 16) & 0xFF;
+				int editorID = (triggerInfo & 0xFFFF);
 				int data = pixels[pixelIterator++];
 				this.obstacles.add(x, y, editorID, data);
 			}
@@ -869,9 +871,10 @@ public class DrawingBoard extends Canvas implements Runnable {
 			this.items = new ItemSet(checksum);
 			int itemSize = pixels[pixelIterator++];
 			for (int i = 0; i < itemSize; i++) {
-				int x = pixels[pixelIterator++];
-				int y = pixels[pixelIterator++];
-				int editorID = pixels[pixelIterator++];
+				int triggerInfo = pixels[pixelIterator++];
+				int x = (triggerInfo >> 24) & 0xFF;
+				int y = (triggerInfo >> 16) & 0xFF;
+				int editorID = (triggerInfo & 0xFFFF);
 				int data = pixels[pixelIterator++];
 				this.items.add(x, y, editorID, data);
 			}

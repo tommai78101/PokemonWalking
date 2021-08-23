@@ -117,33 +117,30 @@ public class Area implements Tileable, UpdateRenderable {
 		// Step 4 - Get the NPCs data.
 		final int npcSize = tempPixels[pixelIterator++];
 		for (int i = 0; i < npcSize; i++) {
-			int x = tempPixels[pixelIterator++];
-			int y = tempPixels[pixelIterator++];
-			// Ignoring Editor ID
-			pixelIterator++;
+			int triggerInfo = tempPixels[pixelIterator++];
 			int data = tempPixels[pixelIterator++];
+			int x = (triggerInfo >> 24) & 0xFF;
+			int y = (triggerInfo >> 16) & 0xFF;
 			this.areaCharacters.put(Map.entry(x, y), Character.build(this, data, x, y));
 		}
 
 		// Step 5 - Get obstacles
 		final int obstaclesSize = tempPixels[pixelIterator++];
 		for (int i = 0; i < obstaclesSize; i++) {
-			int x = tempPixels[pixelIterator++];
-			int y = tempPixels[pixelIterator++];
-			// Ignoring Editor ID
-			pixelIterator++;
+			int triggerInfo = tempPixels[pixelIterator++];
 			int data = tempPixels[pixelIterator++];
+			int x = (triggerInfo >> 24) & 0xFF;
+			int y = (triggerInfo >> 16) & 0xFF;
 			this.areaObstacles.put(Map.entry(x, y), Obstacle.build(this, data, x, y));
 		}
 
 		// Step 6 - Get items
 		final int itemsSize = tempPixels[pixelIterator++];
 		for (int i = 0; i < itemsSize; i++) {
-			int x = tempPixels[pixelIterator++];
-			int y = tempPixels[pixelIterator++];
-			// Ignoring Editor ID
-			pixelIterator++;
+			int triggerInfo = tempPixels[pixelIterator++];
 			int data = tempPixels[pixelIterator++];
+			int x = (triggerInfo >> 24) & 0xFF;
+			int y = (triggerInfo >> 16) & 0xFF;
 			this.areaItems.put(Map.entry(x, y), Item.build(data, x, y));
 		}
 
