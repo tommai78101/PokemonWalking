@@ -41,9 +41,8 @@ public class EditorDataSet {
 		result.add(size);
 		this.cache.forEach(
 			(key, data) -> {
-				result.add(data.getX());
-				result.add(data.getY());
-				result.add(data.getEditorData());
+				int triggerInfo = ((data.getX() & 0xFF) << 24) | ((data.getY() & 0xFF) << 16) | (data.getEditorData() & 0xFFFF);
+				result.add(triggerInfo);
 				result.add(data.getColorData());
 			}
 		);
