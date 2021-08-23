@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -832,7 +833,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 						int x = (triggerInfo >> 24) & 0xFF;
 						int y = (triggerInfo >> 16) & 0xFF;
 						short triggerId = (short) (triggerInfo & 0xFFFF);
-						short npcTriggerId = (short) ((npcTriggerInfo >> 16) & 0xFFFF);
+						short npcTriggerId = (short) (npcTriggerInfo & 0xFFFF);
 						this.triggers.addTriggerById(y * bitmapWidth + x, triggerInfo, triggerId, npcTriggerId);
 					}
 				}
@@ -973,12 +974,54 @@ public class DrawingBoard extends Canvas implements Runnable {
 				panel.redField.setText("");
 				panel.greenField.setText("");
 				panel.blueField.setText("");
+				panel.isNpcTriggerBox.setSelected(false);
 				return;
 			}
 
-			// checks for mouse hoving above tiles, regardless of what editor metadata we are on.
-			int value = this.tiles[h * this.bitmapWidth + w];
 			TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+			int value = 0;
+			panel.isNpcTriggerBox.setSelected(false);
+			switch (EditorConstants.metadata) {
+				default:
+				case Tilesets:
+					value = this.tiles[h * this.bitmapWidth + w];
+					break;
+				case Triggers:
+					Trigger first = null;
+					Trigger second = null;
+					var keys = this.triggers.getAllTriggers().entrySet();
+					FIRST_LOOP:
+					for (var entry : keys) {
+						Set<Trigger> set = entry.getValue();
+						for (Trigger t : set) {
+							if (t.isNpcTrigger()) {
+								first = t;
+							}
+							else {
+								second = t;
+							}
+						}
+						if (first != null || second != null)
+							break FIRST_LOOP;
+					}
+					if (first != null && first.isNpcTrigger()) {
+						value = first.getNpcTriggerID();
+						panel.isNpcTriggerBox.setSelected(true);
+					}
+					else if (second != null) {
+						value = second.getTriggerID();
+						panel.isNpcTriggerBox.setSelected(false);
+					}
+					break;
+				case NonPlayableCharacters:
+					EditorData npc = this.npcs.get(w, h);
+					if (npc != null) {
+						value = npc.getColorData();
+					}
+					break;
+			}
+
+			// checks for mouse hoving above tiles, regardless of what editor metadata we are on.
 			panel.alphaField.setText(Integer.toString((value >> 24) & 0xFF));
 			panel.redField.setText(Integer.toString((value >> 16) & 0xFF));
 			panel.greenField.setText(Integer.toString((value >> 8) & 0xFF));

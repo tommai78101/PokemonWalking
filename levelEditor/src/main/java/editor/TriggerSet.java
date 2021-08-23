@@ -69,6 +69,10 @@ public class TriggerSet {
 		return this.triggers.get(currentTriggerIndex);
 	}
 
+	public Map<Integer, Set<Trigger>> getAllTriggers() {
+		return this.triggers;
+	}
+
 	public void addTrigger(int index, byte newX, byte newY, Trigger trigger) {
 		Set<Trigger> set = this.triggers.get(index);
 		if (set == null)

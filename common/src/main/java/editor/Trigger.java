@@ -8,9 +8,9 @@ public class Trigger {
 	 */
 	public static final short NPC_TRIGGER_ID_NONE = 0;
 
-	private byte x, y;
-	private short triggerID;
-	private short npcTriggerID;
+	private byte x, y; // This occupies the AR value in the pixel color, ARGB space.
+	private short triggerID; // This occupies the GB value in the pixel color, ARGB space.
+	private short npcTriggerID; // This occupies the GB value in the pixel color, ARGB space.
 	private String name;
 	private String script;
 	private String checksum;

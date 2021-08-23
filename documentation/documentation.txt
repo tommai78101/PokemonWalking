@@ -1098,8 +1098,8 @@ not assume their information to be permanent.
 		Extended Tile ID:
 			R: XX - Character Unique ID
 		Tile Specific ID:
+			B: BB - Script ID
 			G: GG - Script ID
-			B: BB - Reserved miscellaneous data 
 		Full Data:
 			0E XX GG BB
 		Description:
@@ -1112,10 +1112,9 @@ not assume their information to be permanent.
 			trigger the characters/NPCs the player will interact with,
 			based only on the character's unique ID value.
 			
-			A hard limitation is, there is a max total of 256 unique 
-			characters/NPCs in the game. You cannot exceed this 
-			number. It is allowed to re-use characters/NPCs in some 
-			game scenarios.
+			There is a max total of 65535 unique characters/NPCs in the
+			game. You cannot exceed this number. It is allowed to re-use
+			characters/NPCs in some game scenarios.
 			
 			Script IDs are assigned to characters/NPCs. They can be 
 			assigned to common scripts that all characters/NPCs can 
