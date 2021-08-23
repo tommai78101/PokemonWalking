@@ -270,10 +270,16 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		this.inventory = inventory;
 	}
 
+	// ------------------------------------------------------------------
+	// Abstract methods
+
 	public abstract void doAction(Game game);
 
 	// TODO: Add function that allows the item to be placed at.
 	public abstract void dropAt(Area area, Player player);
+
+	// ------------------------------------------------------------------
+	// Override methods
 
 	@Override
 	public void tick() {}
@@ -318,6 +324,15 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	public int compareTo(Item other) {
 		return this.id - other.id;
 	}
+
+	@Override
+	protected void setPosition(final int x, final int y) {
+		super.setPosition(x, y);
+		this.setPixelDataPosition(x, y);
+	}
+
+	// ------------------------------------------------------------------
+	// Static helper methods
 
 	/**
 	 * For the Game

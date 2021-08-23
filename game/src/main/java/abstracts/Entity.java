@@ -84,13 +84,6 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		return this.predictedYAreaPosition;
 	}
 
-	protected void setPosition(int x, int y) {
-		this.xAreaPosition = x;
-		this.yAreaPosition = y;
-		this.xPixelPosition = x * Tileable.WIDTH;
-		this.yPixelPosition = y * Tileable.HEIGHT;
-	}
-
 	public byte[] getByteName() {
 		if (this.name == null)
 			this.name = "Joe";
@@ -249,6 +242,20 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 				}
 			}
 		}
+	}
+
+	// --------------------------------------------------------------
+	// Protected methods
+
+	protected void setPosition(int x, int y) {
+		this.xAreaPosition = x;
+		this.yAreaPosition = y;
+		this.xPixelPosition = x * Tileable.WIDTH;
+		this.yPixelPosition = y * Tileable.HEIGHT;
+	}
+
+	protected void setPixelDataPosition(int x, int y) {
+		this.pixelData.setPosition(x, y);
 	}
 
 	// ==============================================================

@@ -592,6 +592,11 @@ public class PixelData {
 		}
 	}
 
+	public void setPosition(final int x, final int y) {
+		this.xPosition = x;
+		this.yPosition = y;
+	}
+
 	public int getColor() {
 		return this.color;
 	}
@@ -668,6 +673,9 @@ public class PixelData {
 	public byte getBlue() {
 		return (byte) (this.color & 0xFF);
 	}
+
+	// -------------------------------------------------
+	// Override methods
 
 	@Override
 	public boolean equals(Object obj) {

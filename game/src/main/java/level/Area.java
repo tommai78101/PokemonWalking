@@ -686,7 +686,11 @@ public class Area implements Tileable, UpdateRenderable {
 
 	public void updateItem(Item item) {
 		PixelData data = item.getPixelData();
-		this.areaData.get(data.yPosition).set(data.xPosition, data);
+		// It is written like this to prevent possible exceptions complaining about "cannot modify list
+		// while it is reading data."
+		final int x = data.xPosition;
+		final int y = data.yPosition;
+		this.areaData.get(y).set(x, data);
 		this.modifiedAreaData.add(data);
 	}
 
