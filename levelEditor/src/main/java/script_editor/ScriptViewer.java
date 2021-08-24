@@ -191,19 +191,12 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		if (source instanceof JList<?> list) {
 			this.selectedTrigger = (Trigger) list.getSelectedValue();
 			if (this.selectedTrigger != null) {
+				boolean isNpcTrigger = this.selectedTrigger.isNpcTrigger();
+				short idValue = isNpcTrigger ? this.selectedTrigger.getNpcTriggerID() : this.selectedTrigger.getTriggerID();
 				this.editor.scriptChanger.disallowFieldsToUpdate();
-				this.editor.scriptChanger.getNameField().setText("");
-				// this.editor.scriptChanger.getXField().setText("");
-				// this.editor.scriptChanger.getYField().setText("");
-				this.editor.scriptChanger.getIDField().setText("");
-				this.editor.scriptChanger.getNpcTriggerFlag().setSelected(this.selectedTrigger.isNpcTrigger());
-				this.editor.scriptChanger.getScriptArea().setText("");
-
 				this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());
-				// this.editor.scriptChanger.getXField().setText(Integer.toString(this.selectedTrigger.getPositionX()));
-				// this.editor.scriptChanger.getYField().setText(Integer.toString(this.selectedTrigger.getPositionY()));
-				this.editor.scriptChanger.getIDField()
-					.setText(Integer.toString(this.selectedTrigger.getTriggerID()));
+				this.editor.scriptChanger.getIDField().setText(Short.toString(idValue));
+				this.editor.scriptChanger.getNpcTriggerFlag().setSelected(isNpcTrigger);
 				this.editor.scriptChanger.getScriptArea().setText(this.selectedTrigger.getScript());
 				this.editor.scriptChanger.allowFieldsToUpdate();
 			}
