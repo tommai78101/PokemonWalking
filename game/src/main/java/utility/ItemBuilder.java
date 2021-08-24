@@ -5,24 +5,22 @@ import java.io.InputStreamReader;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import abstracts.Item;
 import enums.ItemCategories;
 import enums.ItemTags;
 import item.Bicycle;
-import item.ReturnMenu;
-import item.ModdedItem;
 import item.KeyItem;
+import item.ModdedItem;
+import item.ReturnMenu;
 import level.WorldConstants;
 
 public class ItemBuilder {
 
-	public static enum Tag {
+	public enum Tag {
 		POTIONS("POTIONS"),
 		KEYITEMS("KEYITEMS"),
 		POKEBALLS("POKEBALLS"),
@@ -31,7 +29,7 @@ public class ItemBuilder {
 
 		private String name;
 
-		private Tag(String value) {
+		Tag(String value) {
 			this.name = value;
 		}
 
@@ -51,14 +49,14 @@ public class ItemBuilder {
 		}
 	}
 
-	public static enum ItemCommand {
+	public enum ItemCommand {
 		SET("$"),
 		USE("!"),
 		TOSS("&");
 
 		private String scriptValue;
 
-		private ItemCommand(String value) {
+		ItemCommand(String value) {
 			this.scriptValue = value;
 		}
 
@@ -116,10 +114,8 @@ public class ItemBuilder {
 							itemText.category = ItemCategories.TM_HM;
 							break;
 						case ALL:
+							itemText.category = ItemCategories.ALL;
 							itemText.skipCheckCategory = true;
-							break;
-						default:
-							// Intentionally doing nothing.
 							break;
 					}
 				}
@@ -193,6 +189,7 @@ public class ItemBuilder {
 						itemText.category = ItemCategories.TM_HM;
 					}
 					else if (ItemCategories.ALL.chunkEquals(value)) {
+						itemText.category = ItemCategories.ALL;
 						itemText.skipCheckCategory = true;
 					}
 				}
@@ -217,15 +214,12 @@ public class ItemBuilder {
 				}
 			}
 
-			Collections.sort(result, new Comparator<Map.Entry<ModdedItem, Item>>() {
-				@Override
-				public int compare(Entry<ModdedItem, Item> e1, Entry<ModdedItem, Item> e2) {
-					if (e1.getKey().id < e2.getKey().id)
-						return -1;
-					if (e1.getKey().id > e2.getKey().id)
-						return 1;
-					return 0;
-				}
+			Collections.sort(result, (e1, e2) -> {
+				if (e1.getKey().id < e2.getKey().id)
+					return -1;
+				if (e1.getKey().id > e2.getKey().id)
+					return 1;
+				return 0;
 			});
 
 			return result;
@@ -237,25 +231,13 @@ public class ItemBuilder {
 
 	public static Item createNewItem(ModdedItem text) {
 		Item result = null;
-		switch (text.type) {
-			case DUMMY:
-				result = new ReturnMenu(text.itemName, text.description, text.category, text.id);
-				break;
-			case ACTION:
-				switch (text.id) {
-					case WorldConstants.ITEM_BICYCLE:
-						result = new Bicycle(text.itemName, text.description, text.category);
-						break;
-					default:
-						result = new KeyItem(text.itemName, text.description, text.category, text.id);
-						break;
-				}
-				break;
-			case ALL:
-			default:
-				result = null;
-				break;
-		}
-		return result;
+		return switch (text.type) {
+			case DUMMY -> new ReturnMenu(text.itemName, text.description, text.category, text.id);
+			case ACTION -> switch (text.id) {
+					case WorldConstants.ITEM_BICYCLE -> new Bicycle(text.itemName, text.description, text.category);
+					default -> new KeyItem(text.itemName, text.description, text.category, text.id);
+				};
+			case ALL -> null;
+		};
 	}
 }
