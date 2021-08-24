@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package resources;
@@ -98,10 +98,12 @@ public class Art {
 	public static Bitmap inventory_backpack_keyItems;
 	public static Bitmap inventory_backpack_pokeballs;
 	public static Bitmap inventory_backpack_TM_HM;
+	public static Bitmap inventory_backpack_unsorted;
 	public static Bitmap inventory_tag_potions;
 	public static Bitmap inventory_tag_keyItems;
 	public static Bitmap inventory_tag_pokeballs;
 	public static Bitmap inventory_tag_TM_HM;
+	public static Bitmap inventory_tag_unsorted;
 
 	// @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	// Ledge
@@ -157,7 +159,7 @@ public class Art {
 	public static Bitmap[][] player_surf;
 	public static Bitmap[][] player_bicycle;
 	public static Bitmap shadow;
-	
+
 	// NPCs (Entities)
 	public static Bitmap[][] joe;
 
@@ -243,10 +245,12 @@ public class Art {
 		Art.inventory_backpack_keyItems = Bitmap.load("art/inventory/backpack_keyitems.png");
 		Art.inventory_backpack_pokeballs = Bitmap.load("art/inventory/backpack_pokeballs.png");
 		Art.inventory_backpack_TM_HM = Bitmap.load("art/inventory/backpack_tm_hm.png");
+		Art.inventory_backpack_unsorted = Bitmap.load("art/inventory/backpack_unsorted.png");
 		Art.inventory_tag_potions = Bitmap.load("art/inventory/potions.png");
 		Art.inventory_tag_keyItems = Bitmap.load("art/inventory/keyitems.png");
 		Art.inventory_tag_pokeballs = Bitmap.load("art/inventory/pokeballs.png");
 		Art.inventory_tag_TM_HM = Bitmap.load("art/inventory/tm_hm.png");
+		Art.inventory_tag_unsorted = Bitmap.load("art/inventory/unsorted.png");
 
 		// Ledges
 		Art.ledge_bottom = Bitmap.load("art/ledge/ledge_bottom.png");
@@ -296,7 +300,7 @@ public class Art {
 		Art.player_surf = screen.cut("art/player/player_surf.png", 16, 16, 0, 0);
 		Art.player_bicycle = screen.cut("art/player/player_bicycle.png", 16, 16, 0, 0);
 		Art.shadow = Bitmap.load("art/player/shadow.png");
-		
+
 		// NPCs
 		Art.joe = screen.cut("art/player/joe.png", 16, 16, 0, 0);
 
@@ -342,10 +346,7 @@ public class Art {
 		try {
 			result = Font.createFont(Font.TRUETYPE_FONT, url.openStream());
 		}
-		catch (FontFormatException e) {
-			e.printStackTrace();
-		}
-		catch (IOException e) {
+		catch (FontFormatException | IOException e) {
 			e.printStackTrace();
 		}
 		catch (NullPointerException e) {
@@ -360,10 +361,7 @@ public class Art {
 				try {
 					result = Font.createFont(Font.TRUETYPE_FONT, new File("res/font/font.ttf"));
 				}
-				catch (FontFormatException e2) {
-					e2.printStackTrace();
-				}
-				catch (IOException e2) {
+				catch (FontFormatException | IOException e2) {
 					e2.printStackTrace();
 				}
 			}

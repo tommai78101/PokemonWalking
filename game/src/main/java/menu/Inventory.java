@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package menu;
@@ -53,6 +53,7 @@ public class Inventory extends SubMenu {
 	private final List<Map.Entry<Item, Integer>> keyItems;
 	private final List<Map.Entry<Item, Integer>> pokéballs;
 	private final List<Map.Entry<Item, Integer>> TMs_HMs;
+	private final List<Map.Entry<Item, Integer>> unsortedItems;
 	private final List<String> selectionMenu;
 	private int itemCursor;
 	private int arrowPosition;
@@ -78,7 +79,7 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Creates the Inventory submenu, with all the default settings.
-	 * 
+	 *
 	 * @param name
 	 *            The submenu title that is to be displayed in the start menu.
 	 * @param enabled
@@ -98,15 +99,17 @@ public class Inventory extends SubMenu {
 		this.keyItems = new ArrayList<>();
 		this.pokéballs = new ArrayList<>();
 		this.TMs_HMs = new ArrayList<>();
+		this.unsortedItems = new ArrayList<>();
 		this.selectionMenu = new ArrayList<>();
 
 		Item returnExit = new ReturnMenu("RETURN", "Close inventory.", null, 0);
 		returnExit.setReturnMenu(true);
 
-		this.potions.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
-		this.keyItems.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
-		this.pokéballs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
-		this.TMs_HMs.add(new AbstractMap.SimpleEntry<>(returnExit, Integer.MAX_VALUE));
+		this.potions.add(Map.entry(returnExit, Integer.MAX_VALUE));
+		this.keyItems.add(Map.entry(returnExit, Integer.MAX_VALUE));
+		this.pokéballs.add(Map.entry(returnExit, Integer.MAX_VALUE));
+		this.TMs_HMs.add(Map.entry(returnExit, Integer.MAX_VALUE));
+		this.unsortedItems.add(Map.entry(returnExit, Integer.MAX_VALUE));
 		this.arrowPosition = 0;
 		this.category = ItemCategories.POTIONS;
 		this.state = InventoryState.SELECTION;
@@ -140,6 +143,7 @@ public class Inventory extends SubMenu {
 				categoryList.add(Map.entry(item, 1));
 				break;
 			}
+			case ALL:
 			case POKEBALLS:
 			case POTIONS:
 			case TM_HM: {
@@ -177,7 +181,7 @@ public class Inventory extends SubMenu {
 	/**
 	 * Adds an item with its text description into the Inventory, being categorized into its relevant
 	 * "pocket" of the player's bag.
-	 * 
+	 *
 	 * @param itemText
 	 *            The item description of the item that is to be added into the Inventory.
 	 * @param item
@@ -199,6 +203,7 @@ public class Inventory extends SubMenu {
 						}
 						break;
 					}
+					case ALL:
 					case POKEBALLS:
 					case POTIONS:
 					case TM_HM:
@@ -245,10 +250,7 @@ public class Inventory extends SubMenu {
 
 	public void removeItem(Item item) {
 		// If the item is a "Return" menu, we do not remove it.
-		if (item.isReturnMenu())
-			return;
-
-		if (item.getCategory() == ItemCategories.KEYITEMS)
+		if (item.isReturnMenu() || (item.getCategory() == ItemCategories.KEYITEMS))
 			// Cannot remove key items, therefore, this does nothing.
 			return;
 
@@ -258,6 +260,7 @@ public class Inventory extends SubMenu {
 				Debug.error("Removing Key Items - This is impossible to reach here.");
 				break;
 			}
+			case ALL:
 			case POKEBALLS:
 			case POTIONS:
 			case TM_HM: {
@@ -284,10 +287,10 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Initializes the Inventory with the inputs.
-	 * 
+	 *
 	 * <p>
 	 * Does not initialize anything else.
-	 * 
+	 *
 	 * @param keys
 	 *            The input keys the player is using.
 	 * @return Itself.
@@ -303,11 +306,11 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Renders the Inventory to the screen.
-	 * 
+	 *
 	 * <p>
 	 * Note that it doesn't render the {@link screen.Scene#getBufferedImage() BufferedImage} to the
 	 * actual {@link main.MainComponent#getBufferStrategy() BufferStrategy}.
-	 * 
+	 *
 	 * @param output
 	 *            The display that is to be rendered.
 	 * @param graphics
@@ -348,6 +351,10 @@ public class Inventory extends SubMenu {
 						output.blit(Art.inventory_backpack_TM_HM, 0, 8);
 						output.blit(Art.inventory_tag_TM_HM, 0, Tileable.HEIGHT * 4 + 3);
 						break;
+					case ALL:
+						output.blit(Art.inventory_backpack_unsorted, 0, 8);
+						output.blit(Art.inventory_tag_unsorted, 0, Tileable.HEIGHT * 4 + 3);
+						break;
 				}
 				Graphics2D g2d = output.getBufferedImage().createGraphics();
 				this.renderText(g2d);
@@ -379,6 +386,10 @@ public class Inventory extends SubMenu {
 					case TM_HM:
 						output.blit(Art.inventory_backpack_TM_HM, 0, 8);
 						output.blit(Art.inventory_tag_TM_HM, 0, Tileable.HEIGHT * 4 + 3);
+						break;
+					case ALL:
+						output.blit(Art.inventory_backpack_unsorted, 0, 8);
+						output.blit(Art.inventory_tag_unsorted, 0, Tileable.HEIGHT * 4 + 3);
 						break;
 				}
 				BufferedImage old = output.getBufferedImage();
@@ -426,6 +437,10 @@ public class Inventory extends SubMenu {
 						output.blit(Art.inventory_backpack_TM_HM, 0, 8);
 						output.blit(Art.inventory_tag_TM_HM, 0, Tileable.HEIGHT * 4 + 3);
 						break;
+					case ALL:
+						output.blit(Art.inventory_backpack_unsorted, 0, 8);
+						output.blit(Art.inventory_tag_unsorted, 0, Tileable.HEIGHT * 4 + 3);
+						break;
 				}
 				BufferedImage old = output.getBufferedImage();
 				Graphics2D g2d = old.createGraphics();
@@ -461,6 +476,10 @@ public class Inventory extends SubMenu {
 						output.blit(Art.inventory_backpack_TM_HM, 0, 8);
 						output.blit(Art.inventory_tag_TM_HM, 0, Tileable.HEIGHT * 4 + 3);
 						break;
+					case ALL:
+						output.blit(Art.inventory_backpack_unsorted, 0, 8);
+						output.blit(Art.inventory_tag_unsorted, 0, Tileable.HEIGHT * 4 + 3);
+						break;
 				}
 				Graphics2D g2d = output.getBufferedImage().createGraphics();
 				this.renderText(g2d);
@@ -472,7 +491,7 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Resets the position of the pointer that points to the items.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void resetCursor() {
@@ -487,7 +506,7 @@ public class Inventory extends SubMenu {
 	/**
 	 * Resets the position of the pointer and delete the selection menu commands of the item that the
 	 * player is allowed to do.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void resetSelectionCursor() {
@@ -497,7 +516,7 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Updates the Inventory each tick.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	@Override
@@ -563,6 +582,7 @@ public class Inventory extends SubMenu {
 						Item item = list.get(this.itemCursor).getKey();
 						if (item != null && list.get(this.itemCursor).getValue() != Integer.MAX_VALUE) {
 							switch (item.getCategory()) {
+								case ALL:
 								case POTIONS:
 								case POKEBALLS:
 								case TM_HM:
@@ -570,9 +590,6 @@ public class Inventory extends SubMenu {
 									break;
 								case KEYITEMS:
 									this.selectionMenu.addAll(item.getAvailableCommands());
-									break;
-								default:
-									// Ignore
 									break;
 							}
 						}
@@ -655,6 +672,7 @@ public class Inventory extends SubMenu {
 						Item item = list.get(this.itemCursor).getKey();
 						if (item != null && list.get(this.itemCursor).getValue() != Integer.MAX_VALUE) {
 							switch (item.getCategory()) {
+								case ALL:
 								case POTIONS:
 								case POKEBALLS:
 								case TM_HM:
@@ -662,9 +680,6 @@ public class Inventory extends SubMenu {
 									break;
 								case KEYITEMS:
 									this.selectionMenu.addAll(item.getAvailableCommands());
-									break;
-								default:
-									// Ignore
 									break;
 							}
 						}
@@ -687,12 +702,10 @@ public class Inventory extends SubMenu {
 				if (!this.game.itemHasBeenRegistered(actionItem)) {
 					this.game.setRegisteredItem(actionItem);
 				}
-				if (this.set_end) {
-					if (Game.keys.isPrimaryPressed()) {
-						Game.keys.primaryReceived();
-						this.resetSelectionCursor();
-						this.state = InventoryState.SELECTION;
-					}
+				if (this.set_end && Game.keys.isPrimaryPressed()) {
+					Game.keys.primaryReceived();
+					this.resetSelectionCursor();
+					this.state = InventoryState.SELECTION;
 				}
 				break;
 			}
@@ -710,10 +723,10 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Toss away an item.
-	 * 
+	 *
 	 * <p>
 	 * Can be put in a loop to toss away multiple items at the same time.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void tossItem() {
@@ -729,7 +742,7 @@ public class Inventory extends SubMenu {
 	 * List given in order:
 	 * <p>
 	 * Potions -> KeyItems -> Pokéballs -> TMs_HMs.
-	 * 
+	 *
 	 * @return
 	 */
 	public List<List<Map.Entry<Item, Integer>>> getAllItemsList() {
@@ -738,6 +751,7 @@ public class Inventory extends SubMenu {
 		result.add(this.keyItems);
 		result.add(this.pokéballs);
 		result.add(this.TMs_HMs);
+		result.add(this.unsortedItems);
 		return result;
 	}
 
@@ -749,7 +763,7 @@ public class Inventory extends SubMenu {
 	 * <li>Pokéballs
 	 * <li>TMs_HMs.
 	 * </ul>
-	 * 
+	 *
 	 * @return
 	 */
 	public Map<ItemCategories, List<Map.Entry<Item, Integer>>> getAllMappedItemsList() {
@@ -758,6 +772,7 @@ public class Inventory extends SubMenu {
 		result.put(ItemCategories.KEYITEMS, this.keyItems);
 		result.put(ItemCategories.POKEBALLS, this.pokéballs);
 		result.put(ItemCategories.TM_HM, this.TMs_HMs);
+		result.put(ItemCategories.ALL, this.unsortedItems);
 		return result;
 	}
 
@@ -791,7 +806,7 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Obtains the list of items the player is currently browsing in the Inventory.
-	 * 
+	 *
 	 * @return A list of all the items and their corresponding amount of the items that the player is
 	 *         currently browsing in.
 	 */
@@ -810,8 +825,8 @@ public class Inventory extends SubMenu {
 			case TM_HM:
 				result = this.TMs_HMs;
 				break;
-			default:
-				// Ignore
+			case ALL:
+				result = this.unsortedItems;
 				break;
 		}
 		return result;
@@ -819,7 +834,7 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Obtains the list of items of the category the item belongs to in the Inventory.
-	 * 
+	 *
 	 * @param itemText
 	 *            The ItemText object that holds information for obtaining the list of items that it
 	 *            belongs to.
@@ -841,8 +856,8 @@ public class Inventory extends SubMenu {
 			case TM_HM:
 				result = this.TMs_HMs;
 				break;
-			default:
-				// Ignore
+			case ALL:
+				result = this.unsortedItems;
 				break;
 		}
 		return result;
@@ -850,7 +865,7 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Obtains the list of items of the category the item belongs to in the Inventory.
-	 * 
+	 *
 	 * @param item
 	 *            The target item that is used to get the list of items that the targeted item belongs
 	 *            to.
@@ -872,8 +887,8 @@ public class Inventory extends SubMenu {
 			case TM_HM:
 				result = this.TMs_HMs;
 				break;
-			default:
-				// Ignore
+			case ALL:
+				result = this.unsortedItems;
 				break;
 		}
 		return result;
@@ -881,13 +896,13 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Retrieves the list of available commands the item allows from the given list of items.
-	 * 
+	 *
 	 * @param list
 	 *            The list of all the items that is currently being active and browsed by the player.
-	 * 
+	 *
 	 * @param graphics
 	 *            The Graphics object that renders the custom font to the screen.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	private void renderItemMenuText(List<Map.Entry<Item, Integer>> list, Graphics graphics) {
@@ -960,7 +975,7 @@ public class Inventory extends SubMenu {
 	/**
 	 * Renders the background of the Inventory, which its rendering area is where the list of items are
 	 * to be drawn on top of.
-	 * 
+	 *
 	 * @param output
 	 *            The screen that the game used to draw for the player to see.
 	 * @param x
@@ -971,7 +986,7 @@ public class Inventory extends SubMenu {
 	 *            The width of the list box that is to be drawn.
 	 * @param height
 	 *            The height of the lsit box that is too be drawn
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	private void renderListBox(Scene output, int x, int y, int width, int height) {
@@ -989,7 +1004,7 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Sets the inventory state.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	private void setState(InventoryState value) {
@@ -998,15 +1013,15 @@ public class Inventory extends SubMenu {
 
 	/**
 	 * Renders all the texts that are to be drawn to the screen.
-	 * 
+	 *
 	 * <p>
 	 * Does not draw text for the dialogues.
-	 * 
+	 *
 	 * @param g
 	 *            The Graphics object that is passed to draw the text messages. It can be a Graphics
 	 *            object that is created from a BufferedImage, or a Graphics object that is created from
 	 *            a BufferStrategy().
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	private void renderText(Graphics g) {
@@ -1114,18 +1129,15 @@ public class Inventory extends SubMenu {
 							return;
 						}
 						if (this.inventoryDialogueThread == null) {
-							this.inventoryDialogueThread = new Thread(new Runnable() {
-								@Override
-								public void run() {
-									Player.lockMovements();
-									try {
-										Thread.sleep(1500);
-									}
-									catch (InterruptedException e) {}
-									Inventory.this.setState(InventoryState.SELECTION);
-									Inventory.this.set_end = true;
-									Player.unlockMovements();
+							this.inventoryDialogueThread = new Thread(() -> {
+								Player.lockMovements();
+								try {
+									Thread.sleep(1500);
 								}
+								catch (InterruptedException e) {}
+								Inventory.this.setState(InventoryState.SELECTION);
+								Inventory.this.set_end = true;
+								Player.unlockMovements();
 							});
 							this.inventoryDialogueThread.setName("Inventory Dialogue Thread");
 						}
@@ -1142,18 +1154,15 @@ public class Inventory extends SubMenu {
 						return;
 					}
 					if (this.inventoryDialogueThread == null) {
-						this.inventoryDialogueThread = new Thread(new Runnable() {
-							@Override
-							public void run() {
-								Player.lockMovements();
-								try {
-									Thread.sleep(2000);
-								}
-								catch (InterruptedException e) {}
-								Inventory.this.setState(InventoryState.SELECTION);
-								Inventory.this.set_end = true;
-								Player.unlockMovements();
+						this.inventoryDialogueThread = new Thread(() -> {
+							Player.lockMovements();
+							try {
+								Thread.sleep(2000);
 							}
+							catch (InterruptedException e1) {}
+							Inventory.this.setState(InventoryState.SELECTION);
+							Inventory.this.set_end = true;
+							Player.unlockMovements();
 						});
 						this.inventoryDialogueThread.setName("Inventory Dialogue Thread");
 					}
