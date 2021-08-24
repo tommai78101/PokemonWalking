@@ -215,7 +215,7 @@ public class Game {
 		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
 
 		if (WorldConstants.isModsEnabled.booleanValue())
-			Debug.log("Loading custom modded game world.");
+			Debug.warn("Loading custom modded game world.");
 	}
 
 	/**

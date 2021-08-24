@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package data.chunk;
 
@@ -13,7 +13,7 @@ import level.PixelData;
 import main.Game;
 
 /**
- * 
+ *
  * @author tlee
  */
 public class InventoryItemChunk extends Chunk {
@@ -46,7 +46,7 @@ public class InventoryItemChunk extends Chunk {
 		}
 
 		int itemPixelColor = raf.readInt();
-		this.item = Item.build(new PixelData(itemPixelColor));
+		this.item = Item.build(new PixelData(itemPixelColor), 0, 0);
 		if (this.item == null) {
 			throw new IOException("Item cannot be created. Incorrect pixel data.");
 		}

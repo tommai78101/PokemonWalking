@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -11,6 +11,7 @@ package editor;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -37,11 +38,13 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public CustomJTextField greenInputField;
 	public CustomJTextField blueInputField;
 
+	public JCheckBox isNpcTriggerBox;
+
 	public int dataValue;
-	public Data selectData;
+	public SpriteData selectData;
 	public ControlPanel panel;
 
-	public JLabel areaID, tileID, extendedTileID, tileSpecificID, fullDataInput;
+	public JLabel areaID, tileID, extendedTileID, tileSpecificID, fullDataInput, npcTriggerField;
 
 	private int lastKnownValidAreaID = 0;
 
@@ -98,8 +101,6 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	}
 
 	public TilePropertiesPanel(ControlPanel controlPanel) {
-		super();
-
 		this.panel = controlPanel;
 
 		this.areaID = new CustomJLabel("Area ID:");
@@ -107,11 +108,13 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.extendedTileID = new CustomJLabel("Ext. ID:");
 		this.tileSpecificID = new CustomJLabel("Other ID:");
 		this.fullDataInput = new CustomJLabel("Edit Data:");
+		this.npcTriggerField = new CustomJLabel("For NPC:");
 
 		this.alphaField = new CustomJTextField(); // AA
 		this.redField = new CustomJTextField(); // RR
 		this.greenField = new CustomJTextField(); // GG
 		this.blueField = new CustomJTextField(); // BB
+		this.isNpcTriggerBox = new JCheckBox(); // For NPC triggers only.
 
 		this.areaIDInputField = new CustomJTextField();
 		this.alphaInputField = new CustomJTextField();
@@ -123,16 +126,19 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.tileID.setHorizontalAlignment(SwingConstants.CENTER);
 		this.extendedTileID.setHorizontalAlignment(SwingConstants.CENTER);
 		this.tileSpecificID.setHorizontalAlignment(SwingConstants.CENTER);
+		this.npcTriggerField.setHorizontalAlignment(SwingConstants.CENTER);
 
 		this.alphaField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.redField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.greenField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.blueField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.isNpcTriggerBox.setHorizontalAlignment(SwingConstants.CENTER);
 
 		this.alphaField.setEditable(false);
 		this.redField.setEditable(false);
 		this.greenField.setEditable(false);
 		this.blueField.setEditable(false);
+		this.isNpcTriggerBox.setEnabled(false);
 
 		this.areaIDInputField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.alphaInputField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -169,6 +175,9 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.add(this.tileSpecificID);
 		this.add(this.greenField);
 		this.add(this.blueField);
+
+		this.add(this.npcTriggerField);
+		this.add(this.isNpcTriggerBox);
 
 		this.add(this.fullDataInput);
 		this.add(this.alphaInputField);
@@ -225,6 +234,15 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		}
 	}
 
+	/**
+	 * Only for use with EditorConstants Metadata, Triggers.
+	 *
+	 * @return
+	 */
+	public boolean isNpcTrigger() {
+		return this.isNpcTriggerBox.isSelected();
+	}
+
 	public void clearInputFields() {
 		this.areaIDInputField.setText("");
 		this.alphaInputField.setText("");
@@ -240,10 +258,10 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 	/**
 	 * Given a Data object, set all of the input field values based on the data's properties.
-	 * 
+	 *
 	 * @param selectedData
 	 */
-	public void setDataProperties(Data selectedData) {
+	public void setDataProperties(SpriteData selectedData) {
 		this.areaIDInputField.setText(Integer.toString(this.panel.getEditor().getUniqueAreaID()));
 		this.alphaInputField.setText(Integer.toString(selectedData.alpha));
 		this.redInputField.setText(Integer.toString(selectedData.red));
@@ -255,7 +273,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void changedUpdate(DocumentEvent event) {
 		try {
-			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.lastKnownValidAreaID = Integer.parseInt(this.areaIDInputField.getText());
 			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
 		}
 		catch (NumberFormatException e) {
@@ -270,7 +288,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
 
 			if (this.selectData != null && this.selectData.name.equals("Select")) {
-				Data editedData = EditorConstants.getData(this.dataValue);
+				SpriteData editedData = EditorConstants.getData(this.dataValue);
 				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
 			}
 		}
@@ -282,7 +300,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void insertUpdate(DocumentEvent event) {
 		try {
-			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.lastKnownValidAreaID = Integer.parseInt(this.areaIDInputField.getText());
 			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
 		}
 		catch (NumberFormatException e) {
@@ -297,7 +315,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
 
 			if (this.selectData != null && this.selectData.name.equals("Select")) {
-				Data editedData = EditorConstants.getData(this.dataValue);
+				SpriteData editedData = EditorConstants.getData(this.dataValue);
 				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
 			}
 		}
@@ -309,7 +327,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void removeUpdate(DocumentEvent event) {
 		try {
-			this.lastKnownValidAreaID = Integer.valueOf(this.areaIDInputField.getText());
+			this.lastKnownValidAreaID = Integer.parseInt(this.areaIDInputField.getText());
 			this.panel.getEditor().setUniqueAreaID(this.lastKnownValidAreaID);
 		}
 		catch (NumberFormatException e) {
@@ -324,7 +342,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 			this.dataValue = (a << 24) | (r << 16) | (g << 8) | b;
 
 			if (this.selectData != null && this.selectData.name.equals("Select")) {
-				Data editedData = EditorConstants.getData(this.dataValue);
+				SpriteData editedData = EditorConstants.getData(this.dataValue);
 				this.panel.getEditor().drawingBoardPanel.setDataProperties(editedData);
 			}
 		}
@@ -336,7 +354,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
-			case Pixel_Data:
+			case Tilesets:
 				this.tileID.setText("Tile ID:");
 				this.extendedTileID.setText("Extended ID:");
 				this.tileSpecificID.setText("Other IDs:");
@@ -346,6 +364,12 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.redInputField.setVisible(true);
 				this.greenInputField.setVisible(true);
 				this.blueInputField.setVisible(true);
+				this.isNpcTriggerBox.setVisible(false);
+
+				// Label field
+				this.areaID.setVisible(true);
+				this.blueField.setVisible(true);
+				this.npcTriggerField.setVisible(false);
 				break;
 			case Triggers:
 				this.tileID.setText("X Position:");
@@ -357,7 +381,31 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.redInputField.setVisible(false);
 				this.greenInputField.setVisible(false);
 				this.blueInputField.setVisible(false);
+				this.isNpcTriggerBox.setVisible(true);
+
+				// Label field
+				this.areaID.setVisible(false);
+				this.blueField.setVisible(true);
+				this.npcTriggerField.setVisible(true);
 				break;
+			case NonPlayableCharacters: {
+				this.tileID.setText("NPC Type:");
+				this.extendedTileID.setText("Unique ID:");
+				this.tileSpecificID.setText("NpcScriptID:");
+				this.fullDataInput.setVisible(false);
+				this.areaIDInputField.setVisible(false);
+				this.alphaInputField.setVisible(true);
+				this.redInputField.setVisible(true);
+				this.greenInputField.setVisible(true);
+				this.blueInputField.setVisible(false);
+				this.isNpcTriggerBox.setVisible(false);
+
+				// Label field
+				this.areaID.setVisible(false);
+				this.blueField.setVisible(false);
+				this.npcTriggerField.setVisible(false);
+				break;
+			}
 		}
 		super.revalidate();
 		super.repaint();

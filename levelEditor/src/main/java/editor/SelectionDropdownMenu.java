@@ -3,7 +3,6 @@ package editor;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.util.List;
 
 import javax.swing.Box;
@@ -25,9 +24,9 @@ public class SelectionDropdownMenu extends JPanel {
 	private static final Dimension LabelSize = new Dimension(150, 25);
 
 	private JComboBox<Category> tileCategory;
-	private JComboBox<Data> tiles;
+	private JComboBox<SpriteData> tiles;
 	private JComboBox<Trigger> triggers;
-	private Data selectedData;
+	private SpriteData selectedData;
 	private Trigger selectedTrigger;
 	private JPanel triggerEditorInfo;
 
@@ -72,7 +71,7 @@ public class SelectionDropdownMenu extends JPanel {
 		this.validate();
 	}
 
-	public Data getSelectedData() {
+	public SpriteData getSelectedData() {
 		return this.selectedData;
 	}
 
@@ -98,22 +97,19 @@ public class SelectionDropdownMenu extends JPanel {
 				return c.name;
 			}
 		};
-		this.tileCategory.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				EditorConstants.chooser = Tools.Properties;
-				SelectionDropdownMenu.this.editor.input.forceCancelDrawing();
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					Category c = (Category) e.getItem();
-					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) SelectionDropdownMenu.this.tiles.getModel();
-					for (Data d : c.nodes) {
-						model.addElement(d);
-					}
+		this.tileCategory.addItemListener(e -> {
+			EditorConstants.chooser = Tools.Properties;
+			SelectionDropdownMenu.this.editor.input.forceCancelDrawing();
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				Category c = (Category) e.getItem();
+				DefaultComboBoxModel<SpriteData> model1 = (DefaultComboBoxModel<SpriteData>) SelectionDropdownMenu.this.tiles.getModel();
+				for (SpriteData d : c.nodes) {
+					model1.addElement(d);
 				}
-				if (e.getStateChange() == ItemEvent.DESELECTED) {
-					DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) SelectionDropdownMenu.this.tiles.getModel();
-					model.removeAllElements();
-				}
+			}
+			if (e.getStateChange() == ItemEvent.DESELECTED) {
+				DefaultComboBoxModel<SpriteData> model2 = (DefaultComboBoxModel<SpriteData>) SelectionDropdownMenu.this.tiles.getModel();
+				model2.removeAllElements();
 			}
 		});
 
@@ -136,32 +132,29 @@ public class SelectionDropdownMenu extends JPanel {
 
 			@Override
 			public String getDisplayValue(Object item) {
-				Data d = (Data) item;
+				SpriteData d = (SpriteData) item;
 				return d.name;
 			}
 		};
-		this.tiles.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				EditorConstants.chooser = Tools.Properties;
-				SelectionDropdownMenu.this.editor.input.forceCancelDrawing();
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					Data d = (Data) e.getItem();
-					SelectionDropdownMenu.this.selectedData = d;
-					TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
-					panel.alphaInputField.setText(Integer.toString(d.alpha));
-					panel.redInputField.setText(Integer.toString(d.red));
-					panel.greenInputField.setText(Integer.toString(d.green));
-					panel.blueInputField.setText(Integer.toString(d.blue));
-					SelectionDropdownMenu.this.editor.controlPanel.setSelectedData(d);
-				}
+		this.tiles.addItemListener(e -> {
+			EditorConstants.chooser = Tools.Properties;
+			SelectionDropdownMenu.this.editor.input.forceCancelDrawing();
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				SpriteData d = (SpriteData) e.getItem();
+				SelectionDropdownMenu.this.selectedData = d;
+				TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
+				panel.alphaInputField.setText(Integer.toString(d.alpha));
+				panel.redInputField.setText(Integer.toString(d.red));
+				panel.greenInputField.setText(Integer.toString(d.green));
+				panel.blueInputField.setText(Integer.toString(d.blue));
+				SelectionDropdownMenu.this.editor.controlPanel.setSelectedData(d);
 			}
 		});
 
 		// No need to add all of the data elements into this model. Rather, remove all of them, so the
 		// Category can load the Tile model elements in.
 		// Category c = EditorConstants.getInstance().getCategories().get(0);
-		DefaultComboBoxModel<Data> model = (DefaultComboBoxModel<Data>) this.tiles.getModel();
+		DefaultComboBoxModel<SpriteData> model = (DefaultComboBoxModel<SpriteData>) this.tiles.getModel();
 		model.removeAllElements();
 	}
 
@@ -179,21 +172,18 @@ public class SelectionDropdownMenu extends JPanel {
 				return t.getName();
 			}
 		};
-		this.triggers.addItemListener(new ItemListener() {
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				EditorConstants.chooser = Tools.Properties;
-				if (e.getStateChange() == ItemEvent.SELECTED) {
-					Trigger t = (Trigger) e.getItem();
-					TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
-					panel.alphaField.setText(Integer.toString(t.getPositionX()));
-					panel.redField.setText(Integer.toString(t.getPositionY()));
-					panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
-					panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
-					SelectionDropdownMenu.this.selectedTrigger = t;
-					SelectionDropdownMenu.this.editor.controlPanel.setSelectedTrigger(t);
-					SelectionDropdownMenu.this.editor.validate();
-				}
+		this.triggers.addItemListener(e -> {
+			EditorConstants.chooser = Tools.Properties;
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				Trigger t = (Trigger) e.getItem();
+				TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
+				panel.alphaField.setText(Integer.toString(t.getPositionX()));
+				panel.redField.setText(Integer.toString(t.getPositionY()));
+				panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
+				panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
+				SelectionDropdownMenu.this.selectedTrigger = t;
+				SelectionDropdownMenu.this.editor.controlPanel.setSelectedTrigger(t);
+				SelectionDropdownMenu.this.editor.validate();
 			}
 		});
 
@@ -226,9 +216,9 @@ public class SelectionDropdownMenu extends JPanel {
 		}
 	}
 
-	public void setDataAsSelected(Data data) {
+	public void setDataAsSelected(SpriteData data) {
 		DefaultComboBoxModel<Category> categoryModel = (DefaultComboBoxModel<Category>) this.tileCategory.getModel();
-		DefaultComboBoxModel<Data> tilesModel = (DefaultComboBoxModel<Data>) this.tiles.getModel();
+		DefaultComboBoxModel<SpriteData> tilesModel = (DefaultComboBoxModel<SpriteData>) this.tiles.getModel();
 		int categorySize = categoryModel.getSize();
 
 		// Tiles Category
@@ -239,7 +229,7 @@ public class SelectionDropdownMenu extends JPanel {
 				// Tiles
 				int tilesSize = category.nodes.size();
 				for (int j = 0; j < tilesSize; j++) {
-					Data tilesData = category.nodes.get(j);
+					SpriteData tilesData = category.nodes.get(j);
 					if (tilesData.compare(data)) {
 						// Do all of this in 1 go.
 						this.editor.controlPanel.getPropertiesPanel().clearSelectedData();
@@ -255,7 +245,7 @@ public class SelectionDropdownMenu extends JPanel {
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
-			case Pixel_Data:
+			case Tilesets:
 				this.tileCategory.setEnabled(true);
 				this.tiles.setEnabled(true);
 				this.triggers.setEnabled(false);
@@ -267,6 +257,13 @@ public class SelectionDropdownMenu extends JPanel {
 				this.triggers.setEnabled(true);
 				this.triggerEditorInfo.setVisible(true);
 				break;
+			case NonPlayableCharacters: {
+				this.tileCategory.setEnabled(false);
+				this.tiles.setEnabled(false);
+				this.triggers.setEnabled(false);
+				this.triggerEditorInfo.setVisible(false);
+				break;
+			}
 		}
 		super.validate();
 	}

@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -39,8 +39,8 @@ import script_editor.ScriptEditor;
 
 public class FileControl extends JPanel implements ActionListener {
 	public static File lastSavedDirectory = null;
-	public static final String[] TAGS = new String[] {
-	    "New", "Save", "Open", "", "Tileset", "Trigger", "", "Script"
+	public static final String[] TAGS = {
+		"New", "Save", "Open", "", "Tileset", "Trigger", "NPC", "Script"
 	};
 
 	private static final long serialVersionUID = 1L;
@@ -51,7 +51,6 @@ public class FileControl extends JPanel implements ActionListener {
 	private List<String> cacheDirectories;
 
 	public FileControl(LevelEditor editor) {
-		super();
 		this.editor = editor;
 		this.cacheDirectories = new ArrayList<>();
 		this.setLayout(new GridLayout(1, FileControl.TAGS.length));
@@ -77,13 +76,12 @@ public class FileControl extends JPanel implements ActionListener {
 		JButton button = (JButton) event.getSource();
 		String command = button.getActionCommand();
 		try {
-			int value = Integer.valueOf(command);
+			int value = Integer.parseInt(command);
 			switch (value) {
 				case 0: // New
 				{
 					this.editor.drawingBoardPanel.newImage();
 					this.editor.setMapAreaName("Untitled");
-					this.editor.generateChecksum();
 					break;
 				}
 				case 1: { // Save
@@ -129,9 +127,9 @@ public class FileControl extends JPanel implements ActionListener {
 							while (filename.endsWith(".png"))
 								filename = filename.substring(0, filename.length() - ".png".length());
 							ImageIO.write(
-							    img, "png", new File(
-							        FileControl.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"
-							    )
+								img, "png", new File(
+									FileControl.lastSavedDirectory.getAbsolutePath() + "\\" + filename + ".png"
+								)
 							);
 							this.editor.setMapAreaName(filename);
 
@@ -175,6 +173,7 @@ public class FileControl extends JPanel implements ActionListener {
 						try (RandomAccessFile cacheFile = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 							File f = chooser.getSelectedFile();
 							FileControl.lastSavedDirectory = f.getParentFile();
+							EditorConstants.metadata = Metadata.Tilesets;
 							this.editor.setTitle(LevelEditor.NAME_TITLE + " - " + f);
 							BufferedImage image = ImageIO.read(f);
 							this.editor.drawingBoardPanel.openMapImage(image);
@@ -195,11 +194,15 @@ public class FileControl extends JPanel implements ActionListener {
 					break;
 				}
 				case 4: { // Tileset
-					EditorConstants.metadata = Metadata.Pixel_Data;
+					EditorConstants.metadata = Metadata.Tilesets;
 					break;
 				}
 				case 5: { // Trigger
 					EditorConstants.metadata = Metadata.Triggers;
+					break;
+				}
+				case 6: { // Non-Playable Characters (NPC)
+					EditorConstants.metadata = Metadata.NonPlayableCharacters;
 					break;
 				}
 				case 7: {// Script editor

@@ -1,54 +1,14 @@
 package entity;
 
-import java.awt.Graphics;
-
 import abstracts.Character;
-import abstracts.Entity;
-import level.Area;
-import screen.Scene;
 
 public class Joe extends Character {
 	public Joe() {
-		this.setCharacterPlayable(false);
+		this.setAutoWalking(true);
 	}
 
 	@Override
-	public void tick() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void walk() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void sprint() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void jump() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void ride() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void swim() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void interact(Area area, Entity target) {
-		// TODO Auto-generated method stub
+	public int getAutoWalkTickFrequency() {
+		return Character.AUTO_WALK_SLOW;
 	}
 }

@@ -21,9 +21,9 @@
 
 ===
 
-![Imgur](http://i.imgur.com/rwkiHwC.png)
+![Github](https://github.com/tommai78101/PokemonWalking/blob/development/.github/something_not_right.png?raw=true)
 
-![Imgur](http://i.imgur.com/P56aP0J.png)
+![Github](https://github.com/tommai78101/PokemonWalking/blob/development/.github/inventory_key_items.png?raw=true)
 
 ### Pokémon Walking Algorithm (Working Title) 
 
@@ -61,9 +61,12 @@ It's still in very early stages of development. Possibly even earlier than "alph
 
 **Demo:**
 
-http://www.gfycat.com/EachIlliterateHyrax#
+Showcases the possibilities:
 
-http://www.gfycat.com/ShabbySoupyDobermanpinscher
+![Github](https://github.com/tommai78101/PokemonWalking/blob/development/.github/bicycling.gif?raw=true)
+
+
+![Github](https://github.com/tommai78101/PokemonWalking/blob/development/.github/character_scripting.gif?raw=true)
 
 ===
 
@@ -90,7 +93,7 @@ http://www.gfycat.com/ShabbySoupyDobermanpinscher
 
 ===
 
-![Imgur](http://i.imgur.com/u8xYVVc.png)
+![Github](https://github.com/tommai78101/PokemonWalking/blob/development/.github/editor.png?raw=true)
 
 ### Level Editor
 
@@ -118,32 +121,32 @@ This level editor is released to the public to allow players to create their own
 
 *How to use the Level Editor, part 1:*
 
-http://www.gfycat.com/NextNeighboringFluke
+https://www.gfycat.com/NextNeighboringFluke
 
 *How to use the Level Editor, part 2:*
 
-http://www.gfycat.com/FrighteningGargantuanDonkey
+https://www.gfycat.com/FrighteningGargantuanDonkey
 
 *How to use the Level Editor, part 3:*
 
-http://www.gfycat.com/SneakyTalkativeAcaciarat
+https://www.gfycat.com/SneakyTalkativeAcaciarat
 
 *You Should Know when starting the game:*
 
-http://www.gfycat.com/CloudyBonyGlowworm
+https://www.gfycat.com/CloudyBonyGlowworm
 
 *Adding your Custom Maps:*
 
-http://www.gfycat.com/WeepyUnsightlyFairybluebird
+https://www.gfycat.com/WeepyUnsightlyFairybluebird
 
 *Loading your Custom Maps:*
 
-http://www.gfycat.com/FamiliarUncommonIndianabat
+https://www.gfycat.com/FamiliarUncommonIndianabat
 
 
 ===
 
-![Imgur](http://i.imgur.com/6Tcdi5a.png)
+![Github](https://github.com/tommai78101/PokemonWalking/blob/development/.github/script_editor.png?raw=true)
 
 ### Script Editor
 
@@ -190,31 +193,29 @@ to feel lively.
   
 DO NOT CHANGE\/REMOVE THIS TRIGGER SCRIPT. THIS IS RESERVED ONLY. FOLLOW THIS FORMAT.  
   
-<b>TODO:</b> Remove the dependency of this Eraser trigger from the Level Editor.
-
-<pre><code>
-$0
-@Eraser
-%
-</code></pre>
-
 ===
 
 **Features:**
 
 | In development | Beta (Close to completion) | Complete |
 |:---:|:---:|:---:|
-| Triggers/Events | Dialogues | All Movements* |
-| Script Editor | Level Editor | Ledges |
-| ??? | ??? | Area Warping |
-| | | Stairs |
-| | | Water |
-| | | Bitmap Animation |
-| | | Item Balls |
-| | | Inventory |
+| Script Editor | Dialogues | All Movements* |
+| | Level Editor | Ledges |
+| | Triggers/Events | Area Transitions |
+| | | Stairs / Doors |
+| | | Cliff Jumping |
+| | | Wall Collisions |
+| | | Surfing |
+| | | Tile Animations |
+| | | Entity Interactions |
+| | | Inventory / Items |
 | | | Saving/Loading |
+| | | Characters/NPCs |
+| | | NPC Collisions |
+| | | Obstacles Scripting |
+| | | NPC Scripting |
 
-\*All movements: Walking, Facing/Turning, Surfing, Bicycling, Jumping, etc.
+\*All movements: Walking, Facing/Turning, Surfing, Bicycling, Jumping, NPC collisions, Obstacle collisions, etc.
 
 ===
 
@@ -234,10 +235,12 @@ $0
 
 ===
 
-| Downloads | Latest Stable Version | Link |
+| Downloads | Old Stable Version | Link |
 |:---:|:---:|:---:|
 | Walking | v20 (6/18/2015) | http://www.thehelper.net/attachments/walking_v20-zip.18776/ |
 | Editor | v6 (6/18/2015) | http://www.thehelper.net/attachments/editor_v6-zip.18777/ |
+
+<b>New releases are now filed under GitHub Releases, and uses the standard Semantic Versioning (X.Y.Z).</b>
 
 Extract the JAR file from the ZIP file after you have downloaded it. Then double-click on it to run.
 
