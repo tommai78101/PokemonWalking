@@ -688,10 +688,10 @@ public class Dialogue {
 				if (this.tickCount > Dialogue.CHARACTER_TICK_DELAY)
 					this.tickCount = Dialogue.ZERO_TICK;
 			}
-// else {
-// //Just speed up the dialogue.
-// this.tickCount = Dialogue.CHARACTER_TICK_DELAY;
-// }
+			// else {
+			// //Just speed up the dialogue.
+			// this.tickCount = Dialogue.CHARACTER_TICK_DELAY;
+			// }
 		}
 		else {
 			if (this.lineIterator >= this.lines.size()) {

@@ -76,7 +76,8 @@ public abstract class SubMenu implements MenuDisplayable {
 	/**
 	 * Should the game flash a bit when exiting the submenu?
 	 * 
-	 * @return True, if the submenu needs to show flashing animation when exiting submenu. False, if otherwise.
+	 * @return True, if the submenu needs to show flashing animation when exiting submenu. False, if
+	 *         otherwise.
 	 */
 	public boolean needsFlashing() {
 		return this.needsFlashingAnimation;

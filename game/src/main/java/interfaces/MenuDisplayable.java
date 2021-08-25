@@ -6,5 +6,6 @@ import screen.Scene;
 
 public interface MenuDisplayable {
 	public void tick();
+
 	public void render(Scene screen, Graphics graphics);
 }
