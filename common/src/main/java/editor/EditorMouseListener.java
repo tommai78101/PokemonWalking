@@ -70,14 +70,14 @@ public class EditorMouseListener implements MouseListener {
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		MouseEvent newEvent = new MouseEvent(
-		    this.fileChooser,
-		    e.getID(),
-		    e.getWhen(),
-		    e.getModifiersEx(),
-		    e.getX(),
-		    e.getY(),
-		    1,
-		    false
+			this.fileChooser,
+			e.getID(),
+			e.getWhen(),
+			e.getModifiersEx(),
+			e.getX(),
+			e.getY(),
+			1,
+			false
 		);
 		this.mouseClicked(newEvent);
 	}

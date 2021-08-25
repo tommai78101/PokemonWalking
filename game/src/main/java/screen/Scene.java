@@ -90,7 +90,6 @@ public class Scene extends Bitmap {
 		int blitWidth = blitArea.bottomRightCorner_X - blitArea.topLeftCorner_X;
 
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
-
 			int tgt = yy * this.width + blitArea.topLeftCorner_X;
 			int src = (yy - y) * bitmap.width + (blitArea.topLeftCorner_X - x);
 			tgt -= src;
@@ -124,7 +123,6 @@ public class Scene extends Bitmap {
 		int tick = 0;
 
 		for (int yy = blitArea.topLeftCorner_Y; yy < blitArea.bottomRightCorner_Y; yy++) {
-
 			int tgt = yy * this.width + blitArea.topLeftCorner_X;
 			int src = (yy - y) * bitmap.width + (blitArea.topLeftCorner_X - x);
 			tgt -= src;

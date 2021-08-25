@@ -8,7 +8,8 @@ import java.io.File;
 import javax.swing.JFileChooser;
 
 /**
- * Enhanced JFileChooser class object. Built to override the approved selection of directory so it doesn't make mistakes.
+ * Enhanced JFileChooser class object. Built to override the approved selection of directory so it
+ * doesn't make mistakes.
  * 
  * @author tlee
  */

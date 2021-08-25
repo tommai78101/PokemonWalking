@@ -27,7 +27,8 @@ public class InputHandler implements KeyListener {
 	 * This input handler use threads to monitor inputs that require tapping or pressing the keys.
 	 * 
 	 * @param Keys
-	 *            An object that holds key input properties. All properties are used throughout the life cycle of this application.
+	 *            An object that holds key input properties. All properties are used throughout the life
+	 *            cycle of this application.
 	 */
 	public InputHandler(Keys keys) {
 		this.mappings.put(keys.up, KeyEvent.VK_UP);
@@ -48,7 +49,6 @@ public class InputHandler implements KeyListener {
 
 		// Debugging purposes
 		this.mappings.put(keys.F1, KeyEvent.VK_F1);
-
 	}
 
 	@Override

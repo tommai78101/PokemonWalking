@@ -30,7 +30,8 @@ public class HeaderInfo implements RandomFileAccessible {
 			raf.write(header_version);
 			raf.write(header_id);
 			raf.write(header_format);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IOException("Error in writing file.", e);
 		}
 	}
@@ -42,23 +43,27 @@ public class HeaderInfo implements RandomFileAccessible {
 		boolean olderVersion = false;
 		raf.read(info);
 		try {
-			VERSION_CHECK: for (int j = 0; j < header_version.length; j++) {
+			VERSION_CHECK:
+			for (int j = 0; j < header_version.length; j++) {
 				if (header_version[j] != info[j]) {
 					if (header_version[j] > info[j]) {
 						olderVersion = true;
 						new RuntimeException("Incorrect header version signature. Determining its version.")
-								.printStackTrace();
+							.printStackTrace();
 						break VERSION_CHECK;
-					} else
+					}
+					else
 						throw new IOException("Unable to determine version.");
 				}
 			}
-			ID_CHECK: for (int i = 0; i < header_id.length; i++) {
+			ID_CHECK:
+			for (int i = 0; i < header_id.length; i++) {
 				if (header_id[i] != info[i + header_version.length]) {
 					if (olderVersion) {
 						new RuntimeException("Incorrect header id signature. Attempting to update.").printStackTrace();
 						break ID_CHECK;
-					} else
+					}
+					else
 						throw new RuntimeException("Unknown header id signature.");
 				}
 			}
@@ -67,7 +72,8 @@ public class HeaderInfo implements RandomFileAccessible {
 					throw new RuntimeException("Incorrect header code signature.");
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			raf.close();
 			throw new IOException("Error in reading the data file.", e);
 		}

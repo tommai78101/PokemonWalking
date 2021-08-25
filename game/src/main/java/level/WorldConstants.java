@@ -73,7 +73,7 @@ public class WorldConstants {
 
 	// Default scripts path. For internal use only.
 	public static final String ScriptsDefaultPath = "/art/script";
-	
+
 	// Modded maps enabled?
 	public static Boolean isModsEnabled = null;
 
@@ -193,9 +193,9 @@ public class WorldConstants {
 		int areaID = Area.getAreaIDFromBitmap(bitmap);
 		// Java 8 feature
 		boolean exists = WorldConstants.areas.stream()
-		    .filter(chosenArea -> chosenArea.getAreaID() == areaID)
-		    .findFirst()
-		    .isPresent();
+			.filter(chosenArea -> chosenArea.getAreaID() == areaID)
+			.findFirst()
+			.isPresent();
 		if (!exists) {
 			WorldConstants.areas.add(new Area(bitmap));
 		}

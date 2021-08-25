@@ -84,24 +84,28 @@ public class DrawingBoard extends Canvas implements Runnable {
 	public void run() {
 		long now, lastTime = System.nanoTime();
 		double unprocessed = 0.0;
-		final double nsPerTick = 1000000000.0 / 30.0;
+		double targetedFrameRate = 30.0;
+		final double nsPerTick = 1000000000.0 / targetedFrameRate;
 		while (this.editor.running) {
 			now = System.nanoTime();
 			unprocessed += (now - lastTime) / nsPerTick;
 			lastTime = now;
 
-			if (unprocessed >= 40.0)
-				unprocessed = 40.0;
+			if (unprocessed >= targetedFrameRate)
+				unprocessed = targetedFrameRate;
 			if (unprocessed <= 0.0)
 				unprocessed = 1.0;
 
-			while (unprocessed >= 1.0) {
+			try {
 				this.tick();
-				unprocessed -= 1.0;
+				Thread.sleep((long) unprocessed);
 			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+
 			try {
 				this.render();
-				Thread.sleep(1);
 			}
 			catch (Exception e) {
 				e.printStackTrace();

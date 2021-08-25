@@ -9,7 +9,7 @@ public enum ItemTags {
 	Description("@", "DESCRIPTION", "Item description"),
 	Category("^", "CATEGORY", "Item category"),
 	Delimiter(";", "END", "End of the item information"),
-	
+
 	// Item options
 	SetCommand("$", "DESCRIPTION", "Item description"),
 	UseCommand("!", "CATEGORY", "Item category"),
