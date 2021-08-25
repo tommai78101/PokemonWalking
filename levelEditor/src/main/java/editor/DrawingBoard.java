@@ -89,8 +89,11 @@ public class DrawingBoard extends Canvas implements Runnable {
 		final long DRAW_INTERVAL = NANOSECONDS_PER_SECOND / FPS_TARGET;
 		long nextUpdate = System.nanoTime() + UPDATE_INTERVAL;
 		long nextDraw = System.nanoTime() + DRAW_INTERVAL;
+		@SuppressWarnings("unused")
 		long nextReset = System.nanoTime() + NANOSECONDS_PER_SECOND;
+		@SuppressWarnings("unused")
 		int updateCount = 0;
+		@SuppressWarnings("unused")
 		int frameCount = 0;
 		long now = 0L;
 		while (this.editor.running) {
