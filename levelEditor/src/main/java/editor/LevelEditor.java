@@ -114,6 +114,7 @@ public class LevelEditor extends JFrame {
 			}
 			if (LevelEditor.this.drawingBoardPanel == null) {
 				LevelEditor.this.drawingBoardPanel = new DrawingBoard(editor.LevelEditor.this, 20, 20);
+				LevelEditor.this.drawingBoardPanel.setName("DrawingBoardThread");
 				LevelEditor.this.drawingBoardPanel.addMouseListener(LevelEditor.this.input);
 				LevelEditor.this.drawingBoardPanel.addMouseMotionListener(LevelEditor.this.input);
 				LevelEditor.this.add(LevelEditor.this.drawingBoardPanel, BorderLayout.CENTER);

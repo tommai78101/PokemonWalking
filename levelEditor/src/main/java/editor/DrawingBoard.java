@@ -82,34 +82,45 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 	@Override
 	public void run() {
-		long now, lastTime = System.nanoTime();
-		double unprocessed = 0.0;
-		double targetedFrameRate = 30.0;
-		final double nsPerTick = 1000000000.0 / targetedFrameRate;
+		final long NANOSECONDS_PER_SECOND = 1000000000;
+		final int FPS_TARGET = 120;
+		final int UPDATE_TARGET = 60;
+		final long UPDATE_INTERVAL = NANOSECONDS_PER_SECOND / UPDATE_TARGET;
+		final long DRAW_INTERVAL = NANOSECONDS_PER_SECOND / FPS_TARGET;
+		long nextUpdate = System.nanoTime() + UPDATE_INTERVAL;
+		long nextDraw = System.nanoTime() + DRAW_INTERVAL;
+		long nextReset = System.nanoTime() + NANOSECONDS_PER_SECOND;
+		int updateCount = 0;
+		int frameCount = 0;
+		long now = 0L;
 		while (this.editor.running) {
 			now = System.nanoTime();
-			unprocessed += (now - lastTime) / nsPerTick;
-			lastTime = now;
 
-			if (unprocessed >= targetedFrameRate)
-				unprocessed = targetedFrameRate;
-			if (unprocessed <= 0.0)
-				unprocessed = 1.0;
-
-			try {
+			while (now > nextUpdate) {
 				this.tick();
-				Thread.sleep((long) unprocessed);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
+				nextUpdate = now + UPDATE_INTERVAL;
+				updateCount++;
 			}
 
-			try {
-				this.render();
+			while (now > nextDraw) {
+				try {
+					this.render();
+					Thread.sleep(1);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				nextDraw = now + DRAW_INTERVAL;
+				frameCount++;
 			}
-			catch (Exception e) {
-				e.printStackTrace();
+			/* Debug purposes only.
+			if (now >= nextReset) {
+				nextReset = now + NANOSECONDS_PER_SECOND;
+				Debug.info("Fps: " + frameCount + " | Updates: " + updateCount);
+				frameCount = 0;
+				updateCount = 0;
 			}
+			*/
 		}
 	}
 
