@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package menu;
@@ -100,8 +100,8 @@ public class MainMenu extends SubMenu {
 		}
 		this.prepareMenuText();
 		this.handleMenuSelection();
-//		if (Player.isMovementsLocked())
-//			Player.unlockMovements();
+		// if (Player.isMovementsLocked())
+		// Player.unlockMovements();
 	}
 
 	@Override
@@ -121,34 +121,39 @@ public class MainMenu extends SubMenu {
 		return (this.activeMenuItem != null) ? this.activeMenuItem.getEvent() : null;
 	}
 
-//	public void closeMenu() {
-//		if (Player.isMovementsLocked())
-//			Player.unlockMovements();
-//	}
-//
-//	public void openMenu() {
-//		if (!Player.isMovementsLocked())
-//			Player.lockMovements();
-//	}
+	/*
+	public void closeMenu() {
+		if (Player.isMovementsLocked())
+			Player.unlockMovements();
+	}
+
+	public void openMenu() {
+		if (!Player.isMovementsLocked())
+			Player.lockMovements();
+	}
+	*/
 
 	/**
 	 * Compares all available submenus before returning it.
-	 * 
+	 *
 	 * <p>
-	 * <b>Note:</b> There's a legitimate logic error resulting in submenus having different reference values in the Java VM existing in this method. If this method doesn't do any comparison beforehand, it will result in having the JVM using the wrong but correct references.
-	 * 
+	 * <b>Note:</b> There's a legitimate logic error resulting in submenus having different reference
+	 * values in the Java VM existing in this method. If this method doesn't do any comparison
+	 * beforehand, it will result in having the JVM using the wrong but correct references.
+	 *
 	 * @return The chosen submenu that is equal to the submenu used for comparison.
 	 */
-
-//	public SubMenu getChosenSubMenu() {
-//		return this.items.get(this.menuCursorPosition);
-//		SubMenu menu = this.items.get(this.menuCursorPosition);
-//		if (menu.equals(this.inventory))
-//			menu = this.inventory;
-//		else if (menu.equals(this.save))
-//			menu = save;
-//		return menu;
-//	}
+	/*
+	public SubMenu getChosenSubMenu() {
+		return this.items.get(this.menuCursorPosition);
+		SubMenu menu = this.items.get(this.menuCursorPosition);
+		if (menu.equals(this.inventory))
+			menu = this.inventory;
+		else if (menu.equals(this.save))
+			menu = save;
+		return menu;
+	}
+	*/
 
 	public List<SubMenu> getSubMenusList() {
 		return this.items;
@@ -185,7 +190,7 @@ public class MainMenu extends SubMenu {
 
 	/**
 	 * If no active item is found, it will return null.
-	 * 
+	 *
 	 * @return A SubMenu object if there exists a player-chosen submenu item. Otherwise, null.
 	 */
 	public SubMenu getActiveItem() {
@@ -220,26 +225,28 @@ public class MainMenu extends SubMenu {
 			Game.keys.Z.lastKeyState = true;
 			Game.keys.SLASH.lastKeyState = true;
 			this.activeMenuItem = this.items.get(this.menuCursorPosition);
-//			event.trigger(() -> {
-//				MenuEvent menuEvent = (MenuEvent) event;
-//				Type type = menuEvent.getType();
-//				switch (type) {
-//					case INVENTORY:
-//						this.stateManager.setCurrentGameState(GameState.INVENTORY);
-//						this.gameScene.setRenderingEffectTick((byte) 0x0);
-//						break;
-//					case SAVE:
-//						this.stateManager.setCurrentGameState(GameState.SAVING);
-//						break;
-//					case EXIT:
-//						this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
-//						this.startMenu.closeMenu();
-//						break;
-//					case UNUSED:
-//						this.startMenu.closeMenu();
-//						break;
-//				}
-//			});
+			/*
+			event.trigger(() -> {
+				MenuEvent menuEvent = (MenuEvent) event;
+				Type type = menuEvent.getType();
+				switch (type) {
+					case INVENTORY:
+						this.stateManager.setCurrentGameState(GameState.INVENTORY);
+						this.gameScene.setRenderingEffectTick((byte) 0x0);
+						break;
+					case SAVE:
+						this.stateManager.setCurrentGameState(GameState.SAVING);
+						break;
+					case EXIT:
+						this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+						this.startMenu.closeMenu();
+						break;
+					case UNUSED:
+						this.startMenu.closeMenu();
+						break;
+				}
+			});
+			*/
 		}
 	}
 

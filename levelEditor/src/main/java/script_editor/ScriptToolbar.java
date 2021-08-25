@@ -34,7 +34,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private final ScriptEditor editor;
 	private final String[] tags = {
-	    "New Script", "Save Script", "Open Script", ""
+		"New Script", "Save Script", "Open Script", ""
 	};
 	private final HashMap<String, JButton> buttonCache = new HashMap<>();
 
@@ -60,7 +60,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 
 				JComboBox<Trigger> triggerComboBox = this.editor.parent.properties.getTriggerList();
 				DefaultComboBoxModel<Trigger> triggerComboModel = (DefaultComboBoxModel<Trigger>) triggerComboBox
-				    .getModel();
+					.getModel();
 				triggerComboModel.removeAllElements();
 
 				Trigger trigger = new Trigger();

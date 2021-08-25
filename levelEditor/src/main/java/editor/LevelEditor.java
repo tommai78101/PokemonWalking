@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package editor;
@@ -32,7 +32,7 @@ import common.Tileable;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
 
-//TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating 
+//TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating
 //maps and scripts together.
 
 public class LevelEditor extends JFrame {
@@ -87,67 +87,59 @@ public class LevelEditor extends JFrame {
 			@Override
 			public void windowClosing(WindowEvent event) {
 				LevelEditor.this.running = false;
-				SwingUtilities.invokeLater(new Runnable() {
-					@Override
-					public void run() {
-						Runtime.getRuntime().exit(0);
-					}
-				});
+				SwingUtilities.invokeLater(() -> Runtime.getRuntime().exit(0));
 			}
 		});
 
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				boolean shouldValidate = false;
-				if (LevelEditor.this.input == null) {
-					LevelEditor.this.input = new EditorInput(editor.LevelEditor.this);
-					LevelEditor.this.addMouseListener(LevelEditor.this.input);
-					LevelEditor.this.addMouseMotionListener(LevelEditor.this.input);
-				}
-				if (LevelEditor.this.fileControlPanel == null) {
-					LevelEditor.this.fileControlPanel = new FileControl(editor.LevelEditor.this);
-					LevelEditor.this.fileControlPanel.addMouseListener(LevelEditor.this.input);
-					LevelEditor.this.fileControlPanel.addMouseMotionListener(LevelEditor.this.input);
-					LevelEditor.this.add(LevelEditor.this.fileControlPanel, BorderLayout.NORTH);
-					shouldValidate = true;
-				}
-				if (LevelEditor.this.controlPanel == null) {
-					LevelEditor.this.controlPanel = new ControlPanel(editor.LevelEditor.this);
-					LevelEditor.this.controlPanel.addMouseListener(LevelEditor.this.input);
-					LevelEditor.this.controlPanel.addMouseMotionListener(LevelEditor.this.input);
-					LevelEditor.this.add(LevelEditor.this.controlPanel, BorderLayout.WEST);
-					shouldValidate = true;
-				}
-				if (LevelEditor.this.drawingBoardPanel == null) {
-					LevelEditor.this.drawingBoardPanel = new DrawingBoard(editor.LevelEditor.this, 20, 20);
-					LevelEditor.this.drawingBoardPanel.addMouseListener(LevelEditor.this.input);
-					LevelEditor.this.drawingBoardPanel.addMouseMotionListener(LevelEditor.this.input);
-					LevelEditor.this.add(LevelEditor.this.drawingBoardPanel, BorderLayout.CENTER);
-					LevelEditor.this.drawingBoardPanel.start();
-					shouldValidate = true;
-				}
+		SwingUtilities.invokeLater(() -> {
+			boolean shouldValidate = false;
+			if (LevelEditor.this.input == null) {
+				LevelEditor.this.input = new EditorInput(editor.LevelEditor.this);
+				LevelEditor.this.addMouseListener(LevelEditor.this.input);
+				LevelEditor.this.addMouseMotionListener(LevelEditor.this.input);
+			}
+			if (LevelEditor.this.fileControlPanel == null) {
+				LevelEditor.this.fileControlPanel = new FileControl(editor.LevelEditor.this);
+				LevelEditor.this.fileControlPanel.addMouseListener(LevelEditor.this.input);
+				LevelEditor.this.fileControlPanel.addMouseMotionListener(LevelEditor.this.input);
+				LevelEditor.this.add(LevelEditor.this.fileControlPanel, BorderLayout.NORTH);
+				shouldValidate = true;
+			}
+			if (LevelEditor.this.controlPanel == null) {
+				LevelEditor.this.controlPanel = new ControlPanel(editor.LevelEditor.this);
+				LevelEditor.this.controlPanel.addMouseListener(LevelEditor.this.input);
+				LevelEditor.this.controlPanel.addMouseMotionListener(LevelEditor.this.input);
+				LevelEditor.this.add(LevelEditor.this.controlPanel, BorderLayout.WEST);
+				shouldValidate = true;
+			}
+			if (LevelEditor.this.drawingBoardPanel == null) {
+				LevelEditor.this.drawingBoardPanel = new DrawingBoard(editor.LevelEditor.this, 20, 20);
+				LevelEditor.this.drawingBoardPanel.addMouseListener(LevelEditor.this.input);
+				LevelEditor.this.drawingBoardPanel.addMouseMotionListener(LevelEditor.this.input);
+				LevelEditor.this.add(LevelEditor.this.drawingBoardPanel, BorderLayout.CENTER);
+				LevelEditor.this.drawingBoardPanel.start();
+				shouldValidate = true;
+			}
 
-				// TODO: Add Trigger properties here.
-				if (LevelEditor.this.properties == null) {
-					LevelEditor.this.properties = new SelectionDropdownMenu(editor.LevelEditor.this);
-					LevelEditor.this.properties.addMouseListener(LevelEditor.this.input);
-					LevelEditor.this.properties.addMouseMotionListener(LevelEditor.this.input);
-					LevelEditor.this.add(LevelEditor.this.properties, BorderLayout.EAST);
-					shouldValidate = true;
-				}
+			// TODO: Add Trigger properties here.
+			if (LevelEditor.this.properties == null) {
+				LevelEditor.this.properties = new SelectionDropdownMenu(editor.LevelEditor.this);
+				LevelEditor.this.properties.addMouseListener(LevelEditor.this.input);
+				LevelEditor.this.properties.addMouseMotionListener(LevelEditor.this.input);
+				LevelEditor.this.add(LevelEditor.this.properties, BorderLayout.EAST);
+				shouldValidate = true;
+			}
 
-				if (LevelEditor.this.statusPanel == null) {
-					LevelEditor.this.statusPanel = new StatusPanel();
-					LevelEditor.this.statusPanel.addMouseListener(LevelEditor.this.input);
-					LevelEditor.this.statusPanel.addMouseMotionListener(LevelEditor.this.input);
-					LevelEditor.this.add(LevelEditor.this.statusPanel, BorderLayout.SOUTH);
-					shouldValidate = true;
-				}
-				LevelEditor.this.initialize();
-				if (shouldValidate) {
-					LevelEditor.this.validate();
-				}
+			if (LevelEditor.this.statusPanel == null) {
+				LevelEditor.this.statusPanel = new StatusPanel();
+				LevelEditor.this.statusPanel.addMouseListener(LevelEditor.this.input);
+				LevelEditor.this.statusPanel.addMouseMotionListener(LevelEditor.this.input);
+				LevelEditor.this.add(LevelEditor.this.statusPanel, BorderLayout.SOUTH);
+				shouldValidate = true;
+			}
+			LevelEditor.this.initialize();
+			if (shouldValidate) {
+				LevelEditor.this.validate();
 			}
 		});
 		this.createOrReadCache();
@@ -157,11 +149,11 @@ public class LevelEditor extends JFrame {
 	 * <p>
 	 * Generates a cache file for saving the last known directory the editor knew of.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * Upon initialization, the default saved directory will be the editor's file location path.
 	 * </p>
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void createOrReadCache() {
@@ -196,68 +188,65 @@ public class LevelEditor extends JFrame {
 
 	@Override
 	public void validate() {
-		SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				if (LevelEditor.this.statusPanel != null) {
-					StringBuilder builder = new StringBuilder();
-					builder.append("Picked: " + editor.LevelEditor.this.controlPanel.getPickedEntityName() + " ");
-					if (!LevelEditor.this.input.isDragging()) {
-						// This is how we do the [panning + pixel position] math.
-						int w = 0;
-						int h = 0;
-						int temp = 0;
-						try {
-							temp = (LevelEditor.this.input.offsetX + LevelEditor.this.input.mouseX);
-							if (temp >= 0)
-								w = temp / Tileable.WIDTH;
-							else
-								w = (temp / Tileable.WIDTH) - 1;
-						}
-						catch (Exception e) {
-							w = (LevelEditor.this.input.offsetX + LevelEditor.this.input.mouseX) / (LevelEditor.WIDTH * LevelEditor.SIZE);
-						}
-						try {
-							temp = (LevelEditor.this.input.offsetY + LevelEditor.this.input.mouseY);
-							if (temp >= 0)
-								h = temp / Tileable.HEIGHT;
-							else
-								h = (temp / Tileable.HEIGHT) - 1;
-						}
-						catch (Exception e) {
-							h = (LevelEditor.this.input.offsetY + LevelEditor.this.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);
-						}
-						LevelEditor.this.statusPanel.setMousePositionText(w, h);
+		SwingUtilities.invokeLater(() -> {
+			if (LevelEditor.this.statusPanel != null) {
+				StringBuilder builder = new StringBuilder();
+				builder.append("Picked: " + editor.LevelEditor.this.controlPanel.getPickedEntityName() + " ");
+				if (!LevelEditor.this.input.isDragging()) {
+					// This is how we do the [panning + pixel position] math.
+					int w = 0;
+					int h = 0;
+					int temp = 0;
+					try {
+						temp = (LevelEditor.this.input.offsetX + LevelEditor.this.input.mouseX);
+						if (temp >= 0)
+							w = temp / Tileable.WIDTH;
+						else
+							w = (temp / Tileable.WIDTH) - 1;
 					}
-					else {
-						try {
-							LevelEditor.this.statusPanel.setMousePositionText(
-								LevelEditor.this.input.oldX / LevelEditor.this.drawingBoardPanel.getBitmapWidth(),
-								LevelEditor.this.input.oldY / LevelEditor.this.drawingBoardPanel.getBitmapHeight()
-							);
-						}
-						catch (Exception e) {
-							LevelEditor.this.statusPanel.setMousePositionText(0, 0);
-						}
+					catch (Exception e1) {
+						w = (LevelEditor.this.input.offsetX + LevelEditor.this.input.mouseX) / (LevelEditor.WIDTH * LevelEditor.SIZE);
 					}
-					LevelEditor.this.statusPanel.setStatusMessageText(builder.toString());
-					LevelEditor.this.statusPanel.setChecksumLabel(LevelEditor.this.getChecksum());
+					try {
+						temp = (LevelEditor.this.input.offsetY + LevelEditor.this.input.mouseY);
+						if (temp >= 0)
+							h = temp / Tileable.HEIGHT;
+						else
+							h = (temp / Tileable.HEIGHT) - 1;
+					}
+					catch (Exception e2) {
+						h = (LevelEditor.this.input.offsetY + LevelEditor.this.input.mouseY) / (LevelEditor.WIDTH * LevelEditor.SIZE);
+					}
+					LevelEditor.this.statusPanel.setMousePositionText(w, h);
 				}
-
-				if (LevelEditor.this.controlPanel != null) {
-					LevelEditor.this.controlPanel.validate();
-					if (LevelEditor.this.controlPanel.getPropertiesPanel() != null)
-						LevelEditor.this.controlPanel.getPropertiesPanel().validate();
+				else {
+					try {
+						LevelEditor.this.statusPanel.setMousePositionText(
+							LevelEditor.this.input.oldX / LevelEditor.this.drawingBoardPanel.getBitmapWidth(),
+							LevelEditor.this.input.oldY / LevelEditor.this.drawingBoardPanel.getBitmapHeight()
+						);
+					}
+					catch (Exception e3) {
+						LevelEditor.this.statusPanel.setMousePositionText(0, 0);
+					}
 				}
-				if (LevelEditor.this.fileControlPanel != null)
-					LevelEditor.this.fileControlPanel.validate();
-				if (LevelEditor.this.drawingBoardPanel != null)
-					LevelEditor.this.drawingBoardPanel.validate();
-				if (LevelEditor.this.properties != null)
-					LevelEditor.this.properties.validate();
-				if (LevelEditor.this.statusPanel != null)
-					LevelEditor.this.statusPanel.validate();
+				LevelEditor.this.statusPanel.setStatusMessageText(builder.toString());
+				LevelEditor.this.statusPanel.setChecksumLabel(LevelEditor.this.getChecksum());
 			}
+
+			if (LevelEditor.this.controlPanel != null) {
+				LevelEditor.this.controlPanel.validate();
+				if (LevelEditor.this.controlPanel.getPropertiesPanel() != null)
+					LevelEditor.this.controlPanel.getPropertiesPanel().validate();
+			}
+			if (LevelEditor.this.fileControlPanel != null)
+				LevelEditor.this.fileControlPanel.validate();
+			if (LevelEditor.this.drawingBoardPanel != null)
+				LevelEditor.this.drawingBoardPanel.validate();
+			if (LevelEditor.this.properties != null)
+				LevelEditor.this.properties.validate();
+			if (LevelEditor.this.statusPanel != null)
+				LevelEditor.this.statusPanel.validate();
 		});
 		super.validate();
 	}
