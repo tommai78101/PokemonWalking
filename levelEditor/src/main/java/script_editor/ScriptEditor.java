@@ -25,10 +25,15 @@ import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import common.Debug;
 import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
+import enums.ScriptJsonTags;
 import enums.ScriptTags;
 
 public class ScriptEditor extends JFrame {
@@ -104,6 +109,7 @@ public class ScriptEditor extends JFrame {
 		File file = new File("readme.txt");
 		if (file.exists())
 			return;
+
 		// There are many different ways you can do to write data to files. This is one
 		// of them.
 		// @formatter:off
@@ -135,10 +141,38 @@ public class ScriptEditor extends JFrame {
 			"/ ] <Deny>: Negative Action",
 			"/ ; <Repeat, Repeatable>: Repeat Flag. If contains ';', it means it's enabled by default.",
 			" ",
-			"/ DO NOT CHANGE/REMOVE THIS TRIGGER SCRIPT. THIS IS RESERVED ONLY. FOLLOW THIS FORMAT.",
+			"/ Example Legacy Format:",
 			"$0",
 			"@Eraser",
-			"%"
+			"%",
+			" ",
+			"/ Example JSON Format:",
+			"{\r\n"
+			+ "   \"data\": [\r\n"
+			+ "      {\r\n"
+			+ "         \"BEGIN\": \"1\",\r\n"
+			+ "         \"CONTENT\": [\r\n"
+			+ "            {\"1\": \"#First speech begins.\"},\r\n"
+			+ "            {\"2\": \"?First question?\"},\r\n"
+			+ "            {\"3\": \"#Second speech begins.\"},\r\n"
+			+ "            {\"4\": \"#Explaining stuffs.\"},\r\n"
+			+ "            {\"5\": \"#Ending first trigger.\"}\r\n"
+			+ "         ],\r\n"
+			+ "         \"NAME\": \"Sample trigger #1\"\r\n"
+			+ "      },\r\n"
+			+ "      {\r\n"
+			+ "         \"NPC\": \"2\",\r\n"
+			+ "         \"CONTENT\": [\r\n"
+			+ "            {\"1\": \"#First speech.\"},\r\n"
+			+ "            {\"2\": \"#NPC talks second dialogue.\"},\r\n"
+			+ "            {\"3\": \"#Nothing else.\"},\r\n"
+			+ "            {\"4\": \"#Ending NPC speech.\"}\r\n"
+			+ "         ],\r\n"
+			+ "         \"NAME\": \"Sample NPC trigger #2\"\r\n"
+			+ "      }\r\n"
+			+ "   ],\r\n"
+			+ "   \"CHKSUM\": \"ce42c3f6a6f16392\"\r\n"
+			+ "}"
 		};
 		// @formatter:on
 
@@ -243,44 +277,51 @@ public class ScriptEditor extends JFrame {
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);
 
-			String line = null;
-			trigger = null;
-			String checksum = null;
-			StringBuilder builder = new StringBuilder();
-			while ((line = reader.readLine()) != null) {
-				if (ScriptTags.BeginScript.beginsAt(line)) {
-					trigger = new Trigger();
-					trigger.setTriggerID(Short.parseShort(ScriptTags.BeginScript.removeScriptTag(line)));
-				}
-				else if (ScriptTags.NpcScript.beginsAt(line)) {
-					trigger = new Trigger();
-					trigger.setNpcTriggerID(Short.parseShort(ScriptTags.NpcScript.removeScriptTag(line)));
-				}
-				else if (ScriptTags.ScriptName.beginsAt(line)) {
-					line = line.replaceAll("_", " ");
-					trigger.setName(ScriptTags.ScriptName.removeScriptTag(line));
-				}
-				else if (ScriptTags.EndScript.beginsAt(line)) {
-					trigger.setScript(builder.toString());
-					trigger.setChecksum(checksum);
-					scriptTriggerListModel.addElement(trigger);
-					editorTriggerComboModel.addElement(trigger);
-					builder.setLength(0);
-				}
-				else if (ScriptTags.Checksum.beginsAt(line)) {
-					line = ScriptTags.Checksum.removeScriptTag(line);
-					checksum = line;
-				}
-				else if (ScriptTags.Speech.beginsAt(line) || ScriptTags.Question.beginsAt(line) || ScriptTags.Affirm.beginsAt(line) || ScriptTags.Reject.beginsAt(line) || ScriptTags.Confirm.beginsAt(line) || ScriptTags.Cancel.beginsAt(line)) {
-					builder.append(line).append("\n");
+			JSONTokener tokener = new JSONTokener(reader);
+			JSONObject scriptJson = new JSONObject(tokener);
+
+			// Get the checksum from the main script JSON.
+			final String checksum = scriptJson.getString(ScriptTags.Checksum.getSymbolName());
+
+			// Parse the main script JSON's data.
+			JSONArray data = scriptJson.getJSONArray(ScriptJsonTags.DATA.getKey());
+			int length = data.length();
+			for (int i = 0; i < length; i++) {
+				JSONObject element = data.getJSONObject(i);
+				trigger = new Trigger();
+
+				// Determine if it's a trigger script or NPC script. It cannot be anything else.
+				String idType = element.optString(ScriptTags.BeginScript.getSymbolName());
+				if (idType.isBlank()) {
+					idType = element.getString(ScriptTags.NpcScript.getSymbolName());
+					trigger.setNpcTriggerID(Short.parseShort(idType));
 				}
 				else {
-					// Ignore lines.
+					trigger.setTriggerID(Short.parseShort(idType));
 				}
+
+				// Add name
+				trigger.setName(element.getString(ScriptTags.ScriptName.getSymbolName()));
+
+				// Add checksum from the main script JSON.
+				trigger.setChecksum(checksum);
+
+				// Add script contents
+				JSONArray dataContents = element.getJSONArray(ScriptTags.ContentData.getSymbolName());
+				StringBuilder builder = new StringBuilder();
+				for (int cIndex = 0; cIndex < dataContents.length(); cIndex++) {
+					JSONObject content = dataContents.getJSONObject(cIndex);
+					builder.append(content.getString(Integer.toString(cIndex + 1))).append("\n");
+				}
+				trigger.setScript(builder.toString());
+
+				// Finally, add trigger to list models
+				scriptTriggerListModel.addElement(trigger);
+				editorTriggerComboModel.addElement(trigger);
 			}
 		}
 		catch (IOException e) {
-			e.printStackTrace();
+			Debug.error("JSON parsing error.", e);
 		}
 		var triggerList = this.scriptViewer.getTriggerList();
 		triggerList.clearSelection();
@@ -337,31 +378,46 @@ public class ScriptEditor extends JFrame {
 	public void save(File script) {
 		// FileWriter(File, false) will explicitly clear the target file first before writing text.
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(script, false))) {
-			String checksum = this.getEditorChecksum();
-			writer.write(ScriptTags.Checksum.getSymbol() + checksum);
-			writer.newLine();
+			JSONObject scriptJson = new JSONObject();
 
+			// Write checksum to main JSON script.
+			final String checksum = this.getEditorChecksum();
+			scriptJson.put(ScriptTags.Checksum.getSymbolName(), checksum);
+
+			// Write all trigger scripts to main JSON script as data.
+			JSONArray data = new JSONArray();
 			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Trigger t = model.get(i);
+				JSONObject element = new JSONObject();
+
 				if (t.isNpcTrigger() && !t.isEraser()) {
-					writer.write(ScriptTags.NpcScript.getSymbol() + Short.toString(t.getNpcTriggerID()));
+					element.put(ScriptTags.NpcScript.getSymbolName(), Short.toString(t.getNpcTriggerID()));
 				}
 				else {
-					writer.write(ScriptTags.BeginScript.getSymbol() + Short.toString(t.getTriggerID()));
+					element.put(ScriptTags.BeginScript.getSymbolName(), Short.toString(t.getTriggerID()));
 				}
-				writer.newLine();
-				writer.write(ScriptTags.ScriptName.getSymbol() + t.getName().replace(" ", "_"));
-				writer.newLine();
-				writer.write(t.getScript());
-				writer.newLine();
-				writer.write(ScriptTags.EndScript.getSymbol());
-				writer.newLine();
+				element.put(ScriptTags.ScriptName.getSymbolName(), t.getName());
 
-				// Double blank lines for separation of triggers.
-				writer.newLine();
-				writer.newLine();
+				// Write script contents cleanly
+				String[] contents = t.getScript().split("\n");
+				JSONArray orderedList = new JSONArray();
+				for (int cIndex = 0; cIndex < contents.length; cIndex++) {
+					JSONObject order = new JSONObject();
+					String content = contents[cIndex];
+					order.put(Integer.toString(cIndex + 1), content);
+					orderedList.put(order);
+				}
+				element.put(ScriptTags.ContentData.getSymbolName(), orderedList);
+
+				// Write trigger element to main script data.
+				data.put(element);
 			}
+			scriptJson.put(ScriptJsonTags.DATA.getKey(), data);
+
+			// Write to file
+			scriptJson.write(writer, 3, 0);
+
 			Debug.warn("Saved Location: " + script.getAbsolutePath());
 		}
 		catch (IOException e) {

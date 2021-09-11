@@ -93,7 +93,14 @@ public enum ScriptTags {
 	/**
 	 * ~
 	 */
-	Condition("~", "CONDITION", "Conditions that are to be met to complete the script");
+	Condition("~", "CONDITION", "Conditions that are to be met to complete the script"),
+
+	/**
+	 * *
+	 * <p>
+	 * NOTE(Thompson): Only for use with parsing JSON script files.
+	 */
+	ContentData("*", "CONTENT", "Script contents in full.");
 
 	private final String symbol;
 	private final String uppercaseSymbolName;
