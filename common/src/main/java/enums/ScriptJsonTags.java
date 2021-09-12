@@ -22,7 +22,7 @@ public enum ScriptJsonTags {
 
 	// JSON array that contains multiple trigger script information.
 	DATA("data"),
-	ORDER("order"),
+	ARRAY_INDEX("index"),
 
 	// ScriptTags type and content, for ScriptTagsResult
 	TYPE("type"),

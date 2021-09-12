@@ -420,7 +420,7 @@ public class ScriptEditor extends JFrame {
 					JSONObject order = new JSONObject();
 					ScriptTagsResult result = ScriptTags.determineType(content);
 					// Only for human-readability.
-					order.put(ScriptJsonTags.ORDER.getKey(), cIndex + 1);
+					order.put(ScriptJsonTags.ARRAY_INDEX.getKey(), cIndex + 1);
 					order.put(ScriptJsonTags.TYPE.getKey(), result.getType().name());
 					order.put(ScriptJsonTags.CONTENT.getKey(), result.getContent());
 					orderedList.put(order);
