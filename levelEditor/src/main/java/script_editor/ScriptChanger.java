@@ -303,7 +303,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		public void actionPerformed(ActionEvent event) {
 			JTextArea area = ScriptChanger.this.editor.scriptChanger.getScriptArea();
 			PlainDocument doc = (PlainDocument) area.getDocument();
-			ScriptTags action = ScriptTags.parse(event.getActionCommand());
+			ScriptTags action = ScriptTags.parseSymbol(event.getActionCommand());
 			ScriptChanger.this.handleActionCommand(doc, area, action);
 			ScriptChanger.super.revalidate();
 			ScriptChanger.super.repaint();

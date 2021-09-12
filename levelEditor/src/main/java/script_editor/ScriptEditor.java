@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import common.Debug;
+import common.ScriptTagsResult;
 import editor.FileControl;
 import editor.LevelEditor;
 import editor.Trigger;
@@ -273,6 +274,7 @@ public class ScriptEditor extends JFrame {
 			Trigger trigger = new Trigger();
 			trigger.setTriggerID((short) 0);
 			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+			trigger.setNpcTrigger(false);
 			trigger.setName("Eraser");
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);
@@ -281,7 +283,7 @@ public class ScriptEditor extends JFrame {
 			JSONObject scriptJson = new JSONObject(tokener);
 
 			// Get the checksum from the main script JSON.
-			final String checksum = scriptJson.getString(ScriptTags.Checksum.getSymbolName());
+			final String checksum = scriptJson.getString(ScriptJsonTags.CHECKSUM.getKey());
 
 			// Parse the main script JSON's data.
 			JSONArray data = scriptJson.getJSONArray(ScriptJsonTags.DATA.getKey());
@@ -291,27 +293,34 @@ public class ScriptEditor extends JFrame {
 				trigger = new Trigger();
 
 				// Determine if it's a trigger script or NPC script. It cannot be anything else.
-				String idType = element.optString(ScriptTags.BeginScript.getSymbolName());
-				if (idType.isBlank()) {
-					idType = element.getString(ScriptTags.NpcScript.getSymbolName());
-					trigger.setNpcTriggerID(Short.parseShort(idType));
+				String idType = element.optString(ScriptJsonTags.TRIGGER_TYPE.getKey());
+				if (idType.equals(ScriptJsonTags.TRIGGER_TYPE_NPC.getKey())) {
+					// NPC trigger script
+					trigger.setNpcTrigger(true);
+					trigger.setNpcTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
 				}
 				else {
-					trigger.setTriggerID(Short.parseShort(idType));
+					// Scene trigger script
+					trigger.setNpcTrigger(false);
+					trigger.setTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
 				}
 
 				// Add name
-				trigger.setName(element.getString(ScriptTags.ScriptName.getSymbolName()));
+				trigger.setName(element.getString(ScriptJsonTags.NAME.getKey()));
 
 				// Add checksum from the main script JSON.
 				trigger.setChecksum(checksum);
 
 				// Add script contents
-				JSONArray dataContents = element.getJSONArray(ScriptTags.ContentData.getSymbolName());
+				JSONArray dataContents = element.getJSONArray(ScriptJsonTags.SEQUENCE.getKey());
 				StringBuilder builder = new StringBuilder();
 				for (int cIndex = 0; cIndex < dataContents.length(); cIndex++) {
+					// The JSON array is semantically ordered, therefore there is no concern for the script's sequence
+					// order.
 					JSONObject content = dataContents.getJSONObject(cIndex);
-					builder.append(content.getString(Integer.toString(cIndex + 1))).append("\n");
+					ScriptTags tag = ScriptTags.valueOf(content.getString(ScriptJsonTags.TYPE.getKey()));
+					builder.append(tag.getSymbol());
+					builder.append(content.getString(ScriptJsonTags.CONTENT.getKey())).append("\n");
 				}
 				trigger.setScript(builder.toString());
 
@@ -382,7 +391,7 @@ public class ScriptEditor extends JFrame {
 
 			// Write checksum to main JSON script.
 			final String checksum = this.getEditorChecksum();
-			scriptJson.put(ScriptTags.Checksum.getSymbolName(), checksum);
+			scriptJson.put(ScriptJsonTags.CHECKSUM.getKey(), checksum);
 
 			// Write all trigger scripts to main JSON script as data.
 			JSONArray data = new JSONArray();
@@ -392,23 +401,31 @@ public class ScriptEditor extends JFrame {
 				JSONObject element = new JSONObject();
 
 				if (t.isNpcTrigger() && !t.isEraser()) {
-					element.put(ScriptTags.NpcScript.getSymbolName(), Short.toString(t.getNpcTriggerID()));
+					element.put(ScriptJsonTags.TRIGGER_TYPE.getKey(), ScriptJsonTags.TRIGGER_TYPE_NPC.getKey());
+					element.put(ScriptJsonTags.TRIGGER_ID.getKey(), Short.toString(t.getNpcTriggerID()));
 				}
 				else {
-					element.put(ScriptTags.BeginScript.getSymbolName(), Short.toString(t.getTriggerID()));
+					element.put(ScriptJsonTags.TRIGGER_TYPE.getKey(), ScriptJsonTags.TRIGGER_TYPE_SCENE.getKey());
+					element.put(ScriptJsonTags.TRIGGER_ID.getKey(), Short.toString(t.getTriggerID()));
 				}
-				element.put(ScriptTags.ScriptName.getSymbolName(), t.getName());
+				element.put(ScriptJsonTags.NAME.getKey(), t.getName());
 
 				// Write script contents cleanly
 				String[] contents = t.getScript().split("\n");
 				JSONArray orderedList = new JSONArray();
 				for (int cIndex = 0; cIndex < contents.length; cIndex++) {
-					JSONObject order = new JSONObject();
 					String content = contents[cIndex];
-					order.put(Integer.toString(cIndex + 1), content);
+					if (content == null || content.isBlank())
+						continue;
+					JSONObject order = new JSONObject();
+					ScriptTagsResult result = ScriptTags.determineType(content);
+					// Only for human-readability.
+					order.put(ScriptJsonTags.ORDER.getKey(), cIndex + 1);
+					order.put(ScriptJsonTags.TYPE.getKey(), result.getType().name());
+					order.put(ScriptJsonTags.CONTENT.getKey(), result.getContent());
 					orderedList.put(order);
 				}
-				element.put(ScriptTags.ContentData.getSymbolName(), orderedList);
+				element.put(ScriptJsonTags.SEQUENCE.getKey(), orderedList);
 
 				// Write trigger element to main script data.
 				data.put(element);

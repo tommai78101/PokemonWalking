@@ -6,6 +6,7 @@ package enums;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import common.ScriptTagsResult;
 import common.StringUtils;
 
 /**
@@ -33,7 +34,7 @@ public enum ScriptTags {
 	/**
 	 * $
 	 */
-	BeginScript("$", "BEGIN", "Trigger Script begins"),
+	TriggerScript("$", "BEGIN", "Trigger Script begins"),
 
 	/**
 	 * !
@@ -213,12 +214,29 @@ public enum ScriptTags {
 	// ------------------------------------------------------------------------
 	// Static methods
 
-	public static ScriptTags parse(String actionCommand) {
+	public static ScriptTags parseSymbol(String actionCommand) {
 		ScriptTags[] values = ScriptTags.values();
 		for (ScriptTags tag : values) {
 			if (tag.getSymbol().equals(actionCommand))
 				return tag;
 		}
-		throw new IllegalArgumentException("Unknown script tag action command symbol.");
+		throw new IllegalArgumentException("Unknown script tag action command symbol. [" + actionCommand + "]");
+	}
+
+	/**
+	 * Determines the ScriptTags type by parsing the given one-line string. After determining the type,
+	 * it stores the result into a wrapper class, {@linkplain ScriptTagsResult}.
+	 *
+	 * @param script
+	 * @return
+	 */
+	public static ScriptTagsResult determineType(String script) {
+		ScriptTags[] values = ScriptTags.values();
+		for (ScriptTags t : values) {
+			if (t.beginsAt(script)) {
+				return new ScriptTagsResult(t, t.removeScriptTag(script));
+			}
+		}
+		throw new IllegalArgumentException("Unknown script tag symbol found. [" + script + "]");
 	}
 }

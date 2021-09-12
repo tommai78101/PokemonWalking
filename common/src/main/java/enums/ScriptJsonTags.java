@@ -7,14 +7,29 @@ package enums;
  * @author tlee
  */
 public enum ScriptJsonTags {
+	// Script info
+	TRIGGER_ID("id"),
+	CHECKSUM("checksum"),
 	NAME("name"),
 	DESCRIPTION("description"),
 	USAGE("usage"),
+	COMMENT("comment"),
+
+	// Script trigger type
+	TRIGGER_TYPE("triggerType"),
+	TRIGGER_TYPE_SCENE("scene"),
+	TRIGGER_TYPE_NPC("npc"),
 
 	// JSON array that contains multiple trigger script information.
 	DATA("data"),
-	COMMENT("comment"),
-	AREA_CHECKSUM("areaChecksum");
+	ORDER("order"),
+
+	// ScriptTags type and content, for ScriptTagsResult
+	TYPE("type"),
+	CONTENT("content"),
+
+	// Trigger names
+	SEQUENCE("sequence");
 
 	private String jsonKey;
 
