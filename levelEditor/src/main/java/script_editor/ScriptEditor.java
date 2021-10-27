@@ -256,7 +256,7 @@ public class ScriptEditor extends JFrame {
 	 * @deprecated We will be removing the old custom way of loading trigger scripts, and will be
 	 *             transitioning to use JSON formatted scripts instead.
 	 */
-	@Deprecated(since = "v0.9.2", forRemoval = true)
+	@Deprecated(since = "v0.10.2", forRemoval = true)
 	public void load_legacy(File script) {
 		String format = script.getName();
 		if (!format.endsWith(".script")) {
