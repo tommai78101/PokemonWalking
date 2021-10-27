@@ -658,8 +658,8 @@ public class Script {
 				}
 
 				// Start of script (Trigger and NPC Triggers)
-				else if (ScriptTags.TriggerScript.beginsAt(line)) {
-					line = ScriptTags.TriggerScript.removeScriptTag(line);
+				else if (ScriptTags.BeginScript.beginsAt(line)) {
+					line = ScriptTags.BeginScript.removeScriptTag(line);
 					int triggerID = Integer.parseInt(line.trim());
 					if (triggerID > 0) {
 						if (script == null)
