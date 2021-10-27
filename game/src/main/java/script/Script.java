@@ -14,9 +14,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import common.Debug;
 import dialogue.Dialogue;
 import entity.Player;
+import enums.ScriptJsonTags;
 import enums.ScriptTags;
 import level.Area;
 import level.WorldConstants;
@@ -485,6 +491,26 @@ public class Script {
 	}
 
 	/**
+	 * Sets the trigger ID value. Conflicts with NPC trigger ID value.
+	 *
+	 * @param triggerID
+	 */
+	public void setTriggerID(int triggerID) {
+		this.triggerID = triggerID;
+		this.npcTriggerID = 0;
+	}
+
+	/**
+	 * Sets the NPC trigger ID value. Conflicts with trigger ID value.
+	 *
+	 * @param npcTriggerID
+	 */
+	public void setNpcTriggerID(int npcTriggerID) {
+		this.npcTriggerID = npcTriggerID;
+		this.triggerID = 0;
+	}
+
+	/**
 	 * Increments the current iterator based on the type of response we are giving in the game. If we
 	 * are not giving an answer to a question, the current iterator will be incremented. If we are
 	 * giving an affirmative response to a question, the affirmative dialogue iterator will be
@@ -577,9 +603,11 @@ public class Script {
 	 *            - A String object of the file name of the SCRIPT file.
 	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located
 	 *         within the SCRIPT file.
-	 *
+	 * @deprecated The old method of loading custom SCRIPT file is deprecated. Please use the new JSON
+	 *             format script loader.
 	 */
-	public static List<Script> loadScript(String filename, boolean isModdedScript) {
+	@Deprecated(forRemoval = true)
+	public static List<Script> loadScript_legacy(String filename, boolean isModdedScript) {
 		List<Script> result = new ArrayList<>();
 
 		// Scripts must contain a trigger data for Area to use, and must contain
@@ -751,15 +779,206 @@ public class Script {
 		catch (Exception e) {
 			Debug.error("Script loading error: ", e);
 		}
+		finally {
+			// Closing the input stream.
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+					inputStream = null;
+				}
+			}
+			catch (IOException e) {
+				Debug.error("Unable to close input stream.", e);
+			}
+		}
+		return result;
+	}
 
-		// Closing the input stream.
+	/**
+	 * Loads triggers according to the script file stored as a JSON format.
+	 * <p>
+	 * The script file is a database of all triggers of a a certain map. All scripts within the file can
+	 * only be triggered by that area.
+	 * <p>
+	 * Currently needs fixing and testing. Will be completed when all issues have been sorted out.
+	 *
+	 * @param filename
+	 *            - A String object of the file name of the JSON file.
+	 * @return An ArrayList<Script> object, containing all of the triggers and scripted events located
+	 *         within the JSON file.
+	 * @throws JSONException
+	 *             If it cannot parse the SCRIPT file as JSON.
+	 */
+	public static List<Script> loadScript(String filename, boolean isModdedScript) throws JSONException {
+		List<Script> result = new ArrayList<>();
+
+		// Scripts must contain a trigger data for Area to use, and must contain
+		// movements for Area to read.
+
+		String line = null;
+		int iteration = 0;
+		int affirmativeIteration = 0;
+		int negativeIteration = 0;
+		InputStream inputStream = null;
+
+		// Check if the file is a modded script file, or a default script file.
 		try {
-			if (inputStream != null) {
-				inputStream.close();
+			if (isModdedScript) {
+				inputStream = new FileInputStream(new File(filename));
+			}
+			else {
+				inputStream = Script.class.getResourceAsStream(filename);
+			}
+		}
+		catch (FileNotFoundException e) {
+			Debug.error("Unable to locate " + (isModdedScript ? "modded" : "default") + " script input file.", e);
+		}
+
+		// Try-with-resource
+		try (
+			InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+			BufferedReader reader = new BufferedReader(inputStreamReader);
+		) {
+			JSONTokener tokener = new JSONTokener(reader);
+			JSONObject jsonScript = new JSONObject(tokener);
+			JSONArray jsonData = jsonScript.getJSONArray(ScriptJsonTags.DATA.getKey());
+
+			// Get the checksum from the main script JSON.
+			final String checksum = jsonScript.getString(ScriptJsonTags.CHECKSUM.getKey());
+
+			// Parse the main script JSON's data.
+			JSONArray data = jsonScript.getJSONArray(ScriptJsonTags.DATA.getKey());
+			int length = data.length();
+			for (int i = 0; i < length; i++) {
+				JSONObject element = data.getJSONObject(i);
+				Script script = new Script();
+
+				String idType = element.optString(ScriptJsonTags.TRIGGER_TYPE.getKey());
+				// Determine if it's a trigger script or NPC script. It cannot be anything else.
+				if (idType.equals(ScriptJsonTags.TRIGGER_TYPE_NPC.getKey())) {
+					script.setNpcTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
+				}
+				else {
+					script.setTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
+				}
+
+				// Add script trigger name
+				script.setTriggerName(element.getString(ScriptJsonTags.NAME.getKey()));
+
+				// Add checksum from the main script JSON.
+				script.setChecksum(checksum);
+
+				// Add script contents
+				JSONArray dataContents = element.getJSONArray(ScriptJsonTags.SEQUENCE.getKey());
+				int contentLength = dataContents.length();
+				for (int cIndex = 0; cIndex < contentLength; cIndex++) {
+					// The JSON array is semantically ordered, therefore there is no concern for the script's sequence
+					// order.
+					JSONObject content = dataContents.getJSONObject(cIndex);
+					ScriptTags tag = ScriptTags.valueOf(content.getString(ScriptJsonTags.TYPE.getKey()));
+					switch (tag) {
+						case PathData: {
+							MovementData moves = new MovementData();
+							line = content.getString(ScriptJsonTags.CONTENT.getKey());
+							Script.append(moves, line.trim().toCharArray());
+							script.moves.add(Map.entry(iteration, moves));
+							iteration++;
+							break;
+						}
+						case Speech: {
+							line = content.getString(ScriptJsonTags.CONTENT.getKey());
+							Dialogue d = DialogueBuilder.createText(
+								line.trim(),
+								Dialogue.MAX_STRING_LENGTH,
+								Dialogue.DialogueType.SPEECH,
+								true
+							);
+							script.dialogues.add(Map.entry(iteration, d));
+							iteration++;
+							break;
+						}
+						case Question: {
+							line = content.getString(ScriptJsonTags.CONTENT.getKey());
+							Dialogue d = DialogueBuilder.createText(
+								line.trim(),
+								Dialogue.MAX_STRING_LENGTH,
+								Dialogue.DialogueType.QUESTION,
+								true
+							);
+							script.dialogues.add(Map.entry(iteration, d));
+							iteration++;
+							break;
+						}
+						case Affirm: {
+							line = content.getString(ScriptJsonTags.CONTENT.getKey());
+							Dialogue d = DialogueBuilder.createText(
+								line.trim(),
+								Dialogue.MAX_STRING_LENGTH,
+								Dialogue.DialogueType.SPEECH,
+								true
+							);
+							script.affirmativeDialogues.add(Map.entry(affirmativeIteration, d));
+							affirmativeIteration++;
+							break;
+						}
+						case Reject: {
+							line = content.getString(ScriptJsonTags.CONTENT.getKey());
+							Dialogue d = DialogueBuilder.createText(
+								line.trim(),
+								Dialogue.MAX_STRING_LENGTH,
+								Dialogue.DialogueType.SPEECH,
+								true
+							);
+							script.negativeDialogues.add(Map.entry(negativeIteration, d));
+							negativeIteration++;
+							break;
+						}
+						case Confirm: {
+							MovementData moves = new MovementData();
+							line = content.getString(ScriptJsonTags.CONTENT.getKey());
+							Script.append(moves, line.trim().toCharArray());
+							script.affirmativeMoves.add(Map.entry(affirmativeIteration, moves));
+							affirmativeIteration++;
+							break;
+						}
+						case Cancel: {
+							MovementData moves = new MovementData();
+							line = content.getString(ScriptJsonTags.CONTENT.getKey());
+							Script.append(moves, line.trim().toCharArray());
+							script.negativeMoves.add(Map.entry(negativeIteration, moves));
+							negativeIteration++;
+							break;
+						}
+						case Repeat:
+							script.setRepeating();
+							break;
+						case Counter:
+							script.repeat = true;
+							script.setRemainingCounter(Integer.parseInt(content.getString(ScriptJsonTags.CONTENT.getKey())));
+							break;
+						default:
+							Debug.warn("Unknown script tag type: " + tag.getSymbolName());
+							break;
+					}
+				}
+
+				result.add(script);
 			}
 		}
 		catch (IOException e) {
-			Debug.error("Unable to close input stream.", e);
+			Debug.error("Unable to read JSON script file.", e);
+		}
+		finally {
+			// Closing the input stream.
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+					inputStream = null;
+				}
+			}
+			catch (IOException e) {
+				Debug.error("Unable to close input stream.", e);
+			}
 		}
 		return result;
 	}
@@ -773,8 +992,19 @@ public class Script {
 		try {
 			final File[] directory = new File(uri.toURI()).listFiles();
 			for (File f : directory) {
-				if (f.getName().endsWith(".script")) {
-					result.addAll(Script.loadScript(WorldConstants.ScriptsDefaultPath + File.separator + f.getName(), false));
+				String filename = f.getName();
+				if (filename.endsWith(".script")) {
+					// Try loading the file as JSON.
+					try {
+						result.addAll(Script.loadScript(WorldConstants.ScriptsDefaultPath + File.separator + filename, false));
+					}
+					catch (JSONException e) {
+						result.addAll(Script.loadScript_legacy(WorldConstants.ScriptsDefaultPath + File.separator + filename, false));
+					}
+				}
+				if (filename.endsWith(".json")) {
+					// Try loading the file as JSON.
+					result.addAll(Script.loadScript(WorldConstants.ScriptsDefaultPath + File.separator + filename, false));
 				}
 			}
 		}
@@ -801,9 +1031,9 @@ public class Script {
 						String filePath = directory.getPath() + File.separator + scripts[j];
 						if (filePath.endsWith(".script")) {
 							if (results == null)
-								results = Script.loadScript(filePath, true);
+								results = Script.loadScript_legacy(filePath, true);
 							else
-								results.addAll(Script.loadScript(filePath, true));
+								results.addAll(Script.loadScript_legacy(filePath, true));
 						}
 					}
 					break LOOP;
@@ -828,7 +1058,7 @@ public class Script {
 			for (int i = 0; i < scripts.length; i++) {
 				String scriptFile = scripts[i];
 				if (scriptFile.endsWith(".script")) {
-					results.addAll(Script.loadScript(modDirectory.getPath() + File.separator + scriptFile, true));
+					results.addAll(Script.loadScript_legacy(modDirectory.getPath() + File.separator + scriptFile, true));
 				}
 			}
 		}
