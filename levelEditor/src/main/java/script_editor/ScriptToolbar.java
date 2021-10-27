@@ -22,6 +22,8 @@ import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.json.JSONException;
+
 import editor.EditorFileChooser;
 import editor.EditorMouseListener;
 import editor.FileControl;
@@ -39,7 +41,6 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	private final HashMap<String, JButton> buttonCache = new HashMap<>();
 
 	public ScriptToolbar(ScriptEditor editor) {
-		super();
 		this.editor = editor;
 		this.setLayout(new GridLayout(1, this.tags.length));
 
@@ -51,7 +52,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 		final EditorFileChooser chooser = new EditorFileChooser();
 		final EditorMouseListener mouseListener = new EditorMouseListener(chooser);
 
-		switch (Integer.valueOf(event.getActionCommand())) {
+		switch (Integer.parseInt(event.getActionCommand())) {
 			case 0: { // New script
 				this.editor.scriptChanger.clearTextFields();
 				JList<Trigger> triggerList = this.editor.scriptViewer.getTriggerList();
@@ -154,13 +155,20 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				chooser.setCurrentDirectory(ScriptEditor.lastSavedDirectory);
 				chooser.setFileFilter(new FileNameExtensionFilter("SCRIPT files", "script"));
+				chooser.addChoosableFileFilter(new FileNameExtensionFilter("JSON files", "json"));
 				chooser.setVisible(true);
 				int answer = chooser.showOpenDialog(this.editor);
 				if (answer == JFileChooser.APPROVE_OPTION) {
 					File f = chooser.getSelectedFile();
 					ScriptEditor.lastSavedDirectory = f.getParentFile();
 					this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
-					this.editor.load(f);
+					try {
+						this.editor.load(f);
+					}
+					catch (JSONException e) {
+						// Try out the legacy loader
+						this.editor.load_legacy(f);
+					}
 					this.editor.setModifiedFlag(false);
 					this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
 					this.editor.scriptChanger.enableComponent();

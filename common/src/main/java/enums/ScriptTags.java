@@ -37,6 +37,14 @@ public enum ScriptTags {
 	TriggerScript("$", "BEGIN", "Trigger Script begins"),
 
 	/**
+	 * $
+	 *
+	 * @deprecated Please use {@linkplain #TriggerScript} instead.
+	 */
+	@Deprecated(forRemoval = true)
+	BeginScript("$", "BEGIN", "Trigger Script begins"),
+
+	/**
 	 * !
 	 */
 	NpcScript("!", "NPC", "NPC Script begins"),

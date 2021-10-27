@@ -253,6 +253,99 @@ public class ScriptEditor extends JFrame {
 	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
 	 *            editor uses.
 	 * @return Nothing.
+	 * @deprecated We will be removing the old custom way of loading trigger scripts, and will be
+	 *             transitioning to use JSON formatted scripts instead.
+	 */
+	@Deprecated(since = "v0.9.2", forRemoval = true)
+	public void load_legacy(File script) {
+		String format = script.getName();
+		if (!format.endsWith(".script")) {
+			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
+			return;
+		}
+		System.out.println("Opened Location: " + script.getAbsolutePath());
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
+			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
+			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
+			scriptTriggerListModel.clear();
+
+			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
+			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
+				.getModel();
+			editorTriggerComboModel.removeAllElements();
+
+			Trigger trigger = new Trigger();
+			trigger.setTriggerID((short) 0);
+			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+			trigger.setName("Eraser");
+			editorTriggerComboModel.addElement(trigger);
+			comboTriggerList.setSelectedIndex(0);
+
+			String line = null;
+			trigger = null;
+			String checksum = null;
+			StringBuilder builder = new StringBuilder();
+			while ((line = reader.readLine()) != null) {
+				if (ScriptTags.BeginScript.beginsAt(line)) {
+					trigger = new Trigger();
+					trigger.setTriggerID(Short.parseShort(ScriptTags.BeginScript.removeScriptTag(line)));
+				}
+				else if (ScriptTags.NpcScript.beginsAt(line)) {
+					trigger = new Trigger();
+					trigger.setNpcTriggerID(Short.parseShort(ScriptTags.NpcScript.removeScriptTag(line)));
+				}
+				else if (ScriptTags.ScriptName.beginsAt(line)) {
+					line = line.replaceAll("_", " ");
+					trigger.setName(ScriptTags.ScriptName.removeScriptTag(line));
+				}
+				else if (ScriptTags.EndScript.beginsAt(line)) {
+					trigger.setScript(builder.toString());
+					trigger.setChecksum(checksum);
+					scriptTriggerListModel.addElement(trigger);
+					editorTriggerComboModel.addElement(trigger);
+					builder.setLength(0);
+				}
+				else if (ScriptTags.Checksum.beginsAt(line)) {
+					line = ScriptTags.Checksum.removeScriptTag(line);
+					checksum = line;
+				}
+				else if (ScriptTags.Speech.beginsAt(line) || ScriptTags.Question.beginsAt(line) || ScriptTags.Affirm.beginsAt(line) || ScriptTags.Reject.beginsAt(line) || ScriptTags.Confirm.beginsAt(line) || ScriptTags.Cancel.beginsAt(line)) {
+					builder.append(line).append("\n");
+				}
+				else {
+					// Ignore lines.
+				}
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		var triggerList = this.scriptViewer.getTriggerList();
+		triggerList.clearSelection();
+		if (triggerList.getModel().getSize() > 0)
+			triggerList.setSelectedIndex(0);
+
+		this.scriptViewer.revalidate();
+		this.scriptViewer.repaint();
+		this.parent.revalidate();
+		this.parent.repaint();
+		super.revalidate();
+		super.repaint();
+	}
+
+	// (11/24/2014): This is where I load triggers at. This is completed, but may require
+	// double-checking to be very sure.
+	/**
+	 * Loads the file script.
+	 * <p>
+	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
+	 * working as intended. Reason for this is that this method is used as a guideline for loading
+	 * custom scripts into the game itself.
+	 *
+	 * @param script
+	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
+	 *            editor uses.
+	 * @return Nothing.
 	 */
 	public void load(File script) {
 		String format = script.getName();
