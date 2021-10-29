@@ -54,6 +54,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 	private int mouseOnTileX, mouseOnTileY;
 	private boolean mouseInsideDrawingBoardCheck = false;
 
+	private final Color cyanTransparent = new Color(0, 255, 255, 127);
+	private final Color yellowTransparent = new Color(255, 255, 0, 127);
+
 	public DrawingBoard(final LevelEditor editor, int width, int height) {
 		this.editor = editor;
 		this.offsetX = this.offsetY = 0;
@@ -320,50 +323,54 @@ public class DrawingBoard extends Canvas implements Runnable {
 					Graphics g = this.image.getGraphics();
 
 					// This check makes sure that the iterating current tile contains a trigger.
+
+					// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT,
+					// Tile.WIDTH, Tile.HEIGHT, null);
+					Graphics gD = this.image.getGraphics();
+					BufferedImage bimg = new BufferedImage(
+						data.image.getIconWidth(), data.image.getIconHeight(),
+						BufferedImage.TYPE_INT_ARGB
+					);
+					Graphics gB = bimg.getGraphics();
+					// TODO: Area Type ID must be included.
+					gB.drawImage(data.image.getImage(), 0, 0, null);
+					gB.dispose();
+
+					if (data.areaTypeIncluded) {
+						switch (data.areaTypeIDType) {
+							case ALPHA:
+							default:
+								this.setBiomeTile((this.tiles[currentTriggerIndex] >> 24) & 0xFF, g);
+								break;
+							case RED:
+								this.setBiomeTile((this.tiles[currentTriggerIndex] >> 16) & 0xFF, g);
+								break;
+							case GREEN:
+								this.setBiomeTile((this.tiles[currentTriggerIndex] >> 8) & 0xFF, g);
+								break;
+							case BLUE:
+								this.setBiomeTile(this.tiles[currentTriggerIndex] & 0xFF, g);
+								break;
+						}
+					}
+					else
+						gD.setColor(Color.white);
+					g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
+					g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
+
+					// Filling in the rect with alpha transparency.
 					if (this.triggers.hasTriggers(currentTriggerIndex)) {
 						if (this.triggers.contains(currentTriggerIndex, selectedTrigger)) {
-							g.setColor(Color.cyan);
+							// 50% transparent cyan
+							g.setColor(this.cyanTransparent);
 						}
 						else {
-							g.setColor(Color.yellow);
+							// 50% transparent yellow
+							g.setColor(this.yellowTransparent);
 						}
 						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
 					}
-					else {
-						// g.drawImage(data.image.getImage(), w * Tile.WIDTH, h * Tile.HEIGHT,
-						// Tile.WIDTH, Tile.HEIGHT, null);
-						Graphics gD = this.image.getGraphics();
-						BufferedImage bimg = new BufferedImage(
-							data.image.getIconWidth(), data.image.getIconHeight(),
-							BufferedImage.TYPE_INT_ARGB
-						);
-						Graphics gB = bimg.getGraphics();
-						// TODO: Area Type ID must be included.
-						gB.drawImage(data.image.getImage(), 0, 0, null);
-						gB.dispose();
 
-						if (data.areaTypeIncluded) {
-							switch (data.areaTypeIDType) {
-								case ALPHA:
-								default:
-									this.setBiomeTile((this.tiles[currentTriggerIndex] >> 24) & 0xFF, g);
-									break;
-								case RED:
-									this.setBiomeTile((this.tiles[currentTriggerIndex] >> 16) & 0xFF, g);
-									break;
-								case GREEN:
-									this.setBiomeTile((this.tiles[currentTriggerIndex] >> 8) & 0xFF, g);
-									break;
-								case BLUE:
-									this.setBiomeTile(this.tiles[currentTriggerIndex] & 0xFF, g);
-									break;
-							}
-						}
-						else
-							gD.setColor(Color.white);
-						g.fillRect(w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT);
-						g.drawImage(bimg, w * Tileable.WIDTH, h * Tileable.HEIGHT, Tileable.WIDTH, Tileable.HEIGHT, null);
-					}
 					g.dispose();
 				}
 				break;

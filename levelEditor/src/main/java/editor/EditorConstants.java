@@ -291,13 +291,13 @@ public class EditorConstants {
 				else if (checksum == null && ScriptTags.Checksum.beginsAt(line)) {
 					checksum = ScriptTags.Checksum.removeScriptTag(line);
 				}
-				else if (ScriptTags.BeginScript.beginsAt(line)) {
+				else if (ScriptTags.TriggerScript.beginsAt(line)) {
 					// This is where the script begins. The proceeding number is the trigger ID value.
 					if (trigger == null)
 						trigger = new Trigger();
 					if (checksum != null)
 						trigger.setChecksum(checksum);
-					int value = Integer.parseInt(ScriptTags.BeginScript.removeScriptTag(line));
+					int value = Integer.parseInt(ScriptTags.TriggerScript.removeScriptTag(line));
 					if (value != 0) {
 						trigger.setTriggerID((short) (value & 0xFFFF));
 					}

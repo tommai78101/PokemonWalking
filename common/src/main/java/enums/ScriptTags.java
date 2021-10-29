@@ -6,6 +6,7 @@ package enums;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import common.ScriptTagsResult;
 import common.StringUtils;
 
 /**
@@ -33,6 +34,14 @@ public enum ScriptTags {
 	/**
 	 * $
 	 */
+	TriggerScript("$", "BEGIN", "Trigger Script begins"),
+
+	/**
+	 * $
+	 *
+	 * @deprecated Please use {@linkplain #TriggerScript} instead.
+	 */
+	@Deprecated(forRemoval = true)
 	BeginScript("$", "BEGIN", "Trigger Script begins"),
 
 	/**
@@ -93,7 +102,14 @@ public enum ScriptTags {
 	/**
 	 * ~
 	 */
-	Condition("~", "CONDITION", "Conditions that are to be met to complete the script");
+	Condition("~", "CONDITION", "Conditions that are to be met to complete the script"),
+
+	/**
+	 * *
+	 * <p>
+	 * NOTE(Thompson): Only for use with parsing JSON script files.
+	 */
+	ContentData("*", "CONTENT", "Script contents in full.");
 
 	private final String symbol;
 	private final String uppercaseSymbolName;
@@ -206,12 +222,29 @@ public enum ScriptTags {
 	// ------------------------------------------------------------------------
 	// Static methods
 
-	public static ScriptTags parse(String actionCommand) {
+	public static ScriptTags parseSymbol(String actionCommand) {
 		ScriptTags[] values = ScriptTags.values();
 		for (ScriptTags tag : values) {
 			if (tag.getSymbol().equals(actionCommand))
 				return tag;
 		}
-		throw new IllegalArgumentException("Unknown script tag action command symbol.");
+		throw new IllegalArgumentException("Unknown script tag action command symbol. [" + actionCommand + "]");
+	}
+
+	/**
+	 * Determines the ScriptTags type by parsing the given one-line string. After determining the type,
+	 * it stores the result into a wrapper class, {@linkplain ScriptTagsResult}.
+	 *
+	 * @param script
+	 * @return
+	 */
+	public static ScriptTagsResult determineType(String script) {
+		ScriptTags[] values = ScriptTags.values();
+		for (ScriptTags t : values) {
+			if (t.beginsAt(script)) {
+				return new ScriptTagsResult(t, t.removeScriptTag(script));
+			}
+		}
+		throw new IllegalArgumentException("Unknown script tag symbol found. [" + script + "]");
 	}
 }
