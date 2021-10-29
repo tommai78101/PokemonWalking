@@ -18,8 +18,8 @@ import java.util.concurrent.Executors;
 import main.Keys.Key;
 
 public class InputHandler implements KeyListener {
-	public Map<Key, Integer> mappings = new HashMap<>();
 	public static final ExecutorService threadPool = Executors.newCachedThreadPool();
+	public Map<Key, Integer> mappings = new HashMap<>();
 
 	/**
 	 * Initializes the control inputs.

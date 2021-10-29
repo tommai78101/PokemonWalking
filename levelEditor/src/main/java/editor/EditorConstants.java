@@ -33,29 +33,32 @@ import enums.ScriptTags;
 import level.WorldConstants;
 
 public class EditorConstants {
+	private static final EditorConstants instance = new EditorConstants();
+	private static final int KeyColor_Alpha_NPC = 0x0E;
+	public static final Color GRASS_GREEN = new Color(164, 231, 103);
+	public static final Color ROAD_WHITE = new Color(255, 244, 201);
+
+	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
+	public static final Color WATER_BLUE = new Color(0, 65, 255);
+
+	public static Tools chooser = Tools.ControlPanel;
+	public static Metadata metadata = Metadata.Tilesets;
 	// TODO: Add additional pixel data properties that can be edited/modified for
 	// the area.
 	private final List<Category> categories = new ArrayList<>();
 	private final List<Map.Entry<Integer, SpriteData>> datas = new ArrayList<>();
+
 	private final List<Map.Entry<Integer, SpriteData>> npcs = new ArrayList<>();
 	private final List<Trigger> triggers = new ArrayList<>();
 
-	private static final EditorConstants instance = new EditorConstants();
-	private static final int KeyColor_Alpha_NPC = 0x0E;
-
-	public static final Color GRASS_GREEN = new Color(164, 231, 103);
-	public static final Color ROAD_WHITE = new Color(255, 244, 201);
-	public static final Color DIRT_SIENNA = new Color(202, 143, 3);
-	public static final Color WATER_BLUE = new Color(0, 65, 255);
-
 	private boolean hasLoadedTilesetData = false;
+
 	private boolean hasLoadedTriggers = false;
 
-	public enum Tools {
-		ControlPanel,
-		Properties
+	private EditorConstants() {
+		this.loadTilesetData();
+		this.loadTriggers();
 	}
-
 	/**
 	 * Level Editor Metadata Layers. Think of Google Maps information overlays, with each overlay
 	 * depicting relevant information based on what layer was selected.
@@ -78,12 +81,66 @@ public class EditorConstants {
 		}
 	}
 
-	public static Tools chooser = Tools.ControlPanel;
-	public static Metadata metadata = Metadata.Tilesets;
+	public enum Tools {
+		ControlPanel,
+		Properties
+	}
 
-	private EditorConstants() {
-		this.loadTilesetData();
-		this.loadTriggers();
+	public static SpriteData getData(int colorValue) {
+		int alpha = (colorValue & 0xFF000000) >> 24;
+		int red = (colorValue & 0xFF0000) >> 16;
+		int green = (colorValue & 0xFF00) >> 8;
+		int blue = (colorValue & 0xFF);
+		return EditorConstants.getData(alpha, red, green, blue);
+	}
+
+	public static SpriteData getData(int alpha, int red, int green, int blue) {
+		List<Map.Entry<Integer, SpriteData>> dataList = EditorConstants.getInstance().datas.stream().filter(entry -> {
+			SpriteData d = entry.getValue();
+			if (d.areaTypeIncluded) {
+				// Area type ID is value used in the data value. We want to exclude this when doing comparison
+				// checks. Data integrity checks is done here.
+				switch (d.areaTypeIDType) {
+					case ALPHA:
+						return (d.red == red && d.green == green && d.blue == blue);
+					case RED:
+						return (d.alpha == alpha && d.green == green && d.blue == blue);
+					case GREEN:
+						return (d.alpha == alpha && d.red == red && d.blue == blue);
+					case BLUE:
+						return (d.alpha == alpha && d.red == red && d.green == green);
+					case NONE:
+					default:
+						return (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue);
+				}
+			}
+			else {
+				return (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue);
+			}
+		}).collect(Collectors.toList());
+		if (dataList.isEmpty())
+			return EditorConstants.getInstance().getDatas().get(0).getValue();
+		return dataList.get(0).getValue();
+	}
+
+	public static EditorConstants getInstance() {
+		return EditorConstants.instance;
+	}
+
+	public List<Category> getCategories() {
+		return this.categories;
+	}
+
+	public List<Map.Entry<Integer, SpriteData>> getDatas() {
+		return this.datas;
+	}
+
+	public List<Map.Entry<Integer, SpriteData>> getNpcs() {
+		return this.npcs;
+	}
+
+	public List<Trigger> getTriggers() {
+		return this.triggers;
 	}
 
 	private void loadTilesetData() {
@@ -185,12 +242,12 @@ public class EditorConstants {
 						}
 
 						@Override
-						public Dimension getSize() {
+						public Dimension getPreferredSize() {
 							return new Dimension(Tileable.WIDTH, Tileable.HEIGHT);
 						}
 
 						@Override
-						public Dimension getPreferredSize() {
+						public Dimension getSize() {
 							return new Dimension(Tileable.WIDTH, Tileable.HEIGHT);
 						}
 					};
@@ -334,62 +391,5 @@ public class EditorConstants {
 		catch (Exception e) {
 			Debug.error("Unhandled exception when loading level editor triggers.", e);
 		}
-	}
-
-	public static EditorConstants getInstance() {
-		return EditorConstants.instance;
-	}
-
-	public List<Category> getCategories() {
-		return this.categories;
-	}
-
-	public List<Map.Entry<Integer, SpriteData>> getDatas() {
-		return this.datas;
-	}
-
-	public List<Map.Entry<Integer, SpriteData>> getNpcs() {
-		return this.npcs;
-	}
-
-	public List<Trigger> getTriggers() {
-		return this.triggers;
-	}
-
-	public static SpriteData getData(int alpha, int red, int green, int blue) {
-		List<Map.Entry<Integer, SpriteData>> dataList = EditorConstants.getInstance().datas.stream().filter(entry -> {
-			SpriteData d = entry.getValue();
-			if (d.areaTypeIncluded) {
-				// Area type ID is value used in the data value. We want to exclude this when doing comparison
-				// checks. Data integrity checks is done here.
-				switch (d.areaTypeIDType) {
-					case ALPHA:
-						return (d.red == red && d.green == green && d.blue == blue);
-					case RED:
-						return (d.alpha == alpha && d.green == green && d.blue == blue);
-					case GREEN:
-						return (d.alpha == alpha && d.red == red && d.blue == blue);
-					case BLUE:
-						return (d.alpha == alpha && d.red == red && d.green == green);
-					case NONE:
-					default:
-						return (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue);
-				}
-			}
-			else {
-				return (d.alpha == alpha && d.red == red && d.green == green && d.blue == blue);
-			}
-		}).collect(Collectors.toList());
-		if (dataList.isEmpty())
-			return EditorConstants.getInstance().getDatas().get(0).getValue();
-		return dataList.get(0).getValue();
-	}
-
-	public static SpriteData getData(int colorValue) {
-		int alpha = (colorValue & 0xFF000000) >> 24;
-		int red = (colorValue & 0xFF0000) >> 16;
-		int green = (colorValue & 0xFF00) >> 8;
-		int blue = (colorValue & 0xFF);
-		return EditorConstants.getData(alpha, red, green, blue);
 	}
 }

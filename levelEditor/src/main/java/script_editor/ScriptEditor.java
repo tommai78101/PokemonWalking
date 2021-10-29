@@ -98,6 +98,39 @@ public class ScriptEditor extends JFrame {
 		this.setScriptName("Untitled");
 	}
 
+	public void addingComponents() {
+		SwingUtilities.invokeLater(() -> {
+			if (ScriptEditor.this.input == null) {
+				ScriptEditor.this.input = new ScriptInput();
+				ScriptEditor.this.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.addMouseMotionListener(ScriptEditor.this.input);
+			}
+			if (ScriptEditor.this.scriptToolbar == null) {
+				ScriptEditor.this.scriptToolbar = new ScriptToolbar(ScriptEditor.this);
+				ScriptEditor.this.scriptToolbar.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptToolbar.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptToolbar, BorderLayout.NORTH);
+				ScriptEditor.this.validate();
+			}
+			if (ScriptEditor.this.scriptViewer == null) {
+				ScriptEditor.this.scriptViewer = new ScriptViewer(ScriptEditor.this);
+				ScriptEditor.this.scriptViewer.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptViewer.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptViewer, BorderLayout.WEST);
+				ScriptEditor.this.validate();
+			}
+			if (ScriptEditor.this.scriptChanger == null) {
+				ScriptEditor.this.scriptChanger = new ScriptChanger(ScriptEditor.this);
+				ScriptEditor.this.scriptChanger.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptChanger.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptChanger, BorderLayout.CENTER);
+				ScriptEditor.this.validate();
+			}
+			ScriptEditor.this.revalidate();
+			ScriptEditor.this.repaint();
+		});
+	}
+
 	/**
 	 *
 	 * <p>
@@ -189,148 +222,16 @@ public class ScriptEditor extends JFrame {
 		}
 	}
 
-	public void addingComponents() {
-		SwingUtilities.invokeLater(() -> {
-			if (ScriptEditor.this.input == null) {
-				ScriptEditor.this.input = new ScriptInput();
-				ScriptEditor.this.addMouseListener(ScriptEditor.this.input);
-				ScriptEditor.this.addMouseMotionListener(ScriptEditor.this.input);
-			}
-			if (ScriptEditor.this.scriptToolbar == null) {
-				ScriptEditor.this.scriptToolbar = new ScriptToolbar(ScriptEditor.this);
-				ScriptEditor.this.scriptToolbar.addMouseListener(ScriptEditor.this.input);
-				ScriptEditor.this.scriptToolbar.addMouseMotionListener(ScriptEditor.this.input);
-				ScriptEditor.this.add(ScriptEditor.this.scriptToolbar, BorderLayout.NORTH);
-				ScriptEditor.this.validate();
-			}
-			if (ScriptEditor.this.scriptViewer == null) {
-				ScriptEditor.this.scriptViewer = new ScriptViewer(ScriptEditor.this);
-				ScriptEditor.this.scriptViewer.addMouseListener(ScriptEditor.this.input);
-				ScriptEditor.this.scriptViewer.addMouseMotionListener(ScriptEditor.this.input);
-				ScriptEditor.this.add(ScriptEditor.this.scriptViewer, BorderLayout.WEST);
-				ScriptEditor.this.validate();
-			}
-			if (ScriptEditor.this.scriptChanger == null) {
-				ScriptEditor.this.scriptChanger = new ScriptChanger(ScriptEditor.this);
-				ScriptEditor.this.scriptChanger.addMouseListener(ScriptEditor.this.input);
-				ScriptEditor.this.scriptChanger.addMouseMotionListener(ScriptEditor.this.input);
-				ScriptEditor.this.add(ScriptEditor.this.scriptChanger, BorderLayout.CENTER);
-				ScriptEditor.this.validate();
-			}
-			ScriptEditor.this.revalidate();
-			ScriptEditor.this.repaint();
-		});
-	}
-
-	public void resetComponents() {
-		SwingUtilities.invokeLater(() -> {
-			if (ScriptEditor.this.scriptViewer != null) {
-				ScriptEditor.this.scriptViewer.clearTriggerModel();
-				ScriptEditor.this.scriptViewer.clearTriggers();
-			}
-			if (ScriptEditor.this.scriptChanger != null) {
-				ScriptEditor.this.scriptChanger.clearTextFields();
-			}
-			ScriptEditor.this.scriptChanger.disableComponent();
-			ScriptEditor.this.refresh();
-		});
-	}
-
 	public String getEditorChecksum() {
 		return this.parent.getChecksum();
 	}
 
-	// (11/24/2014): This is where I load triggers at. This is completed, but may require
-	// double-checking to be very sure.
-	/**
-	 * Loads the file script.
-	 * <p>
-	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
-	 * working as intended. Reason for this is that this method is used as a guideline for loading
-	 * custom scripts into the game itself.
-	 *
-	 * @param script
-	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
-	 *            editor uses.
-	 * @return Nothing.
-	 * @deprecated We will be removing the old custom way of loading trigger scripts, and will be
-	 *             transitioning to use JSON formatted scripts instead.
-	 */
-	@Deprecated(since = "v0.10.2", forRemoval = true)
-	public void load_legacy(File script) {
-		String format = script.getName();
-		if (!format.endsWith(".script")) {
-			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
-			return;
-		}
-		System.out.println("Opened Location: " + script.getAbsolutePath());
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
-			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
-			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
-			scriptTriggerListModel.clear();
+	public LevelEditor getLevelEditorParent() {
+		return this.parent;
+	}
 
-			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
-			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
-				.getModel();
-			editorTriggerComboModel.removeAllElements();
-
-			Trigger trigger = new Trigger();
-			trigger.setTriggerID((short) 0);
-			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
-			trigger.setName("Eraser");
-			editorTriggerComboModel.addElement(trigger);
-			comboTriggerList.setSelectedIndex(0);
-
-			String line = null;
-			trigger = null;
-			String checksum = null;
-			StringBuilder builder = new StringBuilder();
-			while ((line = reader.readLine()) != null) {
-				if (ScriptTags.BeginScript.beginsAt(line)) {
-					trigger = new Trigger();
-					trigger.setTriggerID(Short.parseShort(ScriptTags.BeginScript.removeScriptTag(line)));
-				}
-				else if (ScriptTags.NpcScript.beginsAt(line)) {
-					trigger = new Trigger();
-					trigger.setNpcTriggerID(Short.parseShort(ScriptTags.NpcScript.removeScriptTag(line)));
-				}
-				else if (ScriptTags.ScriptName.beginsAt(line)) {
-					line = line.replaceAll("_", " ");
-					trigger.setName(ScriptTags.ScriptName.removeScriptTag(line));
-				}
-				else if (ScriptTags.EndScript.beginsAt(line)) {
-					trigger.setScript(builder.toString());
-					trigger.setChecksum(checksum);
-					scriptTriggerListModel.addElement(trigger);
-					editorTriggerComboModel.addElement(trigger);
-					builder.setLength(0);
-				}
-				else if (ScriptTags.Checksum.beginsAt(line)) {
-					line = ScriptTags.Checksum.removeScriptTag(line);
-					checksum = line;
-				}
-				else if (ScriptTags.Speech.beginsAt(line) || ScriptTags.Question.beginsAt(line) || ScriptTags.Affirm.beginsAt(line) || ScriptTags.Reject.beginsAt(line) || ScriptTags.Confirm.beginsAt(line) || ScriptTags.Cancel.beginsAt(line)) {
-					builder.append(line).append("\n");
-				}
-				else {
-					// Ignore lines.
-				}
-			}
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-		var triggerList = this.scriptViewer.getTriggerList();
-		triggerList.clearSelection();
-		if (triggerList.getModel().getSize() > 0)
-			triggerList.setSelectedIndex(0);
-
-		this.scriptViewer.revalidate();
-		this.scriptViewer.repaint();
-		this.parent.revalidate();
-		this.parent.repaint();
-		super.revalidate();
-		super.repaint();
+	public boolean isBeingModified() {
+		return this.modifiedFlag;
 	}
 
 	// (11/24/2014): This is where I load triggers at. This is completed, but may require
@@ -438,6 +339,99 @@ public class ScriptEditor extends JFrame {
 		super.repaint();
 	}
 
+	// (11/24/2014): This is where I load triggers at. This is completed, but may require
+	// double-checking to be very sure.
+	/**
+	 * Loads the file script.
+	 * <p>
+	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
+	 * working as intended. Reason for this is that this method is used as a guideline for loading
+	 * custom scripts into the game itself.
+	 *
+	 * @param script
+	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
+	 *            editor uses.
+	 * @return Nothing.
+	 * @deprecated We will be removing the old custom way of loading trigger scripts, and will be
+	 *             transitioning to use JSON formatted scripts instead.
+	 */
+	@Deprecated(since = "v0.10.2", forRemoval = true)
+	public void load_legacy(File script) {
+		String format = script.getName();
+		if (!format.endsWith(".script")) {
+			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
+			return;
+		}
+		System.out.println("Opened Location: " + script.getAbsolutePath());
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
+			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
+			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
+			scriptTriggerListModel.clear();
+
+			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
+			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
+				.getModel();
+			editorTriggerComboModel.removeAllElements();
+
+			Trigger trigger = new Trigger();
+			trigger.setTriggerID((short) 0);
+			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+			trigger.setName("Eraser");
+			editorTriggerComboModel.addElement(trigger);
+			comboTriggerList.setSelectedIndex(0);
+
+			String line = null;
+			trigger = null;
+			String checksum = null;
+			StringBuilder builder = new StringBuilder();
+			while ((line = reader.readLine()) != null) {
+				if (ScriptTags.BeginScript.beginsAt(line)) {
+					trigger = new Trigger();
+					trigger.setTriggerID(Short.parseShort(ScriptTags.BeginScript.removeScriptTag(line)));
+				}
+				else if (ScriptTags.NpcScript.beginsAt(line)) {
+					trigger = new Trigger();
+					trigger.setNpcTriggerID(Short.parseShort(ScriptTags.NpcScript.removeScriptTag(line)));
+				}
+				else if (ScriptTags.ScriptName.beginsAt(line)) {
+					line = line.replaceAll("_", " ");
+					trigger.setName(ScriptTags.ScriptName.removeScriptTag(line));
+				}
+				else if (ScriptTags.EndScript.beginsAt(line)) {
+					trigger.setScript(builder.toString());
+					trigger.setChecksum(checksum);
+					scriptTriggerListModel.addElement(trigger);
+					editorTriggerComboModel.addElement(trigger);
+					builder.setLength(0);
+				}
+				else if (ScriptTags.Checksum.beginsAt(line)) {
+					line = ScriptTags.Checksum.removeScriptTag(line);
+					checksum = line;
+				}
+				else if (ScriptTags.Speech.beginsAt(line) || ScriptTags.Question.beginsAt(line) || ScriptTags.Affirm.beginsAt(line) || ScriptTags.Reject.beginsAt(line) || ScriptTags.Confirm.beginsAt(line) || ScriptTags.Cancel.beginsAt(line)) {
+					builder.append(line).append("\n");
+				}
+				else {
+					// Ignore lines.
+				}
+			}
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		var triggerList = this.scriptViewer.getTriggerList();
+		triggerList.clearSelection();
+		if (triggerList.getModel().getSize() > 0)
+			triggerList.setSelectedIndex(0);
+
+		this.scriptViewer.revalidate();
+		this.scriptViewer.repaint();
+		this.parent.revalidate();
+		this.parent.repaint();
+		super.revalidate();
+		super.repaint();
+	}
+
 	public void refresh() {
 		this.scriptToolbar.revalidate();
 		this.scriptToolbar.repaint();
@@ -451,25 +445,18 @@ public class ScriptEditor extends JFrame {
 		super.repaint();
 	}
 
-	public boolean isBeingModified() {
-		return this.modifiedFlag;
-	}
-
-	public void setScriptName(String scriptName) {
-		this.scriptName = scriptName;
-	}
-
-	public void setModifiedFlag(boolean value) {
-		if (!value) {
-			String str = this.getTitle();
-			if (str.endsWith("*"))
-				this.setTitle(str.substring(0, str.length() - 1));
-		}
-		this.modifiedFlag = value;
-	}
-
-	public LevelEditor getLevelEditorParent() {
-		return this.parent;
+	public void resetComponents() {
+		SwingUtilities.invokeLater(() -> {
+			if (ScriptEditor.this.scriptViewer != null) {
+				ScriptEditor.this.scriptViewer.clearTriggerModel();
+				ScriptEditor.this.scriptViewer.clearTriggers();
+			}
+			if (ScriptEditor.this.scriptChanger != null) {
+				ScriptEditor.this.scriptChanger.clearTextFields();
+			}
+			ScriptEditor.this.scriptChanger.disableComponent();
+			ScriptEditor.this.refresh();
+		});
 	}
 
 	/**
@@ -535,5 +522,18 @@ public class ScriptEditor extends JFrame {
 		}
 		super.revalidate();
 		super.repaint();
+	}
+
+	public void setModifiedFlag(boolean value) {
+		if (!value) {
+			String str = this.getTitle();
+			if (str.endsWith("*"))
+				this.setTitle(str.substring(0, str.length() - 1));
+		}
+		this.modifiedFlag = value;
+	}
+
+	public void setScriptName(String scriptName) {
+		this.scriptName = scriptName;
 	}
 }

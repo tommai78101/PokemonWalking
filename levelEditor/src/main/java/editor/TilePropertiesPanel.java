@@ -48,58 +48,6 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 	private int lastKnownValidAreaID = 0;
 
-	public class CustomJLabel extends JLabel {
-		private static final long serialVersionUID = 1L;
-
-		public CustomJLabel(String string) {
-			super(string);
-		}
-
-		@Override
-		public Dimension getSize() {
-			return TilePropertiesPanel.SIZE;
-		}
-
-		@Override
-		public Dimension getPreferredSize() {
-			return TilePropertiesPanel.SIZE;
-		}
-
-		@Override
-		public Dimension getMaximumSize() {
-			return TilePropertiesPanel.SIZE;
-		}
-
-		@Override
-		public Dimension getMinimumSize() {
-			return TilePropertiesPanel.SIZE;
-		}
-	}
-
-	public class CustomJTextField extends JTextField {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public Dimension getSize() {
-			return TilePropertiesPanel.INPUT_SIZE;
-		}
-
-		@Override
-		public Dimension getPreferredSize() {
-			return TilePropertiesPanel.INPUT_SIZE;
-		}
-
-		@Override
-		public Dimension getMaximumSize() {
-			return TilePropertiesPanel.INPUT_SIZE;
-		}
-
-		@Override
-		public Dimension getMinimumSize() {
-			return TilePropertiesPanel.INPUT_SIZE;
-		}
-	}
-
 	public TilePropertiesPanel(ControlPanel controlPanel) {
 		this.panel = controlPanel;
 
@@ -186,88 +134,56 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.add(this.blueInputField);
 	}
 
-	public char getAlpha() {
-		try {
-			return (char) (Integer.valueOf(this.alphaInputField.getText()) & 0xFF);
-		}
-		catch (NumberFormatException e) {
-			return 0;
-		}
-	}
+	public class CustomJLabel extends JLabel {
+		private static final long serialVersionUID = 1L;
 
-	public String getTileIDString() {
-		return this.alphaField.getText();
-	}
-
-	public char getRed() {
-		try {
-			return (char) (Integer.valueOf(this.redInputField.getText()) & 0xFF);
+		public CustomJLabel(String string) {
+			super(string);
 		}
-		catch (NumberFormatException e) {
-			return 0;
-		}
-	}
 
-	public String getExtendedTileIDString() {
-		return this.redField.getText();
-	}
-
-	public char getGreen() {
-		try {
-			return (char) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
+		@Override
+		public Dimension getMaximumSize() {
+			return TilePropertiesPanel.SIZE;
 		}
-		catch (NumberFormatException e) {
-			return 0;
+
+		@Override
+		public Dimension getMinimumSize() {
+			return TilePropertiesPanel.SIZE;
+		}
+
+		@Override
+		public Dimension getPreferredSize() {
+			return TilePropertiesPanel.SIZE;
+		}
+
+		@Override
+		public Dimension getSize() {
+			return TilePropertiesPanel.SIZE;
 		}
 	}
 
-	public String getTileIDGString() {
-		return this.greenField.getText();
-	}
+	public class CustomJTextField extends JTextField {
+		private static final long serialVersionUID = 1L;
 
-	public char getBlue() {
-		try {
-			return (char) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
+		@Override
+		public Dimension getMaximumSize() {
+			return TilePropertiesPanel.INPUT_SIZE;
 		}
-		catch (NumberFormatException e) {
-			return 0;
+
+		@Override
+		public Dimension getMinimumSize() {
+			return TilePropertiesPanel.INPUT_SIZE;
 		}
-	}
 
-	/**
-	 * Only for use with EditorConstants Metadata, Triggers.
-	 *
-	 * @return
-	 */
-	public boolean isNpcTrigger() {
-		return this.isNpcTriggerBox.isSelected();
-	}
+		@Override
+		public Dimension getPreferredSize() {
+			return TilePropertiesPanel.INPUT_SIZE;
+		}
 
-	public void clearInputFields() {
-		this.areaIDInputField.setText("");
-		this.alphaInputField.setText("");
-		this.redInputField.setText("");
-		this.greenInputField.setText("");
-		this.blueInputField.setText("");
-		this.selectData = null;
-	}
-
-	public void clearSelectedData() {
-		this.selectData = null;
-	}
-
-	/**
-	 * Given a Data object, set all of the input field values based on the data's properties.
-	 *
-	 * @param selectedData
-	 */
-	public void setDataProperties(SpriteData selectedData) {
-		this.areaIDInputField.setText(Integer.toString(this.panel.getEditor().getUniqueAreaID()));
-		this.alphaInputField.setText(Integer.toString(selectedData.alpha));
-		this.redInputField.setText(Integer.toString(selectedData.red));
-		this.greenInputField.setText(Integer.toString(selectedData.green));
-		this.blueInputField.setText(Integer.toString(selectedData.blue));
-		this.selectData = selectedData;
+		@Override
+		public Dimension getSize() {
+			return TilePropertiesPanel.INPUT_SIZE;
+		}
 	}
 
 	@Override
@@ -297,6 +213,67 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		}
 	}
 
+	public void clearInputFields() {
+		this.areaIDInputField.setText("");
+		this.alphaInputField.setText("");
+		this.redInputField.setText("");
+		this.greenInputField.setText("");
+		this.blueInputField.setText("");
+		this.selectData = null;
+	}
+
+	public void clearSelectedData() {
+		this.selectData = null;
+	}
+
+	public char getAlpha() {
+		try {
+			return (char) (Integer.valueOf(this.alphaInputField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	public char getBlue() {
+		try {
+			return (char) (Integer.valueOf(this.blueInputField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	public String getExtendedTileIDString() {
+		return this.redField.getText();
+	}
+
+	public char getGreen() {
+		try {
+			return (char) (Integer.valueOf(this.greenInputField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	public char getRed() {
+		try {
+			return (char) (Integer.valueOf(this.redInputField.getText()) & 0xFF);
+		}
+		catch (NumberFormatException e) {
+			return 0;
+		}
+	}
+
+	public String getTileIDGString() {
+		return this.greenField.getText();
+	}
+
+	public String getTileIDString() {
+		return this.alphaField.getText();
+	}
+
 	@Override
 	public void insertUpdate(DocumentEvent event) {
 		try {
@@ -324,6 +301,15 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		}
 	}
 
+	/**
+	 * Only for use with EditorConstants Metadata, Triggers.
+	 *
+	 * @return
+	 */
+	public boolean isNpcTrigger() {
+		return this.isNpcTriggerBox.isSelected();
+	}
+
 	@Override
 	public void removeUpdate(DocumentEvent event) {
 		try {
@@ -349,6 +335,20 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		catch (Exception e) {
 			this.dataValue = 0;
 		}
+	}
+
+	/**
+	 * Given a Data object, set all of the input field values based on the data's properties.
+	 *
+	 * @param selectedData
+	 */
+	public void setDataProperties(SpriteData selectedData) {
+		this.areaIDInputField.setText(Integer.toString(this.panel.getEditor().getUniqueAreaID()));
+		this.alphaInputField.setText(Integer.toString(selectedData.alpha));
+		this.redInputField.setText(Integer.toString(selectedData.red));
+		this.greenInputField.setText(Integer.toString(selectedData.green));
+		this.blueInputField.setText(Integer.toString(selectedData.blue));
+		this.selectData = selectedData;
 	}
 
 	@Override

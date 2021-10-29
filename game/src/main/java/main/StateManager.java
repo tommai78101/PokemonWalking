@@ -1,6 +1,13 @@
 package main;
 
 public class StateManager {
+	protected GameState currentGameState;
+
+	protected GameState previousGameState;
+	public StateManager() {
+		this.initialize();
+	}
+
 	public enum GameState {
 		INTRO,
 		LOADING,
@@ -14,11 +21,12 @@ public class StateManager {
 		RESERVED,
 	}
 
-	protected GameState currentGameState;
-	protected GameState previousGameState;
+	public GameState getCurrentGameState() {
+		return this.currentGameState;
+	}
 
-	public StateManager() {
-		this.initialize();
+	public GameState getPreviousGameState() {
+		return this.previousGameState;
 	}
 
 	public void initialize() {
@@ -31,17 +39,9 @@ public class StateManager {
 		return false;
 	}
 
-	public GameState getCurrentGameState() {
-		return this.currentGameState;
-	}
-
 	public void setCurrentGameState(GameState currentGameState) {
 		this.previousGameState = this.currentGameState;
 		this.currentGameState = currentGameState;
-	}
-
-	public GameState getPreviousGameState() {
-		return this.previousGameState;
 	}
 
 	public void setPreviousGameState(GameState previousGameState) {

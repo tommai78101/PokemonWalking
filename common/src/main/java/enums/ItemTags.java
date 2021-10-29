@@ -45,27 +45,20 @@ public enum ItemTags {
 		return line.regionMatches(true, 0, this.name(), 0, this.name().length());
 	}
 
-	/**
-	 * Replaces the first occurrence of the tag name with the equivalent symbol representation.
-	 * <p>
-	 * Otherwise, if the line already has the symbol representation, then it does nothing.
-	 * 
-	 * @param line
-	 * @return The replaced line.
-	 */
-	public String replace(String line) {
-		if (line.startsWith(this.symbol))
-			return line;
-		return line.replaceFirst(Pattern.quote(this.name()), Matcher.quoteReplacement(this.symbol));
+	public String getDescription() {
+		return this.description;
 	}
 
-	public boolean startsWithUpperCase(String line) {
-		String[] tokens = line.toUpperCase().split(":=");
-		if (tokens.length > 0) {
-			String uppercase = tokens[0];
-			return (uppercase.trim().equals(this.uppercaseSymbolName));
-		}
-		return false;
+	public String getLowercaseSymbolName() {
+		return this.lowercaseSymbolName;
+	}
+
+	public String getPrettyDescription() {
+		return this.description + ".";
+	}
+
+	public String getSymbolName() {
+		return this.uppercaseSymbolName;
 	}
 
 	/**
@@ -87,19 +80,26 @@ public enum ItemTags {
 		return line;
 	}
 
-	public String getDescription() {
-		return this.description;
+	/**
+	 * Replaces the first occurrence of the tag name with the equivalent symbol representation.
+	 * <p>
+	 * Otherwise, if the line already has the symbol representation, then it does nothing.
+	 * 
+	 * @param line
+	 * @return The replaced line.
+	 */
+	public String replace(String line) {
+		if (line.startsWith(this.symbol))
+			return line;
+		return line.replaceFirst(Pattern.quote(this.name()), Matcher.quoteReplacement(this.symbol));
 	}
 
-	public String getPrettyDescription() {
-		return this.description + ".";
-	}
-
-	public String getSymbolName() {
-		return this.uppercaseSymbolName;
-	}
-
-	public String getLowercaseSymbolName() {
-		return this.lowercaseSymbolName;
+	public boolean startsWithUpperCase(String line) {
+		String[] tokens = line.toUpperCase().split(":=");
+		if (tokens.length > 0) {
+			String uppercase = tokens[0];
+			return (uppercase.trim().equals(this.uppercaseSymbolName));
+		}
+		return false;
 	}
 }

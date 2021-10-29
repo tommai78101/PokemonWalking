@@ -29,6 +29,10 @@ public class AreaInfo implements RandomFileAccessible {
 		this.size = 0;
 	}
 
+	public void increment(byte[] concatenate) {
+		this.size += concatenate.length;
+	}
+
 	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		// Area Info chunk total size
@@ -70,6 +74,10 @@ public class AreaInfo implements RandomFileAccessible {
 		}
 	}
 
+	public void reset() {
+		this.size = 0;
+	}
+
 	@Override
 	public void write(RandomAccessFile raf) throws IOException {
 		// Total chunk size.
@@ -86,13 +94,5 @@ public class AreaInfo implements RandomFileAccessible {
 		raf.write(AreaInfo.PIXELDATA);
 		for (byte[] b : this.changedPixelData)
 			raf.write(b);
-	}
-
-	public void increment(byte[] concatenate) {
-		this.size += concatenate.length;
-	}
-
-	public void reset() {
-		this.size = 0;
 	}
 }

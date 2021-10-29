@@ -39,6 +39,7 @@ import script_editor.ScriptEditor;
 
 public class FileControl extends JPanel implements ActionListener {
 	public static File lastSavedDirectory = null;
+
 	public static final String[] MenuItemTags = {
 		"New", "Save", "Open", "", "Tileset", "Trigger", "NPC", "Script"
 	};
@@ -47,7 +48,9 @@ public class FileControl extends JPanel implements ActionListener {
 	private static final String defaultPath = Paths.get("").toAbsolutePath().toString();
 
 	public HashMap<String, JButton> buttonCache = new HashMap<>();
+
 	private LevelEditor editor;
+
 	private List<String> cacheDirectories;
 
 	public FileControl(LevelEditor editor) {
@@ -219,8 +222,14 @@ public class FileControl extends JPanel implements ActionListener {
 		}
 	}
 
-	// --------------------------------------------------------------------------------
-	// Private methods
+	private void fetchCachedDirectories(RandomAccessFile file) throws IOException {
+		String buffer = null;
+		file.seek(0);
+		this.cacheDirectories.clear();
+		while ((buffer = file.readLine()) != null) {
+			this.cacheDirectories.add(buffer);
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	private JList<Class<?>> findFileList(Component comp) {
@@ -236,15 +245,6 @@ public class FileControl extends JPanel implements ActionListener {
 			}
 		}
 		return null;
-	}
-
-	private void fetchCachedDirectories(RandomAccessFile file) throws IOException {
-		String buffer = null;
-		file.seek(0);
-		this.cacheDirectories.clear();
-		while ((buffer = file.readLine()) != null) {
-			this.cacheDirectories.add(buffer);
-		}
 	}
 
 	private void storeCachedDirectories(RandomAccessFile file) throws IOException {

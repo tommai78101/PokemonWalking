@@ -17,22 +17,22 @@ import screen.Bitmap;
 import screen.Scene;
 
 public abstract class Character extends Entity implements Interactable, CharacterActionable {
-	// Character debug mode only
-	private final boolean isDebugMode = false;
-
 	// These numbers correspond to the index number of the columns of the character sprite sheet.
 	public static final int DOWN = 0;
+
 	public static final int LEFT = 1;
 	public static final int UP = 2;
 	public static final int RIGHT = 3;
-
 	// AutoWalk frequency settings
 	public static final int AUTO_WALK_DISABLE = 0;
+
 	public static final int AUTO_WALK_VERY_FREQUENT = 0xF;
 	public static final int AUTO_WALK_FAST = 0x1F;
 	public static final int AUTO_WALK_MODERATE = 0x3F;
 	public static final int AUTO_WALK_SLOW = 0x7F;
 	public static final int AUTO_WALK_VERY_SLOW = 0xFF;
+	// Character debug mode only
+	private final boolean isDebugMode = false;
 
 	private boolean isPlayable;
 	@Deprecated
@@ -41,54 +41,79 @@ public abstract class Character extends Entity implements Interactable, Characte
 
 	// General character animations.
 	protected byte animationTick = 0;
+
 	protected byte animationPointer = 0;
+
 	protected byte animationDefaultFacing = 0;
+
 	protected boolean isAutoWalking;
+
 	protected int autoWalkingTick = 0;
+
 	protected boolean isLockedWalking;
+
 	protected boolean isChangingPositions = false;
+
 	protected final boolean isFacingBlocked[] = new boolean[4];
+
 	protected int xAccel;
+
 	protected int yAccel;
 
 	public Character() {
 		this.setCharacterPlayable(false);
 	}
 
-	public Character setOriginPosition(int x, int y) {
-		this.setPosition(x, y);
-		return this;
+	public static Character build(final Area area, final int pixel, final int x, final int y) {
+		return Character.build(area, new PixelData(pixel, x, y), x, y);
 	}
 
-	public boolean isCharacterPlayable() {
-		return this.isPlayable;
+	public static Character build(final Area area, final PixelData pixelData, final int x, final int y) {
+		Character result = null;
+		int red = pixelData.getRed();
+		switch (red) {
+			case 0x1: {// Joe
+				result = new Joe();
+				result.setOriginPosition(x, y);
+				result.setPixelData(pixelData);
+				result.setArea(area);
+				result.loadTriggerData();
+				break;
+			}
+			default:
+				break;
+		}
+		return result;
 	}
 
-	@Deprecated
-	public int getInteractableID() {
-		return this.interactionDataColorID;
+	public void characterRender(Scene screen, Bitmap[][] sprite, Graphics graphics, int playerX, int playerY) {
+		if (this.isLockedWalking) {
+			screen.npcBlit(sprite[this.getFacing()][this.animationPointer], this.getRenderPositionX(playerX), this.getRenderPositionY(playerY));
+		}
+		else {
+			// Idle animation
+			screen.npcBlit(sprite[this.getFacing()][this.animationDefaultFacing], this.getRenderPositionX(playerX), this.getRenderPositionY(playerY));
+		}
 	}
 
-	@Deprecated
-	public void setInteractableID(int dataColor) {
-		this.interactionDataColorID = dataColor;
+	@Override
+	public Area getArea() {
+		return this.area;
 	}
 
-	public void setGender(final GenderType value) {
-		this.gender = value;
+	public abstract int getAutoWalkTickFrequency();
+
+	public byte getDefaultAnimationFacing() {
+		return this.animationDefaultFacing;
 	}
 
 	public GenderType getGender() {
 		return this.gender;
 	}
 
-	public void stopAnimation() {
-		this.animationTick = 0;
-		this.animationPointer = 0;
-	}
-
-	public void stopAutoWalking() {
-		this.autoWalkingTick = 0;
+	@Deprecated
+	public int getInteractableID() {
+		return this.interactionDataColorID;
 	}
 
 	/**
@@ -117,42 +142,45 @@ public abstract class Character extends Entity implements Interactable, Characte
 		return this.yPixelPosition - playerOffsetY;
 	}
 
-	public void characterRender(Scene screen, Bitmap[][] sprite, Graphics graphics, int playerX, int playerY) {
-		if (this.isLockedWalking) {
-			screen.npcBlit(sprite[this.getFacing()][this.animationPointer], this.getRenderPositionX(playerX), this.getRenderPositionY(playerY));
-		}
-		else {
-			// Idle animation
-			screen.npcBlit(sprite[this.getFacing()][this.animationDefaultFacing], this.getRenderPositionX(playerX), this.getRenderPositionY(playerY));
-		}
-	}
-
-	public void setDefaultAnimationFacing(int facing) {
-		this.animationDefaultFacing = (byte) (facing & 0xFF);
-	}
-
-	public byte getDefaultAnimationFacing() {
-		return this.animationDefaultFacing;
-	}
-
-	public void setAutoWalking(boolean state) {
-		this.isAutoWalking = state;
+	@Override
+	public void interact(Area area, Entity target) {
+		// TODO Auto-generated method stub
 	}
 
 	public boolean isAutoWalking() {
 		return this.isAutoWalking;
 	}
 
-	public boolean isLockedWalking() {
-		return this.isLockedWalking;
-	}
-
-	public void setLockedWalking(boolean state) {
-		this.isLockedWalking = state;
+	public boolean isCharacterPlayable() {
+		return this.isPlayable;
 	}
 
 	public boolean isDebugMode() {
 		return this.isDebugMode;
+	}
+
+	public boolean isLockedWalking() {
+		return this.isLockedWalking;
+	}
+
+	@Override
+	public void jump() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
+		if (this.isDebugMode) {
+			screen.blit(Art.error, this.oldXAreaPosition * Tileable.WIDTH - offsetX, this.oldYAreaPosition * Tileable.HEIGHT - offsetY);
+			screen.blit(Art.error, this.predictedXAreaPosition * Tileable.WIDTH - offsetX, this.predictedYAreaPosition * Tileable.HEIGHT - offsetY);
+		}
+		this.characterRender(screen, Art.joe, graphics, offsetX, offsetY);
+		this.dialogueRender(screen);
+	}
+
+	@Override
+	public void ride() {
+		// TODO Auto-generated method stub
 	}
 
 	/**
@@ -180,13 +208,55 @@ public abstract class Character extends Entity implements Interactable, Characte
 		this.isFacingBlocked[Character.RIGHT] = right;
 	}
 
-	// ----------------------------------------------------------------------
-	// Abstract methods
+	@Override
+	public void setArea(Area area) {
+		this.area = area;
+	}
 
-	public abstract int getAutoWalkTickFrequency();
+	public void setAutoWalking(boolean state) {
+		this.isAutoWalking = state;
+	}
 
-	// ----------------------------------------------------------------------
-	// Override methods
+	public void setDefaultAnimationFacing(int facing) {
+		this.animationDefaultFacing = (byte) (facing & 0xFF);
+	}
+
+	public void setGender(final GenderType value) {
+		this.gender = value;
+	}
+
+	@Deprecated
+	public void setInteractableID(int dataColor) {
+		this.interactionDataColorID = dataColor;
+	}
+
+	public void setLockedWalking(boolean state) {
+		this.isLockedWalking = state;
+	}
+
+	public Character setOriginPosition(int x, int y) {
+		this.setPosition(x, y);
+		return this;
+	}
+
+	@Override
+	public void sprint() {
+		// TODO Auto-generated method stub
+	}
+
+	public void stopAnimation() {
+		this.animationTick = 0;
+		this.animationPointer = 0;
+	}
+
+	public void stopAutoWalking() {
+		this.autoWalkingTick = 0;
+	}
+
+	@Override
+	public void swim() {
+		// TODO Auto-generated method stub
+	}
 
 	@Override
 	public void tick() {
@@ -200,16 +270,6 @@ public abstract class Character extends Entity implements Interactable, Characte
 			this.triggerData.setPaused(false);
 			this.triggerData.resetCurrentScript(this.area);
 		}
-	}
-
-	@Override
-	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
-		if (this.isDebugMode) {
-			screen.blit(Art.error, this.oldXAreaPosition * Tileable.WIDTH - offsetX, this.oldYAreaPosition * Tileable.HEIGHT - offsetY);
-			screen.blit(Art.error, this.predictedXAreaPosition * Tileable.WIDTH - offsetX, this.predictedYAreaPosition * Tileable.HEIGHT - offsetY);
-		}
-		this.characterRender(screen, Art.joe, graphics, offsetX, offsetY);
-		this.dialogueRender(screen);
 	}
 
 	@Override
@@ -267,93 +327,6 @@ public abstract class Character extends Entity implements Interactable, Characte
 			this.predictedYAreaPosition = this.yAreaPosition + this.yAccel;
 		}
 	}
-
-	@Override
-	public void sprint() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void jump() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void ride() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void swim() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void interact(Area area, Entity target) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void setArea(Area area) {
-		this.area = area;
-	}
-
-	@Override
-	public Area getArea() {
-		return this.area;
-	}
-
-	// ----------------------------------------------------------------------
-	// Protected methods
-
-	protected void controlTick() {
-		if (this.isLockedWalking) {
-			this.animationTick++;
-			if ((this.getFacing() == Character.UP && this.isFacingBlocked[Character.UP]) || (this.getFacing() == Character.DOWN && this.isFacingBlocked[Character.DOWN])) {
-				if (this.animationTick >= 10) {
-					this.animationTick = 0;
-				}
-			}
-			else if ((this.getFacing() == Character.LEFT && this.isFacingBlocked[Character.LEFT]) || (this.getFacing() == Character.RIGHT && this.isFacingBlocked[Character.RIGHT])) {
-				if (this.animationTick >= 10) {
-					this.animationTick = 0;
-				}
-			}
-			else {
-				if (this.animationTick >= 4)
-					this.animationTick = 0;
-			}
-			if (this.animationTick == 0) {
-				this.animationPointer++;
-				if (this.animationPointer > 3)
-					this.animationPointer = 0;
-			}
-		}
-	}
-
-	protected void handleMovement() {
-		if (this.isLockedWalking)
-			this.walk();
-		else {
-			this.isLockedWalking = false;
-			this.stopAnimation();
-		}
-	}
-
-	protected void handleSurroundingTiles() {
-		boolean upDirection = this.checkCharacterSurroundingData(this.area, 0, -1);
-		boolean downDirection = this.checkCharacterSurroundingData(this.area, 0, 1);
-		boolean leftDirection = this.checkCharacterSurroundingData(this.area, -1, 0);
-		boolean rightDirection = this.checkCharacterSurroundingData(this.area, 1, 0);
-		this.setAllBlockingDirections(upDirection, downDirection, leftDirection, rightDirection);
-	}
-
-	protected void setCharacterPlayable(final boolean value) {
-		this.isPlayable = value;
-	}
-
-	// ----------------------------------------------------------------------
-	// Private methods
 
 	/**
 	 * Checks the pixel data and sets properties according to the documentation provided. The tile the
@@ -481,28 +454,49 @@ public abstract class Character extends Entity implements Interactable, Characte
 		}
 	}
 
-	// ----------------------------------------------------------------------
-	// Static methods
-
-	public static Character build(final Area area, final int pixel, final int x, final int y) {
-		return Character.build(area, new PixelData(pixel, x, y), x, y);
+	protected void controlTick() {
+		if (this.isLockedWalking) {
+			this.animationTick++;
+			if ((this.getFacing() == Character.UP && this.isFacingBlocked[Character.UP]) || (this.getFacing() == Character.DOWN && this.isFacingBlocked[Character.DOWN])) {
+				if (this.animationTick >= 10) {
+					this.animationTick = 0;
+				}
+			}
+			else if ((this.getFacing() == Character.LEFT && this.isFacingBlocked[Character.LEFT]) || (this.getFacing() == Character.RIGHT && this.isFacingBlocked[Character.RIGHT])) {
+				if (this.animationTick >= 10) {
+					this.animationTick = 0;
+				}
+			}
+			else {
+				if (this.animationTick >= 4)
+					this.animationTick = 0;
+			}
+			if (this.animationTick == 0) {
+				this.animationPointer++;
+				if (this.animationPointer > 3)
+					this.animationPointer = 0;
+			}
+		}
 	}
 
-	public static Character build(final Area area, final PixelData pixelData, final int x, final int y) {
-		Character result = null;
-		int red = pixelData.getRed();
-		switch (red) {
-			case 0x1: {// Joe
-				result = new Joe();
-				result.setOriginPosition(x, y);
-				result.setPixelData(pixelData);
-				result.setArea(area);
-				result.loadTriggerData();
-				break;
-			}
-			default:
-				break;
+	protected void handleMovement() {
+		if (this.isLockedWalking)
+			this.walk();
+		else {
+			this.isLockedWalking = false;
+			this.stopAnimation();
 		}
-		return result;
+	}
+
+	protected void handleSurroundingTiles() {
+		boolean upDirection = this.checkCharacterSurroundingData(this.area, 0, -1);
+		boolean downDirection = this.checkCharacterSurroundingData(this.area, 0, 1);
+		boolean leftDirection = this.checkCharacterSurroundingData(this.area, -1, 0);
+		boolean rightDirection = this.checkCharacterSurroundingData(this.area, 1, 0);
+		this.setAllBlockingDirections(upDirection, downDirection, leftDirection, rightDirection);
+	}
+
+	protected void setCharacterPlayable(final boolean value) {
+		this.isPlayable = value;
 	}
 }

@@ -28,6 +28,14 @@ public class AreaChunk extends Chunk {
 	}
 
 	@Override
+	public int getSize(Game game) {
+		int size = this.name.length;
+		// Current area ID bytes count. (int)
+		size += 4;
+		return size;
+	}
+
+	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
 		int rafSize = raf.readShort();
 
@@ -60,14 +68,6 @@ public class AreaChunk extends Chunk {
 		raf.writeShort(this.getSize(game));
 		raf.write(AreaChunk.AREA);
 		raf.writeInt(this.currentAreaID);
-	}
-
-	@Override
-	public int getSize(Game game) {
-		int size = this.name.length;
-		// Current area ID bytes count. (int)
-		size += 4;
-		return size;
 	}
 
 }

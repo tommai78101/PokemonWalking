@@ -47,100 +47,6 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.revalidate();
 	}
 
-	private void constructingList() {
-		this.model = new DefaultListModel<>();
-		final Dimension size = new Dimension(100, 300);
-
-		this.triggerList = new JList<>();
-		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.triggerList.setLayoutOrientation(JList.VERTICAL);
-		this.triggerList.setVisibleRowCount(0);
-		this.triggerList.setSize(size);
-		this.triggerList.setMinimumSize(size);
-
-		this.triggerList.setModel(this.model);
-		new KeySelectionRenderer(this.triggerList) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public String getDisplayValue(Object item) {
-				Trigger t = (Trigger) item;
-				return t.getName();
-			}
-		};
-		this.triggerList.addListSelectionListener(this);
-
-		this.scrollPane = new JScrollPane(this.triggerList);
-		this.scrollPane.setSize(size);
-		this.scrollPane.setMinimumSize(size);
-
-		this.scrollPane.setVisible(true);
-		this.add(this.scrollPane);
-	}
-
-	private void constructingButtons() {
-		JPanel panel = new JPanel();
-		Dimension size = new Dimension(90, 20);
-
-		this.createButton = new JButton("Create");
-		this.createButton.setActionCommand(Integer.toString(0));
-		this.createButton.addActionListener(this);
-		this.createButton.setSize(size);
-		this.createButton.setMaximumSize(size);
-		this.createButton.setMinimumSize(size);
-		this.createButton.setPreferredSize(size);
-		panel.add(this.createButton);
-
-		panel.add(new JSeparator(SwingConstants.HORIZONTAL));
-
-		this.removeButton = new JButton("Remove");
-		this.removeButton.setActionCommand(Integer.toString(1));
-		this.removeButton.addActionListener(this);
-		this.removeButton.setSize(size);
-		this.removeButton.setMaximumSize(size);
-		this.removeButton.setMinimumSize(size);
-		this.removeButton.setPreferredSize(size);
-		panel.add(this.removeButton);
-
-		panel.add(new JSeparator(SwingConstants.HORIZONTAL));
-
-		this.clearButton = new JButton("Clear");
-		this.clearButton.setActionCommand(Integer.toString(2));
-		this.clearButton.addActionListener(this);
-		this.clearButton.setSize(size);
-		this.clearButton.setMaximumSize(size);
-		this.clearButton.setMinimumSize(size);
-		this.clearButton.setPreferredSize(size);
-		panel.add(this.clearButton);
-
-		this.add(panel);
-	}
-
-	public void addTrigger(Trigger t) {
-		this.model.add(0, t);
-		this.validate();
-	}
-
-	public void removeTrigger() {
-		this.model.remove(this.triggerList.getSelectedIndex());
-	}
-
-	public void clearTriggers() {
-		this.triggerList.removeAll();
-	}
-
-	public void clearTriggerModel() {
-		this.model.removeAllElements();
-	}
-
-	public Trigger getSelectedTrigger() {
-		return this.selectedTrigger;
-	}
-
-	public JList<Trigger> getTriggerList() {
-		return this.triggerList;
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent event) {
 		switch (Integer.parseInt(event.getActionCommand())) {
@@ -183,6 +89,31 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.editor.refresh();
 	}
 
+	public void addTrigger(Trigger t) {
+		this.model.add(0, t);
+		this.validate();
+	}
+
+	public void clearTriggerModel() {
+		this.model.removeAllElements();
+	}
+
+	public void clearTriggers() {
+		this.triggerList.removeAll();
+	}
+
+	public Trigger getSelectedTrigger() {
+		return this.selectedTrigger;
+	}
+
+	public JList<Trigger> getTriggerList() {
+		return this.triggerList;
+	}
+
+	public void removeTrigger() {
+		this.model.remove(this.triggerList.getSelectedIndex());
+	}
+
 	@Override
 	public void valueChanged(ListSelectionEvent event) {
 		if (event.getValueIsAdjusting())
@@ -203,5 +134,74 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		}
 		super.revalidate();
 		super.repaint();
+	}
+
+	private void constructingButtons() {
+		JPanel panel = new JPanel();
+		Dimension size = new Dimension(90, 20);
+
+		this.createButton = new JButton("Create");
+		this.createButton.setActionCommand(Integer.toString(0));
+		this.createButton.addActionListener(this);
+		this.createButton.setSize(size);
+		this.createButton.setMaximumSize(size);
+		this.createButton.setMinimumSize(size);
+		this.createButton.setPreferredSize(size);
+		panel.add(this.createButton);
+
+		panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+
+		this.removeButton = new JButton("Remove");
+		this.removeButton.setActionCommand(Integer.toString(1));
+		this.removeButton.addActionListener(this);
+		this.removeButton.setSize(size);
+		this.removeButton.setMaximumSize(size);
+		this.removeButton.setMinimumSize(size);
+		this.removeButton.setPreferredSize(size);
+		panel.add(this.removeButton);
+
+		panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+
+		this.clearButton = new JButton("Clear");
+		this.clearButton.setActionCommand(Integer.toString(2));
+		this.clearButton.addActionListener(this);
+		this.clearButton.setSize(size);
+		this.clearButton.setMaximumSize(size);
+		this.clearButton.setMinimumSize(size);
+		this.clearButton.setPreferredSize(size);
+		panel.add(this.clearButton);
+
+		this.add(panel);
+	}
+
+	private void constructingList() {
+		this.model = new DefaultListModel<>();
+		final Dimension size = new Dimension(100, 300);
+
+		this.triggerList = new JList<>();
+		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.triggerList.setLayoutOrientation(JList.VERTICAL);
+		this.triggerList.setVisibleRowCount(0);
+		this.triggerList.setSize(size);
+		this.triggerList.setMinimumSize(size);
+
+		this.triggerList.setModel(this.model);
+		new KeySelectionRenderer(this.triggerList) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getDisplayValue(Object item) {
+				Trigger t = (Trigger) item;
+				return t.getName();
+			}
+		};
+		this.triggerList.addListSelectionListener(this);
+
+		this.scrollPane = new JScrollPane(this.triggerList);
+		this.scrollPane.setSize(size);
+		this.scrollPane.setMinimumSize(size);
+
+		this.scrollPane.setVisible(true);
+		this.add(this.scrollPane);
 	}
 }

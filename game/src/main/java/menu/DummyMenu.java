@@ -22,11 +22,11 @@ public class DummyMenu extends SubMenu {
 	}
 
 	@Override
+	public void render(Scene output, Graphics graphics) {}
+
+	@Override
 	public void tick() {
 		this.exit();
 	}
-
-	@Override
-	public void render(Scene output, Graphics graphics) {}
 
 }

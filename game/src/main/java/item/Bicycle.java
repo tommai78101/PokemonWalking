@@ -19,8 +19,9 @@ public class Bicycle extends KeyItem {
 	private static final String ENABLING_DESCRIPTION = "Get on bicycle.";
 	private static final String DISABLING_DESCRIPTION = "Get off bicycle.";
 
-	public Bicycle(String name, String description, ItemCategories category) {
-		super("BICYCLE", Bicycle.ENABLING_DESCRIPTION, ItemCategories.KEYITEMS, WorldConstants.ITEM_BICYCLE);
+	public Bicycle(ModdedItem text) {
+		super(text);
+		this.description = Bicycle.ENABLING_DESCRIPTION;
 	}
 
 	/**
@@ -36,31 +37,8 @@ public class Bicycle extends KeyItem {
 		this.setPosition(x, y);
 	}
 
-	public Bicycle(ModdedItem text) {
-		super(text);
-		this.description = Bicycle.ENABLING_DESCRIPTION;
-	}
-
-	@Override
-	public void enable() {
-		super.enable();
-		final Player player = this.inventory.getPlayer();
-		if (!player.isRidingBicycle()) {
-			Player.lockMovements();
-			player.enableAutomaticMode();
-			new Thread(() -> {
-				try {
-					Thread.sleep(800);
-					player.startsRidingBicycle();
-					Thread.sleep(800);
-					Player.unlockMovements();
-					player.disableAutomaticMode();
-				}
-				catch (InterruptedException e) {}
-			}).start();
-			this.description = Bicycle.DISABLING_DESCRIPTION;
-			this.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
-		}
+	public Bicycle(String name, String description, ItemCategories category) {
+		super("BICYCLE", Bicycle.ENABLING_DESCRIPTION, ItemCategories.KEYITEMS, WorldConstants.ITEM_BICYCLE);
 	}
 
 	@Override
@@ -81,6 +59,28 @@ public class Bicycle extends KeyItem {
 				catch (InterruptedException e) {}
 			}).start();
 			this.description = Bicycle.ENABLING_DESCRIPTION;
+			this.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
+		}
+	}
+
+	@Override
+	public void enable() {
+		super.enable();
+		final Player player = this.inventory.getPlayer();
+		if (!player.isRidingBicycle()) {
+			Player.lockMovements();
+			player.enableAutomaticMode();
+			new Thread(() -> {
+				try {
+					Thread.sleep(800);
+					player.startsRidingBicycle();
+					Thread.sleep(800);
+					Player.unlockMovements();
+					player.disableAutomaticMode();
+				}
+				catch (InterruptedException e) {}
+			}).start();
+			this.description = Bicycle.DISABLING_DESCRIPTION;
 			this.inventory.getStateManager().setCurrentGameState(GameState.MAIN_GAME);
 		}
 	}

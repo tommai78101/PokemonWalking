@@ -16,18 +16,6 @@ import java.util.List;
 import interfaces.RandomFileAccessible;
 
 public class PlayerInfo implements RandomFileAccessible {
-	public final byte[] player_name = new byte[16];
-	public final byte[] player_gender = new byte[1];
-	public final List<byte[]> startMenu = new ArrayList<>();
-	public final List<byte[]> potions = new ArrayList<>();
-	public final List<byte[]> keyItems = new ArrayList<>();
-	public final List<byte[]> pokéballs = new ArrayList<>();
-	public final List<byte[]> tm_hm = new ArrayList<>();
-	public final byte[] player_x = new byte[4];
-	public final byte[] player_y = new byte[4];
-	public final byte[] player_facing = new byte[4];
-	public final byte[] player_walking_state = new byte[1];
-
 	public static final byte[] PLAY = "PLAY".getBytes(); // Player Info
 	public static final byte[] NAME = "NAME".getBytes(); // Player name.
 	public static final byte[] GNDR = "GNDR".getBytes(); // Player gender.
@@ -37,10 +25,22 @@ public class PlayerInfo implements RandomFileAccessible {
 	public static final byte[] AXIS = "AXIS".getBytes(); // Current Position.
 	public static final byte[] TURN = "TURN".getBytes(); // Current Direction.
 	public static final byte[] WALK = "WALK".getBytes(); // Current walking state (Riding bike, swimming, or idling).
-
 	public static final byte WalkState_IDLE = 0x00;
 	public static final byte WalkState_SWIM = 0x01;
 	public static final byte WalkState_RIDE = 0x02;
+
+	public final byte[] player_name = new byte[16];
+	public final byte[] player_gender = new byte[1];
+	public final List<byte[]> startMenu = new ArrayList<>();
+	public final List<byte[]> potions = new ArrayList<>();
+	public final List<byte[]> keyItems = new ArrayList<>();
+	public final List<byte[]> pokéballs = new ArrayList<>();
+	public final List<byte[]> tm_hm = new ArrayList<>();
+	public final byte[] player_x = new byte[4];
+
+	public final byte[] player_y = new byte[4];
+	public final byte[] player_facing = new byte[4];
+	public final byte[] player_walking_state = new byte[1];
 
 	private int byteSize = 0;
 

@@ -33,40 +33,26 @@ public class PixelDataChunk extends Chunk {
 		return this.currentAreaId;
 	}
 
-	public void setCurrentAreaId(int currentAreaId) {
-		this.currentAreaId = currentAreaId;
+	public int getPixelColor() {
+		return this.pixelColor;
+	}
+
+	@Override
+	public int getSize(Game game) {
+		// This chunk has a fixed data size.
+		return (4 * 4) + 1;
 	}
 
 	public int getXPosition() {
 		return this.xPosition;
 	}
 
-	public void setXPosition(int xPosition) {
-		this.xPosition = xPosition;
-	}
-
 	public int getYPosition() {
 		return this.yPosition;
 	}
 
-	public void setYPosition(int yPosition) {
-		this.yPosition = yPosition;
-	}
-
-	public int getPixelColor() {
-		return this.pixelColor;
-	}
-
-	public void setPixelColor(int pixelColor) {
-		this.pixelColor = pixelColor;
-	}
-
 	public boolean isHidden() {
 		return this.isHidden;
-	}
-
-	public void setHidden(boolean isHidden) {
-		this.isHidden = isHidden;
 	}
 
 	@Override
@@ -92,6 +78,26 @@ public class PixelDataChunk extends Chunk {
 		}
 	}
 
+	public void setCurrentAreaId(int currentAreaId) {
+		this.currentAreaId = currentAreaId;
+	}
+
+	public void setHidden(boolean isHidden) {
+		this.isHidden = isHidden;
+	}
+
+	public void setPixelColor(int pixelColor) {
+		this.pixelColor = pixelColor;
+	}
+
+	public void setXPosition(int xPosition) {
+		this.xPosition = xPosition;
+	}
+
+	public void setYPosition(int yPosition) {
+		this.yPosition = yPosition;
+	}
+
 	@Override
 	public void write(Game game, RandomAccessFile raf) throws IOException {
 		// We do not write any chunk size here. Only write the properties of the pixel data.
@@ -100,11 +106,5 @@ public class PixelDataChunk extends Chunk {
 		raf.writeInt(this.yPosition);
 		raf.writeInt(this.pixelColor);
 		raf.writeBoolean(this.isHidden);
-	}
-
-	@Override
-	public int getSize(Game game) {
-		// This chunk has a fixed data size.
-		return (4 * 4) + 1;
 	}
 }

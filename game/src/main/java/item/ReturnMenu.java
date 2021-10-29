@@ -16,12 +16,12 @@ import main.Game;
 import main.StateManager.GameState;
 
 public class ReturnMenu extends Item {
-	public ReturnMenu(String name, String description, ItemCategories category, int id) {
-		super(name, description, category, id);
-	}
-
 	public ReturnMenu(ModdedItem text) {
 		super(text);
+	}
+
+	public ReturnMenu(String name, String description, ItemCategories category, int id) {
+		super(name, description, category, id);
 	}
 
 	@Override

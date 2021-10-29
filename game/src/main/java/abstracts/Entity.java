@@ -30,6 +30,7 @@ import script.TriggerData;
  */
 public abstract class Entity implements Tileable, UpdateRenderable {
 	public int id;
+
 	@Deprecated
 	public int interactableID;
 	public boolean isRemoved;
@@ -60,28 +61,37 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 
 	public Entity() {}
 
-	public int getX() {
-		return this.xAreaPosition;
+	public static boolean isCharacter(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_CHARACTER;
 	}
 
-	public int getY() {
-		return this.yAreaPosition;
+	public static boolean isItem(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_ITEM;
 	}
 
-	public int getOldX() {
-		return this.oldXAreaPosition;
+	public static boolean isObstacle(PixelData data) {
+		return data.getAlpha() == WorldConstants.ENTITY_TYPE_OBSTACLE;
 	}
 
-	public int getOldY() {
-		return this.oldYAreaPosition;
+	public void dialogueRender(Scene screen) {
+		if (this.interactingState && this.triggerData != null)
+			this.triggerData.render(screen, screen.getBufferedImage().createGraphics());
 	}
 
-	public int getPredictedX() {
-		return this.predictedXAreaPosition;
+	public void dialogueTick() {
+		if (this.interactingState) {
+			if (this.triggerData != null && this.triggerData.hasActiveScript(this.area)) {
+				this.triggerData.prepareActiveScript();
+				this.triggerData.tick(this.area);
+			}
+			else {
+				this.interactingState = false;
+			}
+		}
 	}
 
-	public int getPredictedY() {
-		return this.predictedYAreaPosition;
+	public Area getArea() {
+		return this.area;
 	}
 
 	public byte[] getByteName() {
@@ -98,6 +108,10 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		return result;
 	}
 
+	public Event getEvent() {
+		return this.event;
+	}
+
 	/**
 	 * Gets a value that determines where the direction the entity is currently facing towards.
 	 *
@@ -105,14 +119,6 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 	 */
 	public int getFacing() {
 		return this.facing;
-	}
-
-	/**
-	 * Sets a value that determines where the direction the entity is currently facing towards.
-	 */
-	public void setFacing(int value) {
-		this.lastFacing = this.facing;
-		this.facing = value;
 	}
 
 	/**
@@ -124,59 +130,32 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		return this.lastFacing;
 	}
 
-	/**
-	 * Checks whether the entity object has recently changed its facing direction.
-	 *
-	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
-	 */
-	public boolean hasChangedFacing() {
-		// True, if current facing has been changed.
-		return this.lastFacing != this.facing;
+	public int getOldX() {
+		return this.oldXAreaPosition;
+	}
+
+	public int getOldY() {
+		return this.oldYAreaPosition;
 	}
 
 	public PixelData getPixelData() {
 		return this.pixelData;
 	}
 
-	public void setPixelData(PixelData data) {
-		this.pixelData = data;
+	public int getPredictedX() {
+		return this.predictedXAreaPosition;
 	}
 
-	public Event getEvent() {
-		return this.event;
+	public int getPredictedY() {
+		return this.predictedYAreaPosition;
 	}
 
-	public void setInteractingState(boolean value) {
-		this.interactingState = value;
-		if (value) {
-			if (!Player.isMovementsLocked())
-				Player.lockMovements();
-		}
-		else {
-			if (Player.isMovementsLocked())
-				Player.unlockMovements();
-		}
+	public TriggerData getTriggerData() {
+		return this.triggerData;
 	}
 
-	public boolean isInteracting() {
-		return this.interactingState;
-	}
-
-	public void dialogueTick() {
-		if (this.interactingState) {
-			if (this.triggerData != null && this.triggerData.hasActiveScript(this.area)) {
-				this.triggerData.prepareActiveScript();
-				this.triggerData.tick(this.area);
-			}
-			else {
-				this.interactingState = false;
-			}
-		}
-	}
-
-	public void dialogueRender(Scene screen) {
-		if (this.interactingState && this.triggerData != null)
-			this.triggerData.render(screen, screen.getBufferedImage().createGraphics());
+	public int getX() {
+		return this.xAreaPosition;
 	}
 
 	public int getXInArea() {
@@ -192,6 +171,10 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		return result;
 	}
 
+	public int getY() {
+		return this.yAreaPosition;
+	}
+
 	public int getYInArea() {
 		// Returns area position Y.
 		int result = (this.yAreaPosition / Tileable.HEIGHT);
@@ -205,20 +188,18 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		return result;
 	}
 
-	public Area getArea() {
-		return this.area;
+	/**
+	 * Checks whether the entity object has recently changed its facing direction.
+	 *
+	 * @return An integer of one of the followings: Entity.UP, Entity.DOWN, Entity.LEFT, Entity.RIGHT.
+	 */
+	public boolean hasChangedFacing() {
+		// True, if current facing has been changed.
+		return this.lastFacing != this.facing;
 	}
 
-	public void setArea(Area a) {
-		this.area = a;
-	}
-
-	public TriggerData getTriggerData() {
-		return this.triggerData;
-	}
-
-	public void setTriggerData(TriggerData data) {
-		this.triggerData = data;
+	public boolean isInteracting() {
+		return this.interactingState;
 	}
 
 	public void loadTriggerData() {
@@ -244,33 +225,46 @@ public abstract class Entity implements Tileable, UpdateRenderable {
 		}
 	}
 
-	// --------------------------------------------------------------
-	// Protected methods
+	public void setArea(Area a) {
+		this.area = a;
+	}
 
-	protected void setPosition(int x, int y) {
-		this.xAreaPosition = x;
-		this.yAreaPosition = y;
-		this.xPixelPosition = x * Tileable.WIDTH;
-		this.yPixelPosition = y * Tileable.HEIGHT;
+	/**
+	 * Sets a value that determines where the direction the entity is currently facing towards.
+	 */
+	public void setFacing(int value) {
+		this.lastFacing = this.facing;
+		this.facing = value;
+	}
+
+	public void setInteractingState(boolean value) {
+		this.interactingState = value;
+		if (value) {
+			if (!Player.isMovementsLocked())
+				Player.lockMovements();
+		}
+		else {
+			if (Player.isMovementsLocked())
+				Player.unlockMovements();
+		}
+	}
+
+	public void setPixelData(PixelData data) {
+		this.pixelData = data;
+	}
+
+	public void setTriggerData(TriggerData data) {
+		this.triggerData = data;
 	}
 
 	protected void setPixelDataPosition(int x, int y) {
 		this.pixelData.setPosition(x, y);
 	}
 
-	// ==============================================================
-	// Static helper methods
-	// ==============================================================
-
-	public static boolean isObstacle(PixelData data) {
-		return data.getAlpha() == WorldConstants.ENTITY_TYPE_OBSTACLE;
-	}
-
-	public static boolean isCharacter(PixelData data) {
-		return data.getAlpha() == WorldConstants.ENTITY_TYPE_CHARACTER;
-	}
-
-	public static boolean isItem(PixelData data) {
-		return data.getAlpha() == WorldConstants.ENTITY_TYPE_ITEM;
+	protected void setPosition(int x, int y) {
+		this.xAreaPosition = x;
+		this.yAreaPosition = y;
+		this.xPixelPosition = x * Tileable.WIDTH;
+		this.yPixelPosition = y * Tileable.HEIGHT;
 	}
 }

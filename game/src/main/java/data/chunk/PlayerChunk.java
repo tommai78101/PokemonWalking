@@ -24,6 +24,26 @@ import menu.Inventory;
  * @author tlee
  */
 public class PlayerChunk extends Chunk {
+	public static final byte[] ChunkTag = "PLAY".getBytes();
+
+	private String playerName;
+
+	// Can support 255 genders. Zero is reserved.
+	private byte gender;
+
+	private int xPosition;
+	private int yPosition;
+	private byte facingDirection;
+	private byte walkingState;
+	public PlayerChunk() {
+		this.playerName = null;
+		this.gender = (byte) 0x0;
+		this.xPosition = -1;
+		this.yPosition = -1;
+		this.facingDirection = (byte) 0x0;
+		this.walkingState = (byte) 0x0;
+	}
+
 	public enum WalkState {
 		IDLE(0x00),
 		SWIM(0x01),
@@ -33,14 +53,6 @@ public class PlayerChunk extends Chunk {
 
 		WalkState(int value) {
 			this.value = (byte) value;
-		}
-
-		public boolean equals(WalkState other) {
-			return this.value == other.value;
-		}
-
-		public byte getByte() {
-			return this.value;
 		}
 
 		public static WalkState convert(byte value) {
@@ -55,34 +67,55 @@ public class PlayerChunk extends Chunk {
 					return null;
 			}
 		}
-	}
 
-	public static final byte[] ChunkTag = "PLAY".getBytes();
+		public boolean equals(WalkState other) {
+			return this.value == other.value;
+		}
 
-	private String playerName;
-
-	// Can support 255 genders. Zero is reserved.
-	private byte gender;
-	private int xPosition;
-	private int yPosition;
-	private byte facingDirection;
-	private byte walkingState;
-
-	public PlayerChunk() {
-		this.playerName = null;
-		this.gender = (byte) 0x0;
-		this.xPosition = -1;
-		this.yPosition = -1;
-		this.facingDirection = (byte) 0x0;
-		this.walkingState = (byte) 0x0;
+		public byte getByte() {
+			return this.value;
+		}
 	}
 
 	public String getPlayerName() {
 		return this.playerName;
 	}
 
-	public void setPlayerName(String name) {
-		this.playerName = name;
+	@Override
+	public int getSize(Game game) {
+		// Prepare
+		Inventory inventory = game.getInventory();
+		Map<ItemCategories, List<Map.Entry<Item, Integer>>> mappedItems = inventory.getAllMappedItemsList();
+
+		// Chunk tag name
+		int size = PlayerChunk.ChunkTag.length;
+		// Gender (byte)
+		size += 1;
+		// X and Y positions (both int)
+		size += 2 * 4;
+		// Facing direction (byte)
+		size += 1;
+		// Walking state (byte)
+		size += 1;
+
+		ItemCategories[] values = ItemCategories.values();
+		for (ItemCategories c : values) {
+			// Item list size (short)
+			size += 2;
+			// Item list category type (byte)
+			size += 1;
+
+			// Item chunk size.
+			List<Map.Entry<Item, Integer>> items = mappedItems.get(c);
+			items = items.stream().filter(e -> !e.getKey().isReturnMenu()).collect(Collectors.toList());
+			int listSize = items.size();
+			for (int i = 0; i < listSize; i++) {
+				InventoryItemChunk chunk = new InventoryItemChunk();
+				size += chunk.getSize(game);
+			}
+		}
+
+		return size;
 	}
 
 	@Override
@@ -147,6 +180,10 @@ public class PlayerChunk extends Chunk {
 		}
 	}
 
+	public void setPlayerName(String name) {
+		this.playerName = name;
+	}
+
 	@Override
 	public void write(Game game, RandomAccessFile raf) throws IOException {
 		Player player = game.getPlayer();
@@ -192,43 +229,6 @@ public class PlayerChunk extends Chunk {
 				chunk.write(game, raf);
 			}
 		}
-	}
-
-	@Override
-	public int getSize(Game game) {
-		// Prepare
-		Inventory inventory = game.getInventory();
-		Map<ItemCategories, List<Map.Entry<Item, Integer>>> mappedItems = inventory.getAllMappedItemsList();
-
-		// Chunk tag name
-		int size = PlayerChunk.ChunkTag.length;
-		// Gender (byte)
-		size += 1;
-		// X and Y positions (both int)
-		size += 2 * 4;
-		// Facing direction (byte)
-		size += 1;
-		// Walking state (byte)
-		size += 1;
-
-		ItemCategories[] values = ItemCategories.values();
-		for (ItemCategories c : values) {
-			// Item list size (short)
-			size += 2;
-			// Item list category type (byte)
-			size += 1;
-
-			// Item chunk size.
-			List<Map.Entry<Item, Integer>> items = mappedItems.get(c);
-			items = items.stream().filter(e -> !e.getKey().isReturnMenu()).collect(Collectors.toList());
-			int listSize = items.size();
-			for (int i = 0; i < listSize; i++) {
-				InventoryItemChunk chunk = new InventoryItemChunk();
-				size += chunk.getSize(game);
-			}
-		}
-
-		return size;
 	}
 
 }

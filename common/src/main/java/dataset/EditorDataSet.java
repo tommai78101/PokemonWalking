@@ -26,13 +26,21 @@ public class EditorDataSet {
 		return prev != null && prev.getEditorData() != data;
 	}
 
-	public boolean remove(int x, int y) {
-		return this.cache.remove(Map.entry(x, y)) != null;
-	}
-
 	public EditorData get(int x, int y) {
 		Map.Entry<Integer, Integer> key = Map.entry(x, y);
 		return this.cache.getOrDefault(key, null);
+	}
+
+	public int getSize() {
+		return this.cache.size();
+	}
+
+	public boolean isEmpty() {
+		return this.cache.isEmpty();
+	}
+
+	public boolean matchesChecksum(String checksum) {
+		return this.checksum.equals(checksum);
 	}
 
 	public int[] produce() {
@@ -61,15 +69,7 @@ public class EditorDataSet {
 		}
 	}
 
-	public boolean isEmpty() {
-		return this.cache.isEmpty();
-	}
-
-	public boolean matchesChecksum(String checksum) {
-		return this.checksum.equals(checksum);
-	}
-
-	public int getSize() {
-		return this.cache.size();
+	public boolean remove(int x, int y) {
+		return this.cache.remove(Map.entry(x, y)) != null;
 	}
 }

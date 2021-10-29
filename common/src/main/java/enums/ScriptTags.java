@@ -112,7 +112,9 @@ public enum ScriptTags {
 	ContentData("*", "CONTENT", "Script contents in full.");
 
 	private final String symbol;
+
 	private final String uppercaseSymbolName;
+
 	private final String capitalizedSymbolName;
 	private final String lowercaseSymbolName;
 	private final String description;
@@ -132,6 +134,32 @@ public enum ScriptTags {
 	}
 
 	/**
+	 * Determines the ScriptTags type by parsing the given one-line string. After determining the type,
+	 * it stores the result into a wrapper class, {@linkplain ScriptTagsResult}.
+	 *
+	 * @param script
+	 * @return
+	 */
+	public static ScriptTagsResult determineType(String script) {
+		ScriptTags[] values = ScriptTags.values();
+		for (ScriptTags t : values) {
+			if (t.beginsAt(script)) {
+				return new ScriptTagsResult(t, t.removeScriptTag(script));
+			}
+		}
+		throw new IllegalArgumentException("Unknown script tag symbol found. [" + script + "]");
+	}
+
+	public static ScriptTags parseSymbol(String actionCommand) {
+		ScriptTags[] values = ScriptTags.values();
+		for (ScriptTags tag : values) {
+			if (tag.getSymbol().equals(actionCommand))
+				return tag;
+		}
+		throw new IllegalArgumentException("Unknown script tag action command symbol. [" + actionCommand + "]");
+	}
+
+	/**
 	 * Checks if the line starts with either the symbol representation, or the tag name.
 	 *
 	 * @param line
@@ -147,6 +175,53 @@ public enum ScriptTags {
 		if (upper.startsWith(this.uppercaseSymbolName) || lower.startsWith(this.lowercaseSymbolName))
 			return true;
 		return line.regionMatches(true, 0, this.name(), 0, this.name().length());
+	}
+
+	public String getAdditionalNote() {
+		return this.note;
+	}
+
+	public String getCapitalizedSymbolName() {
+		return this.capitalizedSymbolName;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public String getLowercaseSymbolName() {
+		return this.lowercaseSymbolName;
+	}
+
+	public String getPrettyDescription() {
+		return this.description + ".";
+	}
+
+	public String getSymbol() {
+		return this.symbol;
+	}
+
+	public String getSymbolName() {
+		return this.uppercaseSymbolName;
+	}
+
+	/**
+	 * Removes the script tag or script symbol from the given line, and returns the result.
+	 *
+	 * @param line
+	 *            The line that contains the script tag or symbol.
+	 * @return The resulting string value after the script tag or symbol has been removed.
+	 */
+	public String removeScriptTag(String line) {
+		if (line.startsWith(this.symbol))
+			return line.substring(this.symbol.length());
+		else if (line.toUpperCase().startsWith(this.uppercaseSymbolName) || line.toLowerCase().startsWith(this.lowercaseSymbolName)) {
+			// We ignore anything that comes before the script tag. We're not doing anything complicated here.
+			int endOfIndex = line.indexOf(this.uppercaseSymbolName) + this.uppercaseSymbolName.length();
+			return line.substring(endOfIndex).trim();
+		}
+		// Cannot remove any script tags or symbols.
+		return line;
 	}
 
 	/**
@@ -170,81 +245,5 @@ public enum ScriptTags {
 			return (uppercase.trim().equals(this.uppercaseSymbolName));
 		}
 		return false;
-	}
-
-	/**
-	 * Removes the script tag or script symbol from the given line, and returns the result.
-	 *
-	 * @param line
-	 *            The line that contains the script tag or symbol.
-	 * @return The resulting string value after the script tag or symbol has been removed.
-	 */
-	public String removeScriptTag(String line) {
-		if (line.startsWith(this.symbol))
-			return line.substring(this.symbol.length());
-		else if (line.toUpperCase().startsWith(this.uppercaseSymbolName) || line.toLowerCase().startsWith(this.lowercaseSymbolName)) {
-			// We ignore anything that comes before the script tag. We're not doing anything complicated here.
-			int endOfIndex = line.indexOf(this.uppercaseSymbolName) + this.uppercaseSymbolName.length();
-			return line.substring(endOfIndex).trim();
-		}
-		// Cannot remove any script tags or symbols.
-		return line;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public String getPrettyDescription() {
-		return this.description + ".";
-	}
-
-	public String getSymbolName() {
-		return this.uppercaseSymbolName;
-	}
-
-	public String getLowercaseSymbolName() {
-		return this.lowercaseSymbolName;
-	}
-
-	public String getCapitalizedSymbolName() {
-		return this.capitalizedSymbolName;
-	}
-
-	public String getSymbol() {
-		return this.symbol;
-	}
-
-	public String getAdditionalNote() {
-		return this.note;
-	}
-
-	// ------------------------------------------------------------------------
-	// Static methods
-
-	public static ScriptTags parseSymbol(String actionCommand) {
-		ScriptTags[] values = ScriptTags.values();
-		for (ScriptTags tag : values) {
-			if (tag.getSymbol().equals(actionCommand))
-				return tag;
-		}
-		throw new IllegalArgumentException("Unknown script tag action command symbol. [" + actionCommand + "]");
-	}
-
-	/**
-	 * Determines the ScriptTags type by parsing the given one-line string. After determining the type,
-	 * it stores the result into a wrapper class, {@linkplain ScriptTagsResult}.
-	 *
-	 * @param script
-	 * @return
-	 */
-	public static ScriptTagsResult determineType(String script) {
-		ScriptTags[] values = ScriptTags.values();
-		for (ScriptTags t : values) {
-			if (t.beginsAt(script)) {
-				return new ScriptTagsResult(t, t.removeScriptTag(script));
-			}
-		}
-		throw new IllegalArgumentException("Unknown script tag symbol found. [" + script + "]");
 	}
 }

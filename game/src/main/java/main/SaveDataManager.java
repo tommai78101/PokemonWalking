@@ -19,6 +19,20 @@ public class SaveDataManager extends SubMenu {
 	public static final String SAVE_FILE_NAME = "data.sav";
 	public static final String MODDED_SAVE_FILE_NAME = "mod" + File.separator + "data.sav";
 
+	private SaveStatus saveStatus;
+
+	private Dialogue saveDialogue;
+	ExecutorService executor;
+	private Game game;
+	public SaveDataManager(Game game) {
+		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, GameState.SAVE);
+		this.game = game;
+		this.saveStatus = SaveStatus.ASK;
+		this.saveDialogue = new Dialogue();
+		this.needsFlashingAnimation = false;
+		this.exitsToGame = true;
+	}
+
 	public enum SaveStatus {
 		ASK,
 		OVERWRITE,
@@ -28,18 +42,18 @@ public class SaveDataManager extends SubMenu {
 		ERROR
 	}
 
-	private SaveStatus saveStatus;
-	private Dialogue saveDialogue;
-	ExecutorService executor;
-	private Game game;
+	public SaveStatus getSaveStatus() {
+		return this.saveStatus;
+	}
 
-	public SaveDataManager(Game game) {
-		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, GameState.SAVE);
-		this.game = game;
+	@Override
+	public void render(Scene output, Graphics graphics) {
+		if (this.saveDialogue != null)
+			this.saveDialogue.render(output, graphics);
+	}
+
+	public void resetSaveStatus() {
 		this.saveStatus = SaveStatus.ASK;
-		this.saveDialogue = new Dialogue();
-		this.needsFlashingAnimation = false;
-		this.exitsToGame = true;
 	}
 
 	@Override
@@ -185,19 +199,5 @@ public class SaveDataManager extends SubMenu {
 				break;
 			}
 		}
-	}
-
-	public SaveStatus getSaveStatus() {
-		return this.saveStatus;
-	}
-
-	public void resetSaveStatus() {
-		this.saveStatus = SaveStatus.ASK;
-	}
-
-	@Override
-	public void render(Scene output, Graphics graphics) {
-		if (this.saveDialogue != null)
-			this.saveDialogue.render(output, graphics);
 	}
 }

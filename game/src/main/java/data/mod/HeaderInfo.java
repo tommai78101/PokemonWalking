@@ -24,19 +24,6 @@ public class HeaderInfo implements RandomFileAccessible {
 	}
 
 	@Override
-	public void write(RandomAccessFile raf) throws IOException {
-		try {
-			raf.write(size);
-			raf.write(header_version);
-			raf.write(header_id);
-			raf.write(header_format);
-		}
-		catch (Exception e) {
-			throw new IOException("Error in writing file.", e);
-		}
-	}
-
-	@Override
 	public void read(RandomAccessFile raf) throws IOException {
 		int size = raf.read();
 		byte[] info = new byte[size];
@@ -76,6 +63,19 @@ public class HeaderInfo implements RandomFileAccessible {
 		catch (Exception e) {
 			raf.close();
 			throw new IOException("Error in reading the data file.", e);
+		}
+	}
+
+	@Override
+	public void write(RandomAccessFile raf) throws IOException {
+		try {
+			raf.write(size);
+			raf.write(header_version);
+			raf.write(header_id);
+			raf.write(header_format);
+		}
+		catch (Exception e) {
+			throw new IOException("Error in writing file.", e);
 		}
 	}
 }

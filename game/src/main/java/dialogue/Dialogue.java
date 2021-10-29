@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package dialogue;
@@ -25,26 +25,6 @@ import screen.Scene;
 //TODO (6/25/2015): Check to see why modded scripts still suffer from blinking dialogue boxes. Non-modded scripts are fixed.
 
 public class Dialogue {
-	// The type value is tied to how the data bits are parsed from the game data.
-	// TODO(Thompson): Need to uncover the valid range, and whether we can actually determine arbitrary
-	// values instead?
-	public static enum DialogueType {
-		SPEECH(0x40),
-		QUESTION(0x41),
-		ALERT(0x42);
-
-		public final int typeValue;
-
-		DialogueType(int value) {
-			this.typeValue = value;
-		}
-
-		@Override
-		public String toString() {
-			return Integer.toString(this.typeValue);
-		}
-	}
-
 	public static final int HALF_STRING_LENGTH = 9;
 
 	// Dialogue max string length per line.
@@ -52,19 +32,19 @@ public class Dialogue {
 
 	// Tick delays
 	public static final byte MAX_TICK_DELAY = 0xE;
+
 	public static final byte CHARACTER_TICK_DELAY = 0x1;
 	public static final byte ZERO_TICK = 0x0;
-
 	private List<String> completedLines;
 
 	private int lineIterator;
+
 	private int lineLength;
 	private List<Map.Entry<String, Boolean>> lines;
-
 	private boolean simpleQuestionFlag;
+
 	private boolean simpleSpeechFlag;
 	private boolean ignoreInputsFlag;
-
 	/**
 	 * If true, displays the "down arrow" inside the dialogue box.
 	 */
@@ -79,16 +59,18 @@ public class Dialogue {
 	 * Three states: YES, NO, NULL. NULL means the YesNo alert dialogue box does not appear.
 	 */
 	private Boolean yesNoAnswerFlag;
-	private boolean yesNoCursorPosition;
 
+	private boolean yesNoCursorPosition;
 	private byte nextTick;
+
 	private int scrollDistance;
 	private boolean showDialog;
-
 	private int subStringIterator;
+
 	private byte tickCount = 0x0;
 
 	private int totalDialogueLength;
+
 	private DialogueType type;
 
 	public Dialogue() {
@@ -140,54 +122,165 @@ public class Dialogue {
 		this.ignoreInputsFlag = false;
 	}
 
+	// The type value is tied to how the data bits are parsed from the game data.
+	// TODO(Thompson): Need to uncover the valid range, and whether we can actually determine arbitrary
+	// values instead?
+	public enum DialogueType {
+		SPEECH(0x40),
+		QUESTION(0x41),
+		ALERT(0x42);
+
+		public final int typeValue;
+
+		DialogueType(int value) {
+			this.typeValue = value;
+		}
+
+		@Override
+		public String toString() {
+			return Integer.toString(this.typeValue);
+		}
+	}
+
+	/**
+	 * Clears dialogues and unsets the dialogue flag.
+	 */
+	public void clearDialogueLines() {
+		if (!this.lines.isEmpty())
+			this.lines.clear();
+	}
+
+	public void closeDialog() {
+		this.showDialog = false;
+	}
+
 	public Boolean getAnswerToSimpleQuestion() {
 		if (this.yesNoAnswerFlag == null)
 			return null;
 		return this.yesNoAnswerFlag.booleanValue();
 	}
 
+	public List<String> getCompletedLines() {
+		return this.completedLines;
+	}
+
+	public String getCurrentLine() {
+		Map.Entry<String, Boolean> entry = this.getLines().get(this.lineIterator);
+		return entry.getKey();
+	}
+
 	public DialogueType getDialogueType() {
 		return this.type;
+	}
+
+	public boolean getIgnoreInputs() {
+		return this.ignoreInputsFlag;
+	}
+
+	public int getLineIterator() {
+		return this.lineIterator;
+	}
+
+	public int getLineLength() {
+		return this.lineLength;
+	}
+
+	public List<Map.Entry<String, Boolean>> getLines() {
+		return this.lines;
+	}
+
+	public byte getNextTick() {
+		return this.nextTick;
+	}
+
+	public int getScrollDistance() {
+		return this.scrollDistance;
+	}
+
+	public int getSubStringIterator() {
+		return this.subStringIterator;
+	}
+
+	public byte getTickCount() {
+		return this.tickCount;
+	}
+
+	public int getTotalDialogueLength() {
+		return this.totalDialogueLength;
+	}
+
+	public DialogueType getType() {
+		return this.type;
+	}
+
+	public Boolean getYesNoAnswerFlag() {
+		return this.yesNoAnswerFlag;
 	}
 
 	public boolean isDialogueCompleted() {
 		return (this.lineIterator >= this.lines.size());
 	}
 
-	public boolean isScrolling() {
-		return this.scrollFlag;
+	/**
+	 * This checks to see if there is a line break in the dialogue.
+	 * <p>
+	 * A line break is defined to be "two whitespaces inside the dialogue's line".
+	 *
+	 * @param subStringIterator
+	 *            - The string iterator marking where the game must render text to, on the current line.
+	 * @return
+	 */
+	public boolean isLineBreak(int subStringIterator) {
+		String currentLine = this.getCurrentLine();
+		try {
+			char previousChar = currentLine.charAt(subStringIterator - 1);
+			char currentChar = currentLine.charAt(subStringIterator);
+			if (previousChar == ' ' && currentChar == ' ') {
+				return true;
+			}
+		}
+		catch (IndexOutOfBoundsException e) {
+			// The substring iterator is at position 0, or it is at the end of the current line.
+			// We do actually expect an exception to be thrown.
+		}
+		return false;
 	}
 
-	public void resetDialogue() {
-		this.subStringIterator = 0;
-		this.nextFlag = false;
-		this.simpleQuestionFlag = false;
-		this.simpleSpeechFlag = false;
-		this.scrollFlag = false;
-		this.scrollDistance = 0;
-		this.nextTick = 0x0;
-		this.lineIterator = 0;
-		this.showDialog = true;
-		this.yesNoCursorPosition = true;
-		this.yesNoAnswerFlag = null;
-		this.completedLines.clear();
+	public boolean isNextFlag() {
+		return this.nextFlag;
 	}
 
 	/**
 	 * Checks if the dialogues were set / not cleared away.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isReady() {
 		return !this.lines.isEmpty();
 	}
 
-	public void setShowDialog(boolean showDialog) {
-		this.showDialog = showDialog;
+	public boolean isScrollFlag() {
+		return this.scrollFlag;
+	}
+
+	public boolean isScrolling() {
+		return this.scrollFlag;
 	}
 
 	public boolean isShowingDialog() {
 		return this.showDialog;
+	}
+
+	public boolean isSimpleQuestionFlag() {
+		return this.simpleQuestionFlag;
+	}
+
+	public boolean isSimpleSpeechFlag() {
+		return this.simpleSpeechFlag;
+	}
+
+	public boolean isYesNoCursorPosition() {
+		return this.yesNoCursorPosition;
 	}
 
 	public void render(Scene output, Graphics graphics) {
@@ -251,6 +344,56 @@ public class Dialogue {
 		}
 	}
 
+	/**
+	 * This is to render the information dialogue box that will appear in the lower left corner when the
+	 * Main Menu is displayed.
+	 *
+	 * This method uses the default X, Y, center width, and center height values.
+	 *
+	 * @param output
+	 */
+	public void renderInformationBox(Scene output) {
+		this.renderInformationBox(output, 0, 6, 9, 2);
+	}
+
+	/**
+	 * This is to render the information dialogue box that will appear in the lower left corner when the
+	 * Main Menu is displayed.
+	 *
+	 * @param output
+	 * @param x
+	 * @param y
+	 * @param centerWidth
+	 * @param centerHeight
+	 */
+	public void renderInformationBox(Scene output, int x, int y, int centerWidth, int centerHeight) {
+		output.blit(Art.dialogue_top_left, x * Tileable.WIDTH, y * Tileable.HEIGHT);
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(Art.dialogue_top, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH), y * Tileable.HEIGHT);
+		}
+		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tileable.WIDTH, y * Tileable.HEIGHT);
+
+		for (int j = 0; j < centerHeight - 1; j++) {
+			output.blit(Art.dialogue_left, x * Tileable.WIDTH, ((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT);
+			for (int i = 0; i < centerWidth - 1; i++) {
+				output.blit(
+					Art.dialogue_background, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
+					((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT
+				);
+			}
+			output.blit(Art.dialogue_right, (x + centerWidth) * Tileable.WIDTH, ((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT);
+		}
+
+		output.blit(Art.dialogue_bottom_left, x * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
+		for (int i = 0; i < centerWidth - 1; i++) {
+			output.blit(
+				Art.dialogue_bottom, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
+				((y + centerHeight) * Tileable.HEIGHT)
+			);
+		}
+		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
+	}
+
 	public void renderYesNoAnswerText(Graphics g) {
 		if (this.simpleQuestionFlag) {
 			g.setFont(Art.font.deriveFont(8f));
@@ -267,11 +410,98 @@ public class Dialogue {
 		}
 	}
 
+	public void resetDialogue() {
+		this.subStringIterator = 0;
+		this.nextFlag = false;
+		this.simpleQuestionFlag = false;
+		this.simpleSpeechFlag = false;
+		this.scrollFlag = false;
+		this.scrollDistance = 0;
+		this.nextTick = 0x0;
+		this.lineIterator = 0;
+		this.showDialog = true;
+		this.yesNoCursorPosition = true;
+		this.yesNoAnswerFlag = null;
+		this.completedLines.clear();
+	}
+
+	public void setCompletedLines(ArrayList<String> completedLines) {
+		this.completedLines = completedLines;
+	}
+
+	public void setIgnoreInputs(boolean flag) {
+		this.ignoreInputsFlag = flag;
+	}
+
+	public void setLineIterator(int lineIterator) {
+		this.lineIterator = lineIterator;
+	}
+
+	public void setLineLength(int lineLength) {
+		this.lineLength = lineLength;
+	}
+
+	public void setLines(List<Map.Entry<String, Boolean>> lines) {
+		this.lines = lines;
+	}
+
+	public void setNextFlag(boolean nextFlag) {
+		this.nextFlag = nextFlag;
+	}
+
+	public void setNextTick(byte nextTick) {
+		this.nextTick = nextTick;
+	}
+
+	public void setScrollDistance(int scrollDistance) {
+		this.scrollDistance = scrollDistance;
+	}
+
+	public void setScrollFlag(boolean scrollFlag) {
+		this.scrollFlag = scrollFlag;
+	}
+
+	public void setShowDialog(boolean showDialog) {
+		this.showDialog = showDialog;
+	}
+
+	public void setSimpleQuestionFlag(boolean simpleQuestionFlag) {
+		this.simpleQuestionFlag = simpleQuestionFlag;
+	}
+
+	public void setSimpleSpeechFlag(boolean simpleSpeechFlag) {
+		this.simpleSpeechFlag = simpleSpeechFlag;
+	}
+
+	public void setSubStringIterator(int subStringIterator) {
+		this.subStringIterator = subStringIterator;
+	}
+
+	public void setTickCount(byte tickCount) {
+		this.tickCount = tickCount;
+	}
+
+	public void setTotalDialogueLength(int totalDialogueLength) {
+		this.totalDialogueLength = totalDialogueLength;
+	}
+
+	public void setType(DialogueType type) {
+		this.type = type;
+	}
+
+	public void setYesNoAnswerFlag(Boolean yesNoAnswerFlag) {
+		this.yesNoAnswerFlag = yesNoAnswerFlag;
+	}
+
+	public void setYesNoCursorPosition(boolean yesNoCursorPosition) {
+		this.yesNoCursorPosition = yesNoCursorPosition;
+	}
+
 	/**
 	 * <p>
 	 * Update method for NewDialogue class.
 	 * </p>
-	 * 
+	 *
 	 * <p>
 	 * <b>WARNING</b> : The code content of this tick() method is deliberately setup and designed in
 	 * such a way that it replicates the dialogues in Gen 1 and Gen 2 Pokémon games. May require a heavy
@@ -335,25 +565,23 @@ public class Dialogue {
 							this.completedLines.add(entry.getKey());
 							this.lineIterator++;
 						}
-						if (this.completedLines.size() == 2) {
-							if (!this.scrollFlag) {
-								switch (this.type) {
-									case SPEECH:
+						if ((this.completedLines.size() == 2) && !this.scrollFlag) {
+							switch (this.type) {
+								case SPEECH:
+									this.nextFlag = true;
+									break;
+								case QUESTION:
+									// Must get to the end of the entire dialogue before asking for answers.
+									if (this.lineIterator >= this.lines.size()) {
+										this.simpleQuestionFlag = true;
+										this.nextFlag = false;
+									}
+									else
 										this.nextFlag = true;
-										break;
-									case QUESTION:
-										// Must get to the end of the entire dialogue before asking for answers.
-										if (this.lineIterator >= this.lines.size()) {
-											this.simpleQuestionFlag = true;
-											this.nextFlag = false;
-										}
-										else
-											this.nextFlag = true;
-										break;
-									case ALERT:
-										this.nextFlag = true;
-										break;
-								}
+									break;
+								case ALERT:
+									this.nextFlag = true;
+									break;
 							}
 						}
 					}
@@ -401,25 +629,23 @@ public class Dialogue {
 							this.completedLines.add(entry.getKey());
 							this.lineIterator++;
 						}
-						if (this.completedLines.size() == 2) {
-							if (!this.scrollFlag) {
-								switch (this.type) {
-									case SPEECH:
+						if ((this.completedLines.size() == 2) && !this.scrollFlag) {
+							switch (this.type) {
+								case SPEECH:
+									this.nextFlag = true;
+									break;
+								case QUESTION:
+									// Must get to the end of the entire dialogue before asking for answers.
+									if (this.lineIterator >= this.lines.size()) {
+										this.simpleQuestionFlag = true;
+										this.nextFlag = false;
+									}
+									else
 										this.nextFlag = true;
-										break;
-									case QUESTION:
-										// Must get to the end of the entire dialogue before asking for answers.
-										if (this.lineIterator >= this.lines.size()) {
-											this.simpleQuestionFlag = true;
-											this.nextFlag = false;
-										}
-										else
-											this.nextFlag = true;
-										break;
-									case ALERT:
-										this.nextFlag = true;
-										break;
-								}
+									break;
+								case ALERT:
+									this.nextFlag = true;
+									break;
 							}
 						}
 					}
@@ -476,7 +702,6 @@ public class Dialogue {
 								return;
 							case ALERT:
 								this.closeDialog();
-								return;
 						}
 					}
 					else
@@ -508,136 +733,6 @@ public class Dialogue {
 	public boolean yesNoQuestionHasBeenAnswered() {
 		return this.yesNoAnswerFlag != null;
 	}
-
-	public void closeDialog() {
-		this.showDialog = false;
-	}
-
-	/**
-	 * Clears dialogues and unsets the dialogue flag.
-	 */
-	public void clearDialogueLines() {
-		if (!this.lines.isEmpty())
-			this.lines.clear();
-	}
-
-	private void renderText(Graphics g) {
-		final int X = 8;
-		final int Y1 = 120;
-		final int Y2 = 136;
-		final Rectangle rect = new Rectangle(X, Y1 - Tileable.HEIGHT, MainComponent.GAME_WIDTH - 16, Tileable.HEIGHT * 2);
-
-		g.setFont(Art.font.deriveFont(8f));
-		g.setColor(Color.black);
-
-		String string = null;
-		try {
-			switch (this.completedLines.size()) {
-				case 0:
-					// None completed.
-					string = this.lines.get(this.lineIterator).getKey();
-					if (this.subStringIterator > string.length()) {
-						g.drawString(string.substring(0, string.length()), X, Y1);
-						this.subStringIterator = this.lineLength;
-					}
-					else
-						g.drawString(string.substring(0, this.subStringIterator), X, Y1);
-					break;
-				case 1:
-					// One line completed.
-					g.drawString(this.completedLines.get(0), X, Y1);
-					string = this.lines.get(this.lineIterator).getKey();
-					if (this.subStringIterator > string.length()) {
-						g.drawString(string.substring(0, string.length()), X, Y2);
-						this.subStringIterator = this.lineLength;
-					}
-					else
-						g.drawString(string.substring(0, this.subStringIterator), X, Y2);
-					break;
-				case 2:
-					// Two lines completed.
-					if (!this.scrollFlag) {
-						g.drawString(this.completedLines.get(0), X, Y1);
-						g.drawString(this.completedLines.get(1), X, Y2);
-					}
-					else {
-						// Time to scroll.
-						// DEBUG: Needs testing to see if there's any problem with
-						// it.
-						Graphics g_clipped = g.create();
-						g_clipped.setClip(rect.x, rect.y, rect.width, rect.height);
-						g_clipped.drawString(this.completedLines.get(0), X, Y1 - this.scrollDistance);
-						g_clipped.drawString(this.completedLines.get(1), X, Y2 - this.scrollDistance);
-						if (this.tickCount == 0x0) {
-							if (this.scrollDistance >= Y2 - Y1) {
-								this.scrollFlag = false;
-								this.scrollDistance = 0;
-								this.subStringIterator = 0;
-								this.completedLines.remove(0);
-								this.lines.get(this.lineIterator).setValue(true);
-							}
-						}
-						g_clipped.dispose();
-					}
-					break;
-			}
-		}
-		catch (Exception e) {}
-	}
-
-	/**
-	 * This is to render the information dialogue box that will appear in the lower left corner when the
-	 * Main Menu is displayed.
-	 * 
-	 * @param output
-	 * @param x
-	 * @param y
-	 * @param centerWidth
-	 * @param centerHeight
-	 */
-	public void renderInformationBox(Scene output, int x, int y, int centerWidth, int centerHeight) {
-		output.blit(Art.dialogue_top_left, x * Tileable.WIDTH, y * Tileable.HEIGHT);
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(Art.dialogue_top, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH), y * Tileable.HEIGHT);
-		}
-		output.blit(Art.dialogue_top_right, (x + centerWidth) * Tileable.WIDTH, y * Tileable.HEIGHT);
-
-		for (int j = 0; j < centerHeight - 1; j++) {
-			output.blit(Art.dialogue_left, x * Tileable.WIDTH, ((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT);
-			for (int i = 0; i < centerWidth - 1; i++) {
-				output.blit(
-					Art.dialogue_background, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
-					((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT
-				);
-			}
-			output.blit(Art.dialogue_right, (x + centerWidth) * Tileable.WIDTH, ((y + 1) * Tileable.HEIGHT) + j * Tileable.HEIGHT);
-		}
-
-		output.blit(Art.dialogue_bottom_left, x * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
-		for (int i = 0; i < centerWidth - 1; i++) {
-			output.blit(
-				Art.dialogue_bottom, ((x + 1) * Tileable.WIDTH) + (i * Tileable.WIDTH),
-				((y + centerHeight) * Tileable.HEIGHT)
-			);
-		}
-		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
-	}
-
-	/**
-	 * This is to render the information dialogue box that will appear in the lower left corner when the
-	 * Main Menu is displayed.
-	 * 
-	 * This method uses the default X, Y, center width, and center height values.
-	 * 
-	 * @param output
-	 */
-	public void renderInformationBox(Scene output) {
-		this.renderInformationBox(output, 0, 6, 9, 2);
-	}
-
-	// ======================================================
-	// Private methods
-	// ======================================================
 
 	private void handleDialogueUpdate() {
 		int count = 0;
@@ -764,169 +859,65 @@ public class Dialogue {
 		output.blit(Art.dialogue_bottom_right, (x + centerWidth) * Tileable.WIDTH, ((y + centerHeight) * Tileable.HEIGHT));
 	}
 
-	public List<String> getCompletedLines() {
-		return this.completedLines;
-	}
+	private void renderText(Graphics g) {
+		final int X = 8;
+		final int Y1 = 120;
+		final int Y2 = 136;
+		final Rectangle rect = new Rectangle(X, Y1 - Tileable.HEIGHT, MainComponent.GAME_WIDTH - 16, Tileable.HEIGHT * 2);
 
-	public void setCompletedLines(ArrayList<String> completedLines) {
-		this.completedLines = completedLines;
-	}
+		g.setFont(Art.font.deriveFont(8f));
+		g.setColor(Color.black);
 
-	public int getLineIterator() {
-		return this.lineIterator;
-	}
-
-	public void setLineIterator(int lineIterator) {
-		this.lineIterator = lineIterator;
-	}
-
-	public int getLineLength() {
-		return this.lineLength;
-	}
-
-	public void setLineLength(int lineLength) {
-		this.lineLength = lineLength;
-	}
-
-	public List<Map.Entry<String, Boolean>> getLines() {
-		return this.lines;
-	}
-
-	public void setLines(List<Map.Entry<String, Boolean>> lines) {
-		this.lines = lines;
-	}
-
-	public boolean isSimpleQuestionFlag() {
-		return this.simpleQuestionFlag;
-	}
-
-	public void setSimpleQuestionFlag(boolean simpleQuestionFlag) {
-		this.simpleQuestionFlag = simpleQuestionFlag;
-	}
-
-	public boolean isSimpleSpeechFlag() {
-		return this.simpleSpeechFlag;
-	}
-
-	public void setSimpleSpeechFlag(boolean simpleSpeechFlag) {
-		this.simpleSpeechFlag = simpleSpeechFlag;
-	}
-
-	public boolean isNextFlag() {
-		return this.nextFlag;
-	}
-
-	public void setNextFlag(boolean nextFlag) {
-		this.nextFlag = nextFlag;
-	}
-
-	public boolean isScrollFlag() {
-		return this.scrollFlag;
-	}
-
-	public void setScrollFlag(boolean scrollFlag) {
-		this.scrollFlag = scrollFlag;
-	}
-
-	public Boolean getYesNoAnswerFlag() {
-		return this.yesNoAnswerFlag;
-	}
-
-	public void setYesNoAnswerFlag(Boolean yesNoAnswerFlag) {
-		this.yesNoAnswerFlag = yesNoAnswerFlag;
-	}
-
-	public boolean isYesNoCursorPosition() {
-		return this.yesNoCursorPosition;
-	}
-
-	public void setYesNoCursorPosition(boolean yesNoCursorPosition) {
-		this.yesNoCursorPosition = yesNoCursorPosition;
-	}
-
-	public byte getNextTick() {
-		return this.nextTick;
-	}
-
-	public void setNextTick(byte nextTick) {
-		this.nextTick = nextTick;
-	}
-
-	public int getScrollDistance() {
-		return this.scrollDistance;
-	}
-
-	public void setScrollDistance(int scrollDistance) {
-		this.scrollDistance = scrollDistance;
-	}
-
-	public int getSubStringIterator() {
-		return this.subStringIterator;
-	}
-
-	public void setSubStringIterator(int subStringIterator) {
-		this.subStringIterator = subStringIterator;
-	}
-
-	public byte getTickCount() {
-		return this.tickCount;
-	}
-
-	public void setTickCount(byte tickCount) {
-		this.tickCount = tickCount;
-	}
-
-	public int getTotalDialogueLength() {
-		return this.totalDialogueLength;
-	}
-
-	public void setTotalDialogueLength(int totalDialogueLength) {
-		this.totalDialogueLength = totalDialogueLength;
-	}
-
-	public DialogueType getType() {
-		return this.type;
-	}
-
-	public void setType(DialogueType type) {
-		this.type = type;
-	}
-
-	public void setIgnoreInputs(boolean flag) {
-		this.ignoreInputsFlag = flag;
-	}
-
-	public boolean getIgnoreInputs() {
-		return this.ignoreInputsFlag;
-	}
-
-	public String getCurrentLine() {
-		Map.Entry<String, Boolean> entry = this.getLines().get(this.lineIterator);
-		return entry.getKey();
-	}
-
-	/**
-	 * This checks to see if there is a line break in the dialogue.
-	 * <p>
-	 * A line break is defined to be "two whitespaces inside the dialogue's line".
-	 * 
-	 * @param subStringIterator
-	 *            - The string iterator marking where the game must render text to, on the current line.
-	 * @return
-	 */
-	public boolean isLineBreak(int subStringIterator) {
-		String currentLine = this.getCurrentLine();
+		String string = null;
 		try {
-			char previousChar = currentLine.charAt(subStringIterator - 1);
-			char currentChar = currentLine.charAt(subStringIterator);
-			if (previousChar == ' ' && currentChar == ' ') {
-				return true;
+			switch (this.completedLines.size()) {
+				case 0:
+					// None completed.
+					string = this.lines.get(this.lineIterator).getKey();
+					if (this.subStringIterator > string.length()) {
+						g.drawString(string.substring(0, string.length()), X, Y1);
+						this.subStringIterator = this.lineLength;
+					}
+					else
+						g.drawString(string.substring(0, this.subStringIterator), X, Y1);
+					break;
+				case 1:
+					// One line completed.
+					g.drawString(this.completedLines.get(0), X, Y1);
+					string = this.lines.get(this.lineIterator).getKey();
+					if (this.subStringIterator > string.length()) {
+						g.drawString(string.substring(0, string.length()), X, Y2);
+						this.subStringIterator = this.lineLength;
+					}
+					else
+						g.drawString(string.substring(0, this.subStringIterator), X, Y2);
+					break;
+				case 2:
+					// Two lines completed.
+					if (!this.scrollFlag) {
+						g.drawString(this.completedLines.get(0), X, Y1);
+						g.drawString(this.completedLines.get(1), X, Y2);
+					}
+					else {
+						// Time to scroll.
+						// DEBUG: Needs testing to see if there's any problem with
+						// it.
+						Graphics g_clipped = g.create();
+						g_clipped.setClip(rect.x, rect.y, rect.width, rect.height);
+						g_clipped.drawString(this.completedLines.get(0), X, Y1 - this.scrollDistance);
+						g_clipped.drawString(this.completedLines.get(1), X, Y2 - this.scrollDistance);
+						if ((this.tickCount == 0x0) && (this.scrollDistance >= Y2 - Y1)) {
+							this.scrollFlag = false;
+							this.scrollDistance = 0;
+							this.subStringIterator = 0;
+							this.completedLines.remove(0);
+							this.lines.get(this.lineIterator).setValue(true);
+						}
+						g_clipped.dispose();
+					}
+					break;
 			}
 		}
-		catch (IndexOutOfBoundsException e) {
-			// The substring iterator is at position 0, or it is at the end of the current line.
-			// We do actually expect an exception to be thrown.
-		}
-		return false;
+		catch (Exception e) {}
 	}
 }

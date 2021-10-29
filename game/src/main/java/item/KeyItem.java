@@ -28,29 +28,21 @@ public class KeyItem extends Item {
 
 	protected boolean enabled;
 
-	public KeyItem(String name, String description, ItemCategories category, int id) {
-		super(name, description, category, id);
-	}
-
 	public KeyItem(ModdedItem text) {
 		super(text);
 	}
 
-	public void enable() {
-		this.enabled = true;
-	}
-
-	public void disable() {
-		this.enabled = false;
-	}
-
-	public boolean isEnabled() {
-		return this.enabled;
+	public KeyItem(String name, String description, ItemCategories category, int id) {
+		super(name, description, category, id);
 	}
 
 	@Override
 	public boolean canBeTossed() {
 		return false;
+	}
+
+	public void disable() {
+		this.enabled = false;
 	}
 
 	@Override
@@ -64,6 +56,10 @@ public class KeyItem extends Item {
 	@Override
 	public void dropAt(Area area, Player player) {
 		// TODO: Continue to work on this.
+	}
+
+	public void enable() {
+		this.enabled = true;
 	}
 
 	@Override
@@ -84,14 +80,18 @@ public class KeyItem extends Item {
 	}
 
 	@Override
+	public List<String> getAvailableCommands() {
+		return Arrays.asList(Inventory.MENU_USE, Inventory.MENU_SET, Inventory.MENU_CANCEL);
+	}
+
+	@Override
 	public int hashCode() {
 		int hash = 3;
 		hash = 53 * hash + ((this.name != null) ? this.name.hashCode() : 0);
 		return hash;
 	}
 
-	@Override
-	public List<String> getAvailableCommands() {
-		return Arrays.asList(Inventory.MENU_USE, Inventory.MENU_SET, Inventory.MENU_CANCEL);
+	public boolean isEnabled() {
+		return this.enabled;
 	}
 }

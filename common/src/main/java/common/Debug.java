@@ -9,12 +9,21 @@ import enums.AnsiColors;
 
 /**
  * Debug utility class with ANSI colors support.
- * 
+ *
  * @author tlee
  */
 public class Debug {
+	private static final int MinimumStringLength = 17;
+
+	private static final int TabLength = 8;
+
+	protected static final int MaxDuplicateLogOccurrences = 1;
+
+	private static Map<String, NotYetImplemented> notYetImplementedTracker = new HashMap<>();
+
 	static class NotYetImplemented {
 		private int occurrences = 0;
+
 		private final String location;
 
 		public NotYetImplemented(String loc) {
@@ -29,36 +38,18 @@ public class Debug {
 			return false;
 		}
 
-		public void increment() {
-			this.occurrences++;
-		}
-
 		public boolean hasReachedLimit() {
 			return this.occurrences >= Debug.MaxDuplicateLogOccurrences;
 		}
-	}
 
-	/**
-	 * Logs information in yellow text.
-	 * 
-	 * @param msg
-	 */
-	public static void warn(String msg) {
-		Debug.printColor(AnsiColors.Yellow, Debug.createString(msg));
-	}
-
-	/**
-	 * Prints out information in green text.
-	 * 
-	 * @param msg
-	 */
-	public static void info(String msg) {
-		Debug.printColor(AnsiColors.Green, Debug.createString(msg));
+		public void increment() {
+			this.occurrences++;
+		}
 	}
 
 	/**
 	 * Displays error in bright red text.
-	 * 
+	 *
 	 * @param msg
 	 */
 	public static void error(String msg) {
@@ -67,7 +58,7 @@ public class Debug {
 
 	/**
 	 * Displays error in bright red text, and prints out the exception in dark red text.
-	 * 
+	 *
 	 * @param msg
 	 * @param e
 	 */
@@ -78,7 +69,7 @@ public class Debug {
 
 	/**
 	 * Displays error exception in dark red text.
-	 * 
+	 *
 	 * @param e
 	 */
 	public static void exception(Exception e) {
@@ -86,8 +77,21 @@ public class Debug {
 	}
 
 	/**
+	 * Prints out information in green text.
+	 *
+	 * @param msg
+	 */
+	public static void info(String msg) {
+		Debug.printColor(AnsiColors.Green, Debug.createString(msg));
+	}
+
+	public static void notYetImplemented() {
+		Debug.toDo("Not yet implemented", 4);
+	}
+
+	/**
 	 * Displays an alert message box with the error message and line number.
-	 * 
+	 *
 	 * @param e
 	 */
 	public static void showExceptionCause(Exception e) {
@@ -96,7 +100,7 @@ public class Debug {
 
 	/**
 	 * Displays an alert message box with a customized message, the error message, and the line number.
-	 * 
+	 *
 	 * @param msg
 	 * @param e
 	 */
@@ -114,6 +118,10 @@ public class Debug {
 		}
 		msg += e.getMessage() + " " + cause;
 		JOptionPane.showMessageDialog(null, msg);
+	}
+
+	public static void toDo(String msg) {
+		Debug.toDo(msg, 5);
 	}
 
 	/**
@@ -134,35 +142,28 @@ public class Debug {
 		}
 	}
 
-	public static void toDo(String msg) {
-		Debug.toDo(msg, 5);
-	}
-
-	public static void notYetImplemented() {
-		Debug.toDo("Not yet implemented", 4);
-	}
-
-	// -----------------------------------------------------------------
-	// Private static methods and class member fields.
-
-	private static final int MinimumStringLength = 17;
-	private static final int TabLength = 8;
-	protected static final int MaxDuplicateLogOccurrences = 1;
-	private static Map<String, NotYetImplemented> notYetImplementedTracker = new HashMap<>();
-
 	/**
-	 * Handles wrapping the input string with ANSI color tags.
-	 * 
-	 * @param color
-	 * @param input
+	 * Logs information in yellow text.
+	 *
+	 * @param msg
 	 */
-	private static void printColor(AnsiColors color, String input) {
-		System.out.println(color.getAnsiCode() + input + AnsiColors.Clear.getAnsiCode());
+	public static void warn(String msg) {
+		Debug.printColor(AnsiColors.Yellow, Debug.createString(msg));
 	}
 
 	/**
 	 * Builds the log messages in a readable format for developers.
-	 * 
+	 *
+	 * @param msg
+	 * @return
+	 */
+	private static String createString(String msg) {
+		return Debug.createString(msg, 3);
+	}
+
+	/**
+	 * Builds the log messages in a readable format for developers.
+	 *
 	 * @param msg
 	 * @param index
 	 *            Specify which stack trace element to choose from.
@@ -182,19 +183,19 @@ public class Debug {
 	}
 
 	/**
-	 * Builds the log messages in a readable format for developers.
-	 * 
-	 * @param msg
-	 * @return
+	 * Handles wrapping the input string with ANSI color tags.
+	 *
+	 * @param color
+	 * @param input
 	 */
-	private static String createString(String msg) {
-		return createString(msg, 3);
+	private static void printColor(AnsiColors color, String input) {
+		System.out.println(color.getAnsiCode() + input + AnsiColors.Clear.getAnsiCode());
 	}
 
 	/**
 	 * Builds a simplified exception message thrown out by the actual class object containing the bug.
 	 * Does not display anything related with Java SDK internal classes.
-	 * 
+	 *
 	 * @param e
 	 * @return
 	 */

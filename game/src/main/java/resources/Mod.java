@@ -40,10 +40,6 @@ public class Mod {
 		}
 	};
 
-	public static void resetLoading() {
-		Mod.hasLoaded = false;
-	}
-
 	public static void loadModdedResources() {
 		if (Mod.hasLoaded)
 			return;
@@ -69,6 +65,44 @@ public class Mod {
 		else
 			throw new RuntimeException("Something is wrong with detecting the mod folder.");
 		Mod.hasLoaded = true;
+	}
+
+	public static void resetLoading() {
+		Mod.hasLoaded = false;
+	}
+
+	@SuppressWarnings("unused")
+	private static int getFilesCount(File file) {
+		File[] files = file.listFiles();
+		int count = 0;
+		for (File f : files)
+			if (f.isDirectory())
+				count += Mod.getFilesCount(f);
+			else
+				count++;
+		return count;
+	}
+
+	private static List<File> getMapContents(File file) {
+		List<File> results = new ArrayList<>();
+		if (file != null && file.exists()) {
+			if (file.isDirectory()) {
+				File[] list = file.listFiles();
+				for (int i = 0; i < list.length; i++) {
+					results.addAll(Mod.getMapContents(list[i]));
+				}
+			}
+			else {
+				String filepath = file.getPath();
+				int dotCount = filepath.lastIndexOf('.');
+				int pathDotCount = Math.max(filepath.lastIndexOf('/'), filepath.lastIndexOf('\\'));
+				if (dotCount > pathDotCount) {
+					if (filepath.substring(dotCount + 1).toLowerCase().equals("png"))
+						results.add(file);
+				}
+			}
+		}
+		return results;
 	}
 
 	/**
@@ -291,39 +325,5 @@ public class Mod {
 				}
 			}
 		}
-	}
-
-	private static List<File> getMapContents(File file) {
-		List<File> results = new ArrayList<>();
-		if (file != null && file.exists()) {
-			if (file.isDirectory()) {
-				File[] list = file.listFiles();
-				for (int i = 0; i < list.length; i++) {
-					results.addAll(Mod.getMapContents(list[i]));
-				}
-			}
-			else {
-				String filepath = file.getPath();
-				int dotCount = filepath.lastIndexOf('.');
-				int pathDotCount = Math.max(filepath.lastIndexOf('/'), filepath.lastIndexOf('\\'));
-				if (dotCount > pathDotCount) {
-					if (filepath.substring(dotCount + 1).toLowerCase().equals("png"))
-						results.add(file);
-				}
-			}
-		}
-		return results;
-	}
-
-	@SuppressWarnings("unused")
-	private static int getFilesCount(File file) {
-		File[] files = file.listFiles();
-		int count = 0;
-		for (File f : files)
-			if (f.isDirectory())
-				count += Mod.getFilesCount(f);
-			else
-				count++;
-		return count;
 	}
 }

@@ -65,6 +65,11 @@ public class StatusPanel extends JPanel {
 		this.add(this.rightPanel);
 	}
 
+	public void setChecksumLabel(String checksum) {
+		this.checksumLabel.setText(checksum);
+		this.update();
+	}
+
 	public void setMousePositionText(int x, int y) {
 		this.mousePosition.setText("[" + x + ", " + y + "]");
 		this.update();
@@ -72,11 +77,6 @@ public class StatusPanel extends JPanel {
 
 	public void setStatusMessageText(String msg) {
 		this.statusMessage.setText(msg);
-		this.update();
-	}
-
-	public void setChecksumLabel(String checksum) {
-		this.checksumLabel.setText(checksum);
 		this.update();
 	}
 

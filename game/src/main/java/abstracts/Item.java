@@ -39,7 +39,9 @@ import utility.DialogueBuilder;
 public abstract class Item extends Entity implements Comparable<Item>, Renderable {
 
 	protected String name;
+
 	protected String itemDialogueName;
+
 	protected String description;
 	protected ItemCategories category;
 	protected boolean picked;
@@ -51,6 +53,21 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	protected Inventory inventory;
 
 	private boolean afterItemActionOccurred = false;
+
+	public Item(ModdedItem itemText) {
+		this.setName(itemText.itemName);
+		this.setDescription(itemText.description);
+		this.setCategory(itemText.category);
+		this.setID(itemText.id);
+		this.picked = false;
+		this.availableCommands = new ArrayList<>();
+		this.initializeCommands(itemText);
+
+		try (Formatter formatter = new Formatter()) {
+			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", itemText.itemName);
+			this.itemDialogueName = formatter.toString();
+		}
+	}
 
 	public Item(String name, String description, ItemCategories category, int id) {
 		this.setName(name);
@@ -69,270 +86,17 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 		}
 	}
 
-	public Item(ModdedItem itemText) {
-		this.setName(itemText.itemName);
-		this.setDescription(itemText.description);
-		this.setCategory(itemText.category);
-		this.setID(itemText.id);
-		this.picked = false;
-		this.availableCommands = new ArrayList<>();
-		this.initializeCommands(itemText);
-
-		try (Formatter formatter = new Formatter()) {
-			formatter.format("%-1" + Dialogue.HALF_STRING_LENGTH + "s", itemText.itemName);
-			this.itemDialogueName = formatter.toString();
-		}
-	}
-
-	public void setName(String value) {
-		if (value == null || value.isBlank() || value.isEmpty()) {
-			value = "UnknownItem";
-		}
-		this.name = value;
-	}
-
-	public void setDescription(String value) {
-		if (value == null || value.isBlank() || value.isEmpty()) {
-			value = "Unknown Item was found.";
-		}
-		this.description = value;
-	}
-
-	public void setCategory(ItemCategories category) {
-		this.category = category;
-	}
-
-	public void setID(int value) {
-		this.id = value;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
 	/**
-	 * This returns the item's name, with extra padded whitespace. This name fills up the entire row of
-	 * the dialogue box.
+	 * For the Level Editor
 	 *
+	 * @param pixel
+	 * @param x
+	 * @param y
 	 * @return
 	 */
-	public String getDialogueName() {
-		return this.itemDialogueName;
+	public static Item build(int pixel, int x, int y) {
+		return Item.build(new PixelData(pixel), x, y);
 	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public ItemCategories getCategory() {
-		return this.category;
-	}
-
-	public int getID() {
-		return this.id;
-	}
-
-	public void pick() {
-		this.picked = true;
-		this.hide();
-
-		this.afterItemActionOccurred = true;
-		if (this.itemPickedDialogue == null || !this.itemPickedDialogue.isReady()) {
-			this.itemPickedDialogue = DialogueBuilder.createText(
-				// Intentionally setting the first row of the dialogue to be only the item name, then the second
-				// sentence to be a fixed sized sentence.
-				this.getDialogueName() + "has been found.",
-				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
-			);
-			this.itemPickedDialogue.setShowDialog(true);
-		}
-		if (!(this.itemPickedDialogue.isDialogueCompleted() && this.itemPickedDialogue.isShowingDialog())) {
-			this.itemPickedDialogue.tick();
-		}
-		// We want the player to interact with the dialogue for the final time, before dismissing it.
-		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
-			this.afterItemActionOccurred = false;
-			this.itemPickedDialogue.clearDialogueLines();
-			this.itemPickedDialogue.setShowDialog(false);
-
-			// We need to completely remove the item out from the area world.
-		}
-	}
-
-	public void drop() {
-		this.picked = false;
-		this.reveal();
-
-		this.afterItemActionOccurred = true;
-		if (this.itemTossedDialogue == null || !this.itemTossedDialogue.isReady()) {
-			this.itemTossedDialogue = DialogueBuilder.createText(
-				// Intentionally setting the first row of the dialogue to be only the item name, then the second
-				// sentence to be a fixed sized sentence.
-				this.getDialogueName() + "was tossed away.",
-				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
-			);
-			this.itemTossedDialogue.setShowDialog(true);
-		}
-		if (!(this.itemTossedDialogue.isDialogueCompleted() && this.itemTossedDialogue.isShowingDialog())) {
-			this.itemTossedDialogue.tick();
-		}
-		// We want the player to interact with the dialogue for the final time, before dismissing it.
-		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
-			this.afterItemActionOccurred = false;
-			this.itemTossedDialogue.clearDialogueLines();
-			this.itemTossedDialogue.setShowDialog(false);
-		}
-	}
-
-	public void hide() {
-		this.getPixelData().hide();
-	}
-
-	public void reveal() {
-		this.getPixelData().reveal();
-	}
-
-	/**
-	 * Checks whether this item can be tossed away or sold in the PokeMart.
-	 *
-	 * This can also be used to check whether the item is a Key Item or not.
-	 *
-	 * @return True always for any item that is not a Key Item. False if the item is a Key Item.
-	 */
-	public boolean canBeTossed() {
-		return true;
-	}
-
-	/**
-	 * Two conditions must be satisfied before claiming the item has been properly picked up.<br/>
-	 * <ol>
-	 * <li>The action to initiate "picking up" has been triggered.
-	 * <li>The event "after picking up" has finished triggering.
-	 * </ol>
-	 * The conditional check has a short-circuited condition where if the "after picking up" event is
-	 * currently triggered, the item is still not properly picked up.
-	 *
-	 * @return True if the item has been properly picked up. False, if otherwise.
-	 */
-	public boolean isPickedUp() {
-		return !this.afterItemActionOccurred && (this.picked);
-	}
-
-	/**
-	 * This checks if the event, "after picking up" has finished triggering.
-	 *
-	 * @return True if the item has finished triggering the "after picked up" event.
-	 */
-	public boolean isFinishedPickingUp() {
-		return !this.afterItemActionOccurred;
-	}
-
-	public void droppedAt(Area area, Player player) {
-		this.drop();
-		this.dropAt(area, player);
-	}
-
-	/**
-	 * Returns true, only if the item is a DummyItem, and the item itself is a menu item, "RETURN".
-	 * False, if otherwise.
-	 *
-	 * @return
-	 */
-	public boolean isReturnMenu() {
-		boolean isDummy = this instanceof ReturnMenu;
-		return isDummy && this.isReturnMenuFlag;
-	}
-
-	public void setReturnMenu(boolean value) {
-		this.isReturnMenuFlag = value;
-	}
-
-	/**
-	 * Items must provide a default available commands to the Inventory menu dialogue.
-	 * <p>
-	 * More specific items can provide additional available commands to the Inventory menu.
-	 */
-	public List<String> getAvailableCommands() {
-		return this.availableCommands;
-	}
-
-	public void initializeCommands(ModdedItem itemText) {
-		this.availableCommands.add(0, Inventory.MENU_CANCEL);
-		if (itemText.tossCommandFlag)
-			this.availableCommands.add(0, Inventory.MENU_TOSS);
-		if (itemText.setCommandFlag)
-			this.availableCommands.add(0, Inventory.MENU_SET);
-		if (itemText.useCommandFlag)
-			this.availableCommands.add(0, Inventory.MENU_USE);
-	}
-
-	public void setInventory(Inventory inventory) {
-		this.inventory = inventory;
-	}
-
-	// ------------------------------------------------------------------
-	// Abstract methods
-
-	public abstract void doAction(Game game);
-
-	// TODO: Add function that allows the item to be placed at.
-	public abstract void dropAt(Area area, Player player);
-
-	// ------------------------------------------------------------------
-	// Override methods
-
-	@Override
-	public void tick() {}
-
-	@Override
-	public void render(Scene output, Graphics graphics, int xOffset, int yOffset) {
-		if (!this.picked) {
-			output.blit(Art.item, xOffset, yOffset);
-		}
-		if (this.afterItemActionOccurred) {
-			if (this.itemPickedDialogue.isReady())
-				this.itemPickedDialogue.render(output, graphics);
-			else if (this.itemTossedDialogue.isReady())
-				this.itemTossedDialogue.render(output, graphics);
-		}
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if ((obj == null) || (this.getClass() != obj.getClass())) {
-			return false;
-		}
-		Item other = (Item) obj;
-		if ((this.category != other.category) || (this.id != other.id)) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((this.category == null) ? 0 : this.category.hashCode());
-		return prime * result + this.id;
-	}
-
-	@Override
-	public int compareTo(Item other) {
-		return this.id - other.id;
-	}
-
-	@Override
-	protected void setPosition(final int x, final int y) {
-		super.setPosition(x, y);
-		this.setPixelDataPosition(x, y);
-	}
-
-	// ------------------------------------------------------------------
-	// Static helper methods
 
 	/**
 	 * For the Game
@@ -367,14 +131,243 @@ public abstract class Item extends Entity implements Comparable<Item>, Renderabl
 	}
 
 	/**
-	 * For the Level Editor
+	 * Checks whether this item can be tossed away or sold in the PokeMart.
 	 *
-	 * @param pixel
-	 * @param x
-	 * @param y
+	 * This can also be used to check whether the item is a Key Item or not.
+	 *
+	 * @return True always for any item that is not a Key Item. False if the item is a Key Item.
+	 */
+	public boolean canBeTossed() {
+		return true;
+	}
+
+	@Override
+	public int compareTo(Item other) {
+		return this.id - other.id;
+	}
+
+	public abstract void doAction(Game game);
+
+	public void drop() {
+		this.picked = false;
+		this.reveal();
+
+		this.afterItemActionOccurred = true;
+		if (this.itemTossedDialogue == null || !this.itemTossedDialogue.isReady()) {
+			this.itemTossedDialogue = DialogueBuilder.createText(
+				// Intentionally setting the first row of the dialogue to be only the item name, then the second
+				// sentence to be a fixed sized sentence.
+				this.getDialogueName() + "was tossed away.",
+				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
+			);
+			this.itemTossedDialogue.setShowDialog(true);
+		}
+		if (!(this.itemTossedDialogue.isDialogueCompleted() && this.itemTossedDialogue.isShowingDialog())) {
+			this.itemTossedDialogue.tick();
+		}
+		// We want the player to interact with the dialogue for the final time, before dismissing it.
+		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
+			this.afterItemActionOccurred = false;
+			this.itemTossedDialogue.clearDialogueLines();
+			this.itemTossedDialogue.setShowDialog(false);
+		}
+	}
+
+	// TODO: Add function that allows the item to be placed at.
+	public abstract void dropAt(Area area, Player player);
+
+	public void droppedAt(Area area, Player player) {
+		this.drop();
+		this.dropAt(area, player);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if ((obj == null) || (this.getClass() != obj.getClass())) {
+			return false;
+		}
+		Item other = (Item) obj;
+		if ((this.category != other.category) || (this.id != other.id)) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Items must provide a default available commands to the Inventory menu dialogue.
+	 * <p>
+	 * More specific items can provide additional available commands to the Inventory menu.
+	 */
+	public List<String> getAvailableCommands() {
+		return this.availableCommands;
+	}
+
+	public ItemCategories getCategory() {
+		return this.category;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	/**
+	 * This returns the item's name, with extra padded whitespace. This name fills up the entire row of
+	 * the dialogue box.
+	 *
 	 * @return
 	 */
-	public static Item build(int pixel, int x, int y) {
-		return Item.build(new PixelData(pixel), x, y);
+	public String getDialogueName() {
+		return this.itemDialogueName;
+	}
+
+	public int getID() {
+		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.category == null) ? 0 : this.category.hashCode());
+		return prime * result + this.id;
+	}
+
+	public void hide() {
+		this.getPixelData().hide();
+	}
+
+	public void initializeCommands(ModdedItem itemText) {
+		this.availableCommands.add(0, Inventory.MENU_CANCEL);
+		if (itemText.tossCommandFlag)
+			this.availableCommands.add(0, Inventory.MENU_TOSS);
+		if (itemText.setCommandFlag)
+			this.availableCommands.add(0, Inventory.MENU_SET);
+		if (itemText.useCommandFlag)
+			this.availableCommands.add(0, Inventory.MENU_USE);
+	}
+
+	/**
+	 * This checks if the event, "after picking up" has finished triggering.
+	 *
+	 * @return True if the item has finished triggering the "after picked up" event.
+	 */
+	public boolean isFinishedPickingUp() {
+		return !this.afterItemActionOccurred;
+	}
+
+	/**
+	 * Two conditions must be satisfied before claiming the item has been properly picked up.<br/>
+	 * <ol>
+	 * <li>The action to initiate "picking up" has been triggered.
+	 * <li>The event "after picking up" has finished triggering.
+	 * </ol>
+	 * The conditional check has a short-circuited condition where if the "after picking up" event is
+	 * currently triggered, the item is still not properly picked up.
+	 *
+	 * @return True if the item has been properly picked up. False, if otherwise.
+	 */
+	public boolean isPickedUp() {
+		return !this.afterItemActionOccurred && (this.picked);
+	}
+
+	/**
+	 * Returns true, only if the item is a DummyItem, and the item itself is a menu item, "RETURN".
+	 * False, if otherwise.
+	 *
+	 * @return
+	 */
+	public boolean isReturnMenu() {
+		boolean isDummy = this instanceof ReturnMenu;
+		return isDummy && this.isReturnMenuFlag;
+	}
+
+	public void pick() {
+		this.picked = true;
+		this.hide();
+
+		this.afterItemActionOccurred = true;
+		if (this.itemPickedDialogue == null || !this.itemPickedDialogue.isReady()) {
+			this.itemPickedDialogue = DialogueBuilder.createText(
+				// Intentionally setting the first row of the dialogue to be only the item name, then the second
+				// sentence to be a fixed sized sentence.
+				this.getDialogueName() + "has been found.",
+				Dialogue.MAX_STRING_LENGTH, DialogueType.SPEECH, true
+			);
+			this.itemPickedDialogue.setShowDialog(true);
+		}
+		if (!(this.itemPickedDialogue.isDialogueCompleted() && this.itemPickedDialogue.isShowingDialog())) {
+			this.itemPickedDialogue.tick();
+		}
+		// We want the player to interact with the dialogue for the final time, before dismissing it.
+		else if (Game.keys.isPrimaryPressed() || Game.keys.isSecondaryPressed()) {
+			this.afterItemActionOccurred = false;
+			this.itemPickedDialogue.clearDialogueLines();
+			this.itemPickedDialogue.setShowDialog(false);
+
+			// We need to completely remove the item out from the area world.
+		}
+	}
+
+	@Override
+	public void render(Scene output, Graphics graphics, int xOffset, int yOffset) {
+		if (!this.picked) {
+			output.blit(Art.item, xOffset, yOffset);
+		}
+		if (this.afterItemActionOccurred) {
+			if (this.itemPickedDialogue.isReady())
+				this.itemPickedDialogue.render(output, graphics);
+			else if (this.itemTossedDialogue.isReady())
+				this.itemTossedDialogue.render(output, graphics);
+		}
+	}
+
+	public void reveal() {
+		this.getPixelData().reveal();
+	}
+
+	public void setCategory(ItemCategories category) {
+		this.category = category;
+	}
+
+	public void setDescription(String value) {
+		if (value == null || value.isBlank() || value.isEmpty()) {
+			value = "Unknown Item was found.";
+		}
+		this.description = value;
+	}
+
+	public void setID(int value) {
+		this.id = value;
+	}
+
+	public void setInventory(Inventory inventory) {
+		this.inventory = inventory;
+	}
+
+	public void setName(String value) {
+		if (value == null || value.isBlank() || value.isEmpty()) {
+			value = "UnknownItem";
+		}
+		this.name = value;
+	}
+
+	public void setReturnMenu(boolean value) {
+		this.isReturnMenuFlag = value;
+	}
+
+	@Override
+	public void tick() {}
+
+	@Override
+	protected void setPosition(final int x, final int y) {
+		super.setPosition(x, y);
+		this.setPixelDataPosition(x, y);
 	}
 }

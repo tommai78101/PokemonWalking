@@ -6,15 +6,11 @@ import java.awt.event.MouseMotionListener;
 
 public class ScriptInput implements MouseListener, MouseMotionListener {
 	@Override
-	public void mouseDragged(MouseEvent e) {
-	}
-
-	@Override
-	public void mouseMoved(MouseEvent e) {
-	}
-
-	@Override
 	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
 	}
 
 	@Override
@@ -23,6 +19,10 @@ public class ScriptInput implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
 	}
 
 	@Override

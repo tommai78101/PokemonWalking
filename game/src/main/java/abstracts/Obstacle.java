@@ -21,6 +21,10 @@ public abstract class Obstacle extends Entity implements Interactable {
 	protected int color;
 	protected int id;
 
+	public static Obstacle build(final Area area, final int pixel, final int xPosition, final int yPosition) {
+		return Obstacle.build(area, new PixelData(pixel, xPosition, yPosition), xPosition, yPosition);
+	}
+
 	public static Obstacle build(final Area area, final PixelData data, final int xPosition, final int yPosition) {
 		int red = data.getRed();
 		Obstacle obj = null;
@@ -57,10 +61,6 @@ public abstract class Obstacle extends Entity implements Interactable {
 			obj.loadTriggerData();
 		}
 		return obj;
-	}
-
-	public static Obstacle build(final Area area, final int pixel, final int xPosition, final int yPosition) {
-		return Obstacle.build(area, new PixelData(pixel, xPosition, yPosition), xPosition, yPosition);
 	}
 
 	// public Obstacle(PixelData data, int id) {
@@ -120,12 +120,12 @@ public abstract class Obstacle extends Entity implements Interactable {
 	// }
 	// }
 
-	public int getID() {
-		return this.id;
-	}
-
 	public int getColor() {
 		return this.color;
+	}
+
+	public int getID() {
+		return this.id;
 	}
 
 	@Override

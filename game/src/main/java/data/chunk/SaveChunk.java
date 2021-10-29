@@ -30,6 +30,19 @@ public class SaveChunk extends Chunk {
 	}
 
 	@Override
+	public int getSize(Game game) {
+		int size = this.name.length;
+		size += this.version.length;
+		for (Chunk chunk : this.chunks) {
+			int chunkSize = chunk.getSize(game);
+			size += chunkSize;
+			// Chunk size bytes count. (short)
+			size += 2;
+		}
+		return size;
+	}
+
+	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
 		short rafSize = raf.readShort();
 
@@ -67,18 +80,5 @@ public class SaveChunk extends Chunk {
 		for (Chunk chunk : this.chunks) {
 			chunk.write(game, raf);
 		}
-	}
-
-	@Override
-	public int getSize(Game game) {
-		int size = this.name.length;
-		size += this.version.length;
-		for (Chunk chunk : this.chunks) {
-			int chunkSize = chunk.getSize(game);
-			size += chunkSize;
-			// Chunk size bytes count. (short)
-			size += 2;
-		}
-		return size;
 	}
 }

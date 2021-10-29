@@ -41,14 +41,11 @@ import utility.DialogueBuilder;
 
 public class Inventory extends SubMenu {
 
-	private enum InventoryState {
-		SELECTION,
-		MENU,
-		USE,
-		TOSS,
-		SET
-	}
+	public static final String MENU_USE = "USE";
 
+	public static final String MENU_SET = "SET";
+	public static final String MENU_TOSS = "TOSS";
+	public static final String MENU_CANCEL = "CANCEL";
 	private final List<Map.Entry<Item, Integer>> potions;
 	private final List<Map.Entry<Item, Integer>> keyItems;
 	private final List<Map.Entry<Item, Integer>> pokéballs;
@@ -66,16 +63,14 @@ public class Inventory extends SubMenu {
 	private int set_tokenIterator = 0;
 	private boolean set_end;
 	private int set_subStringIterator = 0;
+
 	private final List<String> set_completedLines;
+
 	private Thread inventoryDialogueThread;
+
 	private Dialogue inventoryDialogue;
 
 	private Game game;
-
-	public static final String MENU_USE = "USE";
-	public static final String MENU_SET = "SET";
-	public static final String MENU_TOSS = "TOSS";
-	public static final String MENU_CANCEL = "CANCEL";
 
 	/**
 	 * Creates the Inventory submenu, with all the default settings.
@@ -117,6 +112,14 @@ public class Inventory extends SubMenu {
 		this.inventoryDialogue = new Dialogue();
 		this.needsFlashingAnimation = true;
 		this.exitsToGame = false;
+	}
+
+	private enum InventoryState {
+		SELECTION,
+		MENU,
+		USE,
+		TOSS,
+		SET
 	}
 
 	public void addItem(Item item) {
@@ -248,6 +251,87 @@ public class Inventory extends SubMenu {
 		}
 	}
 
+	/**
+	 * List given in order:
+	 * <p>
+	 * Potions -> KeyItems -> Pokéballs -> TMs_HMs.
+	 *
+	 * @return
+	 */
+	public List<List<Map.Entry<Item, Integer>>> getAllItemsList() {
+		List<List<Map.Entry<Item, Integer>>> result = new ArrayList<>();
+		result.add(this.potions);
+		result.add(this.keyItems);
+		result.add(this.pokéballs);
+		result.add(this.TMs_HMs);
+		result.add(this.unsortedItems);
+		return result;
+	}
+
+	/**
+	 * List given in any order, so as long as the key strings match:
+	 * <ul>
+	 * <li>Potions
+	 * <li>KeyItems
+	 * <li>Pokéballs
+	 * <li>TMs_HMs.
+	 * </ul>
+	 *
+	 * @return
+	 */
+	public Map<ItemCategories, List<Map.Entry<Item, Integer>>> getAllMappedItemsList() {
+		Map<ItemCategories, List<Map.Entry<Item, Integer>>> result = new HashMap<>();
+		result.put(ItemCategories.POTIONS, this.potions);
+		result.put(ItemCategories.KEYITEMS, this.keyItems);
+		result.put(ItemCategories.POKEBALLS, this.pokéballs);
+		result.put(ItemCategories.TM_HM, this.TMs_HMs);
+		result.put(ItemCategories.ALL, this.unsortedItems);
+		return result;
+	}
+
+	public List<Map.Entry<Item, Integer>> getKeyItems() {
+		return this.keyItems;
+	}
+
+	public Player getPlayer() {
+		return this.game.getPlayer();
+	}
+
+	public List<Map.Entry<Item, Integer>> getPokeballs() {
+		return this.pokéballs;
+	}
+
+	/**
+	 * Initializes the Inventory with the inputs.
+	 *
+	 * <p>
+	 * Does not initialize anything else.
+	 *
+	 * @param keys
+	 *            The input keys the player is using.
+	 * @return Itself.
+	 */
+	/*
+	@Override
+	public SubMenu initialize(Keys keys) {
+		// TODO: Add new inventory art for background.
+		this.keys = keys;
+		return Inventory.this;
+	}
+	*/
+
+	public List<Map.Entry<Item, Integer>> getPotions() {
+		return this.potions;
+	}
+
+	public StateManager getStateManager() {
+		return this.game.getStateManager();
+	}
+
+	public List<Map.Entry<Item, Integer>> getTM_HM() {
+		return this.TMs_HMs;
+	}
+
 	public void removeItem(Item item) {
 		// If the item is a "Return" menu, we do not remove it.
 		if (item.isReturnMenu() || (item.getCategory() == ItemCategories.KEYITEMS))
@@ -284,25 +368,6 @@ public class Inventory extends SubMenu {
 			}
 		}
 	}
-
-	/**
-	 * Initializes the Inventory with the inputs.
-	 *
-	 * <p>
-	 * Does not initialize anything else.
-	 *
-	 * @param keys
-	 *            The input keys the player is using.
-	 * @return Itself.
-	 */
-	/*
-	@Override
-	public SubMenu initialize(Keys keys) {
-		// TODO: Add new inventory art for background.
-		this.keys = keys;
-		return Inventory.this;
-	}
-	*/
 
 	/**
 	 * Renders the Inventory to the screen.
@@ -739,72 +804,6 @@ public class Inventory extends SubMenu {
 	}
 
 	/**
-	 * List given in order:
-	 * <p>
-	 * Potions -> KeyItems -> Pokéballs -> TMs_HMs.
-	 *
-	 * @return
-	 */
-	public List<List<Map.Entry<Item, Integer>>> getAllItemsList() {
-		List<List<Map.Entry<Item, Integer>>> result = new ArrayList<>();
-		result.add(this.potions);
-		result.add(this.keyItems);
-		result.add(this.pokéballs);
-		result.add(this.TMs_HMs);
-		result.add(this.unsortedItems);
-		return result;
-	}
-
-	/**
-	 * List given in any order, so as long as the key strings match:
-	 * <ul>
-	 * <li>Potions
-	 * <li>KeyItems
-	 * <li>Pokéballs
-	 * <li>TMs_HMs.
-	 * </ul>
-	 *
-	 * @return
-	 */
-	public Map<ItemCategories, List<Map.Entry<Item, Integer>>> getAllMappedItemsList() {
-		Map<ItemCategories, List<Map.Entry<Item, Integer>>> result = new HashMap<>();
-		result.put(ItemCategories.POTIONS, this.potions);
-		result.put(ItemCategories.KEYITEMS, this.keyItems);
-		result.put(ItemCategories.POKEBALLS, this.pokéballs);
-		result.put(ItemCategories.TM_HM, this.TMs_HMs);
-		result.put(ItemCategories.ALL, this.unsortedItems);
-		return result;
-	}
-
-	public List<Map.Entry<Item, Integer>> getPotions() {
-		return this.potions;
-	}
-
-	public List<Map.Entry<Item, Integer>> getKeyItems() {
-		return this.keyItems;
-	}
-
-	public List<Map.Entry<Item, Integer>> getPokeballs() {
-		return this.pokéballs;
-	}
-
-	public List<Map.Entry<Item, Integer>> getTM_HM() {
-		return this.TMs_HMs;
-	}
-
-	public Player getPlayer() {
-		return this.game.getPlayer();
-	}
-
-	public StateManager getStateManager() {
-		return this.game.getStateManager();
-	}
-
-	// -----------------------------------------
-	// PRIVATE METHODS
-	// -----------------------------------------
-
-	/**
 	 * Obtains the list of items the player is currently browsing in the Inventory.
 	 *
 	 * @return A list of all the items and their corresponding amount of the items that the player is
@@ -813,37 +812,6 @@ public class Inventory extends SubMenu {
 	private List<Map.Entry<Item, Integer>> getCurrentList() {
 		List<Map.Entry<Item, Integer>> result = null;
 		switch (this.category) {
-			case POTIONS:
-				result = this.potions;
-				break;
-			case KEYITEMS:
-				result = this.keyItems;
-				break;
-			case POKEBALLS:
-				result = this.pokéballs;
-				break;
-			case TM_HM:
-				result = this.TMs_HMs;
-				break;
-			case ALL:
-				result = this.unsortedItems;
-				break;
-		}
-		return result;
-	}
-
-	/**
-	 * Obtains the list of items of the category the item belongs to in the Inventory.
-	 *
-	 * @param itemText
-	 *            The ItemText object that holds information for obtaining the list of items that it
-	 *            belongs to.
-	 * @return A list of all the items and their corresponding amount of the items that the targeted
-	 *         item belongs to.
-	 */
-	private List<Map.Entry<Item, Integer>> getItemCategoryList(ModdedItem itemText) {
-		List<Map.Entry<Item, Integer>> result = null;
-		switch (itemText.category) {
 			case POTIONS:
 				result = this.potions;
 				break;
@@ -875,6 +843,37 @@ public class Inventory extends SubMenu {
 	private List<Map.Entry<Item, Integer>> getItemCategoryList(Item item) {
 		List<Map.Entry<Item, Integer>> result = null;
 		switch (item.getCategory()) {
+			case POTIONS:
+				result = this.potions;
+				break;
+			case KEYITEMS:
+				result = this.keyItems;
+				break;
+			case POKEBALLS:
+				result = this.pokéballs;
+				break;
+			case TM_HM:
+				result = this.TMs_HMs;
+				break;
+			case ALL:
+				result = this.unsortedItems;
+				break;
+		}
+		return result;
+	}
+
+	/**
+	 * Obtains the list of items of the category the item belongs to in the Inventory.
+	 *
+	 * @param itemText
+	 *            The ItemText object that holds information for obtaining the list of items that it
+	 *            belongs to.
+	 * @return A list of all the items and their corresponding amount of the items that the targeted
+	 *         item belongs to.
+	 */
+	private List<Map.Entry<Item, Integer>> getItemCategoryList(ModdedItem itemText) {
+		List<Map.Entry<Item, Integer>> result = null;
+		switch (itemText.category) {
 			case POTIONS:
 				result = this.potions;
 				break;
@@ -1000,15 +999,6 @@ public class Inventory extends SubMenu {
 		}
 		for (int k = 0; k < width; k++)
 			output.blit(Art.dialogue_background, (x * Tileable.WIDTH) + (k * Tileable.WIDTH), (height * Tileable.HEIGHT));
-	}
-
-	/**
-	 * Sets the inventory state.
-	 *
-	 * @return Nothing.
-	 */
-	private void setState(InventoryState value) {
-		this.state = value;
 	}
 
 	/**
@@ -1171,5 +1161,14 @@ public class Inventory extends SubMenu {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Sets the inventory state.
+	 *
+	 * @return Nothing.
+	 */
+	private void setState(InventoryState value) {
+		this.state = value;
 	}
 }

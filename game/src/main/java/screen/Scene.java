@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package screen;
@@ -20,10 +20,7 @@ import resources.Art;
 import resources.Mod;
 
 public class Scene extends Bitmap {
-	public enum FlashingType {
-		NORMAL,
-		BURST
-	}
+	private static final byte MAX_TICK_LIMIT = 0x7;
 
 	// TODO: Add more drawing functions that enable more controls when it comes to
 	// rendering assets.
@@ -33,10 +30,7 @@ public class Scene extends Bitmap {
 	protected int xOffset;
 	protected int yOffset;
 
-	private static final byte MAX_TICK_LIMIT = 0x7;
 	private byte tick = Scene.MAX_TICK_LIMIT;
-
-	// private boolean cutScreen;
 
 	public Scene(int w, int h) {
 		super(w, h);
@@ -45,37 +39,33 @@ public class Scene extends Bitmap {
 		this.graphics = this.image.getGraphics();
 	}
 
-	public void loadResources() {
-		Art.loadAllResources(this);
-		Mod.loadModdedResources();
+	// private boolean cutScreen;
+
+	public enum FlashingType {
+		NORMAL,
+		BURST
 	}
 
-	public BufferedImage getBufferedImage() {
-		return this.image;
+	public static int darken(int color, float amount) {
+		int r = (color >> 16) & 0xFF;
+		int g = (color >> 8) & 0xFF;
+		int b = color & 0xFF;
+		return 0xFF000000 | ((int) Math.min(255, r - 255 * amount) & 0xFF) << 16
+			| ((int) Math.min(255, g - 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b - 255 * amount) & 0xFF;
 	}
 
-	public Graphics getGraphics() {
-		return this.graphics;
-	}
-
-	public void clear(int color) {
-		Arrays.fill(this.pixels, color);
+	public static int lighten(int color, float amount) {
+		// int a = (color >> 24) & 0xFF;
+		int r = (color >> 16) & 0xFF;
+		int g = (color >> 8) & 0xFF;
+		int b = color & 0xFF;
+		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16
+			| ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
 	}
 
 	public void blit(Bitmap bitmap, int x, int y) {
 		if (bitmap != null)
 			this.blit(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height);
-	}
-
-	public void blitBiome(Bitmap bitmap, int x, int y, PixelData data) {
-		if (bitmap != null) {
-			this.blitBiome(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height, data);
-		}
-	}
-
-	public void npcBlit(Bitmap bitmap, int x, int y) {
-		if (bitmap != null)
-			this.blit(bitmap, x + this.xOffset, y + this.yOffset - 4, bitmap.width, bitmap.height);
 	}
 
 	public void blit(Bitmap bitmap, int x, int y, int w, int h) {
@@ -159,14 +149,31 @@ public class Scene extends Bitmap {
 		}
 	}
 
-	public void setOffset(int xOff, int yOff) {
-		this.xOffset = xOff;
-		this.yOffset = yOff;
+	public void blitBiome(Bitmap bitmap, int x, int y, PixelData data) {
+		if (bitmap != null) {
+			this.blitBiome(bitmap, x + this.xOffset, y + this.yOffset, bitmap.width, bitmap.height, data);
+		}
+	}
+
+	public void clear(int color) {
+		Arrays.fill(this.pixels, color);
 	}
 
 	public void createStaticNoise(Random r) {
 		for (int p = 0; p < this.pixels.length; p++)
 			this.pixels[p] = r.nextInt();
+	}
+
+	public BufferedImage getBufferedImage() {
+		return this.image;
+	}
+
+	public Graphics getGraphics() {
+		return this.graphics;
+	}
+
+	public byte getRenderingEffectTick() {
+		return this.tick;
 	}
 
 	public int getXOffset() {
@@ -185,8 +192,7 @@ public class Scene extends Bitmap {
 			return true;
 		}
 		if (this.tick < 0x6) {
-			for (int i = 0; i < this.pixels.length; i++)
-				this.pixels[i] = 0xFFAAAAAA;
+			Arrays.fill(this.pixels, 0xFFAAAAAA);
 			this.tick++;
 			return true;
 		}
@@ -194,13 +200,26 @@ public class Scene extends Bitmap {
 		return false;
 	}
 
+	public boolean isRenderingEffect() {
+		return (this.tick < Scene.MAX_TICK_LIMIT);
+	}
+
+	public void loadResources() {
+		Art.loadAllResources(this);
+		Mod.loadModdedResources();
+	}
+
+	public void npcBlit(Bitmap bitmap, int x, int y) {
+		if (bitmap != null)
+			this.blit(bitmap, x + this.xOffset, y + this.yOffset - 4, bitmap.width, bitmap.height);
+	}
+
 	public boolean renderEffectFlashing(FlashingType speed) {
 		switch (speed) {
 			case NORMAL:
 			default: {
 				if (this.tick < Scene.MAX_TICK_LIMIT) {
-					for (int i = 0; i < this.pixels.length; i++)
-						this.pixels[i] = 0xFFFFFFFF;
+					Arrays.fill(this.pixels, 0xFFFFFFFF);
 					this.tick++;
 					return true;
 				}
@@ -209,20 +228,17 @@ public class Scene extends Bitmap {
 			}
 			case BURST: {
 				if (this.tick < 0x2) {
-					for (int i = 0; i < this.pixels.length; i++)
-						this.pixels[i] = 0xFFAAAAAA;
+					Arrays.fill(this.pixels, 0xFFAAAAAA);
 					this.tick++;
 					return true;
 				}
 				else if (this.tick < 0x4) {
-					for (int i = 0; i < this.pixels.length; i++)
-						this.pixels[i] = 0xFFF7F7F7;
+					Arrays.fill(this.pixels, 0xFFF7F7F7);
 					this.tick++;
 					return true;
 				}
 				else if (this.tick < 0x6) {
-					for (int i = 0; i < this.pixels.length; i++)
-						this.pixels[i] = 0xFFAAAAAA;
+					Arrays.fill(this.pixels, 0xFFAAAAAA);
 					this.tick++;
 					return true;
 				}
@@ -232,24 +248,18 @@ public class Scene extends Bitmap {
 		}
 	}
 
-	public void setRenderingEffectTick(byte value) {
-		this.tick = value;
-	}
-
-	public byte getRenderingEffectTick() {
-		return this.tick;
-	}
-
-	public boolean isRenderingEffect() {
-		return (this.tick < Scene.MAX_TICK_LIMIT);
-	}
-
 	public void resetRenderingEffect() {
 		this.tick = Scene.MAX_TICK_LIMIT;
 	}
 
-	// -------------------------------------------
-	// Private methods
+	public void setOffset(int xOff, int yOff) {
+		this.xOffset = xOff;
+		this.yOffset = yOff;
+	}
+
+	public void setRenderingEffectTick(byte value) {
+		this.tick = value;
+	}
 
 	private int getBiomeBaseColor(int tileID, int red, int green, int blue) {
 		int color = WorldConstants.GRASS_GREEN;
@@ -295,25 +305,5 @@ public class Scene extends Bitmap {
 				break;
 		}
 		return color;
-	}
-
-	// -------------------------------------------
-	// Public static methods
-
-	public static int lighten(int color, float amount) {
-		// int a = (color >> 24) & 0xFF;
-		int r = (color >> 16) & 0xFF;
-		int g = (color >> 8) & 0xFF;
-		int b = color & 0xFF;
-		return 0xFF000000 | ((int) Math.min(255, r + 255 * amount) & 0xFF) << 16
-			| ((int) Math.min(255, g + 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b + 255 * amount) & 0xFF;
-	}
-
-	public static int darken(int color, float amount) {
-		int r = (color >> 16) & 0xFF;
-		int g = (color >> 8) & 0xFF;
-		int b = color & 0xFF;
-		return 0xFF000000 | ((int) Math.min(255, r - 255 * amount) & 0xFF) << 16
-			| ((int) Math.min(255, g - 255 * amount) & 0xFF) << 8 | (int) Math.min(255, b - 255 * amount) & 0xFF;
 	}
 }

@@ -176,6 +176,44 @@ public class Art {
 	// Miscellaneous
 	public static int COLOR_DEBUG_GREEN = 0xA4E767;
 
+	public static int blendPixels(int bgColor, int blendColor) {
+		int alphaBlend = (blendColor >> 24) & 0xFF;
+		int alphaBackground = 256 - alphaBlend;
+
+		int bgRed = (bgColor >> 16) & 0xFF;
+		int bgGreen = (bgColor >> 8) & 0xFF;
+		int bgBlue = bgColor & 0xFF;
+
+		int blendRed = (blendColor >> 16) & 0xFF;
+		int blendGreen = (blendColor >> 8) & 0xFF;
+		int blendBlue = blendColor & 0xFF;
+
+		int red = ((blendRed * alphaBlend + bgRed * alphaBackground) >> 8) & 0xFF;
+		int green = ((blendGreen * alphaBlend + bgGreen * alphaBackground) >> 8) & 0xFF;
+		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
+
+		return 0xFF000000 | red | green | blue;
+	}
+
+	public static Bitmap changeColors(Bitmap bitmap, int color) {
+		Bitmap result = new Bitmap(bitmap.getWidth(), bitmap.getHeight());
+		int[] pixels = bitmap.getPixels();
+		int[] resultPixels = result.getPixels();
+		for (int i = 0; i < pixels.length; i++) {
+			int alpha = (pixels[i] >> 24) & 0xFF;
+			// May be possible this will expand in the future.
+			switch (alpha) {
+				case 0x01:
+					resultPixels[i] = 0xFF000000 | Scene.lighten(color, 0.2f);
+					break;
+				default:
+					resultPixels[i] = 0xFF000000 | Scene.darken(color, 0.1f);
+					break;
+			}
+		}
+		return result;
+	}
+
 	public static void loadAllResources(Scene screen) {
 		// Animation
 		Art.water = Art.loadAnimation(screen, 16, "art/animation/water/water00");
@@ -315,20 +353,6 @@ public class Art {
 		Art.font = Art.loadFont("art/font/font.ttf");
 	}
 
-	private static Bitmap[] loadAnimation(Scene screen, int frames, String filename) {
-		Bitmap[] result = new Bitmap[frames];
-		for (int i = 0; i < frames; i++) {
-			// There are 16 frames for the water.
-			if (i < 10) {
-				result[i] = Bitmap.load(filename + "0" + String.valueOf(i) + ".png");
-			}
-			else {
-				result[i] = Bitmap.load(filename + String.valueOf(i) + ".png");
-			}
-		}
-		return result;
-	}
-
 	public static Font loadFont(String filename) {
 		Enumeration<URL> urls = null;
 		URL url = null;
@@ -373,41 +397,17 @@ public class Art {
 		return result.deriveFont(Font.PLAIN, 8f * MainComponent.GAME_SCALE);
 	}
 
-	public static Bitmap changeColors(Bitmap bitmap, int color) {
-		Bitmap result = new Bitmap(bitmap.getWidth(), bitmap.getHeight());
-		int[] pixels = bitmap.getPixels();
-		int[] resultPixels = result.getPixels();
-		for (int i = 0; i < pixels.length; i++) {
-			int alpha = (pixels[i] >> 24) & 0xFF;
-			// May be possible this will expand in the future.
-			switch (alpha) {
-				case 0x01:
-					resultPixels[i] = 0xFF000000 | Scene.lighten(color, 0.2f);
-					break;
-				default:
-					resultPixels[i] = 0xFF000000 | Scene.darken(color, 0.1f);
-					break;
+	private static Bitmap[] loadAnimation(Scene screen, int frames, String filename) {
+		Bitmap[] result = new Bitmap[frames];
+		for (int i = 0; i < frames; i++) {
+			// There are 16 frames for the water.
+			if (i < 10) {
+				result[i] = Bitmap.load(filename + "0" + String.valueOf(i) + ".png");
+			}
+			else {
+				result[i] = Bitmap.load(filename + String.valueOf(i) + ".png");
 			}
 		}
 		return result;
-	}
-
-	public static int blendPixels(int bgColor, int blendColor) {
-		int alphaBlend = (blendColor >> 24) & 0xFF;
-		int alphaBackground = 256 - alphaBlend;
-
-		int bgRed = (bgColor >> 16) & 0xFF;
-		int bgGreen = (bgColor >> 8) & 0xFF;
-		int bgBlue = bgColor & 0xFF;
-
-		int blendRed = (blendColor >> 16) & 0xFF;
-		int blendGreen = (blendColor >> 8) & 0xFF;
-		int blendBlue = blendColor & 0xFF;
-
-		int red = ((blendRed * alphaBlend + bgRed * alphaBackground) >> 8) & 0xFF;
-		int green = ((blendGreen * alphaBlend + bgGreen * alphaBackground) >> 8) & 0xFF;
-		int blue = ((blendBlue * alphaBlend + bgBlue * alphaBackground) >> 8) & 0xFF;
-
-		return 0xFF000000 | red | green | blue;
 	}
 }

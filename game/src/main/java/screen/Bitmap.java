@@ -42,45 +42,30 @@ public class Bitmap {
 			this.pixels[i] = p[i];
 	}
 
-	public void setID(int value) {
-		this.id = value;
+	public static Bitmap load(BufferedImage image) {
+		if (image == null)
+			return null;
+
+		int width = image.getWidth();
+		int height = image.getHeight();
+
+		Bitmap result = new Bitmap(width, height, image.getRGB(0, 0, width, height, null, 0, width));
+		WorldConstants.bitmaps.add(result);
+		return result;
 	}
 
-	public int getID() {
-		return this.id;
-	}
-
-	public Bitmap[][] cut(String filename, int w, int h, int clipW, int clipH) {
+	public static Bitmap load(File file) {
 		try {
-			// BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
-			BufferedImage image = ImageIO.read(Bitmap.this.getClass().getClassLoader().getResource(filename));
-			int xTiles = (image.getWidth() - clipW) / w;
-			int yTiles = (image.getHeight() - clipH) / h;
-			Bitmap[][] results = new Bitmap[xTiles][yTiles];
-			for (int x = 0; x < xTiles; x++) {
-				for (int y = 0; y < yTiles; y++) {
-					results[x][y] = new Bitmap(w, h);
-					image.getRGB(clipW + x * w, clipH + y * h, w, h, results[x][y].pixels, 0, w);
-				}
-			}
-			return results;
+			// Prints out the bitmap filename. If there's something wrong, it won't print it
+			// out.
+			Debug.warn(file.getAbsolutePath());
+			BufferedImage image = ImageIO.read(file);
+			return Bitmap.load(image);
 		}
 		catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public int getWidth() {
-		return this.width;
-	}
-
-	public int getHeight() {
-		return this.height;
-	}
-
-	public int[] getPixels() {
-		return this.pixels;
 	}
 
 	public static Bitmap load(String filename) {
@@ -115,13 +100,20 @@ public class Bitmap {
 		return null;
 	}
 
-	public static Bitmap load(File file) {
+	public Bitmap[][] cut(String filename, int w, int h, int clipW, int clipH) {
 		try {
-			// Prints out the bitmap filename. If there's something wrong, it won't print it
-			// out.
-			Debug.warn(file.getAbsolutePath());
-			BufferedImage image = ImageIO.read(file);
-			return Bitmap.load(image);
+			// BufferedImage image = ImageIO.read(BaseBitmap.class.getResource(filename));
+			BufferedImage image = ImageIO.read(Bitmap.this.getClass().getClassLoader().getResource(filename));
+			int xTiles = (image.getWidth() - clipW) / w;
+			int yTiles = (image.getHeight() - clipH) / h;
+			Bitmap[][] results = new Bitmap[xTiles][yTiles];
+			for (int x = 0; x < xTiles; x++) {
+				for (int y = 0; y < yTiles; y++) {
+					results[x][y] = new Bitmap(w, h);
+					image.getRGB(clipW + x * w, clipH + y * h, w, h, results[x][y].pixels, 0, w);
+				}
+			}
+			return results;
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -129,15 +121,23 @@ public class Bitmap {
 		return null;
 	}
 
-	public static Bitmap load(BufferedImage image) {
-		if (image == null)
-			return null;
+	public int getHeight() {
+		return this.height;
+	}
 
-		int width = image.getWidth();
-		int height = image.getHeight();
+	public int getID() {
+		return this.id;
+	}
 
-		Bitmap result = new Bitmap(width, height, image.getRGB(0, 0, width, height, null, 0, width));
-		WorldConstants.bitmaps.add(result);
-		return result;
+	public int[] getPixels() {
+		return this.pixels;
+	}
+
+	public int getWidth() {
+		return this.width;
+	}
+
+	public void setID(int value) {
+		this.id = value;
 	}
 }

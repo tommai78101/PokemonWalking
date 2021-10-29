@@ -32,6 +32,20 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		// separated from each other.
 	}
 
+	public void forceCancelDrawing() {
+		this.drawing = false;
+		this.panning = false;
+		this.clicking = false;
+	}
+
+	public LevelEditor getEditor() {
+		return this.editor;
+	}
+
+	public boolean isClicking() {
+		return this.clicking;
+	}
+
 	public boolean isDragging() {
 		return this.panning;
 	}
@@ -40,12 +54,23 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 		return this.drawing;
 	}
 
-	public boolean isClicking() {
-		return this.clicking;
-	}
-
-	public LevelEditor getEditor() {
-		return this.editor;
+	@Override
+	public void mouseClicked(MouseEvent event) {
+		this.mouseX = event.getX();
+		this.mouseY = event.getY();
+		if (event.getButton() == MouseEvent.BUTTON1) {
+			this.drawing = false;
+			this.panning = false;
+			this.clicking = true;
+			new Thread(() -> {
+				try {
+					// Barely less than 2 ticks (33.34ms).
+					Thread.sleep(32);
+				}
+				catch (InterruptedException e) {}
+				EditorInput.this.clicking = false;
+			}).start();
+		}
 	}
 
 	@Override
@@ -74,32 +99,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent event) {
-		this.drawing = false;
-		this.mouseX = event.getX();
-		this.mouseY = event.getY();
-	}
-
-	@Override
-	public void mouseClicked(MouseEvent event) {
-		this.mouseX = event.getX();
-		this.mouseY = event.getY();
-		if (event.getButton() == MouseEvent.BUTTON1) {
-			this.drawing = false;
-			this.panning = false;
-			this.clicking = true;
-			new Thread(() -> {
-				try {
-					// Barely less than 2 ticks (33.34ms).
-					Thread.sleep(32);
-				}
-				catch (InterruptedException e) {}
-				EditorInput.this.clicking = false;
-			}).start();
-		}
-	}
-
-	@Override
 	public void mouseEntered(MouseEvent event) {
 		this.drawing = false;
 		this.mouseX = event.getX();
@@ -108,6 +107,13 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 
 	@Override
 	public void mouseExited(MouseEvent event) {
+		this.drawing = false;
+		this.mouseX = event.getX();
+		this.mouseY = event.getY();
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent event) {
 		this.drawing = false;
 		this.mouseX = event.getX();
 		this.mouseY = event.getY();
@@ -147,12 +153,6 @@ public class EditorInput implements MouseListener, MouseMotionListener {
 			this.offsetX = this.oldX - this.mouseX;
 			this.offsetY = this.oldY - this.mouseY;
 		}
-		this.drawing = false;
-		this.panning = false;
-		this.clicking = false;
-	}
-
-	public void forceCancelDrawing() {
 		this.drawing = false;
 		this.panning = false;
 		this.clicking = false;
