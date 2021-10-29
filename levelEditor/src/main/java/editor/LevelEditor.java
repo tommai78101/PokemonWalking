@@ -145,13 +145,9 @@ public class LevelEditor extends JFrame {
 	}
 
 	/**
-	 * <p>
 	 * Generates a cache file for saving the last known directory the editor knew of.
-	 * </p>
-	 *
 	 * <p>
 	 * Upon initialization, the default saved directory will be the editor's file location path.
-	 * </p>
 	 *
 	 * @return Nothing.
 	 */
