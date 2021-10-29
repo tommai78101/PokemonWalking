@@ -39,7 +39,7 @@ import script_editor.ScriptEditor;
 
 public class FileControl extends JPanel implements ActionListener {
 	public static File lastSavedDirectory = null;
-	public static final String[] TAGS = {
+	public static final String[] MenuItemTags = {
 		"New", "Save", "Open", "", "Tileset", "Trigger", "NPC", "Script"
 	};
 
@@ -53,14 +53,14 @@ public class FileControl extends JPanel implements ActionListener {
 	public FileControl(LevelEditor editor) {
 		this.editor = editor;
 		this.cacheDirectories = new ArrayList<>();
-		this.setLayout(new GridLayout(1, FileControl.TAGS.length));
+		this.setLayout(new GridLayout(1, FileControl.MenuItemTags.length));
 
-		for (int i = 0; i < FileControl.TAGS.length; i++) {
-			if (FileControl.TAGS[i].isEmpty() || FileControl.TAGS[i].equals("")) {
+		for (int i = 0; i < FileControl.MenuItemTags.length; i++) {
+			if (FileControl.MenuItemTags[i].isEmpty() || FileControl.MenuItemTags[i].equals("")) {
 				this.add(new JSeparator(SwingConstants.VERTICAL));
 				continue;
 			}
-			JButton button = new JButton(FileControl.TAGS[i]);
+			JButton button = new JButton(FileControl.MenuItemTags[i]);
 			button.addActionListener(this);
 			String actionCommand = Integer.toString(i);
 			button.setActionCommand(actionCommand);
