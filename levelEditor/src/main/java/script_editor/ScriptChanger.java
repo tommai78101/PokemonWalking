@@ -105,7 +105,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("X Position: "), c);
-		
+
 		c.gridx = 1;
 		c.gridy = 1;
 		c.gridwidth = 1;
@@ -114,7 +114,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((xField = new JTextField()), c);
 		xField.getDocument().addDocumentListener(this);
-		
+
 		// Third row
 		c.gridx = 0;
 		c.gridy = 2;
@@ -123,7 +123,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("Y Position: "), c);
-		
+
 		c.gridx = 1;
 		c.gridy = 2;
 		c.gridwidth = 1;
@@ -229,7 +229,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 	public JTextField getXField() {
 		return this.xField;
 	}
-	
+
 	public JTextField getYField() {
 		return this.yField;
 	}
@@ -479,9 +479,6 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 			}
 			if (!this.editor.isBeingModified()) {
 				SwingUtilities.invokeLater(() -> {
-					String str = ScriptChanger.this.editor.getTitle();
-					if (!str.endsWith("*"))
-						ScriptChanger.this.editor.setTitle(str + "*");
 					ScriptChanger.this.editor.setModifiedFlag(true);
 				});
 			}
@@ -540,15 +537,19 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 			}
 			if (!this.editor.isBeingModified()) {
 				SwingUtilities.invokeLater(() -> {
-					String str = ScriptChanger.this.editor.getTitle();
-					if (!str.endsWith("*"))
-						ScriptChanger.this.editor.setTitle(str + "*");
 					ScriptChanger.this.editor.setModifiedFlag(true);
 				});
 			}
 		}
 		super.revalidate();
 		super.repaint();
+	}
+
+	public void updateComponent() {
+		if (!this.editor.scriptViewer.isTriggerListEmpty())
+			this.enableComponent();
+		else
+			this.disableComponent();
 	}
 
 	private JPanel constructDialogues() {

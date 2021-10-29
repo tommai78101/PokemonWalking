@@ -73,14 +73,14 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				}
 				if (this.model.isEmpty()) {
 					ScriptViewer.this.editor.scriptChanger.clearTextFields();
-					ScriptViewer.this.editor.scriptChanger.disableComponent();
+					ScriptViewer.this.editor.scriptChanger.updateComponent();
 				}
 				break;
 			}
 			case 2: {// Clear button
 				this.clearTriggerModel();
 				ScriptViewer.this.editor.scriptChanger.clearTextFields();
-				ScriptViewer.this.editor.scriptChanger.disableComponent();
+				ScriptViewer.this.editor.scriptChanger.updateComponent();
 				break;
 			}
 		}
@@ -108,6 +108,10 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 
 	public JList<Trigger> getTriggerList() {
 		return this.triggerList;
+	}
+
+	public boolean isTriggerListEmpty() {
+		return this.model.isEmpty();
 	}
 
 	public void removeTrigger() {

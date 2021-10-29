@@ -54,29 +54,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 
 		switch (Integer.parseInt(event.getActionCommand())) {
 			case 0: { // New script
-				this.editor.scriptChanger.clearTextFields();
-				JList<Trigger> triggerList = this.editor.scriptViewer.getTriggerList();
-				DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
-				model.clear();
-
-				JComboBox<Trigger> triggerComboBox = this.editor.parent.properties.getTriggerList();
-				DefaultComboBoxModel<Trigger> triggerComboModel = (DefaultComboBoxModel<Trigger>) triggerComboBox
-					.getModel();
-				triggerComboModel.removeAllElements();
-
-				Trigger trigger = new Trigger();
-				trigger.setTriggerID((short) 0);
-				trigger.setName("Eraser");
-				triggerComboModel.addElement(trigger);
-				triggerComboBox.setSelectedIndex(0);
-
-				triggerList.clearSelection();
-				this.editor.setModifiedFlag(false);
-				this.editor.setTitle("Script Editor (Hobby) - Untitled.script");
-				this.editor.setScriptName("Untitled");
-				this.editor.scriptChanger.disableComponent();
-
-				this.editor.parent.revalidate();
+				this.makeNewScript();
 				break;
 			}
 			case 1: { // Save script
@@ -110,12 +88,12 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					ScriptEditor.lastSavedDirectory = f.getParentFile();
 
 					if (f.getName().endsWith(".script")) {
-						this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
+						this.editor.setTitle(ScriptEditor.TITLE + " - " + f.getName());
 						this.editor.save(new File(f.getParentFile(), f.getName()));
 						this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
 					}
 					else {
-						this.editor.setTitle("Script Editor (Hobby) - " + f.getName() + ".script");
+						this.editor.setTitle(ScriptEditor.TITLE + " - " + f.getName() + ".script");
 						this.editor.save(new File(f.getParentFile(), f.getName() + ".script"));
 						this.editor.setScriptName(f.getName());
 					}
@@ -161,7 +139,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 				if (answer == JFileChooser.APPROVE_OPTION) {
 					File f = chooser.getSelectedFile();
 					ScriptEditor.lastSavedDirectory = f.getParentFile();
-					this.editor.setTitle("Script Editor (Hobby) - " + f.getName());
+					this.editor.setTitle(ScriptEditor.TITLE + " - " + f.getName());
 					try {
 						this.editor.load(f);
 					}
@@ -171,7 +149,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 					}
 					this.editor.setModifiedFlag(false);
 					this.editor.setScriptName(f.getName().substring(0, (f.getName().length() - ".script".length())));
-					this.editor.scriptChanger.enableComponent();
+					this.editor.scriptChanger.updateComponent();
 
 					try (RandomAccessFile rf = new RandomAccessFile(LevelEditor.SAVED_PATH_DATA, "rw")) {
 						rf.readLine(); // The second line in the cache is for the Script Editor.
@@ -186,6 +164,32 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 		}
 		super.revalidate();
 		super.repaint();
+	}
+
+	public void makeNewScript() {
+		this.editor.scriptChanger.clearTextFields();
+		JList<Trigger> triggerList = this.editor.scriptViewer.getTriggerList();
+		DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) triggerList.getModel();
+		model.clear();
+
+		JComboBox<Trigger> triggerComboBox = this.editor.parent.properties.getTriggerList();
+		DefaultComboBoxModel<Trigger> triggerComboModel = (DefaultComboBoxModel<Trigger>) triggerComboBox
+			.getModel();
+		triggerComboModel.removeAllElements();
+
+		Trigger trigger = new Trigger();
+		trigger.setTriggerID((short) 0);
+		trigger.setName("Eraser");
+		triggerComboModel.addElement(trigger);
+		triggerComboBox.setSelectedIndex(0);
+
+		triggerList.clearSelection();
+		this.editor.setModifiedFlag(false);
+		this.editor.setScriptName("Untitled");
+		this.editor.setTitle(ScriptEditor.TITLE + " - " + this.editor.getScriptName() + ".script");
+		this.editor.scriptChanger.updateComponent();
+
+		this.editor.parent.revalidate();
 	}
 
 	private void createButtons() {

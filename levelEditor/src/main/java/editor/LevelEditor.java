@@ -37,14 +37,12 @@ import script_editor.ScriptEditor;
 
 public class LevelEditor extends JFrame {
 	public static final int WIDTH = 160;
-
 	public static final int HEIGHT = 144;
 	public static final int SIZE = 4;
 	public static final String NAME_TITLE = "Level Editor (Hobby)";
 	public static final String SAVED_PATH_DATA = "cache.ini";
 	public static final int CHECKSUM_MAX_BYTES_LENGTH = 16;
 	public static final String defaultPath = Paths.get("").toAbsolutePath().toString();
-
 	// For cache directory path index, fixed index in the array list.
 	public static final int FileControlIndex = 0;
 
@@ -54,22 +52,14 @@ public class LevelEditor extends JFrame {
 	public FileControl fileControlPanel;
 	public DrawingBoard drawingBoardPanel;
 	public StatusPanel statusPanel;
-
 	public SelectionDropdownMenu properties;
-
 	public ScriptEditor scriptEditor;
-
 	public boolean running;
-
 	public String message;
-
 	public EditorInput input;
 
 	private int uniqueAreaID;
-
 	private String sha2Checksum = "";
-
-	@SuppressWarnings("unused")
 	private String mapAreaName;
 
 	public LevelEditor(String name) {
@@ -208,6 +198,10 @@ public class LevelEditor extends JFrame {
 			return this.generateChecksum();
 		}
 		return this.sha2Checksum;
+	}
+
+	public String getMapAreaName() {
+		return this.mapAreaName;
 	}
 
 	public int getUniqueAreaID() {

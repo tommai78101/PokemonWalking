@@ -53,8 +53,7 @@ public class ScriptEditor extends JFrame {
 	public ScriptChanger scriptChanger;
 
 	private boolean modifiedFlag = false;
-
-	@SuppressWarnings("unused")
+	private String fileExtension = "script";
 	private String scriptName;
 
 	public ScriptEditor(String title, LevelEditor parent) {
@@ -86,6 +85,7 @@ public class ScriptEditor extends JFrame {
 			}
 		});
 		this.addingComponents();
+		this.setFileExtension("script");
 
 		// Generates a scripting tutorial upon loading script editor. This generated
 		// file will not be persistent and the script editor will not overwrite if the
@@ -94,8 +94,44 @@ public class ScriptEditor extends JFrame {
 
 		ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 		ToolTipManager.sharedInstance().setInitialDelay(1);
-		this.setTitle(this.getTitle() + " - Untitled.script");
-		this.setScriptName("Untitled");
+
+		// Auto-opens the script file if it exists within the same directory as the area map file. This is
+		// always done last.
+		SwingUtilities.invokeLater(() -> {
+			String[] filePaths = ScriptEditor.lastSavedDirectory.list((directory, filename) -> {
+				boolean hasExtension = filename.toLowerCase().endsWith(".script") || filename.toLowerCase().endsWith(".json");
+				return filename.contains(this.parent.getMapAreaName()) && hasExtension;
+			});
+
+			boolean success = false;
+			String lastKnownFile = "";
+			try {
+				// Try each one.
+				for (String file : filePaths) {
+					lastKnownFile = file;
+					if (success = this.load(new File(ScriptEditor.lastSavedDirectory, file)))
+						break;
+				}
+			}
+			catch (Exception e) {
+				// Do nothing.
+				Debug.error("Unable to load script file: " + lastKnownFile, e);
+			}
+
+			if (!success) {
+				this.scriptToolbar.makeNewScript();
+			}
+			else {
+				this.setModifiedFlag(false);
+				// Legacy file format support.
+				if (lastKnownFile.endsWith(".script"))
+					this.setScriptName(lastKnownFile.substring(0, (lastKnownFile.length() - ".script".length())));
+				else
+					this.setScriptName(lastKnownFile.substring(0, (lastKnownFile.length() - ".json".length())));
+				this.setEditorTitle();
+				this.scriptChanger.updateComponent();
+			}
+		});
 	}
 
 	public void addingComponents() {
@@ -226,8 +262,16 @@ public class ScriptEditor extends JFrame {
 		return this.parent.getChecksum();
 	}
 
+	public String getFileExtension() {
+		return this.fileExtension;
+	}
+
 	public LevelEditor getLevelEditorParent() {
 		return this.parent;
+	}
+
+	public String getScriptName() {
+		return this.scriptName;
 	}
 
 	public boolean isBeingModified() {
@@ -246,13 +290,13 @@ public class ScriptEditor extends JFrame {
 	 * @param script
 	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
 	 *            editor uses.
-	 * @return Nothing.
+	 * @return True, if the file successfully loads. False, if otherwise.
 	 */
-	public void load(File script) {
+	public boolean load(File script) {
 		String format = script.getName();
 		if (!format.endsWith(".script")) {
 			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
-			return;
+			return false;
 		}
 		System.out.println("Opened Location: " + script.getAbsolutePath());
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
@@ -325,6 +369,7 @@ public class ScriptEditor extends JFrame {
 		}
 		catch (IOException e) {
 			Debug.error("JSON parsing error.", e);
+			return false;
 		}
 		var triggerList = this.scriptViewer.getTriggerList();
 		triggerList.clearSelection();
@@ -337,6 +382,8 @@ public class ScriptEditor extends JFrame {
 		this.parent.repaint();
 		super.revalidate();
 		super.repaint();
+
+		return true;
 	}
 
 	// (11/24/2014): This is where I load triggers at. This is completed, but may require
@@ -454,7 +501,7 @@ public class ScriptEditor extends JFrame {
 			if (ScriptEditor.this.scriptChanger != null) {
 				ScriptEditor.this.scriptChanger.clearTextFields();
 			}
-			ScriptEditor.this.scriptChanger.disableComponent();
+			ScriptEditor.this.scriptChanger.updateComponent();
 			ScriptEditor.this.refresh();
 		});
 	}
@@ -524,11 +571,32 @@ public class ScriptEditor extends JFrame {
 		super.repaint();
 	}
 
+	public void setEditorTitle() {
+		this.setTitle(ScriptEditor.TITLE + " - " + this.getScriptName() + "." + this.fileExtension);
+	}
+
+	public void setEditorTitle(String extension) {
+		this.setTitle(ScriptEditor.TITLE + " - " + this.getScriptName() + "." + extension);
+	}
+
+	public void setEditorTitle(String scriptName, String extension) {
+		this.setTitle(ScriptEditor.TITLE + " - " + scriptName + "." + extension);
+	}
+
+	public void setFileExtension(String extension) {
+		this.fileExtension = extension;
+	}
+
 	public void setModifiedFlag(boolean value) {
 		if (!value) {
 			String str = this.getTitle();
 			if (str.endsWith("*"))
-				this.setTitle(str.substring(0, str.length() - 1));
+				this.setEditorTitle(this.fileExtension);
+		}
+		else {
+			String str = this.getTitle();
+			if (!str.endsWith("*"))
+				this.setTitle(str + "*");
 		}
 		this.modifiedFlag = value;
 	}
