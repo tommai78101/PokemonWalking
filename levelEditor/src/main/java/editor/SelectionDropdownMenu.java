@@ -23,6 +23,8 @@ public class SelectionDropdownMenu extends JPanel {
 	private static final Dimension DropdownMenuSize = new Dimension(150, 30);
 	private static final Dimension LabelSize = new Dimension(150, 25);
 
+	private JLabel tileCategoryLabel;
+	private JLabel triggersLabel;
 	private JComboBox<Category> tileCategory;
 	private JComboBox<SpriteData> tiles;
 	private JComboBox<Trigger> triggers;
@@ -40,18 +42,19 @@ public class SelectionDropdownMenu extends JPanel {
 		this.loadCategory();
 		this.loadTriggers();
 
-		JLabel label = new JLabel("Tileset Category");
-		label.setAlignmentX(Component.CENTER_ALIGNMENT);
-		label.setMinimumSize(SelectionDropdownMenu.LabelSize);
-		label.setMaximumSize(SelectionDropdownMenu.LabelSize);
-		this.add(label);
+		this.tileCategoryLabel = new JLabel("Tileset Category");
+		this.tileCategoryLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.tileCategoryLabel.setMinimumSize(SelectionDropdownMenu.LabelSize);
+		this.tileCategoryLabel.setMaximumSize(SelectionDropdownMenu.LabelSize);
+		this.add(this.tileCategoryLabel);
 		this.add(this.tileCategory);
 		this.add(this.tiles);
-		label = new JLabel("Triggers");
-		label.setAlignmentX(Component.CENTER_ALIGNMENT);
-		label.setMinimumSize(SelectionDropdownMenu.LabelSize);
-		label.setMaximumSize(SelectionDropdownMenu.LabelSize);
-		this.add(label);
+
+		this.triggersLabel = new JLabel("Triggers");
+		this.triggersLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.triggersLabel.setMinimumSize(SelectionDropdownMenu.LabelSize);
+		this.triggersLabel.setMaximumSize(SelectionDropdownMenu.LabelSize);
+		this.add(this.triggersLabel);
 		this.add(this.triggers);
 
 		this.triggerEditorInfo = new JPanel();
@@ -242,26 +245,44 @@ public class SelectionDropdownMenu extends JPanel {
 		}
 	}
 
+	private void hideTileCategory() {
+		this.tileCategoryLabel.setVisible(false);
+		this.tileCategory.setVisible(false);
+		this.tiles.setVisible(false);
+	}
+
+	private void showTileCategory() {
+		this.tileCategoryLabel.setVisible(true);
+		this.tileCategory.setVisible(true);
+		this.tiles.setVisible(true);
+	}
+
+	private void hideTriggers() {
+		this.triggersLabel.setVisible(false);
+		this.triggers.setVisible(false);
+		this.triggerEditorInfo.setVisible(false);
+	}
+
+	private void showTriggers() {
+		this.triggersLabel.setVisible(true);
+		this.triggers.setVisible(true);
+		this.triggerEditorInfo.setVisible(true);
+	}
+
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
 			case Tilesets:
-				this.tileCategory.setEnabled(true);
-				this.tiles.setEnabled(true);
-				this.triggers.setEnabled(false);
-				this.triggerEditorInfo.setVisible(false);
+				this.showTileCategory();
+				this.hideTriggers();
 				break;
 			case Triggers:
-				this.tileCategory.setEnabled(false);
-				this.tiles.setEnabled(false);
-				this.triggers.setEnabled(true);
-				this.triggerEditorInfo.setVisible(true);
+				this.hideTileCategory();
+				this.showTriggers();
 				break;
 			case NonPlayableCharacters: {
-				this.tileCategory.setEnabled(false);
-				this.tiles.setEnabled(false);
-				this.triggers.setEnabled(false);
-				this.triggerEditorInfo.setVisible(false);
+				this.hideTileCategory();
+				this.hideTriggers();
 				break;
 			}
 		}
