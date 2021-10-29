@@ -32,9 +32,6 @@ import common.Tileable;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
 
-//TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating
-//maps and scripts together.
-
 public class LevelEditor extends JFrame {
 	public static final int WIDTH = 160;
 	public static final int HEIGHT = 144;
