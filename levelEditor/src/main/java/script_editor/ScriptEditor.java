@@ -282,7 +282,8 @@ public class ScriptEditor extends JFrame {
 	// (11/24/2014): This is where I load triggers at. This is completed, but may require
 	// double-checking to be very sure.
 	/**
-	 * Loads the file script.
+	 * Loads the file script that is formatted as JSON. Script files with file extensions, .SCRIPT and
+	 * .JSON, are both accepted.
 	 * <p>
 	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
 	 * working as intended. Reason for this is that this method is used as a guideline for loading
