@@ -41,7 +41,7 @@ public class FileControl extends JPanel implements ActionListener {
 	public static File lastSavedDirectory = null;
 
 	public static final String[] MenuItemTags = {
-		"New", "Save", "Open", "", "Tileset", "Trigger", "NPC", "Script"
+		"New", "Save", "Open", "", "Tileset", "Trigger", "NPC", "Events", "", "Script"
 	};
 
 	private static final long serialVersionUID = 1L;
@@ -208,7 +208,11 @@ public class FileControl extends JPanel implements ActionListener {
 					EditorConstants.metadata = Metadata.NonPlayableCharacters;
 					break;
 				}
-				case 7: {// Script editor
+				case 7: { // Event
+					EditorConstants.metadata = Metadata.Event;
+					break;
+				}
+				case 8: {// Script editor
 					if (this.editor.scriptEditor == null) {
 						this.editor.scriptEditor = new ScriptEditor(ScriptEditor.TITLE, this.editor);
 						button.setEnabled(false);

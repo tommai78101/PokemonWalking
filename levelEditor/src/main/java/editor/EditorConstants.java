@@ -69,7 +69,8 @@ public class EditorConstants {
 	public enum Metadata {
 		Tilesets("Pixel Data"),
 		Triggers("Triggers"),
-		NonPlayableCharacters("NPCs");
+		NonPlayableCharacters("NPCs"),
+		Event("Event");
 
 		private String name;
 

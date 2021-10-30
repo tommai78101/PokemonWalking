@@ -33,25 +33,26 @@ import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
 
 public class LevelEditor extends JFrame {
-	public static final int WIDTH = 160;
-	public static final int HEIGHT = 144;
+	// Aspect ratio (Height / Width) = 0.9.
+	public static final int WIDTH = 200;
+	public static final int HEIGHT = 180;
 	public static final int SIZE = 4;
-	public static final String NAME_TITLE = "Level Editor (Hobby)";
-	public static final String SAVED_PATH_DATA = "cache.ini";
 	public static final int CHECKSUM_MAX_BYTES_LENGTH = 16;
-	public static final String defaultPath = Paths.get("").toAbsolutePath().toString();
 	// For cache directory path index, fixed index in the array list.
 	public static final int FileControlIndex = 0;
+	public static final String NAME_TITLE = "Level Editor (Hobby)";
+	public static final String SAVED_PATH_DATA = "cache.ini";
+	public static final String defaultPath = Paths.get("").toAbsolutePath().toString();
 
 	private static final long serialVersionUID = -8739477187675627751L;
 
+	public boolean running;
 	public ControlPanel controlPanel;
 	public FileControl fileControlPanel;
 	public DrawingBoard drawingBoardPanel;
 	public StatusPanel statusPanel;
 	public SelectionDropdownMenu properties;
 	public ScriptEditor scriptEditor;
-	public boolean running;
 	public String message;
 	public EditorInput input;
 
