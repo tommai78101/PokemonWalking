@@ -5,13 +5,13 @@ package interfaces;
  * walking, running, bicycling, swimming/surfing, and more.
  */
 public interface CharacterActionable {
-	void walk();
-
-	void sprint();
-
 	void jump();
 
 	void ride();
 
+	void sprint();
+
 	void swim();
+
+	void walk();
 }

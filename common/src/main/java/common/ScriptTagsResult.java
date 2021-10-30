@@ -19,19 +19,19 @@ public class ScriptTagsResult {
 		this.content = content;
 	}
 
-	public ScriptTags getType() {
-		return this.type;
-	}
-
-	public void setType(ScriptTags type) {
-		this.type = type;
-	}
-
 	public String getContent() {
 		return this.content;
 	}
 
+	public ScriptTags getType() {
+		return this.type;
+	}
+
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public void setType(ScriptTags type) {
+		this.type = type;
 	}
 }

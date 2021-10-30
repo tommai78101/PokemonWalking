@@ -47,35 +47,97 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.revalidate();
 	}
 
-	private void constructingList() {
-		this.model = new DefaultListModel<>();
-		final Dimension size = new Dimension(100, 300);
-
-		this.triggerList = new JList<>();
-		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		this.triggerList.setLayoutOrientation(JList.VERTICAL);
-		this.triggerList.setVisibleRowCount(0);
-		this.triggerList.setSize(size);
-		this.triggerList.setMinimumSize(size);
-
-		this.triggerList.setModel(this.model);
-		new KeySelectionRenderer(this.triggerList) {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public String getDisplayValue(Object item) {
-				Trigger t = (Trigger) item;
-				return t.getName();
+	@Override
+	public void actionPerformed(ActionEvent event) {
+		switch (Integer.parseInt(event.getActionCommand())) {
+			default:
+				break;
+			case 0: {// Create button
+				Trigger t = new Trigger();
+				t.setTriggerID((short) 0);
+				t.setName("<Untitled>");
+				this.model.addElement(t);
+				this.validate();
+				JScrollBar vertical = this.scrollPane.getVerticalScrollBar();
+				vertical.setValue(vertical.getMaximum() + 1);
+				this.triggerList.setSelectedIndex(this.model.getSize() - 1);
+				this.editor.scriptChanger.enableComponent();
+				break;
 			}
-		};
-		this.triggerList.addListSelectionListener(this);
+			case 1: {// Remove button
+				int index = this.triggerList.getSelectedIndex();
+				if (index != -1 && !this.model.isEmpty())
+					this.model.remove(index);
+				else if (!this.model.isEmpty()) {
+					this.model.remove(this.model.getSize() - 1);
+				}
+				if (this.model.isEmpty()) {
+					ScriptViewer.this.editor.scriptChanger.clearTextFields();
+					ScriptViewer.this.editor.scriptChanger.updateComponent();
+				}
+				break;
+			}
+			case 2: {// Clear button
+				this.clearTriggerModel();
+				ScriptViewer.this.editor.scriptChanger.clearTextFields();
+				ScriptViewer.this.editor.scriptChanger.updateComponent();
+				break;
+			}
+		}
+		this.editor.getLevelEditorParent().properties.reloadTriggers();
+		this.triggerList.validate();
+		this.editor.refresh();
+	}
 
-		this.scrollPane = new JScrollPane(this.triggerList);
-		this.scrollPane.setSize(size);
-		this.scrollPane.setMinimumSize(size);
+	public void addTrigger(Trigger t) {
+		this.model.add(0, t);
+		this.validate();
+	}
 
-		this.scrollPane.setVisible(true);
-		this.add(this.scrollPane);
+	public void clearTriggerModel() {
+		this.model.removeAllElements();
+	}
+
+	public void clearTriggers() {
+		this.triggerList.removeAll();
+	}
+
+	public Trigger getSelectedTrigger() {
+		return this.selectedTrigger;
+	}
+
+	public JList<Trigger> getTriggerList() {
+		return this.triggerList;
+	}
+
+	public boolean isTriggerListEmpty() {
+		return this.model.isEmpty();
+	}
+
+	public void removeTrigger() {
+		this.model.remove(this.triggerList.getSelectedIndex());
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent event) {
+		if (event.getValueIsAdjusting())
+			return;
+		Object source = event.getSource();
+		if (source instanceof JList<?> list) {
+			this.selectedTrigger = (Trigger) list.getSelectedValue();
+			if (this.selectedTrigger != null) {
+				boolean isNpcTrigger = this.selectedTrigger.isNpcTrigger();
+				short idValue = isNpcTrigger ? this.selectedTrigger.getNpcTriggerID() : this.selectedTrigger.getTriggerID();
+				this.editor.scriptChanger.disallowFieldsToUpdate();
+				this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());
+				this.editor.scriptChanger.getIDField().setText(Short.toString(idValue));
+				this.editor.scriptChanger.getNpcTriggerFlag().setSelected(isNpcTrigger);
+				this.editor.scriptChanger.getScriptArea().setText(this.selectedTrigger.getScript());
+				this.editor.scriptChanger.allowFieldsToUpdate();
+			}
+		}
+		super.revalidate();
+		super.repaint();
 	}
 
 	private void constructingButtons() {
@@ -116,92 +178,34 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 		this.add(panel);
 	}
 
-	public void addTrigger(Trigger t) {
-		this.model.add(0, t);
-		this.validate();
-	}
+	private void constructingList() {
+		this.model = new DefaultListModel<>();
+		final Dimension size = new Dimension(100, 300);
 
-	public void removeTrigger() {
-		this.model.remove(this.triggerList.getSelectedIndex());
-	}
+		this.triggerList = new JList<>();
+		this.triggerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		this.triggerList.setLayoutOrientation(JList.VERTICAL);
+		this.triggerList.setVisibleRowCount(0);
+		this.triggerList.setSize(size);
+		this.triggerList.setMinimumSize(size);
 
-	public void clearTriggers() {
-		this.triggerList.removeAll();
-	}
+		this.triggerList.setModel(this.model);
+		new KeySelectionRenderer(this.triggerList) {
+			private static final long serialVersionUID = 1L;
 
-	public void clearTriggerModel() {
-		this.model.removeAllElements();
-	}
-
-	public Trigger getSelectedTrigger() {
-		return this.selectedTrigger;
-	}
-
-	public JList<Trigger> getTriggerList() {
-		return this.triggerList;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent event) {
-		switch (Integer.parseInt(event.getActionCommand())) {
-			default:
-				break;
-			case 0: {// Create button
-				Trigger t = new Trigger();
-				t.setTriggerID((short) 0);
-				t.setName("<Untitled>");
-				this.model.addElement(t);
-				this.validate();
-				JScrollBar vertical = this.scrollPane.getVerticalScrollBar();
-				vertical.setValue(vertical.getMaximum() + 1);
-				this.triggerList.setSelectedIndex(this.model.getSize() - 1);
-				this.editor.scriptChanger.enableComponent();
-				break;
+			@Override
+			public String getDisplayValue(Object item) {
+				Trigger t = (Trigger) item;
+				return t.getName();
 			}
-			case 1: {// Remove button
-				int index = this.triggerList.getSelectedIndex();
-				if (index != -1 && !this.model.isEmpty())
-					this.model.remove(index);
-				else if (!this.model.isEmpty()) {
-					this.model.remove(this.model.getSize() - 1);
-				}
-				if (this.model.isEmpty()) {
-					ScriptViewer.this.editor.scriptChanger.clearTextFields();
-					ScriptViewer.this.editor.scriptChanger.disableComponent();
-				}
-				break;
-			}
-			case 2: {// Clear button
-				this.clearTriggerModel();
-				ScriptViewer.this.editor.scriptChanger.clearTextFields();
-				ScriptViewer.this.editor.scriptChanger.disableComponent();
-				break;
-			}
-		}
-		this.editor.getLevelEditorParent().properties.reloadTriggers();
-		this.triggerList.validate();
-		this.editor.refresh();
-	}
+		};
+		this.triggerList.addListSelectionListener(this);
 
-	@Override
-	public void valueChanged(ListSelectionEvent event) {
-		if (event.getValueIsAdjusting())
-			return;
-		Object source = event.getSource();
-		if (source instanceof JList<?> list) {
-			this.selectedTrigger = (Trigger) list.getSelectedValue();
-			if (this.selectedTrigger != null) {
-				boolean isNpcTrigger = this.selectedTrigger.isNpcTrigger();
-				short idValue = isNpcTrigger ? this.selectedTrigger.getNpcTriggerID() : this.selectedTrigger.getTriggerID();
-				this.editor.scriptChanger.disallowFieldsToUpdate();
-				this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());
-				this.editor.scriptChanger.getIDField().setText(Short.toString(idValue));
-				this.editor.scriptChanger.getNpcTriggerFlag().setSelected(isNpcTrigger);
-				this.editor.scriptChanger.getScriptArea().setText(this.selectedTrigger.getScript());
-				this.editor.scriptChanger.allowFieldsToUpdate();
-			}
-		}
-		super.revalidate();
-		super.repaint();
+		this.scrollPane = new JScrollPane(this.triggerList);
+		this.scrollPane.setSize(size);
+		this.scrollPane.setMinimumSize(size);
+
+		this.scrollPane.setVisible(true);
+		this.add(this.scrollPane);
 	}
 }

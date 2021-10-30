@@ -20,15 +20,15 @@ public class SmallDeadTree extends Obstacle {
 	}
 
 	@Override
+	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
+		// Left intentionally blank.
+	}
+
+	@Override
 	public void tick() {
 		// SmallDeadTree should not be interacted with.
 		if (this.interactingState) {
 			this.setInteractingState(false);
 		}
-	}
-
-	@Override
-	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
-		// Left intentionally blank.
 	}
 }

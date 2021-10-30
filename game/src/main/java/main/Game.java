@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package main;
@@ -43,9 +43,9 @@ public class Game {
 
 	/**
 	 * Creates the core component of the game.
-	 * 
+	 *
 	 * All future game components are to be placed here.
-	 * 
+	 *
 	 * @param Scene
 	 *            Takes in a BaseScreen that displays all rendered graphics to the screen.
 	 * @param Keys
@@ -70,16 +70,56 @@ public class Game {
 		this.load();
 	}
 
+	public void closeMainMenu() {
+		this.gameScene.resetRenderingEffect();
+		this.startMenu.clearActiveItem();
+		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+	}
+
+	public Scene getBaseScreen() {
+		return this.gameScene;
+	}
+
+	public Inventory getInventory() {
+		return this.inventoryManager;
+	}
+
+	public Player getPlayer() {
+		return this.player;
+	}
+
+	public SaveDataManager getSaveManager() {
+		return this.saveManager;
+	}
+
+	public MainMenu getStartMenu() {
+		return this.startMenu;
+	}
+
+	public StateManager getStateManager() {
+		return this.stateManager;
+	}
+
+	public OverWorld getWorld() {
+		return this.overworld;
+	}
+
+	public boolean itemHasBeenRegistered(KeyItem item) {
+		if (this.registeredItem == null)
+			return false;
+		return this.registeredItem.equals(item);
+	}
+
 	/**
 	 * Handles rendered objects and rendering effects.
-	 * 
+	 *
 	 * <p>
 	 * All render() methods must be placed in here to render to the screen.
-	 * 
+	 *
 	 * <p>
 	 * Methods placed in here are to be separated by game states, and depending on the game states, they
 	 * are to be called when necessary.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void render(Graphics graphics) {
@@ -127,10 +167,35 @@ public class Game {
 	}
 
 	/**
+	 * Currently unused. However, this is executed in the render() code.
+	 */
+	public void setCameraRelativeToArea(int areaXPos, int areaYPos) {
+		// Not used at the moment.
+
+		// cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
+		// this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
+		// this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
+	}
+
+	public void setRegisteredItem(KeyItem item) {
+		this.registeredItem = item;
+		// TODO: Continue to handle registered item's action event.
+	}
+
+	/**
+	 * Currently unused.
+	 */
+	public void setScrollOffset(int xCamCenter, int yCamCenter) {
+		// CamCenter: the coordinates of the center of camera.
+		// this.xScroll = xCamCenter;
+		// this.yScroll = yCamCenter;
+	}
+
+	/**
 	 * Updates the game.
-	 * 
+	 *
 	 * All tick() methods must be placed in here, in order to correctly update the game.
-	 * 
+	 *
 	 * @return Nothing.
 	 */
 	public void tick() {
@@ -186,107 +251,6 @@ public class Game {
 		}
 	}
 
-	/**
-	 * <p>
-	 * Loads the game.
-	 * </p>
-	 * 
-	 * <p>
-	 * Currently used for debugging purposes only. Press F1 to re-load.
-	 * </p>
-	 */
-	private void load() {
-		// TODO: Load data.
-		this.gameScene.resetRenderingEffect();
-		this.player.reload();
-
-		Mod.loadModdedResources();
-		if (WorldConstants.isModsEnabled == null)
-			WorldConstants.isModsEnabled = Boolean.FALSE;
-		this.overworld = new OverWorld(this.player, this);
-		this.overworld.reloadAllAreas();
-
-		// GameSave.load(this, SaveDataManager.SAVE_FILE_NAME);
-		if (WorldConstants.isModsEnabled.booleanValue())
-			GameSave.loadExperimental(this, SaveDataManager.MODDED_SAVE_FILE_NAME);
-		else
-			GameSave.loadExperimental(this, SaveDataManager.SAVE_FILE_NAME);
-
-		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
-
-		if (WorldConstants.isModsEnabled.booleanValue())
-			Debug.warn("Loading custom modded game world.");
-	}
-
-	/**
-	 * Currently unused.
-	 */
-	public void setScrollOffset(int xCamCenter, int yCamCenter) {
-		// CamCenter: the coordinates of the center of camera.
-		// this.xScroll = xCamCenter;
-		// this.yScroll = yCamCenter;
-	}
-
-	/**
-	 * Currently unused. However, this is executed in the render() code.
-	 */
-	public void setCameraRelativeToArea(int areaXPos, int areaYPos) {
-		// Not used at the moment.
-
-		// cam(x,y) = area(cam.x * -1 + xConstantOffset, cam.y * -1 + yConstantOffset)
-		// this.xCamera = (-areaXPos + this.xScroll) / Tile.WIDTH;
-		// this.yCamera = (-areaYPos + this.yScroll) / Tile.HEIGHT;
-	}
-
-	public Player getPlayer() {
-		return this.player;
-	}
-
-	public MainMenu getStartMenu() {
-		return this.startMenu;
-	}
-
-	public Scene getBaseScreen() {
-		return this.gameScene;
-	}
-
-	public StateManager getStateManager() {
-		return this.stateManager;
-	}
-
-	public void setRegisteredItem(KeyItem item) {
-		this.registeredItem = item;
-		// TODO: Continue to handle registered item's action event.
-	}
-
-	public boolean itemHasBeenRegistered(KeyItem item) {
-		if (this.registeredItem == null)
-			return false;
-		return this.registeredItem.equals(item);
-	}
-
-	public OverWorld getWorld() {
-		return this.overworld;
-	}
-
-	public Inventory getInventory() {
-		return this.inventoryManager;
-	}
-
-	public SaveDataManager getSaveManager() {
-		return this.saveManager;
-	}
-
-	public void closeMainMenu() {
-		this.gameScene.resetRenderingEffect();
-		this.startMenu.clearActiveItem();
-		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
-	}
-
-	// -------------------------------------------------
-	// PRIVATE METHODS
-	// -------------------------------------------------
-
 	private void checkPausing() {
 		GameState state = this.stateManager.getCurrentGameState();
 		if (Game.keys.isStartPressed()) {
@@ -323,9 +287,41 @@ public class Game {
 	}
 
 	/**
+	 * <p>
+	 * Loads the game.
+	 * </p>
+	 *
+	 * <p>
+	 * Currently used for debugging purposes only. Press F1 to re-load.
+	 * </p>
+	 */
+	private void load() {
+		// TODO: Load data.
+		this.gameScene.resetRenderingEffect();
+		this.player.reload();
+
+		Mod.loadModdedResources();
+		if (WorldConstants.isModsEnabled == null)
+			WorldConstants.isModsEnabled = Boolean.FALSE;
+		this.overworld = new OverWorld(this.player, this);
+		this.overworld.reloadAllAreas();
+
+		// GameSave.load(this, SaveDataManager.SAVE_FILE_NAME);
+		if (WorldConstants.isModsEnabled.booleanValue())
+			GameSave.loadExperimental(this, SaveDataManager.MODDED_SAVE_FILE_NAME);
+		else
+			GameSave.loadExperimental(this, SaveDataManager.SAVE_FILE_NAME);
+
+		this.stateManager.setCurrentGameState(GameState.MAIN_GAME);
+
+		if (WorldConstants.isModsEnabled.booleanValue())
+			Debug.warn("Loading custom modded game world.");
+	}
+
+	/**
 	 * This handles updating the main menu states, rendering effects, and the sub menu data, all for
 	 * preparations.
-	 * 
+	 *
 	 * Clearing the main menu data allows the game to reset to the main menu, without the game states
 	 * being messed up because of the focus change.
 	 */

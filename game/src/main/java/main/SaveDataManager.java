@@ -19,16 +19,8 @@ public class SaveDataManager extends SubMenu {
 	public static final String SAVE_FILE_NAME = "data.sav";
 	public static final String MODDED_SAVE_FILE_NAME = "mod" + File.separator + "data.sav";
 
-	public enum SaveStatus {
-		ASK,
-		OVERWRITE,
-		SAVING,
-		SAVED,
-		SAVE_COMPLETE,
-		ERROR
-	}
-
 	private SaveStatus saveStatus;
+
 	private Dialogue saveDialogue;
 	ExecutorService executor;
 	private Game game;
@@ -40,6 +32,29 @@ public class SaveDataManager extends SubMenu {
 		this.saveDialogue = new Dialogue();
 		this.needsFlashingAnimation = false;
 		this.exitsToGame = true;
+	}
+
+	public enum SaveStatus {
+		ASK,
+		OVERWRITE,
+		SAVING,
+		SAVED,
+		SAVE_COMPLETE,
+		ERROR
+	}
+
+	public SaveStatus getSaveStatus() {
+		return this.saveStatus;
+	}
+
+	@Override
+	public void render(Scene output, Graphics graphics) {
+		if (this.saveDialogue != null)
+			this.saveDialogue.render(output, graphics);
+	}
+
+	public void resetSaveStatus() {
+		this.saveStatus = SaveStatus.ASK;
 	}
 
 	@Override
@@ -185,19 +200,5 @@ public class SaveDataManager extends SubMenu {
 				break;
 			}
 		}
-	}
-
-	public SaveStatus getSaveStatus() {
-		return this.saveStatus;
-	}
-
-	public void resetSaveStatus() {
-		this.saveStatus = SaveStatus.ASK;
-	}
-
-	@Override
-	public void render(Scene output, Graphics graphics) {
-		if (this.saveDialogue != null)
-			this.saveDialogue.render(output, graphics);
 	}
 }

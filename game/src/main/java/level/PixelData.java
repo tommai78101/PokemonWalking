@@ -28,8 +28,10 @@ public class PixelData {
 
 	// This is also the ID number for the pixel.
 	private int color;
+
 	// If false, it's an obstacle.
 	private boolean[] facingsBlocked = new boolean[4];
+
 	public int xPosition;
 	public int yPosition;
 	// This represents the art resource this PixelData object is representing.
@@ -50,6 +52,26 @@ public class PixelData {
 	private boolean hidden;
 	private boolean isItem;
 	private int targetMovementScriptID;
+
+	public PixelData(int pixel) {
+		this.color = pixel;
+		this.xPosition = -1;
+		this.yPosition = -1;
+		this.targetArea = -1;
+		this.targetSector = -1;
+		this.groundHeight = 0;
+		this.bitmapTick = 0;
+		this.isItem = false;
+		this.hidden = false;
+
+		int alpha = (pixel >> 24) & 0xFF;
+		int red = (pixel >> 16) & 0xFF;
+		int green = (pixel >> 8) & 0xFF;
+		int blue = pixel & 0xFF;
+
+		this.setProperties(alpha, red, green, blue);
+		this.prepareBitmap(alpha, red, green, blue);
+	}
 
 	public PixelData(int pixel, int x, int y) {
 		this.xPosition = x;
@@ -74,60 +96,151 @@ public class PixelData {
 		this.prepareBitmap(alpha, red, green, blue);
 	}
 
-	public PixelData(int pixel) {
-		this.color = pixel;
-		this.xPosition = -1;
-		this.yPosition = -1;
-		this.targetArea = -1;
-		this.targetSector = -1;
-		this.groundHeight = 0;
-		this.bitmapTick = 0;
-		this.isItem = false;
-		this.hidden = false;
-
-		int alpha = (pixel >> 24) & 0xFF;
-		int red = (pixel >> 16) & 0xFF;
-		int green = (pixel >> 8) & 0xFF;
-		int blue = pixel & 0xFF;
-
-		this.setProperties(alpha, red, green, blue);
-		this.prepareBitmap(alpha, red, green, blue);
+	public static int create(byte alpha, byte red, byte green, byte blue) {
+		return (alpha << 24) | (red << 16) | (green << 8) | blue;
 	}
 
-	public void enableTrigger() {
-		this.triggerFlag = true;
+	public static byte getAlphaData(int pixelColor) {
+		return (byte) ((pixelColor >> 24) & 0xFF);
+	}
+
+	public static byte getBlueData(int pixelColor) {
+		return (byte) (pixelColor & 0xFF);
+	}
+
+	public static byte getByteData(int pixelColor, int bitShift) {
+		return (byte) ((pixelColor >> bitShift) & 0xFF);
+	}
+
+	public static byte getGreenData(int pixelColor) {
+		return (byte) ((pixelColor >> 8) & 0xFF);
+	}
+
+	public static byte getRedData(int pixelColor) {
+		return (byte) ((pixelColor >> 16) & 0xFF);
+	}
+
+	public static PixelData make(int pixelColor) {
+		return new PixelData(pixelColor, -1, -1);
 	}
 
 	public void disableTrigger() {
 		this.triggerFlag = false;
 	}
 
-	public boolean hasTriggerEvent() {
-		return this.triggerFlag;
-	}
-
-	public int getTargetScriptID() {
-		return this.targetMovementScriptID;
-	}
-
 	public void disableWarpZone() {
 		this.isWarpZone = false;
+	}
+
+	public void enableTrigger() {
+		this.triggerFlag = true;
 	}
 
 	public void enableWarpZone() {
 		this.isWarpZone = true;
 	}
 
-	public boolean isWarpZoneEnabled() {
-		return this.isWarpZone;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null || !(obj instanceof PixelData objData))
+			return false;
+		return this.color == objData.color;
+	}
+
+	public byte getAlpha() {
+		return (byte) ((this.color >> 24) & 0xFF);
+	}
+
+	public Bitmap getBiomeBitmap() {
+		return this.biomeBitmap[this.biomeBitmapTick];
+	}
+
+	public Bitmap getBitmap() {
+		return this.bitmap[this.bitmapTick];
+	}
+
+	public byte getBlue() {
+		return (byte) (this.color & 0xFF);
+	}
+
+	// public int getParentAreaID() {
+	// return parentArea;
+	// }
+
+	public int getColor() {
+		return this.color;
+	}
+
+	public byte getExtendedID() {
+		return (byte) ((this.color >> 16) & 0xFF);
+	}
+
+	public byte getGreen() {
+		return (byte) ((this.color >> 8) & 0xFF);
+	}
+
+	public int getGroundHeight() {
+		return this.groundHeight;
+	}
+
+	public byte getRed() {
+		return (byte) ((this.color >> 16) & 0xFF);
+	}
+
+	public int getTargetAreaID() {
+		return this.targetArea;
+	}
+
+	public int getTargetScriptID() {
+		return this.targetMovementScriptID;
+	}
+
+	public int getTargetSectorID() {
+		return this.targetSector;
+	}
+
+	public short getTileSpecificData() {
+		return (short) (this.color & 0xFFFF);
+	}
+
+	public boolean hasTriggerEvent() {
+		return this.triggerFlag;
+	}
+
+	public void hide() {
+		this.hidden = true;
+	}
+
+	public boolean isHidden() {
+		return this.hidden;
 	}
 
 	public boolean isItem() {
 		return this.isItem;
 	}
 
-	public void setAsItem(boolean value) {
-		this.isItem = value;
+	public boolean[] isWalkThroughable() {
+		return this.facingsBlocked;
+	}
+
+	public boolean isWarpZoneEnabled() {
+		return this.isWarpZone;
+	}
+
+	/**
+	 * Prepares the bitmap if the color has been pre-determined.
+	 *
+	 * <p>
+	 * Will cause undefined behaviors if the colors have not been set yet.
+	 *
+	 * @return Nothing.
+	 */
+	public void prepareBitmap() {
+		int alpha = (this.color >> 24) & 0xFF;
+		int red = (this.color >> 16) & 0xFF;
+		int green = (this.color >> 8) & 0xFF;
+		int blue = this.color & 0xFF;
+		this.prepareBitmap(alpha, red, green, blue);
 	}
 
 	/**
@@ -486,20 +599,26 @@ public class PixelData {
 		}
 	}
 
-	/**
-	 * Prepares the bitmap if the color has been pre-determined.
-	 *
-	 * <p>
-	 * Will cause undefined behaviors if the colors have not been set yet.
-	 *
-	 * @return Nothing.
-	 */
-	public void prepareBitmap() {
-		int alpha = (this.color >> 24) & 0xFF;
-		int red = (this.color >> 16) & 0xFF;
-		int green = (this.color >> 8) & 0xFF;
-		int blue = this.color & 0xFF;
-		this.prepareBitmap(alpha, red, green, blue);
+	public void renderTick() {
+		this.bitmapTick++;
+		if (this.bitmapTick >= this.bitmap.length)
+			this.bitmapTick = 0;
+		this.biomeBitmapTick++;
+		if (this.biomeBitmapTick >= this.biomeBitmap.length)
+			this.biomeBitmapTick = 0;
+	}
+
+	public void reveal() {
+		this.hidden = false;
+	}
+
+	public void setAsItem(boolean value) {
+		this.isItem = value;
+	}
+
+	public void setPosition(final int x, final int y) {
+		this.xPosition = x;
+		this.yPosition = y;
 	}
 
 	/**
@@ -590,129 +709,5 @@ public class PixelData {
 				this.facingsBlocked[0] = this.facingsBlocked[1] = this.facingsBlocked[2] = this.facingsBlocked[3] = false;
 				break;
 		}
-	}
-
-	public void setPosition(final int x, final int y) {
-		this.xPosition = x;
-		this.yPosition = y;
-	}
-
-	public int getColor() {
-		return this.color;
-	}
-
-	public short getTileSpecificData() {
-		return (short) (this.color & 0xFFFF);
-	}
-
-	public byte getExtendedID() {
-		return (byte) ((this.color >> 16) & 0xFF);
-	}
-
-	// public int getParentAreaID() {
-	// return parentArea;
-	// }
-
-	public void hide() {
-		this.hidden = true;
-	}
-
-	public void reveal() {
-		this.hidden = false;
-	}
-
-	public boolean isHidden() {
-		return this.hidden;
-	}
-
-	public int getTargetAreaID() {
-		return this.targetArea;
-	}
-
-	public boolean[] isWalkThroughable() {
-		return this.facingsBlocked;
-	}
-
-	public int getTargetSectorID() {
-		return this.targetSector;
-	}
-
-	public void renderTick() {
-		this.bitmapTick++;
-		if (this.bitmapTick >= this.bitmap.length)
-			this.bitmapTick = 0;
-		this.biomeBitmapTick++;
-		if (this.biomeBitmapTick >= this.biomeBitmap.length)
-			this.biomeBitmapTick = 0;
-	}
-
-	public Bitmap getBitmap() {
-		return this.bitmap[this.bitmapTick];
-	}
-
-	public int getGroundHeight() {
-		return this.groundHeight;
-	}
-
-	public Bitmap getBiomeBitmap() {
-		return this.biomeBitmap[this.biomeBitmapTick];
-	}
-
-	public byte getAlpha() {
-		return (byte) ((this.color >> 24) & 0xFF);
-	}
-
-	public byte getRed() {
-		return (byte) ((this.color >> 16) & 0xFF);
-	}
-
-	public byte getGreen() {
-		return (byte) ((this.color >> 8) & 0xFF);
-	}
-
-	public byte getBlue() {
-		return (byte) (this.color & 0xFF);
-	}
-
-	// -------------------------------------------------
-	// Override methods
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null || !(obj instanceof PixelData objData))
-			return false;
-		return this.color == objData.color;
-	}
-
-	// =================================================
-	// Static helper methods
-	// =================================================
-
-	public static int create(byte alpha, byte red, byte green, byte blue) {
-		return (alpha << 24) | (red << 16) | (green << 8) | blue;
-	}
-
-	public static byte getAlphaData(int pixelColor) {
-		return (byte) ((pixelColor >> 24) & 0xFF);
-	}
-
-	public static byte getRedData(int pixelColor) {
-		return (byte) ((pixelColor >> 16) & 0xFF);
-	}
-
-	public static byte getGreenData(int pixelColor) {
-		return (byte) ((pixelColor >> 8) & 0xFF);
-	}
-
-	public static byte getBlueData(int pixelColor) {
-		return (byte) (pixelColor & 0xFF);
-	}
-
-	public static byte getByteData(int pixelColor, int bitShift) {
-		return (byte) ((pixelColor >> bitShift) & 0xFF);
-	}
-
-	public static PixelData make(int pixelColor) {
-		return new PixelData(pixelColor, -1, -1);
 	}
 }

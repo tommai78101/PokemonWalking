@@ -17,15 +17,15 @@ public enum GenderType {
 		this.typeId = value;
 	}
 
-	public byte getByte() {
-		return this.typeId;
-	}
-
 	public static GenderType determineGender(byte value) {
 		if (value == Male.typeId)
 			return Male;
 		if (value == Female.typeId)
 			return Female;
 		return Nondetermined;
+	}
+
+	public byte getByte() {
+		return this.typeId;
 	}
 }

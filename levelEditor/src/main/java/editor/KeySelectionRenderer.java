@@ -43,6 +43,15 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 	}
 
 	/**
+	 * This method must be implemented in the extended class.
+	 *
+	 * @param item
+	 *            an item from the ComboBoxModel
+	 * @returns a String containing the text to be rendered for this item.
+	 */
+	public abstract String getDisplayValue(Object item);
+
+	/**
 	 * Implements the renderer.
 	 */
 	@Override
@@ -118,13 +127,4 @@ public abstract class KeySelectionRenderer extends BasicComboBoxRenderer impleme
 		}
 		return -1;
 	}
-
-	/**
-	 * This method must be implemented in the extended class.
-	 *
-	 * @param item
-	 *            an item from the ComboBoxModel
-	 * @returns a String containing the text to be rendered for this item.
-	 */
-	public abstract String getDisplayValue(Object item);
 }

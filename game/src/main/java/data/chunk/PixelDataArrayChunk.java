@@ -36,6 +36,23 @@ public class PixelDataArrayChunk extends Chunk {
 	}
 
 	@Override
+	public int getSize(Game game) {
+		int size = this.name.length;
+		// Area data size bytes count. (short)
+		size += 2;
+
+		this.p_areas = game.getWorld().getAllAreas();
+		for (Area area : this.p_areas) {
+			int dataSetSize = area.getModifiedPixelDataList().size();
+			for (int i = 0; i < dataSetSize; i++) {
+				PixelDataChunk chunk = new PixelDataChunk();
+				size += chunk.getSize(game);
+			}
+		}
+		return size;
+	}
+
+	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
 		// Prepare data
 		this.p_areas = game.getWorld().getAllAreas();
@@ -91,23 +108,6 @@ public class PixelDataArrayChunk extends Chunk {
 		for (Chunk chunk : this.chunks) {
 			chunk.write(game, raf);
 		}
-	}
-
-	@Override
-	public int getSize(Game game) {
-		int size = this.name.length;
-		// Area data size bytes count. (short)
-		size += 2;
-
-		this.p_areas = game.getWorld().getAllAreas();
-		for (Area area : this.p_areas) {
-			int dataSetSize = area.getModifiedPixelDataList().size();
-			for (int i = 0; i < dataSetSize; i++) {
-				PixelDataChunk chunk = new PixelDataChunk();
-				size += chunk.getSize(game);
-			}
-		}
-		return size;
 	}
 
 }

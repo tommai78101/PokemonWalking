@@ -1,9 +1,9 @@
 /**
- * Open-source Game Boy inspired game. 
- * 
+ * Open-source Game Boy inspired game.
+ *
  * Created by tom_mai78101. Hobby game programming only.
  *
- * All rights copyrighted to The Pokémon Company and Nintendo. 
+ * All rights copyrighted to The Pokémon Company and Nintendo.
  */
 
 package level;
@@ -23,6 +23,7 @@ import screen.Scene;
 public class OverWorld implements Tileable, UpdateRenderable {
 	// Overworld properties.
 	protected Player player;
+
 	protected Area currentArea;
 	protected Game game;
 	public List<Area> areas = new ArrayList<>();
@@ -34,9 +35,9 @@ public class OverWorld implements Tileable, UpdateRenderable {
 
 	/**
 	 * Initializes the overworld in the game.
-	 * 
+	 *
 	 * All game entities are to be loaded through this method.
-	 * 
+	 *
 	 * @param Player
 	 *            Takes a Player object. The overworld then loads all related properties in respect to
 	 *            the Player object.
@@ -101,48 +102,42 @@ public class OverWorld implements Tileable, UpdateRenderable {
 	}
 	*/
 
-	public Area getCurrentArea() {
-		return this.currentArea;
-	}
-
-	public void setCurrentArea(Area area) {
-		this.currentArea = area;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if ((obj == null) || this.getClass() != obj.getClass() || !(obj instanceof OverWorld other)) {
+			return false;
+		}
+		if (this.worldID != other.worldID) {
+			return false;
+		}
+		return true;
 	}
 
 	public List<Area> getAllAreas() {
 		return this.areas;
 	}
 
-	public void reloadAllAreas() {
-		for (Area area : this.areas) {
-			area.loadModifiedPixelDataList();
-		}
+	public Area getCurrentArea() {
+		return this.currentArea;
+	}
+
+	public int getCurrentAreaHeight() {
+		return this.currentArea.getHeight();
+	}
+
+	// Not sure if these width and height values are useful...
+	public int getCurrentAreaWidth() {
+		return this.currentArea.getWidth();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + this.worldID;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (this.getClass() != obj.getClass() || !(obj instanceof OverWorld)) {
-			return false;
-		}
-		OverWorld other = (OverWorld) obj;
-		if (this.worldID != other.worldID) {
-			return false;
-		}
-		return true;
+		return prime * result + this.worldID;
 	}
 
 	public void refresh() {
@@ -154,13 +149,43 @@ public class OverWorld implements Tileable, UpdateRenderable {
 		}
 	}
 
-	// Not sure if these width and height values are useful...
-	public int getCurrentAreaWidth() {
-		return this.currentArea.getWidth();
+	public void reloadAllAreas() {
+		for (Area area : this.areas) {
+			area.loadModifiedPixelDataList();
+		}
 	}
 
-	public int getCurrentAreaHeight() {
-		return this.currentArea.getHeight();
+	@Override
+	public void render(Scene screen, Graphics graphics, int xPlayerPos, int yPlayerPos) {
+		// OverWorld offsets are not set.
+		// Setting area offsets with player positions
+
+		screen.setOffset(screen.getWidth() / 2 - Tileable.WIDTH, (screen.getHeight() - Tileable.HEIGHT) / 2);
+		if (this.currentArea != null)
+			this.currentArea.render(screen, graphics, xPlayerPos, yPlayerPos);
+		screen.setOffset(0, 0);
+
+		if (this.invertBitmapColors) {
+			if (screen.getRenderingEffectTick() == (byte) 0x7) {
+				screen.setRenderingEffectTick((byte) 0x0);
+			}
+			this.invertBitmapColors = screen.invert();
+		}
+
+		if (screen.getRenderingEffectTick() < (byte) 0x4 || screen.getRenderingEffectTick() >= (byte) 0x7)
+			this.player.render(screen, graphics, 0, 0);
+
+		/*
+		if (this.newDialogues != null && this.newDialogues.size() > 0) {
+			Dialogue dialogue = this.newDialogues.get(this.newDialoguesIterator);
+			dialogue.renderInformationBox(screen, 0, 6, 9, 2);
+			dialogue.render(screen, screen.getBufferedImage().createGraphics());
+		}
+		*/
+	}
+
+	public void setCurrentArea(Area area) {
+		this.currentArea = area;
 	}
 
 	@Override
@@ -176,13 +201,11 @@ public class OverWorld implements Tileable, UpdateRenderable {
 			this.handleWarpPointEvent();
 		}
 
-		if (!this.player.isLockedWalking()) {
-			if (this.currentArea != null) {
-				if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
-					this.currentAreaSectorID = this.currentArea.getSectorID();
-					// This is where you get the latest sector id at.
-					Debug.warn("Area: " + this.currentArea.getAreaID() + " Sector: " + this.currentArea.getSectorID());
-				}
+		if (!this.player.isLockedWalking() && (this.currentArea != null)) {
+			if (this.currentArea.getSectorID() != this.currentAreaSectorID) {
+				this.currentAreaSectorID = this.currentArea.getSectorID();
+				// This is where you get the latest sector id at.
+				Debug.warn("Area: " + this.currentArea.getAreaID() + " Sector: " + this.currentArea.getSectorID());
 			}
 		}
 
@@ -200,9 +223,9 @@ public class OverWorld implements Tileable, UpdateRenderable {
 	 * the interacted object's interaction ID number to the OverWorld, where it handles the interaction
 	 * ID accordingly.
 	 * </p>
-	 * 
+	 *
 	 * @throws GameException
-	 * 
+	 *
 	 */
 	/*
 	private void handlePlayerInteractions() {
@@ -470,38 +493,6 @@ public class OverWorld implements Tileable, UpdateRenderable {
 		}
 		*/
 	}
-
-	@Override
-	public void render(Scene screen, Graphics graphics, int xPlayerPos, int yPlayerPos) {
-		// OverWorld offsets are not set.
-		// Setting area offsets with player positions
-
-		screen.setOffset(screen.getWidth() / 2 - Tileable.WIDTH, (screen.getHeight() - Tileable.HEIGHT) / 2);
-		if (this.currentArea != null)
-			this.currentArea.render(screen, graphics, xPlayerPos, yPlayerPos);
-		screen.setOffset(0, 0);
-
-		if (this.invertBitmapColors) {
-			if (screen.getRenderingEffectTick() == (byte) 0x7) {
-				screen.setRenderingEffectTick((byte) 0x0);
-			}
-			this.invertBitmapColors = screen.invert();
-		}
-
-		if (screen.getRenderingEffectTick() < (byte) 0x4 || screen.getRenderingEffectTick() >= (byte) 0x7)
-			this.player.render(screen, graphics, 0, 0);
-
-		/*
-		if (this.newDialogues != null && this.newDialogues.size() > 0) {
-			Dialogue dialogue = this.newDialogues.get(this.newDialoguesIterator);
-			dialogue.renderInformationBox(screen, 0, 6, 9, 2);
-			dialogue.render(screen, screen.getBufferedImage().createGraphics());
-		}
-		*/
-	}
-
-	// ---------------------------------------------------------------------------------------
-	// Private methods
 
 	private void setCurrentAreaSector(int i) {
 		this.currentAreaSectorID = i;

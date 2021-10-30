@@ -20,15 +20,15 @@ public class SmallTree extends Obstacle {
 	}
 
 	@Override
+	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
+		// Left intentionally blank.
+	}
+
+	@Override
 	public void tick() {
 		// SmallTree should not be interacted with.
 		if (this.interactingState) {
 			this.setInteractingState(false);
 		}
-	}
-
-	@Override
-	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
-		// Left intentionally blank.
 	}
 }

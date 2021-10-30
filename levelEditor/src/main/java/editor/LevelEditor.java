@@ -32,9 +32,6 @@ import common.Tileable;
 import editor.EditorConstants.Metadata;
 import script_editor.ScriptEditor;
 
-//TODO(6/23/2015): Redo reading/writing level files. Next time, aim for binary files, instead of PNG bitmap files. This is for incorporating
-//maps and scripts together.
-
 public class LevelEditor extends JFrame {
 	public static final int WIDTH = 160;
 	public static final int HEIGHT = 144;
@@ -43,7 +40,6 @@ public class LevelEditor extends JFrame {
 	public static final String SAVED_PATH_DATA = "cache.ini";
 	public static final int CHECKSUM_MAX_BYTES_LENGTH = 16;
 	public static final String defaultPath = Paths.get("").toAbsolutePath().toString();
-
 	// For cache directory path index, fixed index in the array list.
 	public static final int FileControlIndex = 0;
 
@@ -55,15 +51,12 @@ public class LevelEditor extends JFrame {
 	public StatusPanel statusPanel;
 	public SelectionDropdownMenu properties;
 	public ScriptEditor scriptEditor;
-
 	public boolean running;
 	public String message;
 	public EditorInput input;
 
 	private int uniqueAreaID;
 	private String sha2Checksum = "";
-
-	@SuppressWarnings("unused")
 	private String mapAreaName;
 
 	public LevelEditor(String name) {
@@ -146,14 +139,15 @@ public class LevelEditor extends JFrame {
 		this.createOrReadCache();
 	}
 
+	// Main method.
+	public static void main(String[] args) {
+		new LevelEditor(LevelEditor.NAME_TITLE);
+	}
+
 	/**
-	 * <p>
 	 * Generates a cache file for saving the last known directory the editor knew of.
-	 * </p>
-	 *
 	 * <p>
 	 * Upon initialization, the default saved directory will be the editor's file location path.
-	 * </p>
 	 *
 	 * @return Nothing.
 	 */
@@ -185,6 +179,57 @@ public class LevelEditor extends JFrame {
 			FileControl.lastSavedDirectory = new File(cachedDirectoryPaths.get(LevelEditor.FileControlIndex));
 			ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 		}
+	}
+
+	public String generateChecksum() {
+		this.sha2Checksum = Sha2Utils.generateRandom(UUID.randomUUID().toString()).substring(0, LevelEditor.CHECKSUM_MAX_BYTES_LENGTH);
+		return this.sha2Checksum;
+	}
+
+	public String getChecksum() {
+		if (this.sha2Checksum == null || this.sha2Checksum.trim().isBlank() || this.sha2Checksum.trim().isEmpty()) {
+			return this.generateChecksum();
+		}
+		return this.sha2Checksum;
+	}
+
+	public String getMapAreaName() {
+		return this.mapAreaName;
+	}
+
+	public int getUniqueAreaID() {
+		return this.uniqueAreaID;
+	}
+
+	public final void initialize() {
+		EditorConstants.metadata = Metadata.Tilesets;
+		this.generateChecksum();
+		this.drawingBoardPanel.newImage(15, 15);
+		this.setMapAreaName("Untitled");
+	}
+
+	public int setChecksum(int[] pixels, int startIndex, int readLength) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		int readIndex = startIndex;
+		for (int i = 0; i < readLength; i++, readIndex++) {
+			int pixel = pixels[readIndex];
+			baos.write((pixel >> 24) & 0xFF);
+			baos.write((pixel >> 16) & 0xFF);
+			baos.write((pixel >> 8) & 0xFF);
+			baos.write(pixel & 0xFF);
+		}
+		// SHA-512 checksum are written using ASCII.
+		String result = baos.toString(StandardCharsets.US_ASCII);
+		this.sha2Checksum = result;
+		return readIndex;
+	}
+
+	public void setMapAreaName(String name) {
+		this.mapAreaName = name;
+	}
+
+	public void setUniqueAreaID(int uniqueAreaID) {
+		this.uniqueAreaID = uniqueAreaID;
 	}
 
 	@Override
@@ -251,63 +296,6 @@ public class LevelEditor extends JFrame {
 		});
 		super.validate();
 	}
-
-	public final void initialize() {
-		EditorConstants.metadata = Metadata.Tilesets;
-		this.generateChecksum();
-		this.drawingBoardPanel.newImage(15, 15);
-		this.setMapAreaName("Untitled");
-	}
-
-	public void setMapAreaName(String name) {
-		this.mapAreaName = name;
-	}
-
-	public int getUniqueAreaID() {
-		return this.uniqueAreaID;
-	}
-
-	public void setUniqueAreaID(int uniqueAreaID) {
-		this.uniqueAreaID = uniqueAreaID;
-	}
-
-	public String getChecksum() {
-		if (this.sha2Checksum == null || this.sha2Checksum.trim().isBlank() || this.sha2Checksum.trim().isEmpty()) {
-			return this.generateChecksum();
-		}
-		return this.sha2Checksum;
-	}
-
-	public int setChecksum(int[] pixels, int startIndex, int readLength) {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		int readIndex = startIndex;
-		for (int i = 0; i < readLength; i++, readIndex++) {
-			int pixel = pixels[readIndex];
-			baos.write((pixel >> 24) & 0xFF);
-			baos.write((pixel >> 16) & 0xFF);
-			baos.write((pixel >> 8) & 0xFF);
-			baos.write(pixel & 0xFF);
-		}
-		// SHA-512 checksum are written using ASCII.
-		String result = baos.toString(StandardCharsets.US_ASCII);
-		this.sha2Checksum = result;
-		return readIndex;
-	}
-
-	public String generateChecksum() {
-		this.sha2Checksum = Sha2Utils.generateRandom(UUID.randomUUID().toString()).substring(0, LevelEditor.CHECKSUM_MAX_BYTES_LENGTH);
-		return this.sha2Checksum;
-	}
-
-	// --------------------------------------------------------------------------------
-	// Main method
-
-	public static void main(String[] args) {
-		new LevelEditor(LevelEditor.NAME_TITLE);
-	}
-
-	// --------------------------------------------------------------------------------
-	// Private methods
 
 	private void fetchCachedDirectories(RandomAccessFile file, List<String> output) throws IOException {
 		String buffer = null;

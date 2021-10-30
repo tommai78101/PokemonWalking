@@ -74,6 +74,16 @@ public class ControlPanel extends JPanel implements ActionListener {
 			private static final long serialVersionUID = 1L;
 
 			@Override
+			public Dimension getMaximumSize() {
+				return this.getPreferredSize();
+			}
+
+			@Override
+			public Dimension getMinimumSize() {
+				return this.getPreferredSize();
+			}
+
+			@Override
 			public Dimension getPreferredSize() {
 				int maxWidth = 34;
 				int maxHeight = Tileable.HEIGHT * 20;
@@ -87,16 +97,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 				if (dim.height > maxHeight)
 					dim.height = maxHeight;
 				return dim;
-			}
-
-			@Override
-			public Dimension getMaximumSize() {
-				return this.getPreferredSize();
-			}
-
-			@Override
-			public Dimension getMinimumSize() {
-				return this.getPreferredSize();
 			}
 		};
 		this.scrollIconsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -108,6 +108,16 @@ public class ControlPanel extends JPanel implements ActionListener {
 			private static final long serialVersionUID = 1L;
 
 			@Override
+			public Dimension getMaximumSize() {
+				return this.getPreferredSize();
+			}
+
+			@Override
+			public Dimension getMinimumSize() {
+				return this.getPreferredSize();
+			}
+
+			@Override
 			public Dimension getPreferredSize() {
 				int maxWidth = 34;
 				int maxHeight = Tileable.HEIGHT * 20;
@@ -121,16 +131,6 @@ public class ControlPanel extends JPanel implements ActionListener {
 				if (dim.height > maxHeight)
 					dim.height = maxHeight;
 				return dim;
-			}
-
-			@Override
-			public Dimension getMaximumSize() {
-				return this.getPreferredSize();
-			}
-
-			@Override
-			public Dimension getMinimumSize() {
-				return this.getPreferredSize();
 			}
 		};
 		this.scrollNpcsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -178,6 +178,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 		this.editor.validate();
 	}
 
+	public LevelEditor getEditor() {
+		return this.editor;
+	}
+
 	public String getPickedEntityName() {
 		switch (EditorConstants.chooser) {
 			case ControlPanel:
@@ -186,6 +190,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 				return this.selectedData.name;
 		}
 		return "";
+	}
+
+	public TilePropertiesPanel getPropertiesPanel() {
+		return this.propertiesPanel;
 	}
 
 	public SpriteData getSelectedData() {
@@ -198,24 +206,16 @@ public class ControlPanel extends JPanel implements ActionListener {
 		return null;
 	}
 
-	public void setSelectedData(SpriteData data) {
-		this.selectedData = data;
-	}
-
 	public Trigger getSelectedTrigger() {
 		return this.selectedTrigger;
 	}
 
+	public void setSelectedData(SpriteData data) {
+		this.selectedData = data;
+	}
+
 	public void setSelectedTrigger(Trigger t) {
 		this.selectedTrigger = t;
-	}
-
-	public TilePropertiesPanel getPropertiesPanel() {
-		return this.propertiesPanel;
-	}
-
-	public LevelEditor getEditor() {
-		return this.editor;
 	}
 
 	@Override

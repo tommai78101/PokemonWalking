@@ -25,13 +25,13 @@ public class ProgrammerArtTable extends Obstacle {
 	}
 
 	@Override
-	public void tick() {
+	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
 		// TODO Auto-generated method stub
-		this.setInteractingState(false);
 	}
 
 	@Override
-	public void render(Scene screen, Graphics graphics, int offsetX, int offsetY) {
+	public void tick() {
 		// TODO Auto-generated method stub
+		this.setInteractingState(false);
 	}
 }

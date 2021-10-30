@@ -22,20 +22,16 @@ public class InventoryItemChunk extends Chunk {
 	private Item item;
 	private int count;
 
-	public void setCategory(ItemCategories category) {
-		this.category = category;
-	}
+	@Override
+	public int getSize(Game game) {
+		// Category byte id. (byte)
+		int size = 1;
+		// Item unique id value. (int)
+		size += 4;
+		// Item count. (short)
+		size += 2;
 
-	public void setItem(Item item) {
-		this.item = item;
-	}
-
-	public void setCount(Integer count) {
-		this.setCount(count.intValue());
-	}
-
-	public void setCount(int count) {
-		this.count = count;
+		return size;
 	}
 
 	@Override
@@ -63,23 +59,27 @@ public class InventoryItemChunk extends Chunk {
 		}
 	}
 
+	public void setCategory(ItemCategories category) {
+		this.category = category;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+
+	public void setCount(Integer count) {
+		this.setCount(count.intValue());
+	}
+
+	public void setItem(Item item) {
+		this.item = item;
+	}
+
 	@Override
 	public void write(Game game, RandomAccessFile raf) throws IOException {
 		raf.writeByte(this.category.getByte());
 		raf.writeInt(this.item.getPixelData().getColor());
 		raf.writeShort(this.count);
-	}
-
-	@Override
-	public int getSize(Game game) {
-		// Category byte id. (byte)
-		int size = 1;
-		// Item unique id value. (int)
-		size += 4;
-		// Item count. (short)
-		size += 2;
-
-		return size;
 	}
 
 }

@@ -24,6 +24,27 @@ public enum ItemCategories {
 	}
 
 	/**
+	 * Returns the correct Category enum value. Otherwise, returns null if no Category matches the
+	 * value.
+	 *
+	 * @param value
+	 * @return
+	 */
+	public static ItemCategories convert(byte value) {
+		if (value == POTIONS.getByte())
+			return POTIONS;
+		if (value == KEYITEMS.getByte())
+			return KEYITEMS;
+		if (value == POKEBALLS.getByte())
+			return POKEBALLS;
+		if (value == TM_HM.getByte())
+			return TM_HM;
+		if (value == ALL.getByte())
+			return ALL;
+		return null;
+	}
+
+	/**
 	 * Obtains a Category enum value that matches the given ID number.
 	 *
 	 * <p>
@@ -49,40 +70,19 @@ public enum ItemCategories {
 		return categories[0];
 	}
 
-	public int getID() {
-		return this.id;
+	public boolean chunkEquals(String value) {
+		return this.chunkName.equals(value);
 	}
 
 	public byte getByte() {
 		return this.categoryByte;
 	}
 
+	public int getID() {
+		return this.id;
+	}
+
 	public String getKey() {
 		return this.keyString;
-	}
-
-	public boolean chunkEquals(String value) {
-		return this.chunkName.equals(value);
-	}
-
-	/**
-	 * Returns the correct Category enum value. Otherwise, returns null if no Category matches the
-	 * value.
-	 *
-	 * @param value
-	 * @return
-	 */
-	public static ItemCategories convert(byte value) {
-		if (value == POTIONS.getByte())
-			return POTIONS;
-		if (value == KEYITEMS.getByte())
-			return KEYITEMS;
-		if (value == POKEBALLS.getByte())
-			return POKEBALLS;
-		if (value == TM_HM.getByte())
-			return TM_HM;
-		if (value == ALL.getByte())
-			return ALL;
-		return null;
 	}
 }

@@ -28,6 +28,15 @@ public class Header extends Chunk {
 	}
 
 	@Override
+	public int getSize(Game game) {
+		int size = this.name.length;
+		size += this.currentDate.length;
+		// Byte size of the current date length. (byte)
+		size += 1;
+		return size;
+	}
+
+	@Override
 	public void read(Game game, RandomAccessFile raf) throws IOException {
 		short rafSize = raf.readShort();
 
@@ -66,15 +75,6 @@ public class Header extends Chunk {
 		raf.write(this.name);
 		raf.writeByte(this.currentDate.length);
 		raf.write(this.currentDate);
-	}
-
-	@Override
-	public int getSize(Game game) {
-		int size = this.name.length;
-		size += this.currentDate.length;
-		// Byte size of the current date length. (byte)
-		size += 1;
-		return size;
 	}
 
 }

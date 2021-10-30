@@ -20,35 +20,6 @@ import level.WorldConstants;
 
 public class ItemBuilder {
 
-	public enum Tag {
-		POTIONS("POTIONS"),
-		KEYITEMS("KEYITEMS"),
-		POKEBALLS("POKEBALLS"),
-		TM_HM("TM HM"),
-		ALL("ALL");
-
-		private String name;
-
-		Tag(String value) {
-			this.name = value;
-		}
-
-		public String toGameName() {
-			return this.name;
-		}
-
-		public static Tag convert(String value) {
-			value = value.toUpperCase();
-			Tag[] tags = Tag.values();
-			for (Tag tag : tags) {
-				if (tag.toGameName().equals(value)) {
-					return tag;
-				}
-			}
-			return null;
-		}
-	}
-
 	public enum ItemCommand {
 		SET("$"),
 		USE("!"),
@@ -58,10 +29,6 @@ public class ItemBuilder {
 
 		ItemCommand(String value) {
 			this.scriptValue = value;
-		}
-
-		public String getScript() {
-			return this.scriptValue;
 		}
 
 		public static ItemCommand convert(char value) {
@@ -76,6 +43,51 @@ public class ItemBuilder {
 					return null;
 			}
 		}
+
+		public String getScript() {
+			return this.scriptValue;
+		}
+	}
+
+	public enum Tag {
+		POTIONS("POTIONS"),
+		KEYITEMS("KEYITEMS"),
+		POKEBALLS("POKEBALLS"),
+		TM_HM("TM HM"),
+		ALL("ALL");
+
+		private String name;
+
+		Tag(String value) {
+			this.name = value;
+		}
+
+		public static Tag convert(String value) {
+			value = value.toUpperCase();
+			Tag[] tags = Tag.values();
+			for (Tag tag : tags) {
+				if (tag.toGameName().equals(value)) {
+					return tag;
+				}
+			}
+			return null;
+		}
+
+		public String toGameName() {
+			return this.name;
+		}
+	}
+
+	public static Item createNewItem(ModdedItem text) {
+		Item result = null;
+		return switch (text.type) {
+			case DUMMY -> new ReturnMenu(text.itemName, text.description, text.category, text.id);
+			case ACTION -> switch (text.id) {
+					case WorldConstants.ITEM_BICYCLE -> new Bicycle(text.itemName, text.description, text.category);
+					default -> new KeyItem(text.itemName, text.description, text.category, text.id);
+				};
+			case ALL -> null;
+		};
 	}
 
 	public static HashMap<Integer, ModdedItem> loadItemResources(String filename) {
@@ -227,17 +239,5 @@ public class ItemBuilder {
 		catch (Exception e) {
 			return null;
 		}
-	}
-
-	public static Item createNewItem(ModdedItem text) {
-		Item result = null;
-		return switch (text.type) {
-			case DUMMY -> new ReturnMenu(text.itemName, text.description, text.category, text.id);
-			case ACTION -> switch (text.id) {
-					case WorldConstants.ITEM_BICYCLE -> new Bicycle(text.itemName, text.description, text.category);
-					default -> new KeyItem(text.itemName, text.description, text.category, text.id);
-				};
-			case ALL -> null;
-		};
 	}
 }

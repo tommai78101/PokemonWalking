@@ -83,113 +83,120 @@ public class DrawingBoard extends Canvas implements Runnable {
 		editor.validate();
 	}
 
-	@Override
-	public void run() {
-		final long NANOSECONDS_PER_SECOND = 1000000000;
-		final int FPS_TARGET = 120;
-		final int UPDATE_TARGET = 60;
-		final long UPDATE_INTERVAL = NANOSECONDS_PER_SECOND / UPDATE_TARGET;
-		final long DRAW_INTERVAL = NANOSECONDS_PER_SECOND / FPS_TARGET;
-		long nextUpdate = System.nanoTime() + UPDATE_INTERVAL;
-		long nextDraw = System.nanoTime() + DRAW_INTERVAL;
-		@SuppressWarnings("unused")
-		long nextReset = System.nanoTime() + NANOSECONDS_PER_SECOND;
-		@SuppressWarnings("unused")
-		int updateCount = 0;
-		@SuppressWarnings("unused")
-		int frameCount = 0;
-		long now = 0L;
-		while (this.editor.running) {
-			now = System.nanoTime();
-
-			while (now > nextUpdate) {
-				this.tick();
-				nextUpdate = now + UPDATE_INTERVAL;
-				updateCount++;
-			}
-
-			while (now > nextDraw) {
-				try {
-					this.render();
-					Thread.sleep(1);
-				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
-				nextDraw = now + DRAW_INTERVAL;
-				frameCount++;
-			}
-			/* Debug purposes only.
-			if (now >= nextReset) {
-				nextReset = now + NANOSECONDS_PER_SECOND;
-				Debug.info("Fps: " + frameCount + " | Updates: " + updateCount);
-				frameCount = 0;
-				updateCount = 0;
-			}
-			*/
-		}
+	public int getBitmapHeight() {
+		return this.bitmapHeight;
 	}
 
-	public void setImageSize(int w, int h, boolean runTriggerSetCheck) {
-		if (w <= 0 || h <= 0) {
-			Debug.error("Improper image size [" + w + " x " + h + "] was given.");
-			return;
+	public int getBitmapWidth() {
+		return this.bitmapWidth;
+	}
+
+	/**
+	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is
+	 * necessary.
+	 *
+	 * @return <b>BufferedImage</b> object containing the triggers and tilesets data.
+	 */
+	public BufferedImage getMapImage() {
+		if (this.bitmapWidth * this.bitmapHeight == 0)
+			return null;
+		// Prepare the resulting data.
+		List<Integer> pixels = new ArrayList<>();
+
+		// Storing important area information in the first pixel. This should use up all of the number of
+		// pixels we had reserved.
+		final int areaID = this.editor.getUniqueAreaID();
+
+		// Get the checksum and relevant information.
+		final String checksum = this.editor.getChecksum();
+		byte[] checksumBytes = checksum.getBytes();
+
+		// Trigger size will always be no more than 65536 triggers. Trigger size will always be 1 + (number
+		// of triggers seen in the editor), to account for the Eraser trigger. If there are more triggers
+		// than the width of the bitmap, we add however many extra rows to compensate.
+		int triggerSize = this.triggers.getSize() & 0xFFFF;
+
+		// Add any NPCs, obstacles, and items into a list.
+		int[] npcsData = this.npcs.produce();
+		int[] obstaclesData = this.obstacles.produce();
+		int[] itemsData = this.items.produce();
+
+		// ----------
+		// Step 1 - Set the important map info in the first pixel.
+		pixels.add(((areaID & 0xFFFF) << 16) | (triggerSize & 0xFFFF));
+		pixels.add(((this.bitmapWidth & 0xFFFF) << 16) | (this.bitmapHeight & 0xFFFF));
+		pixels.add(this.tiles.length);
+
+		// Step 2 - Store the area map checksum
+		for (int i = 0; i < checksumBytes.length; i += 4) {
+			pixels.add((checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3]);
 		}
 
-		// Initializing a new Trigger Set.
-		if (runTriggerSetCheck) {
-			String checksum = this.editor.getChecksum();
-			boolean isSetEmpty = (this.triggers == null || this.triggers.isEmpty());
-			if (isSetEmpty || !this.triggers.matchesChecksum(checksum)) {
-				// Only if the triggers set is null or is empty, do we create a new trigger set.
-				this.triggers = new TriggerSet(w, h, this.editor.getChecksum());
-			}
+		// Step 3 - Store the triggers
+		List<Integer> triggerData = this.triggers.convertToData();
+		triggerData.stream().forEach(pixels::add);
 
-			isSetEmpty = (this.npcs == null || this.npcs.isEmpty());
-			if (isSetEmpty || !this.npcs.matchesChecksum(checksum)) {
-				this.npcs = new NpcSet(this.editor.getChecksum());
-			}
+		// Step 4 - Store the NPCs
+		Arrays.stream(npcsData).forEach(pixels::add);
 
-			isSetEmpty = (this.obstacles == null || this.obstacles.isEmpty());
-			if (isSetEmpty || !this.obstacles.matchesChecksum(checksum)) {
-				this.obstacles = new ObstacleSet(checksum);
-			}
+		// Step 5 - Store obstacles
+		Arrays.stream(obstaclesData).forEach(pixels::add);
 
-			isSetEmpty = (this.items == null || this.items.isEmpty());
-			if (isSetEmpty || !this.items.matchesChecksum(checksum)) {
-				this.items = new ItemSet(checksum);
-			}
-		}
+		// Step 6 - Store items
+		Arrays.stream(itemsData).forEach(pixels::add);
 
-		// Initializing the data editor ID arrays.
-		this.tiles = new int[w * h];
-		this.tilesEditorID = new int[w * h];
-		Arrays.fill(this.tiles, 0);
-		Arrays.fill(this.tilesEditorID, 0);
+		// Step 6 - Pad the remaining row with -1
+		int col = pixels.size();
+		for (; (col % this.bitmapWidth) != 0 && (col % this.bitmapWidth) < this.bitmapWidth; col = pixels.size())
+			pixels.add(-1);
 
-		// Clearing the rendered area map image.
-		if (this.image != null) {
-			this.image.flush();
-			this.image = null;
-		}
-		this.image = new BufferedImage(w * Tileable.WIDTH, h * Tileable.HEIGHT, BufferedImage.TYPE_INT_ARGB);
-		int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
-		for (int j = 0; j < this.image.getHeight(); j++) {
-			for (int i = 0; i < this.image.getWidth(); i++) {
-				if (i % Tileable.WIDTH == 0 || j % Tileable.HEIGHT == 0)
-					pixels[j * this.image.getWidth() + i] = 0;
-				else
-					pixels[j * this.image.getWidth() + i] = -1;
-			}
-		}
+		// Step 6 - Store the tiles
+		Arrays.stream(this.tiles).forEach(pixels::add);
 
-		// Initializing other attributes of the current area map session in the level editor.
-		this.bitmapWidth = w;
-		this.bitmapHeight = h;
-		this.offsetX = -((this.getWidth() - (w * Tileable.WIDTH)) / 2);
-		this.offsetY = -((this.getHeight() - (h * Tileable.HEIGHT)) / 2);
-		this.editor.input.offsetX = this.offsetX;
-		this.editor.input.offsetY = this.offsetY;
+		// Step 7 - Convert List<Integer> to int[]
+		int[] data = pixels.parallelStream().mapToInt(Integer::intValue).toArray();
+		int newHeight = (data.length % this.bitmapWidth != 0) ? data.length / this.bitmapWidth + 1 : data.length / this.bitmapWidth;
+		BufferedImage image = new BufferedImage(this.bitmapWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+		final int[] result = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+		System.arraycopy(data, 0, result, 0, data.length);
+		return image;
+	}
+
+	public int getMouseTileX() {
+		return this.mouseOnTileX / Tileable.WIDTH;
+	}
+
+	public int getMouseTileY() {
+		return this.mouseOnTileY / Tileable.HEIGHT;
+	}
+
+	public SpriteData getSelectedDataProperties() {
+		SpriteData data = new SpriteData();
+
+		int tileIndex = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
+		data.setColorValue(this.tiles[tileIndex]);
+		data.setEditorID(this.tilesEditorID[tileIndex]);
+
+		String greenText = Integer.toString(data.green);
+		String blueText = Integer.toString(data.blue);
+		String areaIDText = Integer.toString(this.editor.getUniqueAreaID());
+
+		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+		panel.areaIDInputField.setText(areaIDText);
+		panel.greenInputField.setText(greenText);
+		panel.blueInputField.setText(blueText);
+		panel.greenField.setText(greenText);
+		panel.blueField.setText(blueText);
+
+		return data;
+	}
+
+	public boolean hasBitmap() {
+		return (this.bitmapHeight * this.bitmapWidth != 0);
+	}
+
+	public boolean isMouseInDrawingBoard() {
+		return this.mouseInsideDrawingBoardCheck;
 	}
 
 	public void newImage() {
@@ -228,6 +235,158 @@ public class DrawingBoard extends Canvas implements Runnable {
 
 	public void newImage(final int x, final int y) {
 		EventQueue.invokeLater(() -> DrawingBoard.this.setImageSize(x, y, true));
+	}
+
+	public void openMapImage(BufferedImage image) {
+		int bitmapWidth = image.getWidth();
+		int bitmapHeight = image.getHeight();
+		if (bitmapWidth * bitmapHeight == 0) {
+			Debug.showExceptionCause("Image size is invalid.", new IllegalArgumentException());
+			return;
+		}
+
+		final int[] pixels = image.getRGB(0, 0, bitmapWidth, bitmapHeight, null, 0, bitmapWidth);
+		int pixelIterator = 0;
+		try {
+			// Step 1 - Get important area information in the first pixel. This should use up all of the number
+			// of pixels we had reserved.
+			this.editor.setUniqueAreaID((pixels[pixelIterator] >> 16) & 0xFFFF);
+			final int triggerSize = pixels[pixelIterator++] & 0xFFFF;
+			final int areaInfo = pixels[pixelIterator++];
+			final int tileSize = pixels[pixelIterator++];
+			int newWidth = (areaInfo >> 16) & 0xFFFF;
+			int newHeight = areaInfo & 0xFFFF;
+			this.setImageSize(newWidth, newHeight, false);
+
+			// Step 2 - Get the checksum and relevant information.
+			final int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
+			this.editor.setChecksum(pixels, pixelIterator, checksumPixelsCount);
+			final String checksum = this.editor.getChecksum();
+			pixelIterator += checksumPixelsCount;
+
+			// Step 3 - Add any triggers into a list. If triggers is null, make sure to append the Eraser
+			// trigger, designated as ID 0.
+			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight, this.editor.getChecksum());
+			if (triggerSize > 0) {
+				// Ignoring Eraser trigger.
+				pixelIterator++;
+				pixelIterator++;
+
+				for (int i = 0; i < triggerSize; i++) {
+					int triggerInfo = pixels[pixelIterator++];
+					int npcTriggerInfo = pixels[pixelIterator++];
+					if (triggerInfo - npcTriggerInfo != 0 || triggerInfo + npcTriggerInfo != 0) {
+						// We only want non-Eraser triggers to be added to the trigger set in the level editor.
+						int x = (triggerInfo >> 24) & 0xFF;
+						int y = (triggerInfo >> 16) & 0xFF;
+						short triggerId = (short) (triggerInfo & 0xFFFF);
+						short npcTriggerId = (short) (npcTriggerInfo & 0xFFFF);
+						this.triggers.addTriggerById(y * bitmapWidth + x, triggerInfo, triggerId, npcTriggerId);
+					}
+				}
+			}
+			else {
+				pixelIterator++;
+				pixelIterator++;
+			}
+
+			// Step 4 - Get the NPCs data.
+			this.npcs = new NpcSet(checksum);
+			int npcSize = pixels[pixelIterator++];
+			for (int i = 0; i < npcSize; i++) {
+				int triggerInfo = pixels[pixelIterator++];
+				int x = (triggerInfo >> 24) & 0xFF;
+				int y = (triggerInfo >> 16) & 0xFF;
+				int editorID = (triggerInfo & 0xFFFF);
+				int data = pixels[pixelIterator++];
+				this.npcs.add(x, y, editorID, data);
+			}
+
+			// Step 5 - Get obstacles.
+			this.obstacles = new ObstacleSet(checksum);
+			int obstacleSize = pixels[pixelIterator++];
+			for (int i = 0; i < obstacleSize; i++) {
+				int triggerInfo = pixels[pixelIterator++];
+				int x = (triggerInfo >> 24) & 0xFF;
+				int y = (triggerInfo >> 16) & 0xFF;
+				int editorID = (triggerInfo & 0xFFFF);
+				int data = pixels[pixelIterator++];
+				this.obstacles.add(x, y, editorID, data);
+			}
+
+			// Step 6 - Get items.
+			this.items = new ItemSet(checksum);
+			int itemSize = pixels[pixelIterator++];
+			for (int i = 0; i < itemSize; i++) {
+				int triggerInfo = pixels[pixelIterator++];
+				int x = (triggerInfo >> 24) & 0xFF;
+				int y = (triggerInfo >> 16) & 0xFF;
+				int editorID = (triggerInfo & 0xFFFF);
+				int data = pixels[pixelIterator++];
+				this.items.add(x, y, editorID, data);
+			}
+
+			// Step 6 - Skip the padding
+			int col = pixelIterator % bitmapWidth;
+			for (; pixelIterator % bitmapWidth != 0 && col < bitmapWidth; pixelIterator++)
+				;
+
+			// Step 7 - Get the tiles.
+			System.arraycopy(pixels, pixelIterator, this.tiles, 0, tileSize);
+			pixelIterator += tileSize;
+
+			// Step 8 - Get and fill in the data based on the tiles obtained from above.
+			List<Map.Entry<Integer, SpriteData>> list = EditorConstants.getInstance().getDatas();
+			for (int i = 0; i < this.tiles.length; i++) {
+				int alpha = ((this.tiles[i] >> 24) & 0xFF);
+				FOR_LOOP:
+				for (int j = 0; j < list.size(); j++) {
+					SpriteData d = list.get(j).getValue();
+					if (alpha != Integer.valueOf(d.alpha))
+						continue;
+					switch (alpha) {
+						case 0x01: // Path
+						case 0x02: // Ledges
+						case 0x03: // Obstacles
+						case 0x06: // Stairs
+						case 0x07: // Water
+						case 0x08: // House
+							// Extended Tile IDs are used to differentiate tiles.
+							int red = ((this.tiles[i] >> 16) & 0xFF);
+							if (red == Integer.valueOf(d.red)) {
+								this.tilesEditorID[i] = d.editorID;
+								break FOR_LOOP;
+							}
+							continue;
+						case 0x05: {// Area Zone
+							// Extended Tile IDs are used to differentiate tiles.
+							int blue = this.tiles[i] & 0xFF;
+							if (blue == d.blue) {
+								this.tilesEditorID[i] = d.editorID;
+								break FOR_LOOP;
+							}
+							continue;
+						}
+						case 0x0E: {// Characters/NPCs
+							// Alpha value is only used.
+							this.tilesEditorID[i] = d.editorID;
+							break FOR_LOOP;
+						}
+						default: {
+							// Alpha value is only used.
+							this.tilesEditorID[i] = d.editorID;
+							break FOR_LOOP;
+						}
+					}
+				}
+			}
+		}
+		catch (NegativeArraySizeException e) {
+			Debug.showExceptionCause("Incorrect file format. The file does not contain necessary metadata.", e);
+		}
+		catch (Exception e) {
+			Debug.showExceptionCause(e);
+		}
 	}
 
 	public void render() throws Exception {
@@ -467,84 +626,50 @@ public class DrawingBoard extends Canvas implements Runnable {
 		this.editor.validate();
 	}
 
-	public void tick() {
-		if (this.editor.input.isDragging()) {
-			this.offsetX = this.editor.input.offsetX;
-			this.offsetY = this.editor.input.offsetY;
-		}
-		else if (this.isMouseInDrawingBoard()) {
-			switch (EditorConstants.metadata) {
-				case Tilesets: {
-					if (!this.editor.input.isDrawing())
-						return;
+	@Override
+	public void run() {
+		final long NANOSECONDS_PER_SECOND = 1000000000;
+		final int FPS_TARGET = 120;
+		final int UPDATE_TARGET = 60;
+		final long UPDATE_INTERVAL = NANOSECONDS_PER_SECOND / UPDATE_TARGET;
+		final long DRAW_INTERVAL = NANOSECONDS_PER_SECOND / FPS_TARGET;
+		long nextUpdate = System.nanoTime() + UPDATE_INTERVAL;
+		long nextDraw = System.nanoTime() + DRAW_INTERVAL;
+		@SuppressWarnings("unused")
+		long nextReset = System.nanoTime() + NANOSECONDS_PER_SECOND;
+		@SuppressWarnings("unused")
+		int updateCount = 0;
+		@SuppressWarnings("unused")
+		int frameCount = 0;
+		long now = 0L;
+		while (this.editor.running) {
+			now = System.nanoTime();
 
-					// Tilesets Editing is subjected to both dragging and clicking.
-					this.mouseOnTileX = this.offsetX + this.editor.input.drawingX;
-					this.mouseOnTileY = this.offsetY + this.editor.input.drawingY;
-					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
-						return;
-
-					SpriteData selectedData = this.editor.controlPanel.getSelectedData();
-					if (selectedData != null) {
-						if (selectedData.name.equals("Select")) {
-							this.editor.controlPanel.setSelectedData(selectedData);
-
-							// NOTE(Thompson): Do not set the control panel's selected data to the picked data.
-							SpriteData tilePickerData = this.getSelectedDataProperties();
-
-							// Overwrite the Mouse Select data with the new data from the DrawingBoard.
-							this.editor.controlPanel.getPropertiesPanel().setDataProperties(tilePickerData);
-						}
-						else {
-							this.setDataProperties(selectedData);
-						}
-					}
-					break;
-				}
-				case Triggers: {
-					// Triggers Editing is subjected to clicking only.
-					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
-					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
-					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
-						return;
-
-					Trigger selectedTrigger = this.editor.controlPanel.getSelectedTrigger();
-					if (selectedTrigger != null) {
-						if (this.editor.input.isClicking() && !selectedTrigger.isEraser()) {
-							int x = this.getMouseTileX();
-							int y = this.getMouseTileY();
-							int i = y * this.bitmapWidth + x;
-							if (this.triggers.contains(i, selectedTrigger)) {
-								this.triggers.removeTrigger(i, selectedTrigger);
-							}
-							else {
-								this.triggers.addTrigger(i, (byte) x, (byte) y, selectedTrigger);
-							}
-							this.editor.input.forceCancelDrawing();
-						}
-						else if (this.editor.input.isDrawing() && selectedTrigger.isEraser()) {
-							int x = this.getMouseTileX();
-							int y = this.getMouseTileY();
-							int i = y * this.bitmapWidth + x;
-							this.triggers.clearAllTriggers(i);
-						}
-					}
-					break;
-				}
-				case NonPlayableCharacters: {
-					// NPCs Editing is subjected to clicking only.
-					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
-					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
-					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
-						return;
-
-					SpriteData selectedData = this.editor.controlPanel.getSelectedData();
-					if (selectedData != null && this.editor.input.isDrawing()) {
-						this.setDataProperties(selectedData);
-					}
-					break;
-				}
+			while (now > nextUpdate) {
+				this.tick();
+				nextUpdate = now + UPDATE_INTERVAL;
+				updateCount++;
 			}
+
+			while (now > nextDraw) {
+				try {
+					this.render();
+					Thread.sleep(1);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				nextDraw = now + DRAW_INTERVAL;
+				frameCount++;
+			}
+			/* Debug purposes only.
+			if (now >= nextReset) {
+				nextReset = now + NANOSECONDS_PER_SECOND;
+				Debug.info("Fps: " + frameCount + " | Updates: " + updateCount);
+				frameCount = 0;
+				updateCount = 0;
+			}
+			*/
 		}
 	}
 
@@ -695,280 +820,172 @@ public class DrawingBoard extends Canvas implements Runnable {
 		}
 	}
 
-	public SpriteData getSelectedDataProperties() {
-		SpriteData data = new SpriteData();
+	public void setImageSize(int w, int h, boolean runTriggerSetCheck) {
+		if (w <= 0 || h <= 0) {
+			Debug.error("Improper image size [" + w + " x " + h + "] was given.");
+			return;
+		}
 
-		int tileIndex = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-		data.setColorValue(this.tiles[tileIndex]);
-		data.setEditorID(this.tilesEditorID[tileIndex]);
+		// Initializing a new Trigger Set.
+		if (runTriggerSetCheck) {
+			String checksum = this.editor.getChecksum();
+			boolean isSetEmpty = (this.triggers == null || this.triggers.isEmpty());
+			if (isSetEmpty || !this.triggers.matchesChecksum(checksum)) {
+				// Only if the triggers set is null or is empty, do we create a new trigger set.
+				this.triggers = new TriggerSet(w, h, this.editor.getChecksum());
+			}
 
-		String greenText = Integer.toString(data.green);
-		String blueText = Integer.toString(data.blue);
-		String areaIDText = Integer.toString(this.editor.getUniqueAreaID());
+			isSetEmpty = (this.npcs == null || this.npcs.isEmpty());
+			if (isSetEmpty || !this.npcs.matchesChecksum(checksum)) {
+				this.npcs = new NpcSet(this.editor.getChecksum());
+			}
 
-		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-		panel.areaIDInputField.setText(areaIDText);
-		panel.greenInputField.setText(greenText);
-		panel.blueInputField.setText(blueText);
-		panel.greenField.setText(greenText);
-		panel.blueField.setText(blueText);
+			isSetEmpty = (this.obstacles == null || this.obstacles.isEmpty());
+			if (isSetEmpty || !this.obstacles.matchesChecksum(checksum)) {
+				this.obstacles = new ObstacleSet(checksum);
+			}
 
-		return data;
+			isSetEmpty = (this.items == null || this.items.isEmpty());
+			if (isSetEmpty || !this.items.matchesChecksum(checksum)) {
+				this.items = new ItemSet(checksum);
+			}
+		}
+
+		// Initializing the data editor ID arrays.
+		this.tiles = new int[w * h];
+		this.tilesEditorID = new int[w * h];
+		Arrays.fill(this.tiles, 0);
+		Arrays.fill(this.tilesEditorID, 0);
+
+		// Clearing the rendered area map image.
+		if (this.image != null) {
+			this.image.flush();
+			this.image = null;
+		}
+		this.image = new BufferedImage(w * Tileable.WIDTH, h * Tileable.HEIGHT, BufferedImage.TYPE_INT_ARGB);
+		int[] pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
+		for (int j = 0; j < this.image.getHeight(); j++) {
+			for (int i = 0; i < this.image.getWidth(); i++) {
+				if (i % Tileable.WIDTH == 0 || j % Tileable.HEIGHT == 0)
+					pixels[j * this.image.getWidth() + i] = 0;
+				else
+					pixels[j * this.image.getWidth() + i] = -1;
+			}
+		}
+
+		// Initializing other attributes of the current area map session in the level editor.
+		this.bitmapWidth = w;
+		this.bitmapHeight = h;
+		this.offsetX = -((this.getWidth() - (w * Tileable.WIDTH)) / 2);
+		this.offsetY = -((this.getHeight() - (h * Tileable.HEIGHT)) / 2);
+		this.editor.input.offsetX = this.offsetX;
+		this.editor.input.offsetY = this.offsetY;
 	}
 
 	public void start() {
 		new Thread(this).start();
 	}
 
-	public int getMouseTileX() {
-		return this.mouseOnTileX / Tileable.WIDTH;
-	}
-
-	public int getMouseTileY() {
-		return this.mouseOnTileY / Tileable.HEIGHT;
-	}
-
-	public int getBitmapWidth() {
-		return this.bitmapWidth;
-	}
-
-	public int getBitmapHeight() {
-		return this.bitmapHeight;
-	}
-
-	/**
-	 * Produce a bitmap image containing the triggers data and tilesets data. Some swizzling is
-	 * necessary.
-	 *
-	 * @return <b>BufferedImage</b> object containing the triggers and tilesets data.
-	 */
-	public BufferedImage getMapImage() {
-		if (this.bitmapWidth * this.bitmapHeight == 0)
-			return null;
-		// Prepare the resulting data.
-		List<Integer> pixels = new ArrayList<>();
-
-		// Storing important area information in the first pixel. This should use up all of the number of
-		// pixels we had reserved.
-		final int areaID = this.editor.getUniqueAreaID();
-
-		// Get the checksum and relevant information.
-		final String checksum = this.editor.getChecksum();
-		byte[] checksumBytes = checksum.getBytes();
-
-		// Trigger size will always be no more than 65536 triggers. Trigger size will always be 1 + (number
-		// of triggers seen in the editor), to account for the Eraser trigger. If there are more triggers
-		// than the width of the bitmap, we add however many extra rows to compensate.
-		int triggerSize = this.triggers.getSize() & 0xFFFF;
-
-		// Add any NPCs, obstacles, and items into a list.
-		int[] npcsData = this.npcs.produce();
-		int[] obstaclesData = this.obstacles.produce();
-		int[] itemsData = this.items.produce();
-
-		// ----------
-		// Step 1 - Set the important map info in the first pixel.
-		pixels.add(((areaID & 0xFFFF) << 16) | (triggerSize & 0xFFFF));
-		pixels.add(((this.bitmapWidth & 0xFFFF) << 16) | (this.bitmapHeight & 0xFFFF));
-		pixels.add(this.tiles.length);
-
-		// Step 2 - Store the area map checksum
-		for (int i = 0; i < checksumBytes.length; i += 4) {
-			pixels.add((checksumBytes[i] << 24) | (checksumBytes[i + 1] << 16) | (checksumBytes[i + 2] << 8) | checksumBytes[i + 3]);
+	public void tick() {
+		if (this.editor.input.isDragging()) {
+			this.offsetX = this.editor.input.offsetX;
+			this.offsetY = this.editor.input.offsetY;
 		}
+		else if (this.isMouseInDrawingBoard()) {
+			switch (EditorConstants.metadata) {
+				case Tilesets: {
+					if (!this.editor.input.isDrawing())
+						return;
 
-		// Step 3 - Store the triggers
-		List<Integer> triggerData = this.triggers.convertToData();
-		triggerData.stream().forEach(pixels::add);
+					// Tilesets Editing is subjected to both dragging and clicking.
+					this.mouseOnTileX = this.offsetX + this.editor.input.drawingX;
+					this.mouseOnTileY = this.offsetY + this.editor.input.drawingY;
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
+						return;
 
-		// Step 4 - Store the NPCs
-		Arrays.stream(npcsData).forEach(pixels::add);
+					SpriteData selectedData = this.editor.controlPanel.getSelectedData();
+					if (selectedData != null) {
+						if (selectedData.name.equals("Select")) {
+							this.editor.controlPanel.setSelectedData(selectedData);
 
-		// Step 5 - Store obstacles
-		Arrays.stream(obstaclesData).forEach(pixels::add);
+							// NOTE(Thompson): Do not set the control panel's selected data to the picked data.
+							SpriteData tilePickerData = this.getSelectedDataProperties();
 
-		// Step 6 - Store items
-		Arrays.stream(itemsData).forEach(pixels::add);
-
-		// Step 6 - Pad the remaining row with -1
-		int col = pixels.size();
-		for (; (col % this.bitmapWidth) != 0 && (col % this.bitmapWidth) < this.bitmapWidth; col = pixels.size())
-			pixels.add(-1);
-
-		// Step 6 - Store the tiles
-		Arrays.stream(this.tiles).forEach(pixels::add);
-
-		// Step 7 - Convert List<Integer> to int[]
-		int[] data = pixels.parallelStream().mapToInt(Integer::intValue).toArray();
-		int newHeight = (data.length % this.bitmapWidth != 0) ? data.length / this.bitmapWidth + 1 : data.length / this.bitmapWidth;
-		BufferedImage image = new BufferedImage(this.bitmapWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-		final int[] result = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-		System.arraycopy(data, 0, result, 0, data.length);
-		return image;
-	}
-
-	public boolean hasBitmap() {
-		return (this.bitmapHeight * this.bitmapWidth != 0);
-	}
-
-	public boolean isMouseInDrawingBoard() {
-		return this.mouseInsideDrawingBoardCheck;
-	}
-
-	public void openMapImage(BufferedImage image) {
-		int bitmapWidth = image.getWidth();
-		int bitmapHeight = image.getHeight();
-		if (bitmapWidth * bitmapHeight == 0) {
-			Debug.showExceptionCause("Image size is invalid.", new IllegalArgumentException());
-			return;
-		}
-
-		final int[] pixels = image.getRGB(0, 0, bitmapWidth, bitmapHeight, null, 0, bitmapWidth);
-		int pixelIterator = 0;
-		try {
-			// Step 1 - Get important area information in the first pixel. This should use up all of the number
-			// of pixels we had reserved.
-			this.editor.setUniqueAreaID((pixels[pixelIterator] >> 16) & 0xFFFF);
-			final int triggerSize = pixels[pixelIterator++] & 0xFFFF;
-			final int areaInfo = pixels[pixelIterator++];
-			final int tileSize = pixels[pixelIterator++];
-			int newWidth = (areaInfo >> 16) & 0xFFFF;
-			int newHeight = areaInfo & 0xFFFF;
-			this.setImageSize(newWidth, newHeight, false);
-
-			// Step 2 - Get the checksum and relevant information.
-			final int checksumPixelsCount = LevelEditor.CHECKSUM_MAX_BYTES_LENGTH / 4;
-			this.editor.setChecksum(pixels, pixelIterator, checksumPixelsCount);
-			final String checksum = this.editor.getChecksum();
-			pixelIterator += checksumPixelsCount;
-
-			// Step 3 - Add any triggers into a list. If triggers is null, make sure to append the Eraser
-			// trigger, designated as ID 0.
-			this.triggers = new TriggerSet(bitmapWidth, bitmapHeight, this.editor.getChecksum());
-			if (triggerSize > 0) {
-				// Ignoring Eraser trigger.
-				pixelIterator++;
-				pixelIterator++;
-
-				for (int i = 0; i < triggerSize; i++) {
-					int triggerInfo = pixels[pixelIterator++];
-					int npcTriggerInfo = pixels[pixelIterator++];
-					if (triggerInfo - npcTriggerInfo != 0 || triggerInfo + npcTriggerInfo != 0) {
-						// We only want non-Eraser triggers to be added to the trigger set in the level editor.
-						int x = (triggerInfo >> 24) & 0xFF;
-						int y = (triggerInfo >> 16) & 0xFF;
-						short triggerId = (short) (triggerInfo & 0xFFFF);
-						short npcTriggerId = (short) (npcTriggerInfo & 0xFFFF);
-						this.triggers.addTriggerById(y * bitmapWidth + x, triggerInfo, triggerId, npcTriggerId);
+							// Overwrite the Mouse Select data with the new data from the DrawingBoard.
+							this.editor.controlPanel.getPropertiesPanel().setDataProperties(tilePickerData);
+						}
+						else {
+							this.setDataProperties(selectedData);
+						}
 					}
+					break;
 				}
-			}
-			else {
-				pixelIterator++;
-				pixelIterator++;
-			}
+				case Triggers: {
+					// Triggers Editing is subjected to clicking only.
+					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
+					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
+						return;
 
-			// Step 4 - Get the NPCs data.
-			this.npcs = new NpcSet(checksum);
-			int npcSize = pixels[pixelIterator++];
-			for (int i = 0; i < npcSize; i++) {
-				int triggerInfo = pixels[pixelIterator++];
-				int x = (triggerInfo >> 24) & 0xFF;
-				int y = (triggerInfo >> 16) & 0xFF;
-				int editorID = (triggerInfo & 0xFFFF);
-				int data = pixels[pixelIterator++];
-				this.npcs.add(x, y, editorID, data);
-			}
-
-			// Step 5 - Get obstacles.
-			this.obstacles = new ObstacleSet(checksum);
-			int obstacleSize = pixels[pixelIterator++];
-			for (int i = 0; i < obstacleSize; i++) {
-				int triggerInfo = pixels[pixelIterator++];
-				int x = (triggerInfo >> 24) & 0xFF;
-				int y = (triggerInfo >> 16) & 0xFF;
-				int editorID = (triggerInfo & 0xFFFF);
-				int data = pixels[pixelIterator++];
-				this.obstacles.add(x, y, editorID, data);
-			}
-
-			// Step 6 - Get items.
-			this.items = new ItemSet(checksum);
-			int itemSize = pixels[pixelIterator++];
-			for (int i = 0; i < itemSize; i++) {
-				int triggerInfo = pixels[pixelIterator++];
-				int x = (triggerInfo >> 24) & 0xFF;
-				int y = (triggerInfo >> 16) & 0xFF;
-				int editorID = (triggerInfo & 0xFFFF);
-				int data = pixels[pixelIterator++];
-				this.items.add(x, y, editorID, data);
-			}
-
-			// Step 6 - Skip the padding
-			int col = pixelIterator % bitmapWidth;
-			for (; pixelIterator % bitmapWidth != 0 && col < bitmapWidth; pixelIterator++)
-				;
-
-			// Step 7 - Get the tiles.
-			System.arraycopy(pixels, pixelIterator, this.tiles, 0, tileSize);
-			pixelIterator += tileSize;
-
-			// Step 8 - Get and fill in the data based on the tiles obtained from above.
-			List<Map.Entry<Integer, SpriteData>> list = EditorConstants.getInstance().getDatas();
-			for (int i = 0; i < this.tiles.length; i++) {
-				int alpha = ((this.tiles[i] >> 24) & 0xFF);
-				FOR_LOOP:
-				for (int j = 0; j < list.size(); j++) {
-					SpriteData d = list.get(j).getValue();
-					if (alpha != Integer.valueOf(d.alpha))
-						continue;
-					switch (alpha) {
-						case 0x01: // Path
-						case 0x02: // Ledges
-						case 0x03: // Obstacles
-						case 0x06: // Stairs
-						case 0x07: // Water
-						case 0x08: // House
-							// Extended Tile IDs are used to differentiate tiles.
-							int red = ((this.tiles[i] >> 16) & 0xFF);
-							if (red == Integer.valueOf(d.red)) {
-								this.tilesEditorID[i] = d.editorID;
-								break FOR_LOOP;
+					Trigger selectedTrigger = this.editor.controlPanel.getSelectedTrigger();
+					if (selectedTrigger != null) {
+						if (this.editor.input.isClicking() && !selectedTrigger.isEraser()) {
+							int x = this.getMouseTileX();
+							int y = this.getMouseTileY();
+							int i = y * this.bitmapWidth + x;
+							if (this.triggers.contains(i, selectedTrigger)) {
+								this.triggers.removeTrigger(i, selectedTrigger);
 							}
-							continue;
-						case 0x05: {// Area Zone
-							// Extended Tile IDs are used to differentiate tiles.
-							int blue = this.tiles[i] & 0xFF;
-							if (blue == d.blue) {
-								this.tilesEditorID[i] = d.editorID;
-								break FOR_LOOP;
+							else {
+								this.triggers.addTrigger(i, (byte) x, (byte) y, selectedTrigger);
 							}
-							continue;
+							this.editor.input.forceCancelDrawing();
 						}
-						case 0x0E: {// Characters/NPCs
-							// Alpha value is only used.
-							this.tilesEditorID[i] = d.editorID;
-							break FOR_LOOP;
-						}
-						default: {
-							// Alpha value is only used.
-							this.tilesEditorID[i] = d.editorID;
-							break FOR_LOOP;
+						else if (this.editor.input.isDrawing() && selectedTrigger.isEraser()) {
+							int x = this.getMouseTileX();
+							int y = this.getMouseTileY();
+							int i = y * this.bitmapWidth + x;
+							this.triggers.clearAllTriggers(i);
 						}
 					}
+					break;
+				}
+				case NonPlayableCharacters: {
+					// NPCs Editing is subjected to clicking only.
+					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
+					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
+					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
+						return;
+
+					SpriteData selectedData = this.editor.controlPanel.getSelectedData();
+					if (selectedData != null && this.editor.input.isDrawing()) {
+						this.setDataProperties(selectedData);
+					}
+					break;
 				}
 			}
 		}
-		catch (NegativeArraySizeException e) {
-			Debug.showExceptionCause("Incorrect file format. The file does not contain necessary metadata.", e);
-		}
-		catch (Exception e) {
-			Debug.showExceptionCause(e);
-		}
 	}
 
-	// --------------------------------------------------------------------------------------------
-	// Private methods
+	private void defaultTileProperties(SpriteData d) {
+		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
+		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
+		SpriteData temp = null;
+		for (Map.Entry<Integer, SpriteData> entry : EditorConstants.getInstance().getDatas()) {
+			if (panel.dataValue == entry.getKey()) {
+				temp = entry.getValue();
+				break;
+			}
+		}
+		if (temp != null) {
+			this.tiles[i] = panel.dataValue;
+			this.tilesEditorID[i] = temp.editorID;
+		}
+		else {
+			this.tiles[i] = d.getColorValue();
+			this.tilesEditorID[i] = d.editorID;
+		}
+	}
 
 	private void hoverOver() {
 		try {
@@ -1062,26 +1079,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 			panel.redField.setText("");
 			panel.greenField.setText("");
 			panel.blueField.setText("");
-		}
-	}
-
-	private void defaultTileProperties(SpriteData d) {
-		TilePropertiesPanel panel = this.editor.controlPanel.getPropertiesPanel();
-		int i = this.getMouseTileY() * this.bitmapWidth + this.getMouseTileX();
-		SpriteData temp = null;
-		for (Map.Entry<Integer, SpriteData> entry : EditorConstants.getInstance().getDatas()) {
-			if (panel.dataValue == entry.getKey()) {
-				temp = entry.getValue();
-				break;
-			}
-		}
-		if (temp != null) {
-			this.tiles[i] = panel.dataValue;
-			this.tilesEditorID[i] = temp.editorID;
-		}
-		else {
-			this.tiles[i] = d.getColorValue();
-			this.tilesEditorID[i] = d.editorID;
 		}
 	}
 

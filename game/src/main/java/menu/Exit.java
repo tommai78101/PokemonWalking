@@ -15,8 +15,8 @@ public class Exit extends SubMenu {
 	}
 
 	@Override
-	public void tick() {}
+	public void render(Scene output, Graphics graphics) {}
 
 	@Override
-	public void render(Scene output, Graphics graphics) {}
+	public void tick() {}
 }

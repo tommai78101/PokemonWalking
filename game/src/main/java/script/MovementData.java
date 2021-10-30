@@ -42,15 +42,6 @@ public class MovementData {
 	}
 
 	/**
-	 * Returns a list of the original scripted movement actions that was loaded from the script file.
-	 * 
-	 * @return
-	 */
-	public ArrayList<Map.Entry<Integer, Integer>> getOriginalMoves() {
-		return this.originalMoves;
-	}
-
-	/**
 	 * Returns a list of the currently active scripted movement actions.
 	 * 
 	 * @return
@@ -96,12 +87,30 @@ public class MovementData {
 	}
 
 	/**
+	 * Returns a list of the original scripted movement actions that was loaded from the script file.
+	 * 
+	 * @return
+	 */
+	public ArrayList<Map.Entry<Integer, Integer>> getOriginalMoves() {
+		return this.originalMoves;
+	}
+
+	/**
 	 * Checks if there are more scripted movements left.
 	 * 
 	 * @return
 	 */
 	public boolean hasNextMove() {
 		return this.iterator < this.currentMoves.size();
+	}
+
+	/**
+	 * Resets all scripted moves.
+	 */
+	public void reset() {
+		this.iterator = 0;
+		this.currentMoves.clear();
+		this.currentMoves.addAll(this.originalMoves);
 	}
 
 	/**
@@ -130,14 +139,5 @@ public class MovementData {
 	 */
 	public void writeOriginalMove(int newDirection, int newSteps) {
 		this.originalMoves.add(Map.entry(newDirection, newSteps));
-	}
-
-	/**
-	 * Resets all scripted moves.
-	 */
-	public void reset() {
-		this.iterator = 0;
-		this.currentMoves.clear();
-		this.currentMoves.addAll(this.originalMoves);
 	}
 }

@@ -49,6 +49,18 @@ public class SpriteData {
 		return (this.alpha << 24) | (this.red << 16) | (this.green << 8) | this.blue;
 	}
 
+	public int getEditorID() {
+		return this.editorID;
+	}
+
+	public byte getExtendedID() {
+		return (byte) this.red;
+	}
+
+	public short getTileSpecificID() {
+		return (short) ((this.green << 8) | this.blue);
+	}
+
 	public void setColorValue(int value) {
 		this.alpha = (value & 0xFF000000) >> 24;
 		this.red = (value & 0xFF0000) >> 16;
@@ -58,17 +70,5 @@ public class SpriteData {
 
 	public void setEditorID(int value) {
 		this.editorID = value;
-	}
-
-	public int getEditorID() {
-		return this.editorID;
-	}
-
-	public short getTileSpecificID() {
-		return (short) ((this.green << 8) | this.blue);
-	}
-
-	public byte getExtendedID() {
-		return (byte) this.red;
 	}
 }

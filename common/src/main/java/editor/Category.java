@@ -21,11 +21,6 @@ public class Category {
 		this.id = id;
 	}
 
-	public int setIdByData(SpriteData data) {
-		this.id = data.alpha;
-		return this.id;
-	}
-
 	public void add(SpriteData data) {
 		this.nodes.add(data);
 	}
@@ -36,5 +31,10 @@ public class Category {
 
 	public boolean matchesData(SpriteData data) {
 		return this.id == data.alpha;
+	}
+
+	public int setIdByData(SpriteData data) {
+		this.id = data.alpha;
+		return this.id;
 	}
 }

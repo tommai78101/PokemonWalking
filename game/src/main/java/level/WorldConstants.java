@@ -21,34 +21,33 @@ import script.Script;
 import utility.DialogueBuilder;
 
 public class WorldConstants {
-	private WorldConstants() {
-		// Add/delete a map area, update everything shown below.
-	}
-
 	// Item IDs
 	public static final int ITEM_RETURN = 0;
+
 	public static final int ITEM_TEST = 1;
 	public static final int ITEM_3_OPTIONS = 2;
 	public static final int ITEM_BICYCLE = 3;
-
 	// Entity Types
 	public static final int ENTITY_TYPE_OBSTACLE = 0x03;
+
 	public static final int ENTITY_TYPE_CHARACTER = 0x0E;
 	public static final int ENTITY_TYPE_ITEM = 0x0A;
-
 	// Biome Colors
 	public static final int GRASS_GREEN = 0xFFA4E767;
-	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
 
+	public static final int MOUNTAIN_BROWN = 0xFFD5B23B;
 	// Building Roof Colors / Main Area Color Theme
 	public static final int AREA_1_COLOR = 0xFFC495B0;
-	public static final int AREA_2_COLOR = 0xFF345CBD;
 
+	public static final int AREA_2_COLOR = 0xFF345CBD;
 	// World IDs
 	public static final int OVERWORLD = 0x0A000001;
 
 	// Dialogues
 	public static List<Map.Entry<Dialogue, Integer>> signTexts = DialogueBuilder.loadDialogues("art/dialogue/dialogue.txt");
+
+	// Areas
+	public static final int CHECKSUM_MAX_BYTES_LENGTH = 16;
 
 	// NOTE(Thompson): We're going to start building items instead of loading items from script files.
 	// Items
@@ -56,21 +55,18 @@ public class WorldConstants {
 	// public static List<Map.Entry<ItemText, Item>> items =
 	// ItemBuilder.loadItems("art/item/items.txt");
 
-	// Areas
-	public static final int CHECKSUM_MAX_BYTES_LENGTH = 16;
 	public static List<Area> areas = new ArrayList<>(0);
 	public static List<Area> moddedAreas = new ArrayList<>(0);
-
 	// Main Menu Item Names
 	public static final String MENU_ITEM_NAME_EXIT = "EXIT";
+
 	public static final String MENU_ITEM_NAME_INVENTORY = "PACK";
 	public static final String MENU_ITEM_NAME_SAVE = "SAVE";
-
 	// Main Menu Item Descriptions
 	public static final String MENU_ITEM_DESC_EXIT = "Exit the menu.";
+
 	public static final String MENU_ITEM_DESC_INVENTORY = "Open the pack.";
 	public static final String MENU_ITEM_DESC_SAVE = "Save the game.";
-
 	// Default scripts path. For internal use only.
 	public static final String ScriptsDefaultPath = "/art/script";
 
@@ -81,18 +77,40 @@ public class WorldConstants {
 	// TODO (11/24/2014): Make map more flexible by allowing scripting files of
 	// different filenames to be loaded. Not sure where it was being loaded.
 	public static List<Script> scripts = new ArrayList<>(0);
+
 	public static List<Script> moddedScripts = new ArrayList<>(0);
 	// public static ArrayList<Script> gameScripts =
 	// Script.loadScript("script/aas.script"); // TODO (6/19/2015): Check to see why
 	// there's a need to load "aas.script".
+	// All bitmaps
+	public static List<Bitmap> bitmaps = new ArrayList<>();
 
 	// Custom scripts
 	// This array list is made for a script + area file name. They both go together.
 	// public static ArrayList<Map.Entry<Script, String>> customScripts = new
 	// ArrayList<Map.Entry<Script, String>>();
 
-	// All bitmaps
-	public static List<Bitmap> bitmaps = new ArrayList<>();
+	private WorldConstants() {
+		// Add/delete a map area, update everything shown below.
+	}
+
+	/**
+	 * <p>
+	 * Checks to see if there exists custom maps in the "mod" folder.
+	 * </p>
+	 * 
+	 * @return Nothing
+	 */
+	public static void checkForMods() {
+		if (WorldConstants.isModsEnabled == null) {
+			if (Mod.moddedAreas.isEmpty()) {
+				WorldConstants.isModsEnabled = Boolean.FALSE;
+			}
+			else {
+				WorldConstants.isModsEnabled = Boolean.TRUE;
+			}
+		}
+	}
 
 	/**
 	 * Returns the area matching the given area ID value.
@@ -112,20 +130,20 @@ public class WorldConstants {
 	}
 
 	/**
-	 * <p>
-	 * Checks to see if there exists custom maps in the "mod" folder.
-	 * </p>
+	 * Returns the area color theme of the given area ID.
 	 * 
-	 * @return Nothing
+	 * @param areaID
+	 *            The area ID value.
+	 * @return The primary area color of full opacity.
 	 */
-	public static void checkForMods() {
-		if (WorldConstants.isModsEnabled == null) {
-			if (Mod.moddedAreas.isEmpty()) {
-				WorldConstants.isModsEnabled = Boolean.FALSE;
-			}
-			else {
-				WorldConstants.isModsEnabled = Boolean.TRUE;
-			}
+	public static int convertToAreaColor(int areaID) {
+		switch (areaID % 2) {
+			case 0x01:
+				return WorldConstants.AREA_1_COLOR;
+			case 0x00:
+				return WorldConstants.AREA_2_COLOR;
+			default:
+				return 0;
 		}
 	}
 
@@ -198,24 +216,6 @@ public class WorldConstants {
 			.isPresent();
 		if (!exists) {
 			WorldConstants.areas.add(new Area(bitmap));
-		}
-	}
-
-	/**
-	 * Returns the area color theme of the given area ID.
-	 * 
-	 * @param areaID
-	 *            The area ID value.
-	 * @return The primary area color of full opacity.
-	 */
-	public static int convertToAreaColor(int areaID) {
-		switch (areaID % 2) {
-			case 0x01:
-				return WorldConstants.AREA_1_COLOR;
-			case 0x00:
-				return WorldConstants.AREA_2_COLOR;
-			default:
-				return 0;
 		}
 	}
 }

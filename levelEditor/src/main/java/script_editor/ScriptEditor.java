@@ -26,6 +26,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -53,8 +54,7 @@ public class ScriptEditor extends JFrame {
 	public ScriptChanger scriptChanger;
 
 	private boolean modifiedFlag = false;
-
-	@SuppressWarnings("unused")
+	private String fileExtension = "script";
 	private String scriptName;
 
 	public ScriptEditor(String title, LevelEditor parent) {
@@ -86,6 +86,7 @@ public class ScriptEditor extends JFrame {
 			}
 		});
 		this.addingComponents();
+		this.setFileExtension("script");
 
 		// Generates a scripting tutorial upon loading script editor. This generated
 		// file will not be persistent and the script editor will not overwrite if the
@@ -94,8 +95,77 @@ public class ScriptEditor extends JFrame {
 
 		ScriptEditor.lastSavedDirectory = FileControl.lastSavedDirectory;
 		ToolTipManager.sharedInstance().setInitialDelay(1);
-		this.setTitle(this.getTitle() + " - Untitled.script");
-		this.setScriptName("Untitled");
+
+		// Auto-opens the script file if it exists within the same directory as the area map file. This is
+		// always done last.
+		SwingUtilities.invokeLater(() -> {
+			String[] filePaths = ScriptEditor.lastSavedDirectory.list((directory, filename) -> {
+				boolean hasExtension = filename.toLowerCase().endsWith(".script") || filename.toLowerCase().endsWith(".json");
+				return filename.contains(this.parent.getMapAreaName()) && hasExtension;
+			});
+
+			boolean success = false;
+			String lastKnownFile = "";
+			try {
+				// Try each one.
+				for (String file : filePaths) {
+					lastKnownFile = file;
+					if (success = this.load(new File(ScriptEditor.lastSavedDirectory, file)))
+						break;
+				}
+			}
+			catch (Exception e) {
+				// Do nothing.
+				Debug.error("Unable to load script file: " + lastKnownFile, e);
+			}
+
+			if (!success) {
+				this.scriptToolbar.makeNewScript();
+			}
+			else {
+				this.setModifiedFlag(false);
+				// Legacy file format support.
+				if (lastKnownFile.endsWith(".script"))
+					this.setScriptName(lastKnownFile.substring(0, (lastKnownFile.length() - ".script".length())));
+				else
+					this.setScriptName(lastKnownFile.substring(0, (lastKnownFile.length() - ".json".length())));
+				this.setEditorTitle();
+				this.scriptChanger.updateComponent();
+			}
+		});
+	}
+
+	public void addingComponents() {
+		SwingUtilities.invokeLater(() -> {
+			if (ScriptEditor.this.input == null) {
+				ScriptEditor.this.input = new ScriptInput();
+				ScriptEditor.this.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.addMouseMotionListener(ScriptEditor.this.input);
+			}
+			if (ScriptEditor.this.scriptToolbar == null) {
+				ScriptEditor.this.scriptToolbar = new ScriptToolbar(ScriptEditor.this);
+				ScriptEditor.this.scriptToolbar.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptToolbar.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptToolbar, BorderLayout.NORTH);
+				ScriptEditor.this.validate();
+			}
+			if (ScriptEditor.this.scriptViewer == null) {
+				ScriptEditor.this.scriptViewer = new ScriptViewer(ScriptEditor.this);
+				ScriptEditor.this.scriptViewer.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptViewer.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptViewer, BorderLayout.WEST);
+				ScriptEditor.this.validate();
+			}
+			if (ScriptEditor.this.scriptChanger == null) {
+				ScriptEditor.this.scriptChanger = new ScriptChanger(ScriptEditor.this);
+				ScriptEditor.this.scriptChanger.addMouseListener(ScriptEditor.this.input);
+				ScriptEditor.this.scriptChanger.addMouseMotionListener(ScriptEditor.this.input);
+				ScriptEditor.this.add(ScriptEditor.this.scriptChanger, BorderLayout.CENTER);
+				ScriptEditor.this.validate();
+			}
+			ScriptEditor.this.revalidate();
+			ScriptEditor.this.repaint();
+		});
 	}
 
 	/**
@@ -189,55 +259,137 @@ public class ScriptEditor extends JFrame {
 		}
 	}
 
-	public void addingComponents() {
-		SwingUtilities.invokeLater(() -> {
-			if (ScriptEditor.this.input == null) {
-				ScriptEditor.this.input = new ScriptInput();
-				ScriptEditor.this.addMouseListener(ScriptEditor.this.input);
-				ScriptEditor.this.addMouseMotionListener(ScriptEditor.this.input);
-			}
-			if (ScriptEditor.this.scriptToolbar == null) {
-				ScriptEditor.this.scriptToolbar = new ScriptToolbar(ScriptEditor.this);
-				ScriptEditor.this.scriptToolbar.addMouseListener(ScriptEditor.this.input);
-				ScriptEditor.this.scriptToolbar.addMouseMotionListener(ScriptEditor.this.input);
-				ScriptEditor.this.add(ScriptEditor.this.scriptToolbar, BorderLayout.NORTH);
-				ScriptEditor.this.validate();
-			}
-			if (ScriptEditor.this.scriptViewer == null) {
-				ScriptEditor.this.scriptViewer = new ScriptViewer(ScriptEditor.this);
-				ScriptEditor.this.scriptViewer.addMouseListener(ScriptEditor.this.input);
-				ScriptEditor.this.scriptViewer.addMouseMotionListener(ScriptEditor.this.input);
-				ScriptEditor.this.add(ScriptEditor.this.scriptViewer, BorderLayout.WEST);
-				ScriptEditor.this.validate();
-			}
-			if (ScriptEditor.this.scriptChanger == null) {
-				ScriptEditor.this.scriptChanger = new ScriptChanger(ScriptEditor.this);
-				ScriptEditor.this.scriptChanger.addMouseListener(ScriptEditor.this.input);
-				ScriptEditor.this.scriptChanger.addMouseMotionListener(ScriptEditor.this.input);
-				ScriptEditor.this.add(ScriptEditor.this.scriptChanger, BorderLayout.CENTER);
-				ScriptEditor.this.validate();
-			}
-			ScriptEditor.this.revalidate();
-			ScriptEditor.this.repaint();
-		});
-	}
-
-	public void resetComponents() {
-		SwingUtilities.invokeLater(() -> {
-			if (ScriptEditor.this.scriptViewer != null) {
-				ScriptEditor.this.scriptViewer.clearTriggerModel();
-				ScriptEditor.this.scriptViewer.clearTriggers();
-			}
-			if (ScriptEditor.this.scriptChanger != null) {
-				ScriptEditor.this.scriptChanger.clearTextFields();
-			}
-			ScriptEditor.this.scriptChanger.disableComponent();
-			ScriptEditor.this.refresh();
-		});
-	}
-
 	public String getEditorChecksum() {
 		return this.parent.getChecksum();
+	}
+
+	public String getFileExtension() {
+		return this.fileExtension;
+	}
+
+	public LevelEditor getLevelEditorParent() {
+		return this.parent;
+	}
+
+	public String getScriptName() {
+		return this.scriptName;
+	}
+
+	public boolean isBeingModified() {
+		return this.modifiedFlag;
+	}
+
+	// (11/24/2014): This is where I load triggers at. This is completed, but may require
+	// double-checking to be very sure.
+	/**
+	 * Loads the file script that is formatted as JSON. Script files with file extensions, .SCRIPT and
+	 * .JSON, are both accepted.
+	 * <p>
+	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
+	 * working as intended. Reason for this is that this method is used as a guideline for loading
+	 * custom scripts into the game itself.
+	 *
+	 * @param script
+	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
+	 *            editor uses.
+	 * @return True, if the file successfully loads. False, if otherwise.
+	 */
+	public boolean load(File script) {
+		Debug.info("Opened Location: " + script.getAbsolutePath());
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
+			JSONTokener tokener = new JSONTokener(reader);
+			JSONObject scriptJson = new JSONObject(tokener);
+
+			// First, check if the TDIC (trigger data identification checksum) matches our level editor's
+			// checksum.
+			final String checksum = scriptJson.optString(ScriptJsonTags.CHECKSUM.getKey());
+			if (checksum.isEmpty() || !this.getEditorChecksum().equals(checksum)) {
+				// Checksum does not match. We quickly return false. This is not the script we are looking for.
+				return false;
+			}
+
+			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
+			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
+			scriptTriggerListModel.clear();
+
+			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
+			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
+				.getModel();
+			editorTriggerComboModel.removeAllElements();
+
+			Trigger trigger = new Trigger();
+			trigger.setTriggerID((short) 0);
+			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+			trigger.setNpcTrigger(false);
+			trigger.setName("Eraser");
+			editorTriggerComboModel.addElement(trigger);
+			comboTriggerList.setSelectedIndex(0);
+
+			// Parse the main script JSON's data.
+			JSONArray data = scriptJson.getJSONArray(ScriptJsonTags.DATA.getKey());
+			int length = data.length();
+			for (int i = 0; i < length; i++) {
+				JSONObject element = data.getJSONObject(i);
+				trigger = new Trigger();
+
+				// Determine if it's a trigger script or NPC script. It cannot be anything else.
+				String idType = element.optString(ScriptJsonTags.TRIGGER_TYPE.getKey());
+				if (idType.equals(ScriptJsonTags.TRIGGER_TYPE_NPC.getKey())) {
+					// NPC trigger script
+					trigger.setNpcTrigger(true);
+					trigger.setNpcTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
+				}
+				else {
+					// Scene trigger script
+					trigger.setNpcTrigger(false);
+					trigger.setTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
+				}
+
+				// Add name
+				trigger.setName(element.getString(ScriptJsonTags.NAME.getKey()));
+
+				// Add checksum from the main script JSON.
+				trigger.setChecksum(checksum);
+
+				// Add script contents
+				JSONArray dataContents = element.getJSONArray(ScriptJsonTags.SEQUENCE.getKey());
+				StringBuilder builder = new StringBuilder();
+				for (int cIndex = 0; cIndex < dataContents.length(); cIndex++) {
+					// The JSON array is semantically ordered, therefore there is no concern for the script's sequence
+					// order.
+					JSONObject content = dataContents.getJSONObject(cIndex);
+					ScriptTags tag = ScriptTags.valueOf(content.getString(ScriptJsonTags.TYPE.getKey()));
+					builder.append(tag.getSymbol());
+					builder.append(content.getString(ScriptJsonTags.CONTENT.getKey())).append("\n");
+				}
+				trigger.setScript(builder.toString());
+
+				// Finally, add trigger to list models
+				scriptTriggerListModel.addElement(trigger);
+				editorTriggerComboModel.addElement(trigger);
+			}
+		}
+		catch (JSONException e) {
+			// Expected an error. Return false.
+			return false;
+		}
+		catch (IOException e) {
+			Debug.error("Unable to open file.", e);
+			return false;
+		}
+		var triggerList = this.scriptViewer.getTriggerList();
+		triggerList.clearSelection();
+		if (triggerList.getModel().getSize() > 0)
+			triggerList.setSelectedIndex(0);
+
+		this.scriptViewer.revalidate();
+		this.scriptViewer.repaint();
+		this.parent.revalidate();
+		this.parent.repaint();
+		super.revalidate();
+		super.repaint();
+
+		return true;
 	}
 
 	// (11/24/2014): This is where I load triggers at. This is completed, but may require
@@ -333,111 +485,6 @@ public class ScriptEditor extends JFrame {
 		super.repaint();
 	}
 
-	// (11/24/2014): This is where I load triggers at. This is completed, but may require
-	// double-checking to be very sure.
-	/**
-	 * Loads the file script.
-	 * <p>
-	 * This method may require double-checking in the codes, just to be very sure that it is absolutely
-	 * working as intended. Reason for this is that this method is used as a guideline for loading
-	 * custom scripts into the game itself.
-	 *
-	 * @param script
-	 *            - Takes in a SCRIPT file object, which is the scripting file the game and the script
-	 *            editor uses.
-	 * @return Nothing.
-	 */
-	public void load(File script) {
-		String format = script.getName();
-		if (!format.endsWith(".script")) {
-			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
-			return;
-		}
-		System.out.println("Opened Location: " + script.getAbsolutePath());
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
-			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
-			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
-			scriptTriggerListModel.clear();
-
-			JComboBox<Trigger> comboTriggerList = this.parent.properties.getTriggerList();
-			DefaultComboBoxModel<Trigger> editorTriggerComboModel = (DefaultComboBoxModel<Trigger>) comboTriggerList
-				.getModel();
-			editorTriggerComboModel.removeAllElements();
-
-			Trigger trigger = new Trigger();
-			trigger.setTriggerID((short) 0);
-			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
-			trigger.setNpcTrigger(false);
-			trigger.setName("Eraser");
-			editorTriggerComboModel.addElement(trigger);
-			comboTriggerList.setSelectedIndex(0);
-
-			JSONTokener tokener = new JSONTokener(reader);
-			JSONObject scriptJson = new JSONObject(tokener);
-
-			// Get the checksum from the main script JSON.
-			final String checksum = scriptJson.getString(ScriptJsonTags.CHECKSUM.getKey());
-
-			// Parse the main script JSON's data.
-			JSONArray data = scriptJson.getJSONArray(ScriptJsonTags.DATA.getKey());
-			int length = data.length();
-			for (int i = 0; i < length; i++) {
-				JSONObject element = data.getJSONObject(i);
-				trigger = new Trigger();
-
-				// Determine if it's a trigger script or NPC script. It cannot be anything else.
-				String idType = element.optString(ScriptJsonTags.TRIGGER_TYPE.getKey());
-				if (idType.equals(ScriptJsonTags.TRIGGER_TYPE_NPC.getKey())) {
-					// NPC trigger script
-					trigger.setNpcTrigger(true);
-					trigger.setNpcTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
-				}
-				else {
-					// Scene trigger script
-					trigger.setNpcTrigger(false);
-					trigger.setTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
-				}
-
-				// Add name
-				trigger.setName(element.getString(ScriptJsonTags.NAME.getKey()));
-
-				// Add checksum from the main script JSON.
-				trigger.setChecksum(checksum);
-
-				// Add script contents
-				JSONArray dataContents = element.getJSONArray(ScriptJsonTags.SEQUENCE.getKey());
-				StringBuilder builder = new StringBuilder();
-				for (int cIndex = 0; cIndex < dataContents.length(); cIndex++) {
-					// The JSON array is semantically ordered, therefore there is no concern for the script's sequence
-					// order.
-					JSONObject content = dataContents.getJSONObject(cIndex);
-					ScriptTags tag = ScriptTags.valueOf(content.getString(ScriptJsonTags.TYPE.getKey()));
-					builder.append(tag.getSymbol());
-					builder.append(content.getString(ScriptJsonTags.CONTENT.getKey())).append("\n");
-				}
-				trigger.setScript(builder.toString());
-
-				// Finally, add trigger to list models
-				scriptTriggerListModel.addElement(trigger);
-				editorTriggerComboModel.addElement(trigger);
-			}
-		}
-		catch (IOException e) {
-			Debug.error("JSON parsing error.", e);
-		}
-		var triggerList = this.scriptViewer.getTriggerList();
-		triggerList.clearSelection();
-		if (triggerList.getModel().getSize() > 0)
-			triggerList.setSelectedIndex(0);
-
-		this.scriptViewer.revalidate();
-		this.scriptViewer.repaint();
-		this.parent.revalidate();
-		this.parent.repaint();
-		super.revalidate();
-		super.repaint();
-	}
-
 	public void refresh() {
 		this.scriptToolbar.revalidate();
 		this.scriptToolbar.repaint();
@@ -451,25 +498,18 @@ public class ScriptEditor extends JFrame {
 		super.repaint();
 	}
 
-	public boolean isBeingModified() {
-		return this.modifiedFlag;
-	}
-
-	public void setScriptName(String scriptName) {
-		this.scriptName = scriptName;
-	}
-
-	public void setModifiedFlag(boolean value) {
-		if (!value) {
-			String str = this.getTitle();
-			if (str.endsWith("*"))
-				this.setTitle(str.substring(0, str.length() - 1));
-		}
-		this.modifiedFlag = value;
-	}
-
-	public LevelEditor getLevelEditorParent() {
-		return this.parent;
+	public void resetComponents() {
+		SwingUtilities.invokeLater(() -> {
+			if (ScriptEditor.this.scriptViewer != null) {
+				ScriptEditor.this.scriptViewer.clearTriggerModel();
+				ScriptEditor.this.scriptViewer.clearTriggers();
+			}
+			if (ScriptEditor.this.scriptChanger != null) {
+				ScriptEditor.this.scriptChanger.clearTextFields();
+			}
+			ScriptEditor.this.scriptChanger.updateComponent();
+			ScriptEditor.this.refresh();
+		});
 	}
 
 	/**
@@ -535,5 +575,39 @@ public class ScriptEditor extends JFrame {
 		}
 		super.revalidate();
 		super.repaint();
+	}
+
+	public void setEditorTitle() {
+		this.setTitle(ScriptEditor.TITLE + " - " + this.getScriptName() + "." + this.fileExtension);
+	}
+
+	public void setEditorTitle(String extension) {
+		this.setTitle(ScriptEditor.TITLE + " - " + this.getScriptName() + "." + extension);
+	}
+
+	public void setEditorTitle(String scriptName, String extension) {
+		this.setTitle(ScriptEditor.TITLE + " - " + scriptName + "." + extension);
+	}
+
+	public void setFileExtension(String extension) {
+		this.fileExtension = extension;
+	}
+
+	public void setModifiedFlag(boolean value) {
+		if (!value) {
+			String str = this.getTitle();
+			if (str.endsWith("*"))
+				this.setEditorTitle(this.fileExtension);
+		}
+		else {
+			String str = this.getTitle();
+			if (!str.endsWith("*"))
+				this.setTitle(str + "*");
+		}
+		this.modifiedFlag = value;
+	}
+
+	public void setScriptName(String scriptName) {
+		this.scriptName = scriptName;
 	}
 }

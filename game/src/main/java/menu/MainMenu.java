@@ -34,6 +34,7 @@ import utility.DialogueBuilder;
 public class MainMenu extends SubMenu {
 	// Description area
 	private static final int DESCRIPTION_FIRST_LINE_Y = (Tileable.HEIGHT * 8) - 8;
+
 	private static final int DESCRIPTION_SECOND_LINE_Y = (Tileable.HEIGHT * 9) - 8;
 
 	private List<SubMenu> items = new ArrayList<>();
@@ -45,6 +46,7 @@ public class MainMenu extends SubMenu {
 
 	private boolean subMenuActivation;
 	private List<Map.Entry<String, Boolean>> tokens;
+
 	private MenuEvent actionEvent;
 
 	public MainMenu() {
@@ -55,14 +57,12 @@ public class MainMenu extends SubMenu {
 		this.exitsToGame = true;
 	}
 
-	public MainMenu initialize(Game game) {
-		this.mainMenuDialogue = new Dialogue();
-
-		this.exitItem = new Exit(WorldConstants.MENU_ITEM_NAME_EXIT, WorldConstants.MENU_ITEM_DESC_EXIT, game);
-		this.addMenuItem(game.getInventory());
-		this.addMenuItem(game.getSaveManager());
-		this.addMenuItem(this.exitItem);
-		return this;
+	public static void renderDescriptionBox(Scene output, int x, int y, int width, int height) {
+		for (int j = 0; j < height; j++) {
+			for (int i = 0; i < width; i++) {
+				output.blit(Art.dialogue_background, (x * Tileable.WIDTH) + (i * Tileable.WIDTH), ((y - 1) * Tileable.HEIGHT + 8) + j * Tileable.HEIGHT);
+			}
+		}
 	}
 
 	public void addMenuItem(SubMenu submenu) {
@@ -75,50 +75,25 @@ public class MainMenu extends SubMenu {
 		this.items.add(submenu);
 	}
 
-	public void removeMenuItem(int position) {
-		if (position < 0 || position >= this.items.size()) {
-			return;
-		}
-		this.items = IntStream
-			.range(0, this.items.size())
-			.filter(i -> i != position)
-			.mapToObj(i -> this.items.get(i))
-			.collect(Collectors.toList());
-		if (this.menuCursorPosition > 0)
-			this.menuCursorPosition--;
+	public void clearActiveItem() {
+		this.activeMenuItem = null;
 	}
 
-	@Override
-	public void tick() {
-		if (Game.keys.isStartPressed() || Game.keys.isSecondaryPressed()) {
-			Game.keys.startReceived();
-			Game.keys.secondaryReceived();
-			this.exit();
-			if (this.actionEvent != null)
-				this.actionEvent = null;
-			return;
-		}
-		this.prepareMenuText();
-		this.handleMenuSelection();
-		// if (Player.isMovementsLocked())
-		// Player.unlockMovements();
+	public void disableSubMenu() {
+		this.subMenuActivation = false;
 	}
 
-	@Override
-	public void render(Scene output, Graphics graphics) {
-		this.mainMenuDialogue.renderInformationBox(output, 5, 0, 4, this.items.size());
-		MainMenu.renderDescriptionBox(output, 0, 7, 5, 3);
-		output.blit(Art.dialogue_pointer, Tileable.WIDTH * 5 + 8, Tileable.HEIGHT + this.menuCursorPosition * Tileable.HEIGHT);
-		Graphics2D g2d = output.getBufferedImage().createGraphics();
-		this.renderMenuText(g2d);
-		this.renderMenuDescriptionText(g2d);
-		g2d.dispose();
-		graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+	public void enableSubMenu() {
+		this.subMenuActivation = true;
 	}
 
-	@Override
-	public Event getEvent() {
-		return (this.activeMenuItem != null) ? this.activeMenuItem.getEvent() : null;
+	/**
+	 * If no active item is found, it will return null.
+	 *
+	 * @return A SubMenu object if there exists a player-chosen submenu item. Otherwise, null.
+	 */
+	public SubMenu getActiveItem() {
+		return this.activeMenuItem;
 	}
 
 	/*
@@ -126,12 +101,17 @@ public class MainMenu extends SubMenu {
 		if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}
-
+	
 	public void openMenu() {
 		if (!Player.isMovementsLocked())
 			Player.lockMovements();
 	}
 	*/
+
+	@Override
+	public Event getEvent() {
+		return (this.activeMenuItem != null) ? this.activeMenuItem.getEvent() : null;
+	}
 
 	/**
 	 * Compares all available submenus before returning it.
@@ -159,16 +139,48 @@ public class MainMenu extends SubMenu {
 		return this.items;
 	}
 
+	public MainMenu initialize(Game game) {
+		this.mainMenuDialogue = new Dialogue();
+
+		this.exitItem = new Exit(WorldConstants.MENU_ITEM_NAME_EXIT, WorldConstants.MENU_ITEM_DESC_EXIT, game);
+		this.addMenuItem(game.getInventory());
+		this.addMenuItem(game.getSaveManager());
+		this.addMenuItem(this.exitItem);
+		return this;
+	}
+
 	public boolean isSubMenuActivated() {
 		return this.subMenuActivation;
 	}
 
-	public void enableSubMenu() {
-		this.subMenuActivation = true;
+	public void removeMenuItem(int position) {
+		if (position < 0 || position >= this.items.size()) {
+			return;
+		}
+		this.items = IntStream
+			.range(0, this.items.size())
+			.filter(i -> i != position)
+			.mapToObj(i -> this.items.get(i))
+			.collect(Collectors.toList());
+		if (this.menuCursorPosition > 0)
+			this.menuCursorPosition--;
 	}
 
-	public void disableSubMenu() {
-		this.subMenuActivation = false;
+	@Override
+	public void render(Scene output, Graphics graphics) {
+		this.mainMenuDialogue.renderInformationBox(output, 5, 0, 4, this.items.size());
+		MainMenu.renderDescriptionBox(output, 0, 7, 5, 3);
+		output.blit(Art.dialogue_pointer, Tileable.WIDTH * 5 + 8, Tileable.HEIGHT + this.menuCursorPosition * Tileable.HEIGHT);
+		Graphics2D g2d = output.getBufferedImage().createGraphics();
+		this.renderMenuText(g2d);
+		this.renderMenuDescriptionText(g2d);
+		g2d.dispose();
+		graphics.drawImage(MainComponent.createCompatibleBufferedImage(output.getBufferedImage()), 0, 0, MainComponent.COMPONENT_WIDTH, MainComponent.COMPONENT_HEIGHT, null);
+	}
+
+	public void setActiveItem(int index) {
+		this.menuCursorPosition = index;
+		this.activeMenuItem = this.items.get(index);
 	}
 
 	public void setActiveItem(SubMenu menu) {
@@ -179,29 +191,20 @@ public class MainMenu extends SubMenu {
 		this.activeMenuItem = menu;
 	}
 
-	public void setActiveItem(int index) {
-		this.menuCursorPosition = index;
-		this.activeMenuItem = this.items.get(index);
-	}
-
-	public void clearActiveItem() {
-		this.activeMenuItem = null;
-	}
-
-	/**
-	 * If no active item is found, it will return null.
-	 *
-	 * @return A SubMenu object if there exists a player-chosen submenu item. Otherwise, null.
-	 */
-	public SubMenu getActiveItem() {
-		return this.activeMenuItem;
-	}
-
-	// ------------------------- PRIVATE METHODS -----------------------------------
-
-	private void prepareMenuText() {
-		SubMenu item = this.items.get(this.menuCursorPosition);
-		this.tokens = DialogueBuilder.toLines(item.getDescription(), Dialogue.HALF_STRING_LENGTH);
+	@Override
+	public void tick() {
+		if (Game.keys.isStartPressed() || Game.keys.isSecondaryPressed()) {
+			Game.keys.startReceived();
+			Game.keys.secondaryReceived();
+			this.exit();
+			if (this.actionEvent != null)
+				this.actionEvent = null;
+			return;
+		}
+		this.prepareMenuText();
+		this.handleMenuSelection();
+		// if (Player.isMovementsLocked())
+		// Player.unlockMovements();
 	}
 
 	private void handleMenuSelection() {
@@ -250,12 +253,9 @@ public class MainMenu extends SubMenu {
 		}
 	}
 
-	private void renderMenuText(Graphics g) {
-		g.setFont(Art.font.deriveFont(8f));
-		g.setColor(Color.black);
-		for (int i = 0; i < this.items.size(); i++) {
-			g.drawString(this.items.get(i).getName(), (Tileable.WIDTH * 6), (((Tileable.HEIGHT * 2 - 8) + i * 16)));
-		}
+	private void prepareMenuText() {
+		SubMenu item = this.items.get(this.menuCursorPosition);
+		this.tokens = DialogueBuilder.toLines(item.getDescription(), Dialogue.HALF_STRING_LENGTH);
 	}
 
 	private void renderMenuDescriptionText(Graphics g) {
@@ -268,13 +268,11 @@ public class MainMenu extends SubMenu {
 		catch (Exception e) {}
 	}
 
-	// ------------------------- STATIC METHODS --------------------------------------
-
-	public static void renderDescriptionBox(Scene output, int x, int y, int width, int height) {
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
-				output.blit(Art.dialogue_background, (x * Tileable.WIDTH) + (i * Tileable.WIDTH), ((y - 1) * Tileable.HEIGHT + 8) + j * Tileable.HEIGHT);
-			}
+	private void renderMenuText(Graphics g) {
+		g.setFont(Art.font.deriveFont(8f));
+		g.setColor(Color.black);
+		for (int i = 0; i < this.items.size(); i++) {
+			g.drawString(this.items.get(i).getName(), (Tileable.WIDTH * 6), (((Tileable.HEIGHT * 2 - 8) + i * 16)));
 		}
 	}
 }

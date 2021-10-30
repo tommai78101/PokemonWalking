@@ -17,6 +17,29 @@ import enums.ItemCategories;
  * @author tlee
  */
 public class ModdedItem {
+	public Type type;
+
+	public String itemName;
+	public String description;
+	public ItemCategories category;
+	public boolean skipCheckCategory;
+	public int id;
+	public boolean setCommandFlag;
+	public boolean useCommandFlag;
+	public boolean tossCommandFlag;
+	public boolean done;
+
+	public ModdedItem() {
+		this.type = null;
+		this.itemName = null;
+		this.description = null;
+		this.category = null;
+		this.id = -1;
+		this.skipCheckCategory = false;
+		this.setCommandFlag = this.useCommandFlag = this.tossCommandFlag = false;
+		this.done = false;
+	}
+
 	public enum Type {
 		// @formatter:off
 		ALL("ALL"), 
@@ -37,28 +60,6 @@ public class ModdedItem {
 			}
 			return ALL;
 		}
-	}
-
-	public Type type;
-	public String itemName;
-	public String description;
-	public ItemCategories category;
-	public boolean skipCheckCategory;
-	public int id;
-	public boolean setCommandFlag;
-	public boolean useCommandFlag;
-	public boolean tossCommandFlag;
-	public boolean done;
-
-	public ModdedItem() {
-		this.type = null;
-		this.itemName = null;
-		this.description = null;
-		this.category = null;
-		this.id = -1;
-		this.skipCheckCategory = false;
-		this.setCommandFlag = this.useCommandFlag = this.tossCommandFlag = false;
-		this.done = false;
 	}
 
 	public boolean isComplete() {
