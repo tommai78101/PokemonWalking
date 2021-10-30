@@ -33,14 +33,14 @@ import editor.Trigger;
 public class ScriptToolbar extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private final ScriptEditor editor;
-	private final String[] tags = {
+	private final String[] menuOptionsTags = {
 		"New Script", "Save Script", "Open Script", ""
 	};
 	private final HashMap<String, JButton> buttonCache = new HashMap<>();
 
 	public ScriptToolbar(ScriptEditor editor) {
 		this.editor = editor;
-		this.setLayout(new GridLayout(1, this.tags.length));
+		this.setLayout(new GridLayout(1, this.menuOptionsTags.length));
 
 		this.createButtons();
 	}
@@ -191,12 +191,12 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 	}
 
 	private void createButtons() {
-		for (int i = 0; i < this.tags.length; i++) {
-			if (this.tags[i].isEmpty() || this.tags[i].equals("")) {
+		for (int i = 0; i < this.menuOptionsTags.length; i++) {
+			if (this.menuOptionsTags[i].isEmpty() || this.menuOptionsTags[i].equals("")) {
 				this.add(new JSeparator(SwingConstants.VERTICAL));
 				continue;
 			}
-			JButton button = new JButton(this.tags[i]);
+			JButton button = new JButton(this.menuOptionsTags[i]);
 			button.addActionListener(this);
 			String actionCommand = Integer.toString(i);
 			button.setActionCommand(actionCommand);

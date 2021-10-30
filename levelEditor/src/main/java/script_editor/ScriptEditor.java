@@ -26,6 +26,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -293,13 +294,19 @@ public class ScriptEditor extends JFrame {
 	 * @return True, if the file successfully loads. False, if otherwise.
 	 */
 	public boolean load(File script) {
-		String format = script.getName();
-		if (!format.endsWith(".script")) {
-			JOptionPane.showMessageDialog(null, "Incorrect file format - Please open files ending with \".script\"");
-			return false;
-		}
-		System.out.println("Opened Location: " + script.getAbsolutePath());
+		Debug.info("Opened Location: " + script.getAbsolutePath());
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(script)))) {
+			JSONTokener tokener = new JSONTokener(reader);
+			JSONObject scriptJson = new JSONObject(tokener);
+
+			// First, check if the TDIC (trigger data identification checksum) matches our level editor's
+			// checksum.
+			final String checksum = scriptJson.optString(ScriptJsonTags.CHECKSUM.getKey());
+			if (checksum.isEmpty() || !this.getEditorChecksum().equals(checksum)) {
+				// Checksum does not match. We quickly return false. This is not the script we are looking for.
+				return false;
+			}
+
 			JList<Trigger> triggerList = this.scriptViewer.getTriggerList();
 			DefaultListModel<Trigger> scriptTriggerListModel = (DefaultListModel<Trigger>) triggerList.getModel();
 			scriptTriggerListModel.clear();
@@ -316,12 +323,6 @@ public class ScriptEditor extends JFrame {
 			trigger.setName("Eraser");
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);
-
-			JSONTokener tokener = new JSONTokener(reader);
-			JSONObject scriptJson = new JSONObject(tokener);
-
-			// Get the checksum from the main script JSON.
-			final String checksum = scriptJson.getString(ScriptJsonTags.CHECKSUM.getKey());
 
 			// Parse the main script JSON's data.
 			JSONArray data = scriptJson.getJSONArray(ScriptJsonTags.DATA.getKey());
@@ -367,8 +368,12 @@ public class ScriptEditor extends JFrame {
 				editorTriggerComboModel.addElement(trigger);
 			}
 		}
+		catch (JSONException e) {
+			// Expected an error. Return false.
+			return false;
+		}
 		catch (IOException e) {
-			Debug.error("JSON parsing error.", e);
+			Debug.error("Unable to open file.", e);
 			return false;
 		}
 		var triggerList = this.scriptViewer.getTriggerList();
