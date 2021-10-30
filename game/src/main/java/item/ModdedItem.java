@@ -28,6 +28,7 @@ public class ModdedItem {
 	public boolean useCommandFlag;
 	public boolean tossCommandFlag;
 	public boolean done;
+
 	public ModdedItem() {
 		this.type = null;
 		this.itemName = null;

@@ -59,6 +59,7 @@ public class EditorConstants {
 		this.loadTilesetData();
 		this.loadTriggers();
 	}
+
 	/**
 	 * Level Editor Metadata Layers. Think of Google Maps information overlays, with each overlay
 	 * depicting relevant information based on what layer was selected.

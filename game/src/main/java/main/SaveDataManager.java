@@ -24,6 +24,7 @@ public class SaveDataManager extends SubMenu {
 	private Dialogue saveDialogue;
 	ExecutorService executor;
 	private Game game;
+
 	public SaveDataManager(Game game) {
 		super(WorldConstants.MENU_ITEM_NAME_SAVE, WorldConstants.MENU_ITEM_DESC_SAVE, GameState.SAVE);
 		this.game = game;

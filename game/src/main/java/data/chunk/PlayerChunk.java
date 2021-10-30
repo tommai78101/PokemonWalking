@@ -35,6 +35,7 @@ public class PlayerChunk extends Chunk {
 	private int yPosition;
 	private byte facingDirection;
 	private byte walkingState;
+
 	public PlayerChunk() {
 		this.playerName = null;
 		this.gender = (byte) 0x0;

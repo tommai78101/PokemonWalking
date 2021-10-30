@@ -91,7 +91,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 		}
 		return result;
 	}
-
+	
 	public int getTotalHeight() {
 		int result = 0;
 		for (Area a : areas) {
@@ -334,7 +334,7 @@ public class OverWorld implements Tileable, UpdateRenderable {
 			}
 		}
 	}
-
+	
 	private void handleDialogues() {
 		if (this.newDialogues != null) {
 			// The order is IMPORTANT!!

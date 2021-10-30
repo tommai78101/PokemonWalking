@@ -105,7 +105,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("X Position: "), c);
-
+		
 		c.gridx = 1;
 		c.gridy = 1;
 		c.gridwidth = 1;
@@ -114,7 +114,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((xField = new JTextField()), c);
 		xField.getDocument().addDocumentListener(this);
-
+		
 		// Third row
 		c.gridx = 0;
 		c.gridy = 2;
@@ -123,7 +123,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("Y Position: "), c);
-
+		
 		c.gridx = 1;
 		c.gridy = 2;
 		c.gridwidth = 1;
@@ -229,7 +229,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 	public JTextField getXField() {
 		return this.xField;
 	}
-
+	
 	public JTextField getYField() {
 		return this.yField;
 	}

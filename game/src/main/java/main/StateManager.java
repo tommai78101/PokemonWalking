@@ -4,6 +4,7 @@ public class StateManager {
 	protected GameState currentGameState;
 
 	protected GameState previousGameState;
+
 	public StateManager() {
 		this.initialize();
 	}

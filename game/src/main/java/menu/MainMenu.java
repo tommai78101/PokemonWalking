@@ -101,7 +101,7 @@ public class MainMenu extends SubMenu {
 		if (Player.isMovementsLocked())
 			Player.unlockMovements();
 	}
-
+	
 	public void openMenu() {
 		if (!Player.isMovementsLocked())
 			Player.lockMovements();
