@@ -43,7 +43,7 @@ public class ScriptEditor extends JFrame {
 
 	public static final String TITLE = "Script Editor (Hobby)";
 	public static final int WIDTH = 700;
-	public static final int HEIGHT = 400;
+	public static final int HEIGHT = 450;
 
 	public static File lastSavedDirectory = FileControl.lastSavedDirectory;
 
@@ -78,9 +78,10 @@ public class ScriptEditor extends JFrame {
 				// included.
 
 				ScriptEditor.this.dispose();
-				// 7 is a magic number for "Script Editor" button action command. I don't like
-				// to make a new variable just for this.
-				JButton button = ScriptEditor.this.parent.fileControlPanel.buttonCache.get(Integer.toString(7));
+				JButton button = ScriptEditor.this.parent.fileControlPanel.buttonCache.get(
+					// Solved the magic number. "Script" button is always the right-most button in Level Editor.
+					Integer.toString(FileControl.MenuItem_Script_ButtonIndex)
+				);
 				button.setEnabled(true);
 				ScriptEditor.this.parent.scriptEditor = null;
 			}
@@ -319,7 +320,7 @@ public class ScriptEditor extends JFrame {
 
 			Trigger trigger = new Trigger();
 			trigger.setTriggerID((short) 0);
-			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+			trigger.setNpcTriggerID(Trigger.ID_NONE);
 			trigger.setNpcTrigger(false);
 			trigger.setName("Eraser");
 			editorTriggerComboModel.addElement(trigger);
@@ -428,7 +429,7 @@ public class ScriptEditor extends JFrame {
 
 			Trigger trigger = new Trigger();
 			trigger.setTriggerID((short) 0);
-			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+			trigger.setNpcTriggerID(Trigger.ID_NONE);
 			trigger.setName("Eraser");
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);

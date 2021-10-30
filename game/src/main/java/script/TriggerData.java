@@ -153,7 +153,7 @@ public class TriggerData {
 	 * @return
 	 */
 	public boolean isNpcTrigger() {
-		return this.npcTriggerID != Trigger.NPC_TRIGGER_ID_NONE;
+		return this.npcTriggerID != Trigger.ID_NONE;
 	}
 
 	/**

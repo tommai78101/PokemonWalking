@@ -782,7 +782,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 							blue = this.getMouseTileY();
 						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
 						this.tilesEditorID[tileIndex] = data.editorID;
-						this.triggers.addTriggerById(tileIndex, data.getColorValue(), data.getTileSpecificID(), Trigger.NPC_TRIGGER_ID_NONE);
+						this.triggers.addTriggerById(tileIndex, data.getColorValue(), data.getTileSpecificID(), Trigger.ID_NONE);
 						panel.greenInputField.setText(Integer.toString(green));
 						panel.blueInputField.setText(Integer.toString(blue));
 						panel.greenField.setText(Integer.toString(green));
@@ -961,6 +961,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 					if (selectedData != null && this.editor.input.isDrawing()) {
 						this.setDataProperties(selectedData);
 					}
+					break;
+				}
+				case Event: {
 					break;
 				}
 			}
