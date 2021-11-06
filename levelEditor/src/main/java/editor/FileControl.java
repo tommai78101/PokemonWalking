@@ -215,7 +215,7 @@ public class FileControl extends JPanel implements ActionListener {
 					break;
 				}
 				case 7: { // Event
-					EditorConstants.metadata = Metadata.Event;
+					EditorConstants.metadata = Metadata.Events;
 					break;
 				}
 				case 8: {

@@ -70,7 +70,7 @@ public class EditorConstants {
 		Tilesets("Pixel Data"),
 		Triggers("Triggers"),
 		NonPlayableCharacters("NPCs"),
-		Event("Event");
+		Events("Event");
 
 		private String name;
 

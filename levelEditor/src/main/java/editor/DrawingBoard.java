@@ -920,8 +920,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 					}
 					break;
 				}
-				case Triggers: {
-					// Triggers Editing is subjected to clicking only.
+				case Triggers:
+				case Events: {
+					// Triggers and Events editing are subjected to clicking only.
 					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
 					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
@@ -961,9 +962,6 @@ public class DrawingBoard extends Canvas implements Runnable {
 					if (selectedData != null && this.editor.input.isDrawing()) {
 						this.setDataProperties(selectedData);
 					}
-					break;
-				}
-				case Event: {
 					break;
 				}
 			}
