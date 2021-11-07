@@ -21,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.WindowConstants;
@@ -43,7 +44,7 @@ public class ScriptEditor extends JFrame {
 
 	public static final String TITLE = "Script Editor (Hobby)";
 	public static final int WIDTH = 700;
-	public static final int HEIGHT = 400;
+	public static final int HEIGHT = 450;
 
 	public static File lastSavedDirectory = FileControl.lastSavedDirectory;
 
@@ -78,9 +79,10 @@ public class ScriptEditor extends JFrame {
 				// included.
 
 				ScriptEditor.this.dispose();
-				// 7 is a magic number for "Script Editor" button action command. I don't like
-				// to make a new variable just for this.
-				JButton button = ScriptEditor.this.parent.fileControlPanel.buttonCache.get(Integer.toString(7));
+				JButton button = ScriptEditor.this.parent.fileControlPanel.buttonCache.get(
+					// Solved the magic number. "Script" button is always the right-most button in Level Editor.
+					Integer.toString(FileControl.MenuItem_Script_ButtonIndex)
+				);
 				button.setEnabled(true);
 				ScriptEditor.this.parent.scriptEditor = null;
 			}
@@ -318,8 +320,8 @@ public class ScriptEditor extends JFrame {
 			editorTriggerComboModel.removeAllElements();
 
 			Trigger trigger = new Trigger();
-			trigger.setTriggerID((short) 0);
-			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+			trigger.setGameTriggerID((short) 0);
+			trigger.setNpcTriggerID(Trigger.ID_NONE);
 			trigger.setNpcTrigger(false);
 			trigger.setName("Eraser");
 			editorTriggerComboModel.addElement(trigger);
@@ -337,12 +339,20 @@ public class ScriptEditor extends JFrame {
 				if (idType.equals(ScriptJsonTags.TRIGGER_TYPE_NPC.getKey())) {
 					// NPC trigger script
 					trigger.setNpcTrigger(true);
+					trigger.setEventTrigger(false);
 					trigger.setNpcTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
 				}
-				else {
-					// Scene trigger script
+				else if (idType.equals(ScriptJsonTags.TRIGGER_TYPE_EVENT.getKey())) {
+					// Event trigger script
+					trigger.setEventTrigger(true);
 					trigger.setNpcTrigger(false);
-					trigger.setTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
+					trigger.setEventTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
+				}
+				else {
+					// Game trigger script
+					trigger.setNpcTrigger(false);
+					trigger.setEventTrigger(false);
+					trigger.setGameTriggerID(Short.parseShort(element.getString(ScriptJsonTags.TRIGGER_ID.getKey())));
 				}
 
 				// Add name
@@ -427,8 +437,8 @@ public class ScriptEditor extends JFrame {
 			editorTriggerComboModel.removeAllElements();
 
 			Trigger trigger = new Trigger();
-			trigger.setTriggerID((short) 0);
-			trigger.setNpcTriggerID(Trigger.NPC_TRIGGER_ID_NONE);
+			trigger.setGameTriggerID((short) 0);
+			trigger.setNpcTriggerID(Trigger.ID_NONE);
 			trigger.setName("Eraser");
 			editorTriggerComboModel.addElement(trigger);
 			comboTriggerList.setSelectedIndex(0);
@@ -440,7 +450,7 @@ public class ScriptEditor extends JFrame {
 			while ((line = reader.readLine()) != null) {
 				if (ScriptTags.BeginScript.beginsAt(line)) {
 					trigger = new Trigger();
-					trigger.setTriggerID(Short.parseShort(ScriptTags.BeginScript.removeScriptTag(line)));
+					trigger.setGameTriggerID(Short.parseShort(ScriptTags.BeginScript.removeScriptTag(line)));
 				}
 				else if (ScriptTags.NpcScript.beginsAt(line)) {
 					trigger = new Trigger();
@@ -528,18 +538,31 @@ public class ScriptEditor extends JFrame {
 
 			// Write all trigger scripts to main JSON script as data.
 			JSONArray data = new JSONArray();
-			DefaultListModel<Trigger> model = (DefaultListModel<Trigger>) this.scriptViewer.getTriggerList().getModel();
+			ListModel<Trigger> model = this.scriptViewer.getTriggerList().getModel();
 			for (int i = 0; i < model.getSize(); i++) {
-				Trigger t = model.get(i);
+				Trigger t = model.getElementAt(i);
+				// TODO(Nov-06-2021): If trigger is an Eraser, should we write to the JSON file?
+				if (t.isEraser())
+					continue;
+				if (t.isEventTrigger() && t.isNpcTrigger()) {
+					// Trigger is in an invalid state. Skipping this trigger during saving.
+					Debug.warn("Script trigger is in invalid state: It's both an Event trigger and NPC trigger.");
+					continue;
+				}
 				JSONObject element = new JSONObject();
 
-				if (t.isNpcTrigger() && !t.isEraser()) {
+				if (t.isNpcTrigger()) {
 					element.put(ScriptJsonTags.TRIGGER_TYPE.getKey(), ScriptJsonTags.TRIGGER_TYPE_NPC.getKey());
 					element.put(ScriptJsonTags.TRIGGER_ID.getKey(), Short.toString(t.getNpcTriggerID()));
 				}
+				else if (t.isEventTrigger()) {
+					element.put(ScriptJsonTags.TRIGGER_TYPE.getKey(), ScriptJsonTags.TRIGGER_TYPE_EVENT.getKey());
+					element.put(ScriptJsonTags.TRIGGER_ID.getKey(), Short.toString(t.getEventTriggerID()));
+				}
 				else {
-					element.put(ScriptJsonTags.TRIGGER_TYPE.getKey(), ScriptJsonTags.TRIGGER_TYPE_SCENE.getKey());
-					element.put(ScriptJsonTags.TRIGGER_ID.getKey(), Short.toString(t.getTriggerID()));
+					// Game trigger
+					element.put(ScriptJsonTags.TRIGGER_TYPE.getKey(), ScriptJsonTags.TRIGGER_TYPE_GAME.getKey());
+					element.put(ScriptJsonTags.TRIGGER_ID.getKey(), Short.toString(t.getGameTriggerID()));
 				}
 				element.put(ScriptJsonTags.NAME.getKey(), t.getName());
 

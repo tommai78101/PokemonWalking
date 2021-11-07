@@ -17,8 +17,9 @@ public enum ScriptJsonTags {
 
 	// Script trigger type
 	TRIGGER_TYPE("triggerType"),
-	TRIGGER_TYPE_SCENE("scene"),
+	TRIGGER_TYPE_EVENT("event"),
 	TRIGGER_TYPE_NPC("npc"),
+	TRIGGER_TYPE_GAME("game"),
 
 	// JSON array that contains multiple trigger script information.
 	DATA("data"),

@@ -54,7 +54,7 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				break;
 			case 0: {// Create button
 				Trigger t = new Trigger();
-				t.setTriggerID((short) 0);
+				t.setGameTriggerID((short) 0);
 				t.setName("<Untitled>");
 				this.model.addElement(t);
 				this.validate();
@@ -84,7 +84,8 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 				break;
 			}
 		}
-		this.editor.getLevelEditorParent().properties.reloadTriggers();
+		DefaultListModel<Trigger> scriptModel = (DefaultListModel<Trigger>) this.getTriggerList().getModel();
+		this.editor.getLevelEditorParent().properties.reloadTriggers(scriptModel);
 		this.triggerList.validate();
 		this.editor.refresh();
 	}
@@ -122,19 +123,9 @@ public class ScriptViewer extends JPanel implements ActionListener, ListSelectio
 	public void valueChanged(ListSelectionEvent event) {
 		if (event.getValueIsAdjusting())
 			return;
-		Object source = event.getSource();
-		if (source instanceof JList<?> list) {
+		if (event.getSource() instanceof JList<?> list) {
 			this.selectedTrigger = (Trigger) list.getSelectedValue();
-			if (this.selectedTrigger != null) {
-				boolean isNpcTrigger = this.selectedTrigger.isNpcTrigger();
-				short idValue = isNpcTrigger ? this.selectedTrigger.getNpcTriggerID() : this.selectedTrigger.getTriggerID();
-				this.editor.scriptChanger.disallowFieldsToUpdate();
-				this.editor.scriptChanger.getNameField().setText(this.selectedTrigger.getName());
-				this.editor.scriptChanger.getIDField().setText(Short.toString(idValue));
-				this.editor.scriptChanger.getNpcTriggerFlag().setSelected(isNpcTrigger);
-				this.editor.scriptChanger.getScriptArea().setText(this.selectedTrigger.getScript());
-				this.editor.scriptChanger.allowFieldsToUpdate();
-			}
+			this.editor.scriptChanger.updateTriggerFields(this.selectedTrigger);
 		}
 		super.revalidate();
 		super.repaint();

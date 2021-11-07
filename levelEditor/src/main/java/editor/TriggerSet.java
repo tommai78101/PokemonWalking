@@ -33,7 +33,7 @@ public class TriggerSet {
 		modifiedTrigger.setChecksum(trigger.getChecksum());
 		modifiedTrigger.setTriggerPositionX(newX);
 		modifiedTrigger.setTriggerPositionY(newY);
-		modifiedTrigger.setTriggerID(trigger.getTriggerID());
+		modifiedTrigger.setGameTriggerID(trigger.getGameTriggerID());
 		modifiedTrigger.setNpcTriggerID(trigger.getNpcTriggerID());
 		set.add(modifiedTrigger);
 		this.triggers.put(index, set);
@@ -48,7 +48,7 @@ public class TriggerSet {
 			return;
 		}
 		if (!trigger.isEraser()) {
-			trigger.setTriggerID(triggerId);
+			trigger.setGameTriggerID(triggerId);
 			trigger.setNpcTriggerID(npcTriggerId);
 			this.addTrigger(index, x, y, trigger);
 		}
@@ -68,7 +68,12 @@ public class TriggerSet {
 		if (set == null || set.isEmpty())
 			return false;
 		for (Trigger t : set) {
-			if (t.getTriggerID() == trigger.getTriggerID() || t.getNpcTriggerID() == trigger.getNpcTriggerID())
+			if (t.isNpcTrigger() && trigger.isNpcTrigger() && t.getNpcTriggerID() == trigger.getNpcTriggerID())
+				return true;
+			if (t.isEventTrigger() && trigger.isEventTrigger() && t.getEventTriggerID() == trigger.getEventTriggerID())
+				return true;
+			boolean isGame = !(t.isNpcTrigger() || t.isEventTrigger()) && !(trigger.isNpcTrigger() || trigger.isEventTrigger());
+			if (isGame && t.getGameTriggerID() == trigger.getGameTriggerID())
 				return true;
 		}
 		return false;
@@ -136,7 +141,16 @@ public class TriggerSet {
 		}
 		Trigger delete = null;
 		for (Trigger t : set) {
-			if (t.getTriggerID() == trigger.getTriggerID() || t.getNpcTriggerID() == trigger.getNpcTriggerID()) {
+			if (t.isEventTrigger() && trigger.isEventTrigger() && t.getEventTriggerID() == trigger.getEventTriggerID()) {
+				delete = t;
+				break;
+			}
+			if (t.isNpcTrigger() && trigger.isNpcTrigger() && t.getNpcTriggerID() == trigger.getNpcTriggerID()) {
+				delete = t;
+				break;
+			}
+			boolean isGame = !(t.isEventTrigger() || t.isNpcTrigger()) && !(trigger.isEventTrigger() || trigger.isNpcTrigger());
+			if (isGame && t.getGameTriggerID() == trigger.getGameTriggerID()) {
 				delete = t;
 				break;
 			}

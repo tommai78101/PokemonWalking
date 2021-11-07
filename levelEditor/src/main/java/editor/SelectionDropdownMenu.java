@@ -8,11 +8,10 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListModel;
 
 import common.Debug;
 import editor.EditorConstants.Tools;
@@ -23,14 +22,23 @@ public class SelectionDropdownMenu extends JPanel {
 	private static final Dimension DropdownMenuSize = new Dimension(150, 30);
 	private static final Dimension LabelSize = new Dimension(150, 25);
 
+	// Tilesets
 	private JLabel tileCategoryLabel;
-	private JLabel triggersLabel;
 	private JComboBox<Category> tileCategory;
 	private JComboBox<SpriteData> tiles;
-	private JComboBox<Trigger> triggers;
+
+	// Game Triggers
+	private JLabel gameTriggersLabel;
+	private JComboBox<Trigger> gameTriggers;
+	private JPanel gameTriggerEditorInfo;
+
+	// Events
+	private JLabel eventTriggersLabel;
+	private JComboBox<Trigger> eventTriggers;
+	private JPanel eventTriggerEditorInfo;
+
 	private SpriteData selectedData;
 	private Trigger selectedTrigger;
-	private JPanel triggerEditorInfo;
 
 	public final LevelEditor editor;
 
@@ -40,8 +48,14 @@ public class SelectionDropdownMenu extends JPanel {
 
 		this.loadTiles();
 		this.loadCategory();
-		this.loadTriggers();
+		this.loadGameTriggers();
+		this.loadEventTriggers();
 
+		// Temporary variables to be used within the current scope.
+		JLabel cyanLabel;
+		JLabel yellowLabel;
+
+		// Tilesets
 		this.tileCategoryLabel = new JLabel("Tileset Category");
 		this.tileCategoryLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		this.tileCategoryLabel.setMinimumSize(SelectionDropdownMenu.LabelSize);
@@ -50,27 +64,51 @@ public class SelectionDropdownMenu extends JPanel {
 		this.add(this.tileCategory);
 		this.add(this.tiles);
 
-		this.triggersLabel = new JLabel("Triggers");
-		this.triggersLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		this.triggersLabel.setMinimumSize(SelectionDropdownMenu.LabelSize);
-		this.triggersLabel.setMaximumSize(SelectionDropdownMenu.LabelSize);
-		this.add(this.triggersLabel);
-		this.add(this.triggers);
+		// Game triggers
+		this.gameTriggersLabel = new JLabel("Triggers");
+		this.gameTriggersLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.gameTriggersLabel.setMinimumSize(SelectionDropdownMenu.LabelSize);
+		this.gameTriggersLabel.setMaximumSize(SelectionDropdownMenu.LabelSize);
+		this.add(this.gameTriggersLabel);
+		this.add(this.gameTriggers);
 
-		this.triggerEditorInfo = new JPanel();
-		this.triggerEditorInfo.setLayout(new BoxLayout(this.triggerEditorInfo, BoxLayout.Y_AXIS));
-		this.triggerEditorInfo.add(Box.createVerticalStrut(20));
-		JLabel cyanlabel = new JLabel("Cyan: Selected Trigger");
-		cyanlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		this.triggerEditorInfo.add(cyanlabel);
-		JLabel yellowlabel = new JLabel("Yellow: Other triggers");
-		yellowlabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		this.triggerEditorInfo.add(yellowlabel);
-		this.add(this.triggerEditorInfo);
+		// Game Trigger information panel
+		this.gameTriggerEditorInfo = new JPanel();
+		this.gameTriggerEditorInfo.setLayout(new BoxLayout(this.gameTriggerEditorInfo, BoxLayout.Y_AXIS));
+		this.gameTriggerEditorInfo.add(Box.createVerticalStrut(20));
+		cyanLabel = new JLabel("Cyan: Selected Trigger");
+		cyanLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.gameTriggerEditorInfo.add(cyanLabel);
+		yellowLabel = new JLabel("Yellow: Other triggers");
+		yellowLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.gameTriggerEditorInfo.add(yellowLabel);
+		this.add(this.gameTriggerEditorInfo);
+
+		// Event triggers
+		this.eventTriggersLabel = new JLabel("Events");
+		this.eventTriggersLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.eventTriggersLabel.setMinimumSize(SelectionDropdownMenu.LabelSize);
+		this.eventTriggersLabel.setMaximumSize(SelectionDropdownMenu.LabelSize);
+		this.add(this.eventTriggersLabel);
+		this.add(this.eventTriggers);
+
+		// Event Trigger information panel
+		this.eventTriggerEditorInfo = new JPanel();
+		this.eventTriggerEditorInfo.setLayout(new BoxLayout(this.eventTriggerEditorInfo, BoxLayout.Y_AXIS));
+		this.eventTriggerEditorInfo.add(Box.createVerticalStrut(20));
+		cyanLabel = new JLabel("Cyan: Selected Event");
+		cyanLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.eventTriggerEditorInfo.add(cyanLabel);
+		yellowLabel = new JLabel("Yellow: Other events");
+		yellowLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+		this.eventTriggerEditorInfo.add(yellowLabel);
+		this.add(this.eventTriggerEditorInfo);
 
 		this.tileCategory.setSelectedIndex(0);
 		this.tiles.setSelectedIndex(0);
-		this.triggers.setSelectedIndex(0);
+		this.gameTriggers.setSelectedIndex(0);
+		this.eventTriggers.setSelectedIndex(0);
+
 		this.validate();
 	}
 
@@ -83,24 +121,33 @@ public class SelectionDropdownMenu extends JPanel {
 	}
 
 	public JComboBox<Trigger> getTriggerList() {
-		return this.triggers;
+		return this.gameTriggers;
 	}
 
-	public void reloadTriggers() {
-		if (this.triggers != null) {
-			DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
-			model.removeAllElements();
+	public void reloadTriggers(ListModel<Trigger> scriptModel) {
+		// If any of the trigger combo box models are null, we do not reload anything.
+		if (this.gameTriggers == null || this.eventTriggers == null) {
+			Debug.warn("Unable to reload game and/or event triggers.");
+			return;
+		}
 
-			Trigger trigger = new Trigger();
-			trigger.setTriggerID((short) 0);
-			trigger.setName("Eraser");
-			model.addElement(trigger);
+		DefaultComboBoxModel<Trigger> triggerModel = (DefaultComboBoxModel<Trigger>) this.gameTriggers.getModel();
+		DefaultComboBoxModel<Trigger> eventModel = (DefaultComboBoxModel<Trigger>) this.eventTriggers.getModel();
+		triggerModel.removeAllElements();
+		eventModel.removeAllElements();
 
-			JList<Trigger> list = this.editor.scriptEditor.scriptViewer.getTriggerList();
-			DefaultListModel<Trigger> scriptModel = (DefaultListModel<Trigger>) list.getModel();
-			for (int i = 0; i < scriptModel.getSize(); i++) {
-				model.addElement(scriptModel.get(i));
-			}
+		Trigger trigger = new Trigger();
+		trigger.setGameTriggerID((short) 0);
+		trigger.setName("Eraser");
+		triggerModel.addElement(trigger);
+		eventModel.addElement(trigger);
+
+		for (int i = 0; i < scriptModel.getSize(); i++) {
+			Trigger elem = scriptModel.getElementAt(i);
+			if (elem.isEventTrigger())
+				eventModel.addElement(elem);
+			else
+				triggerModel.addElement(elem);
 		}
 	}
 
@@ -133,33 +180,52 @@ public class SelectionDropdownMenu extends JPanel {
 	@Override
 	public void validate() {
 		switch (EditorConstants.metadata) {
-			case Tilesets:
+			case Tilesets: {
 				this.showTileCategory();
-				this.hideTriggers();
-				break;
-			case Triggers:
-				this.hideTileCategory();
-				this.showTriggers();
-				break;
-			case NonPlayableCharacters: {
-				this.hideTileCategory();
-				this.hideTriggers();
+				this.hideGameTriggers();
+				this.hideEventTriggers();
 				break;
 			}
+			case Triggers: {
+				this.hideTileCategory();
+				this.showGameTriggers();
+				this.hideEventTriggers();
+				break;
+			}
+			case NonPlayableCharacters: {
+				this.hideTileCategory();
+				this.hideGameTriggers();
+				this.hideEventTriggers();
+				break;
+			}
+			case Events: {
+				this.hideTileCategory();
+				this.hideGameTriggers();
+				this.showEventTriggers();
+				break;
+			}
+			default:
+				return;
 		}
 		super.validate();
+	}
+
+	private void hideEventTriggers() {
+		this.eventTriggersLabel.setVisible(false);
+		this.eventTriggers.setVisible(false);
+		this.eventTriggerEditorInfo.setVisible(false);
+	}
+
+	private void hideGameTriggers() {
+		this.gameTriggersLabel.setVisible(false);
+		this.gameTriggers.setVisible(false);
+		this.gameTriggerEditorInfo.setVisible(false);
 	}
 
 	private void hideTileCategory() {
 		this.tileCategoryLabel.setVisible(false);
 		this.tileCategory.setVisible(false);
 		this.tiles.setVisible(false);
-	}
-
-	private void hideTriggers() {
-		this.triggersLabel.setVisible(false);
-		this.triggers.setVisible(false);
-		this.triggerEditorInfo.setVisible(false);
 	}
 
 	private void loadCategory() {
@@ -201,6 +267,86 @@ public class SelectionDropdownMenu extends JPanel {
 		}
 	}
 
+	private void loadEventTriggers() {
+		this.eventTriggers = new JComboBox<>();
+		this.eventTriggers.setPreferredSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.eventTriggers.setMaximumSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.eventTriggers.setMinimumSize(SelectionDropdownMenu.DropdownMenuSize);
+		new KeySelectionRenderer(this.eventTriggers) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getDisplayValue(Object item) {
+				Trigger t = (Trigger) item;
+				return t.getName();
+			}
+		};
+		this.eventTriggers.addItemListener(e -> {
+			EditorConstants.chooser = Tools.Properties;
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				Trigger t = (Trigger) e.getItem();
+				TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
+				panel.alphaField.setText(Integer.toString(t.getPositionX()));
+				panel.redField.setText(Integer.toString(t.getPositionY()));
+				panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
+				panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
+				SelectionDropdownMenu.this.selectedTrigger = t;
+				SelectionDropdownMenu.this.editor.controlPanel.setSelectedTrigger(t);
+				SelectionDropdownMenu.this.editor.validate();
+			}
+		});
+
+		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.eventTriggers.getModel();
+		List<Trigger> list = EditorConstants.getInstance().getTriggers();
+		if (list.isEmpty()) {
+			Debug.error("The default level editor triggers list shouldn't be empty. It should at least contain Eraser.");
+		}
+		for (Trigger t : list) {
+			if (t != null)
+				model.addElement(t);
+		}
+	}
+
+	private void loadGameTriggers() {
+		this.gameTriggers = new JComboBox<>();
+		this.gameTriggers.setPreferredSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.gameTriggers.setMaximumSize(SelectionDropdownMenu.DropdownMenuSize);
+		this.gameTriggers.setMinimumSize(SelectionDropdownMenu.DropdownMenuSize);
+		new KeySelectionRenderer(this.gameTriggers) {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public String getDisplayValue(Object item) {
+				Trigger t = (Trigger) item;
+				return t.getName();
+			}
+		};
+		this.gameTriggers.addItemListener(e -> {
+			EditorConstants.chooser = Tools.Properties;
+			if (e.getStateChange() == ItemEvent.SELECTED) {
+				Trigger t = (Trigger) e.getItem();
+				TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
+				panel.alphaField.setText(Integer.toString(t.getPositionX()));
+				panel.redField.setText(Integer.toString(t.getPositionY()));
+				panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
+				panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
+				SelectionDropdownMenu.this.selectedTrigger = t;
+				SelectionDropdownMenu.this.editor.controlPanel.setSelectedTrigger(t);
+				SelectionDropdownMenu.this.editor.validate();
+			}
+		});
+
+		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.gameTriggers.getModel();
+		List<Trigger> list = EditorConstants.getInstance().getTriggers();
+		if (list.isEmpty()) {
+			Debug.error("The default level editor triggers list shouldn't be empty. It should at least contain Eraser.");
+		}
+		for (Trigger t : list) {
+			if (t != null)
+				model.addElement(t);
+		}
+	}
+
 	private void loadTiles() {
 		this.tiles = new JComboBox<>();
 		this.tiles.setPreferredSize(SelectionDropdownMenu.DropdownMenuSize);
@@ -237,55 +383,21 @@ public class SelectionDropdownMenu extends JPanel {
 		model.removeAllElements();
 	}
 
-	private void loadTriggers() {
-		this.triggers = new JComboBox<>();
-		this.triggers.setPreferredSize(SelectionDropdownMenu.DropdownMenuSize);
-		this.triggers.setMaximumSize(SelectionDropdownMenu.DropdownMenuSize);
-		this.triggers.setMinimumSize(SelectionDropdownMenu.DropdownMenuSize);
-		new KeySelectionRenderer(this.triggers) {
-			private static final long serialVersionUID = 1L;
+	private void showEventTriggers() {
+		this.eventTriggersLabel.setVisible(true);
+		this.eventTriggers.setVisible(true);
+		this.eventTriggerEditorInfo.setVisible(true);
+	}
 
-			@Override
-			public String getDisplayValue(Object item) {
-				Trigger t = (Trigger) item;
-				return t.getName();
-			}
-		};
-		this.triggers.addItemListener(e -> {
-			EditorConstants.chooser = Tools.Properties;
-			if (e.getStateChange() == ItemEvent.SELECTED) {
-				Trigger t = (Trigger) e.getItem();
-				TilePropertiesPanel panel = SelectionDropdownMenu.this.editor.controlPanel.getPropertiesPanel();
-				panel.alphaField.setText(Integer.toString(t.getPositionX()));
-				panel.redField.setText(Integer.toString(t.getPositionY()));
-				panel.greenField.setText(Integer.toString((t.getTriggerID() >> 8) & 0xFF));
-				panel.blueField.setText(Integer.toString(t.getTriggerID() & 0xFF));
-				SelectionDropdownMenu.this.selectedTrigger = t;
-				SelectionDropdownMenu.this.editor.controlPanel.setSelectedTrigger(t);
-				SelectionDropdownMenu.this.editor.validate();
-			}
-		});
-
-		DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.triggers.getModel();
-		List<Trigger> list = EditorConstants.getInstance().getTriggers();
-		if (list.isEmpty()) {
-			Debug.error("The default level editor triggers list shouldn't be empty. It should at least contain Eraser.");
-		}
-		for (Trigger t : list) {
-			if (t != null)
-				model.addElement(t);
-		}
+	private void showGameTriggers() {
+		this.gameTriggersLabel.setVisible(true);
+		this.gameTriggers.setVisible(true);
+		this.gameTriggerEditorInfo.setVisible(true);
 	}
 
 	private void showTileCategory() {
 		this.tileCategoryLabel.setVisible(true);
 		this.tileCategory.setVisible(true);
 		this.tiles.setVisible(true);
-	}
-
-	private void showTriggers() {
-		this.triggersLabel.setVisible(true);
-		this.triggers.setVisible(true);
-		this.triggerEditorInfo.setVisible(true);
 	}
 }

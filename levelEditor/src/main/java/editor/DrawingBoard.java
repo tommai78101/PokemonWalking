@@ -782,7 +782,7 @@ public class DrawingBoard extends Canvas implements Runnable {
 							blue = this.getMouseTileY();
 						this.tiles[tileIndex] = (data.alpha << 24) | (data.red << 16) | (green << 8) | blue;
 						this.tilesEditorID[tileIndex] = data.editorID;
-						this.triggers.addTriggerById(tileIndex, data.getColorValue(), data.getTileSpecificID(), Trigger.NPC_TRIGGER_ID_NONE);
+						this.triggers.addTriggerById(tileIndex, data.getColorValue(), data.getTileSpecificID(), Trigger.ID_NONE);
 						panel.greenInputField.setText(Integer.toString(green));
 						panel.blueInputField.setText(Integer.toString(blue));
 						panel.greenField.setText(Integer.toString(green));
@@ -920,8 +920,9 @@ public class DrawingBoard extends Canvas implements Runnable {
 					}
 					break;
 				}
-				case Triggers: {
-					// Triggers Editing is subjected to clicking only.
+				case Triggers:
+				case Events: {
+					// Triggers and Events editing are subjected to clicking only.
 					this.mouseOnTileX = this.editor.input.offsetX + this.editor.input.drawingX;
 					this.mouseOnTileY = this.editor.input.offsetY + this.editor.input.drawingY;
 					if (this.mouseOnTileX < 0 || this.mouseOnTileX >= this.bitmapWidth * Tileable.WIDTH || this.mouseOnTileY < 0 || this.mouseOnTileY >= this.bitmapHeight * Tileable.HEIGHT)
@@ -1031,33 +1032,43 @@ public class DrawingBoard extends Canvas implements Runnable {
 				case Tilesets:
 					value = this.tiles[h * this.bitmapWidth + w];
 					break;
-				case Triggers:
-					Trigger first = null;
-					Trigger second = null;
+				case Triggers: {
+					Trigger npc = null;
+					Trigger event = null;
+					Trigger game = null;
 					var keys = this.triggers.getAllTriggers().entrySet();
 					FIRST_LOOP:
 					for (var entry : keys) {
 						Set<Trigger> set = entry.getValue();
 						for (Trigger t : set) {
-							if (t.isNpcTrigger()) {
-								first = t;
-							}
-							else {
-								second = t;
-							}
+							if (t.isNpcTrigger())
+								npc = t;
+							else if (t.isEventTrigger())
+								event = t;
+							else if (!(t.isNpcTrigger() || t.isEventTrigger()))
+								game = t;
 						}
-						if (first != null || second != null)
+						if (npc != null || event != null || game != null)
 							break FIRST_LOOP;
 					}
-					if (first != null && first.isNpcTrigger()) {
-						value = first.getNpcTriggerID();
+					if (npc != null && npc.isNpcTrigger()) {
+						value = npc.getNpcTriggerID();
 						panel.isNpcTriggerBox.setSelected(true);
+						panel.isEventTriggerBox.setSelected(false);
 					}
-					else if (second != null) {
-						value = second.getTriggerID();
+					else if (event != null && event.isEventTrigger()) {
+						value = event.getEventTriggerID();
 						panel.isNpcTriggerBox.setSelected(false);
+						panel.isEventTriggerBox.setSelected(true);
+					}
+					else if (game != null) {
+						// Game trigger
+						value = npc.getGameTriggerID();
+						panel.isNpcTriggerBox.setSelected(false);
+						panel.isEventTriggerBox.setSelected(false);
 					}
 					break;
+				}
 				case NonPlayableCharacters:
 					EditorData npc = this.npcs.get(w, h);
 					if (npc != null) {

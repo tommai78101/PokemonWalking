@@ -39,12 +39,14 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 	public CustomJTextField blueInputField;
 
 	public JCheckBox isNpcTriggerBox;
+	public JCheckBox isEventTriggerBox;
 
 	public int dataValue;
 	public SpriteData selectData;
 	public ControlPanel panel;
 
-	public JLabel areaID, tileID, extendedTileID, tileSpecificID, fullDataInput, npcTriggerField;
+	public JLabel areaID, tileID, extendedTileID, tileSpecificID, fullDataInput;
+	public JLabel npcTriggerField, eventTriggerField;
 
 	private int lastKnownValidAreaID = 0;
 
@@ -57,12 +59,14 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.tileSpecificID = new CustomJLabel("Other ID:");
 		this.fullDataInput = new CustomJLabel("Edit Data:");
 		this.npcTriggerField = new CustomJLabel("For NPC:");
+		this.eventTriggerField = new CustomJLabel("For Event:");
 
 		this.alphaField = new CustomJTextField(); // AA
 		this.redField = new CustomJTextField(); // RR
 		this.greenField = new CustomJTextField(); // GG
 		this.blueField = new CustomJTextField(); // BB
 		this.isNpcTriggerBox = new JCheckBox(); // For NPC triggers only.
+		this.isEventTriggerBox = new JCheckBox(); // For event triggers only.
 
 		this.areaIDInputField = new CustomJTextField();
 		this.alphaInputField = new CustomJTextField();
@@ -75,6 +79,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.extendedTileID.setHorizontalAlignment(SwingConstants.CENTER);
 		this.tileSpecificID.setHorizontalAlignment(SwingConstants.CENTER);
 		this.npcTriggerField.setHorizontalAlignment(SwingConstants.CENTER);
+		this.eventTriggerField.setHorizontalAlignment(SwingConstants.CENTER);
 
 		this.alphaField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.redField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -87,6 +92,7 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		this.greenField.setEditable(false);
 		this.blueField.setEditable(false);
 		this.isNpcTriggerBox.setEnabled(false);
+		this.isEventTriggerBox.setEnabled(false);
 
 		this.areaIDInputField.setHorizontalAlignment(SwingConstants.CENTER);
 		this.alphaInputField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -126,6 +132,9 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 
 		this.add(this.npcTriggerField);
 		this.add(this.isNpcTriggerBox);
+
+		this.add(this.eventTriggerField);
+		this.add(this.isEventTriggerBox);
 
 		this.add(this.fullDataInput);
 		this.add(this.alphaInputField);
@@ -301,6 +310,10 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 		}
 	}
 
+	public boolean isEventTrigger() {
+		return this.isEventTriggerBox.isSelected();
+	}
+
 	/**
 	 * Only for use with EditorConstants Metadata, Triggers.
 	 *
@@ -365,12 +378,15 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.greenInputField.setVisible(true);
 				this.blueInputField.setVisible(true);
 				this.isNpcTriggerBox.setVisible(false);
+				this.isEventTriggerBox.setVisible(false);
 
 				// Label field
 				this.areaID.setVisible(true);
 				this.blueField.setVisible(true);
 				this.npcTriggerField.setVisible(false);
+				this.eventTriggerField.setVisible(false);
 				break;
+			case Events:
 			case Triggers:
 				this.tileID.setText("X Position:");
 				this.extendedTileID.setText("Y Position:");
@@ -382,11 +398,13 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.greenInputField.setVisible(false);
 				this.blueInputField.setVisible(false);
 				this.isNpcTriggerBox.setVisible(true);
+				this.isEventTriggerBox.setVisible(true);
 
 				// Label field
 				this.areaID.setVisible(false);
 				this.blueField.setVisible(true);
 				this.npcTriggerField.setVisible(true);
+				this.eventTriggerField.setVisible(true);
 				break;
 			case NonPlayableCharacters: {
 				this.tileID.setText("NPC Type:");
@@ -399,13 +417,17 @@ public class TilePropertiesPanel extends JPanel implements DocumentListener {
 				this.greenInputField.setVisible(true);
 				this.blueInputField.setVisible(false);
 				this.isNpcTriggerBox.setVisible(false);
+				this.isEventTriggerBox.setVisible(false);
 
 				// Label field
 				this.areaID.setVisible(false);
 				this.blueField.setVisible(false);
 				this.npcTriggerField.setVisible(false);
+				this.eventTriggerField.setVisible(false);
 				break;
 			}
+			default:
+				return;
 		}
 		super.revalidate();
 		super.repaint();

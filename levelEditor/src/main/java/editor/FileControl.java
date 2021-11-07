@@ -41,8 +41,10 @@ public class FileControl extends JPanel implements ActionListener {
 	public static File lastSavedDirectory = null;
 
 	public static final String[] MenuItemTags = {
-		"New", "Save", "Open", "", "Tileset", "Trigger", "NPC", "Script"
+		"New", "Save", "Open", "", "Tileset", "Trigger", "NPC", "Events", "", "Script"
 	};
+	// "Script" button index is always the index of the right-most button.
+	public static final int MenuItem_Script_ButtonIndex = FileControl.MenuItemTags.length - 1;
 
 	private static final long serialVersionUID = 1L;
 	private static final String defaultPath = Paths.get("").toAbsolutePath().toString();
@@ -59,7 +61,7 @@ public class FileControl extends JPanel implements ActionListener {
 		this.setLayout(new GridLayout(1, FileControl.MenuItemTags.length));
 
 		for (int i = 0; i < FileControl.MenuItemTags.length; i++) {
-			if (FileControl.MenuItemTags[i].isEmpty() || FileControl.MenuItemTags[i].equals("")) {
+			if (FileControl.MenuItemTags[i].isEmpty()) {
 				this.add(new JSeparator(SwingConstants.VERTICAL));
 				continue;
 			}
@@ -196,6 +198,10 @@ public class FileControl extends JPanel implements ActionListener {
 					}
 					break;
 				}
+				case 3: {
+					// Shouldn't happen. This is a separator.
+					break;
+				}
 				case 4: { // Tileset
 					EditorConstants.metadata = Metadata.Tilesets;
 					break;
@@ -208,7 +214,15 @@ public class FileControl extends JPanel implements ActionListener {
 					EditorConstants.metadata = Metadata.NonPlayableCharacters;
 					break;
 				}
-				case 7: {// Script editor
+				case 7: { // Event
+					EditorConstants.metadata = Metadata.Events;
+					break;
+				}
+				case 8: {
+					// Shouldn't happen. This is a separator.
+					break;
+				}
+				case 9: {// Script editor
 					if (this.editor.scriptEditor == null) {
 						this.editor.scriptEditor = new ScriptEditor(ScriptEditor.TITLE, this.editor);
 						button.setEnabled(false);
