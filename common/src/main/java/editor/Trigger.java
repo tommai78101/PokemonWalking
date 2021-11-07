@@ -14,6 +14,7 @@ public class Trigger {
 	private static final int FLAG_TriggerScript = 3;
 	private static final int FLAG_NpcTriggerID = 4;
 	private static final int FLAG_EventTriggerID = 5;
+
 	private byte x, y; // This occupies the AR value in the pixel color, ARGB space.
 	private short triggerID; // This occupies the GB value in the pixel color, ARGB space.
 	private short npcTriggerID; // This occupies the GB value in the pixel color, ARGB space.
@@ -40,7 +41,7 @@ public class Trigger {
 
 	public static Trigger createEraser() {
 		Trigger trigger = new Trigger();
-		trigger.setTriggerID((short) 0);
+		trigger.setGameTriggerID((short) 0);
 		trigger.setName("Eraser");
 		return trigger;
 	}
@@ -118,6 +119,10 @@ public class Trigger {
 		return this.eventTriggerID;
 	}
 
+	public short getGameTriggerID() {
+		return this.triggerID;
+	}
+
 	public String getName() {
 		return this.name;
 	}
@@ -143,8 +148,24 @@ public class Trigger {
 		return this.script;
 	}
 
+	/**
+	 * Returns the proper trigger ID value based on what type this trigger is.
+	 * <p>
+	 * Supported types are:
+	 * <ul>
+	 * <li>Game Trigger
+	 * <li>NPC Trigger
+	 * <li>Event Trigger
+	 * </ul>
+	 *
+	 * @return A short value containing the trigger ID value.
+	 */
 	public short getTriggerID() {
-		return this.triggerID;
+		if (this.isNpcTrigger)
+			return this.getNpcTriggerID();
+		if (this.isEventTrigger)
+			return this.getEventTriggerID();
+		return this.getGameTriggerID();
 	}
 
 	@Override
@@ -194,10 +215,12 @@ public class Trigger {
 
 	public void reset() {
 		this.x = this.y = -1;
+		this.name = "<Untitled>";
 		this.triggerID = Trigger.ID_NONE;
 		this.eventTriggerID = Trigger.ID_NONE;
+		this.isEventTrigger = false;
 		this.npcTriggerID = Trigger.ID_NONE;
-		this.name = "<Untitled>";
+		this.isNpcTrigger = false;
 		Arrays.fill(this.valuesHasBeenSet, false);
 	}
 
@@ -218,6 +241,16 @@ public class Trigger {
 			this.valuesHasBeenSet[Trigger.FLAG_TriggerID] = false;
 			this.valuesHasBeenSet[Trigger.FLAG_NpcTriggerID] = false;
 		}
+	}
+
+	public void setGameTriggerID(short value) {
+		// No need to set whether it's a trigger.
+		this.triggerID = value;
+		this.npcTriggerID = Trigger.ID_NONE;
+		this.eventTriggerID = Trigger.ID_NONE;
+		this.valuesHasBeenSet[Trigger.FLAG_TriggerID] = true;
+		this.valuesHasBeenSet[Trigger.FLAG_NpcTriggerID] = false;
+		this.valuesHasBeenSet[Trigger.FLAG_EventTriggerID] = false;
 	}
 
 	public void setName(String name) {
@@ -241,16 +274,6 @@ public class Trigger {
 
 	public void setScript(String script) {
 		this.script = script;
-	}
-
-	public void setTriggerID(short value) {
-		// No need to set whether it's a trigger.
-		this.triggerID = value;
-		this.npcTriggerID = Trigger.ID_NONE;
-		this.eventTriggerID = Trigger.ID_NONE;
-		this.valuesHasBeenSet[Trigger.FLAG_TriggerID] = true;
-		this.valuesHasBeenSet[Trigger.FLAG_NpcTriggerID] = false;
-		this.valuesHasBeenSet[Trigger.FLAG_EventTriggerID] = false;
 	}
 
 	public void setTriggerPositionX(byte x) {

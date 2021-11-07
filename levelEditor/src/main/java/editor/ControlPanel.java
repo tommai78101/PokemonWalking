@@ -171,7 +171,7 @@ public class ControlPanel extends JPanel implements ActionListener {
 			case Triggers: {
 				// Initializing the selected trigger with Eraser.
 				this.selectedTrigger = new Trigger();
-				this.selectedTrigger.setTriggerID((short) 1);
+				this.selectedTrigger.setGameTriggerID((short) 1);
 				this.selectedTrigger.setTriggerPositionX((byte) 0xFF);
 				this.selectedTrigger.setTriggerPositionY((byte) 0xFF);
 				break;

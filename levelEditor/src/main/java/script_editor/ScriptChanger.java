@@ -102,7 +102,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("X Position: "), c);
-
+		
 		c.gridx = 1;
 		c.gridy = 1;
 		c.gridwidth = 1;
@@ -111,7 +111,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.fill = GridBagConstraints.HORIZONTAL;
 		this.add((xField = new JTextField()), c);
 		xField.getDocument().addDocumentListener(this);
-
+		
 		// Third row
 		c.gridx = 0;
 		c.gridy = 2;
@@ -120,7 +120,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		c.weighty = 0.1;
 		c.fill = GridBagConstraints.NONE;
 		this.add(new JLabel("Y Position: "), c);
-
+		
 		c.gridx = 1;
 		c.gridy = 2;
 		c.gridwidth = 1;
@@ -245,7 +245,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 	public JTextField getXField() {
 		return this.xField;
 	}
-
+	
 	public JTextField getYField() {
 		return this.yField;
 	}
@@ -323,10 +323,6 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		super.repaint();
 	}
 
-	public void allowFieldsToUpdate() {
-		this.allowUpdate = true;
-	}
-
 	// DocumentListener
 	@Override
 	public void changedUpdate(DocumentEvent event) {}
@@ -363,10 +359,6 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 		this.isEnabled = false;
 	}
 
-	public void disallowFieldsToUpdate() {
-		this.allowUpdate = false;
-	}
-
 	public void enableComponent() {
 		this.nameField.setEnabled(true);
 		this.idField.setEnabled(true);
@@ -395,10 +387,6 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 
 	public JTextField getNameField() {
 		return this.nameField;
-	}
-
-	public JCheckBox getNpcTriggerFlag() {
-		return this.isNpcTriggerBox;
 	}
 
 	public JTextArea getScriptArea() {
@@ -466,7 +454,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 						if ((!selectedTrigger.isNpcTrigger() && n > 0x0FFFF) || (selectedTrigger.isNpcTrigger() && (n > 0x0FFFF || n == 0x0))) {
 							throw new NumberFormatException();
 						}
-						selectedTrigger.setTriggerID((short) (n & 0xFFFF));
+						selectedTrigger.setGameTriggerID((short) (n & 0xFFFF));
 					}
 				}
 				catch (NumberFormatException e) {
@@ -528,7 +516,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 					// Assume the trigger is reverted to game trigger (not NPC trigger nor event trigger).
 					selectedTrigger.setNpcTrigger(false);
 					selectedTrigger.setNpcTriggerID(Trigger.ID_NONE);
-					selectedTrigger.setTriggerID(Short.parseShort(this.getIDField().getText()));
+					selectedTrigger.setGameTriggerID(Short.parseShort(this.getIDField().getText()));
 				}
 			}
 			else if (checkbox == this.isEventTriggerBox) {
@@ -543,7 +531,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 					// Assume the trigger is reverted to game trigger (not NPC trigger nor event trigger).
 					selectedTrigger.setEventTrigger(false);
 					selectedTrigger.setEventTriggerID(Trigger.ID_NONE);
-					selectedTrigger.setTriggerID(Short.parseShort(this.getIDField().getText()));
+					selectedTrigger.setGameTriggerID(Short.parseShort(this.getIDField().getText()));
 				}
 			}
 		}
@@ -566,7 +554,7 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 				// selectedTrigger.setTriggerPositionY((byte) (Integer.valueOf(test) & 0xFF));
 				test = this.editor.scriptChanger.getIDField().getText();
 				if (!test.isBlank())
-					selectedTrigger.setTriggerID((short) (Integer.valueOf(test) & 0xFFFF));
+					selectedTrigger.setGameTriggerID((short) (Integer.valueOf(test) & 0xFFFF));
 				test = this.editor.scriptChanger.getScriptArea().getText();
 				if (!test.isBlank())
 					selectedTrigger.setScript(test);
@@ -590,6 +578,20 @@ public class ScriptChanger extends JPanel implements ActionListener, ItemListene
 			this.enableComponent();
 		else
 			this.disableComponent();
+	}
+
+	public void updateTriggerFields(Trigger selectedTrigger) {
+		if (selectedTrigger == null)
+			return;
+		this.allowUpdate = false;
+		{
+			this.nameField.setText(selectedTrigger.getName());
+			this.idField.setText(Short.toString(selectedTrigger.getTriggerID()));
+			this.isNpcTriggerBox.setSelected(selectedTrigger.isNpcTrigger());
+			this.isEventTriggerBox.setSelected(selectedTrigger.isEventTrigger());
+			this.scriptArea.setText(selectedTrigger.getScript());
+		}
+		this.allowUpdate = true;
 	}
 
 	private JPanel constructDialogues() {

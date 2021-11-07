@@ -358,7 +358,7 @@ public class EditorConstants {
 						trigger.setChecksum(checksum);
 					int value = Integer.parseInt(ScriptTags.TriggerScript.removeScriptTag(line));
 					if (value != 0) {
-						trigger.setTriggerID((short) (value & 0xFFFF));
+						trigger.setGameTriggerID((short) (value & 0xFFFF));
 					}
 					else {
 						// Ignore the trigger value that's equal to 0. This is the Eraser.

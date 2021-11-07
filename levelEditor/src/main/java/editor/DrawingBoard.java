@@ -1032,33 +1032,43 @@ public class DrawingBoard extends Canvas implements Runnable {
 				case Tilesets:
 					value = this.tiles[h * this.bitmapWidth + w];
 					break;
-				case Triggers:
-					Trigger first = null;
-					Trigger second = null;
+				case Triggers: {
+					Trigger npc = null;
+					Trigger event = null;
+					Trigger game = null;
 					var keys = this.triggers.getAllTriggers().entrySet();
 					FIRST_LOOP:
 					for (var entry : keys) {
 						Set<Trigger> set = entry.getValue();
 						for (Trigger t : set) {
-							if (t.isNpcTrigger()) {
-								first = t;
-							}
-							else {
-								second = t;
-							}
+							if (t.isNpcTrigger())
+								npc = t;
+							else if (t.isEventTrigger())
+								event = t;
+							else if (!(t.isNpcTrigger() || t.isEventTrigger()))
+								game = t;
 						}
-						if (first != null || second != null)
+						if (npc != null || event != null || game != null)
 							break FIRST_LOOP;
 					}
-					if (first != null && first.isNpcTrigger()) {
-						value = first.getNpcTriggerID();
+					if (npc != null && npc.isNpcTrigger()) {
+						value = npc.getNpcTriggerID();
 						panel.isNpcTriggerBox.setSelected(true);
+						panel.isEventTriggerBox.setSelected(false);
 					}
-					else if (second != null) {
-						value = second.getTriggerID();
+					else if (event != null && event.isEventTrigger()) {
+						value = event.getEventTriggerID();
 						panel.isNpcTriggerBox.setSelected(false);
+						panel.isEventTriggerBox.setSelected(true);
+					}
+					else if (game != null) {
+						// Game trigger
+						value = npc.getGameTriggerID();
+						panel.isNpcTriggerBox.setSelected(false);
+						panel.isEventTriggerBox.setSelected(false);
 					}
 					break;
+				}
 				case NonPlayableCharacters:
 					EditorData npc = this.npcs.get(w, h);
 					if (npc != null) {

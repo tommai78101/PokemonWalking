@@ -8,11 +8,10 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.ListModel;
 
 import common.Debug;
 import editor.EditorConstants.Tools;
@@ -125,21 +124,30 @@ public class SelectionDropdownMenu extends JPanel {
 		return this.gameTriggers;
 	}
 
-	public void reloadTriggers() {
-		if (this.gameTriggers != null) {
-			DefaultComboBoxModel<Trigger> model = (DefaultComboBoxModel<Trigger>) this.gameTriggers.getModel();
-			model.removeAllElements();
+	public void reloadTriggers(ListModel<Trigger> scriptModel) {
+		// If any of the trigger combo box models are null, we do not reload anything.
+		if (this.gameTriggers == null || this.eventTriggers == null) {
+			Debug.warn("Unable to reload game and/or event triggers.");
+			return;
+		}
 
-			Trigger trigger = new Trigger();
-			trigger.setTriggerID((short) 0);
-			trigger.setName("Eraser");
-			model.addElement(trigger);
+		DefaultComboBoxModel<Trigger> triggerModel = (DefaultComboBoxModel<Trigger>) this.gameTriggers.getModel();
+		DefaultComboBoxModel<Trigger> eventModel = (DefaultComboBoxModel<Trigger>) this.eventTriggers.getModel();
+		triggerModel.removeAllElements();
+		eventModel.removeAllElements();
 
-			JList<Trigger> list = this.editor.scriptEditor.scriptViewer.getTriggerList();
-			DefaultListModel<Trigger> scriptModel = (DefaultListModel<Trigger>) list.getModel();
-			for (int i = 0; i < scriptModel.getSize(); i++) {
-				model.addElement(scriptModel.get(i));
-			}
+		Trigger trigger = new Trigger();
+		trigger.setGameTriggerID((short) 0);
+		trigger.setName("Eraser");
+		triggerModel.addElement(trigger);
+		eventModel.addElement(trigger);
+
+		for (int i = 0; i < scriptModel.getSize(); i++) {
+			Trigger elem = scriptModel.getElementAt(i);
+			if (elem.isEventTrigger())
+				eventModel.addElement(elem);
+			else
+				triggerModel.addElement(elem);
 		}
 	}
 
