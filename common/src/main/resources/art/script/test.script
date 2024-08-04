@@ -1,0 +1,54 @@
+{
+   "data": [
+      {
+         "sequence": [
+            {
+               "type": "Speech",
+               "content": "asdasdas",
+               "order": 1
+            },
+            {
+               "type": "Speech",
+               "content": "asfasdfa",
+               "order": 2
+            },
+            {
+               "type": "Question",
+               "content": "asfasfasf",
+               "order": 3
+            }
+         ],
+         "name": "asdasdasd",
+         "triggerType": "scene",
+         "id": "1"
+      },
+      {
+         "sequence": [
+            {
+               "type": "Speech",
+               "content": "sgsdgsdg",
+               "order": 1
+            },
+            {
+               "type": "Question",
+               "content": "shsdhsdhsd",
+               "order": 2
+            },
+            {
+               "type": "Question",
+               "content": "sdhsdhsdhsdh",
+               "order": 3
+            },
+            {
+               "type": "Cancel",
+               "content": "sdhsdhsdgs",
+               "order": 4
+            }
+         ],
+         "name": "dfhdfhdfh",
+         "triggerType": "npc",
+         "id": "2"
+      }
+   ],
+   "checksum": "e5998d239424bd43"
+}
