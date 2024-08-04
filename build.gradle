@@ -4,6 +4,9 @@ plugins {
 
 //This applies to all sub-projects as well as the root project
 allprojects {
+	apply plugin: 'java'
+	sourceCompatibility = "17"
+	targetCompatibility = "21"
 	repositories {
 		mavenCentral()
 	}
