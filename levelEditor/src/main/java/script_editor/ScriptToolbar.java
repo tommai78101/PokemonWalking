@@ -176,7 +176,7 @@ public class ScriptToolbar extends JPanel implements ActionListener {
 		triggerComboModel.removeAllElements();
 
 		Trigger trigger = new Trigger();
-		trigger.setTriggerID((short) 0);
+		trigger.setGameTriggerID((short) 0);
 		trigger.setName("Eraser");
 		triggerComboModel.addElement(trigger);
 		triggerComboBox.setSelectedIndex(0);

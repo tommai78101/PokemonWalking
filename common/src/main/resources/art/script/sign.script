@@ -1,0 +1,13 @@
+{
+   "data": [{
+      "sequence": [{
+         "index": 1,
+         "type": "Speech",
+         "content": "Hello World 2."
+      }],
+      "name": "NPC",
+      "triggerType": "npc",
+      "id": "1"
+   }],
+   "checksum": "eb7280781bb89cfb"
+}

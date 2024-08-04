@@ -1,0 +1,35 @@
+{
+   "data": [
+      {
+         "sequence": [{
+            "index": 1,
+            "type": "Speech",
+            "content": "This is an event."
+         }],
+         "name": "Event",
+         "triggerType": "event",
+         "id": "1"
+      },
+      {
+         "sequence": [{
+            "index": 1,
+            "type": "Speech",
+            "content": "This is an in-game script."
+         }],
+         "name": "Game Trigger",
+         "triggerType": "game",
+         "id": "1"
+      },
+      {
+         "sequence": [{
+            "index": 1,
+            "type": "Speech",
+            "content": "This is an NPC trigger."
+         }],
+         "name": "NPC trigger",
+         "triggerType": "npc",
+         "id": "0"
+      }
+   ],
+   "checksum": "3ff6e3cf59f156bd"
+}

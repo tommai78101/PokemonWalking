@@ -32,10 +32,10 @@ public class ControlPanel extends JPanel implements ActionListener {
 	private LevelEditor editor; // reference to parent
 	private SpriteData selectedData; // reference to selected data.
 	private Trigger selectedTrigger; // reference to selected trigger.
-	private JPanel iconsPanel; // The small square icon buttons on the right of the Level Editor
-	private JPanel npcsPanel; // Same small square icon buttons panel, but for NPCs.
-	private JScrollPane scrollIconsPanel;
-	private JScrollPane scrollNpcsPanel;
+	private JPanel iconsPanel; // The small square icon buttons on the left of the Level Editor
+	private JPanel npcsPanel; // Same small square NPC buttons panel on the left of the Level Editor.
+	private JScrollPane scrollIconsPanel; // The scroll panel of the icon buttons.
+	private JScrollPane scrollNpcsPanel; // The scroll panel of the NPC buttons.
 
 	public ControlPanel(LevelEditor editor) {
 		this.editor = editor;
@@ -167,13 +167,17 @@ public class ControlPanel extends JPanel implements ActionListener {
 				}
 				break;
 			}
+			case Events:
 			case Triggers: {
+				// Initializing the selected trigger with Eraser.
 				this.selectedTrigger = new Trigger();
-				this.selectedTrigger.setTriggerID((short) 1);
-				this.selectedTrigger.setTriggerPositionX((byte) 0x1);
-				this.selectedTrigger.setTriggerPositionY((byte) 0x1);
+				this.selectedTrigger.setGameTriggerID((short) 1);
+				this.selectedTrigger.setTriggerPositionX((byte) 0xFF);
+				this.selectedTrigger.setTriggerPositionY((byte) 0xFF);
 				break;
 			}
+			default:
+				return;
 		}
 		this.editor.validate();
 	}
@@ -222,38 +226,51 @@ public class ControlPanel extends JPanel implements ActionListener {
 	public void validate() {
 		switch (EditorConstants.metadata) {
 			case Tilesets:
-				this.iconsPanel.setVisible(true);
-				this.iconsPanel.setEnabled(true);
-				this.npcsPanel.setVisible(false);
-				this.npcsPanel.setEnabled(false);
-				this.scrollIconsPanel.setVisible(true);
-				this.scrollNpcsPanel.setVisible(false);
-				this.scrollIconsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-				this.scrollNpcsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				this.setIconsPanelVisible(true);
+				this.setNpcsPanelVisible(false);
+				this.setScrollIconsPanelVisible(true);
+				this.setScrollNpcsPanelVisible(false);
 				break;
+			case Events:
 			case Triggers:
-				this.iconsPanel.setVisible(false);
-				this.iconsPanel.setEnabled(false);
-				this.npcsPanel.setVisible(false);
-				this.npcsPanel.setEnabled(false);
-				this.scrollIconsPanel.setVisible(false);
-				this.scrollNpcsPanel.setVisible(false);
-				this.scrollIconsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-				this.scrollNpcsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+				this.setIconsPanelVisible(false);
+				this.setNpcsPanelVisible(false);
+				this.setScrollIconsPanelVisible(false);
+				this.setScrollNpcsPanelVisible(false);
 				break;
 			case NonPlayableCharacters: {
-				this.iconsPanel.setVisible(false);
-				this.iconsPanel.setEnabled(false);
-				this.npcsPanel.setVisible(true);
-				this.npcsPanel.setEnabled(true);
-				this.scrollIconsPanel.setVisible(false);
-				this.scrollNpcsPanel.setVisible(true);
-				this.scrollIconsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-				this.scrollNpcsPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+				this.setIconsPanelVisible(false);
+				this.setNpcsPanelVisible(true);
+				this.setScrollIconsPanelVisible(false);
+				this.setScrollNpcsPanelVisible(true);
 				break;
 			}
+			default:
+				return;
 		}
 		super.revalidate();
 		super.repaint();
+	}
+
+	private void setIconsPanelVisible(boolean value) {
+		this.iconsPanel.setVisible(value);
+		this.iconsPanel.setEnabled(value);
+	}
+
+	private void setNpcsPanelVisible(boolean value) {
+		this.npcsPanel.setVisible(value);
+		this.npcsPanel.setEnabled(value);
+	}
+
+	private void setScrollIconsPanelVisible(boolean value) {
+		this.scrollIconsPanel.setVisible(value);
+		int policy = value ? ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER;
+		this.scrollIconsPanel.setVerticalScrollBarPolicy(policy);
+	}
+
+	private void setScrollNpcsPanelVisible(boolean value) {
+		this.scrollNpcsPanel.setVisible(value);
+		int policy = value ? ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS : ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER;
+		this.scrollNpcsPanel.setVerticalScrollBarPolicy(policy);
 	}
 }
